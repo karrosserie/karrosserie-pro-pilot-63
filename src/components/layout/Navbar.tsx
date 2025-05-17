@@ -49,7 +49,7 @@ const Navbar = ({ onToggleSidebar, isSidebarOpen = false }: NavbarProps) => {
             <Menu className="h-5 w-5" />
           </Button>
           
-          {/* Only show logo in navbar when sidebar is not open on desktop */}
+          {/* Only show logo in navbar when sidebar is collapsed */}
           {!isSidebarOpen && (
             <Link to="/" className="flex items-center">
               <span className="text-xl font-bold text-karrosserie-orange">
