@@ -45,7 +45,7 @@ const DocumentItem = ({
         <Button variant="outline" size="sm" className="mb-2 w-full">
           Voir
         </Button>
-        <Button className="btn-primary" size="sm" className="w-full">
+        <Button size="sm" className="w-full">
           Éditer
         </Button>
       </div>

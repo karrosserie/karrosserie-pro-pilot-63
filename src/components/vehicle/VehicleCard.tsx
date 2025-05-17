@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Car, Calendar, Tool } from 'lucide-react';
+import { Car, Calendar, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface VehicleCardProps {
@@ -73,7 +73,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
         </div>
         
         <div className="flex items-center mt-2 text-sm text-gray-600">
-          <Tool className="h-4 w-4 mr-1" />
+          <User className="h-4 w-4 mr-1" />
           <span>Client: {owner}</span>
         </div>
       </div>
