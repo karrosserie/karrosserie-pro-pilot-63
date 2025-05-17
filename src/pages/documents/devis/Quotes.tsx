@@ -11,6 +11,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Trash } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // Données mockées pour les devis
 const mockQuotes = [
@@ -54,6 +55,9 @@ const mockQuotes = [
 
 const Quotes = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
+  const [selectedQuote, setSelectedQuote] = useState<any>(null);
   
   const filteredQuotes = mockQuotes.filter(quote => 
     quote.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -72,6 +76,29 @@ const Quotes = () => {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const handleCreateQuote = () => {
+    setSelectedQuote(null);
+    setDialogMode('create');
+    setDialogOpen(true);
+  };
+
+  const handleViewQuote = (quote: any) => {
+    setSelectedQuote(quote);
+    setDialogMode('view');
+    setDialogOpen(true);
+  };
+
+  const handleEditQuote = (quote: any) => {
+    setSelectedQuote(quote);
+    setDialogMode('edit');
+    setDialogOpen(true);
+  };
+
+  const handleQuoteSubmit = (data: any) => {
+    console.log('Quote data submitted:', data);
+    setDialogOpen(false);
   };
   
   return (
@@ -114,7 +141,10 @@ const Quotes = () => {
             <Filter className="h-4 w-4" />
           </Button>
           
-          <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
+          <Button 
+            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+            onClick={handleCreateQuote}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Nouveau devis
           </Button>
@@ -150,13 +180,13 @@ const Quotes = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-1">
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" onClick={() => handleViewQuote(quote)}>
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon">
                         <Download className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" onClick={() => handleEditQuote(quote)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
@@ -182,6 +212,59 @@ const Quotes = () => {
           </TableBody>
         </Table>
       </div>
+
+      {/* Quote Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>
+              {dialogMode === 'create' ? 'Nouveau devis' : dialogMode === 'edit' ? 'Modifier le devis' : 'Détails du devis'}
+            </DialogTitle>
+            <DialogDescription>
+              {dialogMode === 'create' ? 'Créer un nouveau devis.' : dialogMode === 'edit' ? 'Modifier les informations du devis.' : ''}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            {/* Quote form would go here in a real implementation */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label htmlFor="reference" className="text-sm font-medium">Référence</label>
+                <Input id="reference" defaultValue={selectedQuote?.reference} readOnly={dialogMode === 'view'} />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="date" className="text-sm font-medium">Date</label>
+                <Input id="date" type="date" defaultValue={selectedQuote?.date} readOnly={dialogMode === 'view'} />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="client" className="text-sm font-medium">Client</label>
+                <Input id="client" defaultValue={selectedQuote?.client} readOnly={dialogMode === 'view'} />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="vehicle" className="text-sm font-medium">Véhicule</label>
+                <Input id="vehicle" defaultValue={selectedQuote?.vehicle} readOnly={dialogMode === 'view'} />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="amount" className="text-sm font-medium">Montant</label>
+                <Input id="amount" defaultValue={selectedQuote?.amount} readOnly={dialogMode === 'view'} />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="status" className="text-sm font-medium">Statut</label>
+                <Input id="status" defaultValue={selectedQuote?.status} readOnly={dialogMode === 'view'} />
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button variant="outline" onClick={() => setDialogOpen(false)}>
+                {dialogMode === 'view' ? 'Fermer' : 'Annuler'}
+              </Button>
+              {dialogMode !== 'view' && (
+                <Button onClick={() => handleQuoteSubmit(selectedQuote)}>
+                  {dialogMode === 'create' ? 'Créer' : 'Enregistrer'}
+                </Button>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

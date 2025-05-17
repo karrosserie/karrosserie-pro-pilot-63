@@ -10,7 +10,8 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Trash } from 'lucide-react';
+import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Trash, Upload } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // Données mockées pour les PV d'expertise
 const mockReports = [
@@ -48,6 +49,7 @@ const mockReports = [
 
 const ExpertiseReports = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
   
   const filteredReports = mockReports.filter(report => 
     report.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -108,9 +110,12 @@ const ExpertiseReports = () => {
             <Filter className="h-4 w-4" />
           </Button>
           
-          <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
-            <Plus className="h-4 w-4 mr-2" />
-            Nouveau PV
+          <Button 
+            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+            onClick={() => setImportDialogOpen(true)}
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Importer un PV
           </Button>
         </div>
       </div>
@@ -178,6 +183,49 @@ const ExpertiseReports = () => {
           </TableBody>
         </Table>
       </div>
+
+      {/* Import PV Dialog */}
+      <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Importer un PV d'expertise</DialogTitle>
+            <DialogDescription>
+              Importez un procès verbal d'expertise au format PDF.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="flex flex-col gap-2">
+              <label htmlFor="pv-upload" className="text-sm font-medium">
+                Fichier PDF
+              </label>
+              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                <div className="space-y-1 text-center">
+                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                  <div className="flex text-sm text-gray-600">
+                    <label
+                      htmlFor="pv-upload"
+                      className="relative cursor-pointer bg-white rounded-md font-medium text-karrosserie-orange hover:text-karrosserie-orange/80"
+                    >
+                      <span>Télécharger un fichier</span>
+                      <input id="pv-upload" name="pv-upload" type="file" className="sr-only" accept=".pdf" />
+                    </label>
+                    <p className="pl-1">ou glisser-déposer</p>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    PDF jusqu'à 10MB
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setImportDialogOpen(false)}>
+                Annuler
+              </Button>
+              <Button>Importer</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -103,9 +103,9 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
       ]
     },
     { icon: <Car className="app-icon" />, label: 'Véhicules', path: '/vehicles' },
+    { icon: <CreditCard className="app-icon" />, label: 'Cession de créance', path: '/cessions' },
     { icon: <Clock className="app-icon" />, label: 'Véhicules de courtoisie', path: '/fleet' },
     { icon: <Receipt className="app-icon" />, label: 'Comptabilité', path: '/accounting' },
-    { icon: <CreditCard className="app-icon" />, label: 'Cession de créance', path: '/cessions' },
     { icon: <Settings className="app-icon" />, label: 'Paramètres', path: '/settings' },
   ];
 

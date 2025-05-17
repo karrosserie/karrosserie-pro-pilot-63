@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Search, UserPlus } from 'lucide-react';
+import ClientDialog from './ClientDialog';
 
 // Données mockées pour l'exemple
 const mockClients = [
@@ -13,6 +14,34 @@ const mockClients = [
 ];
 
 const ClientList = () => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
+  const [selectedClient, setSelectedClient] = useState<any>(null);
+
+  const handleCreateClient = () => {
+    setSelectedClient(null);
+    setDialogMode('create');
+    setDialogOpen(true);
+  };
+
+  const handleViewClient = (client: any) => {
+    setSelectedClient(client);
+    setDialogMode('view');
+    setDialogOpen(true);
+  };
+
+  const handleEditClient = (client: any) => {
+    setSelectedClient(client);
+    setDialogMode('edit');
+    setDialogOpen(true);
+  };
+
+  const handleClientSubmit = (data: any) => {
+    // Logic to handle client creation or update
+    console.log('Client data submitted:', data);
+    // In a real app, you would update the state or call an API
+  };
+
   return (
     <div className="card-container animate-fade-in">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
@@ -28,7 +57,7 @@ const ClientList = () => {
             />
           </div>
           
-          <Button className="btn-primary">
+          <Button className="btn-primary" onClick={handleCreateClient}>
             <UserPlus className="h-4 w-4 mr-2" />
             Nouveau client
           </Button>
@@ -58,10 +87,10 @@ const ClientList = () => {
                   </span>
                 </td>
                 <td className="px-4 py-3 text-right space-x-2">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" onClick={() => handleViewClient(client)}>
                     Voir
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => handleEditClient(client)}>
                     Éditer
                   </Button>
                 </td>
@@ -78,6 +107,29 @@ const ClientList = () => {
           <Button variant="outline" size="sm" disabled>Suivant</Button>
         </div>
       </div>
+
+      {/* Client Dialog */}
+      <ClientDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        title={
+          dialogMode === 'create' 
+            ? 'Ajouter un client' 
+            : dialogMode === 'edit' 
+            ? 'Modifier le client' 
+            : 'Détails du client'
+        }
+        description={
+          dialogMode === 'create' 
+            ? 'Saisissez les informations du nouveau client.'
+            : dialogMode === 'edit'
+            ? 'Modifiez les informations du client.'
+            : ''
+        }
+        defaultValues={selectedClient}
+        onSubmit={handleClientSubmit}
+        mode={dialogMode}
+      />
     </div>
   );
 };

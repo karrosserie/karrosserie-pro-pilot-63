@@ -11,6 +11,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Trash } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // Données mockées pour les ordres de réparation
 const mockOrders = [
@@ -48,6 +49,9 @@ const mockOrders = [
 
 const RepairOrders = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
   
   const filteredOrders = mockOrders.filter(order => 
     order.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -66,6 +70,29 @@ const RepairOrders = () => {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const handleCreateOrder = () => {
+    setSelectedOrder(null);
+    setDialogMode('create');
+    setDialogOpen(true);
+  };
+
+  const handleViewOrder = (order: any) => {
+    setSelectedOrder(order);
+    setDialogMode('view');
+    setDialogOpen(true);
+  };
+
+  const handleEditOrder = (order: any) => {
+    setSelectedOrder(order);
+    setDialogMode('edit');
+    setDialogOpen(true);
+  };
+
+  const handleOrderSubmit = (data: any) => {
+    console.log('Order data submitted:', data);
+    setDialogOpen(false);
   };
   
   return (
@@ -108,7 +135,10 @@ const RepairOrders = () => {
             <Filter className="h-4 w-4" />
           </Button>
           
-          <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
+          <Button 
+            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+            onClick={handleCreateOrder}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Nouvel ordre
           </Button>
@@ -146,13 +176,13 @@ const RepairOrders = () => {
                   <TableCell>{order.deadline}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-1">
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" onClick={() => handleViewOrder(order)}>
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon">
                         <Download className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" onClick={() => handleEditOrder(order)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
@@ -178,6 +208,63 @@ const RepairOrders = () => {
           </TableBody>
         </Table>
       </div>
+
+      {/* Repair Order Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>
+              {dialogMode === 'create' ? 'Nouvel ordre de réparation' : dialogMode === 'edit' ? 'Modifier l\'ordre de réparation' : 'Détails de l\'ordre de réparation'}
+            </DialogTitle>
+            <DialogDescription>
+              {dialogMode === 'create' ? 'Créer un nouvel ordre de réparation.' : dialogMode === 'edit' ? 'Modifier les informations de l\'ordre de réparation.' : ''}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            {/* Order form would go here in a real implementation */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label htmlFor="reference" className="text-sm font-medium">Référence</label>
+                <Input id="reference" defaultValue={selectedOrder?.reference} readOnly={dialogMode === 'view'} />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="date" className="text-sm font-medium">Date</label>
+                <Input id="date" type="date" defaultValue={selectedOrder?.date} readOnly={dialogMode === 'view'} />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="client" className="text-sm font-medium">Client</label>
+                <Input id="client" defaultValue={selectedOrder?.client} readOnly={dialogMode === 'view'} />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="vehicle" className="text-sm font-medium">Véhicule</label>
+                <Input id="vehicle" defaultValue={selectedOrder?.vehicle} readOnly={dialogMode === 'view'} />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="amount" className="text-sm font-medium">Montant</label>
+                <Input id="amount" defaultValue={selectedOrder?.amount} readOnly={dialogMode === 'view'} />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="status" className="text-sm font-medium">Statut</label>
+                <Input id="status" defaultValue={selectedOrder?.status} readOnly={dialogMode === 'view'} />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="deadline" className="text-sm font-medium">Échéance</label>
+                <Input id="deadline" defaultValue={selectedOrder?.deadline} readOnly={dialogMode === 'view'} />
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button variant="outline" onClick={() => setDialogOpen(false)}>
+                {dialogMode === 'view' ? 'Fermer' : 'Annuler'}
+              </Button>
+              {dialogMode !== 'view' && (
+                <Button onClick={() => handleOrderSubmit(selectedOrder)}>
+                  {dialogMode === 'create' ? 'Créer' : 'Enregistrer'}
+                </Button>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
