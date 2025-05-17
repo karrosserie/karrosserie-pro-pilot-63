@@ -20,19 +20,19 @@ const ClientForm: React.FC<ClientFormProps> = ({
   onCancel
 }) => {
   const [formData, setFormData] = useState({
-    firstName: defaultValues.firstName || '',
-    lastName: defaultValues.lastName || '',
-    email: defaultValues.email || '',
-    phone: defaultValues.phone || '',
-    address: defaultValues.address || '',
-    city: defaultValues.city || '',
-    zipCode: defaultValues.zipCode || '',
-    company: defaultValues.company || '',
-    driverLicenseImage: defaultValues.driverLicenseImage || null
+    firstName: defaultValues?.firstName || '',
+    lastName: defaultValues?.lastName || '',
+    email: defaultValues?.email || '',
+    phone: defaultValues?.phone || '',
+    address: defaultValues?.address || '',
+    city: defaultValues?.city || '',
+    zipCode: defaultValues?.zipCode || '',
+    company: defaultValues?.company || '',
+    driverLicenseImage: defaultValues?.driverLicenseImage || null
   });
 
   const [driverLicensePreview, setDriverLicensePreview] = useState<string | null>(
-    defaultValues.driverLicenseImage || null
+    defaultValues?.driverLicenseImage || null
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

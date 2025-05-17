@@ -46,7 +46,7 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
         </DialogHeader>
         <ClientForm 
           onSubmit={handleSubmit}
-          defaultValues={defaultValues}
+          defaultValues={defaultValues || {}}
           isViewMode={mode === 'view'}
           onCancel={handleCancel}
         />
