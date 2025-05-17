@@ -14,6 +14,15 @@ import Clients from "./pages/Clients";
 import Vehicles from "./pages/Vehicles";
 import Documents from "./pages/Documents";
 import Fleet from "./pages/Fleet";
+import Settings from "./pages/Settings";
+import Accounting from "./pages/Accounting";
+import Cessions from "./pages/Cessions";
+
+// Document pages
+import ExpertiseReports from "./pages/documents/expertise/ExpertiseReports";
+import Quotes from "./pages/documents/devis/Quotes";
+import RepairOrders from "./pages/documents/ordres/RepairOrders";
+import Invoices from "./pages/documents/factures/Invoices";
 
 // Layout Components
 import Navbar from "./components/layout/Navbar";
@@ -89,10 +98,66 @@ const App = () => (
             } 
           />
           <Route 
+            path="/documents/expertise" 
+            element={
+              <AppLayout>
+                <ExpertiseReports />
+              </AppLayout>
+            } 
+          />
+          <Route 
+            path="/documents/devis" 
+            element={
+              <AppLayout>
+                <Quotes />
+              </AppLayout>
+            } 
+          />
+          <Route 
+            path="/documents/ordres" 
+            element={
+              <AppLayout>
+                <RepairOrders />
+              </AppLayout>
+            } 
+          />
+          <Route 
+            path="/documents/factures" 
+            element={
+              <AppLayout>
+                <Invoices />
+              </AppLayout>
+            } 
+          />
+          <Route 
             path="/fleet" 
             element={
               <AppLayout>
                 <Fleet />
+              </AppLayout>
+            } 
+          />
+          <Route 
+            path="/accounting" 
+            element={
+              <AppLayout>
+                <Accounting />
+              </AppLayout>
+            } 
+          />
+          <Route 
+            path="/cessions" 
+            element={
+              <AppLayout>
+                <Cessions />
+              </AppLayout>
+            } 
+          />
+          <Route 
+            path="/settings" 
+            element={
+              <AppLayout>
+                <Settings />
               </AppLayout>
             } 
           />
