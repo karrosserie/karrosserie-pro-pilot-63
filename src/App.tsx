@@ -3,9 +3,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 
 // Pages
 import Index from "./pages/Index";
@@ -17,6 +18,7 @@ import Fleet from "./pages/Fleet";
 import Settings from "./pages/Settings";
 import Accounting from "./pages/Accounting";
 import Cessions from "./pages/Cessions";
+import Auth from "./pages/Auth";
 
 // Document pages
 import ExpertiseReports from "./pages/documents/expertise/ExpertiseReports";
@@ -29,6 +31,27 @@ import Navbar from "./components/layout/Navbar";
 import Sidebar from "./components/layout/Sidebar";
 
 const queryClient = new QueryClient();
+
+// Composant pour protéger les routes
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    // Afficher un écran de chargement pendant la vérification de l'authentification
+    return (
+      <div className="flex h-screen w-screen items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-karrosserie-orange"></div>
+      </div>
+    );
+  }
+  
+  // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  return <>{children}</>;
+};
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const isMobile = useIsMobile();
@@ -58,112 +81,144 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// Wrapper pour ajouter l'AuthProvider autour des routes
+const AppWithAuth = () => (
+  <BrowserRouter>
+    <AuthProvider>
+      <Routes>
+        <Route path="/auth" element={<Auth />} />
+        <Route 
+          path="/" 
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Index />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/clients" 
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Clients />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/vehicles" 
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Vehicles />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/documents" 
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Documents />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/documents/expertise" 
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <ExpertiseReports />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/documents/devis" 
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Quotes />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/documents/ordres" 
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <RepairOrders />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/documents/factures" 
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Invoices />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/fleet" 
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Fleet />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/accounting" 
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Accounting />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/cessions" 
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Cessions />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/settings" 
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Settings />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </AuthProvider>
+  </BrowserRouter>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route 
-            path="/" 
-            element={
-              <AppLayout>
-                <Index />
-              </AppLayout>
-            } 
-          />
-          <Route 
-            path="/clients" 
-            element={
-              <AppLayout>
-                <Clients />
-              </AppLayout>
-            } 
-          />
-          <Route 
-            path="/vehicles" 
-            element={
-              <AppLayout>
-                <Vehicles />
-              </AppLayout>
-            } 
-          />
-          <Route 
-            path="/documents" 
-            element={
-              <AppLayout>
-                <Documents />
-              </AppLayout>
-            } 
-          />
-          <Route 
-            path="/documents/expertise" 
-            element={
-              <AppLayout>
-                <ExpertiseReports />
-              </AppLayout>
-            } 
-          />
-          <Route 
-            path="/documents/devis" 
-            element={
-              <AppLayout>
-                <Quotes />
-              </AppLayout>
-            } 
-          />
-          <Route 
-            path="/documents/ordres" 
-            element={
-              <AppLayout>
-                <RepairOrders />
-              </AppLayout>
-            } 
-          />
-          <Route 
-            path="/documents/factures" 
-            element={
-              <AppLayout>
-                <Invoices />
-              </AppLayout>
-            } 
-          />
-          <Route 
-            path="/fleet" 
-            element={
-              <AppLayout>
-                <Fleet />
-              </AppLayout>
-            } 
-          />
-          <Route 
-            path="/accounting" 
-            element={
-              <AppLayout>
-                <Accounting />
-              </AppLayout>
-            } 
-          />
-          <Route 
-            path="/cessions" 
-            element={
-              <AppLayout>
-                <Cessions />
-              </AppLayout>
-            } 
-          />
-          <Route 
-            path="/settings" 
-            element={
-              <AppLayout>
-                <Settings />
-              </AppLayout>
-            } 
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <AppWithAuth />
     </TooltipProvider>
   </QueryClientProvider>
 );

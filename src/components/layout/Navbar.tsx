@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, Menu, Search, User, Upload, X } from 'lucide-react';
+import { Bell, Menu, Search, User, Upload, X, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
   DropdownMenu,
@@ -19,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useAuth } from '@/contexts/AuthContext';
 
 interface NavbarProps {
   onToggleSidebar: () => void;
@@ -28,6 +29,7 @@ interface NavbarProps {
 const Navbar = ({ onToggleSidebar, isSidebarOpen = false }: NavbarProps) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const { signOut, user, profile } = useAuth();
 
   // Données mockées pour les alertes
   const notifications = [
@@ -130,7 +132,9 @@ const Navbar = ({ onToggleSidebar, isSidebarOpen = false }: NavbarProps) => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
+              <DropdownMenuLabel>
+                {profile ? `${profile.first_name} ${profile.last_name}` : 'Mon compte'}
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem>
@@ -145,7 +149,8 @@ const Navbar = ({ onToggleSidebar, isSidebarOpen = false }: NavbarProps) => {
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuItem onClick={() => signOut()} className="text-red-600 cursor-pointer">
+                <LogOut className="mr-2 h-4 w-4" />
                 <span>Déconnexion</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
