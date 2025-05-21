@@ -1,6 +1,7 @@
 
 import React from 'react';
 import ClientList from '@/components/client/ClientList';
+import { PageLoading } from '@/components/ui/loading';
 
 const Clients = () => {
   return (
