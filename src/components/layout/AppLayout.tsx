@@ -1,0 +1,39 @@
+
+import React, { useState } from 'react';
+import { useIsMobile } from "@/hooks/use-mobile";
+import Navbar from "./Navbar";
+import Sidebar from "./Sidebar";
+
+interface AppLayoutProps {
+  children: React.ReactNode;
+}
+
+const AppLayout = ({ children }: AppLayoutProps) => {
+  const isMobile = useIsMobile();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const closeSidebar = () => {
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  };
+
+  return (
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar isMobile={!!isMobile} isOpen={sidebarOpen} onClose={closeSidebar} />
+
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Navbar onToggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />
+        <main className="flex-1 overflow-y-auto">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default AppLayout;
