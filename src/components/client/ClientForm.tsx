@@ -28,11 +28,16 @@ const ClientForm: React.FC<ClientFormProps> = ({
     city: defaultValues?.city || '',
     zipCode: defaultValues?.zipCode || '',
     company: defaultValues?.company || '',
-    driverLicenseImage: defaultValues?.driverLicenseImage || null
+    driverLicenseFrontImage: defaultValues?.driverLicenseFrontImage || null,
+    driverLicenseBackImage: defaultValues?.driverLicenseBackImage || null
   });
 
-  const [driverLicensePreview, setDriverLicensePreview] = useState<string | null>(
-    defaultValues?.driverLicenseImage || null
+  const [driverLicenseFrontPreview, setDriverLicenseFrontPreview] = useState<string | null>(
+    defaultValues?.driverLicenseFrontImage || null
+  );
+  
+  const [driverLicenseBackPreview, setDriverLicenseBackPreview] = useState<string | null>(
+    defaultValues?.driverLicenseBackImage || null
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,15 +45,20 @@ const ClientForm: React.FC<ClientFormProps> = ({
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleDriverLicenseUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDriverLicenseUpload = (side: 'front' | 'back') => (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const reader = new FileReader();
       
       reader.onload = (event) => {
         if (event.target?.result) {
-          setDriverLicensePreview(event.target.result as string);
-          setFormData(prev => ({ ...prev, driverLicenseImage: file }));
+          if (side === 'front') {
+            setDriverLicenseFrontPreview(event.target.result as string);
+            setFormData(prev => ({ ...prev, driverLicenseFrontImage: file }));
+          } else {
+            setDriverLicenseBackPreview(event.target.result as string);
+            setFormData(prev => ({ ...prev, driverLicenseBackImage: file }));
+          }
         }
       };
       
@@ -61,9 +71,14 @@ const ClientForm: React.FC<ClientFormProps> = ({
     onSubmit(formData);
   };
 
-  const handleRemoveDriverLicense = () => {
-    setDriverLicensePreview(null);
-    setFormData(prev => ({ ...prev, driverLicenseImage: null }));
+  const handleRemoveDriverLicense = (side: 'front' | 'back') => {
+    if (side === 'front') {
+      setDriverLicenseFrontPreview(null);
+      setFormData(prev => ({ ...prev, driverLicenseFrontImage: null }));
+    } else {
+      setDriverLicenseBackPreview(null);
+      setFormData(prev => ({ ...prev, driverLicenseBackImage: null }));
+    }
   };
 
   return (
@@ -177,13 +192,13 @@ const ClientForm: React.FC<ClientFormProps> = ({
         <TabsContent value="documents" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <Label htmlFor="driverLicense">Permis de conduire</Label>
+              <Label htmlFor="driverLicenseFront">Permis de conduire (Recto)</Label>
               <div className="mt-2">
-                {driverLicensePreview ? (
+                {driverLicenseFrontPreview ? (
                   <div className="relative border rounded-lg overflow-hidden">
                     <img 
-                      src={driverLicensePreview} 
-                      alt="Permis de conduire"
+                      src={driverLicenseFrontPreview} 
+                      alt="Permis de conduire (Recto)"
                       className="w-full h-64 object-contain bg-gray-100" 
                     />
                     {!isViewMode && (
@@ -192,7 +207,7 @@ const ClientForm: React.FC<ClientFormProps> = ({
                         size="icon"
                         variant="destructive"
                         className="absolute top-2 right-2"
-                        onClick={handleRemoveDriverLicense}
+                        onClick={() => handleRemoveDriverLicense('front')}
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -218,15 +233,15 @@ const ClientForm: React.FC<ClientFormProps> = ({
                       <div className="mt-4 flex space-x-2">
                         <div>
                           <input
-                            id="driverLicense"
-                            name="driverLicense"
+                            id="driverLicenseFront"
+                            name="driverLicenseFront"
                             type="file"
                             accept="image/png, image/jpeg, application/pdf"
-                            onChange={handleDriverLicenseUpload}
+                            onChange={handleDriverLicenseUpload('front')}
                             className="sr-only"
                             disabled={isViewMode}
                           />
-                          <Label htmlFor="driverLicense" className="cursor-pointer">
+                          <Label htmlFor="driverLicenseFront" className="cursor-pointer">
                             <Button 
                               type="button"
                               variant="outline"
@@ -243,8 +258,90 @@ const ClientForm: React.FC<ClientFormProps> = ({
                           variant="outline"
                           size="sm"
                           onClick={() => {
-                            // Ici, vous ajouteriez la logique pour prendre une photo
-                            console.log("Prendre une photo");
+                            // Logique pour prendre une photo
+                            console.log("Prendre une photo (recto)");
+                          }}
+                        >
+                          <Camera className="h-4 w-4 mr-2" />
+                          Prendre une photo
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Permis de conduire (Verso) */}
+            <div className="mt-6">
+              <Label htmlFor="driverLicenseBack">Permis de conduire (Verso)</Label>
+              <div className="mt-2">
+                {driverLicenseBackPreview ? (
+                  <div className="relative border rounded-lg overflow-hidden">
+                    <img 
+                      src={driverLicenseBackPreview} 
+                      alt="Permis de conduire (Verso)"
+                      className="w-full h-64 object-contain bg-gray-100" 
+                    />
+                    {!isViewMode && (
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="destructive"
+                        className="absolute top-2 right-2"
+                        onClick={() => handleRemoveDriverLicense('back')}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50">
+                    <div className="space-y-2 text-center">
+                      <div className="flex justify-center">
+                        <Upload className="h-10 w-10 text-gray-400" />
+                      </div>
+                      <div className="text-gray-600">
+                        <span className="font-semibold text-karrosserie-orange">
+                          Cliquez pour importer
+                        </span>{" "}
+                        ou glissez-déposez
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        PNG, JPG ou PDF (max. 5MB)
+                      </p>
+                    </div>
+                    {!isViewMode && (
+                      <div className="mt-4 flex space-x-2">
+                        <div>
+                          <input
+                            id="driverLicenseBack"
+                            name="driverLicenseBack"
+                            type="file"
+                            accept="image/png, image/jpeg, application/pdf"
+                            onChange={handleDriverLicenseUpload('back')}
+                            className="sr-only"
+                            disabled={isViewMode}
+                          />
+                          <Label htmlFor="driverLicenseBack" className="cursor-pointer">
+                            <Button 
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="cursor-pointer"
+                            >
+                              <Upload className="h-4 w-4 mr-2" />
+                              Importer un fichier
+                            </Button>
+                          </Label>
+                        </div>
+                        <Button 
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            // Logique pour prendre une photo
+                            console.log("Prendre une photo (verso)");
                           }}
                         >
                           <Camera className="h-4 w-4 mr-2" />

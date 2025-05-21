@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Search, UserPlus } from 'lucide-react';
 import ClientDialog from './ClientDialog';
@@ -10,13 +10,33 @@ import { ColumnDef } from "@tanstack/react-table";
 import { TableLoading } from '@/components/ui/loading';
 import { ErrorMessage } from '@/components/ui/error-message';
 import { useAuth } from '@/contexts/AuthContext';
+import { Input } from '@/components/ui/input';
 
 const ClientList = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const { clients, isLoading, error, createClient, updateClient, deleteClient } = useClients();
   const { user } = useAuth();
+
+  // Filtrer les clients en fonction de la recherche
+  const filteredClients = useMemo(() => {
+    if (!clients || !searchQuery) return clients;
+    
+    const lowercaseQuery = searchQuery.toLowerCase();
+    return clients.filter(client => {
+      return (
+        client.first_name?.toLowerCase().includes(lowercaseQuery) ||
+        client.last_name?.toLowerCase().includes(lowercaseQuery) ||
+        client.email?.toLowerCase().includes(lowercaseQuery) ||
+        client.phone?.toLowerCase().includes(lowercaseQuery) ||
+        client.address?.toLowerCase().includes(lowercaseQuery) ||
+        client.city?.toLowerCase().includes(lowercaseQuery) ||
+        client.postal_code?.toLowerCase().includes(lowercaseQuery)
+      );
+    });
+  }, [clients, searchQuery]);
 
   const handleCreateClient = () => {
     setSelectedClient(null);
@@ -108,6 +128,15 @@ const ClientList = () => {
         <h2 className="text-xl font-semibold text-gray-800">Clients</h2>
         
         <div className="flex items-center mt-4 md:mt-0 w-full md:w-auto space-x-2">
+          <div className="relative w-full md:w-64 mr-2">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Rechercher un client..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
           <Button className="btn-primary" onClick={handleCreateClient}>
             <UserPlus className="h-4 w-4 mr-2" />
             Nouveau client
@@ -117,7 +146,7 @@ const ClientList = () => {
       
       <DataTable
         columns={columns}
-        data={clients || []}
+        data={filteredClients || []}
         searchKey="last_name"
         searchPlaceholder="Rechercher un client..."
       />
