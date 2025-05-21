@@ -99,6 +99,12 @@ export function FileUpload({
     }
   };
 
+  // Function to format the accepted file types for display
+  const getFormattedAcceptTypes = () => {
+    // Use split and join instead of replaceAll for better compatibility
+    return accept.split('.').join('').split(',').join(' ');
+  };
+
   return (
     <div className={cn("w-full", className)}>
       <input
@@ -126,7 +132,7 @@ export function FileUpload({
             <span className="text-karrosserie-orange">parcourir</span>
           </p>
           <p className="text-xs text-gray-500 mt-1">
-            {accept.replaceAll('.', '')} jusqu'à {maxSize} MB
+            {getFormattedAcceptTypes()} jusqu'à {maxSize} MB
           </p>
         </div>
       ) : (
