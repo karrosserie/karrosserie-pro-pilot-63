@@ -9,12 +9,14 @@ import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { TableLoading } from '@/components/ui/loading';
 import { ErrorMessage } from '@/components/ui/error-message';
+import { useAuth } from '@/contexts/AuthContext';
 
 const ClientList = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const { clients, isLoading, error, createClient, updateClient, deleteClient } = useClients();
+  const { user } = useAuth();
 
   const handleCreateClient = () => {
     setSelectedClient(null);
@@ -44,7 +46,7 @@ const ClientList = () => {
         address: data.address,
         city: data.city,
         postal_code: data.zipCode,
-        user_id: 'user-id-placeholder' // Sera remplacé par auth.uid() côté serveur
+        user_id: user ? user.id : null // Utilisation de l'ID utilisateur actuel
       });
     } else if (dialogMode === 'edit' && selectedClient) {
       updateClient.mutate({

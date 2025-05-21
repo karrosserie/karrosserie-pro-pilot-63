@@ -9,12 +9,14 @@ import { ColumnDef } from "@tanstack/react-table";
 import { TableLoading } from '@/components/ui/loading';
 import { ErrorMessage } from '@/components/ui/error-message';
 import VehicleDialog from './VehicleDialog';
+import { useAuth } from '@/contexts/AuthContext';
 
 const VehicleList = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const { vehicles, isLoading, error, createVehicle, updateVehicle, deleteVehicle } = useVehicles();
+  const { user } = useAuth();
 
   const handleCreateVehicle = () => {
     setSelectedVehicle(null);
@@ -46,7 +48,7 @@ const VehicleList = () => {
         mileage: data.mileage ? parseInt(data.mileage) : null,
         fuel_type: data.fuelType,
         client_id: data.clientId,
-        user_id: 'user-id-placeholder', // Sera remplacé par auth.uid() côté serveur
+        user_id: user ? user.id : null, // Utilisation de l'ID utilisateur actuel
       });
     } else if (dialogMode === 'edit' && selectedVehicle) {
       updateVehicle.mutate({
