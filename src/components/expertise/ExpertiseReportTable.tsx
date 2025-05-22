@@ -21,6 +21,19 @@ interface ExpertiseReportTableProps {
   onDeleteReport: (id: string) => void;
 }
 
+// Define a type that extends ExpertiseReport to include the joined data
+interface ExpertiseReportWithRelations extends ExpertiseReport {
+  clients?: {
+    first_name: string;
+    last_name: string;
+  } | null;
+  vehicles?: {
+    brand: string;
+    model: string;
+    license_plate: string;
+  } | null;
+}
+
 const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
   reports,
   isLoading,
@@ -76,67 +89,72 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
       </TableHeader>
       <TableBody>
         {reports.length > 0 ? (
-          reports.map((report) => (
-            <TableRow key={report.id}>
-              <TableCell className="font-medium">{report.reference}</TableCell>
-              <TableCell>{new Date(report.created_at || '').toLocaleDateString('fr-FR')}</TableCell>
-              <TableCell>
-                {report.clients 
-                  ? `${report.clients.first_name} ${report.clients.last_name}` 
-                  : 'Non assigné'}
-              </TableCell>
-              <TableCell>
-                {report.vehicles 
-                  ? `${report.vehicles.brand} ${report.vehicles.model} - ${report.vehicles.license_plate}` 
-                  : 'Non assigné'}
-              </TableCell>
-              <TableCell>{report.expert_name || 'Non spécifié'}</TableCell>
-              <TableCell>{report.amount 
-                ? new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(report.amount)
-                : 'Non spécifié'}
-              </TableCell>
-              <TableCell>
-                <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(report.status || '')}`}>
-                  {report.status}
-                </span>
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end space-x-1">
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={() => onViewReport(report)}
-                    disabled={!report.document_url}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={() => window.open(report.document_url, '_blank')}
-                    disabled={!report.document_url}
-                  >
-                    <Download className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={() => onEditReport(report)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="text-red-500 hover:text-red-700"
-                    onClick={() => onDeleteReport(report.id)}
-                  >
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))
+          reports.map((report) => {
+            // Cast the report to include the joined data
+            const reportWithRelations = report as ExpertiseReportWithRelations;
+            
+            return (
+              <TableRow key={report.id}>
+                <TableCell className="font-medium">{report.reference}</TableCell>
+                <TableCell>{new Date(report.created_at || '').toLocaleDateString('fr-FR')}</TableCell>
+                <TableCell>
+                  {reportWithRelations.clients 
+                    ? `${reportWithRelations.clients.first_name} ${reportWithRelations.clients.last_name}` 
+                    : 'Non assigné'}
+                </TableCell>
+                <TableCell>
+                  {reportWithRelations.vehicles 
+                    ? `${reportWithRelations.vehicles.brand} ${reportWithRelations.vehicles.model} - ${reportWithRelations.vehicles.license_plate}` 
+                    : 'Non assigné'}
+                </TableCell>
+                <TableCell>{report.expert_name || 'Non spécifié'}</TableCell>
+                <TableCell>{report.amount 
+                  ? new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(report.amount)
+                  : 'Non spécifié'}
+                </TableCell>
+                <TableCell>
+                  <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(report.status || '')}`}>
+                    {report.status}
+                  </span>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end space-x-1">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => onViewReport(report)}
+                      disabled={!report.document_url}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => window.open(report.document_url, '_blank')}
+                      disabled={!report.document_url}
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => onEditReport(report)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="text-red-500 hover:text-red-700"
+                      onClick={() => onDeleteReport(report.id)}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })
         ) : (
           <TableRow>
             <TableCell colSpan={8} className="text-center py-4">
