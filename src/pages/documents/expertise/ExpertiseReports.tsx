@@ -17,13 +17,16 @@ import { DocumentViewer } from '@/components/documents/DocumentViewer';
 import { useToast } from '@/hooks/use-toast';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { ExpertiseReportUploader } from '@/components/expertise/ExpertiseReportUploader';
+import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
+import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 
 const ExpertiseReports = () => {
   const { reports, isLoading, error, deleteReport } = useExpertiseReports();
   const [searchTerm, setSearchTerm] = useState('');
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
-  const [selectedReport, setSelectedReport] = useState<any>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<ExpertiseReport | null>(null);
   const { toast } = useToast();
   
   const filteredReports = reports?.filter(report => 
@@ -46,9 +49,14 @@ const ExpertiseReports = () => {
     }
   };
 
-  const handleViewReport = (report: any) => {
+  const handleViewReport = (report: ExpertiseReport) => {
     setSelectedReport(report);
     setViewDialogOpen(true);
+  };
+
+  const handleEditReport = (report: ExpertiseReport) => {
+    setSelectedReport(report);
+    setEditDialogOpen(true);
   };
 
   const handleDeleteReport = async (id: string) => {
@@ -149,7 +157,7 @@ const ExpertiseReports = () => {
                 filteredReports.map((report) => (
                   <TableRow key={report.id}>
                     <TableCell className="font-medium">{report.reference}</TableCell>
-                    <TableCell>{new Date(report.created_at).toLocaleDateString('fr-FR')}</TableCell>
+                    <TableCell>{new Date(report.created_at || '').toLocaleDateString('fr-FR')}</TableCell>
                     <TableCell>
                       {report.clients 
                         ? `${report.clients.first_name} ${report.clients.last_name}` 
@@ -166,7 +174,7 @@ const ExpertiseReports = () => {
                       : 'Non spécifié'}
                     </TableCell>
                     <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(report.status)}`}>
+                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(report.status || '')}`}>
                         {report.status}
                       </span>
                     </TableCell>
@@ -188,7 +196,11 @@ const ExpertiseReports = () => {
                         >
                           <Download className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleEditReport(report)}
+                        >
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button 
@@ -237,6 +249,13 @@ const ExpertiseReports = () => {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Edit PV Dialog */}
+      <ExpertiseReportDialog
+        report={selectedReport}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
 
       {/* View Document Dialog */}
       {selectedReport && (

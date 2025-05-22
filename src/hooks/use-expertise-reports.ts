@@ -1,6 +1,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { expertiseReportsService, NewExpertiseReport, UpdateExpertiseReport } from '@/services/supabase/expertise-reports';
+import { expertiseReportsService, NewExpertiseReport, UpdateExpertiseReport, ExpertiseReport } from '@/services/supabase/expertise-reports';
 import { useToast } from '@/hooks/use-toast';
 
 export function useExpertiseReports() {
@@ -35,8 +35,8 @@ export function useExpertiseReports() {
   });
   
   const updateReport = useMutation({
-    mutationFn: ({ id, data }: { id: string, data: UpdateExpertiseReport }) => 
-      expertiseReportsService.update(id, data),
+    mutationFn: ({ id, data }: { id: string, data: Partial<ExpertiseReport> }) => 
+      expertiseReportsService.update(id, data as UpdateExpertiseReport),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
       toast({
