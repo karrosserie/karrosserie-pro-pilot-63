@@ -12,50 +12,26 @@ import {
 } from "@/components/ui/table";
 import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Trash, Upload } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-
-// Données mockées pour les PV d'expertise
-const mockReports = [
-  { 
-    id: 1, 
-    reference: 'PV-2023-001', 
-    date: '15/05/2023', 
-    client: 'Jean Dupont',
-    vehicle: 'Peugeot 308 - AB-123-CD', 
-    expert: 'Marc Expert', 
-    amount: '3 500,00 €',
-    status: 'Importé' 
-  },
-  { 
-    id: 2, 
-    reference: 'PV-2023-002', 
-    date: '12/05/2023', 
-    client: 'Marie Martin',
-    vehicle: 'Renault Clio - EF-456-GH', 
-    expert: 'Sophie Expertise', 
-    amount: '2 800,00 €',
-    status: 'En attente' 
-  },
-  { 
-    id: 3, 
-    reference: 'PV-2023-003', 
-    date: '10/05/2023', 
-    client: 'Pierre Durand',
-    vehicle: 'Citroën C3 - IJ-789-KL', 
-    expert: 'Marc Expert', 
-    amount: '1 950,00 €',
-    status: 'Validé' 
-  },
-];
+import { useExpertiseReports } from '@/hooks/use-expertise-reports';
+import { DocumentViewer } from '@/components/documents/DocumentViewer';
+import { useToast } from '@/hooks/use-toast';
+import LoadingSpinner from '@/components/ui/loading-spinner';
+import { ExpertiseReportUploader } from '@/components/expertise/ExpertiseReportUploader';
 
 const ExpertiseReports = () => {
+  const { reports, isLoading, error, deleteReport } = useExpertiseReports();
   const [searchTerm, setSearchTerm] = useState('');
   const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<any>(null);
+  const { toast } = useToast();
   
-  const filteredReports = mockReports.filter(report => 
-    report.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    report.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    report.vehicle.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredReports = reports?.filter(report => 
+    report.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (report.clients?.first_name + ' ' + report.clients?.last_name)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (report.vehicles?.brand + ' ' + report.vehicles?.model)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    report.expert_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
   
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -67,6 +43,29 @@ const ExpertiseReports = () => {
         return 'bg-green-100 text-green-800';
       default:
         return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const handleViewReport = (report: any) => {
+    setSelectedReport(report);
+    setViewDialogOpen(true);
+  };
+
+  const handleDeleteReport = async (id: string) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce PV d\'expertise ?')) {
+      try {
+        await deleteReport.mutateAsync(id);
+        toast({
+          title: "PV supprimé",
+          description: "Le PV d'expertise a été supprimé avec succès."
+        });
+      } catch (error: any) {
+        toast({
+          title: "Erreur",
+          description: `Impossible de supprimer le PV d'expertise: ${error.message}`,
+          variant: "destructive"
+        });
+      }
     }
   };
   
@@ -121,67 +120,105 @@ const ExpertiseReports = () => {
       </div>
       
       <div className="card-container">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Référence</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Client</TableHead>
-              <TableHead>Véhicule</TableHead>
-              <TableHead>Expert</TableHead>
-              <TableHead>Montant</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredReports.length > 0 ? (
-              filteredReports.map((report) => (
-                <TableRow key={report.id}>
-                  <TableCell className="font-medium">{report.reference}</TableCell>
-                  <TableCell>{report.date}</TableCell>
-                  <TableCell>{report.client}</TableCell>
-                  <TableCell>{report.vehicle}</TableCell>
-                  <TableCell>{report.expert}</TableCell>
-                  <TableCell>{report.amount}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(report.status)}`}>
-                      {report.status}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1">
-                      <Button variant="ghost" size="icon">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
-                        <Trash className="h-4 w-4" />
-                      </Button>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <LoadingSpinner />
+            <span className="ml-2">Chargement des PV d'expertise...</span>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-red-500">Erreur lors du chargement des PV d'expertise.</p>
+            <p className="text-sm text-gray-500 mt-2">{(error as Error).message}</p>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Référence</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Client</TableHead>
+                <TableHead>Véhicule</TableHead>
+                <TableHead>Expert</TableHead>
+                <TableHead>Montant</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredReports.length > 0 ? (
+                filteredReports.map((report) => (
+                  <TableRow key={report.id}>
+                    <TableCell className="font-medium">{report.reference}</TableCell>
+                    <TableCell>{new Date(report.created_at).toLocaleDateString('fr-FR')}</TableCell>
+                    <TableCell>
+                      {report.clients 
+                        ? `${report.clients.first_name} ${report.clients.last_name}` 
+                        : 'Non assigné'}
+                    </TableCell>
+                    <TableCell>
+                      {report.vehicles 
+                        ? `${report.vehicles.brand} ${report.vehicles.model} - ${report.vehicles.license_plate}` 
+                        : 'Non assigné'}
+                    </TableCell>
+                    <TableCell>{report.expert_name || 'Non spécifié'}</TableCell>
+                    <TableCell>{report.amount 
+                      ? new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(report.amount)
+                      : 'Non spécifié'}
+                    </TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(report.status)}`}>
+                        {report.status}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end space-x-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleViewReport(report)}
+                          disabled={!report.document_url}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => window.open(report.document_url, '_blank')}
+                          disabled={!report.document_url}
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="text-red-500 hover:text-red-700"
+                          onClick={() => handleDeleteReport(report.id)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-4">
+                    <div className="flex flex-col items-center justify-center py-8">
+                      <FileText className="h-10 w-10 text-gray-400 mb-2" />
+                      <h3 className="font-medium text-gray-900">Aucun résultat</h3>
+                      <p className="text-gray-500 mt-1">
+                        Aucun PV d'expertise correspondant à votre recherche n'a été trouvé.
+                      </p>
                     </div>
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center py-4">
-                  <div className="flex flex-col items-center justify-center py-8">
-                    <FileText className="h-10 w-10 text-gray-400 mb-2" />
-                    <h3 className="font-medium text-gray-900">Aucun résultat</h3>
-                    <p className="text-gray-500 mt-1">
-                      Aucun PV d'expertise correspondant à votre recherche n'a été trouvé.
-                    </p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              )}
+            </TableBody>
+          </Table>
+        )}
       </div>
 
       {/* Import PV Dialog */}
@@ -193,39 +230,23 @@ const ExpertiseReports = () => {
               Importez un procès verbal d'expertise au format PDF.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="flex flex-col gap-2">
-              <label htmlFor="pv-upload" className="text-sm font-medium">
-                Fichier PDF
-              </label>
-              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                <div className="space-y-1 text-center">
-                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                  <div className="flex text-sm text-gray-600">
-                    <label
-                      htmlFor="pv-upload"
-                      className="relative cursor-pointer bg-white rounded-md font-medium text-karrosserie-orange hover:text-karrosserie-orange/80"
-                    >
-                      <span>Télécharger un fichier</span>
-                      <input id="pv-upload" name="pv-upload" type="file" className="sr-only" accept=".pdf" />
-                    </label>
-                    <p className="pl-1">ou glisser-déposer</p>
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    PDF jusqu'à 10MB
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setImportDialogOpen(false)}>
-                Annuler
-              </Button>
-              <Button>Importer</Button>
-            </div>
-          </div>
+          <ExpertiseReportUploader 
+            onSuccess={() => setImportDialogOpen(false)}
+            onCancel={() => setImportDialogOpen(false)}
+            className="mt-4"
+          />
         </DialogContent>
       </Dialog>
+
+      {/* View Document Dialog */}
+      {selectedReport && (
+        <DocumentViewer
+          url={selectedReport.document_url}
+          open={viewDialogOpen}
+          onOpenChange={setViewDialogOpen}
+          title={`PV d'expertise - ${selectedReport.reference}`}
+        />
+      )}
     </div>
   );
 };
