@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/contexts/AuthContext';
+import { LogIn } from 'lucide-react';
 
 interface LoginFormProps {
   onToggleMode: () => void;
@@ -23,13 +24,7 @@ const LoginForm = ({ onToggleMode }: LoginFormProps) => {
     setIsLoading(true);
 
     try {
-      const { error } = await signIn(email, password);
-      if (error) throw error;
-      
-      toast({
-        title: "Connecté avec succès",
-        description: "Bienvenue sur Karrosserie Pro",
-      });
+      await signIn(email, password);
     } catch (error: any) {
       toast({
         title: "Erreur",
@@ -106,7 +101,10 @@ const LoginForm = ({ onToggleMode }: LoginFormProps) => {
               Chargement...
             </span>
           ) : (
-            "Se connecter"
+            <>
+              <LogIn className="h-4 w-4 mr-2" />
+              Se connecter
+            </>
           )}
         </Button>
 

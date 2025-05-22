@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/contexts/AuthContext';
 import AuthContainer from '@/components/auth/AuthContainer';
 import LoginForm from '@/components/auth/LoginForm';
 import SignupForm from '@/components/auth/SignupForm';
@@ -10,7 +10,7 @@ const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const { user } = useAuth();
 
-  // Si l'utilisateur est déjà connecté, rediriger vers la page d'accueil
+  // If the user is already logged in, redirect to home page
   if (user) {
     return <Navigate to="/" replace />;
   }

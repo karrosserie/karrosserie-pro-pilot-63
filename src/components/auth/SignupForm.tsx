@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/contexts/AuthContext';
+import { UserPlus } from 'lucide-react';
 
 interface SignupFormProps {
   onToggleMode: () => void;
@@ -25,18 +26,11 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
     setIsLoading(true);
 
     try {
-      const { error } = await signUp(email, password, {
-        first_name: firstName,
-        last_name: lastName
-      });
-      
-      if (error) throw error;
-      
+      await signUp(email, password, firstName, lastName);
       toast({
         title: "Compte créé avec succès",
         description: "Votre compte a été créé. Vous pouvez maintenant vous connecter.",
       });
-      
       onToggleMode();
     } catch (error: any) {
       toast({
@@ -132,7 +126,10 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
               Chargement...
             </span>
           ) : (
-            "S'inscrire"
+            <>
+              <UserPlus className="h-4 w-4 mr-2" />
+              S'inscrire
+            </>
           )}
         </Button>
 
