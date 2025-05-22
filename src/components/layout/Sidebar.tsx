@@ -96,7 +96,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
       path: '/documents',
       hasSubMenu: true,
       subMenuItems: [
-        { label: 'PV d\'expertise', path: '/documents/expertise' },
+        { label: 'Rapports d\'expertise', path: '/documents/expertise' },
         { label: 'Devis', path: '/documents/devis' },
         { label: 'Ordres de réparation', path: '/documents/ordres' },
         { label: 'Factures', path: '/documents/factures' },

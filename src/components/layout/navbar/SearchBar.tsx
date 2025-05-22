@@ -22,7 +22,7 @@ const SearchBar = ({ onImportClick }: SearchBarProps) => {
         onClick={onImportClick}
       >
         <Upload className="h-4 w-4 mr-2" />
-        Importer
+        Importer un rapport
       </Button>
     </div>
   );
