@@ -16,11 +16,12 @@ interface ChartDataItem {
 
 interface FinancialOverviewProps {
   chartData: ChartDataItem[];
+  className?: string;
 }
 
-const FinancialOverview = ({ chartData }: FinancialOverviewProps) => {
+const FinancialOverview = ({ chartData, className = "lg:col-span-2" }: FinancialOverviewProps) => {
   return (
-    <Card className="lg:col-span-2">
+    <Card className={className}>
       <CardHeader>
         <CardTitle>Aperçu financier</CardTitle>
       </CardHeader>

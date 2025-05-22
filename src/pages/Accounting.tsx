@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import StatsCards from '@/components/accounting/StatsCards';
 import FinancialOverview from '@/components/accounting/FinancialOverview';
 import AccountingTabs from '@/components/accounting/AccountingTabs';
-import AISecretary from '@/components/ai/AISecretary';
 import { mockTransactions, chartData, statsCards } from '@/components/accounting/mockData';
 
 const Accounting = () => {
@@ -26,11 +25,7 @@ const Accounting = () => {
       <StatsCards cards={statsCards} />
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <FinancialOverview chartData={chartData} />
-        
-        <div className="lg:col-span-1">
-          <AISecretary />
-        </div>
+        <FinancialOverview chartData={chartData} className="lg:col-span-3" />
       </div>
       
       <AccountingTabs 
