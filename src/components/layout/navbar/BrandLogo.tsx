@@ -3,10 +3,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 interface BrandLogoProps {
-  show: boolean;
+  show?: boolean;
 }
 
-const BrandLogo = ({ show }: BrandLogoProps) => {
+const BrandLogo = ({ show = true }: BrandLogoProps) => {
   if (!show) return null;
   
   return (

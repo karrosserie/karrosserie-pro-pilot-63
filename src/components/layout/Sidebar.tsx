@@ -132,6 +132,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
+        {/* Always show logo in sidebar, regardless of its collapsed or open state */}
         <div className="h-16 flex items-center px-4 border-b border-gray-200">
           <Link to="/" className="flex items-center">
             <span className="text-xl font-bold text-karrosserie-orange">

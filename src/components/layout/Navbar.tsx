@@ -4,7 +4,6 @@ import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import MobileMenuButton from './navbar/MobileMenuButton';
-import BrandLogo from './navbar/BrandLogo';
 import SearchBar from './navbar/SearchBar';
 import NotificationsPanel from './navbar/NotificationsPanel';
 import UserProfileMenu from './navbar/UserProfileMenu';
@@ -33,8 +32,7 @@ const Navbar = ({ onToggleSidebar, isSidebarOpen = false }: NavbarProps) => {
         <div className="flex items-center">
           <MobileMenuButton onClick={onToggleSidebar} />
           
-          {/* Only show logo in navbar when sidebar is collapsed */}
-          <BrandLogo show={!isSidebarOpen} />
+          {/* Removed BrandLogo component from navbar */}
         </div>
 
         <SearchBar onImportClick={() => setImportDialogOpen(true)} />
