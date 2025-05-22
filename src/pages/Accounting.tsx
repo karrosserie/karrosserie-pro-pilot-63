@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/card";
 import { Search, FileText, Plus, Filter, Download, Eye, CreditCard, Receipt, ArrowUpCircle, ArrowDownCircle, Calendar } from 'lucide-react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
+import AISecretary from '@/components/ai/AISecretary';
 
 // Données mockées pour les transactions
 const mockTransactions = [
@@ -154,22 +155,28 @@ const Accounting = () => {
         ))}
       </div>
       
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Aperçu financier</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData}>
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="revenue" name="Chiffre d'affaires" fill="#F97316" />
-              <Bar dataKey="expenses" name="Dépenses" fill="#555555" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Aperçu financier</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={chartData}>
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="revenue" name="Chiffre d'affaires" fill="#F97316" />
+                <Bar dataKey="expenses" name="Dépenses" fill="#555555" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        
+        <div className="lg:col-span-1">
+          <AISecretary />
+        </div>
+      </div>
       
       <Tabs defaultValue="transactions" className="w-full">
         <TabsList className="grid grid-cols-1 md:grid-cols-4 mb-6">
