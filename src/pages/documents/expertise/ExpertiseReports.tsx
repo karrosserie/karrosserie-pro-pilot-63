@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
@@ -37,17 +38,17 @@ const ExpertiseReports = () => {
   };
 
   const handleDeleteReport = async (id: string) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce PV d\'expertise ?')) {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce rapport d\'expertise ?')) {
       try {
         await deleteReport.mutateAsync(id);
         toast({
-          title: "PV supprimé",
-          description: "Le PV d'expertise a été supprimé avec succès."
+          title: "Rapport supprimé",
+          description: "Le rapport d'expertise a été supprimé avec succès."
         });
       } catch (error: any) {
         toast({
           title: "Erreur",
-          description: `Impossible de supprimer le PV d'expertise: ${error.message}`,
+          description: `Impossible de supprimer le rapport d'expertise: ${error.message}`,
           variant: "destructive"
         });
       }
@@ -57,8 +58,8 @@ const ExpertiseReports = () => {
   return (
     <div className="page-container">
       <ExpertiseReportHeader 
-        title="PV d'expertise"
-        description="Consultez et gérez les procès-verbaux d'expertise automobile."
+        title="Rapports d'expertise"
+        description="Consultez et gérez les rapports d'expertise automobile."
       />
       
       <ExpertiseReportFilters 
@@ -78,13 +79,13 @@ const ExpertiseReports = () => {
         />
       </div>
 
-      {/* Import PV Dialog */}
+      {/* Import Rapport Dialog */}
       <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Importer un PV d'expertise</DialogTitle>
+            <DialogTitle>Importer un rapport d'expertise</DialogTitle>
             <DialogDescription>
-              Importez un procès verbal d'expertise au format PDF.
+              Importez un rapport d'expertise au format PDF.
             </DialogDescription>
           </DialogHeader>
           <ExpertiseReportUploader 
@@ -95,7 +96,7 @@ const ExpertiseReports = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Edit PV Dialog */}
+      {/* Edit Rapport Dialog */}
       <ExpertiseReportDialog
         report={selectedReport}
         open={editDialogOpen}
@@ -108,7 +109,7 @@ const ExpertiseReports = () => {
           url={selectedReport.document_url}
           open={viewDialogOpen}
           onOpenChange={setViewDialogOpen}
-          title={`PV d'expertise - ${selectedReport.reference}`}
+          title={`Rapport d'expertise - ${selectedReport.reference}`}
         />
       )}
     </div>

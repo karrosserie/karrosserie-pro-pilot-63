@@ -59,7 +59,7 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-        <span className="ml-2">Chargement des PV d'expertise...</span>
+        <span className="ml-2">Chargement des rapports d'expertise...</span>
       </div>
     );
   }
@@ -67,7 +67,7 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
   if (error) {
     return (
       <div className="text-center py-12">
-        <p className="text-red-500">Erreur lors du chargement des PV d'expertise.</p>
+        <p className="text-red-500">Erreur lors du chargement des rapports d'expertise.</p>
         <p className="text-sm text-gray-500 mt-2">{error.message}</p>
       </div>
     );
@@ -162,7 +162,7 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
                 <FileText className="h-10 w-10 text-gray-400 mb-2" />
                 <h3 className="font-medium text-gray-900">Aucun résultat</h3>
                 <p className="text-gray-500 mt-1">
-                  Aucun PV d'expertise correspondant à votre recherche n'a été trouvé.
+                  Aucun rapport d'expertise correspondant à votre recherche n'a été trouvé.
                 </p>
               </div>
             </TableCell>

@@ -40,7 +40,7 @@ const ExpertiseReportDialog = ({
     } catch (error: any) {
       toast({
         title: "Erreur",
-        description: `Impossible de ${report ? 'mettre à jour' : 'créer'} le PV d'expertise: ${error.message}`,
+        description: `Impossible de ${report ? 'mettre à jour' : 'créer'} le rapport d'expertise: ${error.message}`,
         variant: "destructive"
       });
       throw error;
@@ -53,11 +53,11 @@ const ExpertiseReportDialog = ({
     <Dialog open={open} onOpenChange={!isSubmitting ? onOpenChange : undefined}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>{report ? "Modifier le PV d'expertise" : "Ajouter un PV d'expertise"}</DialogTitle>
+          <DialogTitle>{report ? "Modifier le rapport d'expertise" : "Ajouter un rapport d'expertise"}</DialogTitle>
           <DialogDescription>
             {report
-              ? "Modifiez les détails du procès verbal d'expertise."
-              : "Ajoutez un nouveau procès verbal d'expertise."
+              ? "Modifiez les détails du rapport d'expertise."
+              : "Ajoutez un nouveau rapport d'expertise."
             }
           </DialogDescription>
         </DialogHeader>

@@ -62,12 +62,12 @@ export const ExpertiseReportForm = ({
       await onSubmit(formData);
       toast({
         title: "Succès",
-        description: `Le PV d'expertise a été ${report ? 'mis à jour' : 'créé'} avec succès.`
+        description: `Le rapport d'expertise a été ${report ? 'mis à jour' : 'créé'} avec succès.`
       });
     } catch (error: any) {
       toast({
         title: "Erreur",
-        description: `Impossible de ${report ? 'mettre à jour' : 'créer'} le PV d'expertise: ${error.message}`,
+        description: `Impossible de ${report ? 'mettre à jour' : 'créer'} le rapport d'expertise: ${error.message}`,
         variant: "destructive"
       });
     }

@@ -32,9 +32,9 @@ const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
     <Dialog open={open} onOpenChange={!isUploading ? onOpenChange : undefined}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Importer un PV d'expertise</DialogTitle>
+          <DialogTitle>Importer un rapport d'expertise</DialogTitle>
           <DialogDescription>
-            Importez un procès verbal d'expertise au format PDF.
+            Importez un rapport d'expertise au format PDF.
           </DialogDescription>
         </DialogHeader>
         
