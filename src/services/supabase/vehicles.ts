@@ -56,6 +56,8 @@ export const vehiclesService = {
       throw new Error('Les champs Client, Numéro de série (VIN), Marque, Modèle et Plaque d\'immatriculation sont obligatoires.');
     }
 
+    console.log('Creating vehicle with data:', vehicle);
+
     const { data, error } = await supabase
       .from('vehicles')
       .insert([vehicle])
@@ -67,10 +69,13 @@ export const vehiclesService = {
       throw new Error(error.message);
     }
     
+    console.log('Vehicle created successfully:', data);
     return data;
   },
   
   update: async (id: string, vehicle: UpdateVehicle) => {
+    console.log('Updating vehicle with id:', id, 'and data:', vehicle);
+
     const { data, error } = await supabase
       .from('vehicles')
       .update(vehicle)
@@ -83,6 +88,7 @@ export const vehiclesService = {
       throw new Error(error.message);
     }
     
+    console.log('Vehicle updated successfully:', data);
     return data;
   },
   
