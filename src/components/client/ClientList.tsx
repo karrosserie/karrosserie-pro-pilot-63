@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Search, UserPlus } from 'lucide-react';
+import { Plus, Search, UserPlus, Trash2 } from 'lucide-react';
 import ClientDialog from './ClientDialog';
 import { useClients } from '@/hooks/use-clients';
 import { Client } from '@/services/supabase/clients';
@@ -11,6 +11,17 @@ import { TableLoading } from '@/components/ui/loading';
 import { ErrorMessage } from '@/components/ui/error-message';
 import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/ui/input';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const ClientList = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -54,6 +65,10 @@ const ClientList = () => {
     setSelectedClient(client);
     setDialogMode('edit');
     setDialogOpen(true);
+  };
+
+  const handleDeleteClient = (client: Client) => {
+    deleteClient.mutate(client.id);
   };
 
   const handleClientSubmit = (data: any) => {
@@ -121,6 +136,31 @@ const ClientList = () => {
           <Button variant="outline" size="sm" onClick={() => handleEditClient(row.original)}>
             Éditer
           </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Supprimer le client</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Êtes-vous sûr de vouloir supprimer le client {row.original.first_name} {row.original.last_name} ? 
+                  Cette action est irréversible.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={() => handleDeleteClient(row.original)}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  Supprimer
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       ),
     },
