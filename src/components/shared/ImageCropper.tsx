@@ -96,25 +96,24 @@ export function ImageCropper({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-[90vw] max-h-[90vh] w-auto h-auto">
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>Recadrer l'image</DialogTitle>
         </DialogHeader>
         
-        <div className="flex items-center justify-center w-full h-[70vh] overflow-hidden">
+        <div className="my-4 max-h-[70vh] overflow-auto">
           <ReactCrop
             crop={crop}
             onChange={(c) => setCrop(c)}
             onComplete={(c) => setCompletedCrop(c)}
-            className="w-full h-full flex items-center justify-center"
+            className="max-w-full"
           >
             <img
               ref={imageRef}
               src={imageUrl}
               alt="Image à recadrer"
               onLoad={onImageLoad}
-              className="max-w-full max-h-full object-contain"
-              style={{ maxWidth: '100%', maxHeight: '100%' }}
+              className="max-w-full"
             />
           </ReactCrop>
         </div>
