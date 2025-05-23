@@ -1,17 +1,32 @@
 
 import React, { useState, useEffect } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthContainer from '@/components/auth/AuthContainer';
 import LoginForm from '@/components/auth/LoginForm';
 import SignupForm from '@/components/auth/SignupForm';
+import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm';
+import ResetPasswordForm from '@/components/auth/ResetPasswordForm';
 import { toast } from '@/hooks/use-toast';
 
+type AuthMode = 'login' | 'signup' | 'forgot-password' | 'reset-password';
+
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [authMode, setAuthMode] = useState<AuthMode>('login');
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   
+  // Déterminer le mode basé sur l'URL
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path.includes('/auth/reset-password')) {
+      setAuthMode('reset-password');
+    } else {
+      setAuthMode('login');
+    }
+  }, []);
+
   // Vérifiez les paramètres d'URL pour les messages de redirection
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -56,16 +71,35 @@ const Auth = () => {
   }
 
   const toggleAuthMode = () => {
-    setIsLogin(!isLogin);
+    setAuthMode(authMode === 'login' ? 'signup' : 'login');
+  };
+
+  const showForgotPassword = () => {
+    setAuthMode('forgot-password');
+  };
+
+  const showLogin = () => {
+    setAuthMode('login');
+  };
+
+  const renderAuthForm = () => {
+    switch (authMode) {
+      case 'login':
+        return <LoginForm onToggleMode={toggleAuthMode} onForgotPassword={showForgotPassword} />;
+      case 'signup':
+        return <SignupForm onToggleMode={toggleAuthMode} />;
+      case 'forgot-password':
+        return <ForgotPasswordForm onBackToLogin={showLogin} />;
+      case 'reset-password':
+        return <ResetPasswordForm />;
+      default:
+        return <LoginForm onToggleMode={toggleAuthMode} onForgotPassword={showForgotPassword} />;
+    }
   };
 
   return (
     <AuthContainer>
-      {isLogin ? (
-        <LoginForm onToggleMode={toggleAuthMode} />
-      ) : (
-        <SignupForm onToggleMode={toggleAuthMode} />
-      )}
+      {renderAuthForm()}
     </AuthContainer>
   );
 };

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { authService } from '@/services/supabase/auth';
@@ -192,6 +191,53 @@ export const useAuthState = () => {
     }
   }, []);
 
+  // Reset password request
+  const resetPassword = useCallback(async (email: string) => {
+    try {
+      setLoading(true);
+      await authService.resetPassword(email);
+      
+      toast({
+        title: "Email envoyé",
+        description: "Un email de réinitialisation de mot de passe a été envoyé. Veuillez vérifier votre boîte mail.",
+        variant: "default",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue lors de l'envoi de l'email de réinitialisation",
+        variant: "destructive",
+      });
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Update password
+  const updatePassword = useCallback(async (password: string) => {
+    try {
+      setLoading(true);
+      await authService.updatePassword(password);
+      
+      toast({
+        title: "Mot de passe mis à jour",
+        description: "Votre mot de passe a été mis à jour avec succès.",
+        variant: "default",
+      });
+      navigate('/');
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue lors de la mise à jour du mot de passe",
+        variant: "destructive",
+      });
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate]);
+
   return {
     session,
     user,
@@ -201,5 +247,7 @@ export const useAuthState = () => {
     signUp,
     signOut,
     resendEmailVerification,
+    resetPassword,
+    updatePassword,
   };
 };

@@ -22,6 +22,7 @@ import { AlertCircle } from 'lucide-react';
 
 interface LoginFormProps {
   onToggleMode: () => void;
+  onForgotPassword: () => void;
 }
 
 const loginSchema = z.object({
@@ -31,7 +32,7 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-const LoginForm = ({ onToggleMode }: LoginFormProps) => {
+const LoginForm = ({ onToggleMode, onForgotPassword }: LoginFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [emailVerificationNeeded, setEmailVerificationNeeded] = useState<string | null>(null);
   
@@ -128,9 +129,13 @@ const LoginForm = ({ onToggleMode }: LoginFormProps) => {
               <FormItem className="space-y-2">
                 <div className="flex justify-between">
                   <FormLabel>Mot de passe</FormLabel>
-                  <a href="#" className="text-sm text-karrosserie-orange">
+                  <button 
+                    type="button"
+                    className="text-sm text-karrosserie-orange hover:underline"
+                    onClick={onForgotPassword}
+                  >
                     Mot de passe oublié?
-                  </a>
+                  </button>
                 </div>
                 <FormControl>
                   <Input

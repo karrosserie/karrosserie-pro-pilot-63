@@ -48,6 +48,10 @@ export const routes = [
     element: <Auth />
   },
   {
+    path: "/auth/reset-password",
+    element: <Auth />
+  },
+  {
     path: "/",
     element: (
       <ProtectedRoute>
