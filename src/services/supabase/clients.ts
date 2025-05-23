@@ -43,8 +43,9 @@ export const clientsService = {
   },
   
   create: async (client: any) => {
-    // Extract company field so it's not sent to the database
-    const { company, ...clientData } = {
+    // Extract company field and create clientData without it
+    const company = client.company;
+    const clientData = {
       first_name: client.firstName,
       last_name: client.lastName,
       email: client.email,
@@ -71,12 +72,13 @@ export const clientsService = {
     }
     
     // Add back the company field to the returned data for the frontend
-    return { ...data, company: client.company };
+    return { ...data, company };
   },
   
   update: async (id: string, client: any) => {
-    // Extract company field so it's not sent to the database
-    const { company, ...clientData } = {
+    // Extract company field and create clientData without it
+    const company = client.company;
+    const clientData = {
       first_name: client.firstName,
       last_name: client.lastName,
       email: client.email,
@@ -103,7 +105,7 @@ export const clientsService = {
     }
     
     // Add back the company field to the returned data for the frontend
-    return { ...data, company: client.company };
+    return { ...data, company };
   },
   
   delete: async (id: string) => {
