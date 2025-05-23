@@ -217,8 +217,8 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
         </div>
       </div>
 
-      {/* Start date, arrival date, end date, and road test - ajustement des largeurs */}
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+      {/* Start date, arrival date, end date - ajustement des largeurs */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="startDate">Date de début</Label>
           <Input
@@ -254,8 +254,11 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
             disabled={isViewMode}
           />
         </div>
+      </div>
 
-        <div className="md:col-span-3 space-y-2">
+      {/* Road test and Status on the same line */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
           <Label htmlFor="roadTest">Test routier</Label>
           <Select 
             disabled={isViewMode} 
@@ -267,6 +270,26 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
             </SelectTrigger>
             <SelectContent>
               {roadTestOptions.map(option => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="status">Statut</Label>
+          <Select 
+            disabled={isViewMode} 
+            value={formData.status} 
+            onValueChange={(value) => onSelectChange('status', value)}
+          >
+            <SelectTrigger id="status">
+              <SelectValue placeholder="Sélectionner un statut" />
+            </SelectTrigger>
+            <SelectContent>
+              {statusOptions.map(option => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
@@ -288,27 +311,6 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
           placeholder="Notes sur le test routier..."
           rows={3}
         />
-      </div>
-
-      {/* Status */}
-      <div className="space-y-2">
-        <Label htmlFor="status">Statut</Label>
-        <Select 
-          disabled={isViewMode} 
-          value={formData.status} 
-          onValueChange={(value) => onSelectChange('status', value)}
-        >
-          <SelectTrigger id="status">
-            <SelectValue placeholder="Sélectionner un statut" />
-          </SelectTrigger>
-          <SelectContent>
-            {statusOptions.map(option => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
     </div>
   );
