@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, UserPlus, Filter, Eye, Pencil } from 'lucide-react';
+import { Search, UserPlus, Eye, Pencil } from 'lucide-react';
 import ClientDialog from '@/components/client/ClientDialog';
 import ClientDeleteDialog from '@/components/client/ClientDeleteDialog';
 import { useClients } from '@/hooks/use-clients';
@@ -24,7 +23,6 @@ const Clients = () => {
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeFilter, setActiveFilter] = useState('all');
   const { clients, isLoading, error, createClient, updateClient, deleteClient } = useClients();
   const { user } = useAuth();
 
@@ -38,7 +36,6 @@ const Clients = () => {
       client.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       client.postal_code?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    // Pour l'instant, on affiche tous les clients (pas de statut spécifique)
     return matchesSearch;
   }) || [];
 
@@ -112,32 +109,6 @@ const Clients = () => {
       </div>
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <div className="flex items-center mb-4 md:mb-0">
-          <Button 
-            variant={activeFilter === 'all' ? 'default' : 'outline'} 
-            size="sm" 
-            className="mr-2"
-            onClick={() => setActiveFilter('all')}
-          >
-            Tous
-          </Button>
-          <Button 
-            variant={activeFilter === 'recent' ? 'default' : 'outline'} 
-            size="sm" 
-            className="mr-2"
-            onClick={() => setActiveFilter('recent')}
-          >
-            Récents
-          </Button>
-          <Button 
-            variant={activeFilter === 'active' ? 'default' : 'outline'} 
-            size="sm"
-            onClick={() => setActiveFilter('active')}
-          >
-            Actifs
-          </Button>
-        </div>
-        
         <div className="flex items-center w-full md:w-auto space-x-2">
           <div className="relative flex-1 md:w-60">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -148,10 +119,6 @@ const Clients = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
-          <Button variant="outline" size="icon">
-            <Filter className="h-4 w-4" />
-          </Button>
           
           <Button 
             className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
