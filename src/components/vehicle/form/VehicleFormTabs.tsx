@@ -14,6 +14,9 @@ interface VehicleFormTabsProps {
   onSelectChange: (name: string, value: string) => void;
   onFileUpload: (e: React.ChangeEvent<HTMLInputElement>, fileType: 'registrationDocument' | 'vehicleImage') => void;
   onRemoveFile: (fileType: 'registrationDocument' | 'vehicleImage') => void;
+  onRegistrationFrontUpload: (url: string) => void;
+  onRegistrationBackUpload: (url: string) => void;
+  onVehicleImageUpload: (url: string) => void;
   onFuelLevelChange: (value: number) => void;
   onAddWorkItem: () => void;
   onRemoveWorkItem: (index: number) => void;
@@ -29,6 +32,9 @@ const VehicleFormTabs: React.FC<VehicleFormTabsProps> = ({
   onSelectChange,
   onFileUpload,
   onRemoveFile,
+  onRegistrationFrontUpload,
+  onRegistrationBackUpload,
+  onVehicleImageUpload,
   onFuelLevelChange,
   onAddWorkItem,
   onRemoveWorkItem,
@@ -71,6 +77,9 @@ const VehicleFormTabs: React.FC<VehicleFormTabsProps> = ({
           vehicleImagePreview={vehicleImagePreview}
           onFileUpload={onFileUpload}
           onRemoveFile={onRemoveFile}
+          onRegistrationFrontUpload={onRegistrationFrontUpload}
+          onRegistrationBackUpload={onRegistrationBackUpload}
+          onVehicleImageUpload={onVehicleImageUpload}
         />
       </TabsContent>
     </Tabs>

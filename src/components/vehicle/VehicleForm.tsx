@@ -26,8 +26,9 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     mileage: defaultValues.mileage || '',
     clientId: defaultValues.clientId || '',
     status: defaultValues.status || 'En attente',
-    registrationDocument: defaultValues.registrationDocument || null,
-    vehicleImage: defaultValues.vehicleImage || null,
+    registrationDocumentFrontUrl: defaultValues.registrationDocumentFrontUrl || '',
+    registrationDocumentBackUrl: defaultValues.registrationDocumentBackUrl || '',
+    vehicleImageUrl: defaultValues.vehicleImageUrl || '',
     insuranceCompany: defaultValues.insuranceCompany || '',
     insuranceExpiryDate: defaultValues.insuranceExpiryDate || '',
     startDate: defaultValues.startDate || '',
@@ -119,6 +120,18 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     }));
   };
 
+  const handleRegistrationFrontUpload = (url: string) => {
+    setFormData(prev => ({ ...prev, registrationDocumentFrontUrl: url }));
+  };
+
+  const handleRegistrationBackUpload = (url: string) => {
+    setFormData(prev => ({ ...prev, registrationDocumentBackUrl: url }));
+  };
+
+  const handleVehicleImageUpload = (url: string) => {
+    setFormData(prev => ({ ...prev, vehicleImageUrl: url }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
@@ -135,6 +148,9 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
         onSelectChange={handleSelectChange}
         onFileUpload={handleFileUpload}
         onRemoveFile={handleRemoveFile}
+        onRegistrationFrontUpload={handleRegistrationFrontUpload}
+        onRegistrationBackUpload={handleRegistrationBackUpload}
+        onVehicleImageUpload={handleVehicleImageUpload}
         onFuelLevelChange={handleFuelLevelChange}
         onAddWorkItem={handleAddWorkItem}
         onRemoveWorkItem={handleRemoveWorkItem}
