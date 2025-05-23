@@ -14,6 +14,7 @@ export type UpdateClient = Database['public']['Tables']['clients']['Update'] & {
 
 export const clientsService = {
   getAll: async () => {
+    console.log('Fetching all clients...');
     const { data, error } = await supabase
       .from('clients')
       .select('*')
@@ -24,10 +25,12 @@ export const clientsService = {
       throw new Error(error.message);
     }
     
+    console.log('Clients fetched successfully:', data);
     return data;
   },
 
   getById: async (id: string) => {
+    console.log(`Fetching client with id: ${id}`);
     const { data, error } = await supabase
       .from('clients')
       .select('*')
@@ -39,6 +42,7 @@ export const clientsService = {
       throw new Error(error.message);
     }
     
+    console.log('Client fetched successfully:', data);
     return data;
   },
   
@@ -54,11 +58,17 @@ export const clientsService = {
       city: client.city,
       postal_code: client.zipCode,
       user_id: client.user_id,
-      driver_license_front_url: client.driverLicenseFrontUrl,
-      driver_license_back_url: client.driverLicenseBackUrl
+      driver_license_front_url: client.driverLicenseFrontUrl || null,
+      driver_license_back_url: client.driverLicenseBackUrl || null
     };
 
     console.log('Creating client with data:', clientData);
+    console.log('Client data structure:', {
+      hasDriverLicenseFront: !!clientData.driver_license_front_url,
+      hasDriverLicenseBack: !!clientData.driver_license_back_url,
+      frontUrl: clientData.driver_license_front_url,
+      backUrl: clientData.driver_license_back_url
+    });
 
     const { data, error } = await supabase
       .from('clients')
@@ -68,9 +78,16 @@ export const clientsService = {
       
     if (error) {
       console.error('Error creating client:', error);
+      console.error('Error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
       throw new Error(error.message);
     }
     
+    console.log('Client created successfully:', data);
     // Add back the company field to the returned data for the frontend
     return { ...data, company };
   },
@@ -86,8 +103,8 @@ export const clientsService = {
       address: client.address,
       city: client.city,
       postal_code: client.zipCode,
-      driver_license_front_url: client.driverLicenseFrontUrl,
-      driver_license_back_url: client.driverLicenseBackUrl
+      driver_license_front_url: client.driverLicenseFrontUrl || null,
+      driver_license_back_url: client.driverLicenseBackUrl || null
     };
 
     console.log('Updating client with data:', clientData);
@@ -104,11 +121,13 @@ export const clientsService = {
       throw new Error(error.message);
     }
     
+    console.log('Client updated successfully:', data);
     // Add back the company field to the returned data for the frontend
     return { ...data, company };
   },
   
   delete: async (id: string) => {
+    console.log(`Deleting client with id: ${id}`);
     const { error } = await supabase
       .from('clients')
       .delete()
@@ -119,6 +138,7 @@ export const clientsService = {
       throw new Error(error.message);
     }
     
+    console.log('Client deleted successfully');
     return true;
   }
 };
