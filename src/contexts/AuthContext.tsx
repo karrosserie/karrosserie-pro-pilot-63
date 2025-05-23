@@ -9,8 +9,8 @@ interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<{ session: Session; user: User; }>;
+  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<{ user: User; session: Session; }>;
   signOut: () => Promise<void>;
 }
 
