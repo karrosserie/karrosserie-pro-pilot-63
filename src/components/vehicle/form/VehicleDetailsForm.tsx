@@ -43,9 +43,9 @@ const VehicleDetailsForm: React.FC<VehicleDetailsFormProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Left column: Road test fields - taking 2/4 of the space */}
-        <div className="lg:col-span-2 space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        {/* Left column: Road test fields - taking 3/5 of the space */}
+        <div className="lg:col-span-3 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="roadTest">Test routier</Label>
             <Select 
@@ -80,7 +80,7 @@ const VehicleDetailsForm: React.FC<VehicleDetailsFormProps> = ({
           </div>
         </div>
 
-        {/* Right column: Fuel Gauge - taking 2/4 of the space */}
+        {/* Right column: Fuel Gauge - taking 2/5 of the space */}
         <div className="lg:col-span-2 space-y-4">
           <div className="text-center">
             <Label>Niveau de carburant</Label>
