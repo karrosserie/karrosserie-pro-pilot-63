@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import VehicleFormTabs from './form/VehicleFormTabs';
@@ -31,6 +30,7 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     vehicleImage: defaultValues.vehicleImage || null,
     insuranceCompany: defaultValues.insuranceCompany || '',
     insuranceExpiryDate: defaultValues.insuranceExpiryDate || '',
+    startDate: defaultValues.startDate || '',
     arrivalDate: defaultValues.arrivalDate || '',
     endDate: defaultValues.endDate || '',
     roadTest: defaultValues.roadTest || '',
