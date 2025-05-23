@@ -4,7 +4,7 @@ import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-im
 import 'react-image-crop/dist/ReactCrop.css';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Maximize2, Minimize2 } from 'lucide-react';
 
 interface ImageCropperProps {
   open: boolean;
@@ -12,6 +12,7 @@ interface ImageCropperProps {
   imageUrl: string;
   onCropComplete: (croppedImageBlob: Blob) => void;
   aspectRatio?: number;
+  allowHorizontalExpansion?: boolean;
 }
 
 export function ImageCropper({
@@ -19,12 +20,20 @@ export function ImageCropper({
   onClose,
   imageUrl,
   onCropComplete,
-  aspectRatio = 4 / 3 // Ratio standard pour un permis de conduire
+  aspectRatio = 4 / 3,
+  allowHorizontalExpansion = false
 }: ImageCropperProps) {
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
+  const [isExpanded, setIsExpanded] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Calculer le ratio d'aspect en fonction de l'état d'expansion
+  const getCurrentAspectRatio = () => {
+    if (!allowHorizontalExpansion) return aspectRatio;
+    return isExpanded ? aspectRatio * 1.5 : aspectRatio; // 50% plus large quand élargi
+  };
 
   // Fonction pour initialiser le recadrage au centre lorsque l'image est chargée
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -37,7 +46,7 @@ export function ImageCropper({
           unit: '%',
           width: 90,
         },
-        aspectRatio,
+        getCurrentAspectRatio(),
         width,
         height
       ),
@@ -46,6 +55,33 @@ export function ImageCropper({
     );
     
     setCrop(crop);
+  };
+
+  // Fonction pour basculer l'expansion horizontale
+  const toggleExpansion = () => {
+    if (!allowHorizontalExpansion || !imageRef.current) return;
+    
+    setIsExpanded(!isExpanded);
+    
+    // Recalculer le recadrage avec le nouveau ratio
+    const { width, height } = imageRef.current;
+    const newAspectRatio = !isExpanded ? aspectRatio * 1.5 : aspectRatio;
+    
+    const newCrop = centerCrop(
+      makeAspectCrop(
+        {
+          unit: '%',
+          width: 90,
+        },
+        newAspectRatio,
+        width,
+        height
+      ),
+      width,
+      height
+    );
+    
+    setCrop(newCrop);
   };
 
   // Fonction pour créer une image recadrée à partir du canvas
@@ -100,17 +136,39 @@ export function ImageCropper({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>Recadrer l'image</DialogTitle>
+          <DialogTitle className="flex items-center justify-between">
+            Recadrer l'image
+            {allowHorizontalExpansion && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={toggleExpansion}
+                className="ml-4"
+              >
+                {isExpanded ? (
+                  <>
+                    <Minimize2 className="mr-2 h-4 w-4" />
+                    Format standard
+                  </>
+                ) : (
+                  <>
+                    <Maximize2 className="mr-2 h-4 w-4" />
+                    Élargir horizontalement
+                  </>
+                )}
+              </Button>
+            )}
+          </DialogTitle>
         </DialogHeader>
         
-        <div className="my-4 max-h-[60vh] overflow-auto">
+        <div className="my-4 max-h-[70vh] overflow-auto">
           <ReactCrop
             crop={crop}
             onChange={(c) => setCrop(c)}
             onComplete={(c) => setCompletedCrop(c)}
-            aspect={aspectRatio}
+            aspect={getCurrentAspectRatio()}
             className="max-w-full"
           >
             <img

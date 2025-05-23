@@ -137,6 +137,9 @@ export function DocumentUploader({
      currentDocumentUrl.toLowerCase().endsWith('.jpeg') || 
      currentDocumentUrl.toLowerCase().endsWith('.png') ||
      currentDocumentUrl.toLowerCase().includes('image'));
+
+  // Vérifier si c'est un permis de conduire pour activer l'expansion horizontale
+  const isDriverLicense = documentType === 'driver-license';
   
   if (isUploading) {
     return (
@@ -241,6 +244,8 @@ export function DocumentUploader({
           onClose={handleCropCancel}
           imageUrl={imageToProcess.tempUrl}
           onCropComplete={handleCropComplete}
+          aspectRatio={4 / 3}
+          allowHorizontalExpansion={isDriverLicense}
         />
       )}
     </>
