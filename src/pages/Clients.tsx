@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -101,14 +102,14 @@ const Clients = () => {
 
   return (
     <div className="page-container">
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Clients</h1>
-        <p className="text-gray-600 mt-1">
-          Consultez et gérez vos clients.
-        </p>
-      </div>
-      
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div className="mb-4 md:mb-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Clients</h1>
+          <p className="text-gray-600 mt-1">
+            Consultez et gérez vos clients.
+          </p>
+        </div>
+        
         <div className="flex items-center w-full md:w-auto space-x-2">
           <div className="relative flex-1 md:w-60">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
