@@ -99,8 +99,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
         )}
         {onDelete && (
           <Button variant="destructive" size="sm" onClick={onDelete}>
-            <Trash2 className="h-4 w-4 mr-1" />
-            Supprimer
+            <Trash2 className="h-4 w-4" />
           </Button>
         )}
       </div>
