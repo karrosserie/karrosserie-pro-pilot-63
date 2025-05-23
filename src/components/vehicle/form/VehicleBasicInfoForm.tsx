@@ -251,20 +251,8 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
         </div>
       </div>
 
-      {/* Start date, arrival date, end date */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="startDate">Date de début</Label>
-          <Input
-            id="startDate"
-            name="startDate"
-            type="date"
-            value={formData.startDate || ''}
-            onChange={onInputChange}
-            disabled={isViewMode}
-          />
-        </div>
-
+      {/* Date d'arrivée, Date de début, Date de fin, Statut */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="space-y-2">
           <Label htmlFor="arrivalDate">Date d'arrivée</Label>
           <Input
@@ -272,6 +260,18 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
             name="arrivalDate"
             type="datetime-local"
             value={formData.arrivalDate || ''}
+            onChange={onInputChange}
+            disabled={isViewMode}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="startDate">Date de début</Label>
+          <Input
+            id="startDate"
+            name="startDate"
+            type="date"
+            value={formData.startDate || ''}
             onChange={onInputChange}
             disabled={isViewMode}
           />
@@ -288,10 +288,7 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
             disabled={isViewMode}
           />
         </div>
-      </div>
 
-      {/* Status field only */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="status">Statut</Label>
           <Select 
@@ -317,3 +314,4 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
 };
 
 export default VehicleBasicInfoForm;
+
