@@ -57,7 +57,12 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
 
     try {
       await signUp(data.email, data.password, data.firstName, data.lastName);
-      // Le toast est déjà géré dans le hook useAuthState
+      toast({
+        title: "Compte créé avec succès",
+        description: "Veuillez vérifier votre boîte mail et cliquer sur le lien de confirmation pour activer votre compte.",
+        variant: "default",
+      });
+      onToggleMode(); // Rediriger vers la page de connexion
     } catch (error: any) {
       // Les erreurs sont déjà gérées dans le hook useAuthState
       console.error("Erreur d'inscription:", error);

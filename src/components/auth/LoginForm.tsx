@@ -17,6 +17,8 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 interface LoginFormProps {
   onToggleMode: () => void;
@@ -31,8 +33,9 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const LoginForm = ({ onToggleMode }: LoginFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [emailVerificationNeeded, setEmailVerificationNeeded] = useState<string | null>(null);
   
-  const { signIn } = useAuth();
+  const { signIn, resendEmailVerification } = useAuth();
   const { toast } = useToast();
 
   const form = useForm<LoginFormValues>({
@@ -45,15 +48,40 @@ const LoginForm = ({ onToggleMode }: LoginFormProps) => {
 
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
+    setEmailVerificationNeeded(null);
 
     try {
       await signIn(data.email, data.password);
       // Pas besoin de toast ici, il est déjà géré dans le hook useAuthState
     } catch (error: any) {
-      // Les erreurs sont déjà gérées dans le hook useAuthState
+      // Vérifier si l'erreur est liée à une adresse email non vérifiée
+      if (error.message?.includes('Email not confirmed') || 
+          error.message?.includes('Email pas encore confirmée')) {
+        setEmailVerificationNeeded(data.email);
+      }
       console.error("Erreur de connexion:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!emailVerificationNeeded) return;
+    
+    try {
+      await resendEmailVerification(emailVerificationNeeded);
+      toast({
+        title: "Email envoyé",
+        description: "Un nouvel email de vérification a été envoyé. Veuillez vérifier votre boîte mail.",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Erreur lors de l'envoi de l'email:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'envoyer l'email de vérification. Veuillez réessayer plus tard.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -63,6 +91,21 @@ const LoginForm = ({ onToggleMode }: LoginFormProps) => {
         <h1 className="text-3xl font-bold text-karrosserie-orange">Karrosserie Pro</h1>
         <p className="text-gray-600 mt-2">Connectez-vous à votre compte</p>
       </div>
+
+      {emailVerificationNeeded && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4 mr-2" />
+          <AlertDescription className="flex flex-col">
+            <span>Votre adresse email n'a pas été vérifiée.</span>
+            <button 
+              onClick={handleResendVerification}
+              className="text-left underline font-medium mt-2"
+            >
+              Cliquez ici pour recevoir un nouvel email de vérification
+            </button>
+          </AlertDescription>
+        </Alert>
+      )}
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

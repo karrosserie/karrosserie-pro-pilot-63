@@ -12,6 +12,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ session: Session; user: User; }>;
   signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<{ user: User; session: Session; }>;
   signOut: () => Promise<void>;
+  resendEmailVerification: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

@@ -50,6 +50,7 @@ export const authService = {
           first_name: firstName,
           last_name: lastName,
         },
+        emailRedirectTo: `${window.location.origin}/auth`,
       },
     });
 
@@ -79,5 +80,22 @@ export const authService = {
     });
 
     return data.subscription;
+  },
+
+  /**
+   * Resend email verification
+   */
+  resendEmailVerification: async (email: string) => {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth`,
+      },
+    });
+    
+    if (error) {
+      throw error;
+    }
   },
 };
