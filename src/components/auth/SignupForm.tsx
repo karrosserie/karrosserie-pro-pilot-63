@@ -27,6 +27,10 @@ const signupSchema = z.object({
   lastName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
   email: z.string().email("Veuillez entrer une adresse email valide"),
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Les mots de passe ne correspondent pas",
+  path: ["confirmPassword"],
 });
 
 type SignupFormValues = z.infer<typeof signupSchema>;
@@ -44,6 +48,7 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
       lastName: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
@@ -52,11 +57,7 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
 
     try {
       await signUp(data.email, data.password, data.firstName, data.lastName);
-      toast({
-        title: "Compte créé avec succès",
-        description: "Votre compte a été créé. Vous pouvez maintenant vous connecter.",
-      });
-      onToggleMode();
+      // Le toast est déjà géré dans le hook useAuthState
     } catch (error: any) {
       // Les erreurs sont déjà gérées dans le hook useAuthState
       console.error("Erreur d'inscription:", error);
@@ -83,6 +84,7 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
                   <FormLabel>Prénom</FormLabel>
                   <FormControl>
                     <Input
+                      type="text"
                       placeholder="Jean"
                       {...field}
                     />
@@ -91,7 +93,7 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="lastName"
@@ -100,6 +102,7 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
                   <FormLabel>Nom</FormLabel>
                   <FormControl>
                     <Input
+                      type="text"
                       placeholder="Dupont"
                       {...field}
                     />
@@ -134,6 +137,24 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
             render={({ field }) => (
               <FormItem className="space-y-2">
                 <FormLabel>Mot de passe</FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="••••••••"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel>Confirmer le mot de passe</FormLabel>
                 <FormControl>
                   <Input
                     type="password"
