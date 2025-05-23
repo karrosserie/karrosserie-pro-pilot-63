@@ -3,7 +3,6 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Calendar } from 'lucide-react';
 import { 
   Select,
   SelectContent,
@@ -227,18 +226,14 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
 
         <div className="space-y-2">
           <Label htmlFor="insuranceExpiryDate">Date d'expiration</Label>
-          <div className="relative">
-            <Input
-              id="insuranceExpiryDate"
-              name="insuranceExpiryDate"
-              type="date"
-              value={formData.insuranceExpiryDate}
-              onChange={onInputChange}
-              disabled={isViewMode}
-              className="pr-8"
-            />
-            <Calendar className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-          </div>
+          <Input
+            id="insuranceExpiryDate"
+            name="insuranceExpiryDate"
+            type="date"
+            value={formData.insuranceExpiryDate}
+            onChange={onInputChange}
+            disabled={isViewMode}
+          />
         </div>
       </div>
 
@@ -246,50 +241,38 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="startDate">Date de début</Label>
-          <div className="relative">
-            <Input
-              id="startDate"
-              name="startDate"
-              type="date"
-              value={formData.startDate}
-              onChange={onInputChange}
-              disabled={isViewMode}
-              className="pr-8"
-            />
-            <Calendar className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-          </div>
+          <Input
+            id="startDate"
+            name="startDate"
+            type="date"
+            value={formData.startDate}
+            onChange={onInputChange}
+            disabled={isViewMode}
+          />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="arrivalDate">Date d'arrivée</Label>
-          <div className="relative">
-            <Input
-              id="arrivalDate"
-              name="arrivalDate"
-              type="datetime-local"
-              value={formData.arrivalDate}
-              onChange={onInputChange}
-              disabled={isViewMode}
-              className="pr-8"
-            />
-            <Calendar className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-          </div>
+          <Input
+            id="arrivalDate"
+            name="arrivalDate"
+            type="datetime-local"
+            value={formData.arrivalDate}
+            onChange={onInputChange}
+            disabled={isViewMode}
+          />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="endDate">Date de fin</Label>
-          <div className="relative">
-            <Input
-              id="endDate"
-              name="endDate"
-              type="date"
-              value={formData.endDate}
-              onChange={onInputChange}
-              disabled={isViewMode}
-              className="pr-8"
-            />
-            <Calendar className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-          </div>
+          <Input
+            id="endDate"
+            name="endDate"
+            type="date"
+            value={formData.endDate}
+            onChange={onInputChange}
+            disabled={isViewMode}
+          />
         </div>
       </div>
 
