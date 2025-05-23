@@ -18,7 +18,9 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="lastName">Nom</Label>
+          <Label htmlFor="lastName">
+            Nom <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="lastName"
             name="lastName"
@@ -30,7 +32,9 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="firstName">Prénom</Label>
+          <Label htmlFor="firstName">
+            Prénom <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="firstName"
             name="firstName"
@@ -56,7 +60,9 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="phone">Téléphone</Label>
+          <Label htmlFor="phone">
+            Téléphone <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="phone"
             name="phone"
@@ -80,36 +86,45 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="address">Adresse</Label>
+        <Label htmlFor="address">
+          Adresse <span className="text-red-500">*</span>
+        </Label>
         <Input
           id="address"
           name="address"
           value={formData.address}
           onChange={handleChange}
           disabled={isViewMode}
+          required
         />
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="zipCode">Code postal</Label>
+          <Label htmlFor="zipCode">
+            Code postal <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="zipCode"
             name="zipCode"
             value={formData.zipCode}
             onChange={handleChange}
             disabled={isViewMode}
+            required
           />
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="city">Ville</Label>
+          <Label htmlFor="city">
+            Ville <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="city"
             name="city"
             value={formData.city}
             onChange={handleChange}
             disabled={isViewMode}
+            required
           />
         </div>
       </div>

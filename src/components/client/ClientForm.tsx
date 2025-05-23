@@ -44,8 +44,34 @@ const ClientForm: React.FC<ClientFormProps> = ({
     setFormData(prev => ({ ...prev, driverLicenseBackUrl: url }));
   };
 
+  const validateForm = () => {
+    const requiredFields = ['firstName', 'lastName', 'phone', 'address', 'city', 'zipCode'];
+    for (const field of requiredFields) {
+      if (!formData[field]?.trim()) {
+        alert(`Le champ ${getFieldLabel(field)} est obligatoire.`);
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const getFieldLabel = (field: string) => {
+    const labels = {
+      firstName: 'Prénom',
+      lastName: 'Nom',
+      phone: 'Téléphone',
+      address: 'Adresse',
+      city: 'Ville',
+      zipCode: 'Code postal'
+    };
+    return labels[field] || field;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isViewMode && !validateForm()) {
+      return;
+    }
     onSubmit(formData);
   };
 
