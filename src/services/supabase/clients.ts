@@ -43,8 +43,8 @@ export const clientsService = {
   },
   
   create: async (client: any) => {
-    // Map front-end field names to database field names
-    const clientData = {
+    // Extract company field so it's not sent to the database
+    const { company, ...clientData } = {
       first_name: client.firstName,
       last_name: client.lastName,
       email: client.email,
@@ -53,7 +53,6 @@ export const clientsService = {
       city: client.city,
       postal_code: client.zipCode,
       user_id: client.user_id,
-      company: client.company,
       driver_license_front_url: client.driverLicenseFrontUrl,
       driver_license_back_url: client.driverLicenseBackUrl
     };
@@ -71,12 +70,13 @@ export const clientsService = {
       throw new Error(error.message);
     }
     
-    return data;
+    // Add back the company field to the returned data for the frontend
+    return { ...data, company: client.company };
   },
   
   update: async (id: string, client: any) => {
-    // Map front-end field names to database field names
-    const clientData = {
+    // Extract company field so it's not sent to the database
+    const { company, ...clientData } = {
       first_name: client.firstName,
       last_name: client.lastName,
       email: client.email,
@@ -84,7 +84,6 @@ export const clientsService = {
       address: client.address,
       city: client.city,
       postal_code: client.zipCode,
-      company: client.company,
       driver_license_front_url: client.driverLicenseFrontUrl,
       driver_license_back_url: client.driverLicenseBackUrl
     };
@@ -103,7 +102,8 @@ export const clientsService = {
       throw new Error(error.message);
     }
     
-    return data;
+    // Add back the company field to the returned data for the frontend
+    return { ...data, company: client.company };
   },
   
   delete: async (id: string) => {
