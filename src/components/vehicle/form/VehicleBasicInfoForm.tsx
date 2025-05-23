@@ -56,6 +56,28 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
 
   return (
     <div className="space-y-4">
+      {/* Client - moved before brand */}
+      <div className="space-y-2">
+        <Label htmlFor="clientId">Client</Label>
+        <Select 
+          disabled={isViewMode} 
+          value={formData.clientId} 
+          onValueChange={(value) => onSelectChange('clientId', value)}
+        >
+          <SelectTrigger id="clientId">
+            <SelectValue placeholder="Sélectionner un client" />
+          </SelectTrigger>
+          <SelectContent>
+            {clients?.map(client => (
+              <SelectItem key={client.id} value={client.id}>
+                {client.first_name} {client.last_name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Brand and Model */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="brand">Marque</Label>
@@ -98,7 +120,8 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* License plate, Year, Color, and Mileage on the same line */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="space-y-2">
           <Label htmlFor="licensePlate">Plaque d'immatriculation</Label>
           <Input
@@ -124,9 +147,7 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
             disabled={isViewMode}
           />
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="color">Couleur</Label>
           <Input
@@ -150,47 +171,26 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
           />
         </div>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="clientId">Client</Label>
-          <Select 
-            disabled={isViewMode} 
-            value={formData.clientId} 
-            onValueChange={(value) => onSelectChange('clientId', value)}
-          >
-            <SelectTrigger id="clientId">
-              <SelectValue placeholder="Sélectionner un client" />
-            </SelectTrigger>
-            <SelectContent>
-              {clients?.map(client => (
-                <SelectItem key={client.id} value={client.id}>
-                  {client.first_name} {client.last_name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="status">Statut</Label>
-          <Select 
-            disabled={isViewMode} 
-            value={formData.status} 
-            onValueChange={(value) => onSelectChange('status', value)}
-          >
-            <SelectTrigger id="status">
-              <SelectValue placeholder="Sélectionner un statut" />
-            </SelectTrigger>
-            <SelectContent>
-              {statusOptions.map(option => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      {/* Status */}
+      <div className="space-y-2">
+        <Label htmlFor="status">Statut</Label>
+        <Select 
+          disabled={isViewMode} 
+          value={formData.status} 
+          onValueChange={(value) => onSelectChange('status', value)}
+        >
+          <SelectTrigger id="status">
+            <SelectValue placeholder="Sélectionner un statut" />
+          </SelectTrigger>
+          <SelectContent>
+            {statusOptions.map(option => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
