@@ -183,9 +183,9 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
         </div>
       </div>
 
-      {/* Insurance information */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
+      {/* Insurance information - ajustement des largeurs */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="md:col-span-2 space-y-2">
           <Label htmlFor="insuranceCompany">Compagnie d'assurance</Label>
           <Select 
             disabled={isViewMode} 
@@ -218,8 +218,8 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
         </div>
       </div>
 
-      {/* Arrival date, end date, and road test on the same line */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Arrival date, end date, and road test - ajustement des largeurs */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="space-y-2">
           <Label htmlFor="arrivalDate">Date d'arrivée</Label>
           <Input
@@ -244,7 +244,7 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="md:col-span-2 space-y-2">
           <Label htmlFor="roadTest">Test routier</Label>
           <Select 
             disabled={isViewMode} 

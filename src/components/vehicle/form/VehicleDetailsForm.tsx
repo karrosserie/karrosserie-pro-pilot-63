@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -55,7 +56,9 @@ const VehicleDetailsForm: React.FC<VehicleDetailsFormProps> = ({
 
         {/* Right column: Fuel Gauge */}
         <div className="space-y-4">
-          <Label>Niveau de carburant</Label>
+          <div className="text-center">
+            <Label>Niveau de carburant</Label>
+          </div>
           <div className="flex justify-center">
             <FuelGauge
               value={formData.fuelLevel || 50}
