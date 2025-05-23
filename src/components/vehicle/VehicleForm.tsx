@@ -34,7 +34,8 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     arrivalDate: defaultValues.arrivalDate || '',
     endDate: defaultValues.endDate || '',
     roadTest: defaultValues.roadTest || '',
-    roadTestNotes: defaultValues.roadTestNotes || ''
+    roadTestNotes: defaultValues.roadTestNotes || '',
+    fuelLevel: defaultValues.fuelLevel || 50
   });
 
   const [regDocPreview, setRegDocPreview] = useState<string | null>(
@@ -89,6 +90,10 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     setFormData(prev => ({ ...prev, [fileType]: null }));
   };
 
+  const handleFuelLevelChange = (value: number) => {
+    setFormData(prev => ({ ...prev, fuelLevel: value }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
@@ -105,6 +110,7 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
         onSelectChange={handleSelectChange}
         onFileUpload={handleFileUpload}
         onRemoveFile={handleRemoveFile}
+        onFuelLevelChange={handleFuelLevelChange}
       />
       
       <div className="flex justify-end space-x-2 pt-4 border-t">
