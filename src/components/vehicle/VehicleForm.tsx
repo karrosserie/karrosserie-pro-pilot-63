@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import VehicleFormTabs from './form/VehicleFormTabs';
@@ -44,7 +45,7 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     defaultValues.vehicleImage || null
   );
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };

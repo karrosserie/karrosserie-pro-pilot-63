@@ -2,6 +2,7 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Select,
   SelectContent,
@@ -14,7 +15,7 @@ import { useClients } from '@/hooks/use-clients';
 interface VehicleBasicInfoFormProps {
   formData: any;
   isViewMode: boolean;
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onSelectChange: (name: string, value: string) => void;
 }
 
@@ -217,8 +218,8 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
         </div>
       </div>
 
-      {/* Arrival and end dates */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Arrival date, end date, and road test on the same line */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="arrivalDate">Date d'arrivée</Label>
           <Input
@@ -242,10 +243,7 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
             disabled={isViewMode}
           />
         </div>
-      </div>
 
-      {/* Road test information */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="roadTest">Test routier</Label>
           <Select 
@@ -265,18 +263,20 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
             </SelectContent>
           </Select>
         </div>
+      </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="roadTestNotes">Notes sur le test routier</Label>
-          <Input
-            id="roadTestNotes"
-            name="roadTestNotes"
-            value={formData.roadTestNotes}
-            onChange={onInputChange}
-            disabled={isViewMode}
-            placeholder="Notes sur le test routier..."
-          />
-        </div>
+      {/* Road test notes on its own line */}
+      <div className="space-y-2">
+        <Label htmlFor="roadTestNotes">Notes sur le test routier</Label>
+        <Textarea
+          id="roadTestNotes"
+          name="roadTestNotes"
+          value={formData.roadTestNotes}
+          onChange={onInputChange}
+          disabled={isViewMode}
+          placeholder="Notes sur le test routier..."
+          rows={3}
+        />
       </div>
 
       {/* Status */}
