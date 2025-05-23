@@ -108,20 +108,20 @@ const Clients = () => {
 
   return (
     <div className="page-container">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
         <div className="mb-4 md:mb-0">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Clients</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Clients</h1>
+          <p className="text-gray-600">
             Consultez et gérez vos clients.
           </p>
         </div>
         
-        <div className="flex items-center w-full md:w-auto space-x-2">
-          <div className="relative flex-1 md:w-60">
+        <div className="flex items-center space-x-3">
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input 
               placeholder="Rechercher un client..." 
-              className="pl-10"
+              className="pl-10 w-64 bg-gray-50 border-gray-200"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -129,11 +129,11 @@ const Clients = () => {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" className="bg-white border-gray-200">
                 <Filter className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="bg-white">
               <DropdownMenuItem>Tous les clients</DropdownMenuItem>
               <DropdownMenuItem>Clients récents</DropdownMenuItem>
               <DropdownMenuItem>Clients actifs</DropdownMenuItem>
@@ -141,7 +141,7 @@ const Clients = () => {
           </DropdownMenu>
           
           <Button 
-            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white px-4 py-2"
             onClick={handleCreateClient}
           >
             <UserPlus className="h-4 w-4 mr-2" />
