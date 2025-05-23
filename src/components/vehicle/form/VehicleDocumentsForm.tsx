@@ -2,6 +2,7 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { DocumentUploader } from '@/components/shared/DocumentUploader';
+import MultipleVehicleImages from './MultipleVehicleImages';
 
 interface VehicleDocumentsFormProps {
   formData: any;
@@ -13,6 +14,7 @@ interface VehicleDocumentsFormProps {
   onRegistrationFrontUpload: (url: string) => void;
   onRegistrationBackUpload: (url: string) => void;
   onVehicleImageUpload: (url: string) => void;
+  onVehicleImagesUpdate: (images: string[]) => void;
 }
 
 const VehicleDocumentsForm: React.FC<VehicleDocumentsFormProps> = ({
@@ -20,9 +22,32 @@ const VehicleDocumentsForm: React.FC<VehicleDocumentsFormProps> = ({
   isViewMode,
   onRegistrationFrontUpload,
   onRegistrationBackUpload,
-  onVehicleImageUpload
+  onVehicleImagesUpdate
 }) => {
   const vehicleId = formData.id || 'new-vehicle';
+  const vehicleImages = formData.vehicleImages || [''];
+
+  const handleImageAdd = (url: string) => {
+    if (vehicleImages[vehicleImages.length - 1] === '') {
+      // Remplacer le dernier slot vide
+      const updatedImages = [...vehicleImages];
+      updatedImages[updatedImages.length - 1] = url;
+      onVehicleImagesUpdate(updatedImages);
+    } else {
+      // Ajouter une nouvelle image
+      onVehicleImagesUpdate([...vehicleImages, url]);
+    }
+  };
+
+  const handleImageRemove = (index: number) => {
+    const updatedImages = vehicleImages.filter((_, i) => i !== index);
+    // S'assurer qu'il y a au moins un slot vide si toutes les images sont supprimées
+    if (updatedImages.length === 0) {
+      onVehicleImagesUpdate(['']);
+    } else {
+      onVehicleImagesUpdate(updatedImages);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -48,16 +73,13 @@ const VehicleDocumentsForm: React.FC<VehicleDocumentsFormProps> = ({
         />
       </div>
 
-      <div className="space-y-2">
-        <Label>Photo du véhicule</Label>
-        <DocumentUploader
-          documentType="vehicle-image"
-          documentId={vehicleId}
-          currentDocumentUrl={formData.vehicleImageUrl}
-          onUploadComplete={onVehicleImageUpload}
-          isViewMode={isViewMode}
-        />
-      </div>
+      <MultipleVehicleImages
+        vehicleId={vehicleId}
+        vehicleImages={vehicleImages}
+        isViewMode={isViewMode}
+        onImageAdd={handleImageAdd}
+        onImageRemove={handleImageRemove}
+      />
     </div>
   );
 };

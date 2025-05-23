@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import VehicleFormTabs from './form/VehicleFormTabs';
@@ -29,6 +30,7 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     registrationDocumentFrontUrl: defaultValues.registrationDocumentFrontUrl || '',
     registrationDocumentBackUrl: defaultValues.registrationDocumentBackUrl || '',
     vehicleImageUrl: defaultValues.vehicleImageUrl || '',
+    vehicleImages: defaultValues.vehicleImages || [''],
     insuranceCompany: defaultValues.insuranceCompany || '',
     insuranceExpiryDate: defaultValues.insuranceExpiryDate || '',
     startDate: defaultValues.startDate || '',
@@ -132,6 +134,10 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     setFormData(prev => ({ ...prev, vehicleImageUrl: url }));
   };
 
+  const handleVehicleImagesUpdate = (images: string[]) => {
+    setFormData(prev => ({ ...prev, vehicleImages: images }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
@@ -151,6 +157,7 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
         onRegistrationFrontUpload={handleRegistrationFrontUpload}
         onRegistrationBackUpload={handleRegistrationBackUpload}
         onVehicleImageUpload={handleVehicleImageUpload}
+        onVehicleImagesUpdate={handleVehicleImagesUpdate}
         onFuelLevelChange={handleFuelLevelChange}
         onAddWorkItem={handleAddWorkItem}
         onRemoveWorkItem={handleRemoveWorkItem}
