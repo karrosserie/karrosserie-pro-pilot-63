@@ -1,92 +1,33 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import VehicleDialog from '@/components/vehicle/VehicleDialog';
 import VehiclesHeader from '@/components/vehicle/VehiclesHeader';
 import VehiclesFilters from '@/components/vehicle/VehiclesFilters';
 import VehiclesGrid from '@/components/vehicle/VehiclesGrid';
 import VehiclesEmptyState from '@/components/vehicle/VehiclesEmptyState';
-import { useVehicles } from '@/hooks/use-vehicles';
-import { useAuth } from '@/contexts/AuthContext';
 import { TableLoading } from '@/components/ui/loading';
 import { ErrorMessage } from '@/components/ui/error-message';
+import { useVehiclesPage } from '@/hooks/use-vehicles-page';
 
 const Vehicles = () => {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
-  const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
-  const [statusFilter, setStatusFilter] = useState<string>('Tous');
-  const [searchQuery, setSearchQuery] = useState('');
-  
-  const { vehicles, isLoading, error, createVehicle, updateVehicle, deleteVehicle } = useVehicles();
-  const { user } = useAuth();
-
-  const handleCreateVehicle = () => {
-    setSelectedVehicle(null);
-    setDialogMode('create');
-    setDialogOpen(true);
-  };
-
-  const handleViewVehicle = (vehicle: any) => {
-    setSelectedVehicle(vehicle);
-    setDialogMode('view');
-    setDialogOpen(true);
-  };
-
-  const handleEditVehicle = (vehicle: any) => {
-    setSelectedVehicle(vehicle);
-    setDialogMode('edit');
-    setDialogOpen(true);
-  };
-
-  const handleDeleteVehicle = (vehicleId: string) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?')) {
-      deleteVehicle.mutate(vehicleId);
-    }
-  };
-
-  const handleVehicleSubmit = (data: any) => {
-    if (dialogMode === 'create') {
-      createVehicle.mutate({
-        brand: data.brand,
-        model: data.model,
-        year: data.year ? parseInt(data.year) : null,
-        license_plate: data.licensePlate,
-        color: data.color,
-        vin: data.vin,
-        mileage: data.mileage ? parseInt(data.mileage) : null,
-        fuel_type: data.fuelType,
-        client_id: data.clientId,
-        user_id: user ? user.id : null,
-      });
-    } else if (dialogMode === 'edit' && selectedVehicle) {
-      updateVehicle.mutate({
-        id: selectedVehicle.id,
-        data: {
-          brand: data.brand,
-          model: data.model,
-          year: data.year ? parseInt(data.year) : null,
-          license_plate: data.licensePlate,
-          color: data.color,
-          vin: data.vin,
-          mileage: data.mileage ? parseInt(data.mileage) : null,
-          fuel_type: data.fuelType,
-          client_id: data.clientId,
-        }
-      });
-    }
-    setDialogOpen(false);
-  };
-
-  // Filter vehicles based on status and search
-  const filteredVehicles = vehicles?.filter(vehicle => {
-    const vehicleStatus = vehicle.status || 'En attente';
-    const matchesStatus = statusFilter === 'Tous' || vehicleStatus === statusFilter;
-    const matchesSearch = searchQuery === '' || 
-      vehicle.brand?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vehicle.model?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vehicle.license_plate?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesStatus && matchesSearch;
-  }) || [];
+  const {
+    dialogOpen,
+    dialogMode,
+    selectedVehicle,
+    statusFilter,
+    searchQuery,
+    vehicles,
+    isLoading,
+    error,
+    setDialogOpen,
+    setStatusFilter,
+    setSearchQuery,
+    handleCreateVehicle,
+    handleViewVehicle,
+    handleEditVehicle,
+    handleDeleteVehicle,
+    handleVehicleSubmit,
+  } = useVehiclesPage();
 
   if (isLoading) return <TableLoading />;
   if (error) return <ErrorMessage message={error.message} />;
@@ -102,7 +43,7 @@ const Vehicles = () => {
         onSearchQueryChange={setSearchQuery}
       />
       
-      {filteredVehicles.length === 0 ? (
+      {vehicles.length === 0 ? (
         <VehiclesEmptyState
           searchQuery={searchQuery}
           statusFilter={statusFilter}
@@ -110,14 +51,13 @@ const Vehicles = () => {
         />
       ) : (
         <VehiclesGrid
-          vehicles={filteredVehicles}
+          vehicles={vehicles}
           onViewVehicle={handleViewVehicle}
           onEditVehicle={handleEditVehicle}
           onDeleteVehicle={handleDeleteVehicle}
         />
       )}
 
-      {/* Vehicle Dialog */}
       <VehicleDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
