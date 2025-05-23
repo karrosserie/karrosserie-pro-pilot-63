@@ -75,17 +75,7 @@ const Vehicles = () => {
             ? 'Modifiez les informations du véhicule.'
             : ''
         }
-        defaultValues={selectedVehicle ? {
-          brand: selectedVehicle.brand || '',
-          model: selectedVehicle.model || '',
-          year: selectedVehicle.year?.toString() || '',
-          licensePlate: selectedVehicle.license_plate || '',
-          color: selectedVehicle.color || '',
-          vin: selectedVehicle.vin || '',
-          mileage: selectedVehicle.mileage?.toString() || '',
-          fuelType: selectedVehicle.fuel_type || '',
-          clientId: selectedVehicle.client_id || '',
-        } : {}}
+        defaultValues={selectedVehicle || {}}
         onSubmit={handleVehicleSubmit}
         mode={dialogMode}
       />

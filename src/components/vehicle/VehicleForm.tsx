@@ -17,30 +17,33 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
   onCancel
 }) => {
   const [formData, setFormData] = useState({
+    // Required fields
+    clientId: defaultValues.client_id || '',
+    vin: defaultValues.vin || '',
     brand: defaultValues.brand || '',
     model: defaultValues.model || '',
-    year: defaultValues.year || new Date().getFullYear(),
-    licensePlate: defaultValues.licensePlate || '',
-    vin: defaultValues.vin || '',
-    engineNumber: defaultValues.engineNumber || '',
+    licensePlate: defaultValues.license_plate || '',
+    
+    // Optional fields
+    engineNumber: defaultValues.engine_number || '',
+    year: defaultValues.year || '',
     color: defaultValues.color || '',
     mileage: defaultValues.mileage || '',
-    clientId: defaultValues.clientId || '',
+    insuranceCompany: defaultValues.insurance_company || '',
+    insuranceExpiryDate: defaultValues.insurance_expiry_date || '',
+    startDate: defaultValues.start_date || '',
+    arrivalDate: defaultValues.arrival_date || '',
+    endDate: defaultValues.end_date || '',
     status: defaultValues.status || 'En attente',
-    registrationDocumentFrontUrl: defaultValues.registrationDocumentFrontUrl || '',
-    registrationDocumentBackUrl: defaultValues.registrationDocumentBackUrl || '',
-    vehicleImageUrl: defaultValues.vehicleImageUrl || '',
-    vehicleImages: defaultValues.vehicleImages || [''],
-    insuranceCompany: defaultValues.insuranceCompany || '',
-    insuranceExpiryDate: defaultValues.insuranceExpiryDate || '',
-    startDate: defaultValues.startDate || '',
-    arrivalDate: defaultValues.arrivalDate || '',
-    endDate: defaultValues.endDate || '',
-    roadTest: defaultValues.roadTest || '',
-    roadTestNotes: defaultValues.roadTestNotes || '',
-    fuelLevel: defaultValues.fuelLevel || 50,
-    preAccidentDefects: defaultValues.preAccidentDefects || '',
-    workItems: defaultValues.workItems || ['']
+    roadTest: defaultValues.road_test || '',
+    roadTestNotes: defaultValues.road_test_notes || '',
+    fuelLevel: defaultValues.fuel_level || 50,
+    preAccidentDefects: defaultValues.pre_accident_defects || '',
+    workItems: defaultValues.work_items || [''],
+    registrationDocumentFrontUrl: defaultValues.registration_document_front_url || '',
+    registrationDocumentBackUrl: defaultValues.registration_document_back_url || '',
+    vehicleImageUrl: defaultValues.vehicle_image_url || '',
+    vehicleImages: defaultValues.vehicle_images || ['']
   });
 
   const [regDocPreview, setRegDocPreview] = useState<string | null>(
@@ -138,8 +141,24 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     setFormData(prev => ({ ...prev, vehicleImages: images }));
   };
 
+  const validateRequiredFields = () => {
+    const requiredFields = ['clientId', 'vin', 'brand', 'model', 'licensePlate'];
+    const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
+    
+    if (missingFields.length > 0) {
+      alert('Les champs suivants sont obligatoires : Client, Numéro de série (VIN), Marque, Modèle, Plaque d\'immatriculation');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!isViewMode && !validateRequiredFields()) {
+      return;
+    }
+    
     onSubmit(formData);
   };
 

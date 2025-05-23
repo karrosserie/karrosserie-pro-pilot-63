@@ -51,6 +51,11 @@ export const vehiclesService = {
   },
   
   create: async (vehicle: NewVehicle) => {
+    // Validate required fields
+    if (!vehicle.client_id || !vehicle.vin || !vehicle.brand || !vehicle.model || !vehicle.license_plate) {
+      throw new Error('Les champs Client, Numéro de série (VIN), Marque, Modèle et Plaque d\'immatriculation sont obligatoires.');
+    }
+
     const { data, error } = await supabase
       .from('vehicles')
       .insert([vehicle])

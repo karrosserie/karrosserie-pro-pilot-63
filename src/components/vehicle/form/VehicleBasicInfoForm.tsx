@@ -62,16 +62,19 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* VIN and Engine Number - moved from Details tab */}
+      {/* VIN and Engine Number */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="vin">Numéro de série (VIN)</Label>
+          <Label htmlFor="vin">
+            Numéro de série (VIN) <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="vin"
             name="vin"
-            value={formData.vin}
+            value={formData.vin || ''}
             onChange={onInputChange}
             disabled={isViewMode}
+            required
           />
         </div>
 
@@ -80,7 +83,7 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
           <Input
             id="engineNumber"
             name="engineNumber"
-            value={formData.engineNumber}
+            value={formData.engineNumber || ''}
             onChange={onInputChange}
             disabled={isViewMode}
           />
@@ -90,11 +93,14 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
       {/* Client, Brand and Model on the same line */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="clientId">Client</Label>
+          <Label htmlFor="clientId">
+            Client <span className="text-red-500">*</span>
+          </Label>
           <Select 
             disabled={isViewMode} 
-            value={formData.clientId} 
+            value={formData.clientId || ''} 
             onValueChange={(value) => onSelectChange('clientId', value)}
+            required
           >
             <SelectTrigger id="clientId">
               <SelectValue placeholder="Sélectionner un client" />
@@ -110,11 +116,14 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="brand">Marque</Label>
+          <Label htmlFor="brand">
+            Marque <span className="text-red-500">*</span>
+          </Label>
           <Select 
             disabled={isViewMode} 
-            value={formData.brand} 
+            value={formData.brand || ''} 
             onValueChange={(value) => onSelectChange('brand', value)}
+            required
           >
             <SelectTrigger id="brand">
               <SelectValue placeholder="Sélectionner une marque" />
@@ -130,11 +139,14 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="model">Modèle</Label>
+          <Label htmlFor="model">
+            Modèle <span className="text-red-500">*</span>
+          </Label>
           <Select 
             disabled={isViewMode || !formData.brand} 
-            value={formData.model} 
+            value={formData.model || ''} 
             onValueChange={(value) => onSelectChange('model', value)}
+            required
           >
             <SelectTrigger id="model">
               <SelectValue placeholder="Sélectionner un modèle" />
@@ -153,11 +165,13 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
       {/* License plate, Year, Color, and Mileage on the same line */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="licensePlate">Plaque d'immatriculation</Label>
+          <Label htmlFor="licensePlate">
+            Plaque d'immatriculation <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="licensePlate"
             name="licensePlate"
-            value={formData.licensePlate}
+            value={formData.licensePlate || ''}
             onChange={onInputChange}
             disabled={isViewMode}
             required
@@ -172,7 +186,7 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
             type="number"
             min="1900"
             max={new Date().getFullYear() + 1}
-            value={formData.year}
+            value={formData.year || ''}
             onChange={onInputChange}
             disabled={isViewMode}
           />
@@ -183,7 +197,7 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
           <Input
             id="color"
             name="color"
-            value={formData.color}
+            value={formData.color || ''}
             onChange={onInputChange}
             disabled={isViewMode}
           />
@@ -195,20 +209,20 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
             id="mileage"
             name="mileage"
             type="number"
-            value={formData.mileage}
+            value={formData.mileage || ''}
             onChange={onInputChange}
             disabled={isViewMode}
           />
         </div>
       </div>
 
-      {/* Insurance information - ajustement des largeurs */}
+      {/* Insurance information */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div className="md:col-span-4 space-y-2">
           <Label htmlFor="insuranceCompany">Compagnie d'assurance</Label>
           <Select 
             disabled={isViewMode} 
-            value={formData.insuranceCompany} 
+            value={formData.insuranceCompany || ''} 
             onValueChange={(value) => onSelectChange('insuranceCompany', value)}
           >
             <SelectTrigger id="insuranceCompany">
@@ -230,14 +244,14 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
             id="insuranceExpiryDate"
             name="insuranceExpiryDate"
             type="date"
-            value={formData.insuranceExpiryDate}
+            value={formData.insuranceExpiryDate || ''}
             onChange={onInputChange}
             disabled={isViewMode}
           />
         </div>
       </div>
 
-      {/* Start date, arrival date, end date - ajustement des largeurs */}
+      {/* Start date, arrival date, end date */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="startDate">Date de début</Label>
@@ -245,7 +259,7 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
             id="startDate"
             name="startDate"
             type="date"
-            value={formData.startDate}
+            value={formData.startDate || ''}
             onChange={onInputChange}
             disabled={isViewMode}
           />
@@ -257,7 +271,7 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
             id="arrivalDate"
             name="arrivalDate"
             type="datetime-local"
-            value={formData.arrivalDate}
+            value={formData.arrivalDate || ''}
             onChange={onInputChange}
             disabled={isViewMode}
           />
@@ -269,7 +283,7 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
             id="endDate"
             name="endDate"
             type="date"
-            value={formData.endDate}
+            value={formData.endDate || ''}
             onChange={onInputChange}
             disabled={isViewMode}
           />
@@ -282,7 +296,7 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
           <Label htmlFor="status">Statut</Label>
           <Select 
             disabled={isViewMode} 
-            value={formData.status} 
+            value={formData.status || 'En attente'} 
             onValueChange={(value) => onSelectChange('status', value)}
           >
             <SelectTrigger id="status">
