@@ -90,6 +90,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
   const navItems = [
     { icon: <Home className="app-icon" />, label: 'Tableau de bord', path: '/' },
     { icon: <Users className="app-icon" />, label: 'Clients', path: '/clients' },
+    { icon: <Car className="app-icon" />, label: 'Véhicules', path: '/vehicles' },
     { 
       icon: <FileText className="app-icon" />, 
       label: 'Documents', 
@@ -102,7 +103,6 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
         { label: 'Factures', path: '/documents/factures' },
       ]
     },
-    { icon: <Car className="app-icon" />, label: 'Véhicules', path: '/vehicles' },
     { icon: <CreditCard className="app-icon" />, label: 'Cession de créance', path: '/cessions' },
     { icon: <Clock className="app-icon" />, label: 'Véhicules de courtoisie', path: '/fleet' },
     { icon: <Receipt className="app-icon" />, label: 'Comptabilité', path: '/accounting' },
