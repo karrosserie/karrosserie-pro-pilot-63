@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import VehicleFormTabs from './form/VehicleFormTabs';
@@ -28,7 +27,13 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     clientId: defaultValues.clientId || '',
     status: defaultValues.status || 'En attente',
     registrationDocument: defaultValues.registrationDocument || null,
-    vehicleImage: defaultValues.vehicleImage || null
+    vehicleImage: defaultValues.vehicleImage || null,
+    insuranceCompany: defaultValues.insuranceCompany || '',
+    insuranceExpiryDate: defaultValues.insuranceExpiryDate || '',
+    arrivalDate: defaultValues.arrivalDate || '',
+    endDate: defaultValues.endDate || '',
+    roadTest: defaultValues.roadTest || '',
+    roadTestNotes: defaultValues.roadTestNotes || ''
   });
 
   const [regDocPreview, setRegDocPreview] = useState<string | null>(

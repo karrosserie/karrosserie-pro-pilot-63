@@ -54,31 +54,41 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
     { value: 'Terminé', label: 'Terminé' }
   ];
 
+  const insuranceCompanies = [
+    'AXA', 'Allianz', 'Generali', 'Zurich', 'Bâloise', 'Helvetia', 
+    'Mobilière', 'Vaudoise', 'CSS', 'Sympany', 'Autre'
+  ];
+
+  const roadTestOptions = [
+    { value: 'Aucun', label: 'Aucun' },
+    { value: 'Avec le client', label: 'Avec le client' },
+    { value: 'Avec le client et le mécanicien', label: 'Avec le client et le mécanicien' }
+  ];
+
   return (
     <div className="space-y-4">
-      {/* Client - moved before brand */}
-      <div className="space-y-2">
-        <Label htmlFor="clientId">Client</Label>
-        <Select 
-          disabled={isViewMode} 
-          value={formData.clientId} 
-          onValueChange={(value) => onSelectChange('clientId', value)}
-        >
-          <SelectTrigger id="clientId">
-            <SelectValue placeholder="Sélectionner un client" />
-          </SelectTrigger>
-          <SelectContent>
-            {clients?.map(client => (
-              <SelectItem key={client.id} value={client.id}>
-                {client.first_name} {client.last_name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {/* Client, Brand and Model on the same line */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="clientId">Client</Label>
+          <Select 
+            disabled={isViewMode} 
+            value={formData.clientId} 
+            onValueChange={(value) => onSelectChange('clientId', value)}
+          >
+            <SelectTrigger id="clientId">
+              <SelectValue placeholder="Sélectionner un client" />
+            </SelectTrigger>
+            <SelectContent>
+              {clients?.map(client => (
+                <SelectItem key={client.id} value={client.id}>
+                  {client.first_name} {client.last_name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-      {/* Brand and Model */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="brand">Marque</Label>
           <Select 
@@ -168,6 +178,103 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
             value={formData.mileage}
             onChange={onInputChange}
             disabled={isViewMode}
+          />
+        </div>
+      </div>
+
+      {/* Insurance information */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="insuranceCompany">Compagnie d'assurance</Label>
+          <Select 
+            disabled={isViewMode} 
+            value={formData.insuranceCompany} 
+            onValueChange={(value) => onSelectChange('insuranceCompany', value)}
+          >
+            <SelectTrigger id="insuranceCompany">
+              <SelectValue placeholder="Sélectionner une compagnie" />
+            </SelectTrigger>
+            <SelectContent>
+              {insuranceCompanies.map(company => (
+                <SelectItem key={company} value={company}>
+                  {company}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="insuranceExpiryDate">Date d'expiration de l'assurance</Label>
+          <Input
+            id="insuranceExpiryDate"
+            name="insuranceExpiryDate"
+            type="date"
+            value={formData.insuranceExpiryDate}
+            onChange={onInputChange}
+            disabled={isViewMode}
+          />
+        </div>
+      </div>
+
+      {/* Arrival and end dates */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="arrivalDate">Date d'arrivée</Label>
+          <Input
+            id="arrivalDate"
+            name="arrivalDate"
+            type="datetime-local"
+            value={formData.arrivalDate}
+            onChange={onInputChange}
+            disabled={isViewMode}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="endDate">Date de fin</Label>
+          <Input
+            id="endDate"
+            name="endDate"
+            type="datetime-local"
+            value={formData.endDate}
+            onChange={onInputChange}
+            disabled={isViewMode}
+          />
+        </div>
+      </div>
+
+      {/* Road test information */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="roadTest">Test routier</Label>
+          <Select 
+            disabled={isViewMode} 
+            value={formData.roadTest} 
+            onValueChange={(value) => onSelectChange('roadTest', value)}
+          >
+            <SelectTrigger id="roadTest">
+              <SelectValue placeholder="Sélectionner un type de test" />
+            </SelectTrigger>
+            <SelectContent>
+              {roadTestOptions.map(option => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="roadTestNotes">Notes sur le test routier</Label>
+          <Input
+            id="roadTestNotes"
+            name="roadTestNotes"
+            value={formData.roadTestNotes}
+            onChange={onInputChange}
+            disabled={isViewMode}
+            placeholder="Notes sur le test routier..."
           />
         </div>
       </div>
