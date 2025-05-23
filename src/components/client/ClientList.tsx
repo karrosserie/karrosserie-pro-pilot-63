@@ -218,6 +218,7 @@ const ClientList = () => {
             : ''
         }
         defaultValues={selectedClient ? {
+          id: selectedClient.id,
           firstName: selectedClient.first_name || '',
           lastName: selectedClient.last_name || '',
           email: selectedClient.email || '',
@@ -226,6 +227,8 @@ const ClientList = () => {
           city: selectedClient.city || '',
           zipCode: selectedClient.postal_code || '',
           company: selectedClient.company || '',
+          driverLicenseFrontUrl: selectedClient.driver_license_front_url || '',
+          driverLicenseBackUrl: selectedClient.driver_license_back_url || '',
         } : {}}
         onSubmit={handleClientSubmit}
         mode={dialogMode}

@@ -74,6 +74,7 @@ const ClientForm: React.FC<ClientFormProps> = ({
             formData={formData}
             handleDriverLicenseFrontUpload={handleDriverLicenseFrontUpload}
             handleDriverLicenseBackUpload={handleDriverLicenseBackUpload}
+            isViewMode={isViewMode}
           />
         </TabsContent>
       </Tabs>

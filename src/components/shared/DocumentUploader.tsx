@@ -13,13 +13,15 @@ interface DocumentUploaderProps {
   documentId: string;
   currentDocumentUrl?: string | null;
   onUploadComplete: (url: string) => void;
+  isViewMode?: boolean;
 }
 
 export function DocumentUploader({
   documentType,
   documentId,
   currentDocumentUrl,
-  onUploadComplete
+  onUploadComplete,
+  isViewMode = false
 }: DocumentUploaderProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -167,29 +169,31 @@ export function DocumentUploader({
                 <p className="font-medium truncate">{getFilename(currentDocumentUrl)}</p>
                 <p className="text-xs text-gray-500">Image téléchargée</p>
               </div>
-              <div className="flex space-x-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={handleDownload}
-                >
-                  <DownloadIcon className="h-4 w-4 mr-2" />
-                  Télécharger
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="text-red-500 hover:text-red-600"
-                >
-                  {isDeleting ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
+              {!isViewMode && (
+                <div className="flex space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleDownload}
+                  >
+                    <DownloadIcon className="h-4 w-4 mr-2" />
+                    Télécharger
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="text-red-500 hover:text-red-600"
+                  >
+                    {isDeleting ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         ) : (
@@ -200,33 +204,44 @@ export function DocumentUploader({
                 <p className="font-medium truncate">{getFilename(currentDocumentUrl)}</p>
                 <p className="text-xs text-gray-500">Document téléchargé</p>
               </div>
-              <div className="flex space-x-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={handleDownload}
-                >
-                  <DownloadIcon className="h-4 w-4 mr-2" />
-                  Télécharger
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="text-red-500 hover:text-red-600"
-                >
-                  {isDeleting ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
+              {!isViewMode && (
+                <div className="flex space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleDownload}
+                  >
+                    <DownloadIcon className="h-4 w-4 mr-2" />
+                    Télécharger
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="text-red-500 hover:text-red-600"
+                  >
+                    {isDeleting ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         )}
       </>
+    );
+  }
+  
+  // En mode visualisation sans document, ne rien afficher
+  if (isViewMode) {
+    return (
+      <div className="border rounded-lg p-4 text-center text-gray-500">
+        <p className="text-sm">Aucun document téléchargé</p>
+      </div>
     );
   }
   
