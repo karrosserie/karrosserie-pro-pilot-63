@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useClients } from '@/hooks/use-clients';
 
 interface VehicleFormProps {
   onSubmit: (data: any) => void;
@@ -32,9 +32,11 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     year: defaultValues.year || new Date().getFullYear(),
     licensePlate: defaultValues.licensePlate || '',
     vin: defaultValues.vin || '',
+    engineNumber: defaultValues.engineNumber || '',
     color: defaultValues.color || '',
-    engineType: defaultValues.engineType || '',
-    owner: defaultValues.owner || '',
+    mileage: defaultValues.mileage || '',
+    fuelType: defaultValues.fuelType || '',
+    clientId: defaultValues.clientId || '',
     status: defaultValues.status || 'En attente',
     registrationDocument: defaultValues.registrationDocument || null,
     vehicleImage: defaultValues.vehicleImage || null
@@ -48,13 +50,43 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     defaultValues.vehicleImage || null
   );
 
+  const { clients } = useClients();
+
+  // Listes des marques et modèles
+  const carBrands = [
+    'Audi', 'BMW', 'Citroën', 'Ford', 'Mercedes-Benz', 'Nissan', 'Opel', 
+    'Peugeot', 'Renault', 'Toyota', 'Volkswagen', 'Volvo', 'Autre'
+  ];
+
+  const carModels: { [key: string]: string[] } = {
+    'Audi': ['A1', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'Q3', 'Q5', 'Q7', 'Q8', 'TT'],
+    'BMW': ['Série 1', 'Série 2', 'Série 3', 'Série 4', 'Série 5', 'Série 6', 'Série 7', 'X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7'],
+    'Citroën': ['C1', 'C3', 'C4', 'C5', 'C6', 'Berlingo', 'Picasso', 'Jumpy'],
+    'Ford': ['Fiesta', 'Focus', 'Mondeo', 'Kuga', 'Mustang', 'Transit'],
+    'Mercedes-Benz': ['Classe A', 'Classe B', 'Classe C', 'Classe E', 'Classe S', 'GLA', 'GLB', 'GLC', 'GLE', 'GLS'],
+    'Nissan': ['Micra', 'Note', 'Juke', 'Qashqai', 'X-Trail', 'Leaf'],
+    'Opel': ['Corsa', 'Astra', 'Insignia', 'Crossland', 'Grandland'],
+    'Peugeot': ['108', '208', '308', '508', '2008', '3008', '5008'],
+    'Renault': ['Twingo', 'Clio', 'Mégane', 'Talisman', 'Captur', 'Kadjar', 'Koleos'],
+    'Toyota': ['Yaris', 'Corolla', 'Camry', 'Prius', 'RAV4', 'Highlander'],
+    'Volkswagen': ['Polo', 'Golf', 'Passat', 'Tiguan', 'Touareg', 'T-Roc'],
+    'Volvo': ['V40', 'V60', 'V90', 'XC40', 'XC60', 'XC90'],
+    'Autre': ['Autre modèle']
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => {
+      // Reset model if brand changes
+      if (name === 'brand') {
+        return { ...prev, [name]: value, model: '' };
+      }
+      return { ...prev, [name]: value };
+    });
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, fileType: 'registrationDocument' | 'vehicleImage') => {
@@ -98,6 +130,14 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     { value: 'Terminé', label: 'Terminé' }
   ];
 
+  const fuelTypes = [
+    { value: 'essence', label: 'Essence' },
+    { value: 'diesel', label: 'Diesel' },
+    { value: 'hybride', label: 'Hybride' },
+    { value: 'electrique', label: 'Électrique' },
+    { value: 'gpl', label: 'GPL' }
+  ];
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <Tabs defaultValue="info" className="w-full">
@@ -110,26 +150,42 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="brand">Marque</Label>
-              <Input
-                id="brand"
-                name="brand"
-                value={formData.brand}
-                onChange={handleChange}
-                disabled={isViewMode}
-                required
-              />
+              <Select 
+                disabled={isViewMode} 
+                value={formData.brand} 
+                onValueChange={(value) => handleSelectChange('brand', value)}
+              >
+                <SelectTrigger id="brand">
+                  <SelectValue placeholder="Sélectionner une marque" />
+                </SelectTrigger>
+                <SelectContent>
+                  {carBrands.map(brand => (
+                    <SelectItem key={brand} value={brand}>
+                      {brand}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="model">Modèle</Label>
-              <Input
-                id="model"
-                name="model"
-                value={formData.model}
-                onChange={handleChange}
-                disabled={isViewMode}
-                required
-              />
+              <Select 
+                disabled={isViewMode || !formData.brand} 
+                value={formData.model} 
+                onValueChange={(value) => handleSelectChange('model', value)}
+              >
+                <SelectTrigger id="model">
+                  <SelectValue placeholder="Sélectionner un modèle" />
+                </SelectTrigger>
+                <SelectContent>
+                  {formData.brand && carModels[formData.brand]?.map(model => (
+                    <SelectItem key={model} value={model}>
+                      {model}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           
@@ -160,18 +216,7 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
               />
             </div>
           </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="vin">Numéro de série (VIN)</Label>
-            <Input
-              id="vin"
-              name="vin"
-              value={formData.vin}
-              onChange={handleChange}
-              disabled={isViewMode}
-            />
-          </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="color">Couleur</Label>
@@ -185,11 +230,12 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="engineType">Type de moteur</Label>
+              <Label htmlFor="mileage">Kilométrage</Label>
               <Input
-                id="engineType"
-                name="engineType"
-                value={formData.engineType}
+                id="mileage"
+                name="mileage"
+                type="number"
+                value={formData.mileage}
                 onChange={handleChange}
                 disabled={isViewMode}
               />
@@ -198,35 +244,88 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="owner">Propriétaire</Label>
+              <Label htmlFor="vin">Numéro de série (VIN)</Label>
               <Input
-                id="owner"
-                name="owner"
-                value={formData.owner}
+                id="vin"
+                name="vin"
+                value={formData.vin}
                 onChange={handleChange}
                 disabled={isViewMode}
               />
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="status">Statut</Label>
+              <Label htmlFor="engineNumber">Numéro de moteur</Label>
+              <Input
+                id="engineNumber"
+                name="engineNumber"
+                value={formData.engineNumber}
+                onChange={handleChange}
+                disabled={isViewMode}
+              />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="fuelType">Type de carburant</Label>
               <Select 
                 disabled={isViewMode} 
-                value={formData.status} 
-                onValueChange={(value) => handleSelectChange('status', value)}
+                value={formData.fuelType} 
+                onValueChange={(value) => handleSelectChange('fuelType', value)}
               >
-                <SelectTrigger id="status">
-                  <SelectValue placeholder="Sélectionner un statut" />
+                <SelectTrigger id="fuelType">
+                  <SelectValue placeholder="Sélectionner un carburant" />
                 </SelectTrigger>
                 <SelectContent>
-                  {statusOptions.map(option => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
+                  {fuelTypes.map(fuel => (
+                    <SelectItem key={fuel.value} value={fuel.value}>
+                      {fuel.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="clientId">Client</Label>
+              <Select 
+                disabled={isViewMode} 
+                value={formData.clientId} 
+                onValueChange={(value) => handleSelectChange('clientId', value)}
+              >
+                <SelectTrigger id="clientId">
+                  <SelectValue placeholder="Sélectionner un client" />
+                </SelectTrigger>
+                <SelectContent>
+                  {clients?.map(client => (
+                    <SelectItem key={client.id} value={client.id}>
+                      {client.first_name} {client.last_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="status">Statut</Label>
+            <Select 
+              disabled={isViewMode} 
+              value={formData.status} 
+              onValueChange={(value) => handleSelectChange('status', value)}
+            >
+              <SelectTrigger id="status">
+                <SelectValue placeholder="Sélectionner un statut" />
+              </SelectTrigger>
+              <SelectContent>
+                {statusOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </TabsContent>
         

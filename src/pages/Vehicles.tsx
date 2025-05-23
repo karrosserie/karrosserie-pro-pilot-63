@@ -52,6 +52,7 @@ const Vehicles = () => {
         license_plate: data.licensePlate,
         color: data.color,
         vin: data.vin,
+        engine_number: data.engineNumber,
         mileage: data.mileage ? parseInt(data.mileage) : null,
         fuel_type: data.fuelType,
         client_id: data.clientId,
@@ -67,6 +68,7 @@ const Vehicles = () => {
           license_plate: data.licensePlate,
           color: data.color,
           vin: data.vin,
+          engine_number: data.engineNumber,
           mileage: data.mileage ? parseInt(data.mileage) : null,
           fuel_type: data.fuelType,
           client_id: data.clientId,
@@ -78,7 +80,9 @@ const Vehicles = () => {
 
   // Filtrer les véhicules selon le statut et la recherche
   const filteredVehicles = vehicles?.filter(vehicle => {
-    const matchesStatus = statusFilter === 'Tous' || vehicle.status === statusFilter;
+    // Assigner un statut par défaut si manquant
+    const vehicleStatus = vehicle.status || 'En attente';
+    const matchesStatus = statusFilter === 'Tous' || vehicleStatus === statusFilter;
     const matchesSearch = searchQuery === '' || 
       vehicle.brand?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       vehicle.model?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -208,6 +212,7 @@ const Vehicles = () => {
           licensePlate: selectedVehicle.license_plate || '',
           color: selectedVehicle.color || '',
           vin: selectedVehicle.vin || '',
+          engineNumber: selectedVehicle.engine_number || '',
           mileage: selectedVehicle.mileage?.toString() || '',
           fuelType: selectedVehicle.fuel_type || '',
           clientId: selectedVehicle.client_id || '',
