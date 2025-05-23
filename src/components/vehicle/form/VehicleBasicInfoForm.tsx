@@ -61,14 +61,33 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
     'Mobilière', 'Vaudoise', 'CSS', 'Sympany', 'Autre'
   ];
 
-  const roadTestOptions = [
-    { value: 'Aucun', label: 'Aucun' },
-    { value: 'Avec le client', label: 'Avec le client' },
-    { value: 'Avec le client et le mécanicien', label: 'Avec le client et le mécanicien' }
-  ];
-
   return (
     <div className="space-y-4">
+      {/* VIN and Engine Number - moved from Details tab */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="vin">Numéro de série (VIN)</Label>
+          <Input
+            id="vin"
+            name="vin"
+            value={formData.vin}
+            onChange={onInputChange}
+            disabled={isViewMode}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="engineNumber">Numéro de moteur</Label>
+          <Input
+            id="engineNumber"
+            name="engineNumber"
+            value={formData.engineNumber}
+            onChange={onInputChange}
+            disabled={isViewMode}
+          />
+        </div>
+      </div>
+
       {/* Client, Brand and Model on the same line */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
@@ -274,28 +293,8 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
         </div>
       </div>
 
-      {/* Road test and Status on the same line */}
+      {/* Status field only */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="roadTest">Test routier</Label>
-          <Select 
-            disabled={isViewMode} 
-            value={formData.roadTest} 
-            onValueChange={(value) => onSelectChange('roadTest', value)}
-          >
-            <SelectTrigger id="roadTest">
-              <SelectValue placeholder="Sélectionner un type de test" />
-            </SelectTrigger>
-            <SelectContent>
-              {roadTestOptions.map(option => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
         <div className="space-y-2">
           <Label htmlFor="status">Statut</Label>
           <Select 
@@ -315,20 +314,6 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
             </SelectContent>
           </Select>
         </div>
-      </div>
-
-      {/* Road test notes on its own line */}
-      <div className="space-y-2">
-        <Label htmlFor="roadTestNotes">Notes sur le test routier</Label>
-        <Textarea
-          id="roadTestNotes"
-          name="roadTestNotes"
-          value={formData.roadTestNotes}
-          onChange={onInputChange}
-          disabled={isViewMode}
-          placeholder="Notes sur le test routier..."
-          rows={3}
-        />
       </div>
     </div>
   );

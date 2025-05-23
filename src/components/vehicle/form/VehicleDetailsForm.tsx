@@ -6,11 +6,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
 import FuelGauge from './FuelGauge';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface VehicleDetailsFormProps {
   formData: any;
   isViewMode: boolean;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onSelectChange: (name: string, value: string) => void;
   onFuelLevelChange: (value: number) => void;
   onAddWorkItem: () => void;
   onRemoveWorkItem: (index: number) => void;
@@ -21,35 +29,53 @@ const VehicleDetailsForm: React.FC<VehicleDetailsFormProps> = ({
   formData,
   isViewMode,
   onInputChange,
+  onSelectChange,
   onFuelLevelChange,
   onAddWorkItem,
   onRemoveWorkItem,
   onWorkItemChange
 }) => {
+  const roadTestOptions = [
+    { value: 'Aucun', label: 'Aucun' },
+    { value: 'Avec le client', label: 'Avec le client' },
+    { value: 'Avec le client et le mécanicien', label: 'Avec le client et le mécanicien' }
+  ];
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left column: VIN and Engine Number */}
+        {/* Left column: Road test fields moved from Basic Info */}
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="vin">Numéro de série (VIN)</Label>
-            <Input
-              id="vin"
-              name="vin"
-              value={formData.vin}
-              onChange={onInputChange}
-              disabled={isViewMode}
-            />
+            <Label htmlFor="roadTest">Test routier</Label>
+            <Select 
+              disabled={isViewMode} 
+              value={formData.roadTest} 
+              onValueChange={(value) => onSelectChange('roadTest', value)}
+            >
+              <SelectTrigger id="roadTest">
+                <SelectValue placeholder="Sélectionner un type de test" />
+              </SelectTrigger>
+              <SelectContent>
+                {roadTestOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="engineNumber">Numéro de moteur</Label>
-            <Input
-              id="engineNumber"
-              name="engineNumber"
-              value={formData.engineNumber}
+            <Label htmlFor="roadTestNotes">Notes sur le test routier</Label>
+            <Textarea
+              id="roadTestNotes"
+              name="roadTestNotes"
+              value={formData.roadTestNotes}
               onChange={onInputChange}
               disabled={isViewMode}
+              placeholder="Notes sur le test routier..."
+              rows={3}
             />
           </div>
         </div>

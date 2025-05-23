@@ -64,6 +64,7 @@ const VehicleFormTabs: React.FC<VehicleFormTabsProps> = ({
           formData={formData}
           isViewMode={isViewMode}
           onInputChange={onInputChange}
+          onSelectChange={onSelectChange}
           onFuelLevelChange={onFuelLevelChange}
           onAddWorkItem={onAddWorkItem}
           onRemoveWorkItem={onRemoveWorkItem}
