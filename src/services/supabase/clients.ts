@@ -37,9 +37,26 @@ export const clientsService = {
   },
   
   create: async (client: NewClient) => {
+    // Map front-end field names to database field names
+    const clientData = {
+      ...client,
+      first_name: client.firstName || client.first_name,
+      last_name: client.lastName || client.last_name,
+      zip_code: client.zipCode || client.zip_code,
+      driver_license_front_url: client.driverLicenseFrontUrl || client.driver_license_front_url,
+      driver_license_back_url: client.driverLicenseBackUrl || client.driver_license_back_url,
+    };
+
+    // Remove camelCase properties to avoid conflicts
+    delete clientData.firstName;
+    delete clientData.lastName;
+    delete clientData.zipCode;
+    delete clientData.driverLicenseFrontUrl;
+    delete clientData.driverLicenseBackUrl;
+
     const { data, error } = await supabase
       .from('clients')
-      .insert([client])
+      .insert([clientData])
       .select()
       .single();
       
@@ -52,9 +69,26 @@ export const clientsService = {
   },
   
   update: async (id: string, client: UpdateClient) => {
+    // Map front-end field names to database field names
+    const clientData = {
+      ...client,
+      first_name: client.firstName || client.first_name,
+      last_name: client.lastName || client.last_name,
+      zip_code: client.zipCode || client.zip_code,
+      driver_license_front_url: client.driverLicenseFrontUrl || client.driver_license_front_url,
+      driver_license_back_url: client.driverLicenseBackUrl || client.driver_license_back_url,
+    };
+
+    // Remove camelCase properties to avoid conflicts
+    delete clientData.firstName;
+    delete clientData.lastName;
+    delete clientData.zipCode;
+    delete clientData.driverLicenseFrontUrl;
+    delete clientData.driverLicenseBackUrl;
+
     const { data, error } = await supabase
       .from('clients')
-      .update(client)
+      .update(clientData)
       .eq('id', id)
       .select()
       .single();

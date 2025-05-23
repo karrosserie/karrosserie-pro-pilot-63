@@ -3,6 +3,20 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { clientsService, NewClient, UpdateClient } from '@/services/supabase/clients';
 import { useToast } from '@/hooks/use-toast';
 
+// Helper function to transform client data from database format to frontend format
+const transformClientFromDB = (client: any) => {
+  if (!client) return client;
+  
+  return {
+    ...client,
+    firstName: client.first_name,
+    lastName: client.last_name,
+    zipCode: client.zip_code,
+    driverLicenseFrontUrl: client.driver_license_front_url,
+    driverLicenseBackUrl: client.driver_license_back_url,
+  };
+};
+
 export function useClients() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -13,11 +27,14 @@ export function useClients() {
     error
   } = useQuery({
     queryKey: ['clients'],
-    queryFn: clientsService.getAll
+    queryFn: async () => {
+      const data = await clientsService.getAll();
+      return data?.map(transformClientFromDB) || [];
+    }
   });
   
   const createClient = useMutation({
-    mutationFn: (newClient: NewClient) => clientsService.create(newClient),
+    mutationFn: (newClient: any) => clientsService.create(newClient),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       toast({
@@ -35,7 +52,7 @@ export function useClients() {
   });
   
   const updateClient = useMutation({
-    mutationFn: ({ id, data }: { id: string, data: UpdateClient }) => 
+    mutationFn: ({ id, data }: { id: string, data: any }) => 
       clientsService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
@@ -88,7 +105,11 @@ export function useClient(id?: string) {
     error
   } = useQuery({
     queryKey: ['clients', id],
-    queryFn: () => id ? clientsService.getById(id) : null,
+    queryFn: async () => {
+      if (!id) return null;
+      const data = await clientsService.getById(id);
+      return transformClientFromDB(data);
+    },
     enabled: !!id
   });
   
