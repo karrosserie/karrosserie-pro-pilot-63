@@ -69,6 +69,8 @@ const ClientList = () => {
         city: data.city,
         zipCode: data.zipCode,
         company: data.company,
+        driverLicenseFrontUrl: data.driverLicenseFrontUrl,
+        driverLicenseBackUrl: data.driverLicenseBackUrl,
         user_id: user ? user.id : null
       });
     } else if (dialogMode === 'edit' && selectedClient) {
@@ -82,7 +84,9 @@ const ClientList = () => {
           address: data.address,
           city: data.city,
           zipCode: data.zipCode,
-          company: data.company
+          company: data.company,
+          driverLicenseFrontUrl: data.driverLicenseFrontUrl,
+          driverLicenseBackUrl: data.driverLicenseBackUrl
         }
       });
     }

@@ -2,10 +2,11 @@
 import { useState } from 'react';
 import { FileUpload } from '@/components/ui/file-upload';
 import { Button } from '@/components/ui/button';
-import { Loader2, FileIcon, DownloadIcon, Trash2 } from 'lucide-react';
+import { Loader2, FileIcon, DownloadIcon, Trash2, CropIcon } from 'lucide-react';
 import { useStorage } from '@/hooks/use-storage';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { ImageCropper } from './ImageCropper';
 
 interface DocumentUploaderProps {
   documentType: string;
@@ -22,6 +23,8 @@ export function DocumentUploader({
 }: DocumentUploaderProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [imageToProcess, setImageToProcess] = useState<{ file: File, tempUrl: string } | null>(null);
+  const [cropDialogOpen, setCropDialogOpen] = useState(false);
   const { uploadDocument, deleteDocument } = useStorage();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -38,6 +41,19 @@ export function DocumentUploader({
   };
   
   const handleUpload = async (file: File) => {
+    // Vérifier si le fichier est une image pour proposer le recadrage
+    if (file.type.startsWith('image/')) {
+      const tempUrl = URL.createObjectURL(file);
+      setImageToProcess({ file, tempUrl });
+      setCropDialogOpen(true);
+      return;
+    }
+    
+    // Si ce n'est pas une image, procéder à l'upload direct
+    await uploadFile(file);
+  };
+  
+  const uploadFile = async (file: File) => {
     if (!user) {
       toast({
         title: "Erreur",
@@ -88,6 +104,39 @@ export function DocumentUploader({
       window.open(currentDocumentUrl, '_blank');
     }
   };
+
+  const handleCropComplete = async (croppedImageBlob: Blob) => {
+    if (!imageToProcess) return;
+    
+    setCropDialogOpen(false);
+    
+    // Convertir le Blob en File pour l'upload
+    const filename = imageToProcess.file.name;
+    const fileType = imageToProcess.file.type;
+    const croppedFile = new File([croppedImageBlob], filename, { type: fileType });
+    
+    // Libérer l'URL temporaire
+    URL.revokeObjectURL(imageToProcess.tempUrl);
+    setImageToProcess(null);
+    
+    // Uploader l'image recadrée
+    await uploadFile(croppedFile);
+  };
+  
+  const handleCropCancel = () => {
+    if (imageToProcess) {
+      URL.revokeObjectURL(imageToProcess.tempUrl);
+      setImageToProcess(null);
+    }
+    setCropDialogOpen(false);
+  };
+  
+  // Déterminer si le document actuel est une image
+  const isImage = currentDocumentUrl && 
+    (currentDocumentUrl.toLowerCase().endsWith('.jpg') || 
+     currentDocumentUrl.toLowerCase().endsWith('.jpeg') || 
+     currentDocumentUrl.toLowerCase().endsWith('.png') ||
+     currentDocumentUrl.toLowerCase().includes('image'));
   
   if (isUploading) {
     return (
@@ -100,46 +149,100 @@ export function DocumentUploader({
   
   if (currentDocumentUrl) {
     return (
-      <div className="border rounded-lg p-4">
-        <div className="flex items-center">
-          <FileIcon className="h-10 w-10 text-blue-500 mr-4" />
-          <div className="flex-1">
-            <p className="font-medium truncate">{getFilename(currentDocumentUrl)}</p>
-            <p className="text-xs text-gray-500">Document téléchargé</p>
+      <>
+        {isImage ? (
+          <div className="border rounded-lg p-4">
+            <div className="mb-4">
+              <img 
+                src={currentDocumentUrl} 
+                alt="Document" 
+                className="max-h-40 mx-auto object-contain" 
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <p className="font-medium truncate">{getFilename(currentDocumentUrl)}</p>
+                <p className="text-xs text-gray-500">Image téléchargée</p>
+              </div>
+              <div className="flex space-x-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleDownload}
+                >
+                  <DownloadIcon className="h-4 w-4 mr-2" />
+                  Télécharger
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="text-red-500 hover:text-red-600"
+                >
+                  {isDeleting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
           </div>
-          <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={handleDownload}
-            >
-              <DownloadIcon className="h-4 w-4 mr-2" />
-              Télécharger
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="text-red-500 hover:text-red-600"
-            >
-              {isDeleting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Trash2 className="h-4 w-4" />
-              )}
-            </Button>
+        ) : (
+          <div className="border rounded-lg p-4">
+            <div className="flex items-center">
+              <FileIcon className="h-10 w-10 text-blue-500 mr-4" />
+              <div className="flex-1">
+                <p className="font-medium truncate">{getFilename(currentDocumentUrl)}</p>
+                <p className="text-xs text-gray-500">Document téléchargé</p>
+              </div>
+              <div className="flex space-x-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleDownload}
+                >
+                  <DownloadIcon className="h-4 w-4 mr-2" />
+                  Télécharger
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="text-red-500 hover:text-red-600"
+                >
+                  {isDeleting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        )}
+      </>
     );
   }
   
   return (
-    <FileUpload
-      onUpload={handleUpload}
-      accept=".pdf,.jpg,.jpeg,.png"
-      maxSize={10}
-    />
+    <>
+      <FileUpload
+        onUpload={handleUpload}
+        accept=".pdf,.jpg,.jpeg,.png"
+        maxSize={10}
+      />
+      
+      {imageToProcess && (
+        <ImageCropper
+          open={cropDialogOpen}
+          onClose={handleCropCancel}
+          imageUrl={imageToProcess.tempUrl}
+          onCropComplete={handleCropComplete}
+        />
+      )}
+    </>
   );
 }

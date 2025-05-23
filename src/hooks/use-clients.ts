@@ -12,9 +12,8 @@ const transformClientFromDB = (client: any) => {
     firstName: client.first_name,
     lastName: client.last_name,
     zipCode: client.postal_code,
-    // For now, we'll handle driver license URLs separately via document management
-    driverLicenseFrontUrl: '',
-    driverLicenseBackUrl: '',
+    driverLicenseFrontUrl: client.driver_license_front_url || '',
+    driverLicenseBackUrl: client.driver_license_back_url || '',
   };
 };
 

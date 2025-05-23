@@ -2,9 +2,15 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
-export type Client = Database['public']['Tables']['clients']['Row'];
-export type NewClient = Database['public']['Tables']['clients']['Insert'];
-export type UpdateClient = Database['public']['Tables']['clients']['Update'];
+export type Client = Database['public']['Tables']['clients']['Row'] & {
+  company?: string;
+};
+export type NewClient = Database['public']['Tables']['clients']['Insert'] & {
+  company?: string;
+};
+export type UpdateClient = Database['public']['Tables']['clients']['Update'] & {
+  company?: string;
+};
 
 export const clientsService = {
   getAll: async () => {
@@ -38,7 +44,7 @@ export const clientsService = {
   
   create: async (client: any) => {
     // Map front-end field names to database field names
-    const clientData: NewClient = {
+    const clientData = {
       first_name: client.firstName,
       last_name: client.lastName,
       email: client.email,
@@ -47,7 +53,9 @@ export const clientsService = {
       city: client.city,
       postal_code: client.zipCode,
       user_id: client.user_id,
-      company: client.company
+      company: client.company,
+      driver_license_front_url: client.driverLicenseFrontUrl,
+      driver_license_back_url: client.driverLicenseBackUrl
     };
 
     console.log('Creating client with data:', clientData);
@@ -68,7 +76,7 @@ export const clientsService = {
   
   update: async (id: string, client: any) => {
     // Map front-end field names to database field names
-    const clientData: UpdateClient = {
+    const clientData = {
       first_name: client.firstName,
       last_name: client.lastName,
       email: client.email,
@@ -76,7 +84,9 @@ export const clientsService = {
       address: client.address,
       city: client.city,
       postal_code: client.zipCode,
-      company: client.company
+      company: client.company,
+      driver_license_front_url: client.driverLicenseFrontUrl,
+      driver_license_back_url: client.driverLicenseBackUrl
     };
 
     console.log('Updating client with data:', clientData);
