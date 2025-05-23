@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { authService } from '@/services/supabase/auth';
 import { profileService, Profile } from '@/services/supabase/profiles';
@@ -28,21 +28,6 @@ export const useAuthState = () => {
     const initializeAuth = async () => {
       setLoading(true);
       
-      // Set up auth state change listener
-      const subscription = authService.onAuthStateChange((currentSession, currentUser) => {
-        setSession(currentSession);
-        setUser(currentUser);
-        
-        if (currentUser) {
-          // Use setTimeout to avoid recursive calls to Supabase
-          setTimeout(() => {
-            fetchProfile(currentUser.id);
-          }, 0);
-        } else {
-          setProfile(null);
-        }
-      });
-
       // Get initial session
       const initialSession = await authService.getSession();
       setSession(initialSession);
@@ -51,6 +36,18 @@ export const useAuthState = () => {
       if (initialSession?.user) {
         await fetchProfile(initialSession.user.id);
       }
+      
+      // Set up auth state change listener
+      const subscription = authService.onAuthStateChange((currentSession, currentUser) => {
+        setSession(currentSession);
+        setUser(currentUser);
+        
+        if (currentUser) {
+          fetchProfile(currentUser.id);
+        } else {
+          setProfile(null);
+        }
+      });
       
       setLoading(false);
       
@@ -64,52 +61,80 @@ export const useAuthState = () => {
   }, []);
 
   // Sign in with email and password
-  const signIn = async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string) => {
     try {
       setLoading(true);
-      await authService.signInWithPassword(email, password);
+      const { session: newSession, user: newUser } = await authService.signInWithPassword(email, password);
+      
+      if (!newUser) {
+        throw new Error('Connexion échouée. Veuillez vérifier vos identifiants.');
+      }
       
       toast({
         title: "Connexion réussie",
         description: "Vous êtes maintenant connecté.",
       });
       navigate('/');
+      return { session: newSession, user: newUser };
     } catch (error: any) {
+      const errorMessage = error.message === 'Invalid login credentials' 
+        ? 'Identifiants invalides. Veuillez vérifier votre email et mot de passe.'
+        : error.message || 'Une erreur est survenue lors de la connexion';
+      
       toast({
         title: "Erreur de connexion",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
       throw error;
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
 
   // Sign up with email and password
-  const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
+  const signUp = useCallback(async (email: string, password: string, firstName: string, lastName: string) => {
     try {
       setLoading(true);
-      await authService.signUp({ email, password, firstName, lastName });
+      const { user: newUser, session: newSession } = await authService.signUp({ 
+        email, 
+        password, 
+        firstName, 
+        lastName 
+      });
+      
+      if (!newUser) {
+        throw new Error("L'inscription a échoué. Veuillez réessayer.");
+      }
       
       toast({
         title: "Inscription réussie",
-        description: "Veuillez vérifier votre e-mail pour confirmer votre compte.",
+        description: "Votre compte a été créé avec succès.",
       });
+      
+      return { user: newUser, session: newSession };
     } catch (error: any) {
+      let errorMessage = "Une erreur est survenue lors de l'inscription";
+      
+      if (error.message?.includes('duplicate key')) {
+        errorMessage = "Cet email est déjà utilisé";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Erreur d'inscription",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
       throw error;
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Sign out
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     try {
       setLoading(true);
       await authService.signOut();
@@ -122,14 +147,14 @@ export const useAuthState = () => {
     } catch (error: any) {
       toast({
         title: "Erreur de déconnexion",
-        description: error.message,
+        description: error.message || "Une erreur est survenue lors de la déconnexion",
         variant: "destructive",
       });
       throw error;
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
 
   return {
     session,
