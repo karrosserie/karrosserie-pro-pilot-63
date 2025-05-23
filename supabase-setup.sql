@@ -27,9 +27,13 @@ CREATE TABLE IF NOT EXISTS public.clients (
   city TEXT,
   postal_code TEXT,
   country TEXT,
+  driver_license_front_url TEXT,
+  driver_license_back_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- ... keep existing code (vehicles, fleet_vehicles, quotes, repair_orders, invoices, expertise_reports, cessions, fleet_reservations tables definitions)
 
 -- Create vehicles table
 CREATE TABLE IF NOT EXISTS public.vehicles (
@@ -162,6 +166,8 @@ CREATE TABLE IF NOT EXISTS public.fleet_reservations (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- ... keep existing code (RLS policies, functions, triggers, storage setup)
 
 -- Enable RLS on all tables
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
