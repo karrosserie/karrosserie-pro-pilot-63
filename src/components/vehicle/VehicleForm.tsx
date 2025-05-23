@@ -35,7 +35,9 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     endDate: defaultValues.endDate || '',
     roadTest: defaultValues.roadTest || '',
     roadTestNotes: defaultValues.roadTestNotes || '',
-    fuelLevel: defaultValues.fuelLevel || 50
+    fuelLevel: defaultValues.fuelLevel || 50,
+    preAccidentDefects: defaultValues.preAccidentDefects || '',
+    workItems: defaultValues.workItems || ['']
   });
 
   const [regDocPreview, setRegDocPreview] = useState<string | null>(
@@ -94,6 +96,29 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     setFormData(prev => ({ ...prev, fuelLevel: value }));
   };
 
+  const handleAddWorkItem = () => {
+    setFormData(prev => ({
+      ...prev,
+      workItems: [...(prev.workItems || []), '']
+    }));
+  };
+
+  const handleRemoveWorkItem = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      workItems: prev.workItems.filter((_: any, i: number) => i !== index)
+    }));
+  };
+
+  const handleWorkItemChange = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      workItems: prev.workItems.map((item: string, i: number) => 
+        i === index ? value : item
+      )
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
@@ -111,6 +136,9 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
         onFileUpload={handleFileUpload}
         onRemoveFile={handleRemoveFile}
         onFuelLevelChange={handleFuelLevelChange}
+        onAddWorkItem={handleAddWorkItem}
+        onRemoveWorkItem={handleRemoveWorkItem}
+        onWorkItemChange={handleWorkItemChange}
       />
       
       <div className="flex justify-end space-x-2 pt-4 border-t">
