@@ -1,4 +1,3 @@
-
 -- Create all tables for the application
 
 -- Create profiles table (extends auth.users)
