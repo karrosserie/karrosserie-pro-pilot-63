@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Search, UserPlus, Trash2 } from 'lucide-react';
@@ -226,9 +225,9 @@ const ClientList = () => {
           address: selectedClient.address || '',
           city: selectedClient.city || '',
           zipCode: selectedClient.postal_code || '',
-          company: selectedClient.company || '',
-          driverLicenseFrontUrl: selectedClient.driver_license_front_url || '',
-          driverLicenseBackUrl: selectedClient.driver_license_back_url || '',
+          company: (selectedClient as any).company || '',
+          driverLicenseFrontUrl: (selectedClient as any).driver_license_front_url || '',
+          driverLicenseBackUrl: (selectedClient as any).driver_license_back_url || '',
         } : {}}
         onSubmit={handleClientSubmit}
         mode={dialogMode}
