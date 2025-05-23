@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -239,56 +240,68 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
 
         <div className="space-y-2">
           <Label htmlFor="insuranceExpiryDate">Date d'expiration</Label>
-          <Input
-            id="insuranceExpiryDate"
-            name="insuranceExpiryDate"
-            type="date"
-            value={formData.insuranceExpiryDate || ''}
-            onChange={onInputChange}
-            disabled={isViewMode}
-          />
+          <div className="relative">
+            <Input
+              id="insuranceExpiryDate"
+              name="insuranceExpiryDate"
+              type="date"
+              value={formData.insuranceExpiryDate || ''}
+              onChange={onInputChange}
+              disabled={isViewMode}
+              className="pr-10"
+            />
+          </div>
         </div>
       </div>
 
       {/* Date d'arrivée, Date de début, Date de fin, Statut */}
       <div className="grid grid-cols-12 gap-4">
-        <div className="col-span-12 md:col-span-4 space-y-2">
+        <div className="col-span-6 md:col-span-2 space-y-2">
           <Label htmlFor="arrivalDate">Date d'arrivée</Label>
-          <Input
-            id="arrivalDate"
-            name="arrivalDate"
-            type="datetime-local"
-            value={formData.arrivalDate || ''}
-            onChange={onInputChange}
-            disabled={isViewMode}
-          />
+          <div className="relative">
+            <Input
+              id="arrivalDate"
+              name="arrivalDate"
+              type="datetime-local"
+              value={formData.arrivalDate || ''}
+              onChange={onInputChange}
+              disabled={isViewMode}
+              className="pr-10"
+            />
+          </div>
         </div>
 
         <div className="col-span-6 md:col-span-2 space-y-2">
           <Label htmlFor="startDate">Date de début</Label>
-          <Input
-            id="startDate"
-            name="startDate"
-            type="date"
-            value={formData.startDate || ''}
-            onChange={onInputChange}
-            disabled={isViewMode}
-          />
+          <div className="relative">
+            <Input
+              id="startDate"
+              name="startDate"
+              type="date"
+              value={formData.startDate || ''}
+              onChange={onInputChange}
+              disabled={isViewMode}
+              className="pr-10"
+            />
+          </div>
         </div>
 
         <div className="col-span-6 md:col-span-2 space-y-2">
           <Label htmlFor="endDate">Date de fin</Label>
-          <Input
-            id="endDate"
-            name="endDate"
-            type="date"
-            value={formData.endDate || ''}
-            onChange={onInputChange}
-            disabled={isViewMode}
-          />
+          <div className="relative">
+            <Input
+              id="endDate"
+              name="endDate"
+              type="date"
+              value={formData.endDate || ''}
+              onChange={onInputChange}
+              disabled={isViewMode}
+              className="pr-10"
+            />
+          </div>
         </div>
 
-        <div className="col-span-12 md:col-span-4 space-y-2">
+        <div className="col-span-12 md:col-span-6 space-y-2">
           <Label htmlFor="status">Statut</Label>
           <Select 
             disabled={isViewMode} 
