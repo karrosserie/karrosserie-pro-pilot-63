@@ -57,28 +57,32 @@ const ClientList = () => {
   };
 
   const handleClientSubmit = (data: any) => {
+    console.log('Form submitted with data:', data);
+    
     if (dialogMode === 'create') {
       createClient.mutate({
-        first_name: data.firstName, 
-        last_name: data.lastName,
+        firstName: data.firstName, 
+        lastName: data.lastName,
         email: data.email,
         phone: data.phone,
         address: data.address,
         city: data.city,
-        postal_code: data.zipCode,
-        user_id: user ? user.id : null // Utilisation de l'ID utilisateur actuel
+        zipCode: data.zipCode,
+        company: data.company,
+        user_id: user ? user.id : null
       });
     } else if (dialogMode === 'edit' && selectedClient) {
       updateClient.mutate({
         id: selectedClient.id, 
         data: {
-          first_name: data.firstName,
-          last_name: data.lastName,
+          firstName: data.firstName,
+          lastName: data.lastName,
           email: data.email,
           phone: data.phone,
           address: data.address,
           city: data.city,
-          postal_code: data.zipCode
+          zipCode: data.zipCode,
+          company: data.company
         }
       });
     }
@@ -147,7 +151,7 @@ const ClientList = () => {
       <DataTable
         columns={columns}
         data={filteredClients || []}
-        searchKey="last_name"
+        searchKey="first_name"
         searchPlaceholder="Rechercher un client..."
       />
 
@@ -177,6 +181,7 @@ const ClientList = () => {
           address: selectedClient.address || '',
           city: selectedClient.city || '',
           zipCode: selectedClient.postal_code || '',
+          company: selectedClient.company || '',
         } : {}}
         onSubmit={handleClientSubmit}
         mode={dialogMode}

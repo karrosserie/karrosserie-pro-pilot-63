@@ -11,9 +11,10 @@ const transformClientFromDB = (client: any) => {
     ...client,
     firstName: client.first_name,
     lastName: client.last_name,
-    zipCode: client.zip_code,
-    driverLicenseFrontUrl: client.driver_license_front_url,
-    driverLicenseBackUrl: client.driver_license_back_url,
+    zipCode: client.postal_code,
+    // For now, we'll handle driver license URLs separately via document management
+    driverLicenseFrontUrl: '',
+    driverLicenseBackUrl: '',
   };
 };
 
@@ -34,7 +35,10 @@ export function useClients() {
   });
   
   const createClient = useMutation({
-    mutationFn: (newClient: any) => clientsService.create(newClient),
+    mutationFn: (newClient: any) => {
+      console.log('Creating client with data:', newClient);
+      return clientsService.create(newClient);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       toast({
@@ -43,6 +47,7 @@ export function useClients() {
       });
     },
     onError: (error) => {
+      console.error('Error creating client:', error);
       toast({
         title: "Erreur",
         description: `Impossible de créer le client: ${error.message}`,
@@ -52,8 +57,10 @@ export function useClients() {
   });
   
   const updateClient = useMutation({
-    mutationFn: ({ id, data }: { id: string, data: any }) => 
-      clientsService.update(id, data),
+    mutationFn: ({ id, data }: { id: string, data: any }) => {
+      console.log('Updating client with id and data:', id, data);
+      return clientsService.update(id, data);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       toast({
@@ -62,6 +69,7 @@ export function useClients() {
       });
     },
     onError: (error) => {
+      console.error('Error updating client:', error);
       toast({
         title: "Erreur",
         description: `Impossible de mettre à jour le client: ${error.message}`,

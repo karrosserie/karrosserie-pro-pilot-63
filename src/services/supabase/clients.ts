@@ -36,23 +36,21 @@ export const clientsService = {
     return data;
   },
   
-  create: async (client: NewClient) => {
+  create: async (client: any) => {
     // Map front-end field names to database field names
-    const clientData = {
-      ...client,
-      first_name: client.firstName || client.first_name,
-      last_name: client.lastName || client.last_name,
-      zip_code: client.zipCode || client.zip_code,
-      driver_license_front_url: client.driverLicenseFrontUrl || client.driver_license_front_url,
-      driver_license_back_url: client.driverLicenseBackUrl || client.driver_license_back_url,
+    const clientData: NewClient = {
+      first_name: client.firstName,
+      last_name: client.lastName,
+      email: client.email,
+      phone: client.phone,
+      address: client.address,
+      city: client.city,
+      postal_code: client.zipCode,
+      user_id: client.user_id,
+      company: client.company
     };
 
-    // Remove camelCase properties to avoid conflicts
-    delete clientData.firstName;
-    delete clientData.lastName;
-    delete clientData.zipCode;
-    delete clientData.driverLicenseFrontUrl;
-    delete clientData.driverLicenseBackUrl;
+    console.log('Creating client with data:', clientData);
 
     const { data, error } = await supabase
       .from('clients')
@@ -68,23 +66,20 @@ export const clientsService = {
     return data;
   },
   
-  update: async (id: string, client: UpdateClient) => {
+  update: async (id: string, client: any) => {
     // Map front-end field names to database field names
-    const clientData = {
-      ...client,
-      first_name: client.firstName || client.first_name,
-      last_name: client.lastName || client.last_name,
-      zip_code: client.zipCode || client.zip_code,
-      driver_license_front_url: client.driverLicenseFrontUrl || client.driver_license_front_url,
-      driver_license_back_url: client.driverLicenseBackUrl || client.driver_license_back_url,
+    const clientData: UpdateClient = {
+      first_name: client.firstName,
+      last_name: client.lastName,
+      email: client.email,
+      phone: client.phone,
+      address: client.address,
+      city: client.city,
+      postal_code: client.zipCode,
+      company: client.company
     };
 
-    // Remove camelCase properties to avoid conflicts
-    delete clientData.firstName;
-    delete clientData.lastName;
-    delete clientData.zipCode;
-    delete clientData.driverLicenseFrontUrl;
-    delete clientData.driverLicenseBackUrl;
+    console.log('Updating client with data:', clientData);
 
     const { data, error } = await supabase
       .from('clients')
