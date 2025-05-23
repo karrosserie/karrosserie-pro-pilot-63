@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Car, Calendar, User } from 'lucide-react';
+import { Car, Calendar, User, Edit, Eye, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface VehicleCardProps {
@@ -11,6 +11,9 @@ interface VehicleCardProps {
   status: 'En réparation' | 'Terminé' | 'En attente' | 'Diagnostic';
   owner: string;
   imageUrl?: string;
+  onView?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 const VehicleCard: React.FC<VehicleCardProps> = ({
@@ -20,7 +23,10 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
   licensePlate,
   status,
   owner,
-  imageUrl
+  imageUrl,
+  onView,
+  onEdit,
+  onDelete
 }) => {
   // Détermine la couleur du statut
   const getStatusColor = () => {
@@ -78,13 +84,25 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
         </div>
       </div>
       
-      <div className="border-t border-gray-100 mt-4 pt-4 flex justify-between">
-        <Button variant="outline" size="sm">
-          Documents
-        </Button>
-        <Button className="btn-primary" size="sm">
-          Détails
-        </Button>
+      <div className="border-t border-gray-100 mt-4 pt-4 flex justify-between space-x-2">
+        {onView && (
+          <Button variant="outline" size="sm" onClick={onView}>
+            <Eye className="h-4 w-4 mr-1" />
+            Voir
+          </Button>
+        )}
+        {onEdit && (
+          <Button variant="outline" size="sm" onClick={onEdit}>
+            <Edit className="h-4 w-4 mr-1" />
+            Modifier
+          </Button>
+        )}
+        {onDelete && (
+          <Button variant="destructive" size="sm" onClick={onDelete}>
+            <Trash2 className="h-4 w-4 mr-1" />
+            Supprimer
+          </Button>
+        )}
       </div>
     </div>
   );
