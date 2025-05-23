@@ -10,7 +10,13 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, UserPlus, Eye, Pencil } from 'lucide-react';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { Search, UserPlus, Eye, Pencil, Filter } from 'lucide-react';
 import ClientDialog from '@/components/client/ClientDialog';
 import ClientDeleteDialog from '@/components/client/ClientDeleteDialog';
 import { useClients } from '@/hooks/use-clients';
@@ -120,6 +126,19 @@ const Clients = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Filter className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>Tous les clients</DropdownMenuItem>
+              <DropdownMenuItem>Clients récents</DropdownMenuItem>
+              <DropdownMenuItem>Clients actifs</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           
           <Button 
             className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
