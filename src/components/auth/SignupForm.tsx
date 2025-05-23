@@ -19,7 +19,6 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   
   const { signUp } = useAuth();
-  const { toast } = useToast();
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -37,14 +36,11 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
 
     try {
       await signUp(data.email, data.password, data.firstName, data.lastName);
-      toast({
-        title: "Compte créé avec succès",
-        description: "Veuillez vérifier votre boîte mail et cliquer sur le lien de confirmation pour activer votre compte.",
-        variant: "default",
-      });
-      onToggleMode();
+      // Le message de succès est maintenant géré dans useAuthState
+      onToggleMode(); // Retour vers le formulaire de connexion
     } catch (error: any) {
       console.error("Erreur d'inscription:", error);
+      // Les erreurs sont maintenant gérées dans useAuthState
     } finally {
       setIsLoading(false);
     }

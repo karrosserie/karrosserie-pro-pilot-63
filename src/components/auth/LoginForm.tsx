@@ -52,14 +52,16 @@ const LoginForm = ({ onToggleMode }: LoginFormProps) => {
 
     try {
       await signIn(data.email, data.password);
-      // Pas besoin de toast ici, il est déjà géré dans le hook useAuthState
+      // Le succès est géré dans useAuthState
     } catch (error: any) {
       // Vérifier si l'erreur est liée à une adresse email non vérifiée
       if (error.message?.includes('Email not confirmed') || 
-          error.message?.includes('Email pas encore confirmée')) {
+          error.message?.includes('Email pas encore confirmée') ||
+          error.name === 'EmailNotConfirmed') {
         setEmailVerificationNeeded(data.email);
       }
       console.error("Erreur de connexion:", error);
+      // Les autres erreurs sont gérées dans useAuthState
     } finally {
       setIsLoading(false);
     }
@@ -70,18 +72,10 @@ const LoginForm = ({ onToggleMode }: LoginFormProps) => {
     
     try {
       await resendEmailVerification(emailVerificationNeeded);
-      toast({
-        title: "Email envoyé",
-        description: "Un nouvel email de vérification a été envoyé. Veuillez vérifier votre boîte mail.",
-        variant: "default",
-      });
+      // Le message de succès est géré dans useAuthState
     } catch (error) {
       console.error("Erreur lors de l'envoi de l'email:", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'envoyer l'email de vérification. Veuillez réessayer plus tard.",
-        variant: "destructive",
-      });
+      // Les erreurs sont gérées dans useAuthState
     }
   };
 
@@ -99,7 +93,7 @@ const LoginForm = ({ onToggleMode }: LoginFormProps) => {
             <span>Votre adresse email n'a pas été vérifiée.</span>
             <button 
               onClick={handleResendVerification}
-              className="text-left underline font-medium mt-2"
+              className="text-left underline font-medium mt-2 hover:no-underline"
             >
               Cliquez ici pour recevoir un nouvel email de vérification
             </button>

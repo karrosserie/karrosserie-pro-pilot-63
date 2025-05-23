@@ -72,7 +72,9 @@ export const useAuthState = () => {
       
       // Check if email is verified
       if (newUser.email_confirmed_at === null) {
-        throw new Error('Email pas encore confirmée. Veuillez vérifier votre boîte mail ou demander un nouvel email de confirmation.');
+        const customError = new Error('Email not confirmed');
+        customError.name = 'EmailNotConfirmed';
+        throw customError;
       }
       
       toast({
@@ -86,7 +88,7 @@ export const useAuthState = () => {
       
       if (error.message === 'Invalid login credentials') {
         errorMessage = 'Identifiants invalides. Veuillez vérifier votre email et mot de passe.';
-      } else if (error.message === 'Email not confirmed') {
+      } else if (error.message === 'Email not confirmed' || error.name === 'EmailNotConfirmed') {
         errorMessage = 'Email pas encore confirmée. Veuillez vérifier votre boîte mail.';
       }
       
@@ -116,11 +118,18 @@ export const useAuthState = () => {
         throw new Error("L'inscription a échoué. Veuillez réessayer.");
       }
       
+      // Success message after signup
+      toast({
+        title: "Compte créé avec succès",
+        description: "Veuillez vérifier votre boîte mail et cliquer sur le lien de confirmation pour activer votre compte.",
+        variant: "default",
+      });
+      
       return { user: newUser, session: newSession };
     } catch (error: any) {
       let errorMessage = "Une erreur est survenue lors de l'inscription";
       
-      if (error.message?.includes('duplicate key')) {
+      if (error.message?.includes('duplicate key') || error.message?.includes('already registered')) {
         errorMessage = "Cet email est déjà utilisé";
       } else if (error.message) {
         errorMessage = error.message;
@@ -165,6 +174,12 @@ export const useAuthState = () => {
     try {
       setLoading(true);
       await authService.resendEmailVerification(email);
+      
+      toast({
+        title: "Email envoyé",
+        description: "Un nouvel email de vérification a été envoyé. Veuillez vérifier votre boîte mail.",
+        variant: "default",
+      });
     } catch (error: any) {
       toast({
         title: "Erreur d'envoi d'e-mail",
