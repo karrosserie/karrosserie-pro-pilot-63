@@ -16,6 +16,36 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
   isViewMode = false,
   onCancel
 }) => {
+  // Parse work items from database
+  const parseWorkItems = (workItems: any) => {
+    if (!workItems) return [''];
+    if (Array.isArray(workItems)) return workItems.length > 0 ? workItems : [''];
+    if (typeof workItems === 'string') {
+      try {
+        const parsed = JSON.parse(workItems);
+        return Array.isArray(parsed) && parsed.length > 0 ? parsed : [''];
+      } catch {
+        return workItems.trim() !== '' ? [workItems] : [''];
+      }
+    }
+    return [''];
+  };
+
+  // Parse vehicle images from database
+  const parseVehicleImages = (vehicleImages: any) => {
+    if (!vehicleImages) return [''];
+    if (Array.isArray(vehicleImages)) return vehicleImages.length > 0 ? vehicleImages : [''];
+    if (typeof vehicleImages === 'string') {
+      try {
+        const parsed = JSON.parse(vehicleImages);
+        return Array.isArray(parsed) && parsed.length > 0 ? parsed : [''];
+      } catch {
+        return vehicleImages.trim() !== '' ? [vehicleImages] : [''];
+      }
+    }
+    return [''];
+  };
+
   const [formData, setFormData] = useState({
     // Required fields
     clientId: defaultValues.client_id || '',
@@ -26,9 +56,9 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     
     // Optional fields
     engineNumber: defaultValues.engine_number || '',
-    year: defaultValues.year || '',
+    year: defaultValues.year?.toString() || '',
     color: defaultValues.color || '',
-    mileage: defaultValues.mileage || '',
+    mileage: defaultValues.mileage?.toString() || '',
     insuranceCompany: defaultValues.insurance_company || '',
     insuranceExpiryDate: defaultValues.insurance_expiry_date || '',
     startDate: defaultValues.start_date || '',
@@ -39,11 +69,12 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     roadTestNotes: defaultValues.road_test_notes || '',
     fuelLevel: defaultValues.fuel_level || 50,
     preAccidentDefects: defaultValues.pre_accident_defects || '',
-    workItems: defaultValues.work_items || [''],
+    workItems: parseWorkItems(defaultValues.work_items),
     registrationDocumentFrontUrl: defaultValues.registration_document_front_url || '',
     registrationDocumentBackUrl: defaultValues.registration_document_back_url || '',
     vehicleImageUrl: defaultValues.vehicle_image_url || '',
-    vehicleImages: defaultValues.vehicle_images || ['']
+    vehicleImages: parseVehicleImages(defaultValues.vehicle_images),
+    fuelType: defaultValues.fuel_type || ''
   });
 
   const [regDocPreview, setRegDocPreview] = useState<string | null>(
@@ -154,6 +185,9 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    console.log('Form submit triggered with mode:', isViewMode ? 'view' : 'edit/create');
+    console.log('Form data:', formData);
     
     if (!isViewMode && !validateRequiredFields()) {
       return;

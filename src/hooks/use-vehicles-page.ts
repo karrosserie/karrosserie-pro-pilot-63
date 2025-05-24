@@ -38,10 +38,42 @@ export function useVehiclesPage() {
   };
 
   const handleVehicleSubmit = (data: any) => {
+    console.log('Submitting vehicle data:', data);
+    
     // Validate required fields on the frontend as well
     if (!data.clientId || !data.vin || !data.brand || !data.model || !data.licensePlate) {
       alert('Les champs Client, Numéro de série (VIN), Marque, Modèle et Plaque d\'immatriculation sont obligatoires.');
       return;
+    }
+
+    // Process work items - ensure it's an array and filter out empty items
+    let processedWorkItems = [];
+    if (data.workItems) {
+      if (Array.isArray(data.workItems)) {
+        processedWorkItems = data.workItems.filter((item: string) => item && item.trim() !== '');
+      } else if (typeof data.workItems === 'string') {
+        try {
+          const parsed = JSON.parse(data.workItems);
+          processedWorkItems = Array.isArray(parsed) ? parsed.filter((item: string) => item && item.trim() !== '') : [];
+        } catch {
+          processedWorkItems = data.workItems.trim() !== '' ? [data.workItems] : [];
+        }
+      }
+    }
+
+    // Process vehicle images
+    let processedVehicleImages = [];
+    if (data.vehicleImages) {
+      if (Array.isArray(data.vehicleImages)) {
+        processedVehicleImages = data.vehicleImages.filter((url: string) => url && url.trim() !== '');
+      } else if (typeof data.vehicleImages === 'string') {
+        try {
+          const parsed = JSON.parse(data.vehicleImages);
+          processedVehicleImages = Array.isArray(parsed) ? parsed.filter((url: string) => url && url.trim() !== '') : [];
+        } catch {
+          processedVehicleImages = data.vehicleImages.trim() !== '' ? [data.vehicleImages] : [];
+        }
+      }
     }
 
     const vehicleData = {
@@ -64,20 +96,21 @@ export function useVehiclesPage() {
       road_test_notes: data.roadTestNotes || null,
       fuel_level: data.fuelLevel || null,
       pre_accident_defects: data.preAccidentDefects || null,
-      work_items: data.workItems ? JSON.stringify(data.workItems.filter((item: string) => item.trim() !== '')) : null,
+      work_items: processedWorkItems.length > 0 ? JSON.stringify(processedWorkItems) : null,
       registration_document_front_url: data.registrationDocumentFrontUrl || null,
       registration_document_back_url: data.registrationDocumentBackUrl || null,
       vehicle_image_url: data.vehicleImageUrl || null,
-      vehicle_images: data.vehicleImages ? JSON.stringify(data.vehicleImages.filter((url: string) => url.trim() !== '')) : null,
+      vehicle_images: processedVehicleImages.length > 0 ? JSON.stringify(processedVehicleImages) : null,
       fuel_type: data.fuelType || null,
       user_id: user ? user.id : null,
     };
 
-    console.log('Submitting vehicle data:', vehicleData);
+    console.log('Processed vehicle data:', vehicleData);
 
     if (dialogMode === 'create') {
       createVehicle.mutate(vehicleData);
     } else if (dialogMode === 'edit' && selectedVehicle) {
+      console.log('Updating vehicle with ID:', selectedVehicle.id);
       updateVehicle.mutate({
         id: selectedVehicle.id,
         data: vehicleData
