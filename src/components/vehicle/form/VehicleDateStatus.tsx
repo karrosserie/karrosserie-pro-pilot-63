@@ -2,7 +2,6 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { CalendarIcon } from 'lucide-react';
 import { 
   Select,
   SelectContent,
@@ -35,50 +34,38 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
     <div className="grid grid-cols-12 gap-4">
       <div className="col-span-6 md:col-span-3 space-y-2">
         <Label htmlFor="arrivalDate">Date d'arrivée</Label>
-        <div className="relative">
-          <Input
-            id="arrivalDate"
-            name="arrivalDate"
-            type="date"
-            value={formData.arrivalDate || ''}
-            onChange={onInputChange}
-            disabled={isViewMode}
-            className="pr-10"
-          />
-          <CalendarIcon className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-        </div>
+        <Input
+          id="arrivalDate"
+          name="arrivalDate"
+          type="date"
+          value={formData.arrivalDate || ''}
+          onChange={onInputChange}
+          disabled={isViewMode}
+        />
       </div>
 
       <div className="col-span-6 md:col-span-3 space-y-2">
         <Label htmlFor="startDate">Date de début</Label>
-        <div className="relative">
-          <Input
-            id="startDate"
-            name="startDate"
-            type="date"
-            value={formData.startDate || ''}
-            onChange={onInputChange}
-            disabled={isViewMode}
-            className="pr-10"
-          />
-          <CalendarIcon className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-        </div>
+        <Input
+          id="startDate"
+          name="startDate"
+          type="date"
+          value={formData.startDate || ''}
+          onChange={onInputChange}
+          disabled={isViewMode}
+        />
       </div>
 
       <div className="col-span-6 md:col-span-3 space-y-2">
         <Label htmlFor="endDate">Date de fin</Label>
-        <div className="relative">
-          <Input
-            id="endDate"
-            name="endDate"
-            type="date"
-            value={formData.endDate || ''}
-            onChange={onInputChange}
-            disabled={isViewMode}
-            className="pr-10"
-          />
-          <CalendarIcon className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-        </div>
+        <Input
+          id="endDate"
+          name="endDate"
+          type="date"
+          value={formData.endDate || ''}
+          onChange={onInputChange}
+          disabled={isViewMode}
+        />
       </div>
 
       <div className="col-span-12 md:col-span-3 space-y-2">

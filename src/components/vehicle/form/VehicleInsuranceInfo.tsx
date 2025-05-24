@@ -2,7 +2,6 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { CalendarIcon } from 'lucide-react';
 import { 
   Select,
   SelectContent,
@@ -53,18 +52,14 @@ const VehicleInsuranceInfo: React.FC<VehicleInsuranceInfoProps> = ({
 
       <div className="space-y-2">
         <Label htmlFor="insuranceExpiryDate">Date d'expiration</Label>
-        <div className="relative">
-          <Input
-            id="insuranceExpiryDate"
-            name="insuranceExpiryDate"
-            type="date"
-            value={formData.insuranceExpiryDate || ''}
-            onChange={onInputChange}
-            disabled={isViewMode}
-            className="pr-10"
-          />
-          <CalendarIcon className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-        </div>
+        <Input
+          id="insuranceExpiryDate"
+          name="insuranceExpiryDate"
+          type="date"
+          value={formData.insuranceExpiryDate || ''}
+          onChange={onInputChange}
+          disabled={isViewMode}
+        />
       </div>
     </div>
   );
