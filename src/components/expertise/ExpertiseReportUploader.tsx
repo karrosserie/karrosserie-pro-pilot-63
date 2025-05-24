@@ -50,7 +50,7 @@ export const ExpertiseReportUploader = ({
     if (!selectedFile || !user) {
       toast({
         title: "Erreur",
-        description: "Veuillez sélectionner un fichier et vous connecter pour télécharger un PV d'expertise.",
+        description: "Veuillez sélectionner un fichier et vous connecter pour télécharger un rapport d'expertise.",
         variant: "destructive"
       });
       return;
@@ -83,7 +83,7 @@ export const ExpertiseReportUploader = ({
         .getPublicUrl(filePath);
 
       // 4. Créer l'entrée dans la base de données
-      const reportReference = `PV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+      const reportReference = `RE-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
       
       await createReport.mutateAsync({
         id: reportId,
@@ -94,18 +94,18 @@ export const ExpertiseReportUploader = ({
       });
 
       toast({
-        title: "PV importé",
-        description: "Le procès-verbal d'expertise a été importé avec succès."
+        title: "Rapport importé",
+        description: "Le rapport d'expertise a été importé avec succès."
       });
 
       if (onSuccess) {
         onSuccess();
       }
     } catch (error: any) {
-      console.error("Erreur lors de l'importation du PV:", error);
+      console.error("Erreur lors de l'importation du rapport:", error);
       toast({
         title: "Erreur",
-        description: `Impossible d'importer le PV d'expertise: ${error.message}`,
+        description: `Impossible d'importer le rapport d'expertise: ${error.message}`,
         variant: "destructive"
       });
     } finally {

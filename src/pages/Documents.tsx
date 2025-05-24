@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, Search, Filter } from 'lucide-react';
@@ -58,7 +57,7 @@ const Documents = () => {
     <div className="page-container">
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Gestion des documents</h1>
-        <p className="text-gray-600 mt-1">Consultez et gérez tous vos documents: PV d'expertise, devis, ordres de réparation et factures.</p>
+        <p className="text-gray-600 mt-1">Consultez et gérez tous vos documents: rapports d'expertise, devis, ordres de réparation et factures.</p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -68,7 +67,7 @@ const Documents = () => {
               <FileText className="h-6 w-6 text-blue-600" />
             </div>
           </div>
-          <h3 className="font-bold">PV d'expertise</h3>
+          <h3 className="font-bold">Rapports d'expertise</h3>
           <p className="text-sm text-gray-600 mt-1">12 documents</p>
           <Button className="mt-3 w-full" variant="outline">
             Voir tout
@@ -143,7 +142,7 @@ const Documents = () => {
       <div className="space-y-4">
         <DocumentItem 
           icon={<FileText className="h-5 w-5 text-blue-600" />}
-          title="PV d'expertise - Peugeot 308"
+          title="Rapport d'expertise - Peugeot 308"
           date="Créé le 17/05/2023"
           customer="Jean Dupont"
           vehicle="Peugeot 308 - AB-123-CD"
