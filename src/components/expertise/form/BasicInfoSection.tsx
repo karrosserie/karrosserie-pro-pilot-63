@@ -38,8 +38,8 @@ export const BasicInfoSection = ({ formData, errors, onFieldChange }: BasicInfoS
             <Label htmlFor="reference">Numéro de rapport *</Label>
             <Input
               id="reference"
-              value={formData.reference || ''}
-              onChange={(e) => onFieldChange('reference', e.target.value)}
+              value={formData.report_number || formData.reference || ''}
+              onChange={(e) => onFieldChange('report_number', e.target.value)}
               className={errors.reference ? 'border-red-500' : ''}
               placeholder="Ex: RE-2024-1234"
               readOnly={formData.status !== 'Importé'}
