@@ -2,8 +2,8 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { StatusBadge } from '@/components/ui/status-badge';
 import { FileText, AlertCircle } from 'lucide-react';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 
@@ -14,6 +14,13 @@ interface BasicInfoSectionProps {
 }
 
 export const BasicInfoSection = ({ formData, errors, onFieldChange }: BasicInfoSectionProps) => {
+  const statusOptions = [
+    { value: 'Importé', label: 'Importé' },
+    { value: 'En cours', label: 'En cours' },
+    { value: 'Terminé', label: 'Terminé' },
+    { value: 'Validé', label: 'Validé' }
+  ];
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -58,9 +65,22 @@ export const BasicInfoSection = ({ formData, errors, onFieldChange }: BasicInfoS
 
           <div>
             <Label htmlFor="status">Statut</Label>
-            <div className="mt-2">
-              <StatusBadge status={formData.status || 'Importé'} />
-            </div>
+            <Select
+              value={formData.status || 'Importé'}
+              onValueChange={(value) => onFieldChange('status', value)}
+              disabled={true}
+            >
+              <SelectTrigger id="status">
+                <SelectValue placeholder="Sélectionner un statut" />
+              </SelectTrigger>
+              <SelectContent>
+                {statusOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </CardContent>
