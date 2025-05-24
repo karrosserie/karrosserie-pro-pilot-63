@@ -59,8 +59,8 @@ const VehicleIdentificationFields: React.FC<VehicleIdentificationFieldsProps> = 
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
+      <div className="grid grid-cols-12 gap-4">
+        <div className="col-span-5 space-y-2">
           <Label htmlFor="vin">
             Numéro de série (VIN) <span className="text-red-500">*</span>
           </Label>
@@ -88,10 +88,8 @@ const VehicleIdentificationFields: React.FC<VehicleIdentificationFieldsProps> = 
             </p>
           )}
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
+        <div className="col-span-4 space-y-2">
           <Label htmlFor="engineNumber">Numéro de moteur</Label>
           <Input
             id="engineNumber"
@@ -102,7 +100,7 @@ const VehicleIdentificationFields: React.FC<VehicleIdentificationFieldsProps> = 
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="col-span-3 space-y-2">
           <Label htmlFor="status">Statut</Label>
           <Select 
             disabled={isViewMode} 
