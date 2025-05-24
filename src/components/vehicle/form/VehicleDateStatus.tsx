@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -107,7 +108,7 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
         </div>
       </div>
 
-      <div className="col-span-3 md:col-span-2 space-y-2">
+      <div className="col-span-3 md:col-span-2.5 space-y-2">
         <Label htmlFor="startDate">Date de début</Label>
         <Input
           id="startDate"
@@ -119,7 +120,7 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
         />
       </div>
 
-      <div className="col-span-3 md:col-span-2 space-y-2">
+      <div className="col-span-3 md:col-span-2.5 space-y-2">
         <Label htmlFor="endDate">Date de fin</Label>
         <Input
           id="endDate"
@@ -131,7 +132,7 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
         />
       </div>
 
-      <div className="col-span-12 md:col-span-4 space-y-2">
+      <div className="col-span-12 md:col-span-3 space-y-2">
         <Label htmlFor="status">Statut</Label>
         <Select 
           disabled={isViewMode} 
