@@ -28,6 +28,20 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
   onEditVehicle,
   onDeleteVehicle
 }) => {
+  // Helper function to convert vehicle_images to string array
+  const convertToImageArray = (images?: string | string[]): string[] => {
+    if (!images) return [];
+    if (typeof images === 'string') {
+      try {
+        const parsed = JSON.parse(images);
+        return Array.isArray(parsed) ? parsed : [images];
+      } catch {
+        return [images];
+      }
+    }
+    return Array.isArray(images) ? images : [];
+  };
+
   // Transform vehicles data for VehicleCard component
   const vehicleCardsData = vehicles.map(vehicle => ({
     id: vehicle.id,
@@ -37,7 +51,7 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
     licensePlate: vehicle.license_plate || '',
     status: 'En attente' as 'En réparation' | 'Terminé' | 'En attente' | 'Diagnostic', // Default status since not in database
     owner: vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Non assigné',
-    vehicleImages: vehicle.vehicle_images,
+    vehicleImages: convertToImageArray(vehicle.vehicle_images),
     onView: () => onViewVehicle(vehicle),
     onEdit: () => onEditVehicle(vehicle),
     onDelete: () => onDeleteVehicle(vehicle.id)
