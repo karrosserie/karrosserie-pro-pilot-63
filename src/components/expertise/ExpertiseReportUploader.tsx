@@ -59,13 +59,21 @@ export const ExpertiseReportUploader = ({
     setIsUploading(true);
 
     try {
+      console.log('Starting expertise report upload...', { 
+        fileName: selectedFile.name, 
+        fileSize: selectedFile.size, 
+        userId: user.id 
+      });
+
       // 1. Générer un nom unique pour le fichier
       const fileExt = selectedFile.name.split('.').pop();
       const reportId = uuidv4();
       const fileName = `${reportId}_${Date.now()}.${fileExt}`;
       const filePath = `${user.id}/${fileName}`;
 
-      // 2. Télécharger le fichier dans le bucket
+      console.log('Uploading to expertise_reports bucket with path:', filePath);
+
+      // 2. Télécharger le fichier dans le bucket expertise_reports
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('expertise_reports')
         .upload(filePath, selectedFile, {
@@ -74,13 +82,18 @@ export const ExpertiseReportUploader = ({
         });
 
       if (uploadError) {
+        console.error('Upload error:', uploadError);
         throw uploadError;
       }
+
+      console.log('Upload successful:', uploadData);
 
       // 3. Obtenir l'URL publique
       const { data: publicUrlData } = supabase.storage
         .from('expertise_reports')
         .getPublicUrl(filePath);
+
+      console.log('Public URL generated:', publicUrlData.publicUrl);
 
       // 4. Créer l'entrée dans la base de données
       const reportReference = `RE-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -92,6 +105,8 @@ export const ExpertiseReportUploader = ({
         document_url: publicUrlData.publicUrl,
         status: 'Importé'
       });
+
+      console.log('Database entry created successfully');
 
       toast({
         title: "Rapport importé",
