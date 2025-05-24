@@ -2,6 +2,13 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { 
   Select,
   SelectContent,
@@ -9,6 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface VehicleDateStatusProps {
   formData: any;
@@ -30,18 +40,70 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
     { value: 'Terminé', label: 'Terminé' }
   ];
 
+  const handleArrivalDateTimeChange = (date: Date | undefined, time: string) => {
+    if (date) {
+      const [hours, minutes] = time.split(':');
+      const dateTime = new Date(date);
+      dateTime.setHours(parseInt(hours), parseInt(minutes));
+      
+      // Format as ISO string for the backend
+      const isoString = dateTime.toISOString();
+      onSelectChange('arrivalDate', isoString);
+    }
+  };
+
+  const getArrivalDateValue = () => {
+    if (!formData.arrivalDate) return undefined;
+    return new Date(formData.arrivalDate);
+  };
+
+  const getArrivalTimeValue = () => {
+    if (!formData.arrivalDate) return '09:00';
+    const date = new Date(formData.arrivalDate);
+    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="col-span-6 md:col-span-3 space-y-2">
         <Label htmlFor="arrivalDate">Date d'arrivée</Label>
-        <Input
-          id="arrivalDate"
-          name="arrivalDate"
-          type="date"
-          value={formData.arrivalDate || ''}
-          onChange={onInputChange}
-          disabled={isViewMode}
-        />
+        <div className="flex space-x-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "flex-1 justify-start text-left font-normal",
+                  !getArrivalDateValue() && "text-muted-foreground"
+                )}
+                disabled={isViewMode}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {getArrivalDateValue() ? (
+                  format(getArrivalDateValue()!, "PPP")
+                ) : (
+                  <span>Sélectionner une date</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={getArrivalDateValue()}
+                onSelect={(date) => handleArrivalDateTimeChange(date, getArrivalTimeValue())}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+          <Input
+            type="time"
+            value={getArrivalTimeValue()}
+            onChange={(e) => handleArrivalDateTimeChange(getArrivalDateValue()!, e.target.value)}
+            disabled={isViewMode}
+            className="w-24"
+          />
+        </div>
       </div>
 
       <div className="col-span-6 md:col-span-3 space-y-2">
