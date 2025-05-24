@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
 
 interface VehicleInsuranceInfoProps {
   formData: any;
@@ -23,10 +24,7 @@ const VehicleInsuranceInfo: React.FC<VehicleInsuranceInfoProps> = ({
   onInputChange,
   onSelectChange
 }) => {
-  const insuranceCompanies = [
-    'AXA', 'Allianz', 'Generali', 'Zurich', 'Bâloise', 'Helvetia', 
-    'Mobilière', 'Vaudoise', 'CSS', 'Sympany', 'Autre'
-  ];
+  const { insuranceCompanies } = useInsuranceCompanies();
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -42,8 +40,8 @@ const VehicleInsuranceInfo: React.FC<VehicleInsuranceInfoProps> = ({
           </SelectTrigger>
           <SelectContent>
             {insuranceCompanies.map(company => (
-              <SelectItem key={company} value={company}>
-                {company}
+              <SelectItem key={company.id} value={company.name}>
+                {company.name}
               </SelectItem>
             ))}
           </SelectContent>
