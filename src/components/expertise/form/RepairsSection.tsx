@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wrench, Plus, X } from 'lucide-react';
+import { Wrench, Plus, Trash2 } from 'lucide-react';
 
 interface RepairItem {
   id: string;
@@ -94,7 +94,7 @@ export const RepairsSection = ({ repairs, onRepairsChange }: RepairsSectionProps
         ) : (
           <div className="space-y-2">
             {/* Header */}
-            <div className="grid grid-cols-7 gap-2 text-sm font-medium text-gray-700 pb-2 border-b">
+            <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: '3fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
               <div>Description</div>
               <div>Qté</div>
               <div>Coût Unitaire (€)</div>
@@ -106,7 +106,7 @@ export const RepairsSection = ({ repairs, onRepairsChange }: RepairsSectionProps
 
             {/* Repair items */}
             {repairs.map((repair) => (
-              <div key={repair.id} className="grid grid-cols-7 gap-2 items-center">
+              <div key={repair.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '3fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
                 <Input
                   value={repair.description}
                   onChange={(e) => updateRepair(repair.id, 'description', e.target.value)}
@@ -149,24 +149,26 @@ export const RepairsSection = ({ repairs, onRepairsChange }: RepairsSectionProps
                   variant="outline"
                   size="icon"
                   onClick={() => removeRepair(repair.id)}
-                  className="h-8 w-8"
+                  className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
                 >
-                  <X className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             ))}
           </div>
         )}
 
-        <Button
-          type="button"
-          variant="outline"
-          onClick={addRepair}
-          className="w-full"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Ajouter une réparation
-        </Button>
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={addRepair}
+            className="w-auto"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Ajouter une réparation
+          </Button>
+        </div>
 
         {repairs.length > 0 && (
           <div className="border-t pt-4 space-y-2">

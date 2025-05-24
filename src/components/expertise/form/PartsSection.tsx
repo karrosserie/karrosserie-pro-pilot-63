@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Settings, Plus, X } from 'lucide-react';
+import { Settings, Plus, Trash2 } from 'lucide-react';
 
 interface PartItem {
   id: string;
@@ -94,7 +94,7 @@ export const PartsSection = ({ parts, onPartsChange }: PartsSectionProps) => {
         ) : (
           <div className="space-y-2">
             {/* Header */}
-            <div className="grid grid-cols-7 gap-2 text-sm font-medium text-gray-700 pb-2 border-b">
+            <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: '3fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
               <div>Description</div>
               <div>Qté</div>
               <div>Coût Unitaire (€)</div>
@@ -106,7 +106,7 @@ export const PartsSection = ({ parts, onPartsChange }: PartsSectionProps) => {
 
             {/* Part items */}
             {parts.map((part) => (
-              <div key={part.id} className="grid grid-cols-7 gap-2 items-center">
+              <div key={part.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '3fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
                 <Input
                   value={part.description}
                   onChange={(e) => updatePart(part.id, 'description', e.target.value)}
@@ -149,24 +149,26 @@ export const PartsSection = ({ parts, onPartsChange }: PartsSectionProps) => {
                   variant="outline"
                   size="icon"
                   onClick={() => removePart(part.id)}
-                  className="h-8 w-8"
+                  className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
                 >
-                  <X className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             ))}
           </div>
         )}
 
-        <Button
-          type="button"
-          variant="outline"
-          onClick={addPart}
-          className="w-full"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Ajouter une pièce
-        </Button>
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={addPart}
+            className="w-auto"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Ajouter une pièce
+          </Button>
+        </div>
 
         {parts.length > 0 && (
           <div className="border-t pt-4 space-y-2">
