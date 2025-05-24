@@ -26,6 +26,7 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
         formData={formData}
         isViewMode={isViewMode}
         onInputChange={onInputChange}
+        onSelectChange={onSelectChange}
       />
 
       {/* Client, Brand and Model */}
