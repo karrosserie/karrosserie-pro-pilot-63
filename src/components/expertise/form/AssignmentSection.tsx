@@ -54,7 +54,7 @@ export const AssignmentSection = ({
           <div>
             <Label htmlFor="client_id">Client</Label>
             <Select
-              value={formData.client_id || ''}
+              value={formData.client_id || undefined}
               onValueChange={(value) => onFieldChange('client_id', value || null)}
               disabled={isReadOnly}
             >
@@ -62,7 +62,6 @@ export const AssignmentSection = ({
                 <SelectValue placeholder={isLoadingClients ? "Chargement..." : "Sélectionner un client"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Aucun client</SelectItem>
                 {clientOptions.map((client) => (
                   <SelectItem key={client.id} value={client.id}>
                     {client.first_name} {client.last_name}
@@ -75,7 +74,7 @@ export const AssignmentSection = ({
           <div>
             <Label htmlFor="vehicle_id">Véhicule</Label>
             <Select
-              value={formData.vehicle_id || ''}
+              value={formData.vehicle_id || undefined}
               onValueChange={(value) => onFieldChange('vehicle_id', value || null)}
               disabled={isReadOnly}
             >
@@ -83,7 +82,6 @@ export const AssignmentSection = ({
                 <SelectValue placeholder={isLoadingVehicles ? "Chargement..." : "Sélectionner un véhicule"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Aucun véhicule</SelectItem>
                 {vehicleOptions.map((vehicle) => (
                   <SelectItem key={vehicle.id} value={vehicle.id}>
                     <div className="flex items-center">
