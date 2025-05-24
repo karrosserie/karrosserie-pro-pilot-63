@@ -2,6 +2,7 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { CalendarIcon } from 'lucide-react';
 import { 
   Select,
   SelectContent,
@@ -62,6 +63,7 @@ const VehicleInsuranceInfo: React.FC<VehicleInsuranceInfoProps> = ({
             disabled={isViewMode}
             className="pr-10"
           />
+          <CalendarIcon className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         </div>
       </div>
     </div>

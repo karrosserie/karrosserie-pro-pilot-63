@@ -2,6 +2,7 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { CalendarIcon } from 'lucide-react';
 import { 
   Select,
   SelectContent,
@@ -44,10 +45,11 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
             disabled={isViewMode}
             className="pr-10"
           />
+          <CalendarIcon className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         </div>
       </div>
 
-      <div className="col-span-6 md:col-span-2 space-y-2">
+      <div className="col-span-6 md:col-span-3 space-y-2">
         <Label htmlFor="startDate">Date de début</Label>
         <div className="relative">
           <Input
@@ -59,10 +61,11 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
             disabled={isViewMode}
             className="pr-10"
           />
+          <CalendarIcon className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         </div>
       </div>
 
-      <div className="col-span-6 md:col-span-2 space-y-2">
+      <div className="col-span-6 md:col-span-3 space-y-2">
         <Label htmlFor="endDate">Date de fin</Label>
         <div className="relative">
           <Input
@@ -74,10 +77,11 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
             disabled={isViewMode}
             className="pr-10"
           />
+          <CalendarIcon className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         </div>
       </div>
 
-      <div className="col-span-12 md:col-span-5 space-y-2">
+      <div className="col-span-12 md:col-span-3 space-y-2">
         <Label htmlFor="status">Statut</Label>
         <Select 
           disabled={isViewMode} 
