@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Car, Calendar, User, Edit, Eye, Trash2 } from 'lucide-react';
+import { Car, User, Edit, Eye, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface VehicleCardProps {
@@ -11,6 +11,7 @@ interface VehicleCardProps {
   status: 'En réparation' | 'Terminé' | 'En attente' | 'Diagnostic';
   owner: string;
   imageUrl?: string;
+  vehicleImages?: string[];
   onView?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
@@ -19,11 +20,11 @@ interface VehicleCardProps {
 const VehicleCard: React.FC<VehicleCardProps> = ({
   brand,
   model,
-  year,
   licensePlate,
   status,
   owner,
   imageUrl,
+  vehicleImages,
   onView,
   onEdit,
   onDelete
@@ -44,12 +45,35 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
     }
   };
 
+  // Obtenir la première image disponible
+  const getFirstImage = () => {
+    if (imageUrl) return imageUrl;
+    
+    if (vehicleImages && vehicleImages.length > 0) {
+      // Parse les images si c'est une chaîne JSON
+      if (typeof vehicleImages === 'string') {
+        try {
+          const parsed = JSON.parse(vehicleImages);
+          return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
+        } catch {
+          return null;
+        }
+      }
+      // Si c'est déjà un tableau
+      return Array.isArray(vehicleImages) && vehicleImages.length > 0 ? vehicleImages[0] : null;
+    }
+    
+    return null;
+  };
+
+  const firstImage = getFirstImage();
+
   return (
     <div className="card-container flex flex-col h-full animate-fade-in">
       <div className="relative h-40 bg-gray-100 rounded-lg mb-4 overflow-hidden">
-        {imageUrl ? (
+        {firstImage ? (
           <img 
-            src={imageUrl} 
+            src={firstImage} 
             alt={`${brand} ${model}`} 
             className="w-full h-full object-cover"
           />
@@ -67,11 +91,6 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
       
       <div className="flex-1">
         <h3 className="font-bold text-gray-800 text-lg">{brand} {model}</h3>
-        
-        <div className="flex items-center mt-2 text-sm text-gray-600">
-          <Calendar className="h-4 w-4 mr-1" />
-          <span>{year}</span>
-        </div>
         
         <div className="flex items-center mt-2 text-sm text-gray-600">
           <Car className="h-4 w-4 mr-1" />

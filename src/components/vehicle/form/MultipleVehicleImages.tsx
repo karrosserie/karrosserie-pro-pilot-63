@@ -11,6 +11,7 @@ interface MultipleVehicleImagesProps {
   isViewMode: boolean;
   onImageAdd: (url: string) => void;
   onImageRemove: (index: number) => void;
+  onImageUpdate: (index: number, url: string) => void;
 }
 
 const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
@@ -18,11 +19,22 @@ const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
   vehicleImages,
   isViewMode,
   onImageAdd,
-  onImageRemove
+  onImageRemove,
+  onImageUpdate
 }) => {
   const addNewImageSlot = () => {
     // Ajouter un slot vide pour une nouvelle image
     onImageAdd('');
+  };
+
+  const handleImageUpload = (index: number, url: string) => {
+    if (vehicleImages[index] === '') {
+      // Si c'est un slot vide, utiliser onImageUpdate pour le remplir
+      onImageUpdate(index, url);
+    } else {
+      // Si c'est une image existante, la remplacer
+      onImageUpdate(index, url);
+    }
   };
 
   return (
@@ -49,7 +61,7 @@ const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
             documentType="vehicle-image"
             documentId={`${vehicleId}-0`}
             currentDocumentUrl=""
-            onUploadComplete={onImageAdd}
+            onUploadComplete={(url) => handleImageUpload(0, url)}
             isViewMode={isViewMode}
           />
         )}
@@ -62,14 +74,7 @@ const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
                   documentType="vehicle-image"
                   documentId={`${vehicleId}-${index}`}
                   currentDocumentUrl={imageUrl}
-                  onUploadComplete={(url) => {
-                    // Mettre à jour l'image à l'index spécifique
-                    const updatedImages = [...vehicleImages];
-                    updatedImages[index] = url;
-                    // Ici on devrait appeler une fonction pour mettre à jour toutes les images
-                    // Pour l'instant on utilise onImageAdd qui sera adapté dans le parent
-                    onImageAdd(url);
-                  }}
+                  onUploadComplete={(url) => handleImageUpload(index, url)}
                   isViewMode={isViewMode}
                 />
               </div>

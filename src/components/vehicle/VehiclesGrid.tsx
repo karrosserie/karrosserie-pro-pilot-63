@@ -8,6 +8,7 @@ interface Vehicle {
   model: string;
   year: number;
   license_plate: string;
+  vehicle_images?: string | string[];
   clients?: {
     first_name: string;
     last_name: string;
@@ -36,6 +37,7 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
     licensePlate: vehicle.license_plate || '',
     status: 'En attente' as 'En réparation' | 'Terminé' | 'En attente' | 'Diagnostic', // Default status since not in database
     owner: vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Non assigné',
+    vehicleImages: vehicle.vehicle_images,
     onView: () => onViewVehicle(vehicle),
     onEdit: () => onEditVehicle(vehicle),
     onDelete: () => onDeleteVehicle(vehicle.id)
@@ -52,6 +54,7 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
           licensePlate={vehicle.licensePlate}
           status={vehicle.status}
           owner={vehicle.owner}
+          vehicleImages={vehicle.vehicleImages}
           onView={vehicle.onView}
           onEdit={vehicle.onEdit}
           onDelete={vehicle.onDelete}

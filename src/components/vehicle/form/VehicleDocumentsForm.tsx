@@ -49,6 +49,12 @@ const VehicleDocumentsForm: React.FC<VehicleDocumentsFormProps> = ({
     }
   };
 
+  const handleImageUpdate = (index: number, url: string) => {
+    const updatedImages = [...vehicleImages];
+    updatedImages[index] = url;
+    onVehicleImagesUpdate(updatedImages);
+  };
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -79,6 +85,7 @@ const VehicleDocumentsForm: React.FC<VehicleDocumentsFormProps> = ({
         isViewMode={isViewMode}
         onImageAdd={handleImageAdd}
         onImageRemove={handleImageRemove}
+        onImageUpdate={handleImageUpdate}
       />
     </div>
   );
