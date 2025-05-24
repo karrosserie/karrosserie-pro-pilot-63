@@ -19,10 +19,12 @@ interface PartItem {
 interface PartsSectionProps {
   parts: PartItem[];
   onPartsChange: (parts: PartItem[]) => void;
+  isReadOnly?: boolean;
 }
 
-export const PartsSection = ({ parts, onPartsChange }: PartsSectionProps) => {
+export const PartsSection = ({ parts, onPartsChange, isReadOnly = false }: PartsSectionProps) => {
   const addPart = () => {
+    if (isReadOnly) return;
     const newPart: PartItem = {
       id: `part_${Date.now()}`,
       description: '',
@@ -36,10 +38,12 @@ export const PartsSection = ({ parts, onPartsChange }: PartsSectionProps) => {
   };
 
   const removePart = (id: string) => {
+    if (isReadOnly) return;
     onPartsChange(parts.filter(part => part.id !== id));
   };
 
   const updatePart = (id: string, field: keyof PartItem, value: string | number) => {
+    if (isReadOnly) return;
     const updatedParts = parts.map(part => {
       if (part.id === id) {
         const updated = { ...part, [field]: value };
@@ -94,8 +98,8 @@ export const PartsSection = ({ parts, onPartsChange }: PartsSectionProps) => {
         ) : (
           <div className="space-y-2">
             {/* Header */}
-            <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: '3fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-              <div>Description</div>
+            <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+              <div>Désignation</div>
               <div>Qté</div>
               <div>Coût Unitaire (€)</div>
               <div>Remise (%)</div>
@@ -106,11 +110,13 @@ export const PartsSection = ({ parts, onPartsChange }: PartsSectionProps) => {
 
             {/* Part items */}
             {parts.map((part) => (
-              <div key={part.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '3fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+              <div key={part.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
                 <Input
                   value={part.description}
                   onChange={(e) => updatePart(part.id, 'description', e.target.value)}
-                  placeholder="Description de la pièce"
+                  placeholder="Désignation de la pièce"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <Input
                   type="number"
@@ -118,6 +124,8 @@ export const PartsSection = ({ parts, onPartsChange }: PartsSectionProps) => {
                   onChange={(e) => updatePart(part.id, 'quantity', parseFloat(e.target.value) || 0)}
                   min="0"
                   step="1"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <Input
                   type="number"
@@ -125,6 +133,8 @@ export const PartsSection = ({ parts, onPartsChange }: PartsSectionProps) => {
                   onChange={(e) => updatePart(part.id, 'unitCost', parseFloat(e.target.value) || 0)}
                   min="0"
                   step="0.01"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <Input
                   type="number"
@@ -133,6 +143,8 @@ export const PartsSection = ({ parts, onPartsChange }: PartsSectionProps) => {
                   min="0"
                   max="100"
                   step="0.1"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <Input
                   type="number"
@@ -140,35 +152,41 @@ export const PartsSection = ({ parts, onPartsChange }: PartsSectionProps) => {
                   onChange={(e) => updatePart(part.id, 'vat', parseFloat(e.target.value) || 0)}
                   min="0"
                   step="0.1"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <div className="text-right font-medium">
-                  {part.total.toFixed(2)}
+                  {part.total.toFixed(2)} €
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => removePart(part.id)}
-                  className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {!isReadOnly && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => removePart(part.id)}
+                    className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             ))}
           </div>
         )}
 
-        <div className="flex justify-end">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={addPart}
-            className="w-auto"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Ajouter une pièce
-          </Button>
-        </div>
+        {!isReadOnly && (
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addPart}
+              className="w-auto"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Ajouter une pièce
+            </Button>
+          </div>
+        )}
 
         {parts.length > 0 && (
           <div className="border-t pt-4 space-y-2">

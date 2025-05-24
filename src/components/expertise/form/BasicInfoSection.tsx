@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { StatusBadge } from '@/components/ui/status-badge';
 import { FileText, AlertCircle } from 'lucide-react';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 
@@ -56,20 +57,23 @@ export const BasicInfoSection = ({ formData, errors, onFieldChange }: BasicInfoS
 
           <div>
             <Label htmlFor="status">Statut</Label>
-            <Select
-              value={formData.status || 'Importé'}
-              onValueChange={(value) => onFieldChange('status', value)}
-            >
-              <SelectTrigger id="status">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Importé">Importé</SelectItem>
-                <SelectItem value="En cours d'analyse">En cours d'analyse</SelectItem>
-                <SelectItem value="En attente">En attente</SelectItem>
-                <SelectItem value="Converti">Converti</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <Select
+                value={formData.status || 'Importé'}
+                onValueChange={(value) => onFieldChange('status', value)}
+              >
+                <SelectTrigger id="status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Importé">Importé</SelectItem>
+                  <SelectItem value="En cours d'analyse">En cours d'analyse</SelectItem>
+                  <SelectItem value="En attente">En attente</SelectItem>
+                  <SelectItem value="Converti">Converti</SelectItem>
+                </SelectContent>
+              </Select>
+              <StatusBadge status={formData.status || 'Importé'} />
+            </div>
           </div>
         </div>
       </CardContent>

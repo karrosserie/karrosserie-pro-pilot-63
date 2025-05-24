@@ -64,6 +64,49 @@ export const ExpertiseReportForm = ({
   const [parts, setParts] = useState<PartItem[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Déterminer si le formulaire est en lecture seule
+  const isReadOnly = formData.status !== 'Importé';
+
+  // Calculer les totaux globaux
+  const calculateGlobalTotals = () => {
+    const repairTotals = repairs.reduce((acc, repair) => {
+      const subtotal = repair.quantity * repair.unitCost;
+      const discountAmount = subtotal * (repair.discount / 100);
+      const afterDiscount = subtotal - discountAmount;
+      const vatAmount = afterDiscount * (repair.vat / 100);
+      
+      return {
+        subTotal: acc.subTotal + subtotal,
+        totalVat: acc.totalVat + vatAmount,
+        totalDiscount: acc.totalDiscount + discountAmount,
+        total: acc.total + repair.total
+      };
+    }, { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 });
+
+    const partTotals = parts.reduce((acc, part) => {
+      const subtotal = part.quantity * part.unitCost;
+      const discountAmount = subtotal * (part.discount / 100);
+      const afterDiscount = subtotal - discountAmount;
+      const vatAmount = afterDiscount * (part.vat / 100);
+      
+      return {
+        subTotal: acc.subTotal + subtotal,
+        totalVat: acc.totalVat + vatAmount,
+        totalDiscount: acc.totalDiscount + discountAmount,
+        total: acc.total + part.total
+      };
+    }, { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 });
+
+    return {
+      subTotal: repairTotals.subTotal + partTotals.subTotal,
+      totalVat: repairTotals.totalVat + partTotals.totalVat,
+      totalDiscount: repairTotals.totalDiscount + partTotals.totalDiscount,
+      total: repairTotals.total + partTotals.total
+    };
+  };
+
+  const globalTotals = calculateGlobalTotals();
+
   useEffect(() => {
     if (report) {
       setFormData({
@@ -78,7 +121,20 @@ export const ExpertiseReportForm = ({
         incident_date: report.incident_date,
       });
       // Load repairs and parts from report if available
-      // This would need to be implemented in the database schema
+      if (report.repairs_data) {
+        try {
+          setRepairs(JSON.parse(report.repairs_data));
+        } catch (e) {
+          console.error('Error parsing repairs data:', e);
+        }
+      }
+      if (report.parts_data) {
+        try {
+          setParts(JSON.parse(report.parts_data));
+        } catch (e) {
+          console.error('Error parsing parts data:', e);
+        }
+      }
     } else {
       // Générer une référence automatique pour un nouveau rapport
       const currentYear = new Date().getFullYear();
@@ -166,16 +222,19 @@ export const ExpertiseReportForm = ({
         formData={formData}
         errors={errors}
         onFieldChange={handleChange}
+        globalTotals={globalTotals}
       />
 
       <RepairsSection 
         repairs={repairs}
         onRepairsChange={setRepairs}
+        isReadOnly={isReadOnly}
       />
 
       <PartsSection 
         parts={parts}
         onPartsChange={setParts}
+        isReadOnly={isReadOnly}
       />
 
       <FormActions 

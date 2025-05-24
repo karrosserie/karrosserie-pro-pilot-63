@@ -19,10 +19,12 @@ interface RepairItem {
 interface RepairsSectionProps {
   repairs: RepairItem[];
   onRepairsChange: (repairs: RepairItem[]) => void;
+  isReadOnly?: boolean;
 }
 
-export const RepairsSection = ({ repairs, onRepairsChange }: RepairsSectionProps) => {
+export const RepairsSection = ({ repairs, onRepairsChange, isReadOnly = false }: RepairsSectionProps) => {
   const addRepair = () => {
+    if (isReadOnly) return;
     const newRepair: RepairItem = {
       id: `repair_${Date.now()}`,
       description: '',
@@ -36,10 +38,12 @@ export const RepairsSection = ({ repairs, onRepairsChange }: RepairsSectionProps
   };
 
   const removeRepair = (id: string) => {
+    if (isReadOnly) return;
     onRepairsChange(repairs.filter(repair => repair.id !== id));
   };
 
   const updateRepair = (id: string, field: keyof RepairItem, value: string | number) => {
+    if (isReadOnly) return;
     const updatedRepairs = repairs.map(repair => {
       if (repair.id === id) {
         const updated = { ...repair, [field]: value };
@@ -94,8 +98,8 @@ export const RepairsSection = ({ repairs, onRepairsChange }: RepairsSectionProps
         ) : (
           <div className="space-y-2">
             {/* Header */}
-            <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: '3fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-              <div>Description</div>
+            <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+              <div>Désignation</div>
               <div>Qté</div>
               <div>Coût Unitaire (€)</div>
               <div>Remise (%)</div>
@@ -106,11 +110,13 @@ export const RepairsSection = ({ repairs, onRepairsChange }: RepairsSectionProps
 
             {/* Repair items */}
             {repairs.map((repair) => (
-              <div key={repair.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '3fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+              <div key={repair.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
                 <Input
                   value={repair.description}
                   onChange={(e) => updateRepair(repair.id, 'description', e.target.value)}
-                  placeholder="Description de la réparation"
+                  placeholder="Désignation de la réparation"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <Input
                   type="number"
@@ -118,6 +124,8 @@ export const RepairsSection = ({ repairs, onRepairsChange }: RepairsSectionProps
                   onChange={(e) => updateRepair(repair.id, 'quantity', parseFloat(e.target.value) || 0)}
                   min="0"
                   step="1"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <Input
                   type="number"
@@ -125,6 +133,8 @@ export const RepairsSection = ({ repairs, onRepairsChange }: RepairsSectionProps
                   onChange={(e) => updateRepair(repair.id, 'unitCost', parseFloat(e.target.value) || 0)}
                   min="0"
                   step="0.01"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <Input
                   type="number"
@@ -133,6 +143,8 @@ export const RepairsSection = ({ repairs, onRepairsChange }: RepairsSectionProps
                   min="0"
                   max="100"
                   step="0.1"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <Input
                   type="number"
@@ -140,35 +152,41 @@ export const RepairsSection = ({ repairs, onRepairsChange }: RepairsSectionProps
                   onChange={(e) => updateRepair(repair.id, 'vat', parseFloat(e.target.value) || 0)}
                   min="0"
                   step="0.1"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <div className="text-right font-medium">
-                  {repair.total.toFixed(2)}
+                  {repair.total.toFixed(2)} €
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => removeRepair(repair.id)}
-                  className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {!isReadOnly && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => removeRepair(repair.id)}
+                    className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             ))}
           </div>
         )}
 
-        <div className="flex justify-end">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={addRepair}
-            className="w-auto"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Ajouter une réparation
-          </Button>
-        </div>
+        {!isReadOnly && (
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addRepair}
+              className="w-auto"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Ajouter une réparation
+            </Button>
+          </div>
+        )}
 
         {repairs.length > 0 && (
           <div className="border-t pt-4 space-y-2">

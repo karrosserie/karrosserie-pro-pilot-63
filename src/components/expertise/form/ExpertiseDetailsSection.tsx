@@ -10,9 +10,15 @@ interface ExpertiseDetailsSectionProps {
   formData: Partial<ExpertiseReport>;
   errors: Record<string, string>;
   onFieldChange: (field: string, value: any) => void;
+  globalTotals: {
+    subTotal: number;
+    totalVat: number;
+    totalDiscount: number;
+    total: number;
+  };
 }
 
-export const ExpertiseDetailsSection = ({ formData, errors, onFieldChange }: ExpertiseDetailsSectionProps) => {
+export const ExpertiseDetailsSection = ({ formData, errors, onFieldChange, globalTotals }: ExpertiseDetailsSectionProps) => {
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -21,7 +27,7 @@ export const ExpertiseDetailsSection = ({ formData, errors, onFieldChange }: Exp
           Détails de l'expertise
         </CardTitle>
         <CardDescription>
-          Expert, sinistre et informations détaillées
+          Expert, sinistre et totaux de l'expertise
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -61,6 +67,19 @@ export const ExpertiseDetailsSection = ({ formData, errors, onFieldChange }: Exp
               value={formData.incident_date || ''}
               onChange={(e) => onFieldChange('incident_date', e.target.value)}
             />
+          </div>
+        </div>
+
+        {/* Totaux globaux */}
+        <div className="border-t pt-4 space-y-2">
+          <h4 className="text-sm font-medium text-gray-700 mb-3">Totaux de l'expertise</h4>
+          <div className="flex justify-end space-x-8 text-sm">
+            <div>Sous-total : <span className="font-medium">{globalTotals.subTotal.toFixed(2)} €</span></div>
+            <div>TVA : <span className="font-medium">{globalTotals.totalVat.toFixed(2)} €</span></div>
+            <div>Remise TTC : <span className="font-medium">{globalTotals.totalDiscount.toFixed(2)} €</span></div>
+          </div>
+          <div className="flex justify-end text-lg font-bold">
+            Total : <span className="ml-2">{globalTotals.total.toFixed(2)} €</span>
           </div>
         </div>
       </CardContent>
