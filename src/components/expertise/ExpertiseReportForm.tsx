@@ -184,14 +184,14 @@ export const ExpertiseReportForm = ({
           <div>
             <Label htmlFor="client">Client</Label>
             <Select
-              value={formData.client_id || ''}
-              onValueChange={(value) => handleChange('client_id', value || null)}
+              value={formData.client_id || 'none'}
+              onValueChange={(value) => handleChange('client_id', value === 'none' ? null : value)}
             >
               <SelectTrigger id="client">
                 <SelectValue placeholder="Sélectionner un client" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Aucun client</SelectItem>
+                <SelectItem value="none">Aucun client</SelectItem>
                 {clientOptions.map((client) => (
                   <SelectItem key={client.id} value={client.id}>
                     {client.first_name} {client.last_name}
@@ -205,14 +205,14 @@ export const ExpertiseReportForm = ({
           <div>
             <Label htmlFor="vehicle">Véhicule</Label>
             <Select
-              value={formData.vehicle_id || ''}
-              onValueChange={(value) => handleChange('vehicle_id', value || null)}
+              value={formData.vehicle_id || 'none'}
+              onValueChange={(value) => handleChange('vehicle_id', value === 'none' ? null : value)}
             >
               <SelectTrigger id="vehicle">
                 <SelectValue placeholder="Sélectionner un véhicule" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Aucun véhicule</SelectItem>
+                <SelectItem value="none">Aucun véhicule</SelectItem>
                 {vehicleOptions.map((vehicle) => (
                   <SelectItem key={vehicle.id} value={vehicle.id}>
                     {vehicle.brand} {vehicle.model} - {vehicle.license_plate}

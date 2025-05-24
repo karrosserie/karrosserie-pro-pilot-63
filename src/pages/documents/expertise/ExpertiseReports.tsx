@@ -10,8 +10,6 @@ import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 import ExpertiseReportHeader from '@/components/expertise/ExpertiseReportHeader';
 import ExpertiseReportFilters from '@/components/expertise/ExpertiseReportFilters';
 import ExpertiseReportTable from '@/components/expertise/ExpertiseReportTable';
-import { Button } from '@/components/ui/button';
-import { Plus, Upload } from 'lucide-react';
 
 const ExpertiseReports = () => {
   const { reports, isLoading, error, deleteReport } = useExpertiseReports();
@@ -19,7 +17,6 @@ const ExpertiseReports = () => {
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<ExpertiseReport | null>(null);
   const { toast } = useToast();
   
@@ -38,11 +35,6 @@ const ExpertiseReports = () => {
   const handleEditReport = (report: ExpertiseReport) => {
     setSelectedReport(report);
     setEditDialogOpen(true);
-  };
-
-  const handleCreateReport = () => {
-    setSelectedReport(null);
-    setCreateDialogOpen(true);
   };
 
   const handleDeleteReport = async (id: string) => {
@@ -70,31 +62,11 @@ const ExpertiseReports = () => {
         description="Consultez et gérez les rapports d'expertise automobile."
       />
       
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <ExpertiseReportFilters 
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          onImportClick={() => setImportDialogOpen(true)}
-        />
-        
-        <div className="flex space-x-2 mt-4 md:mt-0">
-          <Button 
-            variant="outline" 
-            onClick={() => setImportDialogOpen(true)}
-            className="flex items-center"
-          >
-            <Upload className="h-4 w-4 mr-2" />
-            Importer
-          </Button>
-          <Button 
-            onClick={handleCreateReport}
-            className="flex items-center"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Nouveau rapport
-          </Button>
-        </div>
-      </div>
+      <ExpertiseReportFilters 
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onImportClick={() => setImportDialogOpen(true)}
+      />
       
       <div className="card-container">
         <ExpertiseReportTable 
@@ -123,13 +95,6 @@ const ExpertiseReports = () => {
           />
         </DialogContent>
       </Dialog>
-
-      {/* Create Rapport Dialog */}
-      <ExpertiseReportDialog
-        report={null}
-        open={createDialogOpen}
-        onOpenChange={setCreateDialogOpen}
-      />
 
       {/* Edit Rapport Dialog */}
       <ExpertiseReportDialog
