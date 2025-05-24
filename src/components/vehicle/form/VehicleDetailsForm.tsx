@@ -74,7 +74,6 @@ const VehicleDetailsForm: React.FC<VehicleDetailsFormProps> = ({
               value={formData.roadTestNotes}
               onChange={onInputChange}
               disabled={isViewMode}
-              placeholder="Notes sur le test routier..."
               rows={3}
             />
           </div>
@@ -103,7 +102,6 @@ const VehicleDetailsForm: React.FC<VehicleDetailsFormProps> = ({
           value={formData.preAccidentDefects || ''}
           onChange={onInputChange}
           disabled={isViewMode}
-          placeholder="Pré-accident / Autres défauts"
           className="min-h-[120px]"
         />
       </div>
@@ -132,7 +130,6 @@ const VehicleDetailsForm: React.FC<VehicleDetailsFormProps> = ({
                 value={item}
                 onChange={(e) => onWorkItemChange(index, e.target.value)}
                 disabled={isViewMode}
-                placeholder="Travaux demandés / Instructions du propriétaire"
                 className="flex-1"
               />
               {!isViewMode && (
@@ -154,7 +151,6 @@ const VehicleDetailsForm: React.FC<VehicleDetailsFormProps> = ({
               value=""
               onChange={(e) => onWorkItemChange(0, e.target.value)}
               disabled={isViewMode}
-              placeholder="Travaux demandés / Instructions du propriétaire"
             />
           )}
         </div>
