@@ -93,7 +93,7 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[150px]">Référence</TableHead>
+              <TableHead className="w-[150px]">Numéro de rapport</TableHead>
               <TableHead className="w-[120px]">Date</TableHead>
               <TableHead>Client</TableHead>
               <TableHead>Véhicule</TableHead>
@@ -114,7 +114,7 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
                     <TableCell className="font-medium">
                       <div className="flex items-center">
                         <FileText className="h-4 w-4 mr-2 text-blue-600" />
-                        {report.reference}
+                        {report.report_number || report.reference || 'Non spécifié'}
                       </div>
                     </TableCell>
                     <TableCell className="text-sm text-gray-600">
