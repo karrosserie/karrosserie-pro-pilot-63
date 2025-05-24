@@ -93,7 +93,7 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[150px]">Numéro de rapport</TableHead>
+              <TableHead className="w-[200px]">Numéro de rapport</TableHead>
               <TableHead className="w-[120px]">Date</TableHead>
               <TableHead>Client</TableHead>
               <TableHead>Véhicule</TableHead>
