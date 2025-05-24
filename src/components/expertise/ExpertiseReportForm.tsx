@@ -7,7 +7,29 @@ import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 import { BasicInfoSection } from './form/BasicInfoSection';
 import { AssignmentSection } from './form/AssignmentSection';
 import { ExpertiseDetailsSection } from './form/ExpertiseDetailsSection';
+import { RepairsSection } from './form/RepairsSection';
+import { PartsSection } from './form/PartsSection';
 import { FormActions } from './form/FormActions';
+
+interface RepairItem {
+  id: string;
+  description: string;
+  quantity: number;
+  unitCost: number;
+  discount: number;
+  vat: number;
+  total: number;
+}
+
+interface PartItem {
+  id: string;
+  description: string;
+  quantity: number;
+  unitCost: number;
+  discount: number;
+  vat: number;
+  total: number;
+}
 
 interface ExpertiseReportFormProps {
   report?: ExpertiseReport | null;
@@ -31,13 +53,15 @@ export const ExpertiseReportForm = ({
     report_date: null,
     client_id: null,
     vehicle_id: null,
+    policy_number: '',
     expert_name: '',
-    amount: null,
     status: 'Importé',
     claim_number: '',
     incident_date: null
   });
 
+  const [repairs, setRepairs] = useState<RepairItem[]>([]);
+  const [parts, setParts] = useState<PartItem[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -47,12 +71,14 @@ export const ExpertiseReportForm = ({
         report_date: report.report_date,
         client_id: report.client_id,
         vehicle_id: report.vehicle_id,
+        policy_number: report.policy_number || '',
         expert_name: report.expert_name || '',
-        amount: report.amount,
         status: report.status || 'Importé',
         claim_number: report.claim_number || '',
         incident_date: report.incident_date,
       });
+      // Load repairs and parts from report if available
+      // This would need to be implemented in the database schema
     } else {
       // Générer une référence automatique pour un nouveau rapport
       const currentYear = new Date().getFullYear();
@@ -73,10 +99,6 @@ export const ExpertiseReportForm = ({
     
     if (!formData.expert_name?.trim()) {
       newErrors.expert_name = 'Le nom de l\'expert est recommandé';
-    }
-    
-    if (formData.amount !== null && formData.amount < 0) {
-      newErrors.amount = 'Le montant ne peut pas être négatif';
     }
     
     setErrors(newErrors);
@@ -104,7 +126,13 @@ export const ExpertiseReportForm = ({
     }
     
     try {
-      await onSubmit(formData);
+      // Include repairs and parts data in the submission
+      const submitData = {
+        ...formData,
+        repairs_data: JSON.stringify(repairs),
+        parts_data: JSON.stringify(parts)
+      };
+      await onSubmit(submitData);
     } catch (error: any) {
       toast({
         title: "Erreur",
@@ -138,6 +166,16 @@ export const ExpertiseReportForm = ({
         formData={formData}
         errors={errors}
         onFieldChange={handleChange}
+      />
+
+      <RepairsSection 
+        repairs={repairs}
+        onRepairsChange={setRepairs}
+      />
+
+      <PartsSection 
+        parts={parts}
+        onPartsChange={setParts}
       />
 
       <FormActions 

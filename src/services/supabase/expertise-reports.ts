@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -6,18 +5,27 @@ export type ExpertiseReport = Database['public']['Tables']['expertise_reports'][
   report_date?: string | null;
   claim_number?: string | null;
   incident_date?: string | null;
+  policy_number?: string | null;
+  repairs_data?: string | null;
+  parts_data?: string | null;
 };
 
 export type NewExpertiseReport = Database['public']['Tables']['expertise_reports']['Insert'] & {
   report_date?: string | null;
   claim_number?: string | null;
   incident_date?: string | null;
+  policy_number?: string | null;
+  repairs_data?: string | null;
+  parts_data?: string | null;
 };
 
 export type UpdateExpertiseReport = Database['public']['Tables']['expertise_reports']['Update'] & {
   report_date?: string | null;
   claim_number?: string | null;
   incident_date?: string | null;
+  policy_number?: string | null;
+  repairs_data?: string | null;
+  parts_data?: string | null;
 };
 
 export const expertiseReportsService = {
