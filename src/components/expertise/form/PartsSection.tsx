@@ -173,12 +173,12 @@ export const PartsSection = ({ parts, onPartsChange }: PartsSectionProps) => {
         {parts.length > 0 && (
           <div className="border-t pt-4 space-y-2">
             <div className="flex justify-end space-x-8 text-sm">
-              <div>Sous-Total: <span className="font-medium">€ {totals.subTotal.toFixed(2)}</span></div>
-              <div>TVA: <span className="font-medium">€ {totals.totalVat.toFixed(2)}</span></div>
-              <div>Remise TTC: <span className="font-medium">€ {totals.totalDiscount.toFixed(2)}</span></div>
+              <div>Sous-total : <span className="font-medium">{totals.subTotal.toFixed(2)} €</span></div>
+              <div>TVA : <span className="font-medium">{totals.totalVat.toFixed(2)} €</span></div>
+              <div>Remise TTC : <span className="font-medium">{totals.totalDiscount.toFixed(2)} €</span></div>
             </div>
             <div className="flex justify-end text-lg font-bold">
-              Total: <span className="ml-2">€ {totals.total.toFixed(2)}</span>
+              Total : <span className="ml-2">{totals.total.toFixed(2)} €</span>
             </div>
           </div>
         )}
