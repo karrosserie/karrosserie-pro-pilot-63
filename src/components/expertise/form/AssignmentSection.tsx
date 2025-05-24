@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Car } from 'lucide-react';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
+import { useClientVehicles } from '@/hooks/use-vehicles';
 
 interface Client {
   id: string;
@@ -32,11 +33,18 @@ export const AssignmentSection = ({
   formData,
   onFieldChange,
   clientOptions,
-  vehicleOptions,
-  isLoadingClients,
-  isLoadingVehicles
+  isLoadingClients
 }: AssignmentSectionProps) => {
   const isReadOnly = formData.status !== 'Importé';
+  
+  // Récupérer les véhicules du client sélectionné
+  const { vehicles: clientVehicles, isLoading: isLoadingClientVehicles } = useClientVehicles(formData.client_id || undefined);
+
+  const handleClientChange = (clientId: string) => {
+    onFieldChange('client_id', clientId);
+    // Réinitialiser le véhicule sélectionné quand on change de client
+    onFieldChange('vehicle_id', null);
+  };
 
   return (
     <Card>
@@ -55,7 +63,7 @@ export const AssignmentSection = ({
             <Label htmlFor="client_id">Client</Label>
             <Select
               value={formData.client_id || undefined}
-              onValueChange={(value) => onFieldChange('client_id', value || null)}
+              onValueChange={handleClientChange}
               disabled={isReadOnly}
             >
               <SelectTrigger id="client_id">
@@ -76,20 +84,34 @@ export const AssignmentSection = ({
             <Select
               value={formData.vehicle_id || undefined}
               onValueChange={(value) => onFieldChange('vehicle_id', value || null)}
-              disabled={isReadOnly}
+              disabled={isReadOnly || !formData.client_id}
             >
               <SelectTrigger id="vehicle_id">
-                <SelectValue placeholder={isLoadingVehicles ? "Chargement..." : "Sélectionner un véhicule"} />
+                <SelectValue 
+                  placeholder={
+                    !formData.client_id 
+                      ? "Sélectionner d'abord un client" 
+                      : isLoadingClientVehicles 
+                        ? "Chargement..." 
+                        : "Sélectionner un véhicule"
+                  } 
+                />
               </SelectTrigger>
               <SelectContent>
-                {vehicleOptions.map((vehicle) => (
-                  <SelectItem key={vehicle.id} value={vehicle.id}>
-                    <div className="flex items-center">
-                      <Car className="h-4 w-4 mr-2" />
-                      {vehicle.brand} {vehicle.model} - {vehicle.license_plate}
-                    </div>
+                {clientVehicles && clientVehicles.length > 0 ? (
+                  clientVehicles.map((vehicle) => (
+                    <SelectItem key={vehicle.id} value={vehicle.id}>
+                      <div className="flex items-center">
+                        <Car className="h-4 w-4 mr-2" />
+                        {vehicle.brand} {vehicle.model} - {vehicle.license_plate}
+                      </div>
+                    </SelectItem>
+                  ))
+                ) : formData.client_id && !isLoadingClientVehicles ? (
+                  <SelectItem value="no-vehicles" disabled>
+                    Aucun véhicule trouvé pour ce client
                   </SelectItem>
-                ))}
+                ) : null}
               </SelectContent>
             </Select>
           </div>

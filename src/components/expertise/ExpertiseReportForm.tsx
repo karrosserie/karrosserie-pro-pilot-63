@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useClients } from '@/hooks/use-clients';
@@ -211,7 +210,6 @@ export const ExpertiseReportForm = ({
   };
 
   const clientOptions = clients?.filter(client => !!client) || [];
-  const vehicleOptions = vehicles?.filter(vehicle => !!vehicle) || [];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto">
@@ -225,9 +223,9 @@ export const ExpertiseReportForm = ({
         formData={formData}
         onFieldChange={handleChange}
         clientOptions={clientOptions}
-        vehicleOptions={vehicleOptions}
+        vehicleOptions={[]}
         isLoadingClients={isLoadingClients}
-        isLoadingVehicles={isLoadingVehicles}
+        isLoadingVehicles={false}
       />
 
       <ExpertiseDetailsSection 
