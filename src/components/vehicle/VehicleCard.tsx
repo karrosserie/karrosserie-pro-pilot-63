@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Car, User, Edit, Eye, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -103,17 +102,15 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
         </div>
       </div>
       
-      <div className="border-t border-gray-100 mt-4 pt-4 flex justify-between space-x-2">
+      <div className="border-t border-gray-100 mt-4 pt-4 flex justify-end space-x-2">
         {onView && (
           <Button variant="outline" size="sm" onClick={onView}>
-            <Eye className="h-4 w-4 mr-1" />
-            Voir
+            <Eye className="h-4 w-4" />
           </Button>
         )}
         {onEdit && (
           <Button variant="outline" size="sm" onClick={onEdit}>
-            <Edit className="h-4 w-4 mr-1" />
-            Modifier
+            <Edit className="h-4 w-4" />
           </Button>
         )}
         {onDelete && (
