@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
 interface VehicleDateStatusProps {
@@ -79,7 +80,7 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {getArrivalDateValue() ? (
-                  format(getArrivalDateValue()!, "PPP")
+                  format(getArrivalDateValue()!, "dd/MM/yyyy", { locale: fr })
                 ) : (
                   <span>Sélectionner une date</span>
                 )}
@@ -91,6 +92,7 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
                 selected={getArrivalDateValue()}
                 onSelect={(date) => handleArrivalDateTimeChange(date, getArrivalTimeValue())}
                 initialFocus
+                locale={fr}
                 className={cn("p-3 pointer-events-auto")}
               />
             </PopoverContent>
