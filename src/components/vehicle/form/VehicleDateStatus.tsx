@@ -32,7 +32,7 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
 
   return (
     <div className="grid grid-cols-12 gap-4">
-      <div className="col-span-6 md:col-span-2 space-y-2">
+      <div className="col-span-6 md:col-span-3 space-y-2">
         <Label htmlFor="arrivalDate">Date d'arrivée</Label>
         <div className="relative">
           <Input
@@ -77,7 +77,7 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
         </div>
       </div>
 
-      <div className="col-span-12 md:col-span-6 space-y-2">
+      <div className="col-span-12 md:col-span-5 space-y-2">
         <Label htmlFor="status">Statut</Label>
         <Select 
           disabled={isViewMode} 
