@@ -1,4 +1,6 @@
+
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,6 +24,8 @@ export const ExpertiseReportUploader = ({
   const { toast } = useToast();
   const { user } = useAuth();
   const { createReport } = useExpertiseReports();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -111,6 +115,11 @@ export const ExpertiseReportUploader = ({
         title: "Rapport importé",
         description: "Le rapport d'expertise a été importé avec succès."
       });
+
+      // Rediriger vers la page des rapports d'expertise si on ne s'y trouve pas déjà
+      if (!location.pathname.includes('/documents/expertise')) {
+        navigate('/documents/expertise');
+      }
 
       if (onSuccess) {
         onSuccess();
