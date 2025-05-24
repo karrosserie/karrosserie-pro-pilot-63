@@ -1,20 +1,9 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wrench, Plus, Trash2 } from 'lucide-react';
-
-interface RepairItem {
-  id: string;
-  description: string;
-  quantity: number;
-  unitCost: number;
-  discount: number;
-  vat: number;
-  total: number;
-}
+import { RepairItem } from './types';
 
 interface RepairsSectionProps {
   repairs: RepairItem[];

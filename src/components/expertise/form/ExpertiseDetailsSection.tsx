@@ -5,17 +5,13 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calculator, AlertCircle } from 'lucide-react';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
+import { GlobalTotals } from './types';
 
 interface ExpertiseDetailsSectionProps {
   formData: Partial<ExpertiseReport>;
   errors: Record<string, string>;
   onFieldChange: (field: string, value: any) => void;
-  globalTotals: {
-    subTotal: number;
-    totalVat: number;
-    totalDiscount: number;
-    total: number;
-  };
+  globalTotals: GlobalTotals;
 }
 
 export const ExpertiseDetailsSection = ({ formData, errors, onFieldChange, globalTotals }: ExpertiseDetailsSectionProps) => {
