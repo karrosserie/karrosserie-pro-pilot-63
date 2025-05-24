@@ -37,7 +37,6 @@ const wmiToBrand: Record<string, string> = {
   
   // Peugeot
   'VF3': 'Peugeot',
-  'VF7': 'Peugeot',
   
   // Renault
   'VF1': 'Renault',
@@ -76,7 +75,7 @@ const wmiToBrand: Record<string, string> = {
 };
 
 // Mapping des codes de modèle spécifiques (exemples courants)
-const vinToModel: Record<string, Record<string, string>> = {
+const vinToModel: Record<string, Record<string, string[]>> = {
   'Audi': {
     'A3': ['8V', '8P', '8L'],
     'A4': ['8K', '8E', '8D', 'B9'],
