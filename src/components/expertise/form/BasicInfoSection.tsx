@@ -2,7 +2,6 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { FileText, AlertCircle } from 'lucide-react';
@@ -36,6 +35,7 @@ export const BasicInfoSection = ({ formData, errors, onFieldChange }: BasicInfoS
               onChange={(e) => onFieldChange('reference', e.target.value)}
               className={errors.reference ? 'border-red-500' : ''}
               placeholder="Ex: RE-2024-1234"
+              readOnly={formData.status !== 'Importé'}
             />
             {errors.reference && (
               <p className="text-sm text-red-500 mt-1 flex items-center">
@@ -52,26 +52,13 @@ export const BasicInfoSection = ({ formData, errors, onFieldChange }: BasicInfoS
               type="date"
               value={formData.report_date || ''}
               onChange={(e) => onFieldChange('report_date', e.target.value)}
+              readOnly={formData.status !== 'Importé'}
             />
           </div>
 
           <div>
             <Label htmlFor="status">Statut</Label>
-            <div className="space-y-2">
-              <Select
-                value={formData.status || 'Importé'}
-                onValueChange={(value) => onFieldChange('status', value)}
-              >
-                <SelectTrigger id="status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Importé">Importé</SelectItem>
-                  <SelectItem value="En cours d'analyse">En cours d'analyse</SelectItem>
-                  <SelectItem value="En attente">En attente</SelectItem>
-                  <SelectItem value="Converti">Converti</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="mt-2">
               <StatusBadge status={formData.status || 'Importé'} />
             </div>
           </div>

@@ -19,6 +19,8 @@ interface ExpertiseDetailsSectionProps {
 }
 
 export const ExpertiseDetailsSection = ({ formData, errors, onFieldChange, globalTotals }: ExpertiseDetailsSectionProps) => {
+  const isReadOnly = formData.status !== 'Importé';
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -40,6 +42,7 @@ export const ExpertiseDetailsSection = ({ formData, errors, onFieldChange, globa
               onChange={(e) => onFieldChange('expert_name', e.target.value)}
               className={errors.expert_name ? 'border-yellow-500' : ''}
               placeholder="Ex: Jean Dupont"
+              readOnly={isReadOnly}
             />
             {errors.expert_name && (
               <p className="text-sm text-yellow-600 mt-1 flex items-center">
@@ -56,6 +59,7 @@ export const ExpertiseDetailsSection = ({ formData, errors, onFieldChange, globa
               value={formData.claim_number || ''}
               onChange={(e) => onFieldChange('claim_number', e.target.value)}
               placeholder="Ex: SIN-2024-5678"
+              readOnly={isReadOnly}
             />
           </div>
 
@@ -66,6 +70,7 @@ export const ExpertiseDetailsSection = ({ formData, errors, onFieldChange, globa
               type="date"
               value={formData.incident_date || ''}
               onChange={(e) => onFieldChange('incident_date', e.target.value)}
+              readOnly={isReadOnly}
             />
           </div>
         </div>

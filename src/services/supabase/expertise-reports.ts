@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -67,9 +68,35 @@ export const expertiseReportsService = {
   },
   
   create: async (report: NewExpertiseReport) => {
+    // Calculer le montant total à partir des données de réparations et pièces
+    let totalAmount = 0;
+    
+    if (report.repairs_data) {
+      try {
+        const repairs = JSON.parse(report.repairs_data);
+        totalAmount += repairs.reduce((sum: number, repair: any) => sum + (repair.total || 0), 0);
+      } catch (e) {
+        console.error('Error parsing repairs data:', e);
+      }
+    }
+    
+    if (report.parts_data) {
+      try {
+        const parts = JSON.parse(report.parts_data);
+        totalAmount += parts.reduce((sum: number, part: any) => sum + (part.total || 0), 0);
+      } catch (e) {
+        console.error('Error parsing parts data:', e);
+      }
+    }
+
+    const reportWithAmount = {
+      ...report,
+      amount: totalAmount
+    };
+
     const { data, error } = await supabase
       .from('expertise_reports')
-      .insert([report])
+      .insert([reportWithAmount])
       .select()
       .single();
       
@@ -82,9 +109,35 @@ export const expertiseReportsService = {
   },
   
   update: async (id: string, report: UpdateExpertiseReport) => {
+    // Calculer le montant total à partir des données de réparations et pièces
+    let totalAmount = 0;
+    
+    if (report.repairs_data) {
+      try {
+        const repairs = JSON.parse(report.repairs_data);
+        totalAmount += repairs.reduce((sum: number, repair: any) => sum + (repair.total || 0), 0);
+      } catch (e) {
+        console.error('Error parsing repairs data:', e);
+      }
+    }
+    
+    if (report.parts_data) {
+      try {
+        const parts = JSON.parse(report.parts_data);
+        totalAmount += parts.reduce((sum: number, part: any) => sum + (part.total || 0), 0);
+      } catch (e) {
+        console.error('Error parsing parts data:', e);
+      }
+    }
+
+    const reportWithAmount = {
+      ...report,
+      amount: totalAmount
+    };
+
     const { data, error } = await supabase
       .from('expertise_reports')
-      .update(report)
+      .update(reportWithAmount)
       .eq('id', id)
       .select()
       .single();

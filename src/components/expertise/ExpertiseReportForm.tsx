@@ -120,19 +120,25 @@ export const ExpertiseReportForm = ({
         claim_number: report.claim_number || '',
         incident_date: report.incident_date,
       });
-      // Load repairs and parts from report if available
+      
+      // Charger les réparations et pièces depuis le rapport
       if (report.repairs_data) {
         try {
-          setRepairs(JSON.parse(report.repairs_data));
+          const parsedRepairs = JSON.parse(report.repairs_data);
+          setRepairs(parsedRepairs);
         } catch (e) {
           console.error('Error parsing repairs data:', e);
+          setRepairs([]);
         }
       }
+      
       if (report.parts_data) {
         try {
-          setParts(JSON.parse(report.parts_data));
+          const parsedParts = JSON.parse(report.parts_data);
+          setParts(parsedParts);
         } catch (e) {
           console.error('Error parsing parts data:', e);
+          setParts([]);
         }
       }
     } else {
@@ -162,8 +168,13 @@ export const ExpertiseReportForm = ({
   };
 
   const handleChange = (field: string, value: any) => {
+    if (isReadOnly && field !== 'status') {
+      return; // Empêcher les modifications si en lecture seule
+    }
+    
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
+    
+    // Effacer l'erreur quand l'utilisateur commence à taper
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
@@ -182,12 +193,13 @@ export const ExpertiseReportForm = ({
     }
     
     try {
-      // Include repairs and parts data in the submission
+      // Inclure les données de réparations et pièces dans la soumission
       const submitData = {
         ...formData,
         repairs_data: JSON.stringify(repairs),
         parts_data: JSON.stringify(parts)
       };
+      
       await onSubmit(submitData);
     } catch (error: any) {
       toast({
