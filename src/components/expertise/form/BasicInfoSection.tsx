@@ -43,8 +43,6 @@ export const BasicInfoSection = ({ formData, errors, onFieldChange }: BasicInfoS
               className={errors.reference ? 'border-red-500' : ''}
               placeholder="Ex: RE-2024-1234"
               readOnly={formData.status !== 'Importé'}
-              autoFocus={false}
-              tabIndex={-1}
             />
             {errors.reference && (
               <p className="text-sm text-red-500 mt-1 flex items-center">

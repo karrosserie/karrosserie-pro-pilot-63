@@ -76,6 +76,19 @@ export const ExpertiseReportForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto">
+      {/* Élément invisible pour capturer le focus initial */}
+      <div 
+        tabIndex={0} 
+        style={{ 
+          position: 'absolute', 
+          left: '-9999px', 
+          width: '1px', 
+          height: '1px', 
+          opacity: 0 
+        }}
+        onFocus={(e) => e.target.blur()}
+      />
+      
       <BasicInfoSection 
         formData={formData}
         errors={errors}
