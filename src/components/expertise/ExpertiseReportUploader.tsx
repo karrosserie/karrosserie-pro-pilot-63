@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -69,13 +68,13 @@ export const ExpertiseReportUploader = ({
       const fileExt = selectedFile.name.split('.').pop();
       const reportId = uuidv4();
       const fileName = `${reportId}_${Date.now()}.${fileExt}`;
-      const filePath = `${user.id}/${fileName}`;
+      const filePath = `${user.id}/expertise_reports/${fileName}`;
 
-      console.log('Uploading to expertise_reports bucket with path:', filePath);
+      console.log('Uploading to documents bucket with path:', filePath);
 
-      // 2. Télécharger le fichier dans le bucket expertise_reports
+      // 2. Télécharger le fichier dans le bucket documents avec sous-dossier expertise_reports
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('expertise_reports')
+        .from('documents')
         .upload(filePath, selectedFile, {
           cacheControl: '3600',
           upsert: false
@@ -90,7 +89,7 @@ export const ExpertiseReportUploader = ({
 
       // 3. Obtenir l'URL publique
       const { data: publicUrlData } = supabase.storage
-        .from('expertise_reports')
+        .from('documents')
         .getPublicUrl(filePath);
 
       console.log('Public URL generated:', publicUrlData.publicUrl);
