@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { FileUpload } from '@/components/ui/file-upload';
 import { Button } from '@/components/ui/button';
@@ -43,6 +42,8 @@ export function DocumentUploader({
   };
   
   const handleUpload = async (file: File) => {
+    console.log('Starting file upload:', { fileName: file.name, fileSize: file.size, documentType, documentId });
+    
     // Vérifier si le fichier est une image pour proposer le recadrage
     if (file.type.startsWith('image/')) {
       const tempUrl = URL.createObjectURL(file);
@@ -68,12 +69,24 @@ export function DocumentUploader({
     setIsUploading(true);
     
     try {
+      console.log('Uploading file to storage...', { userId: user.id, documentType, documentId });
       const url = await uploadDocument(file, documentType, documentId);
+      console.log('Upload successful, URL:', url);
+      
       if (url) {
         onUploadComplete(url);
+        toast({
+          title: "Document téléchargé",
+          description: "Le document a été téléchargé avec succès."
+        });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload error:', error);
+      toast({
+        title: "Erreur de téléchargement",
+        description: `Impossible de télécharger le document: ${error.message}`,
+        variant: "destructive"
+      });
     } finally {
       setIsUploading(false);
     }

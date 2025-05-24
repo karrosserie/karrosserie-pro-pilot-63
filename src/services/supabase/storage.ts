@@ -1,16 +1,20 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export const storageService = {
   uploadDocument: async (file: File, userId: string, documentType: string, documentId: string) => {
-    const filePath = `${userId}/${documentType}/${documentId}/${file.name}`;
+    // Générer un nom de fichier unique avec timestamp pour éviter les conflits
+    const fileExt = file.name.split('.').pop();
+    const timestamp = Date.now();
+    const randomId = Math.random().toString(36).substring(2, 15);
+    const fileName = `${documentId}_${timestamp}_${randomId}.${fileExt}`;
+    const filePath = `${userId}/${documentType}/${fileName}`;
     
     const { data, error } = await supabase
       .storage
       .from('documents')
       .upload(filePath, file, {
         cacheControl: '3600',
-        upsert: false
+        upsert: true // Permettre l'écrasement des fichiers
       });
     
     if (error) {
