@@ -2,9 +2,23 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
-export type ExpertiseReport = Database['public']['Tables']['expertise_reports']['Row'];
-export type NewExpertiseReport = Database['public']['Tables']['expertise_reports']['Insert'];
-export type UpdateExpertiseReport = Database['public']['Tables']['expertise_reports']['Update'];
+export type ExpertiseReport = Database['public']['Tables']['expertise_reports']['Row'] & {
+  report_date?: string | null;
+  claim_number?: string | null;
+  incident_date?: string | null;
+};
+
+export type NewExpertiseReport = Database['public']['Tables']['expertise_reports']['Insert'] & {
+  report_date?: string | null;
+  claim_number?: string | null;
+  incident_date?: string | null;
+};
+
+export type UpdateExpertiseReport = Database['public']['Tables']['expertise_reports']['Update'] & {
+  report_date?: string | null;
+  claim_number?: string | null;
+  incident_date?: string | null;
+};
 
 export const expertiseReportsService = {
   getAll: async () => {

@@ -4,7 +4,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useClients } from '@/hooks/use-clients';
 import { useVehicles } from '@/hooks/use-vehicles';
@@ -32,12 +31,14 @@ export const ExpertiseReportForm = ({
   
   const [formData, setFormData] = useState<Partial<ExpertiseReport>>({
     reference: '',
+    report_date: null,
     client_id: null,
     vehicle_id: null,
     expert_name: '',
     amount: null,
     status: 'Importé',
-    notes: ''
+    claim_number: '',
+    incident_date: null
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -46,12 +47,14 @@ export const ExpertiseReportForm = ({
     if (report) {
       setFormData({
         reference: report.reference,
+        report_date: report.report_date,
         client_id: report.client_id,
         vehicle_id: report.vehicle_id,
         expert_name: report.expert_name || '',
         amount: report.amount,
         status: report.status || 'Importé',
-        notes: report.notes || '',
+        claim_number: report.claim_number || '',
+        incident_date: report.incident_date,
       });
     } else {
       // Générer une référence automatique pour un nouveau rapport
@@ -68,7 +71,7 @@ export const ExpertiseReportForm = ({
     const newErrors: Record<string, string> = {};
     
     if (!formData.reference?.trim()) {
-      newErrors.reference = 'La référence est obligatoire';
+      newErrors.reference = 'Le numéro de rapport est obligatoire';
     }
     
     if (!formData.expert_name?.trim()) {
@@ -127,12 +130,12 @@ export const ExpertiseReportForm = ({
             Informations de base
           </CardTitle>
           <CardDescription>
-            Référence et statut du rapport d'expertise
+            Numéro de rapport, date et statut
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="reference">Référence *</Label>
+            <Label htmlFor="reference">Numéro de rapport *</Label>
             <Input
               id="reference"
               value={formData.reference || ''}
@@ -146,6 +149,16 @@ export const ExpertiseReportForm = ({
                 {errors.reference}
               </p>
             )}
+          </div>
+
+          <div>
+            <Label htmlFor="report_date">Date du rapport</Label>
+            <Input
+              id="report_date"
+              type="date"
+              value={formData.report_date || ''}
+              onChange={(e) => handleChange('report_date', e.target.value)}
+            />
           </div>
 
           <div>
@@ -233,7 +246,7 @@ export const ExpertiseReportForm = ({
             Détails de l'expertise
           </CardTitle>
           <CardDescription>
-            Expert et montant de l'expertise
+            Expert, montant et informations sur le sinistre
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -273,26 +286,24 @@ export const ExpertiseReportForm = ({
               </p>
             )}
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Notes */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Notes et commentaires</CardTitle>
-          <CardDescription>
-            Informations complémentaires sur le rapport
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
           <div>
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea
-              id="notes"
-              value={formData.notes || ''}
-              onChange={(e) => handleChange('notes', e.target.value)}
-              rows={4}
-              placeholder="Ajoutez des notes ou commentaires sur ce rapport d'expertise..."
+            <Label htmlFor="claim_number">Numéro de sinistre</Label>
+            <Input
+              id="claim_number"
+              value={formData.claim_number || ''}
+              onChange={(e) => handleChange('claim_number', e.target.value)}
+              placeholder="Ex: SIN-2024-5678"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="incident_date">Date du sinistre</Label>
+            <Input
+              id="incident_date"
+              type="date"
+              value={formData.incident_date || ''}
+              onChange={(e) => handleChange('incident_date', e.target.value)}
             />
           </div>
         </CardContent>
