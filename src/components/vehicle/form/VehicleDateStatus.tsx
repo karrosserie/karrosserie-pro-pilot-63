@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -9,13 +8,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -108,7 +100,7 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
         </div>
       </div>
 
-      <div className="col-span-3 md:col-span-2.5 space-y-2">
+      <div className="col-span-3 md:col-span-4 space-y-2">
         <Label htmlFor="startDate">Date de début</Label>
         <Input
           id="startDate"
@@ -120,7 +112,7 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
         />
       </div>
 
-      <div className="col-span-3 md:col-span-2.5 space-y-2">
+      <div className="col-span-3 md:col-span-4 space-y-2">
         <Label htmlFor="endDate">Date de fin</Label>
         <Input
           id="endDate"
@@ -130,26 +122,6 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
           onChange={onInputChange}
           disabled={isViewMode}
         />
-      </div>
-
-      <div className="col-span-12 md:col-span-3 space-y-2">
-        <Label htmlFor="status">Statut</Label>
-        <Select 
-          disabled={isViewMode} 
-          value={formData.status || 'En attente'} 
-          onValueChange={(value) => onSelectChange('status', value)}
-        >
-          <SelectTrigger id="status">
-            <SelectValue placeholder="Sélectionner un statut" />
-          </SelectTrigger>
-          <SelectContent>
-            {statusOptions.map(option => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
     </div>
   );

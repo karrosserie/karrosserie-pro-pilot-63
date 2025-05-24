@@ -1,7 +1,13 @@
-
 import React, { useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { decodeVin, isValidVin } from '@/services/vin-decoder';
 
 interface VehicleIdentificationFieldsProps {
@@ -17,6 +23,13 @@ const VehicleIdentificationFields: React.FC<VehicleIdentificationFieldsProps> = 
   onInputChange,
   onSelectChange
 }) => {
+  const statusOptions = [
+    { value: 'En attente', label: 'En attente' },
+    { value: 'Diagnostic', label: 'Diagnostic' },
+    { value: 'En réparation', label: 'En réparation' },
+    { value: 'Terminé', label: 'Terminé' }
+  ];
+
   // Effect pour détecter automatiquement la marque et le modèle quand le VIN change
   useEffect(() => {
     if (formData.vin && formData.vin.length === 17 && isValidVin(formData.vin) && onSelectChange) {
@@ -45,45 +58,69 @@ const VehicleIdentificationFields: React.FC<VehicleIdentificationFieldsProps> = 
   }, [formData.vin, formData.brand, formData.model, formData.year, onSelectChange]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div className="space-y-2">
-        <Label htmlFor="vin">
-          Numéro de série (VIN) <span className="text-red-500">*</span>
-        </Label>
-        <Input
-          id="vin"
-          name="vin"
-          value={formData.vin || ''}
-          onChange={onInputChange}
-          disabled={isViewMode}
-          required
-          placeholder="17 caractères"
-          maxLength={17}
-          style={{
-            textTransform: 'uppercase'
-          }}
-        />
-        {formData.vin && !isValidVin(formData.vin) && (
-          <p className="text-sm text-red-500">
-            Le VIN doit contenir exactement 17 caractères alphanumériques (sans I, O, Q)
-          </p>
-        )}
-        {formData.vin && isValidVin(formData.vin) && (
-          <p className="text-sm text-green-600">
-            ✓ VIN valide - Marque et modèle détectés automatiquement
-          </p>
-        )}
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="vin">
+            Numéro de série (VIN) <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="vin"
+            name="vin"
+            value={formData.vin || ''}
+            onChange={onInputChange}
+            disabled={isViewMode}
+            required
+            placeholder="17 caractères"
+            maxLength={17}
+            style={{
+              textTransform: 'uppercase'
+            }}
+          />
+          {formData.vin && !isValidVin(formData.vin) && (
+            <p className="text-sm text-red-500">
+              Le VIN doit contenir exactement 17 caractères alphanumériques (sans I, O, Q)
+            </p>
+          )}
+          {formData.vin && isValidVin(formData.vin) && (
+            <p className="text-sm text-green-600">
+              ✓ VIN valide - Marque et modèle détectés automatiquement
+            </p>
+          )}
+        </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="engineNumber">Numéro de moteur</Label>
-        <Input
-          id="engineNumber"
-          name="engineNumber"
-          value={formData.engineNumber || ''}
-          onChange={onInputChange}
-          disabled={isViewMode}
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="engineNumber">Numéro de moteur</Label>
+          <Input
+            id="engineNumber"
+            name="engineNumber"
+            value={formData.engineNumber || ''}
+            onChange={onInputChange}
+            disabled={isViewMode}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="status">Statut</Label>
+          <Select 
+            disabled={isViewMode} 
+            value={formData.status || 'En attente'} 
+            onValueChange={(value) => onSelectChange && onSelectChange('status', value)}
+          >
+            <SelectTrigger id="status">
+              <SelectValue placeholder="Sélectionner un statut" />
+            </SelectTrigger>
+            <SelectContent>
+              {statusOptions.map(option => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </div>
   );
