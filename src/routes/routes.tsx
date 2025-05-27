@@ -12,7 +12,6 @@ import Fleet from "@/pages/Fleet";
 import Settings from "@/pages/Settings";
 import Accounting from "@/pages/Accounting";
 import Cessions from "@/pages/Cessions";
-import Payments from "@/pages/Payments";
 import Auth from "@/pages/Auth";
 
 // Document pages
@@ -113,14 +112,6 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <Invoices />
-      </ProtectedRoute>
-    )
-  },
-  {
-    path: "/payments",
-    element: (
-      <ProtectedRoute>
-        <Payments />
       </ProtectedRoute>
     )
   },

@@ -10,7 +10,6 @@ import {
   Receipt, 
   Settings,
   CreditCard, 
-  Euro,
   ChevronDown, 
   ChevronRight
 } from 'lucide-react';
@@ -104,7 +103,6 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
         { label: 'Factures', path: '/documents/factures' },
       ]
     },
-    { icon: <Euro className="app-icon" />, label: 'Paiements', path: '/payments' },
     { icon: <CreditCard className="app-icon" />, label: 'Cession de créance', path: '/cessions' },
     { icon: <Clock className="app-icon" />, label: 'Véhicules de courtoisie', path: '/fleet' },
     { icon: <Receipt className="app-icon" />, label: 'Comptabilité', path: '/accounting' },
