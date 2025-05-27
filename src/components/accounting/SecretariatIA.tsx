@@ -92,7 +92,11 @@ const SecretariatIA: React.FC = () => {
               <Button 
                 variant={currentView === 'table' ? 'default' : 'outline'}
                 onClick={() => setCurrentView('table')}
-                className="bg-gray-800 hover:bg-gray-700"
+                className={`${
+                  currentView === 'table' 
+                    ? 'bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white' 
+                    : 'border-karrosserie-orange text-karrosserie-orange hover:bg-karrosserie-orange hover:text-white'
+                }`}
               >
                 Vue tableau
               </Button>

@@ -105,63 +105,65 @@ const RelanceTable: React.FC = () => {
   };
 
   return (
-    <Card>
+    <Card className="bg-white border border-gray-200 shadow-sm">
       <CardHeader>
-        <CardTitle>Vue tableau</CardTitle>
+        <CardTitle className="text-gray-800">Vue tableau</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Facture</TableHead>
-              <TableHead>Client</TableHead>
-              <TableHead>Projet</TableHead>
-              <TableHead>Montant</TableHead>
-              <TableHead>Échéance</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead>Relances</TableHead>
-              <TableHead>Prochaine action</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {relances.map((relance, index) => (
-              <TableRow key={index}>
-                <TableCell className="font-medium">{relance.facture}</TableCell>
-                <TableCell>{relance.client}</TableCell>
-                <TableCell>{relance.projet}</TableCell>
-                <TableCell>{relance.montant}</TableCell>
-                <TableCell>{relance.echeance}</TableCell>
-                <TableCell>
-                  <Badge variant="destructive">{relance.statut}</Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-col gap-1">
-                    <Badge className={`${getRelanceBadgeColor(relance.relanceType)} text-white w-fit`}>
-                      {relance.relanceType}
-                    </Badge>
-                    <div className="flex gap-1">
-                      {relance.moyens.map((moyen, moyenIndex) => (
-                        <Badge 
-                          key={moyenIndex} 
-                          className={`${getMoyenColor(moyen)} text-white text-xs`}
-                        >
-                          {moyen}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>{relance.prochaineAction}</TableCell>
-                <TableCell>
-                  <Button className="bg-gray-800 hover:bg-gray-700 text-white">
-                    Actions
-                  </Button>
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-gray-200">
+                <TableHead className="text-gray-700 font-medium">Facture</TableHead>
+                <TableHead className="text-gray-700 font-medium">Client</TableHead>
+                <TableHead className="text-gray-700 font-medium">Projet</TableHead>
+                <TableHead className="text-gray-700 font-medium">Montant</TableHead>
+                <TableHead className="text-gray-700 font-medium">Échéance</TableHead>
+                <TableHead className="text-gray-700 font-medium">Statut</TableHead>
+                <TableHead className="text-gray-700 font-medium">Relances</TableHead>
+                <TableHead className="text-gray-700 font-medium">Prochaine action</TableHead>
+                <TableHead className="text-gray-700 font-medium">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {relances.map((relance, index) => (
+                <TableRow key={index} className="border-gray-200 hover:bg-gray-50">
+                  <TableCell className="font-medium text-gray-800">{relance.facture}</TableCell>
+                  <TableCell className="text-gray-700">{relance.client}</TableCell>
+                  <TableCell className="text-gray-700">{relance.projet}</TableCell>
+                  <TableCell className="text-gray-800 font-medium">{relance.montant}</TableCell>
+                  <TableCell className="text-gray-700">{relance.echeance}</TableCell>
+                  <TableCell>
+                    <Badge variant="destructive">{relance.statut}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col gap-1">
+                      <Badge className={`${getRelanceBadgeColor(relance.relanceType)} text-white w-fit`}>
+                        {relance.relanceType}
+                      </Badge>
+                      <div className="flex gap-1">
+                        {relance.moyens.map((moyen, moyenIndex) => (
+                          <Badge 
+                            key={moyenIndex} 
+                            className={`${getMoyenColor(moyen)} text-white text-xs`}
+                          >
+                            {moyen}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-gray-700">{relance.prochaineAction}</TableCell>
+                  <TableCell>
+                    <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white">
+                      Actions
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );
