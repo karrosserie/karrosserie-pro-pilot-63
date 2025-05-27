@@ -85,67 +85,67 @@ const RelanceTable: React.FC = () => {
 
   const getRelanceBadgeColor = (type: string) => {
     switch (type) {
-      case 'Relance 1': return 'bg-blue-500 hover:bg-blue-600';
-      case 'Relance 2': return 'bg-yellow-500 hover:bg-yellow-600';
-      case 'Relance 3': return 'bg-orange-500 hover:bg-orange-600';
-      case 'Relance 4': return 'bg-red-500 hover:bg-red-600';
-      case 'Contentieux': return 'bg-red-700 hover:bg-red-800';
-      default: return 'bg-gray-500 hover:bg-gray-600';
+      case 'Relance 1': return 'bg-blue-600 hover:bg-blue-700';
+      case 'Relance 2': return 'bg-amber-600 hover:bg-amber-700';
+      case 'Relance 3': return 'bg-orange-600 hover:bg-orange-700';
+      case 'Relance 4': return 'bg-red-600 hover:bg-red-700';
+      case 'Contentieux': return 'bg-red-800 hover:bg-red-900';
+      default: return 'bg-gray-600 hover:bg-gray-700';
     }
   };
 
   const getMoyenColor = (moyen: string) => {
     switch (moyen) {
-      case 'SMS': return 'bg-green-500 hover:bg-green-600';
-      case 'Email': return 'bg-blue-500 hover:bg-blue-600';
-      case 'Courrier': return 'bg-purple-500 hover:bg-purple-600';
-      case 'Recommandé': return 'bg-orange-500 hover:bg-orange-600';
-      default: return 'bg-gray-500 hover:bg-gray-600';
+      case 'SMS': return 'bg-green-600 hover:bg-green-700';
+      case 'Email': return 'bg-blue-600 hover:bg-blue-700';
+      case 'Courrier': return 'bg-purple-600 hover:bg-purple-700';
+      case 'Recommandé': return 'bg-orange-600 hover:bg-orange-700';
+      default: return 'bg-gray-600 hover:bg-gray-700';
     }
   };
 
   return (
-    <Card className="bg-white border border-gray-200 shadow-sm">
+    <Card className="bg-white border-gray-200 shadow-sm">
       <CardHeader>
-        <CardTitle className="text-gray-800">Vue tableau</CardTitle>
+        <CardTitle className="text-xl font-semibold text-gray-800">Vue tableau</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="border-gray-200">
-                <TableHead className="text-gray-700 font-medium">Facture</TableHead>
-                <TableHead className="text-gray-700 font-medium">Client</TableHead>
-                <TableHead className="text-gray-700 font-medium">Projet</TableHead>
-                <TableHead className="text-gray-700 font-medium">Montant</TableHead>
-                <TableHead className="text-gray-700 font-medium">Échéance</TableHead>
-                <TableHead className="text-gray-700 font-medium">Statut</TableHead>
-                <TableHead className="text-gray-700 font-medium">Relances</TableHead>
-                <TableHead className="text-gray-700 font-medium">Prochaine action</TableHead>
-                <TableHead className="text-gray-700 font-medium">Actions</TableHead>
+              <TableRow className="border-gray-200 hover:bg-gray-50">
+                <TableHead className="text-gray-700 font-semibold">Facture</TableHead>
+                <TableHead className="text-gray-700 font-semibold">Client</TableHead>
+                <TableHead className="text-gray-700 font-semibold">Projet</TableHead>
+                <TableHead className="text-gray-700 font-semibold">Montant</TableHead>
+                <TableHead className="text-gray-700 font-semibold">Échéance</TableHead>
+                <TableHead className="text-gray-700 font-semibold">Statut</TableHead>
+                <TableHead className="text-gray-700 font-semibold">Relances</TableHead>
+                <TableHead className="text-gray-700 font-semibold">Prochaine action</TableHead>
+                <TableHead className="text-gray-700 font-semibold">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {relances.map((relance, index) => (
-                <TableRow key={index} className="border-gray-200 hover:bg-gray-50">
-                  <TableCell className="font-medium text-gray-800">{relance.facture}</TableCell>
-                  <TableCell className="text-gray-700">{relance.client}</TableCell>
+                <TableRow key={index} className="border-gray-200 hover:bg-gray-50/50">
+                  <TableCell className="font-semibold text-gray-800">{relance.facture}</TableCell>
+                  <TableCell className="text-gray-700 font-medium">{relance.client}</TableCell>
                   <TableCell className="text-gray-700">{relance.projet}</TableCell>
-                  <TableCell className="text-gray-800 font-medium">{relance.montant}</TableCell>
+                  <TableCell className="text-karrosserie-orange font-semibold">{relance.montant}</TableCell>
                   <TableCell className="text-gray-700">{relance.echeance}</TableCell>
                   <TableCell>
-                    <Badge variant="destructive">{relance.statut}</Badge>
+                    <Badge className="bg-red-100 text-red-800 hover:bg-red-100 border-red-200">{relance.statut}</Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1">
-                      <Badge className={`${getRelanceBadgeColor(relance.relanceType)} text-white w-fit`}>
+                      <Badge className={`${getRelanceBadgeColor(relance.relanceType)} text-white w-fit border-0`}>
                         {relance.relanceType}
                       </Badge>
-                      <div className="flex gap-1">
+                      <div className="flex gap-1 flex-wrap">
                         {relance.moyens.map((moyen, moyenIndex) => (
                           <Badge 
                             key={moyenIndex} 
-                            className={`${getMoyenColor(moyen)} text-white text-xs`}
+                            className={`${getMoyenColor(moyen)} text-white text-xs border-0`}
                           >
                             {moyen}
                           </Badge>
@@ -153,7 +153,7 @@ const RelanceTable: React.FC = () => {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-gray-700">{relance.prochaineAction}</TableCell>
+                  <TableCell className="text-gray-700 font-medium">{relance.prochaineAction}</TableCell>
                   <TableCell>
                     <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white">
                       Actions

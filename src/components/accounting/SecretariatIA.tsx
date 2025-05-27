@@ -72,7 +72,7 @@ const SecretariatIA: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* En-tête avec statistiques */}
-      <Card>
+      <Card className="bg-white border-gray-200 shadow-sm">
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
@@ -85,7 +85,11 @@ const SecretariatIA: React.FC = () => {
               <Button 
                 variant={currentView === 'cards' ? 'default' : 'outline'}
                 onClick={() => setCurrentView('cards')}
-                className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+                className={`${
+                  currentView === 'cards' 
+                    ? 'bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white' 
+                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
               >
                 Vue détaillée
               </Button>
@@ -95,7 +99,7 @@ const SecretariatIA: React.FC = () => {
                 className={`${
                   currentView === 'table' 
                     ? 'bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white' 
-                    : 'border-karrosserie-orange text-karrosserie-orange hover:bg-karrosserie-orange hover:text-white'
+                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                 }`}
               >
                 Vue tableau
@@ -105,7 +109,7 @@ const SecretariatIA: React.FC = () => {
         </CardHeader>
       </Card>
 
-      {/* Contenu principal - plus de colonne pour le chat IA */}
+      {/* Contenu principal */}
       <div className="w-full">
         {currentView === 'cards' ? (
           <div className="space-y-4">
