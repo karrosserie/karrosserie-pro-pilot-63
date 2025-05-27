@@ -2,10 +2,8 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import RelanceCard from './RelanceCard';
 import RelanceTable from './RelanceTable';
-import AISecretary from '../ai/AISecretary';
 
 const SecretariatIA: React.FC = () => {
   const [currentView, setCurrentView] = useState<'cards' | 'table'>('cards');
@@ -103,22 +101,17 @@ const SecretariatIA: React.FC = () => {
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          {currentView === 'cards' ? (
-            <div className="space-y-4">
-              {relancesData.map((relance, index) => (
-                <RelanceCard key={index} {...relance} />
-              ))}
-            </div>
-          ) : (
-            <RelanceTable />
-          )}
-        </div>
-        
-        <div className="lg:col-span-1">
-          <AISecretary />
-        </div>
+      {/* Contenu principal - plus de colonne pour le chat IA */}
+      <div className="w-full">
+        {currentView === 'cards' ? (
+          <div className="space-y-4">
+            {relancesData.map((relance, index) => (
+              <RelanceCard key={index} {...relance} />
+            ))}
+          </div>
+        ) : (
+          <RelanceTable />
+        )}
       </div>
     </div>
   );

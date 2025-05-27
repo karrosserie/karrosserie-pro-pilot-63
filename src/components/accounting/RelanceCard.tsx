@@ -53,46 +53,46 @@ const RelanceCard: React.FC<RelanceCardProps> = ({
   };
 
   return (
-    <Card className="bg-gray-800 text-white border-gray-700">
+    <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
       <CardContent className="p-6">
         <div className="flex justify-between items-start mb-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-lg font-semibold">{factureNumber}</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{factureNumber}</h3>
               <Badge className={`${getRelanceBadgeColor(relanceType)} text-white`}>
                 {relanceType}
               </Badge>
             </div>
-            <p className="text-gray-300">{client}</p>
+            <p className="text-gray-600">{client}</p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold">{amount}</p>
+            <p className="text-2xl font-bold text-gray-800">{amount}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
           <div>
-            <p className="text-gray-400">Projet</p>
-            <p className="text-white">{project}</p>
-            <p className="text-gray-400">{projectRef}</p>
+            <p className="text-gray-500 font-medium">Projet</p>
+            <p className="text-gray-800">{project}</p>
+            <p className="text-gray-500">{projectRef}</p>
           </div>
           <div>
-            <p className="text-gray-400">Échéance</p>
-            <p className="text-white">{echeance}</p>
+            <p className="text-gray-500 font-medium">Échéance</p>
+            <p className="text-gray-800">{echeance}</p>
           </div>
           <div>
-            <p className="text-gray-400">Banque</p>
-            <p className="text-white">{banque}</p>
+            <p className="text-gray-500 font-medium">Banque</p>
+            <p className="text-gray-800">{banque}</p>
           </div>
           <div>
-            <p className="text-gray-400">Prochaine action</p>
-            <p className="text-white">{prochaine}</p>
+            <p className="text-gray-500 font-medium">Prochaine action</p>
+            <p className="text-gray-800">{prochaine}</p>
           </div>
         </div>
 
         <div className="mb-4">
-          <p className="text-gray-400 text-sm mb-2">Moyens de relance utilisés :</p>
-          <div className="flex gap-2">
+          <p className="text-gray-500 font-medium text-sm mb-2">Moyens de relance utilisés :</p>
+          <div className="flex gap-2 flex-wrap">
             {moyensUtilises.map((moyen, index) => (
               <Badge key={index} className={`${getMoyenColor(moyen)} text-white text-xs`}>
                 {moyen}
@@ -102,8 +102,8 @@ const RelanceCard: React.FC<RelanceCardProps> = ({
         </div>
 
         <div className="flex justify-between items-center">
-          <p className="text-gray-400 text-sm">Dernière relance: {derniereRelance}</p>
-          <Button className="bg-gray-700 hover:bg-gray-600 text-white">
+          <p className="text-gray-500 text-sm">Dernière relance: {derniereRelance}</p>
+          <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white">
             Actions
           </Button>
         </div>
