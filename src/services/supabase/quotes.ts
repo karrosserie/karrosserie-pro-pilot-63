@@ -10,11 +10,7 @@ export const quotesService = {
   getAll: async () => {
     const { data, error } = await supabase
       .from('quotes')
-      .select(`
-        *,
-        clients(first_name, last_name),
-        vehicles(brand, model, license_plate)
-      `)
+      .select('*')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -28,11 +24,7 @@ export const quotesService = {
   getById: async (id: string) => {
     const { data, error } = await supabase
       .from('quotes')
-      .select(`
-        *,
-        clients(id, first_name, last_name),
-        vehicles(id, brand, model, license_plate)
-      `)
+      .select('*')
       .eq('id', id)
       .single();
       

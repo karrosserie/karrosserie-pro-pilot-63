@@ -24,9 +24,7 @@ const Quotes = () => {
   const { toast } = useToast();
   
   const filteredQuotes = quotes?.filter(quote => 
-    quote.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (quote.clients?.first_name + ' ' + quote.clients?.last_name)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (quote.vehicles?.brand + ' ' + quote.vehicles?.model)?.toLowerCase().includes(searchTerm.toLowerCase())
+    quote.reference?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
   
   const getStatusColor = (status: string) => {
@@ -118,8 +116,8 @@ const Quotes = () => {
             <TableRow>
               <TableHead>Référence</TableHead>
               <TableHead>Date</TableHead>
-              <TableHead>Client</TableHead>
-              <TableHead>Véhicule</TableHead>
+              <TableHead>Client ID</TableHead>
+              <TableHead>Véhicule ID</TableHead>
               <TableHead>Montant</TableHead>
               <TableHead>Statut</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -135,7 +133,7 @@ const Quotes = () => {
             ) : error ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-4 text-red-500">
-                  Erreur lors du chargement des devis
+                  Erreur lors du chargement des devis: {error.message}
                 </TableCell>
               </TableRow>
             ) : filteredQuotes.length > 0 ? (
@@ -143,8 +141,8 @@ const Quotes = () => {
                 <TableRow key={quote.id}>
                   <TableCell className="font-medium">{quote.reference}</TableCell>
                   <TableCell>{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
-                  <TableCell>{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
-                  <TableCell>{quote.vehicles ? `${quote.vehicles.brand} ${quote.vehicles.model} - ${quote.vehicles.license_plate}` : '-'}</TableCell>
+                  <TableCell>{quote.client_id || '-'}</TableCell>
+                  <TableCell>{quote.vehicle_id || '-'}</TableCell>
                   <TableCell>{quote.amount ? `${quote.amount.toFixed(2)} €` : '-'}</TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(quote.status || 'En attente')}`}>
