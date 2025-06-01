@@ -47,9 +47,23 @@ export const quotesService = {
   create: async (quote: NewQuote) => {
     console.log('Creating quote with data:', quote);
 
+    // Récupérer l'utilisateur actuel
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      console.error('Error getting current user:', userError);
+      throw new Error('User not authenticated');
+    }
+
+    // Ajouter automatiquement le user_id
+    const quoteWithUserId = {
+      ...quote,
+      user_id: user.id
+    };
+
     const { data, error } = await supabase
       .from('quotes')
-      .insert([quote])
+      .insert([quoteWithUserId])
       .select()
       .single();
       
