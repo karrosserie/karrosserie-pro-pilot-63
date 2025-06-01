@@ -10,12 +10,11 @@ interface UseQuoteFormLogicProps {
 export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
   const [formData, setFormData] = useState<Partial<Quote>>({
     reference: '',
-    quote_date: null,
-    client_id: null,
-    vehicle_id: null,
+    client_id: '',
+    vehicle_id: '',
     status: 'En attente',
-    valid_until: null,
-    description: ''
+    valid_until: '',
+    notes: ''
   });
 
   const [repairs, setRepairs] = useState<QuoteRepairItem[]>([]);
@@ -95,31 +94,26 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     if (quote) {
       setFormData({
         reference: quote.reference,
-        quote_date: quote.quote_date,
         client_id: quote.client_id,
         vehicle_id: quote.vehicle_id,
         status: quote.status || 'En attente',
         valid_until: quote.valid_until,
-        description: quote.description || ''
+        notes: quote.notes || ''
       });
       
-      // Charger les réparations et pièces depuis le devis
-      if (quote.repairs_data) {
+      // Charger les réparations et pièces depuis les notes (format JSON)
+      if (quote.notes) {
         try {
-          const parsedRepairs = JSON.parse(quote.repairs_data);
-          setRepairs(parsedRepairs);
+          const noteData = JSON.parse(quote.notes);
+          if (noteData.repairs) {
+            setRepairs(noteData.repairs);
+          }
+          if (noteData.parts) {
+            setParts(noteData.parts);
+          }
         } catch (e) {
-          console.error('Error parsing repairs data:', e);
+          console.error('Error parsing quote notes:', e);
           setRepairs([]);
-        }
-      }
-      
-      if (quote.parts_data) {
-        try {
-          const parsedParts = JSON.parse(quote.parts_data);
-          setParts(parsedParts);
-        } catch (e) {
-          console.error('Error parsing parts data:', e);
           setParts([]);
         }
       }

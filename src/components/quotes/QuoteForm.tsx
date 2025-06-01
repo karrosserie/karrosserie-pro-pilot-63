@@ -55,16 +55,23 @@ export const QuoteForm = ({
     }
     
     try {
-      // Inclure les données de réparations et pièces dans la soumission
+      // Créer les données à stocker dans notes (JSON)
+      const notesData = {
+        description: formData.notes || '',
+        repairs,
+        parts
+      };
+      
+      // Inclure les données dans la soumission
       const submitData = {
         ...formData,
-        repairs_data: JSON.stringify(repairs),
-        parts_data: JSON.stringify(parts),
-        total_amount: globalTotals.total
+        notes: JSON.stringify(notesData),
+        amount: globalTotals.total
       };
       
       await onSubmit(submitData);
     } catch (error: any) {
+      console.error('Error submitting quote:', error);
       toast({
         title: "Erreur",
         description: `Impossible de ${quote ? 'mettre à jour' : 'créer'} le devis: ${error.message}`,
@@ -77,19 +84,6 @@ export const QuoteForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto">
-      {/* Élément invisible pour capturer le focus initial */}
-      <div 
-        tabIndex={0} 
-        style={{ 
-          position: 'absolute', 
-          left: '-9999px', 
-          width: '1px', 
-          height: '1px', 
-          opacity: 0 
-        }}
-        onFocus={(e) => e.target.blur()}
-      />
-      
       <QuoteBasicInfoSection 
         formData={formData}
         errors={errors}

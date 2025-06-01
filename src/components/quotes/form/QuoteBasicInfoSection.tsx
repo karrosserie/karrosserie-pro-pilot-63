@@ -32,7 +32,7 @@ export const QuoteBasicInfoSection = ({ formData, errors, onFieldChange }: Quote
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <Label htmlFor="reference">Référence *</Label>
             <Input
@@ -48,16 +48,6 @@ export const QuoteBasicInfoSection = ({ formData, errors, onFieldChange }: Quote
                 {errors.reference}
               </p>
             )}
-          </div>
-
-          <div>
-            <Label htmlFor="quote_date">Date du devis</Label>
-            <Input
-              id="quote_date"
-              type="date"
-              value={formData.quote_date || ''}
-              onChange={(e) => onFieldChange('quote_date', e.target.value)}
-            />
           </div>
 
           <div>

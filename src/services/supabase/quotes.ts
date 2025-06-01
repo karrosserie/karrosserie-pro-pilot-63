@@ -45,35 +45,11 @@ export const quotesService = {
   },
   
   create: async (quote: NewQuote) => {
-    // Calculer le montant total à partir des données de réparations et pièces
-    let totalAmount = 0;
-    
-    if (quote.repairs_data) {
-      try {
-        const repairs = JSON.parse(quote.repairs_data);
-        totalAmount += repairs.reduce((sum: number, repair: any) => sum + (repair.total || 0), 0);
-      } catch (e) {
-        console.error('Error parsing repairs data:', e);
-      }
-    }
-    
-    if (quote.parts_data) {
-      try {
-        const parts = JSON.parse(quote.parts_data);
-        totalAmount += parts.reduce((sum: number, part: any) => sum + (part.total || 0), 0);
-      } catch (e) {
-        console.error('Error parsing parts data:', e);
-      }
-    }
-
-    const quoteWithAmount = {
-      ...quote,
-      total_amount: totalAmount
-    };
+    console.log('Creating quote with data:', quote);
 
     const { data, error } = await supabase
       .from('quotes')
-      .insert([quoteWithAmount])
+      .insert([quote])
       .select()
       .single();
       
@@ -82,39 +58,16 @@ export const quotesService = {
       throw new Error(error.message);
     }
     
+    console.log('Quote created successfully:', data);
     return data;
   },
   
   update: async (id: string, quote: UpdateQuote) => {
-    // Calculer le montant total à partir des données de réparations et pièces
-    let totalAmount = 0;
-    
-    if (quote.repairs_data) {
-      try {
-        const repairs = JSON.parse(quote.repairs_data);
-        totalAmount += repairs.reduce((sum: number, repair: any) => sum + (repair.total || 0), 0);
-      } catch (e) {
-        console.error('Error parsing repairs data:', e);
-      }
-    }
-    
-    if (quote.parts_data) {
-      try {
-        const parts = JSON.parse(quote.parts_data);
-        totalAmount += parts.reduce((sum: number, part: any) => sum + (part.total || 0), 0);
-      } catch (e) {
-        console.error('Error parsing parts data:', e);
-      }
-    }
-
-    const quoteWithAmount = {
-      ...quote,
-      total_amount: totalAmount
-    };
+    console.log('Updating quote with id:', id, 'and data:', quote);
 
     const { data, error } = await supabase
       .from('quotes')
-      .update(quoteWithAmount)
+      .update(quote)
       .eq('id', id)
       .select()
       .single();
@@ -124,6 +77,7 @@ export const quotesService = {
       throw new Error(error.message);
     }
     
+    console.log('Quote updated successfully:', data);
     return data;
   },
   

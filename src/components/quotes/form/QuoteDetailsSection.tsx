@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,11 +29,11 @@ export const QuoteDetailsSection = ({ formData, onFieldChange, globalTotals }: Q
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <Label htmlFor="description">Description</Label>
+          <Label htmlFor="notes">Description</Label>
           <Textarea
-            id="description"
-            value={formData.description || ''}
-            onChange={(e) => onFieldChange('description', e.target.value)}
+            id="notes"
+            value={formData.notes || ''}
+            onChange={(e) => onFieldChange('notes', e.target.value)}
             placeholder="Description détaillée des travaux à effectuer..."
             rows={4}
             readOnly={isReadOnly}

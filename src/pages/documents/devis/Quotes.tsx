@@ -56,16 +56,8 @@ const Quotes = () => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce devis ?')) {
       try {
         await deleteQuote.mutateAsync(id);
-        toast({
-          title: "Devis supprimé",
-          description: "Le devis a été supprimé avec succès."
-        });
       } catch (error: any) {
-        toast({
-          title: "Erreur",
-          description: `Impossible de supprimer le devis: ${error.message}`,
-          variant: "destructive"
-        });
+        console.error('Error deleting quote:', error);
       }
     }
   };
@@ -150,10 +142,10 @@ const Quotes = () => {
               filteredQuotes.map((quote) => (
                 <TableRow key={quote.id}>
                   <TableCell className="font-medium">{quote.reference}</TableCell>
-                  <TableCell>{new Date(quote.quote_date || quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
+                  <TableCell>{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
                   <TableCell>{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
                   <TableCell>{quote.vehicles ? `${quote.vehicles.brand} ${quote.vehicles.model} - ${quote.vehicles.license_plate}` : '-'}</TableCell>
-                  <TableCell>{quote.total_amount ? `${quote.total_amount.toFixed(2)} €` : '-'}</TableCell>
+                  <TableCell>{quote.amount ? `${quote.amount.toFixed(2)} €` : '-'}</TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(quote.status || 'En attente')}`}>
                       {quote.status || 'En attente'}
@@ -194,7 +186,6 @@ const Quotes = () => {
         </Table>
       </div>
 
-      {/* Quote Dialog */}
       <QuoteDialog
         quote={selectedQuote}
         open={editDialogOpen}
