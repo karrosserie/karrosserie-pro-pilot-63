@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,7 +23,8 @@ const Quotes = () => {
   const { toast } = useToast();
   
   const filteredQuotes = quotes?.filter(quote => 
-    quote.reference?.toLowerCase().includes(searchTerm.toLowerCase())
+    quote.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (quote.clients?.first_name + ' ' + quote.clients?.last_name)?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
   
   const getStatusColor = (status: string) => {
@@ -116,7 +116,7 @@ const Quotes = () => {
             <TableRow>
               <TableHead>Référence</TableHead>
               <TableHead>Date</TableHead>
-              <TableHead>Client ID</TableHead>
+              <TableHead>Client</TableHead>
               <TableHead>Véhicule ID</TableHead>
               <TableHead>Montant</TableHead>
               <TableHead>Statut</TableHead>
@@ -141,7 +141,7 @@ const Quotes = () => {
                 <TableRow key={quote.id}>
                   <TableCell className="font-medium">{quote.reference}</TableCell>
                   <TableCell>{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
-                  <TableCell>{quote.client_id || '-'}</TableCell>
+                  <TableCell>{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
                   <TableCell>{quote.vehicle_id || '-'}</TableCell>
                   <TableCell>{quote.amount ? `${quote.amount.toFixed(2)} €` : '-'}</TableCell>
                   <TableCell>

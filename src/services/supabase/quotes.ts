@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -10,7 +9,10 @@ export const quotesService = {
   getAll: async () => {
     const { data, error } = await supabase
       .from('quotes')
-      .select('*')
+      .select(`
+        *,
+        clients(first_name, last_name)
+      `)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -24,7 +26,10 @@ export const quotesService = {
   getById: async (id: string) => {
     const { data, error } = await supabase
       .from('quotes')
-      .select('*')
+      .select(`
+        *,
+        clients(first_name, last_name)
+      `)
       .eq('id', id)
       .single();
       
