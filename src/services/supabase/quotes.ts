@@ -45,9 +45,35 @@ export const quotesService = {
   },
   
   create: async (quote: NewQuote) => {
+    // Calculer le montant total à partir des données de réparations et pièces
+    let totalAmount = 0;
+    
+    if (quote.repairs_data) {
+      try {
+        const repairs = JSON.parse(quote.repairs_data);
+        totalAmount += repairs.reduce((sum: number, repair: any) => sum + (repair.total || 0), 0);
+      } catch (e) {
+        console.error('Error parsing repairs data:', e);
+      }
+    }
+    
+    if (quote.parts_data) {
+      try {
+        const parts = JSON.parse(quote.parts_data);
+        totalAmount += parts.reduce((sum: number, part: any) => sum + (part.total || 0), 0);
+      } catch (e) {
+        console.error('Error parsing parts data:', e);
+      }
+    }
+
+    const quoteWithAmount = {
+      ...quote,
+      total_amount: totalAmount
+    };
+
     const { data, error } = await supabase
       .from('quotes')
-      .insert([quote])
+      .insert([quoteWithAmount])
       .select()
       .single();
       
@@ -60,9 +86,35 @@ export const quotesService = {
   },
   
   update: async (id: string, quote: UpdateQuote) => {
+    // Calculer le montant total à partir des données de réparations et pièces
+    let totalAmount = 0;
+    
+    if (quote.repairs_data) {
+      try {
+        const repairs = JSON.parse(quote.repairs_data);
+        totalAmount += repairs.reduce((sum: number, repair: any) => sum + (repair.total || 0), 0);
+      } catch (e) {
+        console.error('Error parsing repairs data:', e);
+      }
+    }
+    
+    if (quote.parts_data) {
+      try {
+        const parts = JSON.parse(quote.parts_data);
+        totalAmount += parts.reduce((sum: number, part: any) => sum + (part.total || 0), 0);
+      } catch (e) {
+        console.error('Error parsing parts data:', e);
+      }
+    }
+
+    const quoteWithAmount = {
+      ...quote,
+      total_amount: totalAmount
+    };
+
     const { data, error } = await supabase
       .from('quotes')
-      .update(quote)
+      .update(quoteWithAmount)
       .eq('id', id)
       .select()
       .single();
