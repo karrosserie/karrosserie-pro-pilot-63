@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -8,40 +7,98 @@ export type UpdateQuote = Database['public']['Tables']['quotes']['Update'];
 
 export const quotesService = {
   getAll: async () => {
-    const { data, error } = await supabase
+    // Récupérer d'abord tous les devis
+    const { data: quotes, error: quotesError } = await supabase
       .from('quotes')
-      .select(`
-        *,
-        clients(first_name, last_name),
-        vehicles(brand, model, license_plate)
-      `)
+      .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching quotes:', error);
-      throw new Error(error.message);
+    if (quotesError) {
+      console.error('Error fetching quotes:', quotesError);
+      throw new Error(quotesError.message);
     }
+
+    if (!quotes || quotes.length === 0) {
+      return [];
+    }
+
+    // Récupérer les clients associés
+    const clientIds = quotes.map(quote => quote.client_id).filter(id => id);
+    let clientsData = [];
+    if (clientIds.length > 0) {
+      const { data: clients, error: clientsError } = await supabase
+        .from('clients')
+        .select('id, first_name, last_name')
+        .in('id', clientIds);
+      
+      if (!clientsError) {
+        clientsData = clients || [];
+      }
+    }
+
+    // Récupérer les véhicules associés
+    const vehicleIds = quotes.map(quote => quote.vehicle_id).filter(id => id);
+    let vehiclesData = [];
+    if (vehicleIds.length > 0) {
+      const { data: vehicles, error: vehiclesError } = await supabase
+        .from('vehicles')
+        .select('id, brand, model, license_plate')
+        .in('id', vehicleIds);
+      
+      if (!vehiclesError) {
+        vehiclesData = vehicles || [];
+      }
+    }
+
+    // Combiner les données
+    const quotesWithRelations = quotes.map(quote => ({
+      ...quote,
+      clients: clientsData.find(client => client.id === quote.client_id) || null,
+      vehicles: vehiclesData.find(vehicle => vehicle.id === quote.vehicle_id) || null
+    }));
     
-    return data;
+    return quotesWithRelations;
   },
 
   getById: async (id: string) => {
-    const { data, error } = await supabase
+    const { data: quote, error: quoteError } = await supabase
       .from('quotes')
-      .select(`
-        *,
-        clients(first_name, last_name),
-        vehicles(brand, model, license_plate)
-      `)
+      .select('*')
       .eq('id', id)
       .single();
       
-    if (error) {
-      console.error(`Error fetching quote with id ${id}:`, error);
-      throw new Error(error.message);
+    if (quoteError) {
+      console.error(`Error fetching quote with id ${id}:`, quoteError);
+      throw new Error(quoteError.message);
     }
-    
-    return data;
+
+    // Récupérer le client si présent
+    let clientData = null;
+    if (quote.client_id) {
+      const { data: client } = await supabase
+        .from('clients')
+        .select('id, first_name, last_name')
+        .eq('id', quote.client_id)
+        .single();
+      clientData = client;
+    }
+
+    // Récupérer le véhicule si présent
+    let vehicleData = null;
+    if (quote.vehicle_id) {
+      const { data: vehicle } = await supabase
+        .from('vehicles')
+        .select('id, brand, model, license_plate')
+        .eq('id', quote.vehicle_id)
+        .single();
+      vehicleData = vehicle;
+    }
+
+    return {
+      ...quote,
+      clients: clientData,
+      vehicles: vehicleData
+    };
   },
   
   create: async (quote: NewQuote) => {
