@@ -8,14 +8,13 @@ import { Quote } from '@/services/supabase/quotes';
 import { GlobalTotals } from './types';
 
 interface QuoteDetailsSectionProps {
-  formData: Partial<Quote>;
+  description: string;
   onFieldChange: (field: string, value: any) => void;
   globalTotals: GlobalTotals;
+  isReadOnly?: boolean;
 }
 
-export const QuoteDetailsSection = ({ formData, onFieldChange, globalTotals }: QuoteDetailsSectionProps) => {
-  const isReadOnly = formData.status === 'Accepté' || formData.status === 'Refusé';
-
+export const QuoteDetailsSection = ({ description, onFieldChange, globalTotals, isReadOnly }: QuoteDetailsSectionProps) => {
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -29,11 +28,11 @@ export const QuoteDetailsSection = ({ formData, onFieldChange, globalTotals }: Q
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <Label htmlFor="notes">Description</Label>
+          <Label htmlFor="description">Description</Label>
           <Textarea
-            id="notes"
-            value={formData.notes || ''}
-            onChange={(e) => onFieldChange('notes', e.target.value)}
+            id="description"
+            value={description}
+            onChange={(e) => onFieldChange('description', e.target.value)}
             placeholder="Description détaillée des travaux à effectuer..."
             rows={4}
             readOnly={isReadOnly}

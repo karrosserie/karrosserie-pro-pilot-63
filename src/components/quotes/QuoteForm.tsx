@@ -29,6 +29,7 @@ export const QuoteForm = ({
   
   const {
     formData,
+    description,
     repairs,
     parts,
     errors,
@@ -37,7 +38,8 @@ export const QuoteForm = ({
     setParts,
     handleChange,
     validateForm,
-    calculateGlobalTotals
+    calculateGlobalTotals,
+    prepareSubmitData
   } = useQuoteFormLogic({ quote });
 
   const globalTotals = calculateGlobalTotals();
@@ -55,17 +57,8 @@ export const QuoteForm = ({
     }
     
     try {
-      // Créer les données à stocker dans notes (JSON)
-      const notesData = {
-        description: formData.notes || '',
-        repairs,
-        parts
-      };
-      
-      // Inclure les données dans la soumission
       const submitData = {
-        ...formData,
-        notes: JSON.stringify(notesData),
+        ...prepareSubmitData(),
         amount: globalTotals.total
       };
       
@@ -98,9 +91,10 @@ export const QuoteForm = ({
       />
 
       <QuoteDetailsSection 
-        formData={formData}
+        description={description}
         onFieldChange={handleChange}
         globalTotals={globalTotals}
+        isReadOnly={isReadOnly}
       />
 
       <QuoteRepairsSection 

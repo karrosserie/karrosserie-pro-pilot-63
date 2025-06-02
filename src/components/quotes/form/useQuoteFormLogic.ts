@@ -17,6 +17,7 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     notes: ''
   });
 
+  const [description, setDescription] = useState('');
   const [repairs, setRepairs] = useState<QuoteRepairItem[]>([]);
   const [parts, setParts] = useState<QuotePartItem[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -82,12 +83,30 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
       return; // Empêcher les modifications si en lecture seule
     }
     
-    setFormData(prev => ({ ...prev, [field]: value }));
+    if (field === 'description') {
+      setDescription(value);
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }
     
     // Effacer l'erreur quand l'utilisateur commence à taper
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
+  };
+
+  // Fonction pour préparer les données à soumettre
+  const prepareSubmitData = () => {
+    const notesData = {
+      description,
+      repairs,
+      parts
+    };
+    
+    return {
+      ...formData,
+      notes: JSON.stringify(notesData)
+    };
   };
 
   useEffect(() => {
@@ -101,10 +120,11 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
         notes: quote.notes || ''
       });
       
-      // Charger les réparations et pièces depuis les notes (format JSON)
+      // Charger les données depuis les notes (format JSON)
       if (quote.notes) {
         try {
           const noteData = JSON.parse(quote.notes);
+          setDescription(noteData.description || '');
           if (noteData.repairs) {
             setRepairs(noteData.repairs);
           }
@@ -113,9 +133,14 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
           }
         } catch (e) {
           console.error('Error parsing quote notes:', e);
+          setDescription('');
           setRepairs([]);
           setParts([]);
         }
+      } else {
+        setDescription('');
+        setRepairs([]);
+        setParts([]);
       }
     } else {
       // Générer une référence automatique pour un nouveau devis
@@ -125,11 +150,13 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
         ...prev,
         reference: `D-${currentYear}-${randomNumber}`
       }));
+      setDescription('');
     }
   }, [quote]);
 
   return {
     formData,
+    description,
     repairs,
     parts,
     errors,
@@ -138,6 +165,7 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     setParts,
     handleChange,
     validateForm,
-    calculateGlobalTotals
+    calculateGlobalTotals,
+    prepareSubmitData
   };
 };
