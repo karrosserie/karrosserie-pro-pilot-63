@@ -86,7 +86,13 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     if (field === 'description') {
       setDescription(value);
     } else {
-      setFormData(prev => ({ ...prev, [field]: value }));
+      setFormData(prev => {
+        // Si on change de client et qu'on n'est pas en train d'initialiser depuis un devis existant
+        if (field === 'client_id' && !quote) {
+          return { ...prev, [field]: value, vehicle_id: '' };
+        }
+        return { ...prev, [field]: value };
+      });
     }
     
     // Effacer l'erreur quand l'utilisateur commence à taper
@@ -114,7 +120,7 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
       setFormData({
         reference: quote.reference,
         client_id: quote.client_id,
-        vehicle_id: quote.vehicle_id,
+        vehicle_id: quote.vehicle_id || '', // S'assurer que vehicle_id est correctement défini
         status: quote.status || 'En attente',
         valid_until: quote.valid_until,
         notes: quote.notes || ''

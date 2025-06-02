@@ -33,8 +33,8 @@ export const QuoteAssignmentSection = ({
 
   const handleClientChange = (clientId: string) => {
     onFieldChange('client_id', clientId);
-    // Réinitialiser le véhicule sélectionné quand on change de client
-    onFieldChange('vehicle_id', null);
+    // Réinitialiser le véhicule sélectionné seulement lors de la création d'un nouveau devis
+    onFieldChange('vehicle_id', '');
   };
 
   return (
@@ -74,7 +74,7 @@ export const QuoteAssignmentSection = ({
             <Label htmlFor="vehicle_id">Véhicule</Label>
             <Select
               value={formData.vehicle_id || undefined}
-              onValueChange={(value) => onFieldChange('vehicle_id', value || null)}
+              onValueChange={(value) => onFieldChange('vehicle_id', value || '')}
               disabled={isReadOnly || !formData.client_id}
             >
               <SelectTrigger id="vehicle_id">
