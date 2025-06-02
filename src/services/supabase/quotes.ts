@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -11,7 +12,8 @@ export const quotesService = {
       .from('quotes')
       .select(`
         *,
-        clients(first_name, last_name)
+        clients(first_name, last_name),
+        vehicles(brand, model, license_plate)
       `)
       .order('created_at', { ascending: false });
 
@@ -28,7 +30,8 @@ export const quotesService = {
       .from('quotes')
       .select(`
         *,
-        clients(first_name, last_name)
+        clients(first_name, last_name),
+        vehicles(brand, model, license_plate)
       `)
       .eq('id', id)
       .single();
