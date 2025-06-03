@@ -18,13 +18,15 @@ interface QuoteAssignmentSectionProps {
   onFieldChange: (field: string, value: any) => void;
   clientOptions: Client[];
   isLoadingClients: boolean;
+  isEditing?: boolean; // Ajouter cette prop pour savoir si on est en mode édition
 }
 
 export const QuoteAssignmentSection = ({
   formData,
   onFieldChange,
   clientOptions,
-  isLoadingClients
+  isLoadingClients,
+  isEditing = false
 }: QuoteAssignmentSectionProps) => {
   const isReadOnly = formData.status === 'Accepté' || formData.status === 'Refusé';
   
@@ -34,7 +36,9 @@ export const QuoteAssignmentSection = ({
   const handleClientChange = (clientId: string) => {
     onFieldChange('client_id', clientId);
     // Réinitialiser le véhicule sélectionné seulement lors de la création d'un nouveau devis
-    onFieldChange('vehicle_id', '');
+    if (!isEditing) {
+      onFieldChange('vehicle_id', '');
+    }
   };
 
   return (

@@ -88,6 +88,7 @@ export const QuoteForm = ({
         onFieldChange={handleChange}
         clientOptions={clientOptions}
         isLoadingClients={isLoadingClients}
+        isEditing={!!quote}
       />
 
       <QuoteDetailsSection 
