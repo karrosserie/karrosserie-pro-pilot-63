@@ -10,17 +10,10 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { FileText, Eye, Download, Pencil, Trash } from 'lucide-react';
-
-interface RepairOrder {
-  id: number;
-  reference: string;
-  date: string;
-  client: string;
-  vehicle: string;
-  amount: string;
-  status: string;
-  deadline: string;
-}
+import { RepairOrder } from '@/services/supabase/repair-orders';
+import { useRepairOrders } from '@/hooks/use-repair-orders';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface RepairOrdersTableProps {
   orders: RepairOrder[];
@@ -28,6 +21,8 @@ interface RepairOrdersTableProps {
 }
 
 export const RepairOrdersTable = ({ orders, onEditOrder }: RepairOrdersTableProps) => {
+  const { deleteOrder } = useRepairOrders();
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'En cours':
@@ -41,6 +36,21 @@ export const RepairOrdersTable = ({ orders, onEditOrder }: RepairOrdersTableProp
     }
   };
 
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return '-';
+    try {
+      return format(new Date(dateString), 'dd/MM/yyyy', { locale: fr });
+    } catch (error) {
+      return '-';
+    }
+  };
+
+  const handleDelete = async (order: RepairOrder) => {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'ordre de réparation ${order.reference} ?`)) {
+      await deleteOrder.mutateAsync(order.id);
+    }
+  };
+
   if (orders.length === 0) {
     return (
       <div className="card-container">
@@ -48,18 +58,17 @@ export const RepairOrdersTable = ({ orders, onEditOrder }: RepairOrdersTableProp
           <TableHeader>
             <TableRow>
               <TableHead>Référence</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead>Date de début</TableHead>
               <TableHead>Client</TableHead>
               <TableHead>Véhicule</TableHead>
-              <TableHead>Montant</TableHead>
               <TableHead>Statut</TableHead>
-              <TableHead>Échéance</TableHead>
+              <TableHead>Date de fin</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-4">
+              <TableCell colSpan={7} className="text-center py-4">
                 <div className="flex flex-col items-center justify-center py-8">
                   <FileText className="h-10 w-10 text-gray-400 mb-2" />
                   <h3 className="font-medium text-gray-900">Aucun résultat</h3>
@@ -81,12 +90,11 @@ export const RepairOrdersTable = ({ orders, onEditOrder }: RepairOrdersTableProp
         <TableHeader>
           <TableRow>
             <TableHead>Référence</TableHead>
-            <TableHead>Date</TableHead>
+            <TableHead>Date de début</TableHead>
             <TableHead>Client</TableHead>
             <TableHead>Véhicule</TableHead>
-            <TableHead>Montant</TableHead>
             <TableHead>Statut</TableHead>
-            <TableHead>Échéance</TableHead>
+            <TableHead>Date de fin</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -94,16 +102,25 @@ export const RepairOrdersTable = ({ orders, onEditOrder }: RepairOrdersTableProp
           {orders.map((order) => (
             <TableRow key={order.id}>
               <TableCell className="font-medium">{order.reference}</TableCell>
-              <TableCell>{order.date}</TableCell>
-              <TableCell>{order.client}</TableCell>
-              <TableCell>{order.vehicle}</TableCell>
-              <TableCell>{order.amount}</TableCell>
+              <TableCell>{formatDate(order.start_date)}</TableCell>
               <TableCell>
-                <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(order.status)}`}>
-                  {order.status}
+                {order.clients 
+                  ? `${order.clients.first_name} ${order.clients.last_name}`
+                  : '-'
+                }
+              </TableCell>
+              <TableCell>
+                {order.vehicles 
+                  ? `${order.vehicles.brand} ${order.vehicles.model} - ${order.vehicles.license_plate}`
+                  : '-'
+                }
+              </TableCell>
+              <TableCell>
+                <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(order.status || 'En cours')}`}>
+                  {order.status || 'En cours'}
                 </span>
               </TableCell>
-              <TableCell>{order.deadline}</TableCell>
+              <TableCell>{formatDate(order.end_date)}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end space-x-1">
                   <Button variant="ghost" size="icon">
@@ -115,7 +132,12 @@ export const RepairOrdersTable = ({ orders, onEditOrder }: RepairOrdersTableProp
                   <Button variant="ghost" size="icon" onClick={() => onEditOrder(order)}>
                     <Pencil className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="text-red-500 hover:text-red-700"
+                    onClick={() => handleDelete(order)}
+                  >
                     <Trash className="h-4 w-4" />
                   </Button>
                 </div>

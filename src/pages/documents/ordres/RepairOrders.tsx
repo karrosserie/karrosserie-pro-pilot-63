@@ -3,61 +3,49 @@ import React, { useState } from 'react';
 import { RepairOrdersHeader } from '@/components/repair-orders/RepairOrdersHeader';
 import { RepairOrdersTable } from '@/components/repair-orders/RepairOrdersTable';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
-
-// Données mockées pour les ordres de réparation
-const mockOrders = [
-  { 
-    id: 1, 
-    reference: 'OR-2023-001', 
-    date: '18/05/2023', 
-    client: 'Jean Dupont',
-    vehicle: 'Peugeot 308 - AB-123-CD', 
-    amount: '3 785,00 €',
-    status: 'En cours',
-    deadline: '25/05/2023' 
-  },
-  { 
-    id: 2, 
-    reference: 'OR-2023-002', 
-    date: '15/05/2023', 
-    client: 'Marie Martin',
-    vehicle: 'Renault Clio - EF-456-GH', 
-    amount: '2 950,00 €',
-    status: 'En attente de pièces',
-    deadline: '22/05/2023'
-  },
-  { 
-    id: 3, 
-    reference: 'OR-2023-003', 
-    date: '12/05/2023', 
-    client: 'Pierre Durand',
-    vehicle: 'Citroën C3 - IJ-789-KL', 
-    amount: '2 100,00 €',
-    status: 'Terminé',
-    deadline: '18/05/2023'
-  }
-];
+import { useRepairOrders } from '@/hooks/use-repair-orders';
+import { RepairOrder } from '@/services/supabase/repair-orders';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { ErrorMessage } from '@/components/ui/error-message';
 
 const RepairOrders = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [selectedOrder, setSelectedOrder] = useState<RepairOrder | null>(null);
   
-  const filteredOrders = mockOrders.filter(order => 
-    order.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.vehicle.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const { orders, isLoading, error } = useRepairOrders();
+  
+  const filteredOrders = orders?.filter(order => 
+    order.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (order.clients && `${order.clients.first_name} ${order.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (order.vehicles && `${order.vehicles.brand} ${order.vehicles.model} - ${order.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
+  ) || [];
 
   const handleCreateOrder = () => {
     setSelectedOrder(null);
     setDialogOpen(true);
   };
 
-  const handleEditOrder = (order: any) => {
+  const handleEditOrder = (order: RepairOrder) => {
     setSelectedOrder(order);
     setDialogOpen(true);
   };
+
+  if (isLoading) {
+    return (
+      <div className="page-container">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-container">
+        <ErrorMessage message="Erreur lors du chargement des ordres de réparation" />
+      </div>
+    );
+  }
   
   return (
     <div className="page-container">

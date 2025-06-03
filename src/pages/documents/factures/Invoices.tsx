@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,61 +12,25 @@ import {
 } from "@/components/ui/table";
 import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Trash } from 'lucide-react';
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
-
-// Données mockées pour les factures
-const mockInvoices = [
-  { 
-    id: 1, 
-    reference: 'F-2023-001', 
-    date: '20/05/2023', 
-    client: 'Jean Dupont',
-    vehicle: 'Peugeot 308 - AB-123-CD', 
-    amount: '3 785,00 €',
-    status: 'Payée',
-    paymentMethod: 'Carte bancaire'
-  },
-  { 
-    id: 2, 
-    reference: 'F-2023-002', 
-    date: '18/05/2023', 
-    client: 'Marie Martin',
-    vehicle: 'Renault Clio - EF-456-GH', 
-    amount: '2 950,00 €',
-    status: 'En attente',
-    paymentMethod: 'Virement'
-  },
-  { 
-    id: 3, 
-    reference: 'F-2023-003', 
-    date: '15/05/2023', 
-    client: 'Pierre Durand',
-    vehicle: 'Citroën C3 - IJ-789-KL', 
-    amount: '2 100,00 €',
-    status: 'Payée',
-    paymentMethod: 'Chèque'
-  },
-  { 
-    id: 4, 
-    reference: 'F-2023-004', 
-    date: '10/05/2023', 
-    client: 'Sophie Bernard',
-    vehicle: 'Toyota Yaris - MN-012-OP', 
-    amount: '1 850,00 €',
-    status: 'Annulée',
-    paymentMethod: '-'
-  }
-];
+import { useInvoices } from '@/hooks/use-invoices';
+import { Invoice } from '@/services/supabase/invoices';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { ErrorMessage } from '@/components/ui/error-message';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 const Invoices = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   
-  const filteredInvoices = mockInvoices.filter(invoice => 
-    invoice.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    invoice.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    invoice.vehicle.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const { invoices, isLoading, error, deleteInvoice } = useInvoices();
+  
+  const filteredInvoices = invoices?.filter(invoice => 
+    invoice.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (invoice.clients && `${invoice.clients.first_name} ${invoice.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (invoice.vehicles && `${invoice.vehicles.brand} ${invoice.vehicles.model} - ${invoice.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
+  ) || [];
   
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -79,16 +44,54 @@ const Invoices = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return '-';
+    try {
+      return format(new Date(dateString), 'dd/MM/yyyy', { locale: fr });
+    } catch (error) {
+      return '-';
+    }
+  };
+
+  const formatAmount = (amount: number) => {
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(amount);
+  };
   
   const handleCreateInvoice = () => {
     setSelectedInvoice(null);
     setDialogOpen(true);
   };
 
-  const handleEditInvoice = (invoice: any) => {
+  const handleEditInvoice = (invoice: Invoice) => {
     setSelectedInvoice(invoice);
     setDialogOpen(true);
   };
+
+  const handleDelete = async (invoice: Invoice) => {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer la facture ${invoice.reference} ?`)) {
+      await deleteInvoice.mutateAsync(invoice.id);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="page-container">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-container">
+        <ErrorMessage message="Erreur lors du chargement des factures" />
+      </div>
+    );
+  }
   
   return (
     <div className="page-container">
@@ -145,11 +148,12 @@ const Invoices = () => {
           <TableHeader>
             <TableRow>
               <TableHead>Référence</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead>Date de création</TableHead>
               <TableHead>Client</TableHead>
               <TableHead>Véhicule</TableHead>
               <TableHead>Montant</TableHead>
               <TableHead>Statut</TableHead>
+              <TableHead>Échéance</TableHead>
               <TableHead>Paiement</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -159,16 +163,27 @@ const Invoices = () => {
               filteredInvoices.map((invoice) => (
                 <TableRow key={invoice.id}>
                   <TableCell className="font-medium">{invoice.reference}</TableCell>
-                  <TableCell>{invoice.date}</TableCell>
-                  <TableCell>{invoice.client}</TableCell>
-                  <TableCell>{invoice.vehicle}</TableCell>
-                  <TableCell>{invoice.amount}</TableCell>
+                  <TableCell>{formatDate(invoice.created_at)}</TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status)}`}>
-                      {invoice.status}
+                    {invoice.clients 
+                      ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
+                      : '-'
+                    }
+                  </TableCell>
+                  <TableCell>
+                    {invoice.vehicles 
+                      ? `${invoice.vehicles.brand} ${invoice.vehicles.model} - ${invoice.vehicles.license_plate}`
+                      : '-'
+                    }
+                  </TableCell>
+                  <TableCell>{formatAmount(invoice.amount)}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente')}`}>
+                      {invoice.status || 'En attente'}
                     </span>
                   </TableCell>
-                  <TableCell>{invoice.paymentMethod}</TableCell>
+                  <TableCell>{formatDate(invoice.due_date)}</TableCell>
+                  <TableCell>{invoice.payment_method || '-'}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-1">
                       <Button variant="ghost" size="icon">
@@ -180,7 +195,12 @@ const Invoices = () => {
                       <Button variant="ghost" size="icon" onClick={() => handleEditInvoice(invoice)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => handleDelete(invoice)}
+                      >
                         <Trash className="h-4 w-4" />
                       </Button>
                     </div>
@@ -189,7 +209,7 @@ const Invoices = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-4">
+                <TableCell colSpan={9} className="text-center py-4">
                   <div className="flex flex-col items-center justify-center py-8">
                     <FileText className="h-10 w-10 text-gray-400 mb-2" />
                     <h3 className="font-medium text-gray-900">Aucun résultat</h3>

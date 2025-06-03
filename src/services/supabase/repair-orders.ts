@@ -12,9 +12,22 @@ export const repairOrdersService = {
       .from('repair_orders')
       .select(`
         *,
-        clients(first_name, last_name),
-        vehicles(brand, model, license_plate),
-        quotes(reference, amount)
+        clients (
+          id,
+          first_name,
+          last_name
+        ),
+        vehicles (
+          id,
+          brand,
+          model,
+          license_plate
+        ),
+        quotes (
+          id,
+          reference,
+          amount
+        )
       `)
       .order('created_at', { ascending: false });
 
@@ -31,9 +44,22 @@ export const repairOrdersService = {
       .from('repair_orders')
       .select(`
         *,
-        clients(id, first_name, last_name),
-        vehicles(id, brand, model, license_plate),
-        quotes(id, reference, amount)
+        clients (
+          id,
+          first_name,
+          last_name
+        ),
+        vehicles (
+          id,
+          brand,
+          model,
+          license_plate
+        ),
+        quotes (
+          id,
+          reference,
+          amount
+        )
       `)
       .eq('id', id)
       .single();
@@ -47,9 +73,17 @@ export const repairOrdersService = {
   },
   
   create: async (order: NewRepairOrder) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const orderWithUser = {
+      ...order,
+      user_id: user.id
+    };
+
     const { data, error } = await supabase
       .from('repair_orders')
-      .insert([order])
+      .insert([orderWithUser])
       .select()
       .single();
       

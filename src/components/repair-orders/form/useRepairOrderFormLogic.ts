@@ -10,11 +10,12 @@ interface UseRepairOrderFormLogicProps {
 export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps) => {
   const [formData, setFormData] = useState<Partial<RepairOrder>>({
     reference: '',
-    client_id: '',
-    vehicle_id: '',
-    status: 'En cours',
-    start_date: '',
-    end_date: '',
+    client_id: null,
+    vehicle_id: null,
+    status: 'pending',
+    start_date: null,
+    end_date: null,
+    estimated_hours: null,
     notes: ''
   });
 
@@ -24,7 +25,7 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Déterminer si le formulaire est en lecture seule
-  const isReadOnly = formData.status === 'Terminé';
+  const isReadOnly = formData.status === 'completed';
 
   // Calculer les totaux globaux
   const calculateGlobalTotals = (): GlobalTotals => {
@@ -116,9 +117,10 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
         reference: order.reference,
         client_id: order.client_id,
         vehicle_id: order.vehicle_id,
-        status: order.status || 'En cours',
+        status: order.status || 'pending',
         start_date: order.start_date,
         end_date: order.end_date,
+        estimated_hours: order.estimated_hours,
         notes: order.notes || ''
       });
       

@@ -15,9 +15,10 @@ interface RepairOrderBasicInfoSectionProps {
 
 export const RepairOrderBasicInfoSection = ({ formData, errors, onFieldChange }: RepairOrderBasicInfoSectionProps) => {
   const statusOptions = [
-    { value: 'En cours', label: 'En cours' },
-    { value: 'En attente de pièces', label: 'En attente de pièces' },
-    { value: 'Terminé', label: 'Terminé' }
+    { value: 'pending', label: 'En attente' },
+    { value: 'in_progress', label: 'En cours' },
+    { value: 'waiting_for_parts', label: 'En attente de pièces' },
+    { value: 'completed', label: 'Terminé' }
   ];
 
   return (
@@ -73,7 +74,7 @@ export const RepairOrderBasicInfoSection = ({ formData, errors, onFieldChange }:
           <div>
             <Label htmlFor="status">Statut</Label>
             <Select
-              value={formData.status || 'En cours'}
+              value={formData.status || 'pending'}
               onValueChange={(value) => onFieldChange('status', value)}
             >
               <SelectTrigger id="status">
@@ -87,6 +88,20 @@ export const RepairOrderBasicInfoSection = ({ formData, errors, onFieldChange }:
                 ))}
               </SelectContent>
             </Select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="estimated_hours">Heures estimées</Label>
+            <Input
+              id="estimated_hours"
+              type="number"
+              step="0.5"
+              value={formData.estimated_hours || ''}
+              onChange={(e) => onFieldChange('estimated_hours', parseFloat(e.target.value) || null)}
+              placeholder="Ex: 8.5"
+            />
           </div>
         </div>
       </CardContent>

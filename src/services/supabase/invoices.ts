@@ -12,9 +12,21 @@ export const invoicesService = {
       .from('invoices')
       .select(`
         *,
-        clients(first_name, last_name),
-        vehicles(brand, model, license_plate),
-        repair_orders(reference)
+        clients (
+          id,
+          first_name,
+          last_name
+        ),
+        vehicles (
+          id,
+          brand,
+          model,
+          license_plate
+        ),
+        repair_orders (
+          id,
+          reference
+        )
       `)
       .order('created_at', { ascending: false });
 
@@ -31,9 +43,21 @@ export const invoicesService = {
       .from('invoices')
       .select(`
         *,
-        clients(id, first_name, last_name),
-        vehicles(id, brand, model, license_plate),
-        repair_orders(id, reference)
+        clients (
+          id,
+          first_name,
+          last_name
+        ),
+        vehicles (
+          id,
+          brand,
+          model,
+          license_plate
+        ),
+        repair_orders (
+          id,
+          reference
+        )
       `)
       .eq('id', id)
       .single();
@@ -47,9 +71,17 @@ export const invoicesService = {
   },
   
   create: async (invoice: NewInvoice) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const invoiceWithUser = {
+      ...invoice,
+      user_id: user.id
+    };
+
     const { data, error } = await supabase
       .from('invoices')
-      .insert([invoice])
+      .insert([invoiceWithUser])
       .select()
       .single();
       
