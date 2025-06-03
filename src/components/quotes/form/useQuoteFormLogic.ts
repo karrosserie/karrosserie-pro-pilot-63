@@ -87,7 +87,7 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
       setDescription(value);
     } else {
       setFormData(prev => {
-        // Si on change de client et qu'on n'est pas en train d'initialiser depuis un devis existant
+        // Si on change de client et qu'on n'est pas en train d'éditer un devis existant
         if (field === 'client_id' && !quote) {
           return { ...prev, [field]: value, vehicle_id: '' };
         }
@@ -120,7 +120,7 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
       setFormData({
         reference: quote.reference,
         client_id: quote.client_id,
-        vehicle_id: quote.vehicle_id || '', // S'assurer que vehicle_id est correctement défini
+        vehicle_id: quote.vehicle_id || '',
         status: quote.status || 'En attente',
         valid_until: quote.valid_until,
         notes: quote.notes || ''
