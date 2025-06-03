@@ -34,9 +34,11 @@ export const QuoteForm = ({
     parts,
     errors,
     isReadOnly,
+    pendingVehicleId,
     setRepairs,
     setParts,
     handleChange,
+    handleVehicleSelection,
     validateForm,
     calculateGlobalTotals,
     prepareSubmitData
@@ -89,6 +91,8 @@ export const QuoteForm = ({
         clientOptions={clientOptions}
         isLoadingClients={isLoadingClients}
         isEditing={!!quote}
+        pendingVehicleId={pendingVehicleId}
+        onVehicleSelection={handleVehicleSelection}
       />
 
       <QuoteDetailsSection 

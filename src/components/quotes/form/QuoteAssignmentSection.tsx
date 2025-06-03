@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,6 +19,8 @@ interface QuoteAssignmentSectionProps {
   clientOptions: Client[];
   isLoadingClients: boolean;
   isEditing?: boolean;
+  pendingVehicleId?: string;
+  onVehicleSelection?: (vehicleId: string, vehiclesLoaded: boolean) => void;
 }
 
 export const QuoteAssignmentSection = ({
@@ -26,16 +28,42 @@ export const QuoteAssignmentSection = ({
   onFieldChange,
   clientOptions,
   isLoadingClients,
-  isEditing = false
+  isEditing = false,
+  pendingVehicleId = '',
+  onVehicleSelection
 }: QuoteAssignmentSectionProps) => {
   const isReadOnly = formData.status === 'Accepté' || formData.status === 'Refusé';
   
   // Récupérer les véhicules du client sélectionné
-  // En mode édition, on passe le vehicle_id pour s'assurer qu'il soit récupéré
   const { vehicles: clientVehicles, isLoading: isLoadingClientVehicles } = useClientVehicles(
     formData.client_id || undefined,
-    isEditing ? formData.vehicle_id || undefined : undefined
+    isEditing ? pendingVehicleId || undefined : undefined
   );
+
+  // Effet pour sélectionner automatiquement le véhicule une fois les données chargées
+  useEffect(() => {
+    console.log('Vehicle selection effect:', {
+      pendingVehicleId,
+      isLoadingClientVehicles,
+      clientVehiclesCount: clientVehicles?.length,
+      currentVehicleId: formData.vehicle_id
+    });
+
+    if (pendingVehicleId && 
+        !isLoadingClientVehicles && 
+        clientVehicles && 
+        clientVehicles.length > 0 && 
+        !formData.vehicle_id &&
+        onVehicleSelection) {
+      
+      // Vérifier que le véhicule pending existe dans la liste
+      const vehicleExists = clientVehicles.some(vehicle => vehicle.id === pendingVehicleId);
+      if (vehicleExists) {
+        console.log('Auto-selecting vehicle:', pendingVehicleId);
+        onVehicleSelection(pendingVehicleId, true);
+      }
+    }
+  }, [pendingVehicleId, isLoadingClientVehicles, clientVehicles, formData.vehicle_id, onVehicleSelection]);
 
   const handleClientChange = (clientId: string) => {
     console.log('Client changed to:', clientId, 'isEditing:', isEditing);
