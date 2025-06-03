@@ -28,30 +28,21 @@ const QuoteDialog = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (formData: Partial<Quote>) => {
+    if (isSubmitting) return; // Prevent multiple submissions
+    
     setIsSubmitting(true);
     
     try {
       if (quote && quote.id) {
         await updateQuote.mutateAsync({ id: quote.id, data: formData });
-        toast({
-          title: "Devis mis à jour",
-          description: "Le devis a été mis à jour avec succès."
-        });
       } else {
         await createQuote.mutateAsync(formData as any);
-        toast({
-          title: "Devis créé",
-          description: "Le nouveau devis a été créé avec succès."
-        });
       }
       onOpenChange(false);
+      // Don't show toast here as it's already handled in the hooks
     } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: `Impossible de ${quote ? 'mettre à jour' : 'créer'} le devis: ${error.message}`,
-        variant: "destructive"
-      });
-      throw error;
+      // Only show error toast here, success toasts are handled in hooks
+      console.error('Dialog submission error:', error);
     } finally {
       setIsSubmitting(false);
     }

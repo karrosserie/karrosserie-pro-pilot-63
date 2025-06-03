@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react'
 
 // Interfaces for the toast functionality
@@ -23,10 +22,31 @@ const TOAST_REMOVE_DELAY = 1000
 let globalToasts: ToastProps[] = []
 let listeners: Array<(toasts: ToastProps[]) => void> = []
 
+// Keep track of recent toasts to prevent duplicates
+let recentToasts: Set<string> = new Set()
+
+const generateToastKey = (props: Omit<ToastProps, "id">) => {
+  return `${props.title || ''}-${props.description || ''}-${props.variant || 'default'}`
+}
+
 const addToast = (props: Omit<ToastProps, "id">) => {
+  const toastKey = generateToastKey(props)
+  
+  // Prevent duplicate toasts within a short timeframe
+  if (recentToasts.has(toastKey)) {
+    console.log('Duplicate toast prevented:', toastKey)
+    return
+  }
+  
   const id = Math.random().toString(36).substring(2, 9)
   globalToasts = [...globalToasts, { ...props, id }].slice(-TOAST_LIMIT)
   listeners.forEach(listener => listener(globalToasts))
+  
+  // Add to recent toasts and remove after a delay
+  recentToasts.add(toastKey)
+  setTimeout(() => {
+    recentToasts.delete(toastKey)
+  }, 2000) // Prevent duplicates for 2 seconds
 }
 
 const dismissToast = (toastId?: string) => {

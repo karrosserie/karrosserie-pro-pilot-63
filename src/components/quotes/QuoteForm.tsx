@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useClients } from '@/hooks/use-clients';
@@ -47,6 +46,8 @@ export const QuoteForm = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (isSubmitting) return; // Prevent double submissions
+    
     if (!validateForm()) {
       toast({
         title: "Erreur de validation",
@@ -65,11 +66,7 @@ export const QuoteForm = ({
       await onSubmit(submitData);
     } catch (error: any) {
       console.error('Error submitting quote:', error);
-      toast({
-        title: "Erreur",
-        description: `Impossible de ${quote ? 'mettre à jour' : 'créer'} le devis: ${error.message}`,
-        variant: "destructive"
-      });
+      // Don't show toast here as it might be already handled in the parent
     }
   };
 
