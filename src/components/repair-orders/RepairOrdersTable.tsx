@@ -45,6 +45,20 @@ export const RepairOrdersTable = ({ orders, onEditOrder }: RepairOrdersTableProp
     }
   };
 
+  const getClientName = (order: RepairOrder) => {
+    if (order.clients && order.clients.first_name && order.clients.last_name) {
+      return `${order.clients.first_name} ${order.clients.last_name}`;
+    }
+    return 'Client non spécifié';
+  };
+
+  const getVehicleInfo = (order: RepairOrder) => {
+    if (order.vehicles && order.vehicles.brand && order.vehicles.model && order.vehicles.license_plate) {
+      return `${order.vehicles.brand} ${order.vehicles.model} - ${order.vehicles.license_plate}`;
+    }
+    return 'Véhicule non spécifié';
+  };
+
   const handleDelete = async (order: RepairOrder) => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'ordre de réparation ${order.reference} ?`)) {
       await deleteOrder.mutateAsync(order.id);
@@ -103,18 +117,8 @@ export const RepairOrdersTable = ({ orders, onEditOrder }: RepairOrdersTableProp
             <TableRow key={order.id}>
               <TableCell className="font-medium">{order.reference}</TableCell>
               <TableCell>{formatDate(order.start_date)}</TableCell>
-              <TableCell>
-                {order.clients 
-                  ? `${order.clients.first_name} ${order.clients.last_name}`
-                  : '-'
-                }
-              </TableCell>
-              <TableCell>
-                {order.vehicles 
-                  ? `${order.vehicles.brand} ${order.vehicles.model} - ${order.vehicles.license_plate}`
-                  : '-'
-                }
-              </TableCell>
+              <TableCell>{getClientName(order)}</TableCell>
+              <TableCell>{getVehicleInfo(order)}</TableCell>
               <TableCell>
                 <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(order.status || 'En cours')}`}>
                   {order.status || 'En cours'}
