@@ -14,7 +14,7 @@ import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Trash } from 'lu
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import { useInvoices } from '@/hooks/use-invoices';
 import { Invoice } from '@/services/supabase/invoices';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';

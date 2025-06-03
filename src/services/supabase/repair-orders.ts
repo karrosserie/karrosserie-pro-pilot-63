@@ -2,7 +2,25 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
-export type RepairOrder = Database['public']['Tables']['repair_orders']['Row'];
+export type RepairOrder = Database['public']['Tables']['repair_orders']['Row'] & {
+  clients?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  };
+  vehicles?: {
+    id: string;
+    brand: string;
+    model: string;
+    license_plate: string;
+  };
+  quotes?: {
+    id: string;
+    reference: string;
+    amount: number;
+  };
+};
+
 export type NewRepairOrder = Database['public']['Tables']['repair_orders']['Insert'];
 export type UpdateRepairOrder = Database['public']['Tables']['repair_orders']['Update'];
 

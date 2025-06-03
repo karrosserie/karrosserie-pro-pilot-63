@@ -5,7 +5,7 @@ import { RepairOrdersTable } from '@/components/repair-orders/RepairOrdersTable'
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { RepairOrder } from '@/services/supabase/repair-orders';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
 
 const RepairOrders = () => {
