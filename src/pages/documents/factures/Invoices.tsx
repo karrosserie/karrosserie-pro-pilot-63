@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +10,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Trash } from 'lucide-react';
+import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 
 // Données mockées pour les factures
 const mockInvoices = [
@@ -58,6 +58,8 @@ const mockInvoices = [
 
 const Invoices = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   
   const filteredInvoices = mockInvoices.filter(invoice => 
     invoice.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -76,6 +78,16 @@ const Invoices = () => {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+  
+  const handleCreateInvoice = () => {
+    setSelectedInvoice(null);
+    setDialogOpen(true);
+  };
+
+  const handleEditInvoice = (invoice: any) => {
+    setSelectedInvoice(invoice);
+    setDialogOpen(true);
   };
   
   return (
@@ -118,7 +130,10 @@ const Invoices = () => {
             <Filter className="h-4 w-4" />
           </Button>
           
-          <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
+          <Button 
+            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+            onClick={handleCreateInvoice}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Nouvelle facture
           </Button>
@@ -162,7 +177,7 @@ const Invoices = () => {
                       <Button variant="ghost" size="icon">
                         <Download className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" onClick={() => handleEditInvoice(invoice)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
@@ -188,6 +203,12 @@ const Invoices = () => {
           </TableBody>
         </Table>
       </div>
+
+      <InvoiceDialog
+        invoice={selectedInvoice}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </div>
   );
 };

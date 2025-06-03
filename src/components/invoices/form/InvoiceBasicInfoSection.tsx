@@ -1,0 +1,111 @@
+
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { FileText, AlertCircle } from 'lucide-react';
+import { Invoice } from '@/services/supabase/invoices';
+
+interface InvoiceBasicInfoSectionProps {
+  formData: Partial<Invoice>;
+  errors: Record<string, string>;
+  onFieldChange: (field: string, value: any) => void;
+}
+
+export const InvoiceBasicInfoSection = ({ formData, errors, onFieldChange }: InvoiceBasicInfoSectionProps) => {
+  const statusOptions = [
+    { value: 'En attente', label: 'En attente' },
+    { value: 'Payée', label: 'Payée' },
+    { value: 'Annulée', label: 'Annulée' }
+  ];
+
+  const paymentMethodOptions = [
+    { value: 'Carte bancaire', label: 'Carte bancaire' },
+    { value: 'Virement', label: 'Virement' },
+    { value: 'Chèque', label: 'Chèque' },
+    { value: 'Espèces', label: 'Espèces' }
+  ];
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center text-lg">
+          <FileText className="h-5 w-5 mr-2" />
+          Informations de base
+        </CardTitle>
+        <CardDescription>
+          Référence, échéance et statut de la facture
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <Label htmlFor="reference">Référence *</Label>
+            <Input
+              id="reference"
+              value={formData.reference || ''}
+              onChange={(e) => onFieldChange('reference', e.target.value)}
+              className={errors.reference ? 'border-red-500' : ''}
+              placeholder="Ex: F-2024-1234"
+            />
+            {errors.reference && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.reference}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="due_date">Échéance</Label>
+            <Input
+              id="due_date"
+              type="date"
+              value={formData.due_date || ''}
+              onChange={(e) => onFieldChange('due_date', e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="status">Statut</Label>
+            <Select
+              value={formData.status || 'En attente'}
+              onValueChange={(value) => onFieldChange('status', value)}
+            >
+              <SelectTrigger id="status">
+                <SelectValue placeholder="Sélectionner un statut" />
+              </SelectTrigger>
+              <SelectContent>
+                {statusOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="payment_method">Mode de paiement</Label>
+            <Select
+              value={formData.payment_method || ''}
+              onValueChange={(value) => onFieldChange('payment_method', value)}
+            >
+              <SelectTrigger id="payment_method">
+                <SelectValue placeholder="Sélectionner un mode" />
+              </SelectTrigger>
+              <SelectContent>
+                {paymentMethodOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};

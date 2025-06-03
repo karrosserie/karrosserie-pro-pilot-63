@@ -1,0 +1,173 @@
+
+import { useState, useEffect } from 'react';
+import { Invoice } from '@/services/supabase/invoices';
+import { InvoiceRepairItem, InvoicePartItem, GlobalTotals } from './types';
+
+interface UseInvoiceFormLogicProps {
+  invoice?: Invoice | null;
+}
+
+export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
+  const [formData, setFormData] = useState<Partial<Invoice>>({
+    reference: '',
+    client_id: '',
+    vehicle_id: '',
+    status: 'En attente',
+    due_date: '',
+    payment_method: '',
+    notes: ''
+  });
+
+  const [description, setDescription] = useState('');
+  const [repairs, setRepairs] = useState<InvoiceRepairItem[]>([]);
+  const [parts, setParts] = useState<InvoicePartItem[]>([]);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Déterminer si le formulaire est en lecture seule
+  const isReadOnly = formData.status === 'Payée';
+
+  // Calculer les totaux globaux
+  const calculateGlobalTotals = (): GlobalTotals => {
+    const repairTotals = repairs.reduce((acc, repair) => {
+      const subtotal = repair.quantity * repair.unitCost;
+      const discountAmount = subtotal * (repair.discount / 100);
+      const afterDiscount = subtotal - discountAmount;
+      const vatAmount = afterDiscount * (repair.vat / 100);
+      
+      return {
+        subTotal: acc.subTotal + subtotal,
+        totalVat: acc.totalVat + vatAmount,
+        totalDiscount: acc.totalDiscount + discountAmount,
+        total: acc.total + repair.total
+      };
+    }, { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 });
+
+    const partTotals = parts.reduce((acc, part) => {
+      const subtotal = part.quantity * part.unitCost;
+      const discountAmount = subtotal * (part.discount / 100);
+      const afterDiscount = subtotal - discountAmount;
+      const vatAmount = afterDiscount * (part.vat / 100);
+      
+      return {
+        subTotal: acc.subTotal + subtotal,
+        totalVat: acc.totalVat + vatAmount,
+        totalDiscount: acc.totalDiscount + discountAmount,
+        total: acc.total + part.total
+      };
+    }, { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 });
+
+    return {
+      subTotal: repairTotals.subTotal + partTotals.subTotal,
+      totalVat: repairTotals.totalVat + partTotals.totalVat,
+      totalDiscount: repairTotals.totalDiscount + partTotals.totalDiscount,
+      total: repairTotals.total + partTotals.total
+    };
+  };
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.reference?.trim()) {
+      newErrors.reference = 'La référence de la facture est obligatoire';
+    }
+    
+    if (!formData.client_id) {
+      newErrors.client_id = 'Le client est obligatoire';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (field: string, value: any) => {
+    if (isReadOnly && field !== 'status') {
+      return; // Empêcher les modifications si en lecture seule
+    }
+    
+    if (field === 'description') {
+      setDescription(value);
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }
+    
+    // Effacer l'erreur quand l'utilisateur commence à taper
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  // Fonction pour préparer les données à soumettre
+  const prepareSubmitData = () => {
+    const notesData = {
+      description,
+      repairs,
+      parts
+    };
+    
+    return {
+      ...formData,
+      notes: JSON.stringify(notesData)
+    };
+  };
+
+  useEffect(() => {
+    if (invoice) {
+      setFormData({
+        reference: invoice.reference,
+        client_id: invoice.client_id,
+        vehicle_id: invoice.vehicle_id,
+        status: invoice.status || 'En attente',
+        due_date: invoice.due_date,
+        payment_method: invoice.payment_method,
+        notes: invoice.notes || ''
+      });
+      
+      // Charger les données depuis les notes (format JSON)
+      if (invoice.notes) {
+        try {
+          const noteData = JSON.parse(invoice.notes);
+          setDescription(noteData.description || '');
+          if (noteData.repairs) {
+            setRepairs(noteData.repairs);
+          }
+          if (noteData.parts) {
+            setParts(noteData.parts);
+          }
+        } catch (e) {
+          console.error('Error parsing invoice notes:', e);
+          setDescription('');
+          setRepairs([]);
+          setParts([]);
+        }
+      } else {
+        setDescription('');
+        setRepairs([]);
+        setParts([]);
+      }
+    } else {
+      // Générer une référence automatique pour une nouvelle facture
+      const currentYear = new Date().getFullYear();
+      const randomNumber = Math.floor(1000 + Math.random() * 9000);
+      setFormData(prev => ({
+        ...prev,
+        reference: `F-${currentYear}-${randomNumber}`
+      }));
+      setDescription('');
+    }
+  }, [invoice]);
+
+  return {
+    formData,
+    description,
+    repairs,
+    parts,
+    errors,
+    isReadOnly,
+    setRepairs,
+    setParts,
+    handleChange,
+    validateForm,
+    calculateGlobalTotals,
+    prepareSubmitData
+  };
+};
