@@ -79,6 +79,8 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
   };
 
   const handleChange = (field: string, value: any) => {
+    console.log(`handleChange called with field: ${field}, value: ${value}, isEditing: ${!!quote}`);
+    
     if (isReadOnly && field !== 'status') {
       return; // Empêcher les modifications si en lecture seule
     }
@@ -87,11 +89,18 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
       setDescription(value);
     } else {
       setFormData(prev => {
-        // Si on change de client et qu'on n'est pas en train d'éditer un devis existant
+        console.log('Previous formData:', prev);
+        
+        // Si on change de client ET qu'on n'est pas en train d'éditer un devis existant
         if (field === 'client_id' && !quote) {
+          console.log('Resetting vehicle_id because creating new quote and client changed');
           return { ...prev, [field]: value, vehicle_id: '' };
         }
-        return { ...prev, [field]: value };
+        
+        // Pour tous les autres cas (y compris l'édition), ne pas toucher au vehicle_id
+        const newFormData = { ...prev, [field]: value };
+        console.log('New formData:', newFormData);
+        return newFormData;
       });
     }
     
@@ -116,7 +125,14 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
   };
 
   useEffect(() => {
+    console.log('useEffect triggered with quote:', quote);
+    
     if (quote) {
+      console.log('Setting form data from existing quote:', {
+        client_id: quote.client_id,
+        vehicle_id: quote.vehicle_id
+      });
+      
       setFormData({
         reference: quote.reference,
         client_id: quote.client_id,
@@ -149,6 +165,7 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
         setParts([]);
       }
     } else {
+      console.log('Creating new quote - generating reference');
       // Générer une référence automatique pour un nouveau devis
       const currentYear = new Date().getFullYear();
       const randomNumber = Math.floor(1000 + Math.random() * 9000);
