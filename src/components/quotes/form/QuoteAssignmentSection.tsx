@@ -30,10 +30,11 @@ export const QuoteAssignmentSection = ({
 }: QuoteAssignmentSectionProps) => {
   const isReadOnly = formData.status === 'Accepté' || formData.status === 'Refusé';
   
-  // Récupérer les véhicules du client sélectionné ou le véhicule spécifique si on édite
+  // Récupérer les véhicules du client sélectionné
+  // En mode édition, on passe le vehicle_id pour s'assurer qu'il soit récupéré
   const { vehicles: clientVehicles, isLoading: isLoadingClientVehicles } = useClientVehicles(
-    formData.client_id || undefined, 
-    formData.vehicle_id || undefined
+    formData.client_id || undefined,
+    isEditing ? formData.vehicle_id || undefined : undefined
   );
 
   const handleClientChange = (clientId: string) => {
@@ -101,12 +102,12 @@ export const QuoteAssignmentSection = ({
             <Select
               value={vehicleValue}
               onValueChange={handleVehicleChange}
-              disabled={isReadOnly || (!formData.client_id && !formData.vehicle_id)}
+              disabled={isReadOnly || !formData.client_id}
             >
               <SelectTrigger id="vehicle_id">
                 <SelectValue 
                   placeholder={
-                    (!formData.client_id && !formData.vehicle_id)
+                    !formData.client_id
                       ? "Sélectionner d'abord un client" 
                       : isLoadingClientVehicles 
                         ? "Chargement..." 
@@ -124,9 +125,9 @@ export const QuoteAssignmentSection = ({
                       </div>
                     </SelectItem>
                   ))
-                ) : (formData.client_id || formData.vehicle_id) && !isLoadingClientVehicles ? (
+                ) : formData.client_id && !isLoadingClientVehicles ? (
                   <SelectItem value="no-vehicles" disabled>
-                    Aucun véhicule trouvé
+                    Aucun véhicule trouvé pour ce client
                   </SelectItem>
                 ) : null}
               </SelectContent>

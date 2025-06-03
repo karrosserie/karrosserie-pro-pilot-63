@@ -93,11 +93,16 @@ export function useClientVehicles(clientId?: string, vehicleId?: string) {
       if (clientId) {
         return vehiclesService.getByClientId(clientId);
       }
-      // Si on a un vehicle_id mais pas de client (cas d'édition), charger ce véhicule spécifique
-      if (vehicleId) {
+      // Si on a seulement un vehicle_id (cas d'édition sans client), 
+      // on doit d'abord récupérer le véhicule pour connaître son client
+      if (vehicleId && !clientId) {
         const allVehicles = await vehiclesService.getAll();
         const vehicle = allVehicles.find(v => v.id === vehicleId);
-        return vehicle ? [vehicle] : [];
+        if (vehicle) {
+          // Retourner tous les véhicules du client pour permettre le changement
+          return vehiclesService.getByClientId(vehicle.client_id);
+        }
+        return [];
       }
       return [];
     },

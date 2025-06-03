@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Quote } from '@/services/supabase/quotes';
 import { QuoteRepairItem, QuotePartItem, GlobalTotals } from './types';
@@ -133,6 +132,7 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
         vehicle_id: quote.vehicle_id
       });
       
+      // Charger d'abord le client_id, puis le vehicle_id sera géré par le composant
       setFormData({
         reference: quote.reference,
         client_id: quote.client_id,
