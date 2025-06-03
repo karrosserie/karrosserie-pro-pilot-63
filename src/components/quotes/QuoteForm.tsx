@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useClients } from '@/hooks/use-clients';
@@ -33,12 +34,9 @@ export const QuoteForm = ({
     parts,
     errors,
     isReadOnly,
-    targetVehicleId,
-    isInitializing,
     setRepairs,
     setParts,
     handleChange,
-    onVehiclesLoaded,
     validateForm,
     calculateGlobalTotals,
     prepareSubmitData
@@ -90,9 +88,6 @@ export const QuoteForm = ({
         onFieldChange={handleChange}
         clientOptions={clientOptions}
         isLoadingClients={isLoadingClients}
-        targetVehicleId={targetVehicleId}
-        isInitializing={isInitializing}
-        onVehiclesLoaded={onVehiclesLoaded}
       />
 
       <QuoteDetailsSection 

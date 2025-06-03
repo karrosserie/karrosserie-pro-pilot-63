@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,67 +18,24 @@ interface QuoteAssignmentSectionProps {
   onFieldChange: (field: string, value: any) => void;
   clientOptions: Client[];
   isLoadingClients: boolean;
-  targetVehicleId?: string;
-  isInitializing?: boolean;
-  onVehiclesLoaded?: (loaded: boolean) => void;
 }
 
 export const QuoteAssignmentSection = ({
   formData,
   onFieldChange,
   clientOptions,
-  isLoadingClients,
-  targetVehicleId = '',
-  isInitializing = false,
-  onVehiclesLoaded
+  isLoadingClients
 }: QuoteAssignmentSectionProps) => {
   const isReadOnly = formData.status === 'Accepté' || formData.status === 'Refusé';
   
   // Récupérer les véhicules du client sélectionné
-  const { vehicles: clientVehicles, isLoading: isLoadingClientVehicles } = useClientVehicles(
-    formData.client_id || undefined
-  );
-
-  // Effet pour notifier quand les véhicules sont chargés et sélectionner le bon véhicule
-  useEffect(() => {
-    console.log('Vehicle loading effect:', {
-      isLoadingClientVehicles,
-      clientVehiclesCount: clientVehicles?.length,
-      targetVehicleId,
-      isInitializing,
-      currentVehicleId: formData.vehicle_id
-    });
-
-    if (!isLoadingClientVehicles && clientVehicles && onVehiclesLoaded) {
-      console.log('Notifying that vehicles are loaded');
-      onVehiclesLoaded(true);
-    }
-  }, [isLoadingClientVehicles, clientVehicles, targetVehicleId, isInitializing, formData.vehicle_id, onVehiclesLoaded]);
+  const { vehicles: clientVehicles, isLoading: isLoadingClientVehicles } = useClientVehicles(formData.client_id || undefined);
 
   const handleClientChange = (clientId: string) => {
-    console.log('Client changed to:', clientId);
     onFieldChange('client_id', clientId);
-    // Réinitialiser le véhicule lors du changement de client (sauf en mode édition initial)
-    if (!isInitializing) {
-      console.log('Resetting vehicle because not in initialization mode');
-      onFieldChange('vehicle_id', '');
-    }
+    // Réinitialiser le véhicule sélectionné quand on change de client
+    onFieldChange('vehicle_id', null);
   };
-
-  const handleVehicleChange = (vehicleId: string) => {
-    console.log('Vehicle changed to:', vehicleId);
-    if (vehicleId && vehicleId.trim() !== '') {
-      onFieldChange('vehicle_id', vehicleId);
-    } else {
-      onFieldChange('vehicle_id', '');
-    }
-  };
-
-  // Déterminer la valeur du véhicule à afficher
-  const vehicleValue = formData.vehicle_id || '';
-  
-  console.log('Render - Vehicle value for Select:', vehicleValue);
-  console.log('Available vehicles:', clientVehicles);
 
   return (
     <Card>
@@ -96,7 +53,7 @@ export const QuoteAssignmentSection = ({
           <div>
             <Label htmlFor="client_id">Client</Label>
             <Select
-              value={formData.client_id || ''}
+              value={formData.client_id || undefined}
               onValueChange={handleClientChange}
               disabled={isReadOnly}
             >
@@ -116,14 +73,14 @@ export const QuoteAssignmentSection = ({
           <div>
             <Label htmlFor="vehicle_id">Véhicule</Label>
             <Select
-              value={vehicleValue}
-              onValueChange={handleVehicleChange}
+              value={formData.vehicle_id || undefined}
+              onValueChange={(value) => onFieldChange('vehicle_id', value || null)}
               disabled={isReadOnly || !formData.client_id}
             >
               <SelectTrigger id="vehicle_id">
                 <SelectValue 
                   placeholder={
-                    !formData.client_id
+                    !formData.client_id 
                       ? "Sélectionner d'abord un client" 
                       : isLoadingClientVehicles 
                         ? "Chargement..." 

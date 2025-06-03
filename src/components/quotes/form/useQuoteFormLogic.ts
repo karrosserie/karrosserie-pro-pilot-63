@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Quote } from '@/services/supabase/quotes';
 import { QuoteRepairItem, QuotePartItem, GlobalTotals } from './types';
@@ -20,10 +21,6 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
   const [repairs, setRepairs] = useState<QuoteRepairItem[]>([]);
   const [parts, setParts] = useState<QuotePartItem[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
-  // États pour gérer la séquence de chargement en mode édition
-  const [targetVehicleId, setTargetVehicleId] = useState<string>('');
-  const [isInitializing, setIsInitializing] = useState(false);
 
   // Déterminer si le formulaire est en lecture seule
   const isReadOnly = formData.status === 'Accepté' || formData.status === 'Refusé';
@@ -82,8 +79,6 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
   };
 
   const handleChange = (field: string, value: any) => {
-    console.log(`handleChange called with field: ${field}, value: ${value}`);
-    
     if (isReadOnly && field !== 'status') {
       return; // Empêcher les modifications si en lecture seule
     }
@@ -91,32 +86,12 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     if (field === 'description') {
       setDescription(value);
     } else {
-      setFormData(prev => {
-        // Si on change de client ET qu'on n'est pas en train d'éditer un devis existant
-        if (field === 'client_id' && !quote) {
-          console.log('Resetting vehicle_id because creating new quote and client changed');
-          return { ...prev, [field]: value, vehicle_id: '' };
-        }
-        
-        return { ...prev, [field]: value };
-      });
+      setFormData(prev => ({ ...prev, [field]: value }));
     }
     
     // Effacer l'erreur quand l'utilisateur commence à taper
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
-    }
-  };
-
-  // Fonction appelée par le composant QuoteAssignmentSection quand les véhicules sont chargés
-  const onVehiclesLoaded = (vehiclesLoaded: boolean) => {
-    console.log('onVehiclesLoaded called:', { vehiclesLoaded, targetVehicleId, isInitializing });
-    
-    if (vehiclesLoaded && targetVehicleId && isInitializing && !formData.vehicle_id) {
-      console.log('Setting vehicle_id to:', targetVehicleId);
-      setFormData(prev => ({ ...prev, vehicle_id: targetVehicleId }));
-      setTargetVehicleId('');
-      setIsInitializing(false);
     }
   };
 
@@ -135,23 +110,11 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
   };
 
   useEffect(() => {
-    console.log('useEffect triggered with quote:', quote);
-    
     if (quote) {
-      console.log('Initializing form with quote data:', {
-        client_id: quote.client_id,
-        vehicle_id: quote.vehicle_id
-      });
-      
-      // Stocker le vehicle_id cible pour la sélection ultérieure
-      setTargetVehicleId(quote.vehicle_id || '');
-      setIsInitializing(true);
-      
-      // Charger immédiatement le client_id pour déclencher le chargement des véhicules
       setFormData({
         reference: quote.reference,
-        client_id: quote.client_id, // Sélectionner le client immédiatement
-        vehicle_id: '', // Le véhicule sera sélectionné une fois les données chargées
+        client_id: quote.client_id,
+        vehicle_id: quote.vehicle_id,
         status: quote.status || 'En attente',
         valid_until: quote.valid_until,
         notes: quote.notes || ''
@@ -180,7 +143,6 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
         setParts([]);
       }
     } else {
-      console.log('Creating new quote - generating reference');
       // Générer une référence automatique pour un nouveau devis
       const currentYear = new Date().getFullYear();
       const randomNumber = Math.floor(1000 + Math.random() * 9000);
@@ -189,8 +151,6 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
         reference: `D-${currentYear}-${randomNumber}`
       }));
       setDescription('');
-      setTargetVehicleId('');
-      setIsInitializing(false);
     }
   }, [quote]);
 
@@ -201,12 +161,9 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     parts,
     errors,
     isReadOnly,
-    targetVehicleId,
-    isInitializing,
     setRepairs,
     setParts,
     handleChange,
-    onVehiclesLoaded,
     validateForm,
     calculateGlobalTotals,
     prepareSubmitData
