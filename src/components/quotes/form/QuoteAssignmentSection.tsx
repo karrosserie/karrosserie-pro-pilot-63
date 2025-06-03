@@ -18,7 +18,7 @@ interface QuoteAssignmentSectionProps {
   onFieldChange: (field: string, value: any) => void;
   clientOptions: Client[];
   isLoadingClients: boolean;
-  isEditing?: boolean; // Ajouter cette prop pour savoir si on est en mode édition
+  isEditing?: boolean;
 }
 
 export const QuoteAssignmentSection = ({
@@ -34,12 +34,24 @@ export const QuoteAssignmentSection = ({
   const { vehicles: clientVehicles, isLoading: isLoadingClientVehicles } = useClientVehicles(formData.client_id || undefined);
 
   const handleClientChange = (clientId: string) => {
+    console.log('Client changed to:', clientId, 'isEditing:', isEditing);
     onFieldChange('client_id', clientId);
-    // Réinitialiser le véhicule sélectionné seulement lors de la création d'un nouveau devis
+    // Ne réinitialiser le véhicule que lors de la création d'un nouveau devis
     if (!isEditing) {
+      console.log('Resetting vehicle because creating new quote');
       onFieldChange('vehicle_id', '');
     }
   };
+
+  const handleVehicleChange = (vehicleId: string) => {
+    console.log('Vehicle changed to:', vehicleId);
+    onFieldChange('vehicle_id', vehicleId);
+  };
+
+  // S'assurer que la valeur du véhicule est valide
+  const vehicleValue = formData.vehicle_id && formData.vehicle_id.trim() !== '' ? formData.vehicle_id : undefined;
+  
+  console.log('Vehicle value for Select:', vehicleValue, 'formData.vehicle_id:', formData.vehicle_id);
 
   return (
     <Card>
@@ -77,8 +89,8 @@ export const QuoteAssignmentSection = ({
           <div>
             <Label htmlFor="vehicle_id">Véhicule</Label>
             <Select
-              value={formData.vehicle_id || undefined}
-              onValueChange={(value) => onFieldChange('vehicle_id', value || '')}
+              value={vehicleValue}
+              onValueChange={handleVehicleChange}
               disabled={isReadOnly || !formData.client_id}
             >
               <SelectTrigger id="vehicle_id">
