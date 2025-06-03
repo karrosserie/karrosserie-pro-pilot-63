@@ -14,7 +14,7 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
     vehicle_id: '',
     status: 'En cours',
     start_date: '',
-    deadline: '',
+    end_date: '',
     notes: ''
   });
 
@@ -118,7 +118,7 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
         vehicle_id: order.vehicle_id,
         status: order.status || 'En cours',
         start_date: order.start_date,
-        deadline: order.deadline,
+        end_date: order.end_date,
         notes: order.notes || ''
       });
       

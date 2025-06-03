@@ -61,12 +61,12 @@ export const RepairOrderBasicInfoSection = ({ formData, errors, onFieldChange }:
           </div>
 
           <div>
-            <Label htmlFor="deadline">Échéance</Label>
+            <Label htmlFor="end_date">Date de fin</Label>
             <Input
-              id="deadline"
+              id="end_date"
               type="date"
-              value={formData.deadline || ''}
-              onChange={(e) => onFieldChange('deadline', e.target.value)}
+              value={formData.end_date || ''}
+              onChange={(e) => onFieldChange('end_date', e.target.value)}
             />
           </div>
 
