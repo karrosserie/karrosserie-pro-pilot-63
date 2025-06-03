@@ -81,15 +81,27 @@ export function useVehicles() {
   };
 }
 
-export function useClientVehicles(clientId?: string) {
+export function useClientVehicles(clientId?: string, vehicleId?: string) {
   const {
     data: vehicles,
     isLoading,
     error
   } = useQuery({
-    queryKey: ['vehicles', 'client', clientId],
-    queryFn: () => clientId ? vehiclesService.getByClientId(clientId) : Promise.resolve([]),
-    enabled: !!clientId
+    queryKey: ['vehicles', 'client', clientId, vehicleId],
+    queryFn: async () => {
+      // Si on a un client, charger ses véhicules
+      if (clientId) {
+        return vehiclesService.getByClientId(clientId);
+      }
+      // Si on a un vehicle_id mais pas de client (cas d'édition), charger ce véhicule spécifique
+      if (vehicleId) {
+        const allVehicles = await vehiclesService.getAll();
+        const vehicle = allVehicles.find(v => v.id === vehicleId);
+        return vehicle ? [vehicle] : [];
+      }
+      return [];
+    },
+    enabled: !!(clientId || vehicleId)
   });
   
   return {

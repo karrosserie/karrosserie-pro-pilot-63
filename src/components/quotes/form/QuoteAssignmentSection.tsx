@@ -30,8 +30,11 @@ export const QuoteAssignmentSection = ({
 }: QuoteAssignmentSectionProps) => {
   const isReadOnly = formData.status === 'Accepté' || formData.status === 'Refusé';
   
-  // Récupérer les véhicules du client sélectionné
-  const { vehicles: clientVehicles, isLoading: isLoadingClientVehicles } = useClientVehicles(formData.client_id || undefined);
+  // Récupérer les véhicules du client sélectionné ou le véhicule spécifique si on édite
+  const { vehicles: clientVehicles, isLoading: isLoadingClientVehicles } = useClientVehicles(
+    formData.client_id || undefined, 
+    formData.vehicle_id || undefined
+  );
 
   const handleClientChange = (clientId: string) => {
     console.log('Client changed to:', clientId, 'isEditing:', isEditing);
@@ -58,6 +61,7 @@ export const QuoteAssignmentSection = ({
   const vehicleValue = formData.vehicle_id || '';
   
   console.log('Vehicle value for Select:', vehicleValue, 'formData.vehicle_id:', formData.vehicle_id);
+  console.log('Available vehicles:', clientVehicles);
 
   return (
     <Card>
@@ -97,12 +101,12 @@ export const QuoteAssignmentSection = ({
             <Select
               value={vehicleValue}
               onValueChange={handleVehicleChange}
-              disabled={isReadOnly || !formData.client_id}
+              disabled={isReadOnly || (!formData.client_id && !formData.vehicle_id)}
             >
               <SelectTrigger id="vehicle_id">
                 <SelectValue 
                   placeholder={
-                    !formData.client_id 
+                    (!formData.client_id && !formData.vehicle_id)
                       ? "Sélectionner d'abord un client" 
                       : isLoadingClientVehicles 
                         ? "Chargement..." 
@@ -120,9 +124,9 @@ export const QuoteAssignmentSection = ({
                       </div>
                     </SelectItem>
                   ))
-                ) : formData.client_id && !isLoadingClientVehicles ? (
+                ) : (formData.client_id || formData.vehicle_id) && !isLoadingClientVehicles ? (
                   <SelectItem value="no-vehicles" disabled>
-                    Aucun véhicule trouvé pour ce client
+                    Aucun véhicule trouvé
                   </SelectItem>
                 ) : null}
               </SelectContent>
