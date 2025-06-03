@@ -18,9 +18,9 @@ interface QuoteAssignmentSectionProps {
   onFieldChange: (field: string, value: any) => void;
   clientOptions: Client[];
   isLoadingClients: boolean;
-  isEditing?: boolean;
-  pendingVehicleId?: string;
-  onVehicleSelection?: (vehicleId: string, vehiclesLoaded: boolean) => void;
+  targetVehicleId?: string;
+  isInitializing?: boolean;
+  onVehiclesLoaded?: (loaded: boolean) => void;
 }
 
 export const QuoteAssignmentSection = ({
@@ -28,56 +28,45 @@ export const QuoteAssignmentSection = ({
   onFieldChange,
   clientOptions,
   isLoadingClients,
-  isEditing = false,
-  pendingVehicleId = '',
-  onVehicleSelection
+  targetVehicleId = '',
+  isInitializing = false,
+  onVehiclesLoaded
 }: QuoteAssignmentSectionProps) => {
   const isReadOnly = formData.status === 'Accepté' || formData.status === 'Refusé';
   
   // Récupérer les véhicules du client sélectionné
   const { vehicles: clientVehicles, isLoading: isLoadingClientVehicles } = useClientVehicles(
-    formData.client_id || undefined,
-    isEditing ? pendingVehicleId || undefined : undefined
+    formData.client_id || undefined
   );
 
-  // Effet pour sélectionner automatiquement le véhicule une fois les données chargées
+  // Effet pour notifier quand les véhicules sont chargés et sélectionner le bon véhicule
   useEffect(() => {
-    console.log('Vehicle selection effect:', {
-      pendingVehicleId,
+    console.log('Vehicle loading effect:', {
       isLoadingClientVehicles,
       clientVehiclesCount: clientVehicles?.length,
+      targetVehicleId,
+      isInitializing,
       currentVehicleId: formData.vehicle_id
     });
 
-    if (pendingVehicleId && 
-        !isLoadingClientVehicles && 
-        clientVehicles && 
-        clientVehicles.length > 0 && 
-        !formData.vehicle_id &&
-        onVehicleSelection) {
-      
-      // Vérifier que le véhicule pending existe dans la liste
-      const vehicleExists = clientVehicles.some(vehicle => vehicle.id === pendingVehicleId);
-      if (vehicleExists) {
-        console.log('Auto-selecting vehicle:', pendingVehicleId);
-        onVehicleSelection(pendingVehicleId, true);
-      }
+    if (!isLoadingClientVehicles && clientVehicles && onVehiclesLoaded) {
+      console.log('Notifying that vehicles are loaded');
+      onVehiclesLoaded(true);
     }
-  }, [pendingVehicleId, isLoadingClientVehicles, clientVehicles, formData.vehicle_id, onVehicleSelection]);
+  }, [isLoadingClientVehicles, clientVehicles, targetVehicleId, isInitializing, formData.vehicle_id, onVehiclesLoaded]);
 
   const handleClientChange = (clientId: string) => {
-    console.log('Client changed to:', clientId, 'isEditing:', isEditing);
+    console.log('Client changed to:', clientId);
     onFieldChange('client_id', clientId);
-    // Ne réinitialiser le véhicule que lors de la création d'un nouveau devis
-    if (!isEditing) {
-      console.log('Resetting vehicle because creating new quote');
+    // Réinitialiser le véhicule lors du changement de client (sauf en mode édition initial)
+    if (!isInitializing) {
+      console.log('Resetting vehicle because not in initialization mode');
       onFieldChange('vehicle_id', '');
     }
   };
 
   const handleVehicleChange = (vehicleId: string) => {
     console.log('Vehicle changed to:', vehicleId);
-    // Ne pas accepter les valeurs vides ou undefined comme changement valide
     if (vehicleId && vehicleId.trim() !== '') {
       onFieldChange('vehicle_id', vehicleId);
     } else {
@@ -86,10 +75,9 @@ export const QuoteAssignmentSection = ({
   };
 
   // Déterminer la valeur du véhicule à afficher
-  // Ne pas utiliser undefined car cela peut causer des problèmes avec Radix UI
   const vehicleValue = formData.vehicle_id || '';
   
-  console.log('Vehicle value for Select:', vehicleValue, 'formData.vehicle_id:', formData.vehicle_id);
+  console.log('Render - Vehicle value for Select:', vehicleValue);
   console.log('Available vehicles:', clientVehicles);
 
   return (

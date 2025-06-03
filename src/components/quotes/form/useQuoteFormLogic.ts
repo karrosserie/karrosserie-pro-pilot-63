@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Quote } from '@/services/supabase/quotes';
 import { QuoteRepairItem, QuotePartItem, GlobalTotals } from './types';
@@ -23,8 +22,8 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   
   // États pour gérer la séquence de chargement en mode édition
-  const [pendingVehicleId, setPendingVehicleId] = useState<string>('');
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [targetVehicleId, setTargetVehicleId] = useState<string>('');
+  const [isInitializing, setIsInitializing] = useState(false);
 
   // Déterminer si le formulaire est en lecture seule
   const isReadOnly = formData.status === 'Accepté' || formData.status === 'Refusé';
@@ -83,7 +82,7 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
   };
 
   const handleChange = (field: string, value: any) => {
-    console.log(`handleChange called with field: ${field}, value: ${value}, isEditing: ${!!quote}`);
+    console.log(`handleChange called with field: ${field}, value: ${value}`);
     
     if (isReadOnly && field !== 'status') {
       return; // Empêcher les modifications si en lecture seule
@@ -93,18 +92,13 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
       setDescription(value);
     } else {
       setFormData(prev => {
-        console.log('Previous formData:', prev);
-        
         // Si on change de client ET qu'on n'est pas en train d'éditer un devis existant
         if (field === 'client_id' && !quote) {
           console.log('Resetting vehicle_id because creating new quote and client changed');
           return { ...prev, [field]: value, vehicle_id: '' };
         }
         
-        // Pour tous les autres cas (y compris l'édition), ne pas toucher au vehicle_id
-        const newFormData = { ...prev, [field]: value };
-        console.log('New formData:', newFormData);
-        return newFormData;
+        return { ...prev, [field]: value };
       });
     }
     
@@ -114,15 +108,15 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     }
   };
 
-  // Nouvelle fonction pour gérer la sélection du véhicule une fois les données chargées
-  const handleVehicleSelection = (vehicleId: string, vehiclesLoaded: boolean) => {
-    console.log('handleVehicleSelection called:', { vehicleId, vehiclesLoaded, pendingVehicleId });
+  // Fonction appelée par le composant QuoteAssignmentSection quand les véhicules sont chargés
+  const onVehiclesLoaded = (vehiclesLoaded: boolean) => {
+    console.log('onVehiclesLoaded called:', { vehiclesLoaded, targetVehicleId, isInitializing });
     
-    if (vehicleId && vehiclesLoaded && isInitialLoad) {
-      console.log('Setting vehicle_id to:', vehicleId);
-      setFormData(prev => ({ ...prev, vehicle_id: vehicleId }));
-      setPendingVehicleId('');
-      setIsInitialLoad(false);
+    if (vehiclesLoaded && targetVehicleId && isInitializing && !formData.vehicle_id) {
+      console.log('Setting vehicle_id to:', targetVehicleId);
+      setFormData(prev => ({ ...prev, vehicle_id: targetVehicleId }));
+      setTargetVehicleId('');
+      setIsInitializing(false);
     }
   };
 
@@ -144,20 +138,20 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     console.log('useEffect triggered with quote:', quote);
     
     if (quote) {
-      console.log('Setting form data from existing quote:', {
+      console.log('Initializing form with quote data:', {
         client_id: quote.client_id,
         vehicle_id: quote.vehicle_id
       });
       
-      // Stocker le vehicle_id en attente pour la sélection ultérieure
-      setPendingVehicleId(quote.vehicle_id || '');
-      setIsInitialLoad(true);
+      // Stocker le vehicle_id cible pour la sélection ultérieure
+      setTargetVehicleId(quote.vehicle_id || '');
+      setIsInitializing(true);
       
-      // Charger d'abord le client_id, puis le vehicle_id sera géré par le composant
+      // Charger immédiatement le client_id pour déclencher le chargement des véhicules
       setFormData({
         reference: quote.reference,
-        client_id: quote.client_id,
-        vehicle_id: '', // On ne définit pas le vehicle_id immédiatement
+        client_id: quote.client_id, // Sélectionner le client immédiatement
+        vehicle_id: '', // Le véhicule sera sélectionné une fois les données chargées
         status: quote.status || 'En attente',
         valid_until: quote.valid_until,
         notes: quote.notes || ''
@@ -195,8 +189,8 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
         reference: `D-${currentYear}-${randomNumber}`
       }));
       setDescription('');
-      setPendingVehicleId('');
-      setIsInitialLoad(false);
+      setTargetVehicleId('');
+      setIsInitializing(false);
     }
   }, [quote]);
 
@@ -207,12 +201,12 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     parts,
     errors,
     isReadOnly,
-    pendingVehicleId,
-    isInitialLoad,
+    targetVehicleId,
+    isInitializing,
     setRepairs,
     setParts,
     handleChange,
-    handleVehicleSelection,
+    onVehiclesLoaded,
     validateForm,
     calculateGlobalTotals,
     prepareSubmitData
