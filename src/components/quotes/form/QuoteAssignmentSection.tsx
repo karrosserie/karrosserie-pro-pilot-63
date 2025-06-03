@@ -45,11 +45,17 @@ export const QuoteAssignmentSection = ({
 
   const handleVehicleChange = (vehicleId: string) => {
     console.log('Vehicle changed to:', vehicleId);
-    onFieldChange('vehicle_id', vehicleId);
+    // Ne pas accepter les valeurs vides ou undefined comme changement valide
+    if (vehicleId && vehicleId.trim() !== '') {
+      onFieldChange('vehicle_id', vehicleId);
+    } else {
+      onFieldChange('vehicle_id', '');
+    }
   };
 
-  // S'assurer que la valeur du véhicule est valide
-  const vehicleValue = formData.vehicle_id && formData.vehicle_id.trim() !== '' ? formData.vehicle_id : undefined;
+  // Déterminer la valeur du véhicule à afficher
+  // Ne pas utiliser undefined car cela peut causer des problèmes avec Radix UI
+  const vehicleValue = formData.vehicle_id || '';
   
   console.log('Vehicle value for Select:', vehicleValue, 'formData.vehicle_id:', formData.vehicle_id);
 
@@ -69,7 +75,7 @@ export const QuoteAssignmentSection = ({
           <div>
             <Label htmlFor="client_id">Client</Label>
             <Select
-              value={formData.client_id || undefined}
+              value={formData.client_id || ''}
               onValueChange={handleClientChange}
               disabled={isReadOnly}
             >
