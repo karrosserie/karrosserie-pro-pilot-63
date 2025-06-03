@@ -36,26 +36,24 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
 
   return (
     <TooltipProvider>
-      <div className="rounded-md border">
-        <Table>
-          <ExpertiseReportTableHeader />
-          {reports.length > 0 ? (
-            <TableBody>
-              {reports.map((report) => (
-                <ExpertiseReportTableRow
-                  key={report.id}
-                  report={report}
-                  onViewReport={onViewReport}
-                  onEditReport={onEditReport}
-                  onDeleteReport={onDeleteReport}
-                />
-              ))}
-            </TableBody>
-          ) : (
-            <ExpertiseReportTableEmpty />
-          )}
-        </Table>
-      </div>
+      <Table>
+        <ExpertiseReportTableHeader />
+        {reports.length > 0 ? (
+          <TableBody>
+            {reports.map((report) => (
+              <ExpertiseReportTableRow
+                key={report.id}
+                report={report}
+                onViewReport={onViewReport}
+                onEditReport={onEditReport}
+                onDeleteReport={onDeleteReport}
+              />
+            ))}
+          </TableBody>
+        ) : (
+          <ExpertiseReportTableEmpty />
+        )}
+      </Table>
     </TooltipProvider>
   );
 };
