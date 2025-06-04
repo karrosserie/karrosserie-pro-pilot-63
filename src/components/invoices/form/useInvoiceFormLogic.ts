@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { Invoice } from '@/services/supabase/invoices';
-import { InvoiceRepairItem, InvoicePartItem, GlobalTotals } from './types';
+import { InvoiceRepairItem, InvoicePartItem, InvoiceDiscountItem, GlobalTotals } from './types';
 import { invoicesService } from '@/services/supabase/invoices';
 
 interface UseInvoiceFormLogicProps {
@@ -22,6 +21,7 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
   const [description, setDescription] = useState('');
   const [repairs, setRepairs] = useState<InvoiceRepairItem[]>([]);
   const [parts, setParts] = useState<InvoicePartItem[]>([]);
+  const [discounts, setDiscounts] = useState<InvoiceDiscountItem[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Déterminer si le formulaire est en lecture seule
@@ -102,7 +102,8 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
     const notesData = {
       description,
       repairs,
-      parts
+      parts,
+      discounts
     };
     
     return {
@@ -146,23 +147,32 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
           if (noteData.parts) {
             setParts(noteData.parts);
           }
+          if (noteData.discounts) {
+            setDiscounts(noteData.discounts);
+          }
         } catch (e) {
           console.error('Error parsing invoice notes:', e);
           setDescription('');
           setRepairs([]);
           setParts([]);
+          setDiscounts([]);
         }
       } else {
         setDescription('');
         setRepairs([]);
         setParts([]);
+        setDiscounts([]);
       }
     } else {
+      // Pour une nouvelle facture, définir la date du jour
+      const today = new Date().toISOString().split('T')[0];
+      
       // Générer un numéro automatique pour une nouvelle facture
       generateNextInvoiceNumber().then(nextNumber => {
         setFormData(prev => ({
           ...prev,
-          reference: nextNumber
+          reference: nextNumber,
+          due_date: today
         }));
       });
       setDescription('');
@@ -174,10 +184,12 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
     description,
     repairs,
     parts,
+    discounts,
     errors,
     isReadOnly,
     setRepairs,
     setParts,
+    setDiscounts,
     handleChange,
     validateForm,
     calculateGlobalTotals,

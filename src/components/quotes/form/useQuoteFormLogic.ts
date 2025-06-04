@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Quote } from '@/services/supabase/quotes';
 import { QuoteRepairItem, QuotePartItem, QuoteDiscountItem, GlobalTotals } from './types';
@@ -166,11 +165,15 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
         setDiscounts([]);
       }
     } else {
+      // Pour un nouveau devis, définir la date du jour
+      const today = new Date().toISOString().split('T')[0];
+      
       // Générer un numéro automatique pour un nouveau devis
       generateNextQuoteNumber().then(nextNumber => {
         setFormData(prev => ({
           ...prev,
-          reference: nextNumber
+          reference: nextNumber,
+          valid_until: today
         }));
       });
       setNotes('');

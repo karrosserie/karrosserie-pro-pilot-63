@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { RepairOrderRepairItem, RepairOrderPartItem, GlobalTotals } from './types';
@@ -160,11 +159,15 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
         setParts([]);
       }
     } else {
+      // Pour un nouvel ordre de réparation, définir la date du jour
+      const today = new Date().toISOString().split('T')[0];
+      
       // Générer un numéro automatique pour un nouvel ordre
       generateNextOrderNumber().then(nextNumber => {
         setFormData(prev => ({
           ...prev,
-          reference: nextNumber
+          reference: nextNumber,
+          start_date: today
         }));
       });
       setDescription('');
