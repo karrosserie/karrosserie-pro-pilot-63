@@ -61,6 +61,20 @@ const RepairOrders = () => {
     });
   };
 
+  const handleRequestDocuments = (order: RepairOrder) => {
+    toast({
+      title: "Demande de justificatifs",
+      description: `Demande de justificatifs envoyée pour l'ordre de réparation ${order.reference}`
+    });
+  };
+
+  const handleConvertToInvoice = (order: RepairOrder) => {
+    toast({
+      title: "Conversion en facture",
+      description: `L'ordre de réparation ${order.reference} a été converti en facture`
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="page-container">
@@ -92,7 +106,9 @@ const RepairOrders = () => {
           onDownload: handleDownload,
           onPrint: handlePrint,
           onSendEmail: handleSendEmail,
-          onSignOrder: handleSignOrder
+          onSignOrder: handleSignOrder,
+          onRequestDocuments: handleRequestDocuments,
+          onConvertToInvoice: handleConvertToInvoice
         }}
       />
 
