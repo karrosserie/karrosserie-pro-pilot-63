@@ -22,8 +22,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Printer, Mail, FileCheck, ArrowRight } from 'lucide-react';
-import { signature } from 'lucide-react';
+import { Printer, Mail, FileCheck, ArrowRight, Signature } from 'lucide-react';
 
 const Quotes = () => {
   const { quotes, isLoading, error, deleteQuote } = useQuotes();
@@ -229,7 +228,7 @@ const Quotes = () => {
                           <DropdownMenuSeparator />
                           {quote.status === 'En attente' && (
                             <DropdownMenuItem onClick={() => handleSignQuote(quote)}>
-                              <signature className="mr-2 h-4 w-4" />
+                              <Signature className="mr-2 h-4 w-4" />
                               Signer
                             </DropdownMenuItem>
                           )}
