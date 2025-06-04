@@ -121,7 +121,7 @@ export const InvoiceDiscountsSection = ({
                   <div className="flex-1">
                     <p className="font-medium">{part.description || 'Pièce sans description'}</p>
                     <p className="text-sm text-gray-500">
-                      Réf: {part.reference} - {part.quantity} × {part.unitCost.toFixed(2)} €
+                      {part.quantity} × {part.unitCost.toFixed(2)} €
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
