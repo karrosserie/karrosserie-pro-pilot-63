@@ -77,14 +77,22 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
   };
 
   const handleChange = (field: string, value: any) => {
+    console.log('handleChange called with:', { field, value, isReadOnly });
+    
     if (isReadOnly && field !== 'payment_method' && field !== 'payment_date') {
+      console.log('Blocked change due to readonly mode');
       return; // Empêcher les modifications si en lecture seule
     }
     
     if (field === 'description') {
       setDescription(value);
     } else {
-      setFormData(prev => ({ ...prev, [field]: value }));
+      console.log('Updating formData:', field, value);
+      setFormData(prev => {
+        const newData = { ...prev, [field]: value };
+        console.log('New formData after update:', newData);
+        return newData;
+      });
     }
     
     // Effacer l'erreur quand l'utilisateur commence à taper
