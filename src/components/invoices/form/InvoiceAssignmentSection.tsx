@@ -79,9 +79,9 @@ export const InvoiceAssignmentSection = ({
                     </SelectItem>
                   ))
                 ) : (
-                  <SelectItem value="" disabled>
+                  <div className="px-2 py-1.5 text-sm text-gray-500">
                     {isLoadingClients ? 'Chargement...' : 'Aucun client disponible'}
-                  </SelectItem>
+                  </div>
                 )}
               </SelectContent>
             </Select>
@@ -109,22 +109,28 @@ export const InvoiceAssignmentSection = ({
                 <SelectValue placeholder="Sélectionner un véhicule" />
               </SelectTrigger>
               <SelectContent>
-                {clientVehicles.map((vehicle) => (
-                  <SelectItem key={vehicle.id} value={vehicle.id}>
-                    {vehicle.brand} {vehicle.model} - {vehicle.license_plate}
-                  </SelectItem>
-                ))}
+                {clientVehicles.length > 0 ? (
+                  clientVehicles.map((vehicle) => (
+                    <SelectItem key={vehicle.id} value={vehicle.id}>
+                      {vehicle.brand} {vehicle.model} - {vehicle.license_plate}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <div className="px-2 py-1.5 text-sm text-gray-500">
+                    {!formData.client_id 
+                      ? 'Sélectionnez d\'abord un client'
+                      : isLoadingVehicles 
+                      ? 'Chargement...'
+                      : 'Aucun véhicule trouvé pour ce client'
+                    }
+                  </div>
+                )}
               </SelectContent>
             </Select>
             {errors.vehicle_id && (
               <p className="text-sm text-red-500 mt-1 flex items-center">
                 <AlertCircle className="h-4 w-4 mr-1" />
                 {errors.vehicle_id}
-              </p>
-            )}
-            {formData.client_id && clientVehicles.length === 0 && !isLoadingVehicles && (
-              <p className="text-sm text-gray-500 mt-1">
-                Aucun véhicule trouvé pour ce client
               </p>
             )}
           </div>
