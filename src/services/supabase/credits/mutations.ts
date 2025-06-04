@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Credit, CreditCreateData, CreditUpdateData } from './types';
+import { ensureCreditsTableExists } from './table-utils';
 
 export const createCredit = async (creditData: CreditCreateData): Promise<Credit> => {
   console.log('Creating credit with data:', creditData);
@@ -12,6 +13,9 @@ export const createCredit = async (creditData: CreditCreateData): Promise<Credit
   }
 
   console.log('User authenticated:', user.id);
+
+  // Ensure the credits table exists
+  await ensureCreditsTableExists();
 
   const insertData = {
     user_id: user.id,
@@ -26,7 +30,7 @@ export const createCredit = async (creditData: CreditCreateData): Promise<Credit
   console.log('Inserting data:', insertData);
 
   try {
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from('credits')
       .insert([insertData])
       .select()
@@ -34,7 +38,11 @@ export const createCredit = async (creditData: CreditCreateData): Promise<Credit
 
     if (error) {
       console.error('Supabase insert error:', error);
-      throw error;
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      console.error('Error details:', error.details);
+      console.error('Error hint:', error.hint);
+      throw new Error(`Failed to create credit: ${error.message || 'Unknown error'}`);
     }
 
     console.log('Credit created successfully:', data);
@@ -46,23 +54,29 @@ export const createCredit = async (creditData: CreditCreateData): Promise<Credit
 };
 
 export const updateCredit = async (id: string, creditData: CreditUpdateData): Promise<Credit> => {
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from('credits')
     .update(creditData)
     .eq('id', id)
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('Update credit error:', error);
+    throw new Error(`Failed to update credit: ${error.message || 'Unknown error'}`);
+  }
   return data;
 };
 
 export const deleteCredit = async (id: string): Promise<boolean> => {
-  const { error } = await (supabase as any)
+  const { error } = await supabase
     .from('credits')
     .delete()
     .eq('id', id);
 
-  if (error) throw error;
+  if (error) {
+    console.error('Delete credit error:', error);
+    throw new Error(`Failed to delete credit: ${error.message || 'Unknown error'}`);
+  }
   return true;
 };
