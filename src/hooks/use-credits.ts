@@ -1,10 +1,22 @@
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { creditsService, NewCredit, UpdateCredit } from '@/services/supabase/credits';
+import { useQuery } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 
+// Mock data for now since the credits table doesn't exist yet
+const mockCredits = [
+  {
+    id: '1',
+    reference: '001',
+    created_at: '2024-01-15T10:00:00Z',
+    amount: 250.50,
+    status: 'En attente',
+    invoice_id: 'invoice-1',
+    notes: 'Remboursement partiel',
+    user_id: 'user-1'
+  }
+];
+
 export function useCredits() {
-  const queryClient = useQueryClient();
   const { toast } = useToast();
   
   const {
@@ -13,63 +25,35 @@ export function useCredits() {
     error
   } = useQuery({
     queryKey: ['credits'],
-    queryFn: creditsService.getAll
-  });
-  
-  const createCredit = useMutation({
-    mutationFn: (newCredit: NewCredit) => creditsService.create(newCredit),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['credits'] });
-      toast({
-        title: "Avoir créé",
-        description: "L'avoir a été créé avec succès."
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Erreur",
-        description: `Impossible de créer l'avoir: ${error.message}`,
-        variant: "destructive"
-      });
+    queryFn: async () => {
+      // Simulation d'une requête API
+      await new Promise(resolve => setTimeout(resolve, 500));
+      return mockCredits;
     }
   });
   
-  const updateCredit = useMutation({
-    mutationFn: ({ id, data }: { id: string, data: UpdateCredit }) => 
-      creditsService.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['credits'] });
-      toast({
-        title: "Avoir mis à jour",
-        description: "L'avoir a été mis à jour avec succès."
-      });
+  const createCredit = {
+    mutateAsync: async (creditData: any) => {
+      console.log('Creating credit:', creditData);
+      // Simulation de création
+      return { id: Date.now().toString(), ...creditData };
     },
-    onError: (error) => {
-      toast({
-        title: "Erreur",
-        description: `Impossible de mettre à jour l'avoir: ${error.message}`,
-        variant: "destructive"
-      });
-    }
-  });
+    isPending: false
+  };
   
-  const deleteCredit = useMutation({
-    mutationFn: (id: string) => creditsService.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['credits'] });
-      toast({
-        title: "Avoir supprimé",
-        description: "L'avoir a été supprimé avec succès."
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Erreur",
-        description: `Impossible de supprimer l'avoir: ${error.message}`,
-        variant: "destructive"
-      });
+  const updateCredit = {
+    mutateAsync: async ({ id, data }: { id: string, data: any }) => {
+      console.log('Updating credit:', id, data);
+      return { id, ...data };
     }
-  });
+  };
+  
+  const deleteCredit = {
+    mutateAsync: async (id: string) => {
+      console.log('Deleting credit:', id);
+      return true;
+    }
+  };
   
   return {
     credits,
@@ -88,7 +72,12 @@ export function useCredit(id?: string) {
     error
   } = useQuery({
     queryKey: ['credits', id],
-    queryFn: () => id ? creditsService.getById(id) : null,
+    queryFn: async () => {
+      if (!id) return null;
+      // Simulation d'une requête par ID
+      await new Promise(resolve => setTimeout(resolve, 300));
+      return mockCredits.find(c => c.id === id) || null;
+    },
     enabled: !!id
   });
   

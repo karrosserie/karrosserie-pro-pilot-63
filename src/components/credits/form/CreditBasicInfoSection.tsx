@@ -83,7 +83,7 @@ export const CreditBasicInfoSection = ({
         </div>
 
         <div>
-          <Label htmlFor="invoice_id">Facture *</Label>
+          <Label htmlFor="invoice_id" required>Facture</Label>
           <Select
             value={formData.invoice_id || ''}
             onValueChange={(value) => onFieldChange('invoice_id', value)}
