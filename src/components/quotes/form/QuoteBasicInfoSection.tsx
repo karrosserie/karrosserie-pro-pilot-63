@@ -16,8 +16,13 @@ interface QuoteBasicInfoSectionProps {
 export const QuoteBasicInfoSection = ({ formData, errors, onFieldChange }: QuoteBasicInfoSectionProps) => {
   const statusOptions = [
     { value: 'En attente', label: 'En attente' },
-    { value: 'Accepté', label: 'Accepté' },
-    { value: 'Refusé', label: 'Refusé' }
+    { value: 'En attente de signature', label: 'En attente de signature' },
+    { value: 'Signature annulée', label: 'Signature annulée' },
+    { value: 'Signé', label: 'Signé' },
+    { value: 'Facturé', label: 'Facturé' },
+    { value: 'Refusé', label: 'Refusé' },
+    { value: 'Annulé', label: 'Annulé' },
+    { value: 'Converti', label: 'Converti' }
   ];
 
   return (

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Quote } from '@/services/supabase/quotes';
 import { QuoteRepairItem, QuotePartItem, GlobalTotals } from './types';
@@ -23,7 +22,7 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Déterminer si le formulaire est en lecture seule
-  const isReadOnly = formData.status === 'Accepté' || formData.status === 'Refusé';
+  const isReadOnly = formData.status === 'Facturé' || formData.status === 'Refusé' || formData.status === 'Annulé';
 
   // Calculer les totaux globaux
   const calculateGlobalTotals = (): GlobalTotals => {

@@ -15,6 +15,7 @@ import { useQuotes } from '@/hooks/use-quotes';
 import { useToast } from '@/hooks/use-toast';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import { Quote } from '@/services/supabase/quotes';
+import { StatusBadge } from '@/components/ui/status-badge';
 
 const Quotes = () => {
   const { quotes, isLoading, error, deleteQuote } = useQuotes();
@@ -29,19 +30,6 @@ const Quotes = () => {
     (quote.vehicles?.brand + ' ' + quote.vehicles?.model)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     quote.vehicles?.license_plate?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
-  
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'En attente':
-        return 'bg-amber-100 text-amber-800';
-      case 'Accepté':
-        return 'bg-green-100 text-green-800';
-      case 'Refusé':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   const handleCreateQuote = () => {
     setSelectedQuote(null);
@@ -81,10 +69,10 @@ const Quotes = () => {
             En attente
           </Button>
           <Button variant="outline" size="sm" className="mr-2">
-            Acceptés
+            Signés
           </Button>
           <Button variant="outline" size="sm">
-            Refusés
+            Facturés
           </Button>
         </div>
         
@@ -153,9 +141,7 @@ const Quotes = () => {
                   </TableCell>
                   <TableCell>{quote.amount ? `${quote.amount.toFixed(2)} €` : '-'}</TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(quote.status || 'En attente')}`}>
-                      {quote.status || 'En attente'}
-                    </span>
+                    <StatusBadge status={quote.status || 'En attente'} />
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-1">
