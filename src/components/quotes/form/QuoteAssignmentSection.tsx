@@ -40,8 +40,8 @@ export const QuoteAssignmentSection = ({
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="client_id" className={cn(errors.client_id && "text-red-500")}>
-              Client *
+            <Label htmlFor="client_id" required className={cn(errors.client_id && "text-red-500")}>
+              Client
             </Label>
             <Select
               value={formData.client_id || ''}

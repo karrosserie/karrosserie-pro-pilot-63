@@ -18,8 +18,8 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="lastName">
-            Nom <span className="text-red-500">*</span>
+          <Label htmlFor="lastName" required>
+            Nom
           </Label>
           <Input
             id="lastName"
@@ -32,8 +32,8 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="firstName">
-            Prénom <span className="text-red-500">*</span>
+          <Label htmlFor="firstName" required>
+            Prénom
           </Label>
           <Input
             id="firstName"
@@ -60,8 +60,8 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="phone">
-            Téléphone <span className="text-red-500">*</span>
+          <Label htmlFor="phone" required>
+            Téléphone
           </Label>
           <Input
             id="phone"
@@ -86,8 +86,8 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="address">
-          Adresse <span className="text-red-500">*</span>
+        <Label htmlFor="address" required>
+          Adresse
         </Label>
         <Input
           id="address"
@@ -101,8 +101,8 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="zipCode">
-            Code postal <span className="text-red-500">*</span>
+          <Label htmlFor="zipCode" required>
+            Code postal
           </Label>
           <Input
             id="zipCode"
@@ -115,8 +115,8 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="city">
-            Ville <span className="text-red-500">*</span>
+          <Label htmlFor="city" required>
+            Ville
           </Label>
           <Input
             id="city"
