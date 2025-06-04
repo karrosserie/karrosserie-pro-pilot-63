@@ -91,13 +91,6 @@ export const QuoteForm = ({
         isLoadingClients={isLoadingClients}
       />
 
-      <QuoteDetailsSection 
-        notes={notes}
-        onFieldChange={handleChange}
-        globalTotals={globalTotals}
-        isReadOnly={isReadOnly}
-      />
-
       <QuoteRepairsSection 
         repairs={repairs}
         onRepairsChange={setRepairs}
@@ -113,6 +106,13 @@ export const QuoteForm = ({
       <QuoteDiscountsSection 
         discounts={discounts}
         onDiscountsChange={setDiscounts}
+        isReadOnly={isReadOnly}
+      />
+
+      <QuoteDetailsSection 
+        notes={notes}
+        onFieldChange={handleChange}
+        globalTotals={globalTotals}
         isReadOnly={isReadOnly}
       />
 
