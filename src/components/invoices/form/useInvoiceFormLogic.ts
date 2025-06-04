@@ -28,7 +28,14 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Déterminer si le formulaire est en lecture seule
-  const isReadOnly = formData.payment_date !== null || formData.status === 'Envoyé';
+  const isReadOnly = Boolean(invoice && (formData.payment_date !== null || formData.status === 'Envoyé'));
+
+  console.log('isReadOnly calculation:', {
+    hasInvoice: !!invoice,
+    payment_date: formData.payment_date,
+    status: formData.status,
+    isReadOnly
+  });
 
   // Calculer les totaux globaux
   const calculateGlobalTotals = (): GlobalTotals => {
