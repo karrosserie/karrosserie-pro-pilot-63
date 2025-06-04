@@ -8,12 +8,14 @@ export function useCredits() {
   const queryClient = useQueryClient();
   
   const {
-    data: credits,
+    data: credits = [],
     isLoading,
     error
   } = useQuery({
     queryKey: ['credits'],
-    queryFn: creditsService.getCredits
+    queryFn: creditsService.getCredits,
+    retry: false,
+    staleTime: 1000 * 60 * 5
   });
   
   const createCredit = useMutation({
@@ -25,13 +27,21 @@ export function useCredits() {
         description: "L'avoir a été créé avec succès.",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error creating credit:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer l'avoir.",
-        variant: "destructive"
-      });
+      if (error?.code === '42P01') {
+        toast({
+          title: "Table manquante",
+          description: "La table des avoirs n'existe pas encore. Veuillez exécuter les migrations de base de données.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Erreur",
+          description: "Impossible de créer l'avoir.",
+          variant: "destructive"
+        });
+      }
     }
   });
   
@@ -45,7 +55,7 @@ export function useCredits() {
         description: "L'avoir a été modifié avec succès.",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error updating credit:', error);
       toast({
         title: "Erreur",
@@ -64,7 +74,7 @@ export function useCredits() {
         description: "L'avoir a été supprimé avec succès.",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error deleting credit:', error);
       toast({
         title: "Erreur",
@@ -77,7 +87,8 @@ export function useCredits() {
   const generateReference = useQuery({
     queryKey: ['credits', 'generate-reference'],
     queryFn: creditsService.generateReference,
-    enabled: false
+    enabled: false,
+    retry: false
   });
   
   return {
@@ -99,7 +110,8 @@ export function useCredit(id?: string) {
   } = useQuery({
     queryKey: ['credits', id],
     queryFn: () => creditsService.getCredit(id!),
-    enabled: !!id
+    enabled: !!id,
+    retry: false
   });
   
   return {

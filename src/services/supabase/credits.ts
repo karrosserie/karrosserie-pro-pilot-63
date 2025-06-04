@@ -56,10 +56,31 @@ export interface CreditUpdate {
   notes?: string | null;
 }
 
+const checkTableExists = async (): Promise<boolean> => {
+  try {
+    const { error } = await (supabase as any)
+      .from('credits')
+      .select('id')
+      .limit(1);
+    
+    return !error || error.code !== '42P01';
+  } catch (error: any) {
+    return error?.code !== '42P01';
+  }
+};
+
 export const creditsService = {
   // Get all credits for the current user
   async getCredits(): Promise<Credit[]> {
     console.log('Fetching credits...');
+    
+    // Check if table exists first
+    const tableExists = await checkTableExists();
+    if (!tableExists) {
+      console.warn('Credits table does not exist yet');
+      return [];
+    }
+
     try {
       // Utilisation de any pour contourner les erreurs de types
       const { data, error } = await (supabase as any)
@@ -212,6 +233,14 @@ export const creditsService = {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
+      // Check if table exists first
+      const tableExists = await checkTableExists();
+      if (!tableExists) {
+        console.warn('Credits table does not exist, generating default reference');
+        const currentYear = new Date().getFullYear();
+        return `AV${currentYear}-001`;
+      }
+
       const { data, error } = await (supabase as any)
         .from('credits')
         .select('reference')
@@ -219,7 +248,11 @@ export const creditsService = {
         .order('created_at', { ascending: false })
         .limit(1);
 
-      if (error) throw error;
+      if (error) {
+        console.warn('Error fetching last reference, generating default:', error);
+        const currentYear = new Date().getFullYear();
+        return `AV${currentYear}-001`;
+      }
 
       if (data && data.length > 0) {
         const lastReference = data[0].reference;

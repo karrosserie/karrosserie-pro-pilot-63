@@ -80,7 +80,7 @@ const Credits = () => {
   const [selectedCredit, setSelectedCredit] = useState<any>(null);
   const { toast } = useToast();
   
-  const { credits = [], isLoading, deleteCredit } = useCredits();
+  const { credits = [], isLoading, deleteCredit, error } = useCredits();
   
   const filteredCredits = credits.filter(credit => 
     credit.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -118,6 +118,15 @@ const Credits = () => {
   };
   
   const handleCreateCredit = () => {
+    // Check if there's an error indicating missing table
+    if (error && (error as any)?.code === '42P01') {
+      toast({
+        title: "Table manquante",
+        description: "La table des avoirs n'existe pas encore. Veuillez exécuter la migration de base de données.",
+        variant: "destructive"
+      });
+      return;
+    }
     setIsDialogOpen(true);
   };
 
@@ -184,6 +193,32 @@ const Credits = () => {
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-karrosserie-orange mx-auto mb-4"></div>
             <p className="text-gray-600">Chargement des avoirs...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error message if table doesn't exist
+  if (error && (error as any)?.code === '42P01') {
+    return (
+      <div className="page-container">
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Avoirs</h1>
+          <p className="text-gray-600 mt-1">
+            Consultez et gérez les avoirs émis pour vos clients.
+          </p>
+        </div>
+        
+        <div className="card-container">
+          <div className="flex flex-col items-center justify-center py-12">
+            <FileText className="h-16 w-16 text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Table des avoirs non trouvée</h3>
+            <p className="text-gray-500 text-center max-w-md">
+              La table des avoirs n'existe pas encore dans votre base de données. 
+              Veuillez exécuter la migration <code>013_create_credits_table.sql</code> 
+              dans votre dashboard Supabase.
+            </p>
           </div>
         </div>
       </div>
