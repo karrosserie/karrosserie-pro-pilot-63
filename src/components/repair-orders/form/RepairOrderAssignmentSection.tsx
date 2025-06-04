@@ -3,18 +3,15 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Car } from 'lucide-react';
+import { Users, AlertCircle } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
-import { useClientVehicles } from '@/hooks/use-vehicles';
-
-interface Client {
-  id: string;
-  first_name: string;
-  last_name: string;
-}
+import { Client } from '@/services/supabase/clients';
+import { useVehicles } from '@/hooks/use-vehicles';
+import { cn } from '@/lib/utils';
 
 interface RepairOrderAssignmentSectionProps {
   formData: Partial<RepairOrder>;
+  errors: Record<string, string>;
   onFieldChange: (field: string, value: any) => void;
   clientOptions: Client[];
   isLoadingClients: boolean;
@@ -22,16 +19,21 @@ interface RepairOrderAssignmentSectionProps {
 
 export const RepairOrderAssignmentSection = ({
   formData,
+  errors,
   onFieldChange,
   clientOptions,
   isLoadingClients
 }: RepairOrderAssignmentSectionProps) => {
-  const isReadOnly = formData.status === 'Terminé';
+  const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
   
-  const { vehicles: clientVehicles, isLoading: isLoadingClientVehicles } = useClientVehicles(formData.client_id || undefined);
+  // Filtrer les véhicules pour le client sélectionné
+  const clientVehicles = vehicles?.filter(vehicle => 
+    vehicle.client_id === formData.client_id
+  ) || [];
 
   const handleClientChange = (clientId: string) => {
     onFieldChange('client_id', clientId);
+    // Réinitialiser le véhicule quand on change de client
     onFieldChange('vehicle_id', null);
   };
 
@@ -40,23 +42,28 @@ export const RepairOrderAssignmentSection = ({
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center text-lg">
           <Users className="h-5 w-5 mr-2" />
-          Assignation
+          Attribution
         </CardTitle>
         <CardDescription>
-          Client et véhicule concernés par l'ordre de réparation
+          Sélectionnez le client et le véhicule concernés
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="client_id">Client</Label>
+            <Label htmlFor="client_id" required>Client</Label>
             <Select
-              value={formData.client_id || undefined}
+              value={formData.client_id || ''}
               onValueChange={handleClientChange}
-              disabled={isReadOnly}
+              disabled={isLoadingClients}
             >
-              <SelectTrigger id="client_id">
-                <SelectValue placeholder={isLoadingClients ? "Chargement..." : "Sélectionner un client"} />
+              <SelectTrigger 
+                id="client_id"
+                className={cn(
+                  errors.client_id && "border-red-500 focus-visible:ring-red-500"
+                )}
+              >
+                <SelectValue placeholder="Sélectionner un client" />
               </SelectTrigger>
               <SelectContent>
                 {clientOptions.map((client) => (
@@ -66,43 +73,48 @@ export const RepairOrderAssignmentSection = ({
                 ))}
               </SelectContent>
             </Select>
+            {errors.client_id && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.client_id}
+              </p>
+            )}
           </div>
 
           <div>
             <Label htmlFor="vehicle_id">Véhicule</Label>
             <Select
-              value={formData.vehicle_id || undefined}
-              onValueChange={(value) => onFieldChange('vehicle_id', value || null)}
-              disabled={isReadOnly || !formData.client_id}
+              value={formData.vehicle_id || ''}
+              onValueChange={(value) => onFieldChange('vehicle_id', value)}
+              disabled={!formData.client_id || isLoadingVehicles}
             >
-              <SelectTrigger id="vehicle_id">
-                <SelectValue 
-                  placeholder={
-                    !formData.client_id 
-                      ? "Sélectionner d'abord un client" 
-                      : isLoadingClientVehicles 
-                        ? "Chargement..." 
-                        : "Sélectionner un véhicule"
-                  } 
-                />
+              <SelectTrigger 
+                id="vehicle_id"
+                className={cn(
+                  errors.vehicle_id && "border-red-500 focus-visible:ring-red-500"
+                )}
+              >
+                <SelectValue placeholder="Sélectionner un véhicule" />
               </SelectTrigger>
               <SelectContent>
-                {clientVehicles && clientVehicles.length > 0 ? (
-                  clientVehicles.map((vehicle) => (
-                    <SelectItem key={vehicle.id} value={vehicle.id}>
-                      <div className="flex items-center">
-                        <Car className="h-4 w-4 mr-2" />
-                        {vehicle.brand} {vehicle.model} - {vehicle.license_plate}
-                      </div>
-                    </SelectItem>
-                  ))
-                ) : formData.client_id && !isLoadingClientVehicles ? (
-                  <SelectItem value="no-vehicles" disabled>
-                    Aucun véhicule trouvé pour ce client
+                {clientVehicles.map((vehicle) => (
+                  <SelectItem key={vehicle.id} value={vehicle.id}>
+                    {vehicle.brand} {vehicle.model} - {vehicle.license_plate}
                   </SelectItem>
-                ) : null}
+                ))}
               </SelectContent>
             </Select>
+            {errors.vehicle_id && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.vehicle_id}
+              </p>
+            )}
+            {formData.client_id && clientVehicles.length === 0 && !isLoadingVehicles && (
+              <p className="text-sm text-gray-500 mt-1">
+                Aucun véhicule trouvé pour ce client
+              </p>
+            )}
           </div>
         </div>
       </CardContent>

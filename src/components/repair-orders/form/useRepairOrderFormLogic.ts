@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { RepairOrderRepairItem, RepairOrderPartItem, GlobalTotals } from './types';
 import { repairOrdersService } from '@/services/supabase/repair-orders';
+import { validateRepairOrderForm } from './utils/validation';
 
 interface UseRepairOrderFormLogicProps {
   order?: RepairOrder | null;
@@ -69,18 +69,9 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
   };
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    
-    if (!formData.reference?.trim()) {
-      newErrors.reference = "Le numéro de l'ordre de réparation est obligatoire";
-    }
-    
-    if (!formData.client_id) {
-      newErrors.client_id = 'Le client est obligatoire';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const validationResult = validateRepairOrderForm(formData, claimNumber, currentMileage);
+    setErrors(validationResult.errors);
+    return validationResult.isValid;
   };
 
   const handleChange = (field: string, value: any) => {
@@ -103,12 +94,22 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
   const handleClaimNumberChange = (value: string) => {
     if (!isReadOnly) {
       setClaimNumber(value);
+      console.log('Claim number changed to:', value);
+      // Effacer l'erreur quand l'utilisateur modifie le champ
+      if (errors.claim_number) {
+        setErrors(prev => ({ ...prev, claim_number: '' }));
+      }
     }
   };
 
   const handleCurrentMileageChange = (value: string) => {
     if (!isReadOnly) {
       setCurrentMileage(value);
+      console.log('Current mileage changed to:', value);
+      // Effacer l'erreur quand l'utilisateur modifie le champ
+      if (errors.current_mileage) {
+        setErrors(prev => ({ ...prev, current_mileage: '' }));
+      }
     }
   };
 
