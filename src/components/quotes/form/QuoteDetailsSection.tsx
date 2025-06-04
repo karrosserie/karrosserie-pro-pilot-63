@@ -17,7 +17,19 @@ export const QuoteDetailsSection = ({ notes, onFieldChange, globalTotals, isRead
   return (
     <Card>
       <CardContent className="space-y-4 pt-6">
-        <div>
+        {/* Totaux globaux */}
+        <div className="space-y-2">
+          <div className="flex justify-end space-x-8 text-sm">
+            <div>Sous-total : <span className="font-medium">{globalTotals.subTotal.toFixed(2)} €</span></div>
+            <div>TVA : <span className="font-medium">{globalTotals.totalVat.toFixed(2)} €</span></div>
+            <div>Remises totales : <span className="font-medium">{globalTotals.totalDiscount.toFixed(2)} €</span></div>
+          </div>
+          <div className="flex justify-end text-lg font-bold">
+            Total : <span className="ml-2">{globalTotals.total.toFixed(2)} €</span>
+          </div>
+        </div>
+
+        <div className="border-t pt-4">
           <Label htmlFor="notes">Notes</Label>
           <Textarea
             id="notes"
@@ -27,18 +39,6 @@ export const QuoteDetailsSection = ({ notes, onFieldChange, globalTotals, isRead
             rows={4}
             readOnly={isReadOnly}
           />
-        </div>
-
-        {/* Totaux globaux */}
-        <div className="border-t pt-4 space-y-2">
-          <div className="flex justify-end space-x-8 text-sm">
-            <div>Sous-total : <span className="font-medium">{globalTotals.subTotal.toFixed(2)} €</span></div>
-            <div>TVA : <span className="font-medium">{globalTotals.totalVat.toFixed(2)} €</span></div>
-            <div>Remises totales : <span className="font-medium">{globalTotals.totalDiscount.toFixed(2)} €</span></div>
-          </div>
-          <div className="flex justify-end text-lg font-bold">
-            Total : <span className="ml-2">{globalTotals.total.toFixed(2)} €</span>
-          </div>
         </div>
       </CardContent>
     </Card>
