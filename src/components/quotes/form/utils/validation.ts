@@ -18,6 +18,11 @@ export const validateQuoteForm = (
     console.log('Client error detected');
   }
 
+  if (!formData.vehicle_id) {
+    newErrors.vehicle_id = 'Le véhicule est obligatoire';
+    console.log('Vehicle error detected');
+  }
+
   if (!formData.valid_until) {
     newErrors.valid_until = 'La date de validité est obligatoire';
     console.log('Valid until error detected');

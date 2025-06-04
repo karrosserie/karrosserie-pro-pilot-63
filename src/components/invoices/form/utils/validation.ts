@@ -18,6 +18,11 @@ export const validateInvoiceForm = (
     console.log('Client error detected');
   }
 
+  if (!formData.vehicle_id) {
+    newErrors.vehicle_id = 'Le véhicule est obligatoire';
+    console.log('Vehicle error detected');
+  }
+
   // Validation pour les nouveaux champs
   if (claimNumber && claimNumber.trim().length > 0 && claimNumber.trim().length < 3) {
     newErrors.claim_number = 'Le numéro de sinistre doit contenir au moins 3 caractères';

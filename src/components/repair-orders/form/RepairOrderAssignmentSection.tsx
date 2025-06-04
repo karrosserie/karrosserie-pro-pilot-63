@@ -82,7 +82,7 @@ export const RepairOrderAssignmentSection = ({
           </div>
 
           <div>
-            <Label htmlFor="vehicle_id">Véhicule</Label>
+            <Label htmlFor="vehicle_id" required>Véhicule</Label>
             <Select
               value={formData.vehicle_id || ''}
               onValueChange={(value) => onFieldChange('vehicle_id', value)}

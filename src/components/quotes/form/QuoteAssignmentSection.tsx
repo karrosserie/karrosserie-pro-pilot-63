@@ -112,7 +112,7 @@ export const QuoteAssignmentSection = ({
           </div>
 
           <div>
-            <Label htmlFor="vehicle_id" className={cn(errors.vehicle_id && "text-red-500")}>
+            <Label htmlFor="vehicle_id" required className={cn(errors.vehicle_id && "text-red-500")}>
               Véhicule
             </Label>
             <Select

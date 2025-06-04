@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useClients } from '@/hooks/use-clients';
@@ -90,6 +91,7 @@ export const InvoiceForm = ({
 
       <InvoiceAssignmentSection 
         formData={formData}
+        errors={errors}
         onFieldChange={handleChange}
         clientOptions={clientOptions}
         isLoadingClients={isLoadingClients}
