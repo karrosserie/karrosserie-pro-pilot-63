@@ -19,6 +19,9 @@ export const RepairOrderBasicInfoSection = ({ formData, errors, onFieldChange }:
     { value: 'En attente de pièces', label: 'En attente de pièces' },
     { value: 'Terminé', label: 'Terminé' },
     { value: 'En attente', label: 'En attente' },
+    { value: 'En attente de signature', label: 'En attente de signature' },
+    { value: 'Signature annulée', label: 'Signature annulée' },
+    { value: 'Signé', label: 'Signé' },
     { value: 'Annulé', label: 'Annulé' }
   ];
 
