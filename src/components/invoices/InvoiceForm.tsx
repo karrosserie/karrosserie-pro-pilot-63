@@ -8,6 +8,7 @@ import { InvoiceAssignmentSection } from './form/InvoiceAssignmentSection';
 import { InvoiceRepairsSection } from './form/InvoiceRepairsSection';
 import { InvoicePartsSection } from './form/InvoicePartsSection';
 import { InvoiceDiscountsSection } from './form/InvoiceDiscountsSection';
+import { InvoiceGlobalDiscountsSection } from './form/InvoiceGlobalDiscountsSection';
 import { InvoiceDetailsSection } from './form/InvoiceDetailsSection';
 import { InvoiceFormActions } from './form/InvoiceFormActions';
 import { useInvoiceFormLogic } from './form/useInvoiceFormLogic';
@@ -33,12 +34,14 @@ export const InvoiceForm = ({
     description,
     repairs,
     parts,
+    discounts,
     errors,
     isReadOnly,
     claimNumber,
     currentMileage,
     setRepairs,
     setParts,
+    setDiscounts,
     handleChange,
     handleClaimNumberChange,
     handleCurrentMileageChange,
@@ -114,6 +117,12 @@ export const InvoiceForm = ({
         parts={parts}
         onRepairsChange={setRepairs}
         onPartsChange={setParts}
+        isReadOnly={isReadOnly}
+      />
+
+      <InvoiceGlobalDiscountsSection
+        discounts={discounts}
+        onDiscountsChange={setDiscounts}
         isReadOnly={isReadOnly}
       />
 

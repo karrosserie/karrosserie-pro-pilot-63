@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
-import { RepairOrderRepairItem, RepairOrderPartItem, GlobalTotals } from './types';
+import { RepairOrderRepairItem, RepairOrderPartItem, RepairOrderDiscountItem, GlobalTotals } from './types';
 import { repairOrdersService } from '@/services/supabase/repair-orders';
 import { validateRepairOrderForm } from './utils/validation';
 
@@ -25,6 +26,7 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
   const [currentMileage, setCurrentMileage] = useState('');
   const [repairs, setRepairs] = useState<RepairOrderRepairItem[]>([]);
   const [parts, setParts] = useState<RepairOrderPartItem[]>([]);
+  const [discounts, setDiscounts] = useState<RepairOrderDiscountItem[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Déterminer si le formulaire est en lecture seule
@@ -60,11 +62,13 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
       };
     }, { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 });
 
+    const globalDiscounts = discounts.reduce((sum, discount) => sum + discount.amount, 0);
+
     return {
       subTotal: repairTotals.subTotal + partTotals.subTotal,
       totalVat: repairTotals.totalVat + partTotals.totalVat,
-      totalDiscount: repairTotals.totalDiscount + partTotals.totalDiscount,
-      total: repairTotals.total + partTotals.total
+      totalDiscount: repairTotals.totalDiscount + partTotals.totalDiscount + globalDiscounts,
+      total: repairTotals.total + partTotals.total - globalDiscounts
     };
   };
 
@@ -120,7 +124,8 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
       claimNumber,
       currentMileage,
       repairs,
-      parts
+      parts,
+      discounts
     };
     
     return {
@@ -167,6 +172,9 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
           if (noteData.parts) {
             setParts(noteData.parts);
           }
+          if (noteData.discounts) {
+            setDiscounts(noteData.discounts);
+          }
         } catch (e) {
           console.error('Error parsing order notes:', e);
           setDescription('');
@@ -174,6 +182,7 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
           setCurrentMileage('');
           setRepairs([]);
           setParts([]);
+          setDiscounts([]);
         }
       } else {
         setDescription('');
@@ -181,6 +190,7 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
         setCurrentMileage('');
         setRepairs([]);
         setParts([]);
+        setDiscounts([]);
       }
     } else {
       // Pour un nouvel ordre de réparation, définir la date du jour
@@ -207,10 +217,12 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
     currentMileage,
     repairs,
     parts,
+    discounts,
     errors,
     isReadOnly,
     setRepairs,
     setParts,
+    setDiscounts,
     handleChange,
     handleClaimNumberChange,
     handleCurrentMileageChange,

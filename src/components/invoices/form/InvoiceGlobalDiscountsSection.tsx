@@ -4,18 +4,18 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Percent, Plus, Trash2 } from 'lucide-react';
-import { RepairOrderDiscountItem } from './types';
+import { InvoiceDiscountItem } from './types';
 
-interface RepairOrderDiscountsSectionProps {
-  discounts: RepairOrderDiscountItem[];
-  onDiscountsChange: (discounts: RepairOrderDiscountItem[]) => void;
+interface InvoiceGlobalDiscountsSectionProps {
+  discounts: InvoiceDiscountItem[];
+  onDiscountsChange: (discounts: InvoiceDiscountItem[]) => void;
   isReadOnly?: boolean;
 }
 
-export const RepairOrderDiscountsSection = ({ discounts, onDiscountsChange, isReadOnly = false }: RepairOrderDiscountsSectionProps) => {
+export const InvoiceGlobalDiscountsSection = ({ discounts, onDiscountsChange, isReadOnly = false }: InvoiceGlobalDiscountsSectionProps) => {
   const addDiscount = () => {
     if (isReadOnly) return;
-    const newDiscount: RepairOrderDiscountItem = {
+    const newDiscount: InvoiceDiscountItem = {
       id: `discount_${Date.now()}`,
       description: '',
       amount: 0
@@ -28,7 +28,7 @@ export const RepairOrderDiscountsSection = ({ discounts, onDiscountsChange, isRe
     onDiscountsChange(discounts.filter(discount => discount.id !== id));
   };
 
-  const updateDiscount = (id: string, field: keyof RepairOrderDiscountItem, value: string | number) => {
+  const updateDiscount = (id: string, field: keyof InvoiceDiscountItem, value: string | number) => {
     if (isReadOnly) return;
     const updatedDiscounts = discounts.map(discount => {
       if (discount.id === id) {
@@ -49,7 +49,7 @@ export const RepairOrderDiscountsSection = ({ discounts, onDiscountsChange, isRe
           Remises
         </CardTitle>
         <CardDescription>
-          Remises appliquées à l'ordre de réparation
+          Remises appliquées à la facture
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

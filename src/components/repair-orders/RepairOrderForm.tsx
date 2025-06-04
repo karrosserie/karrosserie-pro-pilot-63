@@ -33,12 +33,14 @@ export const RepairOrderForm = ({
     description,
     repairs,
     parts,
+    discounts,
     errors,
     isReadOnly,
     claimNumber,
     currentMileage,
     setRepairs,
     setParts,
+    setDiscounts,
     handleChange,
     handleClaimNumberChange,
     handleCurrentMileageChange,
@@ -110,10 +112,8 @@ export const RepairOrderForm = ({
       />
 
       <RepairOrderDiscountsSection
-        repairs={repairs}
-        parts={parts}
-        onRepairsChange={setRepairs}
-        onPartsChange={setParts}
+        discounts={discounts}
+        onDiscountsChange={setDiscounts}
         isReadOnly={isReadOnly}
       />
 

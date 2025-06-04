@@ -20,6 +20,12 @@ export interface RepairOrderPartItem {
   total: number;
 }
 
+export interface RepairOrderDiscountItem {
+  id: string;
+  description: string;
+  amount: number;
+}
+
 export interface GlobalTotals {
   subTotal: number;
   totalVat: number;

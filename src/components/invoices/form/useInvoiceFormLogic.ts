@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Invoice } from '@/services/supabase/invoices';
 import { InvoiceRepairItem, InvoicePartItem, InvoiceDiscountItem, GlobalTotals } from './types';
@@ -13,9 +14,10 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
     reference: '',
     client_id: null,
     vehicle_id: null,
-    status: 'En attente',
+    status: 'Brouillon',
+    issue_date: null,
     due_date: null,
-    payment_method: null,
+    payment_status: 'En attente',
     notes: ''
   });
 
@@ -28,7 +30,7 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Déterminer si le formulaire est en lecture seule
-  const isReadOnly = formData.status === 'Payée' || formData.status === 'Annulée';
+  const isReadOnly = formData.payment_status === 'Payé' || formData.status === 'Envoyé';
 
   // Calculer les totaux globaux
   const calculateGlobalTotals = (): GlobalTotals => {
@@ -60,11 +62,13 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
       };
     }, { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 });
 
+    const globalDiscounts = discounts.reduce((sum, discount) => sum + discount.amount, 0);
+
     return {
       subTotal: repairTotals.subTotal + partTotals.subTotal,
       totalVat: repairTotals.totalVat + partTotals.totalVat,
-      totalDiscount: repairTotals.totalDiscount + partTotals.totalDiscount,
-      total: repairTotals.total + partTotals.total
+      totalDiscount: repairTotals.totalDiscount + partTotals.totalDiscount + globalDiscounts,
+      total: repairTotals.total + partTotals.total - globalDiscounts
     };
   };
 
@@ -75,7 +79,7 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
   };
 
   const handleChange = (field: string, value: any) => {
-    if (isReadOnly && field !== 'status') {
+    if (isReadOnly && field !== 'payment_status') {
       return; // Empêcher les modifications si en lecture seule
     }
     
@@ -148,9 +152,10 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
         reference: invoice.reference,
         client_id: invoice.client_id,
         vehicle_id: invoice.vehicle_id,
-        status: invoice.status || 'En attente',
+        status: invoice.status || 'Brouillon',
+        issue_date: invoice.issue_date,
         due_date: invoice.due_date,
-        payment_method: invoice.payment_method,
+        payment_status: invoice.payment_status || 'En attente',
         notes: invoice.notes || ''
       });
       
@@ -190,13 +195,16 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
     } else {
       // Pour une nouvelle facture, définir la date du jour
       const today = new Date().toISOString().split('T')[0];
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 30); // 30 jours pour l'échéance
       
       // Générer un numéro automatique pour une nouvelle facture
       generateNextInvoiceNumber().then(nextNumber => {
         setFormData(prev => ({
           ...prev,
           reference: nextNumber,
-          due_date: today
+          issue_date: today,
+          due_date: dueDate.toISOString().split('T')[0]
         }));
       });
       setDescription('');
