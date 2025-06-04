@@ -66,6 +66,7 @@ export const QuoteForm = ({
     
     if (!validationResult.isValid) {
       console.log('Validation failed - showing toast');
+      console.log('About to pass errors to components:', validationResult.errors);
       toast({
         title: "Erreur de validation",
         description: "Veuillez corriger les erreurs dans le formulaire.",

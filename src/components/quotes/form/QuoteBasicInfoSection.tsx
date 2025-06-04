@@ -27,6 +27,11 @@ export const QuoteBasicInfoSection = ({
   onClaimNumberChange,
   onCurrentMileageChange
 }: QuoteBasicInfoSectionProps) => {
+  // Log pour déboguer les erreurs reçues
+  console.log('QuoteBasicInfoSection - Errors received:', errors);
+  console.log('QuoteBasicInfoSection - client_id error:', errors.client_id);
+  console.log('QuoteBasicInfoSection - formData.client_id:', formData.client_id);
+
   const statusOptions = [
     { value: 'En attente', label: 'En attente' },
     { value: 'Facturé', label: 'Facturé' },
@@ -49,7 +54,9 @@ export const QuoteBasicInfoSection = ({
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <Label htmlFor="reference">Numéro *</Label>
+            <Label htmlFor="reference" className={cn(errors.reference && "text-red-500")}>
+              Numéro *
+            </Label>
             <Input
               id="reference"
               value={formData.reference || ''}
