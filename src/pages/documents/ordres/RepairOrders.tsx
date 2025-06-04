@@ -7,11 +7,14 @@ import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
+import { DocumentContextMenu } from '@/components/ui/document-context-menu';
+import { useToast } from '@/hooks/use-toast';
 
 const RepairOrders = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<RepairOrder | null>(null);
+  const { toast } = useToast();
   
   const { orders, isLoading, error } = useRepairOrders();
   
@@ -29,6 +32,27 @@ const RepairOrders = () => {
   const handleEditOrder = (order: RepairOrder) => {
     setSelectedOrder(order);
     setDialogOpen(true);
+  };
+
+  const handleDownload = (order: RepairOrder) => {
+    toast({
+      title: "Téléchargement",
+      description: `Téléchargement de l'ordre de réparation ${order.reference}...`
+    });
+  };
+
+  const handlePrint = (order: RepairOrder) => {
+    toast({
+      title: "Impression",
+      description: `Impression de l'ordre de réparation ${order.reference}...`
+    });
+  };
+
+  const handleSendEmail = (order: RepairOrder) => {
+    toast({
+      title: "Envoi par e-mail",
+      description: `Envoi de l'ordre de réparation ${order.reference} par e-mail...`
+    });
   };
 
   if (isLoading) {
@@ -58,6 +82,11 @@ const RepairOrders = () => {
       <RepairOrdersTable
         orders={filteredOrders}
         onEditOrder={handleEditOrder}
+        contextMenuProps={{
+          onDownload: handleDownload,
+          onPrint: handlePrint,
+          onSendEmail: handleSendEmail
+        }}
       />
 
       <RepairOrderDialog

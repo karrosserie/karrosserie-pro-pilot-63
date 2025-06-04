@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import { Quote } from '@/services/supabase/quotes';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { DocumentContextMenu } from '@/components/ui/document-context-menu';
 
 const Quotes = () => {
   const { quotes, isLoading, error, deleteQuote } = useQuotes();
@@ -49,6 +50,27 @@ const Quotes = () => {
         console.error('Error deleting quote:', error);
       }
     }
+  };
+
+  const handleDownload = (quote: Quote) => {
+    toast({
+      title: "Téléchargement",
+      description: `Téléchargement du devis ${quote.reference}...`
+    });
+  };
+
+  const handlePrint = (quote: Quote) => {
+    toast({
+      title: "Impression",
+      description: `Impression du devis ${quote.reference}...`
+    });
+  };
+
+  const handleSendEmail = (quote: Quote) => {
+    toast({
+      title: "Envoi par e-mail",
+      description: `Envoi du devis ${quote.reference} par e-mail...`
+    });
   };
   
   return (
@@ -129,37 +151,44 @@ const Quotes = () => {
               </TableRow>
             ) : filteredQuotes.length > 0 ? (
               filteredQuotes.map((quote) => (
-                <TableRow key={quote.id}>
-                  <TableCell className="font-medium">{quote.reference}</TableCell>
-                  <TableCell>{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
-                  <TableCell>{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
-                  <TableCell>
-                    {quote.vehicles 
-                      ? `${quote.vehicles.brand} ${quote.vehicles.model} - ${quote.vehicles.license_plate}` 
-                      : '-'
-                    }
-                  </TableCell>
-                  <TableCell>{quote.amount ? `${quote.amount.toFixed(2)} €` : '-'}</TableCell>
-                  <TableCell>
-                    <StatusBadge status={quote.status || 'En attente'} />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1">
-                      <Button variant="ghost" size="icon">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleEditQuote(quote)}>
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700" onClick={() => handleDeleteQuote(quote.id)}>
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <DocumentContextMenu
+                  key={quote.id}
+                  onDownload={() => handleDownload(quote)}
+                  onPrint={() => handlePrint(quote)}
+                  onSendEmail={() => handleSendEmail(quote)}
+                >
+                  <TableRow>
+                    <TableCell className="font-medium">{quote.reference}</TableCell>
+                    <TableCell>{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
+                    <TableCell>{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
+                    <TableCell>
+                      {quote.vehicles 
+                        ? `${quote.vehicles.brand} ${quote.vehicles.model} - ${quote.vehicles.license_plate}` 
+                        : '-'
+                      }
+                    </TableCell>
+                    <TableCell>{quote.amount ? `${quote.amount.toFixed(2)} €` : '-'}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={quote.status || 'En attente'} />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end space-x-1">
+                        <Button variant="ghost" size="icon">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                          <Download className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleEditQuote(quote)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700" onClick={() => handleDeleteQuote(quote.id)}>
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </DocumentContextMenu>
               ))
             ) : (
               <TableRow>

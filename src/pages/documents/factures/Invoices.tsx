@@ -18,11 +18,14 @@ import LoadingSpinner from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { DocumentContextMenu } from '@/components/ui/document-context-menu';
+import { useToast } from '@/hooks/use-toast';
 
 const Invoices = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const { toast } = useToast();
   
   const { invoices, isLoading, error, deleteInvoice } = useInvoices();
   
@@ -75,6 +78,27 @@ const Invoices = () => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer la facture ${invoice.reference} ?`)) {
       await deleteInvoice.mutateAsync(invoice.id);
     }
+  };
+
+  const handleDownload = (invoice: Invoice) => {
+    toast({
+      title: "Téléchargement",
+      description: `Téléchargement de la facture ${invoice.reference}...`
+    });
+  };
+
+  const handlePrint = (invoice: Invoice) => {
+    toast({
+      title: "Impression",
+      description: `Impression de la facture ${invoice.reference}...`
+    });
+  };
+
+  const handleSendEmail = (invoice: Invoice) => {
+    toast({
+      title: "Envoi par e-mail",
+      description: `Envoi de la facture ${invoice.reference} par e-mail...`
+    });
   };
 
   if (isLoading) {
@@ -161,51 +185,58 @@ const Invoices = () => {
           <TableBody>
             {filteredInvoices.length > 0 ? (
               filteredInvoices.map((invoice) => (
-                <TableRow key={invoice.id}>
-                  <TableCell className="font-medium">{invoice.reference}</TableCell>
-                  <TableCell>{formatDate(invoice.created_at)}</TableCell>
-                  <TableCell>
-                    {invoice.clients 
-                      ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
-                      : '-'
-                    }
-                  </TableCell>
-                  <TableCell>
-                    {invoice.vehicles 
-                      ? `${invoice.vehicles.brand} ${invoice.vehicles.model} - ${invoice.vehicles.license_plate}`
-                      : '-'
-                    }
-                  </TableCell>
-                  <TableCell>{formatAmount(invoice.amount)}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente')}`}>
-                      {invoice.status || 'En attente'}
-                    </span>
-                  </TableCell>
-                  <TableCell>{formatDate(invoice.due_date)}</TableCell>
-                  <TableCell>{invoice.payment_method || '-'}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1">
-                      <Button variant="ghost" size="icon">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleEditInvoice(invoice)}>
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-red-500 hover:text-red-700"
-                        onClick={() => handleDelete(invoice)}
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <DocumentContextMenu
+                  key={invoice.id}
+                  onDownload={() => handleDownload(invoice)}
+                  onPrint={() => handlePrint(invoice)}
+                  onSendEmail={() => handleSendEmail(invoice)}
+                >
+                  <TableRow>
+                    <TableCell className="font-medium">{invoice.reference}</TableCell>
+                    <TableCell>{formatDate(invoice.created_at)}</TableCell>
+                    <TableCell>
+                      {invoice.clients 
+                        ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
+                        : '-'
+                      }
+                    </TableCell>
+                    <TableCell>
+                      {invoice.vehicles 
+                        ? `${invoice.vehicles.brand} ${invoice.vehicles.model} - ${invoice.vehicles.license_plate}`
+                        : '-'
+                      }
+                    </TableCell>
+                    <TableCell>{formatAmount(invoice.amount)}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente')}`}>
+                        {invoice.status || 'En attente'}
+                      </span>
+                    </TableCell>
+                    <TableCell>{formatDate(invoice.due_date)}</TableCell>
+                    <TableCell>{invoice.payment_method || '-'}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end space-x-1">
+                        <Button variant="ghost" size="icon">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                          <Download className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleEditInvoice(invoice)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="text-red-500 hover:text-red-700"
+                          onClick={() => handleDelete(invoice)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </DocumentContextMenu>
               ))
             ) : (
               <TableRow>
