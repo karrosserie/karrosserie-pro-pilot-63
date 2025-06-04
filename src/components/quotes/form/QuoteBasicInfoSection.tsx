@@ -43,11 +43,9 @@ export const QuoteBasicInfoSection = ({ formData, errors, onFieldChange }: Quote
             <Input
               id="reference"
               value={formData.reference || ''}
-              onChange={(e) => onFieldChange('reference', e.target.value)}
-              className={errors.reference ? 'border-red-500' : ''}
-              placeholder="Ex: 1234"
-              type="number"
-              min="1"
+              readOnly
+              className="bg-gray-50 cursor-not-allowed"
+              placeholder="Généré automatiquement"
             />
             {errors.reference && (
               <p className="text-sm text-red-500 mt-1 flex items-center">
@@ -58,7 +56,7 @@ export const QuoteBasicInfoSection = ({ formData, errors, onFieldChange }: Quote
           </div>
 
           <div>
-            <Label htmlFor="valid_until">Valide jusqu'au</Label>
+            <Label htmlFor="valid_until">Date</Label>
             <Input
               id="valid_until"
               type="date"
