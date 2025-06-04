@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -99,6 +100,31 @@ export const quotesService = {
       clients: clientData,
       vehicles: vehicleData
     };
+  },
+
+  getLastQuoteByUser: async () => {
+    // Récupérer l'utilisateur actuel
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      console.error('Error getting current user:', userError);
+      throw new Error('User not authenticated');
+    }
+
+    const { data: quote, error } = await supabase
+      .from('quotes')
+      .select('reference')
+      .eq('user_id', user.id)
+      .order('reference', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+      console.error('Error fetching last quote:', error);
+      throw new Error(error.message);
+    }
+
+    return quote;
   },
   
   create: async (quote: NewQuote) => {

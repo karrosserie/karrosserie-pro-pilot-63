@@ -33,19 +33,21 @@ export const QuoteBasicInfoSection = ({ formData, errors, onFieldChange }: Quote
           Informations de base
         </CardTitle>
         <CardDescription>
-          Référence, date et statut du devis
+          Numéro, date et statut du devis
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <Label htmlFor="reference">Référence *</Label>
+            <Label htmlFor="reference">Numéro *</Label>
             <Input
               id="reference"
               value={formData.reference || ''}
               onChange={(e) => onFieldChange('reference', e.target.value)}
               className={errors.reference ? 'border-red-500' : ''}
-              placeholder="Ex: D-2024-1234"
+              placeholder="Ex: 1234"
+              type="number"
+              min="1"
             />
             {errors.reference && (
               <p className="text-sm text-red-500 mt-1 flex items-center">

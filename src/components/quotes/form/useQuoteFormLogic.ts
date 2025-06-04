@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Quote } from '@/services/supabase/quotes';
 import { QuoteRepairItem, QuotePartItem, QuoteDiscountItem, GlobalTotals } from './types';
+import { quotesService } from '@/services/supabase/quotes';
 
 interface UseQuoteFormLogicProps {
   quote?: Quote | null;
@@ -71,7 +72,7 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     const newErrors: Record<string, string> = {};
     
     if (!formData.reference?.trim()) {
-      newErrors.reference = 'La référence du devis est obligatoire';
+      newErrors.reference = 'Le numéro du devis est obligatoire';
     }
     
     if (!formData.client_id) {
@@ -114,6 +115,18 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     };
   };
 
+  // Fonction pour générer le prochain numéro de devis
+  const generateNextQuoteNumber = async () => {
+    try {
+      const lastQuote = await quotesService.getLastQuoteByUser();
+      const lastNumber = lastQuote?.reference ? parseInt(lastQuote.reference) : 0;
+      return (lastNumber + 1).toString();
+    } catch (error) {
+      console.error('Error generating quote number:', error);
+      return '1';
+    }
+  };
+
   useEffect(() => {
     if (quote) {
       setFormData({
@@ -153,13 +166,13 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
         setDiscounts([]);
       }
     } else {
-      // Générer une référence automatique pour un nouveau devis
-      const currentYear = new Date().getFullYear();
-      const randomNumber = Math.floor(1000 + Math.random() * 9000);
-      setFormData(prev => ({
-        ...prev,
-        reference: `D-${currentYear}-${randomNumber}`
-      }));
+      // Générer un numéro automatique pour un nouveau devis
+      generateNextQuoteNumber().then(nextNumber => {
+        setFormData(prev => ({
+          ...prev,
+          reference: nextNumber
+        }));
+      });
       setNotes('');
     }
   }, [quote]);

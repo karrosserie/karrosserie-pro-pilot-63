@@ -105,7 +105,7 @@ const Quotes = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Référence</TableHead>
+              <TableHead>Numéro</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Client</TableHead>
               <TableHead>Véhicule</TableHead>
