@@ -15,10 +15,11 @@ interface RepairOrderBasicInfoSectionProps {
 
 export const RepairOrderBasicInfoSection = ({ formData, errors, onFieldChange }: RepairOrderBasicInfoSectionProps) => {
   const statusOptions = [
-    { value: 'pending', label: 'En attente' },
-    { value: 'in_progress', label: 'En cours' },
-    { value: 'waiting_for_parts', label: 'En attente de pièces' },
-    { value: 'completed', label: 'Terminé' }
+    { value: 'En cours', label: 'En cours' },
+    { value: 'En attente de pièces', label: 'En attente de pièces' },
+    { value: 'Terminé', label: 'Terminé' },
+    { value: 'En attente', label: 'En attente' },
+    { value: 'Annulé', label: 'Annulé' }
   ];
 
   return (
@@ -29,19 +30,19 @@ export const RepairOrderBasicInfoSection = ({ formData, errors, onFieldChange }:
           Informations de base
         </CardTitle>
         <CardDescription>
-          Référence, dates et statut de l'ordre de réparation
+          Numéro, date et statut de l'ordre de réparation
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <Label htmlFor="reference">Référence *</Label>
+            <Label htmlFor="reference">Numéro *</Label>
             <Input
               id="reference"
               value={formData.reference || ''}
-              onChange={(e) => onFieldChange('reference', e.target.value)}
-              className={errors.reference ? 'border-red-500' : ''}
-              placeholder="Ex: OR-2024-1234"
+              readOnly
+              className="bg-gray-50 cursor-not-allowed"
+              placeholder="Généré automatiquement"
             />
             {errors.reference && (
               <p className="text-sm text-red-500 mt-1 flex items-center">
@@ -52,7 +53,7 @@ export const RepairOrderBasicInfoSection = ({ formData, errors, onFieldChange }:
           </div>
 
           <div>
-            <Label htmlFor="start_date">Date de début</Label>
+            <Label htmlFor="start_date">Date</Label>
             <Input
               id="start_date"
               type="date"
@@ -62,19 +63,9 @@ export const RepairOrderBasicInfoSection = ({ formData, errors, onFieldChange }:
           </div>
 
           <div>
-            <Label htmlFor="end_date">Date de fin</Label>
-            <Input
-              id="end_date"
-              type="date"
-              value={formData.end_date || ''}
-              onChange={(e) => onFieldChange('end_date', e.target.value)}
-            />
-          </div>
-
-          <div>
             <Label htmlFor="status">Statut</Label>
             <Select
-              value={formData.status || 'pending'}
+              value={formData.status || 'En cours'}
               onValueChange={(value) => onFieldChange('status', value)}
             >
               <SelectTrigger id="status">
@@ -88,20 +79,6 @@ export const RepairOrderBasicInfoSection = ({ formData, errors, onFieldChange }:
                 ))}
               </SelectContent>
             </Select>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="estimated_hours">Heures estimées</Label>
-            <Input
-              id="estimated_hours"
-              type="number"
-              step="0.5"
-              value={formData.estimated_hours || ''}
-              onChange={(e) => onFieldChange('estimated_hours', parseFloat(e.target.value) || null)}
-              placeholder="Ex: 8.5"
-            />
           </div>
         </div>
       </CardContent>

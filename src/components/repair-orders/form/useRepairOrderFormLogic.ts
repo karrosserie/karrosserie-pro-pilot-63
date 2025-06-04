@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { RepairOrderRepairItem, RepairOrderPartItem, GlobalTotals } from './types';
+import { repairOrdersService } from '@/services/supabase/repair-orders';
 
 interface UseRepairOrderFormLogicProps {
   order?: RepairOrder | null;
@@ -12,7 +13,7 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
     reference: '',
     client_id: null,
     vehicle_id: null,
-    status: 'pending',
+    status: 'En cours',
     start_date: null,
     end_date: null,
     estimated_hours: null,
@@ -25,7 +26,7 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Déterminer si le formulaire est en lecture seule
-  const isReadOnly = formData.status === 'completed';
+  const isReadOnly = formData.status === 'Terminé' || formData.status === 'Annulé';
 
   // Calculer les totaux globaux
   const calculateGlobalTotals = (): GlobalTotals => {
@@ -69,7 +70,7 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
     const newErrors: Record<string, string> = {};
     
     if (!formData.reference?.trim()) {
-      newErrors.reference = "La référence de l'ordre de réparation est obligatoire";
+      newErrors.reference = "Le numéro de l'ordre de réparation est obligatoire";
     }
     
     if (!formData.client_id) {
@@ -111,13 +112,25 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
     };
   };
 
+  // Fonction pour générer le prochain numéro d'ordre de réparation
+  const generateNextOrderNumber = async () => {
+    try {
+      const lastOrder = await repairOrdersService.getLastOrderByUser();
+      const lastNumber = lastOrder?.reference ? parseInt(lastOrder.reference) : 0;
+      return (lastNumber + 1).toString();
+    } catch (error) {
+      console.error('Error generating order number:', error);
+      return '1';
+    }
+  };
+
   useEffect(() => {
     if (order) {
       setFormData({
         reference: order.reference,
         client_id: order.client_id,
         vehicle_id: order.vehicle_id,
-        status: order.status || 'pending',
+        status: order.status || 'En cours',
         start_date: order.start_date,
         end_date: order.end_date,
         estimated_hours: order.estimated_hours,
@@ -147,13 +160,13 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
         setParts([]);
       }
     } else {
-      // Générer une référence automatique pour un nouvel ordre
-      const currentYear = new Date().getFullYear();
-      const randomNumber = Math.floor(1000 + Math.random() * 9000);
-      setFormData(prev => ({
-        ...prev,
-        reference: `OR-${currentYear}-${randomNumber}`
-      }));
+      // Générer un numéro automatique pour un nouvel ordre
+      generateNextOrderNumber().then(nextNumber => {
+        setFormData(prev => ({
+          ...prev,
+          reference: nextNumber
+        }));
+      });
       setDescription('');
     }
   }, [order]);

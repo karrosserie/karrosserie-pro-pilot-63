@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Invoice } from '@/services/supabase/invoices';
 import { InvoiceRepairItem, InvoicePartItem, GlobalTotals } from './types';
+import { invoicesService } from '@/services/supabase/invoices';
 
 interface UseInvoiceFormLogicProps {
   invoice?: Invoice | null;
@@ -10,11 +11,11 @@ interface UseInvoiceFormLogicProps {
 export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
   const [formData, setFormData] = useState<Partial<Invoice>>({
     reference: '',
-    client_id: '',
-    vehicle_id: '',
+    client_id: null,
+    vehicle_id: null,
     status: 'En attente',
-    due_date: '',
-    payment_method: '',
+    due_date: null,
+    payment_method: null,
     notes: ''
   });
 
@@ -24,7 +25,7 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Déterminer si le formulaire est en lecture seule
-  const isReadOnly = formData.status === 'Payée';
+  const isReadOnly = formData.status === 'Payée' || formData.status === 'Annulée';
 
   // Calculer les totaux globaux
   const calculateGlobalTotals = (): GlobalTotals => {
@@ -68,7 +69,7 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
     const newErrors: Record<string, string> = {};
     
     if (!formData.reference?.trim()) {
-      newErrors.reference = 'La référence de la facture est obligatoire';
+      newErrors.reference = 'Le numéro de la facture est obligatoire';
     }
     
     if (!formData.client_id) {
@@ -110,6 +111,18 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
     };
   };
 
+  // Fonction pour générer le prochain numéro de facture
+  const generateNextInvoiceNumber = async () => {
+    try {
+      const lastInvoice = await invoicesService.getLastInvoiceByUser();
+      const lastNumber = lastInvoice?.reference ? parseInt(lastInvoice.reference) : 0;
+      return (lastNumber + 1).toString();
+    } catch (error) {
+      console.error('Error generating invoice number:', error);
+      return '1';
+    }
+  };
+
   useEffect(() => {
     if (invoice) {
       setFormData({
@@ -145,13 +158,13 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
         setParts([]);
       }
     } else {
-      // Générer une référence automatique pour une nouvelle facture
-      const currentYear = new Date().getFullYear();
-      const randomNumber = Math.floor(1000 + Math.random() * 9000);
-      setFormData(prev => ({
-        ...prev,
-        reference: `F-${currentYear}-${randomNumber}`
-      }));
+      // Générer un numéro automatique pour une nouvelle facture
+      generateNextInvoiceNumber().then(nextNumber => {
+        setFormData(prev => ({
+          ...prev,
+          reference: nextNumber
+        }));
+      });
       setDescription('');
     }
   }, [invoice]);

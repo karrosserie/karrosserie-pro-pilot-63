@@ -17,14 +17,8 @@ export const InvoiceBasicInfoSection = ({ formData, errors, onFieldChange }: Inv
   const statusOptions = [
     { value: 'En attente', label: 'En attente' },
     { value: 'Payée', label: 'Payée' },
-    { value: 'Annulée', label: 'Annulée' }
-  ];
-
-  const paymentMethodOptions = [
-    { value: 'Carte bancaire', label: 'Carte bancaire' },
-    { value: 'Virement', label: 'Virement' },
-    { value: 'Chèque', label: 'Chèque' },
-    { value: 'Espèces', label: 'Espèces' }
+    { value: 'Annulée', label: 'Annulée' },
+    { value: 'En retard', label: 'En retard' }
   ];
 
   return (
@@ -35,19 +29,19 @@ export const InvoiceBasicInfoSection = ({ formData, errors, onFieldChange }: Inv
           Informations de base
         </CardTitle>
         <CardDescription>
-          Référence, échéance et statut de la facture
+          Numéro, date et statut de la facture
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <Label htmlFor="reference">Référence *</Label>
+            <Label htmlFor="reference">Numéro *</Label>
             <Input
               id="reference"
               value={formData.reference || ''}
-              onChange={(e) => onFieldChange('reference', e.target.value)}
-              className={errors.reference ? 'border-red-500' : ''}
-              placeholder="Ex: F-2024-1234"
+              readOnly
+              className="bg-gray-50 cursor-not-allowed"
+              placeholder="Généré automatiquement"
             />
             {errors.reference && (
               <p className="text-sm text-red-500 mt-1 flex items-center">
@@ -58,7 +52,7 @@ export const InvoiceBasicInfoSection = ({ formData, errors, onFieldChange }: Inv
           </div>
 
           <div>
-            <Label htmlFor="due_date">Échéance</Label>
+            <Label htmlFor="due_date">Date</Label>
             <Input
               id="due_date"
               type="date"
@@ -78,25 +72,6 @@ export const InvoiceBasicInfoSection = ({ formData, errors, onFieldChange }: Inv
               </SelectTrigger>
               <SelectContent>
                 {statusOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="payment_method">Mode de paiement</Label>
-            <Select
-              value={formData.payment_method || ''}
-              onValueChange={(value) => onFieldChange('payment_method', value)}
-            >
-              <SelectTrigger id="payment_method">
-                <SelectValue placeholder="Sélectionner un mode" />
-              </SelectTrigger>
-              <SelectContent>
-                {paymentMethodOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>

@@ -147,6 +147,31 @@ export const invoicesService = {
     
     return data;
   },
+
+  getLastInvoiceByUser: async () => {
+    // Récupérer l'utilisateur actuel
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      console.error('Error getting current user:', userError);
+      throw new Error('User not authenticated');
+    }
+
+    const { data: invoice, error } = await supabase
+      .from('invoices')
+      .select('reference')
+      .eq('user_id', user.id)
+      .order('reference', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+      console.error('Error fetching last invoice:', error);
+      throw new Error(error.message);
+    }
+
+    return invoice;
+  },
   
   create: async (invoice: NewInvoice) => {
     const { data: { user } } = await supabase.auth.getUser();
