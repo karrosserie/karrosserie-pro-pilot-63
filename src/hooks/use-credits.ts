@@ -28,17 +28,27 @@ export function useCredits() {
       });
     },
     onError: (error: any) => {
-      console.error('Error creating credit:', error);
+      console.error('Error creating credit - Full error object:', error);
+      console.error('Error code:', error?.code);
+      console.error('Error message:', error?.message);
+      console.error('Error details:', error?.details);
+      
       if (error?.code === '42P01') {
         toast({
           title: "Table manquante",
           description: "La table des avoirs n'existe pas encore. Veuillez exécuter les migrations de base de données.",
           variant: "destructive"
         });
+      } else if (error?.message) {
+        toast({
+          title: "Erreur",
+          description: error.message,
+          variant: "destructive"
+        });
       } else {
         toast({
           title: "Erreur",
-          description: "Impossible de créer l'avoir.",
+          description: "Impossible de créer l'avoir. Vérifiez la console pour plus de détails.",
           variant: "destructive"
         });
       }

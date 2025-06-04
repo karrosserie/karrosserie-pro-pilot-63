@@ -44,23 +44,32 @@ export const CreditForm = ({ onClose }: CreditFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Form submission started');
+    console.log('Form data:', formData);
+    console.log('Items:', items);
+    
     if (!validateForm()) {
+      console.log('Form validation failed');
       return;
     }
 
+    const submitData = {
+      reference: formData.reference,
+      invoice_id: formData.invoice_id,
+      status: formData.status,
+      amount: calculateTotal(),
+      items_data: JSON.stringify(items),
+      notes: formData.notes || ''
+    };
+
+    console.log('Submitting credit data:', submitData);
+
     try {
-      await createCredit.mutateAsync({
-        reference: formData.reference,
-        invoice_id: formData.invoice_id,
-        status: formData.status,
-        amount: calculateTotal(),
-        items_data: JSON.stringify(items),
-        notes: formData.notes || ''
-      });
-      
+      await createCredit.mutateAsync(submitData);
+      console.log('Credit creation successful');
       onClose();
     } catch (error) {
-      console.error('Error creating credit:', error);
+      console.error('Error in handleSubmit:', error);
     }
   };
 
