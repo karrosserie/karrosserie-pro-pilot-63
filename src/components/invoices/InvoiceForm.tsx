@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useClients } from '@/hooks/use-clients';
@@ -35,9 +34,13 @@ export const InvoiceForm = ({
     parts,
     errors,
     isReadOnly,
+    claimNumber,
+    currentMileage,
     setRepairs,
     setParts,
     handleChange,
+    handleClaimNumberChange,
+    handleCurrentMileageChange,
     validateForm,
     calculateGlobalTotals,
     prepareSubmitData
@@ -79,6 +82,10 @@ export const InvoiceForm = ({
         formData={formData}
         errors={errors}
         onFieldChange={handleChange}
+        claimNumber={claimNumber}
+        currentMileage={currentMileage}
+        onClaimNumberChange={handleClaimNumberChange}
+        onCurrentMileageChange={handleCurrentMileageChange}
       />
 
       <InvoiceAssignmentSection 

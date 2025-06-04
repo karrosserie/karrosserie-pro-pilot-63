@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Invoice } from '@/services/supabase/invoices';
 import { InvoiceRepairItem, InvoicePartItem, InvoiceDiscountItem, GlobalTotals } from './types';
@@ -19,6 +20,8 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
   });
 
   const [description, setDescription] = useState('');
+  const [claimNumber, setClaimNumber] = useState('');
+  const [currentMileage, setCurrentMileage] = useState('');
   const [repairs, setRepairs] = useState<InvoiceRepairItem[]>([]);
   const [parts, setParts] = useState<InvoicePartItem[]>([]);
   const [discounts, setDiscounts] = useState<InvoiceDiscountItem[]>([]);
@@ -97,10 +100,24 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
     }
   };
 
+  const handleClaimNumberChange = (value: string) => {
+    if (!isReadOnly) {
+      setClaimNumber(value);
+    }
+  };
+
+  const handleCurrentMileageChange = (value: string) => {
+    if (!isReadOnly) {
+      setCurrentMileage(value);
+    }
+  };
+
   // Fonction pour préparer les données à soumettre
   const prepareSubmitData = () => {
     const notesData = {
       description,
+      claimNumber,
+      currentMileage,
       repairs,
       parts,
       discounts
@@ -141,6 +158,8 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
         try {
           const noteData = JSON.parse(invoice.notes);
           setDescription(noteData.description || '');
+          setClaimNumber(noteData.claimNumber || '');
+          setCurrentMileage(noteData.currentMileage || '');
           if (noteData.repairs) {
             setRepairs(noteData.repairs);
           }
@@ -153,12 +172,16 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
         } catch (e) {
           console.error('Error parsing invoice notes:', e);
           setDescription('');
+          setClaimNumber('');
+          setCurrentMileage('');
           setRepairs([]);
           setParts([]);
           setDiscounts([]);
         }
       } else {
         setDescription('');
+        setClaimNumber('');
+        setCurrentMileage('');
         setRepairs([]);
         setParts([]);
         setDiscounts([]);
@@ -176,12 +199,16 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
         }));
       });
       setDescription('');
+      setClaimNumber('');
+      setCurrentMileage('');
     }
   }, [invoice]);
 
   return {
     formData,
     description,
+    claimNumber,
+    currentMileage,
     repairs,
     parts,
     discounts,
@@ -191,6 +218,8 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
     setParts,
     setDiscounts,
     handleChange,
+    handleClaimNumberChange,
+    handleCurrentMileageChange,
     validateForm,
     calculateGlobalTotals,
     prepareSubmitData

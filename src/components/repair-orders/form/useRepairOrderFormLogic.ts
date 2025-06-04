@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { RepairOrderRepairItem, RepairOrderPartItem, GlobalTotals } from './types';
@@ -20,6 +21,8 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
   });
 
   const [description, setDescription] = useState('');
+  const [claimNumber, setClaimNumber] = useState('');
+  const [currentMileage, setCurrentMileage] = useState('');
   const [repairs, setRepairs] = useState<RepairOrderRepairItem[]>([]);
   const [parts, setParts] = useState<RepairOrderPartItem[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -97,10 +100,24 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
     }
   };
 
+  const handleClaimNumberChange = (value: string) => {
+    if (!isReadOnly) {
+      setClaimNumber(value);
+    }
+  };
+
+  const handleCurrentMileageChange = (value: string) => {
+    if (!isReadOnly) {
+      setCurrentMileage(value);
+    }
+  };
+
   // Fonction pour préparer les données à soumettre
   const prepareSubmitData = () => {
     const notesData = {
       description,
+      claimNumber,
+      currentMileage,
       repairs,
       parts
     };
@@ -141,6 +158,8 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
         try {
           const noteData = JSON.parse(order.notes);
           setDescription(noteData.description || '');
+          setClaimNumber(noteData.claimNumber || '');
+          setCurrentMileage(noteData.currentMileage || '');
           if (noteData.repairs) {
             setRepairs(noteData.repairs);
           }
@@ -150,11 +169,15 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
         } catch (e) {
           console.error('Error parsing order notes:', e);
           setDescription('');
+          setClaimNumber('');
+          setCurrentMileage('');
           setRepairs([]);
           setParts([]);
         }
       } else {
         setDescription('');
+        setClaimNumber('');
+        setCurrentMileage('');
         setRepairs([]);
         setParts([]);
       }
@@ -171,12 +194,16 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
         }));
       });
       setDescription('');
+      setClaimNumber('');
+      setCurrentMileage('');
     }
   }, [order]);
 
   return {
     formData,
     description,
+    claimNumber,
+    currentMileage,
     repairs,
     parts,
     errors,
@@ -184,6 +211,8 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
     setRepairs,
     setParts,
     handleChange,
+    handleClaimNumberChange,
+    handleCurrentMileageChange,
     validateForm,
     calculateGlobalTotals,
     prepareSubmitData

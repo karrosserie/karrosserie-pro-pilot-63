@@ -11,9 +11,21 @@ interface InvoiceBasicInfoSectionProps {
   formData: Partial<Invoice>;
   errors: Record<string, string>;
   onFieldChange: (field: string, value: any) => void;
+  claimNumber?: string;
+  currentMileage?: string;
+  onClaimNumberChange?: (value: string) => void;
+  onCurrentMileageChange?: (value: string) => void;
 }
 
-export const InvoiceBasicInfoSection = ({ formData, errors, onFieldChange }: InvoiceBasicInfoSectionProps) => {
+export const InvoiceBasicInfoSection = ({ 
+  formData, 
+  errors, 
+  onFieldChange,
+  claimNumber = '',
+  currentMileage = '',
+  onClaimNumberChange,
+  onCurrentMileageChange
+}: InvoiceBasicInfoSectionProps) => {
   const statusOptions = [
     { value: 'En attente', label: 'En attente' },
     { value: 'Payée', label: 'Payée' },
@@ -29,7 +41,7 @@ export const InvoiceBasicInfoSection = ({ formData, errors, onFieldChange }: Inv
           Informations de base
         </CardTitle>
         <CardDescription>
-          Numéro, date et statut de la facture
+          Numéro, date, statut et informations du sinistre
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -78,6 +90,29 @@ export const InvoiceBasicInfoSection = ({ formData, errors, onFieldChange }: Inv
                 ))}
               </SelectContent>
             </Select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="claim_number">N° de sinistre</Label>
+            <Input
+              id="claim_number"
+              value={claimNumber}
+              onChange={(e) => onClaimNumberChange?.(e.target.value)}
+              placeholder="Numéro de sinistre"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="current_mileage">Kilométrage actuel</Label>
+            <Input
+              id="current_mileage"
+              type="number"
+              value={currentMileage}
+              onChange={(e) => onCurrentMileageChange?.(e.target.value)}
+              placeholder="Kilométrage en km"
+            />
           </div>
         </div>
       </CardContent>

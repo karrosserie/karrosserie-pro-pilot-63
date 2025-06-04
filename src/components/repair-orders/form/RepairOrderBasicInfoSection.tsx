@@ -11,9 +11,21 @@ interface RepairOrderBasicInfoSectionProps {
   formData: Partial<RepairOrder>;
   errors: Record<string, string>;
   onFieldChange: (field: string, value: any) => void;
+  claimNumber?: string;
+  currentMileage?: string;
+  onClaimNumberChange?: (value: string) => void;
+  onCurrentMileageChange?: (value: string) => void;
 }
 
-export const RepairOrderBasicInfoSection = ({ formData, errors, onFieldChange }: RepairOrderBasicInfoSectionProps) => {
+export const RepairOrderBasicInfoSection = ({ 
+  formData, 
+  errors, 
+  onFieldChange,
+  claimNumber = '',
+  currentMileage = '',
+  onClaimNumberChange,
+  onCurrentMileageChange
+}: RepairOrderBasicInfoSectionProps) => {
   const statusOptions = [
     { value: 'En cours', label: 'En cours' },
     { value: 'En attente de pièces', label: 'En attente de pièces' },
@@ -33,7 +45,7 @@ export const RepairOrderBasicInfoSection = ({ formData, errors, onFieldChange }:
           Informations de base
         </CardTitle>
         <CardDescription>
-          Numéro, date et statut de l'ordre de réparation
+          Numéro, date, statut et informations du sinistre
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -82,6 +94,29 @@ export const RepairOrderBasicInfoSection = ({ formData, errors, onFieldChange }:
                 ))}
               </SelectContent>
             </Select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="claim_number">N° de sinistre</Label>
+            <Input
+              id="claim_number"
+              value={claimNumber}
+              onChange={(e) => onClaimNumberChange?.(e.target.value)}
+              placeholder="Numéro de sinistre"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="current_mileage">Kilométrage actuel</Label>
+            <Input
+              id="current_mileage"
+              type="number"
+              value={currentMileage}
+              onChange={(e) => onCurrentMileageChange?.(e.target.value)}
+              placeholder="Kilométrage en km"
+            />
           </div>
         </div>
       </CardContent>
