@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { RepairOrdersHeader } from '@/components/repair-orders/RepairOrdersHeader';
 import { RepairOrdersTable } from '@/components/repair-orders/RepairOrdersTable';
@@ -7,7 +6,6 @@ import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
-import { DocumentContextMenu } from '@/components/ui/document-context-menu';
 import { useToast } from '@/hooks/use-toast';
 
 const RepairOrders = () => {

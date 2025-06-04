@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,13 +9,19 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Trash } from 'lucide-react';
+import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useToast } from '@/hooks/use-toast';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import { Quote } from '@/services/supabase/quotes';
 import { StatusBadge } from '@/components/ui/status-badge';
-import { DocumentContextMenu } from '@/components/ui/document-context-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Printer, Mail } from 'lucide-react';
 
 const Quotes = () => {
   const { quotes, isLoading, error, deleteQuote } = useQuotes();
@@ -151,44 +156,58 @@ const Quotes = () => {
               </TableRow>
             ) : filteredQuotes.length > 0 ? (
               filteredQuotes.map((quote) => (
-                <DocumentContextMenu
-                  key={quote.id}
-                  onDownload={() => handleDownload(quote)}
-                  onPrint={() => handlePrint(quote)}
-                  onSendEmail={() => handleSendEmail(quote)}
-                >
-                  <TableRow>
-                    <TableCell className="font-medium">{quote.reference}</TableCell>
-                    <TableCell>{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
-                    <TableCell>{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
-                    <TableCell>
-                      {quote.vehicles 
-                        ? `${quote.vehicles.brand} ${quote.vehicles.model} - ${quote.vehicles.license_plate}` 
-                        : '-'
-                      }
-                    </TableCell>
-                    <TableCell>{quote.amount ? `${quote.amount.toFixed(2)} €` : '-'}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={quote.status || 'En attente'} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end space-x-1">
-                        <Button variant="ghost" size="icon">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                          <Download className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleEditQuote(quote)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700" onClick={() => handleDeleteQuote(quote.id)}>
-                          <Trash className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                </DocumentContextMenu>
+                <TableRow key={quote.id}>
+                  <TableCell className="font-medium">{quote.reference}</TableCell>
+                  <TableCell>{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
+                  <TableCell>{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
+                  <TableCell>
+                    {quote.vehicles 
+                      ? `${quote.vehicles.brand} ${quote.vehicles.model} - ${quote.vehicles.license_plate}` 
+                      : '-'
+                    }
+                  </TableCell>
+                  <TableCell>{quote.amount ? `${quote.amount.toFixed(2)} €` : '-'}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={quote.status || 'En attente'} />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end space-x-1">
+                      <Button variant="ghost" size="icon">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon">
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleEditQuote(quote)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700" onClick={() => handleDeleteQuote(quote.id)}>
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56">
+                          <DropdownMenuItem onClick={() => handleDownload(quote)}>
+                            <Download className="mr-2 h-4 w-4" />
+                            Télécharger
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handlePrint(quote)}>
+                            <Printer className="mr-2 h-4 w-4" />
+                            Imprimer
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleSendEmail(quote)}>
+                            <Mail className="mr-2 h-4 w-4" />
+                            Envoyer par e-mail
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableCell>
+                </TableRow>
               ))
             ) : (
               <TableRow>

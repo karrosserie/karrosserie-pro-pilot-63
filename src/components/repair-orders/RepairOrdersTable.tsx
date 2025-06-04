@@ -3,9 +3,15 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Pencil, Trash2, FileText } from 'lucide-react';
+import { Eye, Pencil, Trash2, FileText, MoreVertical } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
-import { DocumentContextMenu } from '@/components/ui/document-context-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Download, Printer, Mail } from 'lucide-react';
 
 interface RepairOrdersTableProps {
   orders: RepairOrder[];
@@ -75,48 +81,62 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
         </TableHeader>
         <TableBody>
           {orders.map((order) => (
-            <DocumentContextMenu
-              key={order.id}
-              onDownload={() => contextMenuProps?.onDownload(order)}
-              onPrint={() => contextMenuProps?.onPrint(order)}
-              onSendEmail={() => contextMenuProps?.onSendEmail(order)}
-            >
-              <TableRow>
-                <TableCell className="font-medium">{order.reference}</TableCell>
-                <TableCell>{formatDate(order.created_at)}</TableCell>
-                <TableCell>
-                  {order.clients 
-                    ? `${order.clients.first_name} ${order.clients.last_name}`
-                    : '-'
-                  }
-                </TableCell>
-                <TableCell>
-                  {order.vehicles 
-                    ? `${order.vehicles.brand} ${order.vehicles.model} - ${order.vehicles.license_plate}`
-                    : '-'
-                  }
-                </TableCell>
-                <TableCell>{formatAmount(order.quotes?.amount)}</TableCell>
-                <TableCell>
-                  <Badge className={getStatusColor(order.status || 'En attente')}>
-                    {order.status || 'En attente'}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end space-x-1">
-                    <Button variant="ghost" size="icon">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => onEditOrder(order)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            </DocumentContextMenu>
+            <TableRow key={order.id}>
+              <TableCell className="font-medium">{order.reference}</TableCell>
+              <TableCell>{formatDate(order.created_at)}</TableCell>
+              <TableCell>
+                {order.clients 
+                  ? `${order.clients.first_name} ${order.clients.last_name}`
+                  : '-'
+                }
+              </TableCell>
+              <TableCell>
+                {order.vehicles 
+                  ? `${order.vehicles.brand} ${order.vehicles.model} - ${order.vehicles.license_plate}`
+                  : '-'
+                }
+              </TableCell>
+              <TableCell>{formatAmount(order.quotes?.amount)}</TableCell>
+              <TableCell>
+                <Badge className={getStatusColor(order.status || 'En attente')}>
+                  {order.status || 'En attente'}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-right">
+                <div className="flex justify-end space-x-1">
+                  <Button variant="ghost" size="icon">
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => onEditOrder(order)}>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56">
+                      <DropdownMenuItem onClick={() => contextMenuProps?.onDownload(order)}>
+                        <Download className="mr-2 h-4 w-4" />
+                        Télécharger
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => contextMenuProps?.onPrint(order)}>
+                        <Printer className="mr-2 h-4 w-4" />
+                        Imprimer
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => contextMenuProps?.onSendEmail(order)}>
+                        <Mail className="mr-2 h-4 w-4" />
+                        Envoyer par e-mail
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </TableCell>
+            </TableRow>
           ))}
         </TableBody>
       </Table>

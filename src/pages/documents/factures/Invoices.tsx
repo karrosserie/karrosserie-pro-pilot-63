@@ -10,7 +10,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Trash } from 'lucide-react';
+import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import { useInvoices } from '@/hooks/use-invoices';
 import { Invoice } from '@/services/supabase/invoices';
@@ -18,8 +18,14 @@ import LoadingSpinner from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { DocumentContextMenu } from '@/components/ui/document-context-menu';
 import { useToast } from '@/hooks/use-toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Printer, Mail } from 'lucide-react';
 
 const Invoices = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -185,58 +191,72 @@ const Invoices = () => {
           <TableBody>
             {filteredInvoices.length > 0 ? (
               filteredInvoices.map((invoice) => (
-                <DocumentContextMenu
-                  key={invoice.id}
-                  onDownload={() => handleDownload(invoice)}
-                  onPrint={() => handlePrint(invoice)}
-                  onSendEmail={() => handleSendEmail(invoice)}
-                >
-                  <TableRow>
-                    <TableCell className="font-medium">{invoice.reference}</TableCell>
-                    <TableCell>{formatDate(invoice.created_at)}</TableCell>
-                    <TableCell>
-                      {invoice.clients 
-                        ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
-                        : '-'
-                      }
-                    </TableCell>
-                    <TableCell>
-                      {invoice.vehicles 
-                        ? `${invoice.vehicles.brand} ${invoice.vehicles.model} - ${invoice.vehicles.license_plate}`
-                        : '-'
-                      }
-                    </TableCell>
-                    <TableCell>{formatAmount(invoice.amount)}</TableCell>
-                    <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente')}`}>
-                        {invoice.status || 'En attente'}
-                      </span>
-                    </TableCell>
-                    <TableCell>{formatDate(invoice.due_date)}</TableCell>
-                    <TableCell>{invoice.payment_method || '-'}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end space-x-1">
-                        <Button variant="ghost" size="icon">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                          <Download className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleEditInvoice(invoice)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="text-red-500 hover:text-red-700"
-                          onClick={() => handleDelete(invoice)}
-                        >
-                          <Trash className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                </DocumentContextMenu>
+                <TableRow key={invoice.id}>
+                  <TableCell className="font-medium">{invoice.reference}</TableCell>
+                  <TableCell>{formatDate(invoice.created_at)}</TableCell>
+                  <TableCell>
+                    {invoice.clients 
+                      ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
+                      : '-'
+                    }
+                  </TableCell>
+                  <TableCell>
+                    {invoice.vehicles 
+                      ? `${invoice.vehicles.brand} ${invoice.vehicles.model} - ${invoice.vehicles.license_plate}`
+                      : '-'
+                    }
+                  </TableCell>
+                  <TableCell>{formatAmount(invoice.amount)}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente')}`}>
+                      {invoice.status || 'En attente'}
+                    </span>
+                  </TableCell>
+                  <TableCell>{formatDate(invoice.due_date)}</TableCell>
+                  <TableCell>{invoice.payment_method || '-'}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end space-x-1">
+                      <Button variant="ghost" size="icon">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon">
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleEditInvoice(invoice)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => handleDelete(invoice)}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56">
+                          <DropdownMenuItem onClick={() => handleDownload(invoice)}>
+                            <Download className="mr-2 h-4 w-4" />
+                            Télécharger
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handlePrint(invoice)}>
+                            <Printer className="mr-2 h-4 w-4" />
+                            Imprimer
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleSendEmail(invoice)}>
+                            <Mail className="mr-2 h-4 w-4" />
+                            Envoyer par e-mail
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableCell>
+                </TableRow>
               ))
             ) : (
               <TableRow>
