@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, AlertCircle } from 'lucide-react';
 import { Quote } from '@/services/supabase/quotes';
+import { cn } from '@/lib/utils';
 
 interface QuoteBasicInfoSectionProps {
   formData: Partial<Quote>;
@@ -53,7 +54,10 @@ export const QuoteBasicInfoSection = ({
               id="reference"
               value={formData.reference || ''}
               readOnly
-              className="bg-gray-50 cursor-not-allowed"
+              className={cn(
+                "bg-gray-50 cursor-not-allowed",
+                errors.reference && "border-red-500 focus-visible:ring-red-500"
+              )}
               placeholder="Généré automatiquement"
             />
             {errors.reference && (
@@ -71,7 +75,16 @@ export const QuoteBasicInfoSection = ({
               type="date"
               value={formData.valid_until || ''}
               onChange={(e) => onFieldChange('valid_until', e.target.value)}
+              className={cn(
+                errors.valid_until && "border-red-500 focus-visible:ring-red-500"
+              )}
             />
+            {errors.valid_until && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.valid_until}
+              </p>
+            )}
           </div>
 
           <div>
@@ -80,7 +93,12 @@ export const QuoteBasicInfoSection = ({
               value={formData.status || 'En attente'}
               onValueChange={(value) => onFieldChange('status', value)}
             >
-              <SelectTrigger id="status">
+              <SelectTrigger 
+                id="status"
+                className={cn(
+                  errors.status && "border-red-500 focus-visible:ring-red-500"
+                )}
+              >
                 <SelectValue placeholder="Sélectionner un statut" />
               </SelectTrigger>
               <SelectContent>
@@ -91,6 +109,12 @@ export const QuoteBasicInfoSection = ({
                 ))}
               </SelectContent>
             </Select>
+            {errors.status && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.status}
+              </p>
+            )}
           </div>
         </div>
 
@@ -102,7 +126,16 @@ export const QuoteBasicInfoSection = ({
               value={claimNumber}
               onChange={(e) => onClaimNumberChange?.(e.target.value)}
               placeholder="Numéro de sinistre"
+              className={cn(
+                errors.claim_number && "border-red-500 focus-visible:ring-red-500"
+              )}
             />
+            {errors.claim_number && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.claim_number}
+              </p>
+            )}
           </div>
 
           <div>
@@ -113,7 +146,16 @@ export const QuoteBasicInfoSection = ({
               value={currentMileage}
               onChange={(e) => onCurrentMileageChange?.(e.target.value)}
               placeholder="Kilométrage en km"
+              className={cn(
+                errors.current_mileage && "border-red-500 focus-visible:ring-red-500"
+              )}
             />
+            {errors.current_mileage && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.current_mileage}
+              </p>
+            )}
           </div>
         </div>
       </CardContent>

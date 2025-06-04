@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, AlertCircle } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
+import { cn } from '@/lib/utils';
 
 interface RepairOrderBasicInfoSectionProps {
   formData: Partial<RepairOrder>;
@@ -56,7 +57,10 @@ export const RepairOrderBasicInfoSection = ({
               id="reference"
               value={formData.reference || ''}
               readOnly
-              className="bg-gray-50 cursor-not-allowed"
+              className={cn(
+                "bg-gray-50 cursor-not-allowed",
+                errors.reference && "border-red-500 focus-visible:ring-red-500"
+              )}
               placeholder="Généré automatiquement"
             />
             {errors.reference && (
@@ -74,7 +78,16 @@ export const RepairOrderBasicInfoSection = ({
               type="date"
               value={formData.start_date || ''}
               onChange={(e) => onFieldChange('start_date', e.target.value)}
+              className={cn(
+                errors.start_date && "border-red-500 focus-visible:ring-red-500"
+              )}
             />
+            {errors.start_date && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.start_date}
+              </p>
+            )}
           </div>
 
           <div>
@@ -83,7 +96,12 @@ export const RepairOrderBasicInfoSection = ({
               value={formData.status || 'En cours'}
               onValueChange={(value) => onFieldChange('status', value)}
             >
-              <SelectTrigger id="status">
+              <SelectTrigger 
+                id="status"
+                className={cn(
+                  errors.status && "border-red-500 focus-visible:ring-red-500"
+                )}
+              >
                 <SelectValue placeholder="Sélectionner un statut" />
               </SelectTrigger>
               <SelectContent>
@@ -94,6 +112,12 @@ export const RepairOrderBasicInfoSection = ({
                 ))}
               </SelectContent>
             </Select>
+            {errors.status && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.status}
+              </p>
+            )}
           </div>
         </div>
 
@@ -105,7 +129,16 @@ export const RepairOrderBasicInfoSection = ({
               value={claimNumber}
               onChange={(e) => onClaimNumberChange?.(e.target.value)}
               placeholder="Numéro de sinistre"
+              className={cn(
+                errors.claim_number && "border-red-500 focus-visible:ring-red-500"
+              )}
             />
+            {errors.claim_number && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.claim_number}
+              </p>
+            )}
           </div>
 
           <div>
@@ -116,7 +149,16 @@ export const RepairOrderBasicInfoSection = ({
               value={currentMileage}
               onChange={(e) => onCurrentMileageChange?.(e.target.value)}
               placeholder="Kilométrage en km"
+              className={cn(
+                errors.current_mileage && "border-red-500 focus-visible:ring-red-500"
+              )}
             />
+            {errors.current_mileage && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.current_mileage}
+              </p>
+            )}
           </div>
         </div>
       </CardContent>
