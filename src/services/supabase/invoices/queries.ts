@@ -1,30 +1,9 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { Database } from '@/integrations/supabase/types';
+import { Invoice } from './types';
 
-export type Invoice = Database['public']['Tables']['invoices']['Row'] & {
-  clients?: {
-    id: string;
-    first_name: string;
-    last_name: string;
-  } | null;
-  vehicles?: {
-    id: string;
-    brand: string;
-    model: string;
-    license_plate: string;
-  } | null;
-  repair_orders?: {
-    id: string;
-    reference: string;
-  } | null;
-};
-
-export type NewInvoice = Database['public']['Tables']['invoices']['Insert'];
-export type UpdateInvoice = Database['public']['Tables']['invoices']['Update'];
-
-export const invoicesService = {
-  getAll: async () => {
+export const invoiceQueries = {
+  getAll: async (): Promise<Invoice[]> => {
     console.log('Fetching invoices...');
     
     // First, try to get invoices with joins
@@ -113,10 +92,10 @@ export const invoicesService = {
       return enrichedInvoices;
     }
     
-    return invoicesWithJoins;
+    return invoicesWithJoins || [];
   },
 
-  getById: async (id: string) => {
+  getById: async (id: string): Promise<Invoice> => {
     const { data, error } = await supabase
       .from('invoices')
       .select(`
@@ -171,58 +150,5 @@ export const invoicesService = {
     }
 
     return invoice;
-  },
-  
-  create: async (invoice: NewInvoice) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
-
-    const invoiceWithUser = {
-      ...invoice,
-      user_id: user.id
-    };
-
-    const { data, error } = await supabase
-      .from('invoices')
-      .insert([invoiceWithUser])
-      .select()
-      .single();
-      
-    if (error) {
-      console.error('Error creating invoice:', error);
-      throw new Error(error.message);
-    }
-    
-    return data;
-  },
-  
-  update: async (id: string, invoice: UpdateInvoice) => {
-    const { data, error } = await supabase
-      .from('invoices')
-      .update(invoice)
-      .eq('id', id)
-      .select()
-      .single();
-      
-    if (error) {
-      console.error(`Error updating invoice with id ${id}:`, error);
-      throw new Error(error.message);
-    }
-    
-    return data;
-  },
-  
-  delete: async (id: string) => {
-    const { error } = await supabase
-      .from('invoices')
-      .delete()
-      .eq('id', id);
-      
-    if (error) {
-      console.error(`Error deleting invoice with id ${id}:`, error);
-      throw new Error(error.message);
-    }
-    
-    return true;
   }
 };
