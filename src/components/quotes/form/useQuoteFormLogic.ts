@@ -72,27 +72,38 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
+    console.log('Starting validation with:', { formData, claimNumber, currentMileage });
+    
     if (!formData.reference?.trim()) {
       newErrors.reference = 'Le numéro du devis est obligatoire';
+      console.log('Reference error detected');
     }
     
     if (!formData.client_id) {
       newErrors.client_id = 'Le client est obligatoire';
+      console.log('Client error detected');
     }
 
     if (!formData.valid_until) {
       newErrors.valid_until = 'La date de validité est obligatoire';
+      console.log('Valid until error detected');
     }
 
-    // Validation optionnelle pour les nouveaux champs
-    if (claimNumber && claimNumber.length < 3) {
+    // Validation pour les nouveaux champs - ajout de règles plus strictes pour forcer l'erreur
+    if (claimNumber && claimNumber.trim().length > 0 && claimNumber.trim().length < 3) {
       newErrors.claim_number = 'Le numéro de sinistre doit contenir au moins 3 caractères';
+      console.log('Claim number error detected:', claimNumber);
     }
 
-    if (currentMileage && (parseInt(currentMileage) < 0 || parseInt(currentMileage) > 999999)) {
-      newErrors.current_mileage = 'Le kilométrage doit être entre 0 et 999999 km';
+    if (currentMileage && currentMileage.trim().length > 0) {
+      const mileageNum = parseInt(currentMileage);
+      if (isNaN(mileageNum) || mileageNum < 0 || mileageNum > 999999) {
+        newErrors.current_mileage = 'Le kilométrage doit être un nombre entre 0 et 999999 km';
+        console.log('Current mileage error detected:', currentMileage);
+      }
     }
     
+    console.log('Validation complete. New errors:', newErrors);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -117,6 +128,7 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
   const handleClaimNumberChange = (value: string) => {
     if (!isReadOnly) {
       setClaimNumber(value);
+      console.log('Claim number changed to:', value);
       // Effacer l'erreur quand l'utilisateur modifie le champ
       if (errors.claim_number) {
         setErrors(prev => ({ ...prev, claim_number: '' }));
@@ -127,6 +139,7 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
   const handleCurrentMileageChange = (value: string) => {
     if (!isReadOnly) {
       setCurrentMileage(value);
+      console.log('Current mileage changed to:', value);
       // Effacer l'erreur quand l'utilisateur modifie le champ
       if (errors.current_mileage) {
         setErrors(prev => ({ ...prev, current_mileage: '' }));

@@ -56,11 +56,16 @@ export const QuoteForm = ({
     
     if (isSubmitting) return; // Prevent double submissions
     
-    console.log('Validation attempt - Current errors:', errors);
-    console.log('Form data:', { formData, claimNumber, currentMileage });
+    console.log('Validation attempt - Current errors before validation:', errors);
+    console.log('Form data before validation:', { formData, claimNumber, currentMileage });
     
-    if (!validateForm()) {
-      console.log('Validation failed - New errors:', errors);
+    const isValid = validateForm();
+    
+    console.log('Validation result:', isValid);
+    console.log('Errors after validation:', errors);
+    
+    if (!isValid) {
+      console.log('Validation failed - showing toast');
       toast({
         title: "Erreur de validation",
         description: "Veuillez corriger les erreurs dans le formulaire.",
@@ -81,6 +86,12 @@ export const QuoteForm = ({
       // Don't show toast here as it might be already handled in the parent
     }
   };
+
+  // Forcer une erreur pour le test si le client n'est pas sélectionné
+  React.useEffect(() => {
+    console.log('Current errors state:', errors);
+    console.log('Current form data:', formData);
+  }, [errors, formData]);
 
   const clientOptions = clients?.filter(client => !!client) || [];
 
