@@ -1,18 +1,68 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { Database } from '@/integrations/supabase/types';
 
-type Credit = Database['public']['Tables']['credits']['Row'];
-type CreditInsert = Database['public']['Tables']['credits']['Insert'];
-type CreditUpdate = Database['public']['Tables']['credits']['Update'];
+// Types personnalisés pour les credits puisque la table n'existe pas encore dans les types générés
+export interface Credit {
+  id: string;
+  user_id: string;
+  reference: string;
+  client_id: string | null;
+  vehicle_id: string | null;
+  invoice_id: string | null;
+  status: string;
+  amount: number;
+  items_data: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  // Relations (optionnelles, ajoutées par les joins)
+  clients?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  } | null;
+  vehicles?: {
+    id: string;
+    brand: string;
+    model: string;
+    license_plate: string;
+  } | null;
+  invoices?: {
+    id: string;
+    reference: string;
+  } | null;
+}
+
+export interface CreditInsert {
+  user_id: string;
+  reference: string;
+  client_id?: string | null;
+  vehicle_id?: string | null;
+  invoice_id?: string | null;
+  status: string;
+  amount: number;
+  items_data?: string | null;
+  notes?: string | null;
+}
+
+export interface CreditUpdate {
+  reference?: string;
+  client_id?: string | null;
+  vehicle_id?: string | null;
+  invoice_id?: string | null;
+  status?: string;
+  amount?: number;
+  items_data?: string | null;
+  notes?: string | null;
+}
 
 export const creditsService = {
   // Get all credits for the current user
-  async getCredits() {
+  async getCredits(): Promise<Credit[]> {
     console.log('Fetching credits...');
     try {
-      // Try to get credits with joins first
-      const { data, error } = await supabase
+      // Utilisation de any pour contourner les erreurs de types
+      const { data, error } = await (supabase as any)
         .from('credits')
         .select(`
           *,
@@ -25,7 +75,7 @@ export const creditsService = {
       if (error) {
         console.log('Joins failed, falling back to basic query:', error);
         // Fallback to basic query without joins
-        const { data: basicData, error: basicError } = await supabase
+        const { data: basicData, error: basicError } = await (supabase as any)
           .from('credits')
           .select('*')
           .order('created_at', { ascending: false });
@@ -34,7 +84,7 @@ export const creditsService = {
 
         // Fetch related data separately
         const creditsWithRelations = await Promise.all(
-          (basicData || []).map(async (credit) => {
+          (basicData || []).map(async (credit: Credit) => {
             const relations: any = { clients: null, vehicles: null, invoices: null };
 
             if (credit.client_id) {
@@ -79,8 +129,8 @@ export const creditsService = {
   },
 
   // Get a single credit by ID
-  async getCredit(id: string) {
-    const { data, error } = await supabase
+  async getCredit(id: string): Promise<Credit> {
+    const { data, error } = await (supabase as any)
       .from('credits')
       .select(`
         *,
@@ -103,11 +153,11 @@ export const creditsService = {
     amount: number;
     items_data: string;
     notes?: string;
-  }) {
+  }): Promise<Credit> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('credits')
       .insert([{
         user_id: user.id,
@@ -133,8 +183,8 @@ export const creditsService = {
     amount?: number;
     items_data?: string;
     notes?: string;
-  }) {
-    const { data, error } = await supabase
+  }): Promise<Credit> {
+    const { data, error } = await (supabase as any)
       .from('credits')
       .update(creditData)
       .eq('id', id)
@@ -146,8 +196,8 @@ export const creditsService = {
   },
 
   // Delete a credit
-  async deleteCredit(id: string) {
-    const { error } = await supabase
+  async deleteCredit(id: string): Promise<boolean> {
+    const { error } = await (supabase as any)
       .from('credits')
       .delete()
       .eq('id', id);
@@ -157,12 +207,12 @@ export const creditsService = {
   },
 
   // Generate next reference number
-  async generateReference() {
+  async generateReference(): Promise<string> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('credits')
         .select('reference')
         .eq('user_id', user.id)
