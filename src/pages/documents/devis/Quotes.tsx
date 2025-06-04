@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Printer, Mail, FileCheck, ArrowRight, Signature } from 'lucide-react';
+import { Printer, Mail, FileCheck, ArrowRight } from 'lucide-react';
 
 const Quotes = () => {
   const { quotes, isLoading, error, deleteQuote } = useQuotes();
@@ -90,13 +90,6 @@ const Quotes = () => {
     toast({
       title: "Conversion en ordre de réparation",
       description: `Le devis ${quote.reference} a été converti en ordre de réparation`
-    });
-  };
-
-  const handleSignQuote = (quote: Quote) => {
-    toast({
-      title: "Signature du devis",
-      description: `Le devis ${quote.reference} a été signé`
     });
   };
   
@@ -226,12 +219,6 @@ const Quotes = () => {
                             Envoyer par e-mail
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          {quote.status === 'En attente' && (
-                            <DropdownMenuItem onClick={() => handleSignQuote(quote)}>
-                              <Signature className="mr-2 h-4 w-4" />
-                              Signer
-                            </DropdownMenuItem>
-                          )}
                           <DropdownMenuItem onClick={() => handleRequestDocuments(quote)}>
                             <FileCheck className="mr-2 h-4 w-4" />
                             Demander les justificatifs

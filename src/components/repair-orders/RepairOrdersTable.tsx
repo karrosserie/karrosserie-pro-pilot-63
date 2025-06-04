@@ -10,8 +10,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Download, Printer, Mail } from 'lucide-react';
+import { Download, Printer, Mail, Signature } from 'lucide-react';
 
 interface RepairOrdersTableProps {
   orders: RepairOrder[];
@@ -20,6 +21,7 @@ interface RepairOrdersTableProps {
     onDownload: (order: RepairOrder) => void;
     onPrint: (order: RepairOrder) => void;
     onSendEmail: (order: RepairOrder) => void;
+    onSignOrder?: (order: RepairOrder) => void;
   };
 }
 
@@ -132,6 +134,13 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
                         <Mail className="mr-2 h-4 w-4" />
                         Envoyer par e-mail
                       </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      {order.status === 'En attente' && (
+                        <DropdownMenuItem onClick={() => contextMenuProps?.onSignOrder?.(order)}>
+                          <Signature className="mr-2 h-4 w-4" />
+                          Signer
+                        </DropdownMenuItem>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>

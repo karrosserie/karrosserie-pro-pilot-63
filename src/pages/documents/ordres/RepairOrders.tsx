@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { RepairOrdersHeader } from '@/components/repair-orders/RepairOrdersHeader';
 import { RepairOrdersTable } from '@/components/repair-orders/RepairOrdersTable';
@@ -53,6 +54,13 @@ const RepairOrders = () => {
     });
   };
 
+  const handleSignOrder = (order: RepairOrder) => {
+    toast({
+      title: "Signature de l'ordre de réparation",
+      description: `L'ordre de réparation ${order.reference} a été signé`
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="page-container">
@@ -83,7 +91,8 @@ const RepairOrders = () => {
         contextMenuProps={{
           onDownload: handleDownload,
           onPrint: handlePrint,
-          onSendEmail: handleSendEmail
+          onSendEmail: handleSendEmail,
+          onSignOrder: handleSignOrder
         }}
       />
 
