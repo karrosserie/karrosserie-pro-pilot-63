@@ -8,13 +8,13 @@ import { Quote } from '@/services/supabase/quotes';
 import { GlobalTotals } from './types';
 
 interface QuoteDetailsSectionProps {
-  description: string;
+  notes: string;
   onFieldChange: (field: string, value: any) => void;
   globalTotals: GlobalTotals;
   isReadOnly?: boolean;
 }
 
-export const QuoteDetailsSection = ({ description, onFieldChange, globalTotals, isReadOnly }: QuoteDetailsSectionProps) => {
+export const QuoteDetailsSection = ({ notes, onFieldChange, globalTotals, isReadOnly }: QuoteDetailsSectionProps) => {
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -23,17 +23,17 @@ export const QuoteDetailsSection = ({ description, onFieldChange, globalTotals, 
           Détails du devis
         </CardTitle>
         <CardDescription>
-          Description et totaux du devis
+          Notes et totaux du devis
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <Label htmlFor="description">Description</Label>
+          <Label htmlFor="notes">Notes</Label>
           <Textarea
-            id="description"
-            value={description}
-            onChange={(e) => onFieldChange('description', e.target.value)}
-            placeholder="Description détaillée des travaux à effectuer..."
+            id="notes"
+            value={notes}
+            onChange={(e) => onFieldChange('notes', e.target.value)}
+            placeholder="Notes et observations concernant le devis..."
             rows={4}
             readOnly={isReadOnly}
           />
@@ -45,7 +45,7 @@ export const QuoteDetailsSection = ({ description, onFieldChange, globalTotals, 
           <div className="flex justify-end space-x-8 text-sm">
             <div>Sous-total : <span className="font-medium">{globalTotals.subTotal.toFixed(2)} €</span></div>
             <div>TVA : <span className="font-medium">{globalTotals.totalVat.toFixed(2)} €</span></div>
-            <div>Remise TTC : <span className="font-medium">{globalTotals.totalDiscount.toFixed(2)} €</span></div>
+            <div>Remises totales : <span className="font-medium">{globalTotals.totalDiscount.toFixed(2)} €</span></div>
           </div>
           <div className="flex justify-end text-lg font-bold">
             Total : <span className="ml-2">{globalTotals.total.toFixed(2)} €</span>

@@ -19,6 +19,12 @@ export interface QuotePartItem {
   total: number;
 }
 
+export interface QuoteDiscountItem {
+  id: string;
+  description: string;
+  amount: number;
+}
+
 export interface GlobalTotals {
   subTotal: number;
   totalVat: number;

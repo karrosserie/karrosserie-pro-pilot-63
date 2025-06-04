@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { Quote } from '@/services/supabase/quotes';
-import { QuoteRepairItem, QuotePartItem, GlobalTotals } from './types';
+import { QuoteRepairItem, QuotePartItem, QuoteDiscountItem, GlobalTotals } from './types';
 
 interface UseQuoteFormLogicProps {
   quote?: Quote | null;
@@ -16,9 +17,10 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     notes: ''
   });
 
-  const [description, setDescription] = useState('');
+  const [notes, setNotes] = useState('');
   const [repairs, setRepairs] = useState<QuoteRepairItem[]>([]);
   const [parts, setParts] = useState<QuotePartItem[]>([]);
+  const [discounts, setDiscounts] = useState<QuoteDiscountItem[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Déterminer si le formulaire est en lecture seule
@@ -54,11 +56,14 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
       };
     }, { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 });
 
+    // Calculer le total des remises additionnelles
+    const additionalDiscounts = discounts.reduce((sum, discount) => sum + discount.amount, 0);
+
     return {
       subTotal: repairTotals.subTotal + partTotals.subTotal,
       totalVat: repairTotals.totalVat + partTotals.totalVat,
-      totalDiscount: repairTotals.totalDiscount + partTotals.totalDiscount,
-      total: repairTotals.total + partTotals.total
+      totalDiscount: repairTotals.totalDiscount + partTotals.totalDiscount + additionalDiscounts,
+      total: repairTotals.total + partTotals.total - additionalDiscounts
     };
   };
 
@@ -82,8 +87,8 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
       return; // Empêcher les modifications si en lecture seule
     }
     
-    if (field === 'description') {
-      setDescription(value);
+    if (field === 'notes') {
+      setNotes(value);
     } else {
       setFormData(prev => ({ ...prev, [field]: value }));
     }
@@ -97,9 +102,10 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
   // Fonction pour préparer les données à soumettre
   const prepareSubmitData = () => {
     const notesData = {
-      description,
+      notes,
       repairs,
-      parts
+      parts,
+      discounts
     };
     
     return {
@@ -123,23 +129,28 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
       if (quote.notes) {
         try {
           const noteData = JSON.parse(quote.notes);
-          setDescription(noteData.description || '');
+          setNotes(noteData.notes || noteData.description || '');
           if (noteData.repairs) {
             setRepairs(noteData.repairs);
           }
           if (noteData.parts) {
             setParts(noteData.parts);
           }
+          if (noteData.discounts) {
+            setDiscounts(noteData.discounts);
+          }
         } catch (e) {
           console.error('Error parsing quote notes:', e);
-          setDescription('');
+          setNotes('');
           setRepairs([]);
           setParts([]);
+          setDiscounts([]);
         }
       } else {
-        setDescription('');
+        setNotes('');
         setRepairs([]);
         setParts([]);
+        setDiscounts([]);
       }
     } else {
       // Générer une référence automatique pour un nouveau devis
@@ -149,19 +160,21 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
         ...prev,
         reference: `D-${currentYear}-${randomNumber}`
       }));
-      setDescription('');
+      setNotes('');
     }
   }, [quote]);
 
   return {
     formData,
-    description,
+    notes,
     repairs,
     parts,
+    discounts,
     errors,
     isReadOnly,
     setRepairs,
     setParts,
+    setDiscounts,
     handleChange,
     validateForm,
     calculateGlobalTotals,

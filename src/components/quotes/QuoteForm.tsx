@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useClients } from '@/hooks/use-clients';
@@ -7,6 +8,7 @@ import { QuoteAssignmentSection } from './form/QuoteAssignmentSection';
 import { QuoteDetailsSection } from './form/QuoteDetailsSection';
 import { QuoteRepairsSection } from './form/QuoteRepairsSection';
 import { QuotePartsSection } from './form/QuotePartsSection';
+import { QuoteDiscountsSection } from './form/QuoteDiscountsSection';
 import { QuoteFormActions } from './form/QuoteFormActions';
 import { useQuoteFormLogic } from './form/useQuoteFormLogic';
 
@@ -28,13 +30,15 @@ export const QuoteForm = ({
   
   const {
     formData,
-    description,
+    notes,
     repairs,
     parts,
+    discounts,
     errors,
     isReadOnly,
     setRepairs,
     setParts,
+    setDiscounts,
     handleChange,
     validateForm,
     calculateGlobalTotals,
@@ -88,7 +92,7 @@ export const QuoteForm = ({
       />
 
       <QuoteDetailsSection 
-        description={description}
+        notes={notes}
         onFieldChange={handleChange}
         globalTotals={globalTotals}
         isReadOnly={isReadOnly}
@@ -103,6 +107,12 @@ export const QuoteForm = ({
       <QuotePartsSection 
         parts={parts}
         onPartsChange={setParts}
+        isReadOnly={isReadOnly}
+      />
+
+      <QuoteDiscountsSection 
+        discounts={discounts}
+        onDiscountsChange={setDiscounts}
         isReadOnly={isReadOnly}
       />
 
