@@ -7,7 +7,6 @@ import { InvoiceBasicInfoSection } from './form/InvoiceBasicInfoSection';
 import { InvoiceAssignmentSection } from './form/InvoiceAssignmentSection';
 import { InvoiceRepairsSection } from './form/InvoiceRepairsSection';
 import { InvoicePartsSection } from './form/InvoicePartsSection';
-import { InvoiceDiscountsSection } from './form/InvoiceDiscountsSection';
 import { InvoiceGlobalDiscountsSection } from './form/InvoiceGlobalDiscountsSection';
 import { InvoiceDetailsSection } from './form/InvoiceDetailsSection';
 import { InvoiceFormActions } from './form/InvoiceFormActions';
@@ -112,14 +111,6 @@ export const InvoiceForm = ({
 
       <InvoicePartsSection
         parts={parts}
-        onPartsChange={setParts}
-        isReadOnly={isReadOnly}
-      />
-
-      <InvoiceDiscountsSection
-        repairs={repairs}
-        parts={parts}
-        onRepairsChange={setRepairs}
         onPartsChange={setParts}
         isReadOnly={isReadOnly}
       />
