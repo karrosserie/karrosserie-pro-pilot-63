@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -183,8 +182,6 @@ const Invoices = () => {
               <TableHead>Véhicule</TableHead>
               <TableHead>Montant</TableHead>
               <TableHead>Statut</TableHead>
-              <TableHead>Échéance</TableHead>
-              <TableHead>Paiement</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -212,8 +209,6 @@ const Invoices = () => {
                       {invoice.status || 'En attente'}
                     </span>
                   </TableCell>
-                  <TableCell>{formatDate(invoice.due_date)}</TableCell>
-                  <TableCell>{invoice.payment_method || '-'}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-1">
                       <Button variant="ghost" size="icon">
@@ -260,7 +255,7 @@ const Invoices = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-4">
+                <TableCell colSpan={7} className="text-center py-4">
                   <div className="flex flex-col items-center justify-center py-8">
                     <FileText className="h-10 w-10 text-gray-400 mb-2" />
                     <h3 className="font-medium text-gray-900">Aucun résultat</h3>
