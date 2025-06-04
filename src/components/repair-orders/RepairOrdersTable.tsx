@@ -96,7 +96,7 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
                     : '-'
                   }
                 </TableCell>
-                <TableCell>{formatAmount(order.total_amount)}</TableCell>
+                <TableCell>{formatAmount(order.amount)}</TableCell>
                 <TableCell>
                   <Badge className={getStatusColor(order.status || 'En attente')}>
                     {order.status || 'En attente'}
