@@ -59,12 +59,12 @@ export const QuoteForm = ({
     console.log('Validation attempt - Current errors before validation:', errors);
     console.log('Form data before validation:', { formData, claimNumber, currentMileage });
     
-    const isValid = validateForm();
+    const validationResult = validateForm();
     
-    console.log('Validation result:', isValid);
-    console.log('Errors after validation:', errors);
+    console.log('Validation result:', validationResult.isValid);
+    console.log('Errors from validation:', validationResult.errors);
     
-    if (!isValid) {
+    if (!validationResult.isValid) {
       console.log('Validation failed - showing toast');
       toast({
         title: "Erreur de validation",
@@ -86,12 +86,6 @@ export const QuoteForm = ({
       // Don't show toast here as it might be already handled in the parent
     }
   };
-
-  // Forcer une erreur pour le test si le client n'est pas sélectionné
-  React.useEffect(() => {
-    console.log('Current errors state:', errors);
-    console.log('Current form data:', formData);
-  }, [errors, formData]);
 
   const clientOptions = clients?.filter(client => !!client) || [];
 

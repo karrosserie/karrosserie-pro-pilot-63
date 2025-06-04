@@ -104,8 +104,12 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     }
     
     console.log('Validation complete. New errors:', newErrors);
+    
+    // Mettre à jour les erreurs de façon synchrone
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    
+    // Retourner les erreurs directement pour usage immédiat
+    return { isValid: Object.keys(newErrors).length === 0, errors: newErrors };
   };
 
   const handleChange = (field: string, value: any) => {
