@@ -24,10 +24,13 @@ export const ensureCreditsTableExists = async (): Promise<void> => {
 
     if (error && error.code === '42P01') {
       console.log('Credits table does not exist');
-      throw new Error('La table des avoirs n\'existe pas. Veuillez exécuter la migration 013_create_credits_table.sql dans votre dashboard Supabase.');
+      throw new Error('TABLE_MISSING');
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error ensuring credits table exists:', error);
+    if (error.message === 'TABLE_MISSING') {
+      throw new Error('La table des avoirs n\'existe pas. Veuillez exécuter la migration SQL dans votre dashboard Supabase.');
+    }
     throw error;
   }
 };

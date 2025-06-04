@@ -29,14 +29,12 @@ export function useCredits() {
     },
     onError: (error: any) => {
       console.error('Error creating credit - Full error object:', error);
-      console.error('Error code:', error?.code);
       console.error('Error message:', error?.message);
-      console.error('Error details:', error?.details);
       
-      if (error?.code === '42P01') {
+      if (error?.message?.includes('table des avoirs n\'existe pas')) {
         toast({
           title: "Table manquante",
-          description: "La table des avoirs n'existe pas encore. Veuillez exécuter les migrations de base de données.",
+          description: "La table des avoirs n'existe pas. Veuillez exécuter la migration SQL dans votre dashboard Supabase.",
           variant: "destructive"
         });
       } else if (error?.message) {
@@ -67,11 +65,19 @@ export function useCredits() {
     },
     onError: (error: any) => {
       console.error('Error updating credit:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de modifier l'avoir.",
-        variant: "destructive"
-      });
+      if (error?.message?.includes('table des avoirs n\'existe pas')) {
+        toast({
+          title: "Table manquante",
+          description: "La table des avoirs n'existe pas. Veuillez exécuter la migration SQL dans votre dashboard Supabase.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Erreur",
+          description: "Impossible de modifier l'avoir.",
+          variant: "destructive"
+        });
+      }
     }
   });
   
@@ -86,11 +92,19 @@ export function useCredits() {
     },
     onError: (error: any) => {
       console.error('Error deleting credit:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer l'avoir.",
-        variant: "destructive"
-      });
+      if (error?.message?.includes('table des avoirs n\'existe pas')) {
+        toast({
+          title: "Table manquante",
+          description: "La table des avoirs n'existe pas. Veuillez exécuter la migration SQL dans votre dashboard Supabase.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Erreur",
+          description: "Impossible de supprimer l'avoir.",
+          variant: "destructive"
+        });
+      }
     }
   });
 
