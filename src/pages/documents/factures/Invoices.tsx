@@ -45,10 +45,10 @@ const Invoices = () => {
     switch (status) {
       case 'Payée':
         return 'bg-green-100 text-green-800';
-      case 'En attente':
+      case 'En attente de paiement':
         return 'bg-amber-100 text-amber-800';
-      case 'Annulée':
-        return 'bg-red-100 text-red-800';
+      case 'Paiement partiel':
+        return 'bg-blue-100 text-blue-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -162,10 +162,10 @@ const Invoices = () => {
             Payées
           </Button>
           <Button variant="outline" size="sm" className="mr-2">
-            En attente
+            En attente de paiement
           </Button>
           <Button variant="outline" size="sm">
-            Annulées
+            Paiement partiel
           </Button>
         </div>
         
@@ -227,8 +227,8 @@ const Invoices = () => {
                   </TableCell>
                   <TableCell>{formatAmount(invoice.amount)}</TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente')}`}>
-                      {invoice.status || 'En attente'}
+                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente de paiement')}`}>
+                      {invoice.status || 'En attente de paiement'}
                     </span>
                   </TableCell>
                   <TableCell className="text-right">

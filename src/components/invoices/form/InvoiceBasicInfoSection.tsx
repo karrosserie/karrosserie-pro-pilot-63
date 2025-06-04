@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,10 +27,9 @@ export const InvoiceBasicInfoSection = ({
   onCurrentMileageChange
 }: InvoiceBasicInfoSectionProps) => {
   const statusOptions = [
-    { value: 'En attente', label: 'En attente' },
-    { value: 'Payée', label: 'Payée' },
-    { value: 'Annulée', label: 'Annulée' },
-    { value: 'En retard', label: 'En retard' }
+    { value: 'En attente de paiement', label: 'En attente de paiement' },
+    { value: 'Paiement partiel', label: 'Paiement partiel' },
+    { value: 'Payée', label: 'Payée' }
   ];
 
   return (
@@ -89,7 +87,7 @@ export const InvoiceBasicInfoSection = ({
           <div>
             <Label htmlFor="status">Statut</Label>
             <Select
-              value={formData.status || 'En attente'}
+              value={formData.status || 'En attente de paiement'}
               onValueChange={(value) => onFieldChange('status', value)}
             >
               <SelectTrigger 
