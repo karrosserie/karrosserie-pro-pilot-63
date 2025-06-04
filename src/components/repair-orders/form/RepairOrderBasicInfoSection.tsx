@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,6 +34,7 @@ export const RepairOrderBasicInfoSection = ({
     { value: 'En attente de signature', label: 'En attente de signature' },
     { value: 'Signature annulée', label: 'Signature annulée' },
     { value: 'Signé', label: 'Signé' },
+    { value: 'Facturé', label: 'Facturé' },
     { value: 'Annulé', label: 'Annulé' }
   ];
 
