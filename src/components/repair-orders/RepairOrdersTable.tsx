@@ -139,7 +139,7 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => contextMenuProps?.onSignOrder?.(order)}>
                         <Signature className="mr-2 h-4 w-4" />
-                        Signer
+                        Signature du client
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => contextMenuProps?.onRequestDocuments?.(order)}>
                         <FileCheck className="mr-2 h-4 w-4" />
