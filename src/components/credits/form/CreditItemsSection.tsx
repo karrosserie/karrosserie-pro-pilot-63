@@ -11,35 +11,14 @@ interface CreditItemsSectionProps {
   onAddItem: () => void;
   onUpdateItem: (id: string, field: keyof CreditItem, value: any) => void;
   onRemoveItem: (id: string) => void;
-  calculateTotal: () => number;
 }
 
 export const CreditItemsSection = ({
   items,
   onAddItem,
   onUpdateItem,
-  onRemoveItem,
-  calculateTotal
+  onRemoveItem
 }: CreditItemsSectionProps) => {
-  const calculateTotals = () => {
-    const subTotal = items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
-    const totalVat = items.reduce((sum, item) => {
-      const subtotal = item.quantity * item.unit_price;
-      const discountAmount = subtotal * (item.discount / 100);
-      const afterDiscount = subtotal - discountAmount;
-      return sum + (afterDiscount * (item.vat / 100));
-    }, 0);
-    const totalDiscount = items.reduce((sum, item) => {
-      const subtotal = item.quantity * item.unit_price;
-      return sum + (subtotal * (item.discount / 100));
-    }, 0);
-    const total = items.reduce((sum, item) => sum + item.total, 0);
-
-    return { subTotal, totalVat, totalDiscount, total };
-  };
-
-  const totals = calculateTotals();
-
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -135,19 +114,6 @@ export const CreditItemsSection = ({
             Ajouter un article
           </Button>
         </div>
-
-        {items.length > 0 && (
-          <div className="border-t pt-4 space-y-2">
-            <div className="flex justify-end space-x-8 text-sm">
-              <div>Sous-total : <span className="font-medium">{totals.subTotal.toFixed(2)} €</span></div>
-              <div>TVA : <span className="font-medium">{totals.totalVat.toFixed(2)} €</span></div>
-              <div>Remise TTC : <span className="font-medium">{totals.totalDiscount.toFixed(2)} €</span></div>
-            </div>
-            <div className="flex justify-end text-lg font-bold">
-              Total : <span className="ml-2">{totals.total.toFixed(2)} €</span>
-            </div>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

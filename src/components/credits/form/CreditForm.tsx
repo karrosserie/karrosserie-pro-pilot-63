@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
 import { CreditBasicInfoSection } from './CreditBasicInfoSection';
 import { CreditItemsSection } from './CreditItemsSection';
+import { CreditTotalsSection } from './CreditTotalsSection';
 import { useCreditFormState } from './hooks/useCreditFormState';
 import { useCredits } from '@/hooks/use-credits';
 
@@ -76,7 +77,6 @@ export const CreditForm = ({ onClose }: CreditFormProps) => {
         onAddItem={addItem}
         onUpdateItem={updateItem}
         onRemoveItem={removeItem}
-        calculateTotal={calculateTotal}
       />
 
       {errors.items && (
@@ -85,6 +85,8 @@ export const CreditForm = ({ onClose }: CreditFormProps) => {
           {errors.items}
         </p>
       )}
+
+      <CreditTotalsSection items={items} />
 
       <div className="flex justify-end space-x-2 pt-4 border-t">
         <Button type="button" variant="outline" onClick={onClose}>
