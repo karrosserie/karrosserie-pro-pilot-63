@@ -1,6 +1,8 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, Search, Filter } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const DocumentItem = ({ 
   icon, 
@@ -57,10 +59,10 @@ const Documents = () => {
     <div className="page-container">
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Gestion des documents</h1>
-        <p className="text-gray-600 mt-1">Consultez et gérez tous vos documents: rapports d'expertise, devis, ordres de réparation et factures.</p>
+        <p className="text-gray-600 mt-1">Consultez et gérez tous vos documents: rapports d'expertise, devis, ordres de réparation, factures et avoirs.</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <div className="card-container text-center">
           <div className="flex justify-center mb-2">
             <div className="bg-blue-100 p-3 rounded-full">
@@ -69,9 +71,11 @@ const Documents = () => {
           </div>
           <h3 className="font-bold">Rapports d'expertise</h3>
           <p className="text-sm text-gray-600 mt-1">12 documents</p>
-          <Button className="mt-3 w-full" variant="outline">
-            Voir tout
-          </Button>
+          <Link to="/documents/expertise">
+            <Button className="mt-3 w-full" variant="outline">
+              Voir tout
+            </Button>
+          </Link>
         </div>
         
         <div className="card-container text-center">
@@ -82,9 +86,11 @@ const Documents = () => {
           </div>
           <h3 className="font-bold">Devis</h3>
           <p className="text-sm text-gray-600 mt-1">8 documents</p>
-          <Button className="mt-3 w-full" variant="outline">
-            Voir tout
-          </Button>
+          <Link to="/documents/devis">
+            <Button className="mt-3 w-full" variant="outline">
+              Voir tout
+            </Button>
+          </Link>
         </div>
         
         <div className="card-container text-center">
@@ -95,9 +101,11 @@ const Documents = () => {
           </div>
           <h3 className="font-bold">Ordres de réparation</h3>
           <p className="text-sm text-gray-600 mt-1">15 documents</p>
-          <Button className="mt-3 w-full" variant="outline">
-            Voir tout
-          </Button>
+          <Link to="/documents/ordres">
+            <Button className="mt-3 w-full" variant="outline">
+              Voir tout
+            </Button>
+          </Link>
         </div>
         
         <div className="card-container text-center">
@@ -108,9 +116,26 @@ const Documents = () => {
           </div>
           <h3 className="font-bold">Factures</h3>
           <p className="text-sm text-gray-600 mt-1">23 documents</p>
-          <Button className="mt-3 w-full" variant="outline">
-            Voir tout
-          </Button>
+          <Link to="/documents/factures">
+            <Button className="mt-3 w-full" variant="outline">
+              Voir tout
+            </Button>
+          </Link>
+        </div>
+
+        <div className="card-container text-center">
+          <div className="flex justify-center mb-2">
+            <div className="bg-red-100 p-3 rounded-full">
+              <FileText className="h-6 w-6 text-red-600" />
+            </div>
+          </div>
+          <h3 className="font-bold">Avoirs</h3>
+          <p className="text-sm text-gray-600 mt-1">5 documents</p>
+          <Link to="/documents/avoirs">
+            <Button className="mt-3 w-full" variant="outline">
+              Voir tout
+            </Button>
+          </Link>
         </div>
       </div>
       

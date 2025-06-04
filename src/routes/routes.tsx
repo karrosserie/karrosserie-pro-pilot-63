@@ -19,6 +19,7 @@ import ExpertiseReports from "@/pages/documents/expertise/ExpertiseReports";
 import Quotes from "@/pages/documents/devis/Quotes";
 import RepairOrders from "@/pages/documents/ordres/RepairOrders";
 import Invoices from "@/pages/documents/factures/Invoices";
+import Credits from "@/pages/documents/avoirs/Credits";
 
 // Wrapper component for protected routes
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -112,6 +113,14 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <Invoices />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/documents/avoirs",
+    element: (
+      <ProtectedRoute>
+        <Credits />
       </ProtectedRoute>
     )
   },

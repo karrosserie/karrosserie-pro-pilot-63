@@ -101,6 +101,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
         { label: 'Devis', path: '/documents/devis' },
         { label: 'Ordres de réparation', path: '/documents/ordres' },
         { label: 'Factures', path: '/documents/factures' },
+        { label: 'Avoirs', path: '/documents/avoirs' },
       ]
     },
     { icon: <CreditCard className="app-icon" />, label: 'Cession de créance', path: '/cessions' },
