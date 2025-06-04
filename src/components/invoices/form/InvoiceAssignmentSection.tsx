@@ -26,12 +26,18 @@ export const InvoiceAssignmentSection = ({
 }: InvoiceAssignmentSectionProps) => {
   const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
   
+  console.log('InvoiceAssignmentSection - clientOptions:', clientOptions);
+  console.log('InvoiceAssignmentSection - formData.client_id:', formData.client_id);
+  
   // Filtrer les véhicules pour le client sélectionné
   const clientVehicles = vehicles?.filter(vehicle => 
     vehicle.client_id === formData.client_id
   ) || [];
 
+  console.log('InvoiceAssignmentSection - clientVehicles:', clientVehicles);
+
   const handleClientChange = (clientId: string) => {
+    console.log('Client changed to:', clientId);
     onFieldChange('client_id', clientId);
     // Réinitialiser le véhicule quand on change de client
     onFieldChange('vehicle_id', null);
@@ -66,11 +72,17 @@ export const InvoiceAssignmentSection = ({
                 <SelectValue placeholder="Sélectionner un client" />
               </SelectTrigger>
               <SelectContent>
-                {clientOptions.map((client) => (
-                  <SelectItem key={client.id} value={client.id}>
-                    {client.first_name} {client.last_name}
+                {clientOptions && clientOptions.length > 0 ? (
+                  clientOptions.map((client) => (
+                    <SelectItem key={client.id} value={client.id}>
+                      {client.first_name} {client.last_name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="" disabled>
+                    {isLoadingClients ? 'Chargement...' : 'Aucun client disponible'}
                   </SelectItem>
-                ))}
+                )}
               </SelectContent>
             </Select>
             {errors.client_id && (

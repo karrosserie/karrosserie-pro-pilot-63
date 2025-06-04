@@ -78,7 +78,11 @@ export const InvoiceForm = ({
     }
   };
 
-  const clientOptions = clients?.filter(client => !!client) || [];
+  // S'assurer que clientOptions est un tableau valide
+  const clientOptions = Array.isArray(clients) ? clients.filter(client => client && client.id) : [];
+  
+  console.log('InvoiceForm - clients from useClients:', clients);
+  console.log('InvoiceForm - clientOptions after filtering:', clientOptions);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto">
