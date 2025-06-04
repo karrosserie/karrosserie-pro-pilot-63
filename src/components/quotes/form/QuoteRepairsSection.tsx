@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -113,7 +112,7 @@ export const QuoteRepairsSection = ({ repairs, onRepairsChange, isReadOnly = fal
                   value={repair.quantity}
                   onChange={(e) => updateRepair(repair.id, 'quantity', parseFloat(e.target.value) || 0)}
                   min="0"
-                  step="1"
+                  step="0.01"
                   readOnly={isReadOnly}
                   className={isReadOnly ? 'bg-gray-50' : ''}
                 />

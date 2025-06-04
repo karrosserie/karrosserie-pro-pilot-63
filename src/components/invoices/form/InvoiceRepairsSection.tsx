@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -80,9 +79,10 @@ export const InvoiceRepairsSection = ({ repairs, onRepairsChange, isReadOnly }: 
               <Input
                 id={`repair-quantity-${repair.id}`}
                 type="number"
-                min="1"
+                min="0"
+                step="0.01"
                 value={repair.quantity}
-                onChange={(e) => updateRepair(repair.id, 'quantity', parseInt(e.target.value) || 0)}
+                onChange={(e) => updateRepair(repair.id, 'quantity', parseFloat(e.target.value) || 0)}
                 readOnly={isReadOnly}
               />
             </div>

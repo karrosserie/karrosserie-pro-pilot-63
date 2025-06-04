@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -54,9 +53,7 @@ export const QuotePartsSection = ({ parts, onPartsChange, isReadOnly = false }: 
     const subTotal = parts.reduce((sum, part) => sum + (part.quantity * part.unitCost), 0);
     const totalVat = parts.reduce((sum, part) => {
       const subtotal = part.quantity * part.unitCost;
-      const discountAmount = subtotal * (part.discount / 100);
-      const afterDiscount = subtotal - discountAmount;
-      return sum + (afterDiscount * (part.vat / 100));
+      return sum + (subtotal * (part.vat / 100));
     }, 0);
     const totalDiscount = parts.reduce((sum, part) => {
       const subtotal = part.quantity * part.unitCost;
@@ -113,7 +110,7 @@ export const QuotePartsSection = ({ parts, onPartsChange, isReadOnly = false }: 
                   value={part.quantity}
                   onChange={(e) => updatePart(part.id, 'quantity', parseFloat(e.target.value) || 0)}
                   min="0"
-                  step="1"
+                  step="0.01"
                   readOnly={isReadOnly}
                   className={isReadOnly ? 'bg-gray-50' : ''}
                 />
