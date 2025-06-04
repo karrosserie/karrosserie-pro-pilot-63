@@ -11,9 +11,21 @@ interface QuoteBasicInfoSectionProps {
   formData: Partial<Quote>;
   errors: Record<string, string>;
   onFieldChange: (field: string, value: any) => void;
+  claimNumber?: string;
+  currentMileage?: string;
+  onClaimNumberChange?: (value: string) => void;
+  onCurrentMileageChange?: (value: string) => void;
 }
 
-export const QuoteBasicInfoSection = ({ formData, errors, onFieldChange }: QuoteBasicInfoSectionProps) => {
+export const QuoteBasicInfoSection = ({ 
+  formData, 
+  errors, 
+  onFieldChange,
+  claimNumber = '',
+  currentMileage = '',
+  onClaimNumberChange,
+  onCurrentMileageChange
+}: QuoteBasicInfoSectionProps) => {
   const statusOptions = [
     { value: 'En attente', label: 'En attente' },
     { value: 'Facturé', label: 'Facturé' },
@@ -87,8 +99,8 @@ export const QuoteBasicInfoSection = ({ formData, errors, onFieldChange }: Quote
             <Label htmlFor="claim_number">N° de sinistre</Label>
             <Input
               id="claim_number"
-              value={formData.claim_number || ''}
-              onChange={(e) => onFieldChange('claim_number', e.target.value)}
+              value={claimNumber}
+              onChange={(e) => onClaimNumberChange?.(e.target.value)}
               placeholder="Numéro de sinistre"
             />
           </div>
@@ -98,8 +110,8 @@ export const QuoteBasicInfoSection = ({ formData, errors, onFieldChange }: Quote
             <Input
               id="current_mileage"
               type="number"
-              value={formData.current_mileage || ''}
-              onChange={(e) => onFieldChange('current_mileage', e.target.value)}
+              value={currentMileage}
+              onChange={(e) => onCurrentMileageChange?.(e.target.value)}
               placeholder="Kilométrage en km"
             />
           </div>

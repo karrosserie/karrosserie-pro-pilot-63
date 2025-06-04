@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useClients } from '@/hooks/use-clients';
@@ -36,10 +35,14 @@ export const QuoteForm = ({
     discounts,
     errors,
     isReadOnly,
+    claimNumber,
+    currentMileage,
     setRepairs,
     setParts,
     setDiscounts,
     handleChange,
+    handleClaimNumberChange,
+    handleCurrentMileageChange,
     validateForm,
     calculateGlobalTotals,
     prepareSubmitData
@@ -82,6 +85,10 @@ export const QuoteForm = ({
         formData={formData}
         errors={errors}
         onFieldChange={handleChange}
+        claimNumber={claimNumber}
+        currentMileage={currentMileage}
+        onClaimNumberChange={handleClaimNumberChange}
+        onCurrentMileageChange={handleCurrentMileageChange}
       />
 
       <QuoteAssignmentSection 

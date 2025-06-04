@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Quote } from '@/services/supabase/quotes';
 import { QuoteRepairItem, QuotePartItem, QuoteDiscountItem, GlobalTotals } from './types';
@@ -18,6 +19,8 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
   });
 
   const [notes, setNotes] = useState('');
+  const [claimNumber, setClaimNumber] = useState('');
+  const [currentMileage, setCurrentMileage] = useState('');
   const [repairs, setRepairs] = useState<QuoteRepairItem[]>([]);
   const [parts, setParts] = useState<QuotePartItem[]>([]);
   const [discounts, setDiscounts] = useState<QuoteDiscountItem[]>([]);
@@ -99,10 +102,24 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     }
   };
 
+  const handleClaimNumberChange = (value: string) => {
+    if (!isReadOnly) {
+      setClaimNumber(value);
+    }
+  };
+
+  const handleCurrentMileageChange = (value: string) => {
+    if (!isReadOnly) {
+      setCurrentMileage(value);
+    }
+  };
+
   // Fonction pour préparer les données à soumettre
   const prepareSubmitData = () => {
     const notesData = {
       notes,
+      claimNumber,
+      currentMileage,
       repairs,
       parts,
       discounts
@@ -142,6 +159,8 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
         try {
           const noteData = JSON.parse(quote.notes);
           setNotes(noteData.notes || noteData.description || '');
+          setClaimNumber(noteData.claimNumber || '');
+          setCurrentMileage(noteData.currentMileage || '');
           if (noteData.repairs) {
             setRepairs(noteData.repairs);
           }
@@ -154,12 +173,16 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
         } catch (e) {
           console.error('Error parsing quote notes:', e);
           setNotes('');
+          setClaimNumber('');
+          setCurrentMileage('');
           setRepairs([]);
           setParts([]);
           setDiscounts([]);
         }
       } else {
         setNotes('');
+        setClaimNumber('');
+        setCurrentMileage('');
         setRepairs([]);
         setParts([]);
         setDiscounts([]);
@@ -177,12 +200,16 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
         }));
       });
       setNotes('');
+      setClaimNumber('');
+      setCurrentMileage('');
     }
   }, [quote]);
 
   return {
     formData,
     notes,
+    claimNumber,
+    currentMileage,
     repairs,
     parts,
     discounts,
@@ -192,6 +219,8 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     setParts,
     setDiscounts,
     handleChange,
+    handleClaimNumberChange,
+    handleCurrentMileageChange,
     validateForm,
     calculateGlobalTotals,
     prepareSubmitData
