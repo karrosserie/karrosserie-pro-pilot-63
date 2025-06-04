@@ -5,6 +5,9 @@ import { useClients } from '@/hooks/use-clients';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { RepairOrderBasicInfoSection } from './form/RepairOrderBasicInfoSection';
 import { RepairOrderAssignmentSection } from './form/RepairOrderAssignmentSection';
+import { RepairOrderRepairsSection } from './form/RepairOrderRepairsSection';
+import { RepairOrderPartsSection } from './form/RepairOrderPartsSection';
+import { RepairOrderDiscountsSection } from './form/RepairOrderDiscountsSection';
 import { RepairOrderDetailsSection } from './form/RepairOrderDetailsSection';
 import { RepairOrderFormActions } from './form/RepairOrderFormActions';
 import { useRepairOrderFormLogic } from './form/useRepairOrderFormLogic';
@@ -83,6 +86,26 @@ export const RepairOrderForm = ({
         onFieldChange={handleChange}
         clientOptions={clientOptions}
         isLoadingClients={isLoadingClients}
+      />
+
+      <RepairOrderRepairsSection
+        repairs={repairs}
+        onRepairsChange={setRepairs}
+        isReadOnly={isReadOnly}
+      />
+
+      <RepairOrderPartsSection
+        parts={parts}
+        onPartsChange={setParts}
+        isReadOnly={isReadOnly}
+      />
+
+      <RepairOrderDiscountsSection
+        repairs={repairs}
+        parts={parts}
+        onRepairsChange={setRepairs}
+        onPartsChange={setParts}
+        isReadOnly={isReadOnly}
       />
 
       <RepairOrderDetailsSection 
