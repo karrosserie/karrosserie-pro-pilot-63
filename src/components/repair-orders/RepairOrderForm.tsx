@@ -66,10 +66,7 @@ export const RepairOrderForm = ({
     }
     
     try {
-      const submitData = {
-        ...prepareSubmitData(),
-        amount: globalTotals.total
-      };
+      const submitData = prepareSubmitData();
       
       await onSubmit(submitData);
     } catch (error: any) {
