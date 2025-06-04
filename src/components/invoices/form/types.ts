@@ -20,6 +20,12 @@ export interface InvoicePartItem {
   total: number;
 }
 
+export interface InvoiceDiscountItem {
+  id: string;
+  description: string;
+  amount: number;
+}
+
 export interface GlobalTotals {
   subTotal: number;
   totalVat: number;
