@@ -2,10 +2,8 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Trash2, Package } from 'lucide-react';
+import { Package, Plus, Trash2 } from 'lucide-react';
 import { CreditItem } from './types';
 
 interface CreditItemsSectionProps {
@@ -23,6 +21,25 @@ export const CreditItemsSection = ({
   onRemoveItem,
   calculateTotal
 }: CreditItemsSectionProps) => {
+  const calculateTotals = () => {
+    const subTotal = items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
+    const totalVat = items.reduce((sum, item) => {
+      const subtotal = item.quantity * item.unit_price;
+      const discountAmount = subtotal * (item.discount / 100);
+      const afterDiscount = subtotal - discountAmount;
+      return sum + (afterDiscount * (item.vat / 100));
+    }, 0);
+    const totalDiscount = items.reduce((sum, item) => {
+      const subtotal = item.quantity * item.unit_price;
+      return sum + (subtotal * (item.discount / 100));
+    }, 0);
+    const total = items.reduce((sum, item) => sum + item.total, 0);
+
+    return { subTotal, totalVat, totalDiscount, total };
+  };
+
+  const totals = calculateTotals();
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -35,85 +52,102 @@ export const CreditItemsSection = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-4">
-          {items.length > 0 ? (
-            <div className="border rounded-lg overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[40%]">Description</TableHead>
-                    <TableHead className="w-[15%]">Quantité</TableHead>
-                    <TableHead className="w-[20%]">Prix unitaire</TableHead>
-                    <TableHead className="w-[20%]">Total</TableHead>
-                    <TableHead className="w-[5%]"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {items.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>
-                        <Input
-                          value={item.description}
-                          onChange={(e) => onUpdateItem(item.id, 'description', e.target.value)}
-                          placeholder="Description de l'article"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          value={item.quantity}
-                          onChange={(e) => onUpdateItem(item.id, 'quantity', parseInt(e.target.value) || 0)}
-                          min="1"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          value={item.unit_price}
-                          onChange={(e) => onUpdateItem(item.id, 'unit_price', parseFloat(e.target.value) || 0)}
-                          placeholder="0.00"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <div className="font-medium">
-                          {item.total.toFixed(2)} €
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onRemoveItem(item.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+        {items.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            Aucun article ajouté
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {/* Header */}
+            <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+              <div>Désignation</div>
+              <div>Qté</div>
+              <div>Prix Unitaire (€)</div>
+              <div>Remise (%)</div>
+              <div>TVA (%)</div>
+              <div>Total (€)</div>
+              <div></div>
             </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              Aucun article ajouté
-            </div>
-          )}
-        </div>
 
-        <div className="flex justify-between items-center pt-4 border-t">
-          <Button type="button" variant="outline" onClick={onAddItem}>
+            {/* Item rows */}
+            {items.map((item) => (
+              <div key={item.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+                <Input
+                  value={item.description}
+                  onChange={(e) => onUpdateItem(item.id, 'description', e.target.value)}
+                  placeholder="Désignation de l'article"
+                />
+                <Input
+                  type="number"
+                  value={item.quantity}
+                  onChange={(e) => onUpdateItem(item.id, 'quantity', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  step="0.01"
+                />
+                <Input
+                  type="number"
+                  value={item.unit_price}
+                  onChange={(e) => onUpdateItem(item.id, 'unit_price', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                />
+                <Input
+                  type="number"
+                  value={item.discount}
+                  onChange={(e) => onUpdateItem(item.id, 'discount', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  max="100"
+                  step="0.1"
+                />
+                <Input
+                  type="number"
+                  value={item.vat}
+                  onChange={(e) => onUpdateItem(item.id, 'vat', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  step="0.1"
+                />
+                <div className="text-right font-medium">
+                  {item.total.toFixed(2)} €
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => onRemoveItem(item.id)}
+                  className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onAddItem}
+            className="w-auto"
+          >
             <Plus className="h-4 w-4 mr-2" />
             Ajouter un article
           </Button>
-          
-          <div className="text-right">
-            <Label className="text-lg font-semibold">
-              Total: {calculateTotal().toFixed(2)} €
-            </Label>
-          </div>
         </div>
+
+        {items.length > 0 && (
+          <div className="border-t pt-4 space-y-2">
+            <div className="flex justify-end space-x-8 text-sm">
+              <div>Sous-total : <span className="font-medium">{totals.subTotal.toFixed(2)} €</span></div>
+              <div>TVA : <span className="font-medium">{totals.totalVat.toFixed(2)} €</span></div>
+              <div>Remise TTC : <span className="font-medium">{totals.totalDiscount.toFixed(2)} €</span></div>
+            </div>
+            <div className="flex justify-end text-lg font-bold">
+              Total : <span className="ml-2">{totals.total.toFixed(2)} €</span>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

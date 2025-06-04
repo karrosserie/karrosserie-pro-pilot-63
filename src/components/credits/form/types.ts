@@ -13,5 +13,7 @@ export interface CreditItem {
   description: string;
   quantity: number;
   unit_price: number;
+  discount: number;
+  vat: number;
   total: number;
 }

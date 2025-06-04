@@ -45,6 +45,8 @@ export const useCreditFormState = () => {
       description: '',
       quantity: 1,
       unit_price: 0,
+      discount: 0,
+      vat: 20,
       total: 0
     };
     setItems(prev => [...prev, newItem]);
@@ -54,9 +56,12 @@ export const useCreditFormState = () => {
     setItems(prev => prev.map(item => {
       if (item.id === id) {
         const updatedItem = { ...item, [field]: value };
-        if (field === 'quantity' || field === 'unit_price') {
-          updatedItem.total = updatedItem.quantity * updatedItem.unit_price;
-        }
+        // Calculate total with discount and VAT
+        const subtotal = updatedItem.quantity * updatedItem.unit_price;
+        const discountAmount = subtotal * (updatedItem.discount / 100);
+        const afterDiscount = subtotal - discountAmount;
+        const vatAmount = afterDiscount * (updatedItem.vat / 100);
+        updatedItem.total = afterDiscount + vatAmount;
         return updatedItem;
       }
       return item;
