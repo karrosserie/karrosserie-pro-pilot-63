@@ -5,14 +5,14 @@ import { AlertCircle } from 'lucide-react';
 import { CreditBasicInfoSection } from './CreditBasicInfoSection';
 import { CreditItemsSection } from './CreditItemsSection';
 import { useCreditFormState } from './hooks/useCreditFormState';
-import { useToast } from '@/hooks/use-toast';
+import { useCredits } from '@/hooks/use-credits';
 
 interface CreditFormProps {
   onClose: () => void;
 }
 
 export const CreditForm = ({ onClose }: CreditFormProps) => {
-  const { toast } = useToast();
+  const { createCredit } = useCredits();
   const {
     formData,
     items,
@@ -44,38 +44,22 @@ export const CreditForm = ({ onClose }: CreditFormProps) => {
     e.preventDefault();
     
     if (!validateForm()) {
-      toast({
-        title: "Erreur de validation",
-        description: "Veuillez corriger les erreurs dans le formulaire.",
-        variant: "destructive"
-      });
       return;
     }
 
     try {
-      // Pour l'instant, on simule la création
-      console.log('Creating credit with data:', {
+      await createCredit.mutateAsync({
         reference: formData.reference,
         invoice_id: formData.invoice_id,
         status: formData.status,
         amount: calculateTotal(),
         items_data: JSON.stringify(items),
-        notes: formData.notes
-      });
-
-      toast({
-        title: "Avoir créé",
-        description: "L'avoir a été créé avec succès.",
+        notes: formData.notes || ''
       });
       
       onClose();
     } catch (error) {
       console.error('Error creating credit:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer l'avoir.",
-        variant: "destructive"
-      });
     }
   };
 
@@ -108,9 +92,10 @@ export const CreditForm = ({ onClose }: CreditFormProps) => {
         </Button>
         <Button 
           type="submit" 
+          disabled={createCredit.isPending}
           className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
         >
-          Créer l'avoir
+          {createCredit.isPending ? 'Création...' : 'Créer l\'avoir'}
         </Button>
       </div>
     </form>

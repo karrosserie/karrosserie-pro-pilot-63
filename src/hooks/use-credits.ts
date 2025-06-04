@@ -1,23 +1,11 @@
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
-
-// Mock data for now since the credits table doesn't exist yet
-const mockCredits = [
-  {
-    id: '1',
-    reference: '001',
-    created_at: '2024-01-15T10:00:00Z',
-    amount: 250.50,
-    status: 'En attente',
-    invoice_id: 'invoice-1',
-    notes: 'Remboursement partiel',
-    user_id: 'user-1'
-  }
-];
+import { creditsService } from '@/services/supabase/credits';
 
 export function useCredits() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const {
     data: credits,
@@ -25,35 +13,72 @@ export function useCredits() {
     error
   } = useQuery({
     queryKey: ['credits'],
-    queryFn: async () => {
-      // Simulation d'une requête API
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return mockCredits;
+    queryFn: creditsService.getCredits
+  });
+  
+  const createCredit = useMutation({
+    mutationFn: creditsService.createCredit,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['credits'] });
+      toast({
+        title: "Avoir créé",
+        description: "L'avoir a été créé avec succès.",
+      });
+    },
+    onError: (error) => {
+      console.error('Error creating credit:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer l'avoir.",
+        variant: "destructive"
+      });
     }
   });
   
-  const createCredit = {
-    mutateAsync: async (creditData: any) => {
-      console.log('Creating credit:', creditData);
-      // Simulation de création
-      return { id: Date.now().toString(), ...creditData };
+  const updateCredit = useMutation({
+    mutationFn: ({ id, data }: { id: string, data: any }) => 
+      creditsService.updateCredit(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['credits'] });
+      toast({
+        title: "Avoir modifié",
+        description: "L'avoir a été modifié avec succès.",
+      });
     },
-    isPending: false
-  };
-  
-  const updateCredit = {
-    mutateAsync: async ({ id, data }: { id: string, data: any }) => {
-      console.log('Updating credit:', id, data);
-      return { id, ...data };
+    onError: (error) => {
+      console.error('Error updating credit:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de modifier l'avoir.",
+        variant: "destructive"
+      });
     }
-  };
+  });
   
-  const deleteCredit = {
-    mutateAsync: async (id: string) => {
-      console.log('Deleting credit:', id);
-      return true;
+  const deleteCredit = useMutation({
+    mutationFn: creditsService.deleteCredit,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['credits'] });
+      toast({
+        title: "Avoir supprimé",
+        description: "L'avoir a été supprimé avec succès.",
+      });
+    },
+    onError: (error) => {
+      console.error('Error deleting credit:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer l'avoir.",
+        variant: "destructive"
+      });
     }
-  };
+  });
+
+  const generateReference = useQuery({
+    queryKey: ['credits', 'generate-reference'],
+    queryFn: creditsService.generateReference,
+    enabled: false
+  });
   
   return {
     credits,
@@ -61,7 +86,8 @@ export function useCredits() {
     error,
     createCredit,
     updateCredit,
-    deleteCredit
+    deleteCredit,
+    generateReference
   };
 }
 
@@ -72,12 +98,7 @@ export function useCredit(id?: string) {
     error
   } = useQuery({
     queryKey: ['credits', id],
-    queryFn: async () => {
-      if (!id) return null;
-      // Simulation d'une requête par ID
-      await new Promise(resolve => setTimeout(resolve, 300));
-      return mockCredits.find(c => c.id === id) || null;
-    },
+    queryFn: () => creditsService.getCredit(id!),
     enabled: !!id
   });
   

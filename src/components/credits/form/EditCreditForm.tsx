@@ -5,7 +5,7 @@ import { AlertCircle } from 'lucide-react';
 import { CreditBasicInfoSection } from './CreditBasicInfoSection';
 import { CreditItemsSection } from './CreditItemsSection';
 import { useEditCreditFormState } from './hooks/useEditCreditFormState';
-import { useToast } from '@/hooks/use-toast';
+import { useCredits } from '@/hooks/use-credits';
 
 interface EditCreditFormProps {
   creditId: string;
@@ -22,7 +22,7 @@ interface EditCreditFormProps {
 }
 
 export const EditCreditForm = ({ creditId, initialData, onClose }: EditCreditFormProps) => {
-  const { toast } = useToast();
+  const { updateCredit } = useCredits();
   const {
     formData,
     items,
@@ -54,39 +54,25 @@ export const EditCreditForm = ({ creditId, initialData, onClose }: EditCreditFor
     e.preventDefault();
     
     if (!validateForm()) {
-      toast({
-        title: "Erreur de validation",
-        description: "Veuillez corriger les erreurs dans le formulaire.",
-        variant: "destructive"
-      });
       return;
     }
 
     try {
-      // Pour l'instant, on simule la modification
-      console.log('Updating credit with data:', {
+      await updateCredit.mutateAsync({
         id: creditId,
-        reference: formData.reference,
-        invoice_id: formData.invoice_id,
-        status: formData.status,
-        amount: calculateTotal(),
-        items_data: JSON.stringify(items),
-        notes: formData.notes
-      });
-
-      toast({
-        title: "Avoir modifié",
-        description: "L'avoir a été modifié avec succès.",
+        data: {
+          reference: formData.reference,
+          invoice_id: formData.invoice_id,
+          status: formData.status,
+          amount: calculateTotal(),
+          items_data: JSON.stringify(items),
+          notes: formData.notes || ''
+        }
       });
       
       onClose();
     } catch (error) {
       console.error('Error updating credit:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de modifier l'avoir.",
-        variant: "destructive"
-      });
     }
   };
 
@@ -119,9 +105,10 @@ export const EditCreditForm = ({ creditId, initialData, onClose }: EditCreditFor
         </Button>
         <Button 
           type="submit" 
+          disabled={updateCredit.isPending}
           className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
         >
-          Modifier l'avoir
+          {updateCredit.isPending ? 'Modification...' : 'Modifier l\'avoir'}
         </Button>
       </div>
     </form>

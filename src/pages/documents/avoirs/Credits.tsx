@@ -21,6 +21,7 @@ import {
 import { Printer, Mail, FileX } from 'lucide-react';
 import { CreditDialog } from '@/components/credits/CreditDialog';
 import { EditCreditDialog } from '@/components/credits/EditCreditDialog';
+import { useCredits } from '@/hooks/use-credits';
 
 // Mock data for credits - to be replaced with real data later
 const mockCredits = [
@@ -79,15 +80,17 @@ const Credits = () => {
   const [selectedCredit, setSelectedCredit] = useState<any>(null);
   const { toast } = useToast();
   
-  const filteredCredits = mockCredits.filter(credit => 
+  const { credits = [], isLoading, deleteCredit } = useCredits();
+  
+  const filteredCredits = credits.filter(credit => 
     credit.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (credit.clients && `${credit.clients.first_name} ${credit.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (credit.vehicles && `${credit.vehicles.brand} ${credit.vehicles.model} - ${credit.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
-  ) || [];
+  );
   
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Validé':
+      case 'Payé':
         return 'bg-green-100 text-green-800';
       case 'En attente':
         return 'bg-amber-100 text-amber-800';
@@ -119,16 +122,30 @@ const Credits = () => {
   };
 
   const handleEditCredit = (credit: any) => {
-    setSelectedCredit(credit);
+    // Parse items_data if it exists
+    let items = [];
+    if (credit.items_data) {
+      try {
+        items = JSON.parse(credit.items_data);
+      } catch (error) {
+        console.error('Error parsing items_data:', error);
+      }
+    }
+
+    setSelectedCredit({
+      ...credit,
+      items
+    });
     setEditDialogOpen(true);
   };
 
-  const handleDelete = (credit: any) => {
+  const handleDelete = async (credit: any) => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'avoir ${credit.reference} ?`)) {
-      toast({
-        title: "Suppression",
-        description: `L'avoir ${credit.reference} a été supprimé`
-      });
+      try {
+        await deleteCredit.mutateAsync(credit.id);
+      } catch (error) {
+        console.error('Error deleting credit:', error);
+      }
     }
   };
 
@@ -160,6 +177,19 @@ const Credits = () => {
     });
   };
   
+  if (isLoading) {
+    return (
+      <div className="page-container">
+        <div className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-karrosserie-orange mx-auto mb-4"></div>
+            <p className="text-gray-600">Chargement des avoirs...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="page-container">
       <div className="mb-6">
@@ -242,7 +272,9 @@ const Credits = () => {
                       : '-'
                     }
                   </TableCell>
-                  <TableCell>{credit.original_invoice}</TableCell>
+                  <TableCell>
+                    {credit.invoices?.reference || '-'}
+                  </TableCell>
                   <TableCell>{formatAmount(credit.amount)}</TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(credit.status || 'En attente')}`}>
@@ -265,6 +297,7 @@ const Credits = () => {
                         size="icon" 
                         className="text-red-500 hover:text-red-700"
                         onClick={() => handleDelete(credit)}
+                        disabled={deleteCredit.isPending}
                       >
                         <Trash className="h-4 w-4" />
                       </Button>
@@ -327,8 +360,8 @@ const Credits = () => {
           creditId={selectedCredit.id}
           initialData={{
             reference: selectedCredit.reference,
-            client_id: null,
-            vehicle_id: null,
+            client_id: selectedCredit.client_id,
+            vehicle_id: selectedCredit.vehicle_id,
             invoice_id: selectedCredit.invoice_id,
             status: selectedCredit.status,
             notes: selectedCredit.notes,
