@@ -1,0 +1,68 @@
+
+import { supabase } from '@/integrations/supabase/client';
+import { Credit, CreditCreateData, CreditUpdateData } from './types';
+
+export const createCredit = async (creditData: CreditCreateData): Promise<Credit> => {
+  console.log('Creating credit with data:', creditData);
+  
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    console.error('User not authenticated');
+    throw new Error('User not authenticated');
+  }
+
+  console.log('User authenticated:', user.id);
+
+  const insertData = {
+    user_id: user.id,
+    reference: creditData.reference,
+    invoice_id: creditData.invoice_id,
+    status: creditData.status,
+    amount: creditData.amount,
+    items_data: creditData.items_data,
+    notes: creditData.notes
+  };
+
+  console.log('Inserting data:', insertData);
+
+  try {
+    const { data, error } = await (supabase as any)
+      .from('credits')
+      .insert([insertData])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Supabase insert error:', error);
+      throw error;
+    }
+
+    console.log('Credit created successfully:', data);
+    return data;
+  } catch (error) {
+    console.error('Error in createCredit:', error);
+    throw error;
+  }
+};
+
+export const updateCredit = async (id: string, creditData: CreditUpdateData): Promise<Credit> => {
+  const { data, error } = await (supabase as any)
+    .from('credits')
+    .update(creditData)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+export const deleteCredit = async (id: string): Promise<boolean> => {
+  const { error } = await (supabase as any)
+    .from('credits')
+    .delete()
+    .eq('id', id);
+
+  if (error) throw error;
+  return true;
+};
