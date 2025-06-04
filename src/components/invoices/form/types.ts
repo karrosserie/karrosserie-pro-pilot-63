@@ -11,7 +11,6 @@ export interface InvoiceRepairItem {
 
 export interface InvoicePartItem {
   id: string;
-  reference: string;
   description: string;
   quantity: number;
   unitCost: number;

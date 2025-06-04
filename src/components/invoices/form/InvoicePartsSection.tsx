@@ -17,7 +17,6 @@ export const InvoicePartsSection = ({ parts, onPartsChange, isReadOnly = false }
     if (isReadOnly) return;
     const newPart: InvoicePartItem = {
       id: `part_${Date.now()}`,
-      reference: '',
       description: '',
       quantity: 1,
       unitCost: 0,
@@ -55,9 +54,7 @@ export const InvoicePartsSection = ({ parts, onPartsChange, isReadOnly = false }
     const subTotal = parts.reduce((sum, part) => sum + (part.quantity * part.unitCost), 0);
     const totalVat = parts.reduce((sum, part) => {
       const subtotal = part.quantity * part.unitCost;
-      const discountAmount = subtotal * (part.discount / 100);
-      const afterDiscount = subtotal - discountAmount;
-      return sum + (afterDiscount * (part.vat / 100));
+      return sum + (subtotal * (part.vat / 100));
     }, 0);
     const totalDiscount = parts.reduce((sum, part) => {
       const subtotal = part.quantity * part.unitCost;
@@ -75,7 +72,7 @@ export const InvoicePartsSection = ({ parts, onPartsChange, isReadOnly = false }
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center text-lg">
           <Settings className="h-5 w-5 mr-2" />
-          Pièces détachées
+          Pièces
         </CardTitle>
         <CardDescription>
           Liste des pièces utilisées pour la réparation
@@ -89,8 +86,7 @@ export const InvoicePartsSection = ({ parts, onPartsChange, isReadOnly = false }
         ) : (
           <div className="space-y-2">
             {/* Header */}
-            <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: '2fr 2fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-              <div>Référence</div>
+            <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
               <div>Désignation</div>
               <div>Qté</div>
               <div>Coût Unitaire (€)</div>
@@ -102,14 +98,7 @@ export const InvoicePartsSection = ({ parts, onPartsChange, isReadOnly = false }
 
             {/* Part items */}
             {parts.map((part) => (
-              <div key={part.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '2fr 2fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-                <Input
-                  value={part.reference}
-                  onChange={(e) => updatePart(part.id, 'reference', e.target.value)}
-                  placeholder="Référence"
-                  readOnly={isReadOnly}
-                  className={isReadOnly ? 'bg-gray-50' : ''}
-                />
+              <div key={part.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
                 <Input
                   value={part.description}
                   onChange={(e) => updatePart(part.id, 'description', e.target.value)}
