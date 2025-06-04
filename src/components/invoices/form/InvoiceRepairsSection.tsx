@@ -1,7 +1,7 @@
+
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wrench, Plus, Trash2 } from 'lucide-react';
 import { InvoiceRepairItem } from './types';
@@ -12,10 +12,11 @@ interface InvoiceRepairsSectionProps {
   isReadOnly?: boolean;
 }
 
-export const InvoiceRepairsSection = ({ repairs, onRepairsChange, isReadOnly }: InvoiceRepairsSectionProps) => {
+export const InvoiceRepairsSection = ({ repairs, onRepairsChange, isReadOnly = false }: InvoiceRepairsSectionProps) => {
   const addRepair = () => {
+    if (isReadOnly) return;
     const newRepair: InvoiceRepairItem = {
-      id: crypto.randomUUID(),
+      id: `repair_${Date.now()}`,
       description: '',
       quantity: 1,
       unitCost: 0,
@@ -26,28 +27,47 @@ export const InvoiceRepairsSection = ({ repairs, onRepairsChange, isReadOnly }: 
     onRepairsChange([...repairs, newRepair]);
   };
 
-  const updateRepair = (id: string, field: keyof InvoiceRepairItem, value: any) => {
+  const removeRepair = (id: string) => {
+    if (isReadOnly) return;
+    onRepairsChange(repairs.filter(repair => repair.id !== id));
+  };
+
+  const updateRepair = (id: string, field: keyof InvoiceRepairItem, value: string | number) => {
+    if (isReadOnly) return;
     const updatedRepairs = repairs.map(repair => {
       if (repair.id === id) {
-        const updatedRepair = { ...repair, [field]: value };
-        
-        // Recalculer le total
-        const subtotal = updatedRepair.quantity * updatedRepair.unitCost;
-        const discountAmount = subtotal * (updatedRepair.discount / 100);
+        const updated = { ...repair, [field]: value };
+        // Calculate total
+        const subtotal = updated.quantity * updated.unitCost;
+        const discountAmount = subtotal * (updated.discount / 100);
         const afterDiscount = subtotal - discountAmount;
-        const vatAmount = afterDiscount * (updatedRepair.vat / 100);
-        updatedRepair.total = afterDiscount + vatAmount;
-        
-        return updatedRepair;
+        const vatAmount = afterDiscount * (updated.vat / 100);
+        updated.total = afterDiscount + vatAmount;
+        return updated;
       }
       return repair;
     });
     onRepairsChange(updatedRepairs);
   };
 
-  const removeRepair = (id: string) => {
-    onRepairsChange(repairs.filter(repair => repair.id !== id));
+  const calculateTotals = () => {
+    const subTotal = repairs.reduce((sum, repair) => sum + (repair.quantity * repair.unitCost), 0);
+    const totalVat = repairs.reduce((sum, repair) => {
+      const subtotal = repair.quantity * repair.unitCost;
+      const discountAmount = subtotal * (repair.discount / 100);
+      const afterDiscount = subtotal - discountAmount;
+      return sum + (afterDiscount * (repair.vat / 100));
+    }, 0);
+    const totalDiscount = repairs.reduce((sum, repair) => {
+      const subtotal = repair.quantity * repair.unitCost;
+      return sum + (subtotal * (repair.discount / 100));
+    }, 0);
+    const total = repairs.reduce((sum, repair) => sum + repair.total, 0);
+
+    return { subTotal, totalVat, totalDiscount, total };
   };
+
+  const totals = calculateTotals();
 
   return (
     <Card>
@@ -61,88 +81,114 @@ export const InvoiceRepairsSection = ({ repairs, onRepairsChange, isReadOnly }: 
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {repairs.map((repair) => (
-          <div key={repair.id} className="grid grid-cols-1 md:grid-cols-6 gap-4 p-4 border rounded-lg">
-            <div className="md:col-span-2">
-              <Label htmlFor={`repair-description-${repair.id}`}>Description</Label>
-              <Input
-                id={`repair-description-${repair.id}`}
-                value={repair.description}
-                onChange={(e) => updateRepair(repair.id, 'description', e.target.value)}
-                placeholder="Description de la réparation"
-                readOnly={isReadOnly}
-              />
+        {repairs.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            Aucune réparation ajoutée
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {/* Header */}
+            <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+              <div>Désignation</div>
+              <div>Qté</div>
+              <div>Coût Unitaire (€)</div>
+              <div>Remise (%)</div>
+              <div>TVA (%)</div>
+              <div>Total (€)</div>
+              <div></div>
             </div>
-            
-            <div>
-              <Label htmlFor={`repair-quantity-${repair.id}`}>Quantité</Label>
-              <Input
-                id={`repair-quantity-${repair.id}`}
-                type="number"
-                min="0"
-                step="0.01"
-                value={repair.quantity}
-                onChange={(e) => updateRepair(repair.id, 'quantity', parseFloat(e.target.value) || 0)}
-                readOnly={isReadOnly}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor={`repair-cost-${repair.id}`}>Prix unitaire (€)</Label>
-              <Input
-                id={`repair-cost-${repair.id}`}
-                type="number"
-                min="0"
-                step="0.01"
-                value={repair.unitCost}
-                onChange={(e) => updateRepair(repair.id, 'unitCost', parseFloat(e.target.value) || 0)}
-                readOnly={isReadOnly}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor={`repair-vat-${repair.id}`}>TVA (%)</Label>
-              <Input
-                id={`repair-vat-${repair.id}`}
-                type="number"
-                min="0"
-                max="100"
-                step="0.1"
-                value={repair.vat}
-                onChange={(e) => updateRepair(repair.id, 'vat', parseFloat(e.target.value) || 0)}
-                readOnly={isReadOnly}
-              />
-            </div>
-            
-            <div className="flex items-end">
-              <div className="flex-1">
-                <Label>Total: {repair.total.toFixed(2)} €</Label>
+
+            {/* Repair items */}
+            {repairs.map((repair) => (
+              <div key={repair.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+                <Input
+                  value={repair.description}
+                  onChange={(e) => updateRepair(repair.id, 'description', e.target.value)}
+                  placeholder="Désignation de la réparation"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
+                />
+                <Input
+                  type="number"
+                  value={repair.quantity}
+                  onChange={(e) => updateRepair(repair.id, 'quantity', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  step="0.01"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
+                />
+                <Input
+                  type="number"
+                  value={repair.unitCost}
+                  onChange={(e) => updateRepair(repair.id, 'unitCost', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  step="0.01"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
+                />
+                <Input
+                  type="number"
+                  value={repair.discount}
+                  onChange={(e) => updateRepair(repair.id, 'discount', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
+                />
+                <Input
+                  type="number"
+                  value={repair.vat}
+                  onChange={(e) => updateRepair(repair.id, 'vat', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  step="0.1"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
+                />
+                <div className="text-right font-medium">
+                  {repair.total.toFixed(2)} €
+                </div>
+                {!isReadOnly && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => removeRepair(repair.id)}
+                    className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
-              {!isReadOnly && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => removeRepair(repair.id)}
-                  className="ml-2"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
+            ))}
+          </div>
+        )}
+
+        {!isReadOnly && (
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addRepair}
+              className="w-auto"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Ajouter une réparation
+            </Button>
+          </div>
+        )}
+
+        {repairs.length > 0 && (
+          <div className="border-t pt-4 space-y-2">
+            <div className="flex justify-end space-x-8 text-sm">
+              <div>Sous-total : <span className="font-medium">{totals.subTotal.toFixed(2)} €</span></div>
+              <div>TVA : <span className="font-medium">{totals.totalVat.toFixed(2)} €</span></div>
+              <div>Remise TTC : <span className="font-medium">{totals.totalDiscount.toFixed(2)} €</span></div>
+            </div>
+            <div className="flex justify-end text-lg font-bold">
+              Total : <span className="ml-2">{totals.total.toFixed(2)} €</span>
             </div>
           </div>
-        ))}
-        
-        {!isReadOnly && (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={addRepair}
-            className="w-full"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Ajouter une réparation
-          </Button>
         )}
       </CardContent>
     </Card>

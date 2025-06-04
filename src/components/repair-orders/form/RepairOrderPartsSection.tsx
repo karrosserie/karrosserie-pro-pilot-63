@@ -1,7 +1,7 @@
+
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Settings, Plus, Trash2 } from 'lucide-react';
 import { RepairOrderPartItem } from './types';
@@ -12,10 +12,11 @@ interface RepairOrderPartsSectionProps {
   isReadOnly?: boolean;
 }
 
-export const RepairOrderPartsSection = ({ parts, onPartsChange, isReadOnly }: RepairOrderPartsSectionProps) => {
+export const RepairOrderPartsSection = ({ parts, onPartsChange, isReadOnly = false }: RepairOrderPartsSectionProps) => {
   const addPart = () => {
+    if (isReadOnly) return;
     const newPart: RepairOrderPartItem = {
-      id: crypto.randomUUID(),
+      id: `part_${Date.now()}`,
       reference: '',
       description: '',
       quantity: 1,
@@ -27,134 +28,166 @@ export const RepairOrderPartsSection = ({ parts, onPartsChange, isReadOnly }: Re
     onPartsChange([...parts, newPart]);
   };
 
-  const updatePart = (id: string, field: keyof RepairOrderPartItem, value: any) => {
+  const removePart = (id: string) => {
+    if (isReadOnly) return;
+    onPartsChange(parts.filter(part => part.id !== id));
+  };
+
+  const updatePart = (id: string, field: keyof RepairOrderPartItem, value: string | number) => {
+    if (isReadOnly) return;
     const updatedParts = parts.map(part => {
       if (part.id === id) {
-        const updatedPart = { ...part, [field]: value };
-        
-        // Recalculer le total
-        const subtotal = updatedPart.quantity * updatedPart.unitCost;
-        const discountAmount = subtotal * (updatedPart.discount / 100);
+        const updated = { ...part, [field]: value };
+        // Calculate total
+        const subtotal = updated.quantity * updated.unitCost;
+        const discountAmount = subtotal * (updated.discount / 100);
         const afterDiscount = subtotal - discountAmount;
-        const vatAmount = afterDiscount * (updatedPart.vat / 100);
-        updatedPart.total = afterDiscount + vatAmount;
-        
-        return updatedPart;
+        const vatAmount = afterDiscount * (updated.vat / 100);
+        updated.total = afterDiscount + vatAmount;
+        return updated;
       }
       return part;
     });
     onPartsChange(updatedParts);
   };
 
-  const removePart = (id: string) => {
-    onPartsChange(parts.filter(part => part.id !== id));
+  const calculateTotals = () => {
+    const subTotal = parts.reduce((sum, part) => sum + (part.quantity * part.unitCost), 0);
+    const totalVat = parts.reduce((sum, part) => {
+      const subtotal = part.quantity * part.unitCost;
+      return sum + (subtotal * (part.vat / 100));
+    }, 0);
+    const totalDiscount = parts.reduce((sum, part) => {
+      const subtotal = part.quantity * part.unitCost;
+      return sum + (subtotal * (part.discount / 100));
+    }, 0);
+    const total = parts.reduce((sum, part) => sum + part.total, 0);
+
+    return { subTotal, totalVat, totalDiscount, total };
   };
+
+  const totals = calculateTotals();
 
   return (
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center text-lg">
           <Settings className="h-5 w-5 mr-2" />
-          Pièces détachées
+          Pièces
         </CardTitle>
         <CardDescription>
-          Liste des pièces nécessaires à la réparation
+          Liste des pièces à remplacer
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {parts.map((part) => (
-          <div key={part.id} className="grid grid-cols-1 md:grid-cols-7 gap-4 p-4 border rounded-lg">
-            <div>
-              <Label htmlFor={`part-reference-${part.id}`}>Référence</Label>
-              <Input
-                id={`part-reference-${part.id}`}
-                value={part.reference}
-                onChange={(e) => updatePart(part.id, 'reference', e.target.value)}
-                placeholder="Référence"
-                readOnly={isReadOnly}
-              />
+        {parts.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            Aucune pièce ajoutée
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {/* Header */}
+            <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+              <div>Désignation</div>
+              <div>Qté</div>
+              <div>Coût Unitaire (€)</div>
+              <div>Remise (%)</div>
+              <div>TVA (%)</div>
+              <div>Total (€)</div>
+              <div></div>
             </div>
-            
-            <div className="md:col-span-2">
-              <Label htmlFor={`part-description-${part.id}`}>Description</Label>
-              <Input
-                id={`part-description-${part.id}`}
-                value={part.description}
-                onChange={(e) => updatePart(part.id, 'description', e.target.value)}
-                placeholder="Description de la pièce"
-                readOnly={isReadOnly}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor={`part-quantity-${part.id}`}>Quantité</Label>
-              <Input
-                id={`part-quantity-${part.id}`}
-                type="number"
-                min="0"
-                step="0.01"
-                value={part.quantity}
-                onChange={(e) => updatePart(part.id, 'quantity', parseFloat(e.target.value) || 0)}
-                readOnly={isReadOnly}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor={`part-cost-${part.id}`}>Prix unitaire (€)</Label>
-              <Input
-                id={`part-cost-${part.id}`}
-                type="number"
-                min="0"
-                step="0.01"
-                value={part.unitCost}
-                onChange={(e) => updatePart(part.id, 'unitCost', parseFloat(e.target.value) || 0)}
-                readOnly={isReadOnly}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor={`part-vat-${part.id}`}>TVA (%)</Label>
-              <Input
-                id={`part-vat-${part.id}`}
-                type="number"
-                min="0"
-                max="100"
-                step="0.1"
-                value={part.vat}
-                onChange={(e) => updatePart(part.id, 'vat', parseFloat(e.target.value) || 0)}
-                readOnly={isReadOnly}
-              />
-            </div>
-            
-            <div className="flex items-end">
-              <div className="flex-1">
-                <Label>Total: {part.total.toFixed(2)} €</Label>
+
+            {/* Part items */}
+            {parts.map((part) => (
+              <div key={part.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+                <Input
+                  value={part.description}
+                  onChange={(e) => updatePart(part.id, 'description', e.target.value)}
+                  placeholder="Désignation de la pièce"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
+                />
+                <Input
+                  type="number"
+                  value={part.quantity}
+                  onChange={(e) => updatePart(part.id, 'quantity', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  step="0.01"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
+                />
+                <Input
+                  type="number"
+                  value={part.unitCost}
+                  onChange={(e) => updatePart(part.id, 'unitCost', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  step="0.01"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
+                />
+                <Input
+                  type="number"
+                  value={part.discount}
+                  onChange={(e) => updatePart(part.id, 'discount', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
+                />
+                <Input
+                  type="number"
+                  value={part.vat}
+                  onChange={(e) => updatePart(part.id, 'vat', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  step="0.1"
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? 'bg-gray-50' : ''}
+                />
+                <div className="text-right font-medium">
+                  {part.total.toFixed(2)} €
+                </div>
+                {!isReadOnly && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => removePart(part.id)}
+                    className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
-              {!isReadOnly && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => removePart(part.id)}
-                  className="ml-2"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
+            ))}
+          </div>
+        )}
+
+        {!isReadOnly && (
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addPart}
+              className="w-auto"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Ajouter une pièce
+            </Button>
+          </div>
+        )}
+
+        {parts.length > 0 && (
+          <div className="border-t pt-4 space-y-2">
+            <div className="flex justify-end space-x-8 text-sm">
+              <div>Sous-total : <span className="font-medium">{totals.subTotal.toFixed(2)} €</span></div>
+              <div>TVA : <span className="font-medium">{totals.totalVat.toFixed(2)} €</span></div>
+              <div>Remise TTC : <span className="font-medium">{totals.totalDiscount.toFixed(2)} €</span></div>
+            </div>
+            <div className="flex justify-end text-lg font-bold">
+              Total : <span className="ml-2">{totals.total.toFixed(2)} €</span>
             </div>
           </div>
-        ))}
-        
-        {!isReadOnly && (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={addPart}
-            className="w-full"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Ajouter une pièce
-          </Button>
         )}
       </CardContent>
     </Card>
