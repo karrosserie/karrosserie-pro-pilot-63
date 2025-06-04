@@ -96,7 +96,7 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
         reference: invoice.reference,
         client_id: invoice.client_id,
         vehicle_id: invoice.vehicle_id,
-        status: invoice.status || 'Brouillon',
+        status: invoice.status || 'En attente de paiement',
         due_date: invoice.due_date,
         payment_method: invoice.payment_method,
         payment_date: invoice.payment_date,
@@ -128,6 +128,7 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
         setFormData(prev => ({
           ...prev,
           reference: nextNumber,
+          status: 'En attente de paiement',
           due_date: dueDate.toISOString().split('T')[0]
         }));
       });
