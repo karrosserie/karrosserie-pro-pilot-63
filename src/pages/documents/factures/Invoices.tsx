@@ -23,8 +23,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Printer, Mail } from 'lucide-react';
+import { Printer, Mail, Signature, CreditCard, FileX } from 'lucide-react';
 
 const Invoices = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -103,6 +104,27 @@ const Invoices = () => {
     toast({
       title: "Envoi par e-mail",
       description: `Envoi de la facture ${invoice.reference} par e-mail...`
+    });
+  };
+
+  const handleClientSignature = (invoice: Invoice) => {
+    toast({
+      title: "Signature du client",
+      description: `Demande de signature du client pour la facture ${invoice.reference}`
+    });
+  };
+
+  const handleAddPayment = (invoice: Invoice) => {
+    toast({
+      title: "Ajouter un paiement",
+      description: `Ajout d'un paiement pour la facture ${invoice.reference}`
+    });
+  };
+
+  const handleAddCredit = (invoice: Invoice) => {
+    toast({
+      title: "Ajouter un avoir",
+      description: `Ajout d'un avoir pour la facture ${invoice.reference}`
     });
   };
 
@@ -246,6 +268,19 @@ const Invoices = () => {
                           <DropdownMenuItem onClick={() => handleSendEmail(invoice)}>
                             <Mail className="mr-2 h-4 w-4" />
                             Envoyer par e-mail
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => handleClientSignature(invoice)}>
+                            <Signature className="mr-2 h-4 w-4" />
+                            Signature du client
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleAddPayment(invoice)}>
+                            <CreditCard className="mr-2 h-4 w-4" />
+                            Ajouter un paiement
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleAddCredit(invoice)}>
+                            <FileX className="mr-2 h-4 w-4" />
+                            Ajouter un avoir
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
