@@ -30,7 +30,7 @@ export const QuoteBasicInfoSection = ({ formData, errors, onFieldChange }: Quote
           Informations de base
         </CardTitle>
         <CardDescription>
-          Numéro, date et statut du devis
+          Numéro, date, statut et informations du sinistre
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -79,6 +79,29 @@ export const QuoteBasicInfoSection = ({ formData, errors, onFieldChange }: Quote
                 ))}
               </SelectContent>
             </Select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="claim_number">N° de sinistre</Label>
+            <Input
+              id="claim_number"
+              value={formData.claim_number || ''}
+              onChange={(e) => onFieldChange('claim_number', e.target.value)}
+              placeholder="Numéro de sinistre"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="current_mileage">Kilométrage actuel</Label>
+            <Input
+              id="current_mileage"
+              type="number"
+              value={formData.current_mileage || ''}
+              onChange={(e) => onFieldChange('current_mileage', e.target.value)}
+              placeholder="Kilométrage en km"
+            />
           </div>
         </div>
       </CardContent>
