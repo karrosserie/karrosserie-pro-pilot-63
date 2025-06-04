@@ -43,6 +43,11 @@ export const InvoiceAssignmentSection = ({
     onFieldChange('vehicle_id', null);
   };
 
+  const handleVehicleChange = (vehicleId: string) => {
+    console.log('Vehicle changed to:', vehicleId);
+    onFieldChange('vehicle_id', vehicleId);
+  };
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -97,7 +102,7 @@ export const InvoiceAssignmentSection = ({
             <Label htmlFor="vehicle_id" required>Véhicule</Label>
             <Select
               value={formData.vehicle_id || ''}
-              onValueChange={(value) => onFieldChange('vehicle_id', value)}
+              onValueChange={handleVehicleChange}
               disabled={!formData.client_id || isLoadingVehicles}
             >
               <SelectTrigger 
