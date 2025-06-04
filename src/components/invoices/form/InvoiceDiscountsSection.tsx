@@ -19,9 +19,11 @@ export const InvoiceDiscountsSection = ({
   parts, 
   onRepairsChange, 
   onPartsChange, 
-  isReadOnly 
+  isReadOnly = false
 }: InvoiceDiscountsSectionProps) => {
   const updateRepairDiscount = (id: string, discount: number) => {
+    if (isReadOnly) return;
+    
     const updatedRepairs = repairs.map(repair => {
       if (repair.id === id) {
         const updatedRepair = { ...repair, discount };
@@ -41,6 +43,8 @@ export const InvoiceDiscountsSection = ({
   };
 
   const updatePartDiscount = (id: string, discount: number) => {
+    if (isReadOnly) return;
+    
     const updatedParts = parts.map(part => {
       if (part.id === id) {
         const updatedPart = { ...part, discount };
@@ -68,7 +72,7 @@ export const InvoiceDiscountsSection = ({
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center text-lg">
           <Percent className="h-5 w-5 mr-2" />
-          Remises
+          Remises individuelles
         </CardTitle>
         <CardDescription>
           Appliquez des remises individuelles sur chaque élément
@@ -100,7 +104,7 @@ export const InvoiceDiscountsSection = ({
                         step="0.1"
                         value={repair.discount}
                         onChange={(e) => updateRepairDiscount(repair.id, parseFloat(e.target.value) || 0)}
-                        className="w-20"
+                        className={`w-20 ${isReadOnly ? 'bg-gray-50' : ''}`}
                         readOnly={isReadOnly}
                       />
                       <span className="ml-1">%</span>
@@ -137,7 +141,7 @@ export const InvoiceDiscountsSection = ({
                         step="0.1"
                         value={part.discount}
                         onChange={(e) => updatePartDiscount(part.id, parseFloat(e.target.value) || 0)}
-                        className="w-20"
+                        className={`w-20 ${isReadOnly ? 'bg-gray-50' : ''}`}
                         readOnly={isReadOnly}
                       />
                       <span className="ml-1">%</span>
