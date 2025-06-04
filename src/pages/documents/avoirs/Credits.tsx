@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +19,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Printer, Mail, FileX } from 'lucide-react';
+import { CreditDialog } from '@/components/credits/CreditDialog';
 
 // Mock data for credits - to be replaced with real data later
 const mockCredits = [
@@ -47,6 +47,7 @@ const mockCredits = [
 
 const Credits = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
   
   const filteredCredits = mockCredits.filter(credit => 
@@ -85,10 +86,7 @@ const Credits = () => {
   };
   
   const handleCreateCredit = () => {
-    toast({
-      title: "Création d'avoir",
-      description: "Fonctionnalité en cours de développement"
-    });
+    setIsDialogOpen(true);
   };
 
   const handleEditCredit = (credit: any) => {
@@ -289,6 +287,11 @@ const Credits = () => {
           </TableBody>
         </Table>
       </div>
+
+      <CreditDialog 
+        open={isDialogOpen} 
+        onOpenChange={setIsDialogOpen} 
+      />
     </div>
   );
 };
