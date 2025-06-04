@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Printer, Mail, FileX } from 'lucide-react';
 import { CreditDialog } from '@/components/credits/CreditDialog';
+import { EditCreditDialog } from '@/components/credits/EditCreditDialog';
 
 // Mock data for credits - to be replaced with real data later
 const mockCredits = [
@@ -31,7 +32,20 @@ const mockCredits = [
     status: 'Validé',
     clients: { first_name: 'Jean', last_name: 'Dupont' },
     vehicles: { brand: 'Peugeot', model: '308', license_plate: 'AB-123-CD' },
-    original_invoice: 'F2024-045'
+    original_invoice: 'F2024-045',
+    invoice_id: 'e79f5109-04a0-408b-a5b3-9ed7d3c8b238',
+    notes: 'Remboursement partiel',
+    items: [
+      {
+        id: '1',
+        description: 'Pièce défectueuse',
+        quantity: 1,
+        unit_price: 208.75,
+        discount: 0,
+        vat: 20,
+        total: 250.50
+      }
+    ]
   },
   {
     id: '2',
@@ -41,13 +55,28 @@ const mockCredits = [
     status: 'En attente',
     clients: { first_name: 'Marie', last_name: 'Martin' },
     vehicles: { brand: 'Renault', model: 'Clio', license_plate: 'EF-456-GH' },
-    original_invoice: 'F2024-052'
+    original_invoice: 'F2024-052',
+    invoice_id: 'f79f5109-04a0-408b-a5b3-9ed7d3c8b239',
+    notes: '',
+    items: [
+      {
+        id: '2',
+        description: 'Service non effectué',
+        quantity: 1,
+        unit_price: 125.00,
+        discount: 0,
+        vat: 20,
+        total: 150.00
+      }
+    ]
   }
 ];
 
 const Credits = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedCredit, setSelectedCredit] = useState<any>(null);
   const { toast } = useToast();
   
   const filteredCredits = mockCredits.filter(credit => 
@@ -90,10 +119,8 @@ const Credits = () => {
   };
 
   const handleEditCredit = (credit: any) => {
-    toast({
-      title: "Édition d'avoir",
-      description: `Édition de l'avoir ${credit.reference}`
-    });
+    setSelectedCredit(credit);
+    setEditDialogOpen(true);
   };
 
   const handleDelete = (credit: any) => {
@@ -292,6 +319,23 @@ const Credits = () => {
         open={isDialogOpen} 
         onOpenChange={setIsDialogOpen} 
       />
+
+      {selectedCredit && (
+        <EditCreditDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          creditId={selectedCredit.id}
+          initialData={{
+            reference: selectedCredit.reference,
+            client_id: null,
+            vehicle_id: null,
+            invoice_id: selectedCredit.invoice_id,
+            status: selectedCredit.status,
+            notes: selectedCredit.notes,
+            items: selectedCredit.items
+          }}
+        />
+      )}
     </div>
   );
 };
