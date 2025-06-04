@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,8 +21,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Printer, Mail } from 'lucide-react';
+import { Printer, Mail, FileCheck, ArrowRight } from 'lucide-react';
 
 const Quotes = () => {
   const { quotes, isLoading, error, deleteQuote } = useQuotes();
@@ -75,6 +77,20 @@ const Quotes = () => {
     toast({
       title: "Envoi par e-mail",
       description: `Envoi du devis ${quote.reference} par e-mail...`
+    });
+  };
+
+  const handleRequestDocuments = (quote: Quote) => {
+    toast({
+      title: "Demande de justificatifs",
+      description: `Demande de justificatifs envoyée pour le devis ${quote.reference}`
+    });
+  };
+
+  const handleConvertToRepairOrder = (quote: Quote) => {
+    toast({
+      title: "Conversion en ordre de réparation",
+      description: `Le devis ${quote.reference} a été converti en ordre de réparation`
     });
   };
   
@@ -202,6 +218,15 @@ const Quotes = () => {
                           <DropdownMenuItem onClick={() => handleSendEmail(quote)}>
                             <Mail className="mr-2 h-4 w-4" />
                             Envoyer par e-mail
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => handleRequestDocuments(quote)}>
+                            <FileCheck className="mr-2 h-4 w-4" />
+                            Demander les justificatifs
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleConvertToRepairOrder(quote)}>
+                            <ArrowRight className="mr-2 h-4 w-4" />
+                            Convertir en ordre de réparation
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
