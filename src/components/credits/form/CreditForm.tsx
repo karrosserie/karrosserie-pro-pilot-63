@@ -2,8 +2,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CreditBasicInfoSection } from './CreditBasicInfoSection';
+import { CreditItemsSection } from './CreditItemsSection';
 import { useCreditFormState } from './hooks/useCreditFormState';
 import { useToast } from '@/hooks/use-toast';
+import { useCredits } from '@/hooks/use-credits';
 
 interface CreditFormProps {
   onClose: () => void;
@@ -11,6 +13,7 @@ interface CreditFormProps {
 
 export const CreditForm = ({ onClose }: CreditFormProps) => {
   const { toast } = useToast();
+  const { createCredit } = useCredits();
   const {
     formData,
     items,
@@ -26,27 +29,19 @@ export const CreditForm = ({ onClose }: CreditFormProps) => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.reference.trim()) {
-      newErrors.reference = 'La référence est obligatoire';
+    if (!formData.invoice_id) {
+      newErrors.invoice_id = 'La sélection d\'une facture est obligatoire';
     }
 
-    if (!formData.original_invoice_reference.trim()) {
-      newErrors.original_invoice_reference = 'La référence de la facture d\'origine est obligatoire';
-    }
-
-    if (!formData.reason.trim()) {
-      newErrors.reason = 'Le motif de l\'avoir est obligatoire';
-    }
-
-    if (formData.amount <= 0) {
-      newErrors.amount = 'Le montant doit être supérieur à 0';
+    if (items.length === 0) {
+      newErrors.items = 'Au moins un article est requis';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -58,15 +53,21 @@ export const CreditForm = ({ onClose }: CreditFormProps) => {
       return;
     }
 
-    // TODO: Implement actual creation logic
-    console.log('Credit data:', { formData, items, total: calculateTotal() });
-    
-    toast({
-      title: "Avoir créé",
-      description: `L'avoir ${formData.reference} a été créé avec succès.`
-    });
-    
-    onClose();
+    try {
+      const creditData = {
+        reference: formData.reference,
+        invoice_id: formData.invoice_id,
+        status: formData.status,
+        amount: calculateTotal(),
+        items_data: JSON.stringify(items),
+        notes: formData.notes
+      };
+
+      await createCredit.mutateAsync(creditData);
+      onClose();
+    } catch (error) {
+      console.error('Error creating credit:', error);
+    }
   };
 
   return (
@@ -77,12 +78,31 @@ export const CreditForm = ({ onClose }: CreditFormProps) => {
         onFieldChange={handleChange}
       />
 
+      <CreditItemsSection
+        items={items}
+        onAddItem={addItem}
+        onUpdateItem={updateItem}
+        onRemoveItem={removeItem}
+        calculateTotal={calculateTotal}
+      />
+
+      {errors.items && (
+        <p className="text-sm text-red-500 flex items-center">
+          <AlertCircle className="h-4 w-4 mr-1" />
+          {errors.items}
+        </p>
+      )}
+
       <div className="flex justify-end space-x-2 pt-4 border-t">
         <Button type="button" variant="outline" onClick={onClose}>
           Annuler
         </Button>
-        <Button type="submit" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
-          Créer l'avoir
+        <Button 
+          type="submit" 
+          className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+          disabled={createCredit.isPending}
+        >
+          {createCredit.isPending ? 'Création...' : 'Créer l\'avoir'}
         </Button>
       </div>
     </form>

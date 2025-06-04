@@ -3,11 +3,8 @@ export interface CreditFormData {
   reference: string;
   client_id: string | null;
   vehicle_id: string | null;
-  original_invoice_id: string | null;
-  original_invoice_reference: string;
-  amount: number;
-  reason: string;
-  status: 'En attente' | 'Validé' | 'Annulé';
+  invoice_id: string | null;
+  status: 'En attente' | 'Payé';
   notes?: string;
 }
 
