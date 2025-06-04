@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Invoice } from '@/services/supabase/invoices';
 import { InvoiceRepairItem, InvoicePartItem, InvoiceDiscountItem, GlobalTotals } from './types';
@@ -15,9 +14,8 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
     client_id: null,
     vehicle_id: null,
     status: 'Brouillon',
-    issue_date: null,
     due_date: null,
-    payment_status: 'En attente',
+    payment_method: null,
     notes: ''
   });
 
@@ -30,7 +28,7 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Déterminer si le formulaire est en lecture seule
-  const isReadOnly = formData.payment_status === 'Payé' || formData.status === 'Envoyé';
+  const isReadOnly = formData.payment_date !== null || formData.status === 'Envoyé';
 
   // Calculer les totaux globaux
   const calculateGlobalTotals = (): GlobalTotals => {
@@ -79,7 +77,7 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
   };
 
   const handleChange = (field: string, value: any) => {
-    if (isReadOnly && field !== 'payment_status') {
+    if (isReadOnly && field !== 'payment_method' && field !== 'payment_date') {
       return; // Empêcher les modifications si en lecture seule
     }
     
@@ -153,9 +151,9 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
         client_id: invoice.client_id,
         vehicle_id: invoice.vehicle_id,
         status: invoice.status || 'Brouillon',
-        issue_date: invoice.issue_date,
         due_date: invoice.due_date,
-        payment_status: invoice.payment_status || 'En attente',
+        payment_method: invoice.payment_method,
+        payment_date: invoice.payment_date,
         notes: invoice.notes || ''
       });
       
@@ -203,7 +201,6 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
         setFormData(prev => ({
           ...prev,
           reference: nextNumber,
-          issue_date: today,
           due_date: dueDate.toISOString().split('T')[0]
         }));
       });
