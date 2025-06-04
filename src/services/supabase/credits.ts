@@ -56,92 +56,6 @@ export interface CreditUpdate {
   notes?: string | null;
 }
 
-const createCreditsTable = async (): Promise<boolean> => {
-  try {
-    console.log('Creating credits table...');
-    
-    // Create the table
-    const { error: tableError } = await supabase.rpc('exec', {
-      sql: `
-        CREATE TABLE IF NOT EXISTS credits (
-          id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-          user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-          reference TEXT NOT NULL,
-          client_id UUID REFERENCES clients(id) ON DELETE SET NULL,
-          vehicle_id UUID REFERENCES vehicles(id) ON DELETE SET NULL,
-          invoice_id UUID REFERENCES invoices(id) ON DELETE SET NULL,
-          status TEXT NOT NULL DEFAULT 'En attente' CHECK (status IN ('En attente', 'Payé', 'Annulé')),
-          amount DECIMAL(10,2) NOT NULL DEFAULT 0,
-          items_data JSONB,
-          notes TEXT,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
-          updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
-          UNIQUE(user_id, reference)
-        );
-      `
-    });
-
-    if (tableError) {
-      console.error('Error creating table:', tableError);
-      return false;
-    }
-
-    // Enable RLS
-    const { error: rlsError } = await supabase.rpc('exec', {
-      sql: `
-        ALTER TABLE credits ENABLE ROW LEVEL SECURITY;
-      `
-    });
-
-    if (rlsError) {
-      console.error('Error enabling RLS:', rlsError);
-    }
-
-    // Create RLS policies
-    const { error: policiesError } = await supabase.rpc('exec', {
-      sql: `
-        CREATE POLICY IF NOT EXISTS "Users can view their own credits" ON credits
-          FOR SELECT USING (auth.uid() = user_id);
-
-        CREATE POLICY IF NOT EXISTS "Users can insert their own credits" ON credits
-          FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-        CREATE POLICY IF NOT EXISTS "Users can update their own credits" ON credits
-          FOR UPDATE USING (auth.uid() = user_id);
-
-        CREATE POLICY IF NOT EXISTS "Users can delete their own credits" ON credits
-          FOR DELETE USING (auth.uid() = user_id);
-      `
-    });
-
-    if (policiesError) {
-      console.error('Error creating policies:', policiesError);
-    }
-
-    // Create indexes
-    const { error: indexError } = await supabase.rpc('exec', {
-      sql: `
-        CREATE INDEX IF NOT EXISTS idx_credits_user_id ON credits(user_id);
-        CREATE INDEX IF NOT EXISTS idx_credits_client_id ON credits(client_id);
-        CREATE INDEX IF NOT EXISTS idx_credits_vehicle_id ON credits(vehicle_id);
-        CREATE INDEX IF NOT EXISTS idx_credits_invoice_id ON credits(invoice_id);
-        CREATE INDEX IF NOT EXISTS idx_credits_status ON credits(status);
-        CREATE INDEX IF NOT EXISTS idx_credits_created_at ON credits(created_at);
-      `
-    });
-
-    if (indexError) {
-      console.error('Error creating indexes:', indexError);
-    }
-
-    console.log('Credits table created successfully');
-    return true;
-  } catch (error) {
-    console.error('Error in createCreditsTable:', error);
-    return false;
-  }
-};
-
 const checkTableExists = async (): Promise<boolean> => {
   try {
     const { error } = await (supabase as any)
@@ -155,23 +69,15 @@ const checkTableExists = async (): Promise<boolean> => {
   }
 };
 
-const ensureTableExists = async (): Promise<boolean> => {
-  const exists = await checkTableExists();
-  if (!exists) {
-    return await createCreditsTable();
-  }
-  return true;
-};
-
 export const creditsService = {
   // Get all credits for the current user
   async getCredits(): Promise<Credit[]> {
     console.log('Fetching credits...');
     
-    // Ensure table exists
-    const tableReady = await ensureTableExists();
-    if (!tableReady) {
-      console.warn('Could not create credits table');
+    // Check if table exists first
+    const tableExists = await checkTableExists();
+    if (!tableExists) {
+      console.warn('Credits table does not exist yet');
       return [];
     }
 
@@ -245,8 +151,6 @@ export const creditsService = {
 
   // Get a single credit by ID
   async getCredit(id: string): Promise<Credit> {
-    await ensureTableExists();
-    
     const { data, error } = await (supabase as any)
       .from('credits')
       .select(`
@@ -280,13 +184,6 @@ export const creditsService = {
     }
 
     console.log('User authenticated:', user.id);
-
-    // Ensure table exists
-    const tableReady = await ensureTableExists();
-    if (!tableReady) {
-      console.error('Could not create credits table');
-      throw new Error('Impossible de créer la table des avoirs. Vérifiez vos permissions de base de données.');
-    }
 
     const insertData = {
       user_id: user.id,
@@ -329,8 +226,6 @@ export const creditsService = {
     items_data?: string;
     notes?: string;
   }): Promise<Credit> {
-    await ensureTableExists();
-    
     const { data, error } = await (supabase as any)
       .from('credits')
       .update(creditData)
@@ -344,8 +239,6 @@ export const creditsService = {
 
   // Delete a credit
   async deleteCredit(id: string): Promise<boolean> {
-    await ensureTableExists();
-    
     const { error } = await (supabase as any)
       .from('credits')
       .delete()
@@ -361,10 +254,10 @@ export const creditsService = {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      // Ensure table exists
-      const tableReady = await ensureTableExists();
-      if (!tableReady) {
-        console.warn('Could not create credits table, generating default reference');
+      // Check if table exists first
+      const tableExists = await checkTableExists();
+      if (!tableExists) {
+        console.warn('Credits table does not exist yet, generating default reference');
         return '1';
       }
 
