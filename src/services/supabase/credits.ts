@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 // Types personnalisés pour les credits puisque la table n'existe pas encore dans les types générés
@@ -237,8 +236,7 @@ export const creditsService = {
       const tableExists = await checkTableExists();
       if (!tableExists) {
         console.warn('Credits table does not exist, generating default reference');
-        const currentYear = new Date().getFullYear();
-        return `AV${currentYear}-001`;
+        return '1';
       }
 
       const { data, error } = await (supabase as any)
@@ -250,32 +248,22 @@ export const creditsService = {
 
       if (error) {
         console.warn('Error fetching last reference, generating default:', error);
-        const currentYear = new Date().getFullYear();
-        return `AV${currentYear}-001`;
+        return '1';
       }
 
       if (data && data.length > 0) {
         const lastReference = data[0].reference;
-        const match = lastReference.match(/AV(\d{4})-(\d{3})$/);
-        if (match) {
-          const year = new Date().getFullYear();
-          const lastYear = parseInt(match[1]);
-          const lastNumber = parseInt(match[2]);
-          
-          if (year === lastYear) {
-            return `AV${year}-${String(lastNumber + 1).padStart(3, '0')}`;
-          } else {
-            return `AV${year}-001`;
-          }
+        const lastNumber = parseInt(lastReference);
+        
+        if (!isNaN(lastNumber)) {
+          return (lastNumber + 1).toString();
         }
       }
 
-      const currentYear = new Date().getFullYear();
-      return `AV${currentYear}-001`;
+      return '1';
     } catch (error) {
       console.error('Error generating reference:', error);
-      const currentYear = new Date().getFullYear();
-      return `AV${currentYear}-001`;
+      return '1';
     }
   }
 };
