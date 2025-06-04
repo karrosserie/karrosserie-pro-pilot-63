@@ -37,7 +37,8 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
     return new Date(dateString).toLocaleDateString('fr-FR');
   };
 
-  const formatAmount = (amount: number) => {
+  const formatAmount = (amount: number | null | undefined) => {
+    if (!amount) return '-';
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'EUR'
@@ -95,7 +96,7 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
                     : '-'
                   }
                 </TableCell>
-                <TableCell>{formatAmount(order.amount || 0)}</TableCell>
+                <TableCell>{formatAmount(order.total_amount)}</TableCell>
                 <TableCell>
                   <Badge className={getStatusColor(order.status || 'En attente')}>
                     {order.status || 'En attente'}
