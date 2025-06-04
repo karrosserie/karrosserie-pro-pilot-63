@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useClients } from '@/hooks/use-clients';
@@ -55,7 +56,11 @@ export const QuoteForm = ({
     
     if (isSubmitting) return; // Prevent double submissions
     
+    console.log('Validation attempt - Current errors:', errors);
+    console.log('Form data:', { formData, claimNumber, currentMileage });
+    
     if (!validateForm()) {
+      console.log('Validation failed - New errors:', errors);
       toast({
         title: "Erreur de validation",
         description: "Veuillez corriger les erreurs dans le formulaire.",

@@ -56,7 +56,7 @@ export const QuoteBasicInfoSection = ({
               readOnly
               className={cn(
                 "bg-gray-50 cursor-not-allowed",
-                errors.reference && "border-red-500 focus-visible:ring-red-500"
+                errors.reference && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
               )}
               placeholder="Généré automatiquement"
             />
@@ -69,14 +69,16 @@ export const QuoteBasicInfoSection = ({
           </div>
 
           <div>
-            <Label htmlFor="valid_until">Date</Label>
+            <Label htmlFor="valid_until" className={cn(errors.valid_until && "text-red-500")}>
+              Date *
+            </Label>
             <Input
               id="valid_until"
               type="date"
               value={formData.valid_until || ''}
               onChange={(e) => onFieldChange('valid_until', e.target.value)}
               className={cn(
-                errors.valid_until && "border-red-500 focus-visible:ring-red-500"
+                errors.valid_until && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
               )}
             />
             {errors.valid_until && (
@@ -88,7 +90,9 @@ export const QuoteBasicInfoSection = ({
           </div>
 
           <div>
-            <Label htmlFor="status">Statut</Label>
+            <Label htmlFor="status" className={cn(errors.status && "text-red-500")}>
+              Statut
+            </Label>
             <Select
               value={formData.status || 'En attente'}
               onValueChange={(value) => onFieldChange('status', value)}
@@ -96,7 +100,7 @@ export const QuoteBasicInfoSection = ({
               <SelectTrigger 
                 id="status"
                 className={cn(
-                  errors.status && "border-red-500 focus-visible:ring-red-500"
+                  errors.status && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
                 )}
               >
                 <SelectValue placeholder="Sélectionner un statut" />
@@ -120,14 +124,16 @@ export const QuoteBasicInfoSection = ({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="claim_number">N° de sinistre</Label>
+            <Label htmlFor="claim_number" className={cn(errors.claim_number && "text-red-500")}>
+              N° de sinistre
+            </Label>
             <Input
               id="claim_number"
               value={claimNumber}
               onChange={(e) => onClaimNumberChange?.(e.target.value)}
               placeholder="Numéro de sinistre"
               className={cn(
-                errors.claim_number && "border-red-500 focus-visible:ring-red-500"
+                errors.claim_number && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
               )}
             />
             {errors.claim_number && (
@@ -139,7 +145,9 @@ export const QuoteBasicInfoSection = ({
           </div>
 
           <div>
-            <Label htmlFor="current_mileage">Kilométrage actuel</Label>
+            <Label htmlFor="current_mileage" className={cn(errors.current_mileage && "text-red-500")}>
+              Kilométrage actuel
+            </Label>
             <Input
               id="current_mileage"
               type="number"
@@ -147,7 +155,7 @@ export const QuoteBasicInfoSection = ({
               onChange={(e) => onCurrentMileageChange?.(e.target.value)}
               placeholder="Kilométrage en km"
               className={cn(
-                errors.current_mileage && "border-red-500 focus-visible:ring-red-500"
+                errors.current_mileage && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
               )}
             />
             {errors.current_mileage && (

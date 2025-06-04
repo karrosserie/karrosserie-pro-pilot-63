@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Quote } from '@/services/supabase/quotes';
 import { QuoteRepairItem, QuotePartItem, QuoteDiscountItem, GlobalTotals } from './types';
@@ -80,6 +79,19 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     if (!formData.client_id) {
       newErrors.client_id = 'Le client est obligatoire';
     }
+
+    if (!formData.valid_until) {
+      newErrors.valid_until = 'La date de validité est obligatoire';
+    }
+
+    // Validation optionnelle pour les nouveaux champs
+    if (claimNumber && claimNumber.length < 3) {
+      newErrors.claim_number = 'Le numéro de sinistre doit contenir au moins 3 caractères';
+    }
+
+    if (currentMileage && (parseInt(currentMileage) < 0 || parseInt(currentMileage) > 999999)) {
+      newErrors.current_mileage = 'Le kilométrage doit être entre 0 et 999999 km';
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -105,12 +117,20 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
   const handleClaimNumberChange = (value: string) => {
     if (!isReadOnly) {
       setClaimNumber(value);
+      // Effacer l'erreur quand l'utilisateur modifie le champ
+      if (errors.claim_number) {
+        setErrors(prev => ({ ...prev, claim_number: '' }));
+      }
     }
   };
 
   const handleCurrentMileageChange = (value: string) => {
     if (!isReadOnly) {
       setCurrentMileage(value);
+      // Effacer l'erreur quand l'utilisateur modifie le champ
+      if (errors.current_mileage) {
+        setErrors(prev => ({ ...prev, current_mileage: '' }));
+      }
     }
   };
 
