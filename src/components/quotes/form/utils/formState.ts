@@ -1,0 +1,62 @@
+
+import { Quote } from '@/services/supabase/quotes';
+import { QuoteRepairItem, QuotePartItem, QuoteDiscountItem } from '../types';
+
+export const prepareSubmitData = (
+  formData: Partial<Quote>,
+  notes: string,
+  claimNumber: string,
+  currentMileage: string,
+  repairs: QuoteRepairItem[],
+  parts: QuotePartItem[],
+  discounts: QuoteDiscountItem[]
+) => {
+  const notesData = {
+    notes,
+    claimNumber,
+    currentMileage,
+    repairs,
+    parts,
+    discounts
+  };
+  
+  return {
+    ...formData,
+    notes: JSON.stringify(notesData)
+  };
+};
+
+export const parseQuoteNotes = (notesString: string | null) => {
+  if (!notesString) {
+    return {
+      notes: '',
+      claimNumber: '',
+      currentMileage: '',
+      repairs: [],
+      parts: [],
+      discounts: []
+    };
+  }
+
+  try {
+    const noteData = JSON.parse(notesString);
+    return {
+      notes: noteData.notes || noteData.description || '',
+      claimNumber: noteData.claimNumber || '',
+      currentMileage: noteData.currentMileage || '',
+      repairs: noteData.repairs || [],
+      parts: noteData.parts || [],
+      discounts: noteData.discounts || []
+    };
+  } catch (e) {
+    console.error('Error parsing quote notes:', e);
+    return {
+      notes: '',
+      claimNumber: '',
+      currentMileage: '',
+      repairs: [],
+      parts: [],
+      discounts: []
+    };
+  }
+};

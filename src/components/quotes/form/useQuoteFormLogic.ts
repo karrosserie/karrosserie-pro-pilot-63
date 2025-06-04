@@ -1,7 +1,11 @@
+
 import { useState, useEffect } from 'react';
 import { Quote } from '@/services/supabase/quotes';
-import { QuoteRepairItem, QuotePartItem, QuoteDiscountItem, GlobalTotals } from './types';
-import { quotesService } from '@/services/supabase/quotes';
+import { QuoteRepairItem, QuotePartItem, QuoteDiscountItem } from './types';
+import { validateQuoteForm } from './utils/validation';
+import { calculateGlobalTotals } from './utils/calculations';
+import { prepareSubmitData, parseQuoteNotes } from './utils/formState';
+import { generateNextQuoteNumber } from './utils/quoteNumber';
 
 interface UseQuoteFormLogicProps {
   quote?: Quote | null;
@@ -28,88 +32,10 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
   // Déterminer si le formulaire est en lecture seule
   const isReadOnly = formData.status === 'Facturé' || formData.status === 'Refusé' || formData.status === 'Annulé';
 
-  // Calculer les totaux globaux
-  const calculateGlobalTotals = (): GlobalTotals => {
-    const repairTotals = repairs.reduce((acc, repair) => {
-      const subtotal = repair.quantity * repair.unitCost;
-      const discountAmount = subtotal * (repair.discount / 100);
-      const afterDiscount = subtotal - discountAmount;
-      const vatAmount = afterDiscount * (repair.vat / 100);
-      
-      return {
-        subTotal: acc.subTotal + subtotal,
-        totalVat: acc.totalVat + vatAmount,
-        totalDiscount: acc.totalDiscount + discountAmount,
-        total: acc.total + repair.total
-      };
-    }, { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 });
-
-    const partTotals = parts.reduce((acc, part) => {
-      const subtotal = part.quantity * part.unitCost;
-      const discountAmount = subtotal * (part.discount / 100);
-      const afterDiscount = subtotal - discountAmount;
-      const vatAmount = afterDiscount * (part.vat / 100);
-      
-      return {
-        subTotal: acc.subTotal + subtotal,
-        totalVat: acc.totalVat + vatAmount,
-        totalDiscount: acc.totalDiscount + discountAmount,
-        total: acc.total + part.total
-      };
-    }, { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 });
-
-    // Calculer le total des remises additionnelles
-    const additionalDiscounts = discounts.reduce((sum, discount) => sum + discount.amount, 0);
-
-    return {
-      subTotal: repairTotals.subTotal + partTotals.subTotal,
-      totalVat: repairTotals.totalVat + partTotals.totalVat,
-      totalDiscount: repairTotals.totalDiscount + partTotals.totalDiscount + additionalDiscounts,
-      total: repairTotals.total + partTotals.total - additionalDiscounts
-    };
-  };
-
   const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    
-    console.log('Starting validation with:', { formData, claimNumber, currentMileage });
-    
-    if (!formData.reference?.trim()) {
-      newErrors.reference = 'Le numéro du devis est obligatoire';
-      console.log('Reference error detected');
-    }
-    
-    if (!formData.client_id) {
-      newErrors.client_id = 'Le client est obligatoire';
-      console.log('Client error detected');
-    }
-
-    if (!formData.valid_until) {
-      newErrors.valid_until = 'La date de validité est obligatoire';
-      console.log('Valid until error detected');
-    }
-
-    // Validation pour les nouveaux champs - ajout de règles plus strictes pour forcer l'erreur
-    if (claimNumber && claimNumber.trim().length > 0 && claimNumber.trim().length < 3) {
-      newErrors.claim_number = 'Le numéro de sinistre doit contenir au moins 3 caractères';
-      console.log('Claim number error detected:', claimNumber);
-    }
-
-    if (currentMileage && currentMileage.trim().length > 0) {
-      const mileageNum = parseInt(currentMileage);
-      if (isNaN(mileageNum) || mileageNum < 0 || mileageNum > 999999) {
-        newErrors.current_mileage = 'Le kilométrage doit être un nombre entre 0 et 999999 km';
-        console.log('Current mileage error detected:', currentMileage);
-      }
-    }
-    
-    console.log('Validation complete. New errors:', newErrors);
-    
-    // Mettre à jour les erreurs de façon synchrone
-    setErrors(newErrors);
-    
-    // Retourner les erreurs directement pour usage immédiat
-    return { isValid: Object.keys(newErrors).length === 0, errors: newErrors };
+    const validationResult = validateQuoteForm(formData, claimNumber, currentMileage);
+    setErrors(validationResult.errors);
+    return validationResult;
   };
 
   const handleChange = (field: string, value: any) => {
@@ -151,35 +77,6 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     }
   };
 
-  // Fonction pour préparer les données à soumettre
-  const prepareSubmitData = () => {
-    const notesData = {
-      notes,
-      claimNumber,
-      currentMileage,
-      repairs,
-      parts,
-      discounts
-    };
-    
-    return {
-      ...formData,
-      notes: JSON.stringify(notesData)
-    };
-  };
-
-  // Fonction pour générer le prochain numéro de devis
-  const generateNextQuoteNumber = async () => {
-    try {
-      const lastQuote = await quotesService.getLastQuoteByUser();
-      const lastNumber = lastQuote?.reference ? parseInt(lastQuote.reference) : 0;
-      return (lastNumber + 1).toString();
-    } catch (error) {
-      console.error('Error generating quote number:', error);
-      return '1';
-    }
-  };
-
   useEffect(() => {
     if (quote) {
       setFormData({
@@ -192,38 +89,13 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
       });
       
       // Charger les données depuis les notes (format JSON)
-      if (quote.notes) {
-        try {
-          const noteData = JSON.parse(quote.notes);
-          setNotes(noteData.notes || noteData.description || '');
-          setClaimNumber(noteData.claimNumber || '');
-          setCurrentMileage(noteData.currentMileage || '');
-          if (noteData.repairs) {
-            setRepairs(noteData.repairs);
-          }
-          if (noteData.parts) {
-            setParts(noteData.parts);
-          }
-          if (noteData.discounts) {
-            setDiscounts(noteData.discounts);
-          }
-        } catch (e) {
-          console.error('Error parsing quote notes:', e);
-          setNotes('');
-          setClaimNumber('');
-          setCurrentMileage('');
-          setRepairs([]);
-          setParts([]);
-          setDiscounts([]);
-        }
-      } else {
-        setNotes('');
-        setClaimNumber('');
-        setCurrentMileage('');
-        setRepairs([]);
-        setParts([]);
-        setDiscounts([]);
-      }
+      const parsedData = parseQuoteNotes(quote.notes);
+      setNotes(parsedData.notes);
+      setClaimNumber(parsedData.claimNumber);
+      setCurrentMileage(parsedData.currentMileage);
+      setRepairs(parsedData.repairs);
+      setParts(parsedData.parts);
+      setDiscounts(parsedData.discounts);
     } else {
       // Pour un nouveau devis, définir la date du jour
       const today = new Date().toISOString().split('T')[0];
@@ -259,7 +131,7 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
     handleClaimNumberChange,
     handleCurrentMileageChange,
     validateForm,
-    calculateGlobalTotals,
-    prepareSubmitData
+    calculateGlobalTotals: () => calculateGlobalTotals(repairs, parts, discounts),
+    prepareSubmitData: () => prepareSubmitData(formData, notes, claimNumber, currentMileage, repairs, parts, discounts)
   };
 };
