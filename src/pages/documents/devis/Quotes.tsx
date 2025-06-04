@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -91,6 +90,13 @@ const Quotes = () => {
     toast({
       title: "Conversion en ordre de réparation",
       description: `Le devis ${quote.reference} a été converti en ordre de réparation`
+    });
+  };
+
+  const handleSignQuote = (quote: Quote) => {
+    toast({
+      title: "Signature du devis",
+      description: `Le devis ${quote.reference} a été signé`
     });
   };
   
@@ -220,6 +226,12 @@ const Quotes = () => {
                             Envoyer par e-mail
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
+                          {quote.status === 'En attente' && (
+                            <DropdownMenuItem onClick={() => handleSignQuote(quote)}>
+                              <FileCheck className="mr-2 h-4 w-4" />
+                              Signer
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem onClick={() => handleRequestDocuments(quote)}>
                             <FileCheck className="mr-2 h-4 w-4" />
                             Demander les justificatifs
