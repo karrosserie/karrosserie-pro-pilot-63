@@ -43,6 +43,11 @@ export const createCredit = async (creditData: CreditCreateData): Promise<Credit
       console.error('Error message:', error.message);
       console.error('Error details:', error.details);
       console.error('Error hint:', error.hint);
+      
+      if (error.code === '42P01') {
+        throw new Error('La table des avoirs n\'existe pas. Veuillez exécuter la migration 013_create_credits_table.sql dans votre dashboard Supabase.');
+      }
+      
       throw new Error(`Failed to create credit: ${error.message || 'Unknown error'}`);
     }
 
