@@ -1,8 +1,10 @@
 
 import React from 'react';
 import { DataTable } from '@/components/ui/data-table';
+import { EmptyState } from '@/components/ui/empty-state';
 import { createReceiptsColumns } from './columns';
 import { ReceiptWithClient } from '@/services/supabase/receipts/types';
+import { Receipt } from 'lucide-react';
 
 interface ReceiptsTableProps {
   receipts: ReceiptWithClient[];
@@ -19,9 +21,11 @@ export const ReceiptsTable = ({
 
   if (receipts.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
-        Aucun encaissement trouvé
-      </div>
+      <EmptyState
+        icon={Receipt}
+        title="Aucun encaissement trouvé"
+        description="Aucun encaissement correspondant à votre recherche n'a été trouvé."
+      />
     );
   }
 

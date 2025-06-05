@@ -3,6 +3,7 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Eye, Pencil, Trash2, FileText, MoreVertical } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import {
@@ -58,13 +59,11 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
   if (orders.length === 0) {
     return (
       <div className="card-container">
-        <div className="flex flex-col items-center justify-center py-12">
-          <FileText className="h-12 w-12 text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun ordre de réparation</h3>
-          <p className="text-gray-500 text-center max-w-md">
-            Aucun ordre de réparation n'a été trouvé. Créez-en un nouveau pour commencer.
-          </p>
-        </div>
+        <EmptyState
+          icon={FileText}
+          title="Aucun ordre de réparation"
+          description="Aucun ordre de réparation n'a été trouvé. Créez-en un nouveau pour commencer."
+        />
       </div>
     );
   }

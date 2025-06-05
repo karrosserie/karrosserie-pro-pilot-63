@@ -28,7 +28,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { ChevronDown, Search, Settings } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ChevronDown, Search, Settings, FileQuestion } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -151,7 +152,13 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Aucun résultat.
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <FileQuestion className="h-12 w-12 text-gray-400 mb-4" />
+                    <h3 className="font-medium text-gray-900 mb-2">Aucun résultat</h3>
+                    <p className="text-gray-500">
+                      Aucun élément correspondant à votre recherche n'a été trouvé.
+                    </p>
+                  </div>
                 </TableCell>
               </TableRow>
             )}

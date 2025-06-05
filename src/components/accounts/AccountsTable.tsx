@@ -9,6 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import { EmptyState } from '@/components/ui/empty-state';
 import { Eye, Pencil, Trash, CreditCard, Building, Wallet, RefreshCw } from 'lucide-react';
 
 interface Account {
@@ -66,6 +67,18 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
     }).format(amount);
   };
 
+  if (accounts.length === 0) {
+    return (
+      <div className="card-container">
+        <EmptyState
+          icon={Wallet}
+          title="Aucun compte"
+          description="Commencez par créer votre premier compte bancaire."
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="card-container">
       <Table>
@@ -81,73 +94,59 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
           </TableRow>
         </TableHeader>
         <TableBody>
-          {accounts.length > 0 ? (
-            accounts.map((account) => (
-              <TableRow key={account.id}>
-                <TableCell className="font-medium">
-                  <div className="flex items-center">
-                    {getTypeIcon(account.type)}
-                    <span className="ml-2">{account.name}</span>
-                  </div>
-                </TableCell>
-                <TableCell>{account.bank}</TableCell>
-                <TableCell className="font-mono text-sm">{account.iban}</TableCell>
-                <TableCell className="font-mono text-sm">{account.bic}</TableCell>
-                <TableCell className="font-medium">
-                  {formatAmount(account.balance)}
-                </TableCell>
-                <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(account.status)}`}>
-                    {account.status}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end space-x-1">
-                    <Button variant="ghost" size="icon" title="Voir les détails">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => onSync(account)}
-                      title="Synchroniser"
-                    >
-                      <RefreshCw className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => onEdit(account)}
-                      title="Modifier"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="text-red-500 hover:text-red-700"
-                      onClick={() => onDelete(account)}
-                      title="Supprimer"
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={7} className="text-center py-4">
-                <div className="flex flex-col items-center justify-center py-8">
-                  <Wallet className="h-10 w-10 text-gray-400 mb-2" />
-                  <h3 className="font-medium text-gray-900">Aucun compte</h3>
-                  <p className="text-gray-500 mt-1">
-                    Commencez par créer votre premier compte bancaire.
-                  </p>
+          {accounts.map((account) => (
+            <TableRow key={account.id}>
+              <TableCell className="font-medium">
+                <div className="flex items-center">
+                  {getTypeIcon(account.type)}
+                  <span className="ml-2">{account.name}</span>
+                </div>
+              </TableCell>
+              <TableCell>{account.bank}</TableCell>
+              <TableCell className="font-mono text-sm">{account.iban}</TableCell>
+              <TableCell className="font-mono text-sm">{account.bic}</TableCell>
+              <TableCell className="font-medium">
+                {formatAmount(account.balance)}
+              </TableCell>
+              <TableCell>
+                <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(account.status)}`}>
+                  {account.status}
+                </span>
+              </TableCell>
+              <TableCell className="text-right">
+                <div className="flex justify-end space-x-1">
+                  <Button variant="ghost" size="icon" title="Voir les détails">
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => onSync(account)}
+                    title="Synchroniser"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => onEdit(account)}
+                    title="Modifier"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="text-red-500 hover:text-red-700"
+                    onClick={() => onDelete(account)}
+                    title="Supprimer"
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>
-          )}
+          ))}
         </TableBody>
       </Table>
     </div>
