@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { TypeProofFields } from './form/TypeProofFields';
 import { BasicFields } from './form/BasicFields';
@@ -39,7 +38,7 @@ export const ExpenseForm = ({
     vat_amount: '',
     total_amount: '',
     supplier: '',
-    category: 'Péage',
+    category: 'Autres',
     assign_to_vehicle: false,
     vehicle_id: ''
   });
