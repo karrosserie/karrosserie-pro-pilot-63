@@ -16,19 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-interface Expense {
-  id: string;
-  reference: string;
-  date: string;
-  amount: number;
-  status: string;
-  supplier: string;
-  category: string;
-  payment_method: string;
-  bank_account: string;
-  description: string;
-}
+import { Expense } from '@/components/expenses/form/types';
 
 interface ExpensesTableProps {
   expenses: Expense[];
@@ -50,11 +38,12 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete }: ExpensesTableProps
     }
   };
 
-  const formatAmount = (amount: number) => {
+  const formatAmount = (amount: number | string) => {
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) || 0 : amount;
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'EUR'
-    }).format(amount);
+    }).format(numAmount);
   };
 
   return (
@@ -62,7 +51,7 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete }: ExpensesTableProps
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Référence</TableHead>
+            <TableHead>Type</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Fournisseur</TableHead>
             <TableHead>Catégorie</TableHead>
@@ -78,7 +67,7 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete }: ExpensesTableProps
           {expenses.length > 0 ? (
             expenses.map((expense) => (
               <TableRow key={expense.id}>
-                <TableCell className="font-medium">{expense.reference}</TableCell>
+                <TableCell className="font-medium">{expense.type || 'Note de frais'}</TableCell>
                 <TableCell>{new Date(expense.date).toLocaleDateString('fr-FR')}</TableCell>
                 <TableCell>{expense.supplier}</TableCell>
                 <TableCell>{expense.category}</TableCell>
