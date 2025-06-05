@@ -102,20 +102,33 @@ export const ReceiptForm = ({
           </SelectTrigger>
           <SelectContent>
             {isLoadingInvoices ? (
-              <SelectItem value="" disabled>Chargement...</SelectItem>
-            ) : (
-              invoices?.map((invoice) => (
+              <SelectItem value="loading" disabled>Chargement...</SelectItem>
+            ) : invoices && invoices.length > 0 ? (
+              invoices.map((invoice) => (
                 <SelectItem key={invoice.id} value={invoice.reference}>
                   {invoice.reference} - {invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client non assigné'} - {invoice.amount}€
                 </SelectItem>
-              )) || <SelectItem value="" disabled>Aucune facture disponible</SelectItem>
+              ))
+            ) : (
+              <SelectItem value="no-invoices" disabled>Aucune facture disponible</SelectItem>
             )}
           </SelectContent>
         </Select>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        {/* Date - Premier */}
+        {/* Référence - Premier, non obligatoire */}
+        <div>
+          <Label htmlFor="reference">Référence</Label>
+          <Input
+            id="reference"
+            value={formData.reference}
+            onChange={(e) => handleChange('reference', e.target.value)}
+            placeholder="ENC2024-001"
+          />
+        </div>
+        
+        {/* Date - Deuxième */}
         <div>
           <Label htmlFor="date" required>Date</Label>
           <Input
@@ -126,21 +139,25 @@ export const ReceiptForm = ({
             required
           />
         </div>
-        
-        {/* Référence - Deuxième, non obligatoire */}
-        <div>
-          <Label htmlFor="reference">Référence</Label>
-          <Input
-            id="reference"
-            value={formData.reference}
-            onChange={(e) => handleChange('reference', e.target.value)}
-            placeholder="ENC2024-001"
-          />
-        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        {/* Méthode de paiement - Premier */}
+        {/* Statut - Premier */}
+        <div>
+          <Label htmlFor="status" required>Statut</Label>
+          <Select value={formData.status} onValueChange={(value) => handleChange('status', value)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="En attente">En attente</SelectItem>
+              <SelectItem value="Encaissé">Encaissé</SelectItem>
+              <SelectItem value="Annulé">Annulé</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        {/* Méthode de paiement - Deuxième */}
         <div>
           <Label htmlFor="payment_method" required>Méthode de paiement</Label>
           <Select value={formData.payment_method} onValueChange={(value) => handleChange('payment_method', value)}>
@@ -155,21 +172,6 @@ export const ReceiptForm = ({
               <SelectItem value="Argent mobile">Argent mobile</SelectItem>
               <SelectItem value="Paiement en ligne">Paiement en ligne</SelectItem>
               <SelectItem value="Autres">Autres</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        {/* Statut - Deuxième */}
-        <div>
-          <Label htmlFor="status" required>Statut</Label>
-          <Select value={formData.status} onValueChange={(value) => handleChange('status', value)}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="En attente">En attente</SelectItem>
-              <SelectItem value="Encaissé">Encaissé</SelectItem>
-              <SelectItem value="Annulé">Annulé</SelectItem>
             </SelectContent>
           </Select>
         </div>
