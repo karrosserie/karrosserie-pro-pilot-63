@@ -10,7 +10,7 @@ import {
 import { ReceiptForm } from './ReceiptForm';
 import { useToast } from '@/hooks/use-toast';
 import { Receipt } from './form/types';
-import { createReceipt, updateReceipt } from '@/services/supabase/receipts';
+import { receiptMutations } from '@/services/supabase/receipts/mutations';
 
 interface ReceiptDialogProps {
   receipt?: Receipt | null;
@@ -32,17 +32,25 @@ const ReceiptDialog = ({
     setIsSubmitting(true);
     
     try {
-      // Convert amount to number before submitting
+      // Ensure amount is properly converted to number
+      const amount = typeof formData.amount === 'string' ? parseFloat(formData.amount) : formData.amount;
+      
       const dataToSubmit = {
-        ...formData,
-        amount: typeof formData.amount === 'string' ? parseFloat(formData.amount) || 0 : formData.amount,
+        reference: formData.reference,
+        date: formData.date,
+        amount: amount || 0,
+        status: formData.status,
+        payment_method: formData.payment_method,
+        bank_account: formData.bank_account,
+        notes: formData.notes || '',
+        payment_proofs: formData.payment_proofs || [],
         invoice_id: formData.invoice || null
       };
 
       if (receipt?.id) {
-        await updateReceipt(receipt.id, dataToSubmit);
+        await receiptMutations.update(receipt.id, dataToSubmit);
       } else {
-        await createReceipt(dataToSubmit);
+        await receiptMutations.create(dataToSubmit);
       }
       
       toast({

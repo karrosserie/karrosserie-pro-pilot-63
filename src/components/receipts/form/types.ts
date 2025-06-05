@@ -5,7 +5,7 @@ export interface Receipt {
   date: string;
   amount: number | string;
   status: string;
-  invoice: string;
+  invoice?: string;
   payment_method: string;
   bank_account: string;
   notes?: string;
