@@ -11,7 +11,11 @@ import {
   Settings,
   CreditCard, 
   ChevronDown, 
-  ChevronRight
+  ChevronRight,
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  Wallet
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -106,6 +110,17 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     },
     { icon: <CreditCard className="app-icon" />, label: 'Cession de créance', path: '/cessions' },
     { icon: <Clock className="app-icon" />, label: 'Véhicules de courtoisie', path: '/fleet' },
+    { 
+      icon: <DollarSign className="app-icon" />, 
+      label: 'Paiements', 
+      path: '/payments',
+      hasSubMenu: true,
+      subMenuItems: [
+        { label: 'Encaissements', path: '/payments/receipts' },
+        { label: 'Dépenses', path: '/payments/expenses' },
+        { label: 'Gestion des comptes', path: '/payments/accounts' },
+      ]
+    },
     { icon: <Receipt className="app-icon" />, label: 'Comptabilité', path: '/accounting' },
     { icon: <Settings className="app-icon" />, label: 'Paramètres', path: '/settings' },
   ];
