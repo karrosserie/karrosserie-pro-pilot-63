@@ -89,34 +89,18 @@ export const AccountForm = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="type" required>Type de compte</Label>
-          <Select value={formData.type} onValueChange={(value) => handleChange('type', value)}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Courant">Courant</SelectItem>
-              <SelectItem value="Épargne">Épargne</SelectItem>
-              <SelectItem value="Professionnel">Professionnel</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div>
-          <Label htmlFor="status" required>Statut</Label>
-          <Select value={formData.status} onValueChange={(value) => handleChange('status', value)}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Actif">Actif</SelectItem>
-              <SelectItem value="Inactif">Inactif</SelectItem>
-              <SelectItem value="Suspendu">Suspendu</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <div>
+        <Label htmlFor="status" required>Statut</Label>
+        <Select value={formData.status} onValueChange={(value) => handleChange('status', value)}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Actif">Actif</SelectItem>
+            <SelectItem value="Inactif">Inactif</SelectItem>
+            <SelectItem value="Suspendu">Suspendu</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div>
