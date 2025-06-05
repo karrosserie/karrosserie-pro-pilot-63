@@ -19,6 +19,7 @@ interface Account {
   bic: string;
   balance: number;
   status: string;
+  type?: string;
 }
 
 interface AccountFormProps {
@@ -40,14 +41,16 @@ export const AccountForm = ({
     iban: '',
     bic: '',
     balance: 0,
-    status: 'Actif'
+    status: 'Actif',
+    type: 'Courant'
   });
 
   useEffect(() => {
     if (account) {
       setFormData({
         ...account,
-        balance: Number(account.balance) || 0
+        balance: Number(account.balance) || 0,
+        type: account.type || 'Courant'
       });
     }
   }, [account]);
@@ -90,18 +93,34 @@ export const AccountForm = ({
         </div>
       </div>
 
-      <div>
-        <Label htmlFor="status" required>Statut</Label>
-        <Select value={formData.status} onValueChange={(value) => handleChange('status', value)}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Actif">Actif</SelectItem>
-            <SelectItem value="Inactif">Inactif</SelectItem>
-            <SelectItem value="Suspendu">Suspendu</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="type" required>Type de compte</Label>
+          <Select value={formData.type} onValueChange={(value) => handleChange('type', value)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Courant">Courant</SelectItem>
+              <SelectItem value="Épargne">Épargne</SelectItem>
+              <SelectItem value="Professionnel">Professionnel</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label htmlFor="status" required>Statut</Label>
+          <Select value={formData.status} onValueChange={(value) => handleChange('status', value)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Actif">Actif</SelectItem>
+              <SelectItem value="Inactif">Inactif</SelectItem>
+              <SelectItem value="Suspendu">Suspendu</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div>

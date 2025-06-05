@@ -1,5 +1,7 @@
 
+
 import { supabase } from '@/integrations/supabase/client';
+import { mockAccountsService } from '@/services/mock/accounts';
 
 // Temporary manual types until migration is applied
 export type Account = {
@@ -11,97 +13,45 @@ export type Account = {
   bic: string;
   balance: number;
   status: string;
+  type: string;
+  last_sync: string;
   created_at: string;
   updated_at: string;
 };
 
-export type NewAccount = Omit<Account, 'id' | 'created_at' | 'updated_at'>;
+export type NewAccount = Omit<Account, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'last_sync'>;
 export type UpdateAccount = Partial<Omit<Account, 'id' | 'user_id' | 'created_at' | 'updated_at'>>;
 
+// Temporary: Use mock service until Supabase migration is applied
 export const accountsService = {
   // Get all accounts for the current user
   async getAll(): Promise<Account[]> {
-    const { data, error } = await supabase
-      .from('accounts')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching accounts:', error);
-      throw error;
-    }
-
-    return data || [];
+    console.log('Using mock accounts service - Supabase migration not yet applied');
+    return mockAccountsService.getAll();
   },
 
   // Get a single account by ID
   async getById(id: string): Promise<Account | null> {
-    const { data, error } = await supabase
-      .from('accounts')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) {
-      console.error('Error fetching account:', error);
-      throw error;
-    }
-
-    return data;
+    console.log('Using mock accounts service - Supabase migration not yet applied');
+    return mockAccountsService.getById(id);
   },
 
   // Create a new account
   async create(account: Omit<NewAccount, 'user_id'>): Promise<Account> {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      throw new Error('User not authenticated');
-    }
-
-    const { data, error } = await supabase
-      .from('accounts')
-      .insert({
-        ...account,
-        user_id: user.id,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error creating account:', error);
-      throw error;
-    }
-
-    return data;
+    console.log('Using mock accounts service - Supabase migration not yet applied');
+    return mockAccountsService.create(account as NewAccount);
   },
 
   // Update an existing account
   async update(id: string, updates: UpdateAccount): Promise<Account> {
-    const { data, error } = await supabase
-      .from('accounts')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error updating account:', error);
-      throw error;
-    }
-
-    return data;
+    console.log('Using mock accounts service - Supabase migration not yet applied');
+    return mockAccountsService.update(id, updates);
   },
 
   // Delete an account
   async delete(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('accounts')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      console.error('Error deleting account:', error);
-      throw error;
-    }
+    console.log('Using mock accounts service - Supabase migration not yet applied');
+    return mockAccountsService.delete(id);
   },
 };
+

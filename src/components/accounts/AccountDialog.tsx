@@ -18,6 +18,7 @@ interface Account {
   bic: string;
   balance: number;
   status: string;
+  type?: string;
 }
 
 interface AccountDialogProps {
@@ -45,6 +46,7 @@ const AccountDialog = ({
             bic: formData.bic,
             balance: formData.balance,
             status: formData.status,
+            type: formData.type,
           }
         });
       } else {
@@ -55,6 +57,7 @@ const AccountDialog = ({
           bic: formData.bic,
           balance: formData.balance,
           status: formData.status,
+          type: formData.type || 'Courant',
         });
       }
       
