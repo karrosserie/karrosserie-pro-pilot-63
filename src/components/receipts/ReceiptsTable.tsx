@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { DataTable } from '@/components/ui/data-table';
-import { Card } from '@/components/ui/card';
 import { createReceiptsColumns } from './columns';
 import { ReceiptWithClient } from '@/services/supabase/receipts/types';
 
@@ -19,13 +18,11 @@ export const ReceiptsTable = ({
   const columns = createReceiptsColumns({ onEdit, onDelete });
 
   return (
-    <Card className="p-6">
-      <DataTable 
-        columns={columns} 
-        data={receipts}
-        searchKey="reference"
-        searchPlaceholder="Rechercher par référence, client ou facture..."
-      />
-    </Card>
+    <DataTable 
+      columns={columns} 
+      data={receipts}
+      searchKey="reference"
+      searchPlaceholder="Rechercher par référence, client ou facture..."
+    />
   );
 };

@@ -43,11 +43,13 @@ const Receipts = () => {
         onCreateReceipt={handleCreateReceipt}
       />
       
-      <ReceiptsTable
-        receipts={filteredReceipts}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      <div className="card-container">
+        <ReceiptsTable
+          receipts={filteredReceipts}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      </div>
 
       <ReceiptDialog
         receipt={selectedReceipt}
