@@ -44,6 +44,7 @@ export function useReceiptsData() {
       });
     },
     onError: (error) => {
+      console.error('Create receipt error:', error);
       toast({
         title: "Erreur",
         description: `Impossible de créer l'encaissement: ${error.message}`,
@@ -63,6 +64,7 @@ export function useReceiptsData() {
       });
     },
     onError: (error) => {
+      console.error('Update receipt error:', error);
       toast({
         title: "Erreur",
         description: `Impossible de mettre à jour l'encaissement: ${error.message}`,
@@ -81,6 +83,7 @@ export function useReceiptsData() {
       });
     },
     onError: (error) => {
+      console.error('Delete receipt error:', error);
       toast({
         title: "Erreur",
         description: `Impossible de supprimer l'encaissement: ${error.message}`,

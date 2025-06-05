@@ -32,13 +32,18 @@ const ReceiptDialog = ({
     setIsSubmitting(true);
     
     try {
-      // Ensure amount is properly converted to number
-      const amount = typeof formData.amount === 'string' ? parseFloat(formData.amount) : formData.amount;
+      // Ensure amount is properly converted to number, handle empty strings
+      let amount = 0;
+      if (typeof formData.amount === 'string') {
+        amount = formData.amount.trim() === '' ? 0 : parseFloat(formData.amount);
+      } else {
+        amount = formData.amount || 0;
+      }
       
       const dataToSubmit = {
-        reference: formData.reference,
+        reference: formData.reference || '',
         date: formData.date,
-        amount: amount || 0,
+        amount: amount,
         status: formData.status,
         payment_method: formData.payment_method,
         bank_account: formData.bank_account,
@@ -46,6 +51,8 @@ const ReceiptDialog = ({
         payment_proofs: formData.payment_proofs || [],
         invoice_id: formData.invoice || null
       };
+
+      console.log('Submitting receipt data:', dataToSubmit);
 
       if (receipt?.id) {
         await receiptMutations.update(receipt.id, dataToSubmit);
