@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { AccountForm } from './AccountForm';
-import { useToast } from '@/hooks/use-toast';
+import { useAccounts } from '@/hooks/use-accounts';
 
 interface Account {
   id?: string;
@@ -17,7 +17,6 @@ interface Account {
   iban: string;
   bic: string;
   balance: number;
-  type: string;
   status: string;
 }
 
@@ -32,36 +31,40 @@ const AccountDialog = ({
   open,
   onOpenChange
 }: AccountDialogProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+  const { createAccount, updateAccount, isCreating, isUpdating } = useAccounts();
 
   const handleSubmit = async (formData: Account) => {
-    if (isSubmitting) return;
-    
-    setIsSubmitting(true);
-    
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: account ? "Compte modifié" : "Compte créé",
-        description: account 
-          ? `Le compte ${formData.name} a été modifié avec succès.`
-          : "Le nouveau compte a été créé avec succès."
-      });
+      if (account?.id) {
+        updateAccount({
+          id: account.id,
+          updates: {
+            name: formData.name,
+            bank: formData.bank,
+            iban: formData.iban,
+            bic: formData.bic,
+            balance: formData.balance,
+            status: formData.status,
+          }
+        });
+      } else {
+        createAccount({
+          name: formData.name,
+          bank: formData.bank,
+          iban: formData.iban,
+          bic: formData.bic,
+          balance: formData.balance,
+          status: formData.status,
+        });
+      }
       
       onOpenChange(false);
     } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de l'enregistrement.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
+      console.error('Error submitting account:', error);
     }
   };
+
+  const isSubmitting = isCreating || isUpdating;
 
   return (
     <Dialog open={open} onOpenChange={!isSubmitting ? onOpenChange : undefined}>

@@ -1,66 +1,87 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
-
-interface Account {
-  id: string;
-  name: string;
-  bank: string;
-  iban: string;
-  bic: string;
-  balance: number;
-  type: string;
-  status: string;
-  last_sync: string;
-}
-
-// Mock data for accounts
-const mockAccounts: Account[] = [
-  {
-    id: '1',
-    name: 'Compte Principal',
-    bank: 'Banque Populaire',
-    iban: 'FR76 1***************45',
-    bic: 'CCBPFRPPNCY',
-    balance: 15420.50,
-    type: 'Courant',
-    status: 'Actif',
-    last_sync: '2024-01-20T14:30:00Z'
-  },
-  {
-    id: '2',
-    name: 'Compte Épargne',
-    bank: 'Crédit Agricole',
-    iban: 'FR14 2***************89',
-    bic: 'AGRIFRPP',
-    balance: 8750.00,
-    type: 'Épargne',
-    status: 'Actif',
-    last_sync: '2024-01-19T10:15:00Z'
-  },
-  {
-    id: '3',
-    name: 'Compte Professionnel',
-    bank: 'BNP Paribas',
-    iban: 'FR35 3***************12',
-    bic: 'BNPAFRPP',
-    balance: 3250.75,
-    type: 'Professionnel',
-    status: 'Inactif',
-    last_sync: '2024-01-18T16:45:00Z'
-  }
-];
+import { accountsService, Account } from '@/services/supabase/accounts';
 
 export const useAccounts = () => {
-  const [accounts] = useState<Account[]>(mockAccounts);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch accounts
+  const {
+    data: accounts = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['accounts'],
+    queryFn: accountsService.getAll,
+  });
+
+  // Create account mutation
+  const createAccountMutation = useMutation({
+    mutationFn: accountsService.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      toast({
+        title: "Compte créé",
+        description: "Le nouveau compte a été créé avec succès."
+      });
+    },
+    onError: (error) => {
+      console.error('Error creating account:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la création du compte.",
+        variant: "destructive"
+      });
+    },
+  });
+
+  // Update account mutation
+  const updateAccountMutation = useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: any }) =>
+      accountsService.update(id, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      toast({
+        title: "Compte modifié",
+        description: "Le compte a été modifié avec succès."
+      });
+    },
+    onError: (error) => {
+      console.error('Error updating account:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la modification du compte.",
+        variant: "destructive"
+      });
+    },
+  });
+
+  // Delete account mutation
+  const deleteAccountMutation = useMutation({
+    mutationFn: accountsService.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      toast({
+        title: "Compte supprimé",
+        description: "Le compte a été supprimé avec succès."
+      });
+    },
+    onError: (error) => {
+      console.error('Error deleting account:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la suppression du compte.",
+        variant: "destructive"
+      });
+    },
+  });
 
   const handleDelete = (account: Account) => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer le compte ${account.name} ?`)) {
-      toast({
-        title: "Suppression",
-        description: `Compte ${account.name} supprimé`
-      });
+      deleteAccountMutation.mutate(account.id);
     }
   };
 
@@ -74,15 +95,21 @@ export const useAccounts = () => {
   const filterAccounts = (accounts: Account[], searchTerm: string) => {
     return accounts.filter(account => 
       account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      account.bank.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      account.type.toLowerCase().includes(searchTerm.toLowerCase())
+      account.bank.toLowerCase().includes(searchTerm.toLowerCase())
     );
   };
 
   return {
     accounts,
+    isLoading,
+    error,
     handleDelete,
     handleSync,
-    filterAccounts
+    filterAccounts,
+    createAccount: createAccountMutation.mutate,
+    updateAccount: updateAccountMutation.mutate,
+    isCreating: createAccountMutation.isPending,
+    isUpdating: updateAccountMutation.isPending,
+    isDeleting: deleteAccountMutation.isPending,
   };
 };

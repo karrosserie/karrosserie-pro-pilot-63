@@ -18,7 +18,6 @@ interface Account {
   iban: string;
   bic: string;
   balance: number;
-  type: string;
   status: string;
 }
 
@@ -41,13 +40,15 @@ export const AccountForm = ({
     iban: '',
     bic: '',
     balance: 0,
-    type: 'Courant',
     status: 'Actif'
   });
 
   useEffect(() => {
     if (account) {
-      setFormData(account);
+      setFormData({
+        ...account,
+        balance: Number(account.balance) || 0
+      });
     }
   }, [account]);
 
