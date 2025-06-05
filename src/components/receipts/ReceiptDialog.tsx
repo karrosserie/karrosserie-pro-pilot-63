@@ -11,6 +11,7 @@ import { ReceiptForm } from './ReceiptForm';
 import { useToast } from '@/hooks/use-toast';
 import { Receipt } from './form/types';
 import { receiptMutations } from '@/services/supabase/receipts/mutations';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface ReceiptDialogProps {
   receipt?: Receipt | null;
@@ -25,6 +26,7 @@ const ReceiptDialog = ({
 }: ReceiptDialogProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (formData: Receipt) => {
     if (isSubmitting) return;
@@ -73,6 +75,9 @@ const ReceiptDialog = ({
       } else {
         await receiptMutations.create(dataToSubmit);
       }
+
+      // Invalider le cache pour mettre à jour le tableau
+      await queryClient.invalidateQueries({ queryKey: ['receipts'] });
       
       toast({
         title: receipt ? "Encaissement modifié" : "Encaissement créé",
