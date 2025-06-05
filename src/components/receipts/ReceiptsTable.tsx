@@ -10,23 +10,12 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Eye, Download, Pencil, Trash, TrendingUp } from 'lucide-react';
-
-interface Receipt {
-  id: string;
-  reference: string;
-  date: string;
-  amount: number;
-  status: string;
-  client: string;
-  invoice: string;
-  payment_method: string;
-  bank_account: string;
-}
+import { ReceiptWithClient } from '@/services/supabase/receipts/types';
 
 interface ReceiptsTableProps {
-  receipts: Receipt[];
-  onEdit: (receipt: Receipt) => void;
-  onDelete: (receipt: Receipt) => void;
+  receipts: ReceiptWithClient[];
+  onEdit: (receipt: ReceiptWithClient) => void;
+  onDelete: (receipt: ReceiptWithClient) => void;
 }
 
 export const ReceiptsTable = ({ receipts, onEdit, onDelete }: ReceiptsTableProps) => {
@@ -70,14 +59,14 @@ export const ReceiptsTable = ({ receipts, onEdit, onDelete }: ReceiptsTableProps
             receipts.map((receipt) => (
               <TableRow key={receipt.id}>
                 <TableCell>{new Date(receipt.date).toLocaleDateString('fr-FR')}</TableCell>
-                <TableCell>{receipt.client}</TableCell>
-                <TableCell>{receipt.invoice}</TableCell>
+                <TableCell>{receipt.client || 'Client non assigné'}</TableCell>
+                <TableCell>{receipt.invoice || 'Aucune facture'}</TableCell>
                 <TableCell>{receipt.payment_method}</TableCell>
                 <TableCell>{receipt.bank_account}</TableCell>
                 <TableCell>{formatAmount(receipt.amount)}</TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(receipt.status)}`}>
-                    {receipt.status}
+                  <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(receipt.status || 'En attente')}`}>
+                    {receipt.status || 'En attente'}
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
