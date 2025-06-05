@@ -66,14 +66,6 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
     }).format(amount);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR');
-  };
-
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString('fr-FR');
-  };
-
   return (
     <div className="card-container">
       <Table>
@@ -85,7 +77,6 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
             <TableHead>BIC</TableHead>
             <TableHead>Solde</TableHead>
             <TableHead>Statut</TableHead>
-            <TableHead>Dernière sync</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -109,9 +100,6 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                   <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(account.status)}`}>
                     {account.status}
                   </span>
-                </TableCell>
-                <TableCell className="text-sm text-gray-500">
-                  {account.last_sync ? formatDateTime(account.last_sync) : 'Jamais'}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-1">
@@ -149,7 +137,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-4">
+              <TableCell colSpan={7} className="text-center py-4">
                 <div className="flex flex-col items-center justify-center py-8">
                   <Wallet className="h-10 w-10 text-gray-400 mb-2" />
                   <h3 className="font-medium text-gray-900">Aucun compte</h3>
