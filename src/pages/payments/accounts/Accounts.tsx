@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from '@/components/ui/badge';
+import AccountDialog from '@/components/accounts/AccountDialog';
 
 // Mock data for bank accounts
 const mockAccounts = [
@@ -59,6 +59,8 @@ const mockAccounts = [
 
 const Accounts = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState<any>(null);
   const { toast } = useToast();
   
   const filteredAccounts = mockAccounts.filter(account => 
@@ -111,17 +113,13 @@ const Accounts = () => {
   };
 
   const handleCreateAccount = () => {
-    toast({
-      title: "Nouveau compte",
-      description: "Fonctionnalité en cours de développement"
-    });
+    setSelectedAccount(null);
+    setDialogOpen(true);
   };
 
   const handleEdit = (account: any) => {
-    toast({
-      title: "Édition",
-      description: `Édition du compte ${account.name}`
-    });
+    setSelectedAccount(account);
+    setDialogOpen(true);
   };
 
   const handleDelete = (account: any) => {
@@ -282,6 +280,12 @@ const Accounts = () => {
           </TableBody>
         </Table>
       </div>
+
+      <AccountDialog
+        account={selectedAccount}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </div>
   );
 };

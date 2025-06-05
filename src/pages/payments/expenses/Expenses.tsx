@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Printer, Mail } from 'lucide-react';
+import ExpenseDialog from '@/components/expenses/ExpenseDialog';
 
 // Mock data for expenses
 const mockExpenses = [
@@ -50,6 +50,8 @@ const mockExpenses = [
 
 const Expenses = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState<any>(null);
   const { toast } = useToast();
   
   const filteredExpenses = mockExpenses.filter(expense => 
@@ -79,17 +81,13 @@ const Expenses = () => {
   };
 
   const handleCreateExpense = () => {
-    toast({
-      title: "Nouvelle dépense",
-      description: "Fonctionnalité en cours de développement"
-    });
+    setSelectedExpense(null);
+    setDialogOpen(true);
   };
 
   const handleEdit = (expense: any) => {
-    toast({
-      title: "Édition",
-      description: `Édition de la dépense ${expense.reference}`
-    });
+    setSelectedExpense(expense);
+    setDialogOpen(true);
   };
 
   const handleDelete = (expense: any) => {
@@ -244,6 +242,12 @@ const Expenses = () => {
           </TableBody>
         </Table>
       </div>
+
+      <ExpenseDialog
+        expense={selectedExpense}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </div>
   );
 };

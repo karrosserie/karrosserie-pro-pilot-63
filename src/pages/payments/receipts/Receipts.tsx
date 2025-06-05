@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Printer, Mail } from 'lucide-react';
+import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 
 // Mock data for receipts
 const mockReceipts = [
@@ -48,6 +48,8 @@ const mockReceipts = [
 
 const Receipts = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedReceipt, setSelectedReceipt] = useState<any>(null);
   const { toast } = useToast();
   
   const filteredReceipts = mockReceipts.filter(receipt => 
@@ -77,17 +79,13 @@ const Receipts = () => {
   };
 
   const handleCreateReceipt = () => {
-    toast({
-      title: "Nouveau encaissement",
-      description: "Fonctionnalité en cours de développement"
-    });
+    setSelectedReceipt(null);
+    setDialogOpen(true);
   };
 
   const handleEdit = (receipt: any) => {
-    toast({
-      title: "Édition",
-      description: `Édition de l'encaissement ${receipt.reference}`
-    });
+    setSelectedReceipt(receipt);
+    setDialogOpen(true);
   };
 
   const handleDelete = (receipt: any) => {
@@ -240,6 +238,12 @@ const Receipts = () => {
           </TableBody>
         </Table>
       </div>
+
+      <ReceiptDialog
+        receipt={selectedReceipt}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </div>
   );
 };
