@@ -1,14 +1,12 @@
 
 import React from 'react';
 import VehicleCard from '@/components/vehicle/VehicleCard';
+import type { Database } from '@/integrations/supabase/types';
 
-interface Vehicle {
-  id: string;
-  brand: string;
-  model: string;
-  year: number;
-  license_plate: string;
-  vehicle_images?: string | string[];
+// Use the actual Supabase type for vehicles
+type VehicleRow = Database['public']['Tables']['vehicles']['Row'];
+
+interface Vehicle extends VehicleRow {
   clients?: {
     first_name: string;
     last_name: string;
@@ -29,7 +27,7 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
   onDeleteVehicle
 }) => {
   // Helper function to convert vehicle_images to string array
-  const convertToImageArray = (images?: string | string[]): string[] => {
+  const convertToImageArray = (images?: any): string[] => {
     if (!images) return [];
     if (typeof images === 'string') {
       try {
@@ -39,7 +37,10 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
         return [images];
       }
     }
-    return Array.isArray(images) ? images : [];
+    if (Array.isArray(images)) {
+      return images.filter(img => typeof img === 'string');
+    }
+    return [];
   };
 
   // Transform vehicles data for VehicleCard component

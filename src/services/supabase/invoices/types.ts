@@ -1,7 +1,13 @@
 
-import { Database } from '@/integrations/supabase/types';
+import type { Database } from '@/integrations/supabase/types';
 
-export type Invoice = Database['public']['Tables']['invoices']['Row'] & {
+// Base invoice type from Supabase
+type InvoiceRow = Database['public']['Tables']['invoices']['Row'];
+type InvoiceInsert = Database['public']['Tables']['invoices']['Insert'];
+type InvoiceUpdate = Database['public']['Tables']['invoices']['Update'];
+
+// Extended invoice type with joins
+export interface Invoice extends InvoiceRow {
   clients?: {
     id: string;
     first_name: string;
@@ -17,7 +23,8 @@ export type Invoice = Database['public']['Tables']['invoices']['Row'] & {
     id: string;
     reference: string;
   } | null;
-};
+}
 
-export type NewInvoice = Database['public']['Tables']['invoices']['Insert'];
-export type UpdateInvoice = Database['public']['Tables']['invoices']['Update'];
+export interface NewInvoice extends Omit<InvoiceInsert, 'id' | 'created_at' | 'updated_at'> {}
+
+export interface UpdateInvoice extends InvoiceUpdate {}

@@ -1,7 +1,17 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import type { Database } from '@/integrations/supabase/types';
+
+// Use the actual Supabase type for vehicles
+type VehicleRow = Database['public']['Tables']['vehicles']['Row'];
+
+interface Vehicle extends VehicleRow {
+  clients?: {
+    first_name: string;
+    last_name: string;
+  };
+}
 
 export function useClientVehicles(clientId?: string) {
   const {
@@ -23,7 +33,7 @@ export function useClientVehicles(clientId?: string) {
         throw new Error(error.message);
       }
 
-      return data;
+      return data as Vehicle[];
     },
     enabled: !!clientId
   });
@@ -48,7 +58,13 @@ export function useVehicles() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('vehicles')
-        .select('*')
+        .select(`
+          *,
+          clients (
+            first_name,
+            last_name
+          )
+        `)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -56,7 +72,13 @@ export function useVehicles() {
         throw new Error(error.message);
       }
 
-      return data;
+      // Transform the data to handle the join properly
+      const transformedData = (data || []).map(vehicle => ({
+        ...vehicle,
+        clients: Array.isArray(vehicle.clients) && vehicle.clients.length > 0 ? vehicle.clients[0] : vehicle.clients
+      })) as Vehicle[];
+
+      return transformedData;
     }
   });
 

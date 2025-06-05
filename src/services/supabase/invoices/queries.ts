@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Invoice } from './types';
 
@@ -85,14 +84,22 @@ export const invoiceQueries = {
             clients: clientData,
             vehicles: vehicleData,
             repair_orders: repairOrderData
-          };
+          } as Invoice;
         })
       );
 
       return enrichedInvoices;
     }
     
-    return invoicesWithJoins || [];
+    // Transform the joined data to match our Invoice interface
+    const transformedInvoices = (invoicesWithJoins || []).map(invoice => ({
+      ...invoice,
+      clients: Array.isArray(invoice.clients) && invoice.clients.length > 0 ? invoice.clients[0] : invoice.clients,
+      vehicles: Array.isArray(invoice.vehicles) && invoice.vehicles.length > 0 ? invoice.vehicles[0] : invoice.vehicles,
+      repair_orders: Array.isArray(invoice.repair_orders) && invoice.repair_orders.length > 0 ? invoice.repair_orders[0] : invoice.repair_orders
+    })) as Invoice[];
+    
+    return transformedInvoices;
   },
 
   getById: async (id: string): Promise<Invoice> => {
@@ -124,7 +131,15 @@ export const invoiceQueries = {
       throw new Error(error.message);
     }
     
-    return data;
+    // Transform the joined data to match our Invoice interface
+    const transformedInvoice = {
+      ...data,
+      clients: Array.isArray(data.clients) && data.clients.length > 0 ? data.clients[0] : data.clients,
+      vehicles: Array.isArray(data.vehicles) && data.vehicles.length > 0 ? data.vehicles[0] : data.vehicles,
+      repair_orders: Array.isArray(data.repair_orders) && data.repair_orders.length > 0 ? data.repair_orders[0] : data.repair_orders
+    } as Invoice;
+    
+    return transformedInvoice;
   },
 
   getLastInvoiceByUser: async () => {
