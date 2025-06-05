@@ -1,10 +1,22 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { Database } from '@/integrations/supabase/types';
 
-export type Account = Database['public']['Tables']['accounts']['Row'];
-export type NewAccount = Database['public']['Tables']['accounts']['Insert'];
-export type UpdateAccount = Database['public']['Tables']['accounts']['Update'];
+// Temporary manual types until migration is applied
+export type Account = {
+  id: string;
+  user_id: string;
+  name: string;
+  bank: string;
+  iban: string;
+  bic: string;
+  balance: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type NewAccount = Omit<Account, 'id' | 'created_at' | 'updated_at'>;
+export type UpdateAccount = Partial<Omit<Account, 'id' | 'user_id' | 'created_at' | 'updated_at'>>;
 
 export const accountsService = {
   // Get all accounts for the current user
