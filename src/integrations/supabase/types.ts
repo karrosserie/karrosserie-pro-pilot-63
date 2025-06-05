@@ -654,6 +654,62 @@ export type Database = {
         }
         Relationships: []
       }
+      receipts: {
+        Row: {
+          amount: number
+          bank_account: string
+          created_at: string | null
+          date: string
+          id: string
+          invoice_id: string | null
+          notes: string | null
+          payment_method: string
+          payment_proofs: string[] | null
+          reference: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          bank_account: string
+          created_at?: string | null
+          date: string
+          id?: string
+          invoice_id?: string | null
+          notes?: string | null
+          payment_method: string
+          payment_proofs?: string[] | null
+          reference?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          bank_account?: string
+          created_at?: string | null
+          date?: string
+          id?: string
+          invoice_id?: string | null
+          notes?: string | null
+          payment_method?: string
+          payment_proofs?: string[] | null
+          reference?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receipts_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       repair_orders: {
         Row: {
           client_id: string | null
