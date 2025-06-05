@@ -17,6 +17,12 @@ export const accountsService = {
         return mockAccountsService.getAll();
       }
 
+      // Utilisation temporaire du service mock en attendant que la table bank_accounts soit créée
+      console.log('Using mock accounts service - bank_accounts table not yet available in Supabase');
+      return mockAccountsService.getAll();
+
+      // TODO: Uncomment when bank_accounts table is created and types are regenerated
+      /*
       const { data, error } = await supabase
         .from('bank_accounts')
         .select('*')
@@ -33,6 +39,7 @@ export const accountsService = {
 
       console.log('Successfully fetched bank accounts from Supabase:', data);
       return data as Account[];
+      */
     } catch (error) {
       console.error('Error in getAll:', error);
       console.log('Falling back to mock service');
@@ -48,6 +55,11 @@ export const accountsService = {
         return mockAccountsService.getById(id);
       }
 
+      // Utilisation temporaire du service mock
+      return mockAccountsService.getById(id);
+
+      // TODO: Uncomment when bank_accounts table is created and types are regenerated
+      /*
       const { data, error } = await supabase
         .from('bank_accounts')
         .select('*')
@@ -64,6 +76,7 @@ export const accountsService = {
       }
 
       return data as Account;
+      */
     } catch (error) {
       console.error('Error in getById:', error);
       return mockAccountsService.getById(id);
@@ -78,6 +91,11 @@ export const accountsService = {
         return mockAccountsService.create(account);
       }
 
+      // Utilisation temporaire du service mock
+      return mockAccountsService.create(account);
+
+      // TODO: Uncomment when bank_accounts table is created and types are regenerated
+      /*
       const { data, error } = await supabase
         .from('bank_accounts')
         .insert({
@@ -96,6 +114,7 @@ export const accountsService = {
       }
 
       return data as Account;
+      */
     } catch (error) {
       console.error('Error in create:', error);
       return mockAccountsService.create(account);
@@ -110,6 +129,11 @@ export const accountsService = {
         return mockAccountsService.update(id, updates);
       }
 
+      // Utilisation temporaire du service mock
+      return mockAccountsService.update(id, updates);
+
+      // TODO: Uncomment when bank_accounts table is created and types are regenerated
+      /*
       const { data, error } = await supabase
         .from('bank_accounts')
         .update({
@@ -130,6 +154,7 @@ export const accountsService = {
       }
 
       return data as Account;
+      */
     } catch (error) {
       console.error('Error in update:', error);
       return mockAccountsService.update(id, updates);
@@ -144,6 +169,11 @@ export const accountsService = {
         return mockAccountsService.delete(id);
       }
 
+      // Utilisation temporaire du service mock
+      return mockAccountsService.delete(id);
+
+      // TODO: Uncomment when bank_accounts table is created and types are regenerated
+      /*
       const { error } = await supabase
         .from('bank_accounts')
         .delete()
@@ -157,6 +187,7 @@ export const accountsService = {
         }
         throw error;
       }
+      */
     } catch (error) {
       console.error('Error in delete:', error);
       return mockAccountsService.delete(id);
