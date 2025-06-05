@@ -7,8 +7,131 @@ export type Json =
   | Json[]
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          operationName?: string
+          query?: string
+          variables?: Json
+          extensions?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
+      bank_accounts: {
+        Row: {
+          balance: number | null
+          bank: string
+          bic: string
+          created_at: string
+          iban: string
+          id: string
+          last_sync: string | null
+          name: string
+          status: string | null
+          type: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number | null
+          bank: string
+          bic: string
+          created_at?: string
+          iban: string
+          id?: string
+          last_sync?: string | null
+          name: string
+          status?: string | null
+          type?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number | null
+          bank?: string
+          bic?: string
+          created_at?: string
+          iban?: string
+          id?: string
+          last_sync?: string | null
+          name?: string
+          status?: string | null
+          type?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      car_brands: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      car_models: {
+        Row: {
+          brand_id: string
+          created_at: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          brand_id: string
+          created_at?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          brand_id?: string
+          created_at?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "car_models_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "car_brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cessions: {
         Row: {
           buyer_contact: string | null
@@ -65,6 +188,8 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string | null
+          driver_license_back_url: string | null
+          driver_license_front_url: string | null
           email: string | null
           first_name: string
           id: string
@@ -79,6 +204,8 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
+          driver_license_back_url?: string | null
+          driver_license_front_url?: string | null
           email?: string | null
           first_name: string
           id?: string
@@ -93,6 +220,8 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
+          driver_license_back_url?: string | null
+          driver_license_front_url?: string | null
           email?: string | null
           first_name?: string
           id?: string
@@ -104,16 +233,90 @@ export type Database = {
         }
         Relationships: []
       }
+      credits: {
+        Row: {
+          amount: number
+          client_id: string | null
+          created_at: string
+          id: string
+          invoice_id: string | null
+          items_data: Json | null
+          notes: string | null
+          reference: string
+          status: string
+          updated_at: string
+          user_id: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          amount?: number
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          invoice_id?: string | null
+          items_data?: Json | null
+          notes?: string | null
+          reference: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          amount?: number
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          invoice_id?: string | null
+          items_data?: Json | null
+          notes?: string | null
+          reference?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credits_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credits_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credits_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expertise_reports: {
         Row: {
           amount: number | null
+          claim_number: string | null
           client_id: string | null
           created_at: string | null
           document_url: string | null
           expert_name: string | null
           id: string
+          incident_date: string | null
           notes: string | null
+          parts_data: string | null
+          policy_number: string | null
           reference: string
+          repairs_data: string | null
+          report_date: string | null
+          report_number: string | null
           status: string | null
           updated_at: string | null
           user_id: string
@@ -121,13 +324,20 @@ export type Database = {
         }
         Insert: {
           amount?: number | null
+          claim_number?: string | null
           client_id?: string | null
           created_at?: string | null
           document_url?: string | null
           expert_name?: string | null
           id?: string
+          incident_date?: string | null
           notes?: string | null
+          parts_data?: string | null
+          policy_number?: string | null
           reference: string
+          repairs_data?: string | null
+          report_date?: string | null
+          report_number?: string | null
           status?: string | null
           updated_at?: string | null
           user_id: string
@@ -135,13 +345,20 @@ export type Database = {
         }
         Update: {
           amount?: number | null
+          claim_number?: string | null
           client_id?: string | null
           created_at?: string | null
           document_url?: string | null
           expert_name?: string | null
           id?: string
+          incident_date?: string | null
           notes?: string | null
+          parts_data?: string | null
+          policy_number?: string | null
           reference?: string
+          repairs_data?: string | null
+          report_date?: string | null
+          report_number?: string | null
           status?: string | null
           updated_at?: string | null
           user_id?: string
@@ -267,6 +484,27 @@ export type Database = {
         }
         Relationships: []
       }
+      insurance_companies: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           amount: number
@@ -324,24 +562,10 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "invoices_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "invoices_repair_order_id_fkey"
             columns: ["repair_order_id"]
             isOneToOne: false
             referencedRelation: "repair_orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "invoices_vehicle_id_fkey"
-            columns: ["vehicle_id"]
-            isOneToOne: false
-            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -428,22 +652,7 @@ export type Database = {
           valid_until?: string | null
           vehicle_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "quotes_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "quotes_vehicle_id_fkey"
-            columns: ["vehicle_id"]
-            isOneToOne: false
-            referencedRelation: "vehicles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       repair_orders: {
         Row: {
@@ -496,72 +705,106 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "repair_orders_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "repair_orders_quote_id_fkey"
             columns: ["quote_id"]
             isOneToOne: false
             referencedRelation: "quotes"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "repair_orders_vehicle_id_fkey"
-            columns: ["vehicle_id"]
-            isOneToOne: false
-            referencedRelation: "vehicles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       vehicles: {
         Row: {
+          arrival_date: string | null
           brand: string
           client_id: string | null
           color: string | null
           created_at: string | null
+          end_date: string | null
+          engine_number: string | null
+          fuel_level: number | null
           fuel_type: string | null
           id: string
+          insurance_company: string | null
+          insurance_expiry_date: string | null
           license_plate: string
           mileage: number | null
           model: string
+          pre_accident_defects: string | null
+          registration_document_back_url: string | null
+          registration_document_front_url: string | null
+          road_test: string | null
+          road_test_notes: string | null
+          start_date: string | null
+          status: string | null
           updated_at: string | null
           user_id: string
+          vehicle_image_url: string | null
+          vehicle_images: Json | null
           vin: string | null
+          work_items: Json | null
           year: number | null
         }
         Insert: {
+          arrival_date?: string | null
           brand: string
           client_id?: string | null
           color?: string | null
           created_at?: string | null
+          end_date?: string | null
+          engine_number?: string | null
+          fuel_level?: number | null
           fuel_type?: string | null
           id?: string
+          insurance_company?: string | null
+          insurance_expiry_date?: string | null
           license_plate: string
           mileage?: number | null
           model: string
+          pre_accident_defects?: string | null
+          registration_document_back_url?: string | null
+          registration_document_front_url?: string | null
+          road_test?: string | null
+          road_test_notes?: string | null
+          start_date?: string | null
+          status?: string | null
           updated_at?: string | null
           user_id: string
+          vehicle_image_url?: string | null
+          vehicle_images?: Json | null
           vin?: string | null
+          work_items?: Json | null
           year?: number | null
         }
         Update: {
+          arrival_date?: string | null
           brand?: string
           client_id?: string | null
           color?: string | null
           created_at?: string | null
+          end_date?: string | null
+          engine_number?: string | null
+          fuel_level?: number | null
           fuel_type?: string | null
           id?: string
+          insurance_company?: string | null
+          insurance_expiry_date?: string | null
           license_plate?: string
           mileage?: number | null
           model?: string
+          pre_accident_defects?: string | null
+          registration_document_back_url?: string | null
+          registration_document_front_url?: string | null
+          road_test?: string | null
+          road_test_notes?: string | null
+          start_date?: string | null
+          status?: string | null
           updated_at?: string | null
           user_id?: string
+          vehicle_image_url?: string | null
+          vehicle_images?: Json | null
           vin?: string | null
+          work_items?: Json | null
           year?: number | null
         }
         Relationships: [
@@ -696,6 +939,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },
