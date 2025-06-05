@@ -300,6 +300,62 @@ export type Database = {
           },
         ]
       }
+      expenses: {
+        Row: {
+          assign_to_vehicle: boolean
+          category: string
+          created_at: string
+          date: string
+          id: string
+          proof_url: string | null
+          supplier: string
+          total_amount: number
+          type: string
+          updated_at: string
+          user_id: string
+          vat_amount: number
+          vehicle_id: string | null
+        }
+        Insert: {
+          assign_to_vehicle?: boolean
+          category: string
+          created_at?: string
+          date: string
+          id?: string
+          proof_url?: string | null
+          supplier: string
+          total_amount?: number
+          type?: string
+          updated_at?: string
+          user_id: string
+          vat_amount?: number
+          vehicle_id?: string | null
+        }
+        Update: {
+          assign_to_vehicle?: boolean
+          category?: string
+          created_at?: string
+          date?: string
+          id?: string
+          proof_url?: string | null
+          supplier?: string
+          total_amount?: number
+          type?: string
+          updated_at?: string
+          user_id?: string
+          vat_amount?: number
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expertise_reports: {
         Row: {
           amount: number | null
