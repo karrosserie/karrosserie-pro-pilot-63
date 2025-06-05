@@ -1,84 +1,87 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ReceiptForm } from './ReceiptForm';
-import { useReceiptsData } from '@/hooks/use-receipts-data';
+import { useToast } from '@/hooks/use-toast';
 import { Receipt } from './form/types';
-import { Receipt as ServiceReceipt } from '@/services/supabase/receipts/types';
+import { createReceipt, updateReceipt } from '@/services/supabase/receipts';
 
 interface ReceiptDialogProps {
-  receipt?: ServiceReceipt;
+  receipt?: Receipt | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const ReceiptDialog = ({ receipt, open, onOpenChange }: ReceiptDialogProps) => {
+const ReceiptDialog = ({
+  receipt,
+  open,
+  onOpenChange
+}: ReceiptDialogProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { createReceipt, updateReceipt } = useReceiptsData();
+  const { toast } = useToast();
 
   const handleSubmit = async (formData: Receipt) => {
+    if (isSubmitting) return;
+    
     setIsSubmitting(true);
+    
     try {
-      // Find the invoice by reference to get the invoice_id
-      let invoice_id = null;
-      if (formData.invoice) {
-        // For now, we'll use the invoice reference as a string
-        // In a real implementation, you'd want to find the actual invoice ID
-        invoice_id = formData.invoice;
-      }
-
-      const receiptData = {
-        reference: formData.reference,
-        date: formData.date,
-        amount: formData.amount,
-        status: formData.status,
-        payment_method: formData.payment_method,
-        bank_account: formData.bank_account,
-        notes: formData.notes || '',
-        payment_proofs: formData.payment_proofs || [],
-        invoice_id
+      // Convert amount to number before submitting
+      const dataToSubmit = {
+        ...formData,
+        amount: typeof formData.amount === 'string' ? parseFloat(formData.amount) || 0 : formData.amount,
+        invoice_id: formData.invoice || null
       };
 
       if (receipt?.id) {
-        await updateReceipt.mutateAsync({ id: receipt.id, data: receiptData });
+        await updateReceipt(receipt.id, dataToSubmit);
       } else {
-        await createReceipt.mutateAsync(receiptData);
+        await createReceipt(dataToSubmit);
       }
+      
+      toast({
+        title: receipt ? "Encaissement modifié" : "Encaissement créé",
+        description: receipt 
+          ? `L'encaissement a été modifié avec succès.`
+          : "Le nouvel encaissement a été créé avec succès."
+      });
       
       onOpenChange(false);
     } catch (error) {
-      console.error('Error submitting receipt:', error);
+      console.error('Error saving receipt:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'enregistrement.",
+        variant: "destructive"
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Convert ServiceReceipt to form Receipt type
-  const formReceipt: Receipt | undefined = receipt ? {
-    id: receipt.id,
-    reference: receipt.reference || '',
-    date: receipt.date,
-    amount: receipt.amount,
-    status: receipt.status || 'En attente',
-    invoice: receipt.invoice_id || '',
-    payment_method: receipt.payment_method,
-    bank_account: receipt.bank_account,
-    notes: receipt.notes || '',
-    payment_proofs: receipt.payment_proofs || [],
-    invoice_id: receipt.invoice_id
-  } : undefined;
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={!isSubmitting ? onOpenChange : undefined}>
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>
-            {receipt ? 'Modifier l\'encaissement' : 'Nouvel encaissement'}
+            {receipt ? `Modifier l'encaissement` : "Nouvel encaissement"}
           </DialogTitle>
+          <DialogDescription>
+            {receipt
+              ? "Modifiez les détails de l'encaissement."
+              : "Créez un nouvel encaissement en remplissant les informations ci-dessous."
+            }
+          </DialogDescription>
         </DialogHeader>
         
         <ReceiptForm
-          receipt={formReceipt}
+          receipt={receipt}
           onSubmit={handleSubmit}
           onCancel={() => onOpenChange(false)}
           isSubmitting={isSubmitting}

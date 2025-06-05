@@ -9,19 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { ExpenseForm } from './ExpenseForm';
 import { useToast } from '@/hooks/use-toast';
-
-interface Expense {
-  id?: string;
-  reference: string;
-  date: string;
-  amount: number;
-  status: string;
-  supplier: string;
-  category: string;
-  payment_method: string;
-  bank_account: string;
-  description: string;
-}
+import { Expense } from './form/types';
 
 interface ExpenseDialogProps {
   expense?: Expense | null;
@@ -43,13 +31,19 @@ const ExpenseDialog = ({
     setIsSubmitting(true);
     
     try {
+      // Convert amount to number for processing
+      const processedData = {
+        ...formData,
+        amount: typeof formData.amount === 'string' ? parseFloat(formData.amount) || 0 : formData.amount
+      };
+
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
         title: expense ? "Dépense modifiée" : "Dépense créée",
         description: expense 
-          ? `La dépense ${formData.reference} a été modifiée avec succès.`
+          ? `La dépense ${processedData.reference} a été modifiée avec succès.`
           : "La nouvelle dépense a été créée avec succès."
       });
       
