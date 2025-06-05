@@ -16,6 +16,23 @@ export const useAccounts = () => {
   } = useQuery({
     queryKey: ['accounts'],
     queryFn: accountsService.getAll,
+    retry: 1,
+    onError: (error: any) => {
+      console.error('Error fetching accounts:', error);
+      if (error.code === '42P01') {
+        toast({
+          title: "Migration requise",
+          description: "La table des comptes n'existe pas encore. Veuillez appliquer les migrations Supabase.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger les comptes.",
+          variant: "destructive"
+        });
+      }
+    },
   });
 
   // Create account mutation
@@ -28,7 +45,7 @@ export const useAccounts = () => {
         description: "Le nouveau compte a été créé avec succès."
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error creating account:', error);
       toast({
         title: "Erreur",
@@ -49,7 +66,7 @@ export const useAccounts = () => {
         description: "Le compte a été modifié avec succès."
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error updating account:', error);
       toast({
         title: "Erreur",
@@ -69,7 +86,7 @@ export const useAccounts = () => {
         description: "Le compte a été supprimé avec succès."
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error deleting account:', error);
       toast({
         title: "Erreur",

@@ -20,7 +20,8 @@ interface Account {
   balance: number;
   type: string;
   status: string;
-  last_sync: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface AccountsTableProps {
@@ -64,6 +65,10 @@ export const AccountsTable = ({ accounts, onEdit, onDelete }: AccountsTableProps
     }).format(amount);
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('fr-FR');
+  };
+
   return (
     <div className="card-container">
       <Table>
@@ -75,6 +80,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete }: AccountsTableProps
             <TableHead>BIC</TableHead>
             <TableHead>Solde</TableHead>
             <TableHead>Statut</TableHead>
+            <TableHead>Créé le</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -89,8 +95,8 @@ export const AccountsTable = ({ accounts, onEdit, onDelete }: AccountsTableProps
                   </div>
                 </TableCell>
                 <TableCell>{account.bank}</TableCell>
-                <TableCell>{account.iban}</TableCell>
-                <TableCell>{account.bic}</TableCell>
+                <TableCell className="font-mono text-sm">{account.iban}</TableCell>
+                <TableCell className="font-mono text-sm">{account.bic}</TableCell>
                 <TableCell className="font-medium">
                   {formatAmount(account.balance)}
                 </TableCell>
@@ -98,6 +104,9 @@ export const AccountsTable = ({ accounts, onEdit, onDelete }: AccountsTableProps
                   <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(account.status)}`}>
                     {account.status}
                   </span>
+                </TableCell>
+                <TableCell className="text-sm text-gray-500">
+                  {formatDate(account.created_at)}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-1">
@@ -121,12 +130,12 @@ export const AccountsTable = ({ accounts, onEdit, onDelete }: AccountsTableProps
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-4">
+              <TableCell colSpan={8} className="text-center py-4">
                 <div className="flex flex-col items-center justify-center py-8">
                   <Wallet className="h-10 w-10 text-gray-400 mb-2" />
-                  <h3 className="font-medium text-gray-900">Aucun résultat</h3>
+                  <h3 className="font-medium text-gray-900">Aucun compte</h3>
                   <p className="text-gray-500 mt-1">
-                    Aucun compte correspondant à votre recherche n'a été trouvé.
+                    Commencez par créer votre premier compte bancaire.
                   </p>
                 </div>
               </TableCell>
