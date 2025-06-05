@@ -1,20 +1,7 @@
 
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-
-interface Expense {
-  id: string;
-  type: string;
-  proof_url: string;
-  date: string;
-  amount: number;
-  status: string;
-  supplier: string;
-  category: string;
-  payment_method: string;
-  bank_account: string;
-  description: string;
-}
+import { Expense } from '@/components/expenses/form/types';
 
 // Mock data for expenses
 const mockExpenses: Expense[] = [
@@ -63,7 +50,7 @@ export const useExpenses = () => {
     return expenses.filter(expense => 
       expense.supplier.toLowerCase().includes(searchTerm.toLowerCase()) ||
       expense.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      expense.type.toLowerCase().includes(searchTerm.toLowerCase())
+      (expense.type && expense.type.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   };
 

@@ -43,7 +43,7 @@ const ExpenseDialog = ({
       toast({
         title: expense ? "Dépense modifiée" : "Dépense créée",
         description: expense 
-          ? `La dépense ${processedData.reference} a été modifiée avec succès.`
+          ? `La dépense a été modifiée avec succès.`
           : "La nouvelle dépense a été créée avec succès."
       });
       
@@ -64,7 +64,7 @@ const ExpenseDialog = ({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>
-            {expense ? `Modifier la dépense - ${expense.reference}` : "Nouvelle dépense"}
+            {expense ? `Modifier la dépense` : "Nouvelle dépense"}
           </DialogTitle>
           <DialogDescription>
             {expense
