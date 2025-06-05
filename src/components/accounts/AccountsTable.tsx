@@ -9,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Eye, Pencil, Trash, CreditCard, Building, Wallet } from 'lucide-react';
+import { Eye, Pencil, Trash, CreditCard, Building, Wallet, RefreshCw } from 'lucide-react';
 
 interface Account {
   id: string;
@@ -22,6 +22,7 @@ interface Account {
   status: string;
   created_at: string;
   updated_at: string;
+  last_sync?: string;
 }
 
 interface AccountsTableProps {
@@ -31,7 +32,7 @@ interface AccountsTableProps {
   onSync: (account: Account) => void;
 }
 
-export const AccountsTable = ({ accounts, onEdit, onDelete }: AccountsTableProps) => {
+export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTableProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Actif':
@@ -69,6 +70,10 @@ export const AccountsTable = ({ accounts, onEdit, onDelete }: AccountsTableProps
     return new Date(dateString).toLocaleDateString('fr-FR');
   };
 
+  const formatDateTime = (dateString: string) => {
+    return new Date(dateString).toLocaleString('fr-FR');
+  };
+
   return (
     <div className="card-container">
       <Table>
@@ -80,7 +85,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete }: AccountsTableProps
             <TableHead>BIC</TableHead>
             <TableHead>Solde</TableHead>
             <TableHead>Statut</TableHead>
-            <TableHead>Créé le</TableHead>
+            <TableHead>Dernière sync</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -106,14 +111,27 @@ export const AccountsTable = ({ accounts, onEdit, onDelete }: AccountsTableProps
                   </span>
                 </TableCell>
                 <TableCell className="text-sm text-gray-500">
-                  {formatDate(account.created_at)}
+                  {account.last_sync ? formatDateTime(account.last_sync) : 'Jamais'}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-1">
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" title="Voir les détails">
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => onEdit(account)}>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => onSync(account)}
+                      title="Synchroniser"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => onEdit(account)}
+                      title="Modifier"
+                    >
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button 
@@ -121,6 +139,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete }: AccountsTableProps
                       size="icon" 
                       className="text-red-500 hover:text-red-700"
                       onClick={() => onDelete(account)}
+                      title="Supprimer"
                     >
                       <Trash className="h-4 w-4" />
                     </Button>

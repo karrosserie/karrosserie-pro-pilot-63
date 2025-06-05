@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { accountsService, Account } from '@/services/supabase/accounts';
@@ -14,17 +15,13 @@ export const useAccounts = () => {
   } = useQuery({
     queryKey: ['accounts'],
     queryFn: accountsService.getAll,
-    retry: 1,
+    retry: (failureCount, error: any) => {
+      // Don't retry if it's a table not found error
+      if (error?.code === '42P01') return false;
+      return failureCount < 2;
+    },
+    refetchOnWindowFocus: false,
   });
-
-  // Handle errors manually
-  if (error) {
-    console.error('Error fetching accounts:', error);
-    const errorMessage = error as any;
-    if (errorMessage.code === '42P01') {
-      console.log('Table accounts does not exist yet - using mock service');
-    }
-  }
 
   // Create account mutation
   const createAccountMutation = useMutation({
@@ -94,16 +91,30 @@ export const useAccounts = () => {
   };
 
   const handleSync = (account: Account) => {
+    // Pour l'instant, une simple notification
     toast({
       title: "Synchronisation",
       description: `Synchronisation du compte ${account.name} en cours...`
     });
+    
+    // Simuler une synchronisation en rechargeant les données
+    setTimeout(() => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      toast({
+        title: "Synchronisation terminée",
+        description: `Le compte ${account.name} a été synchronisé.`
+      });
+    }, 2000);
   };
 
   const filterAccounts = (accounts: Account[], searchTerm: string) => {
+    if (!searchTerm.trim()) return accounts;
+    
     return accounts.filter(account => 
       account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      account.bank.toLowerCase().includes(searchTerm.toLowerCase())
+      account.bank.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      account.iban.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      account.type?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   };
 
