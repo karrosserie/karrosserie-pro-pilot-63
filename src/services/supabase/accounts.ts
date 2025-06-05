@@ -17,12 +17,6 @@ export const accountsService = {
         return mockAccountsService.getAll();
       }
 
-      // Utilisation temporaire du service mock en attendant que la table bank_accounts soit créée
-      console.log('Using mock accounts service - bank_accounts table not yet available in Supabase');
-      return mockAccountsService.getAll();
-
-      // TODO: Uncomment when bank_accounts table is created and types are regenerated
-      /*
       const { data, error } = await supabase
         .from('bank_accounts')
         .select('*')
@@ -38,8 +32,20 @@ export const accountsService = {
       }
 
       console.log('Successfully fetched bank accounts from Supabase:', data);
-      return data as Account[];
-      */
+      return data.map(account => ({
+        id: account.id,
+        name: account.name,
+        bank: account.bank,
+        iban: account.iban,
+        bic: account.bic,
+        balance: Number(account.balance),
+        status: account.status,
+        type: account.type || 'Courant',
+        created_at: account.created_at,
+        updated_at: account.updated_at,
+        last_sync: account.last_sync,
+        user_id: account.user_id
+      })) as Account[];
     } catch (error) {
       console.error('Error in getAll:', error);
       console.log('Falling back to mock service');
@@ -55,11 +61,6 @@ export const accountsService = {
         return mockAccountsService.getById(id);
       }
 
-      // Utilisation temporaire du service mock
-      return mockAccountsService.getById(id);
-
-      // TODO: Uncomment when bank_accounts table is created and types are regenerated
-      /*
       const { data, error } = await supabase
         .from('bank_accounts')
         .select('*')
@@ -72,11 +73,26 @@ export const accountsService = {
         if (error.code === '42P01') {
           return mockAccountsService.getById(id);
         }
+        if (error.code === 'PGRST116') {
+          return null;
+        }
         throw error;
       }
 
-      return data as Account;
-      */
+      return {
+        id: data.id,
+        name: data.name,
+        bank: data.bank,
+        iban: data.iban,
+        bic: data.bic,
+        balance: Number(data.balance),
+        status: data.status,
+        type: data.type || 'Courant',
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+        last_sync: data.last_sync,
+        user_id: data.user_id
+      } as Account;
     } catch (error) {
       console.error('Error in getById:', error);
       return mockAccountsService.getById(id);
@@ -91,15 +107,16 @@ export const accountsService = {
         return mockAccountsService.create(account);
       }
 
-      // Utilisation temporaire du service mock
-      return mockAccountsService.create(account);
-
-      // TODO: Uncomment when bank_accounts table is created and types are regenerated
-      /*
       const { data, error } = await supabase
         .from('bank_accounts')
         .insert({
-          ...account,
+          name: account.name,
+          bank: account.bank,
+          iban: account.iban,
+          bic: account.bic,
+          balance: account.balance,
+          status: account.status,
+          type: account.type || 'Courant',
           user_id: user.user.id,
         })
         .select()
@@ -113,8 +130,20 @@ export const accountsService = {
         throw error;
       }
 
-      return data as Account;
-      */
+      return {
+        id: data.id,
+        name: data.name,
+        bank: data.bank,
+        iban: data.iban,
+        bic: data.bic,
+        balance: Number(data.balance),
+        status: data.status,
+        type: data.type || 'Courant',
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+        last_sync: data.last_sync,
+        user_id: data.user_id
+      } as Account;
     } catch (error) {
       console.error('Error in create:', error);
       return mockAccountsService.create(account);
@@ -129,11 +158,6 @@ export const accountsService = {
         return mockAccountsService.update(id, updates);
       }
 
-      // Utilisation temporaire du service mock
-      return mockAccountsService.update(id, updates);
-
-      // TODO: Uncomment when bank_accounts table is created and types are regenerated
-      /*
       const { data, error } = await supabase
         .from('bank_accounts')
         .update({
@@ -153,8 +177,20 @@ export const accountsService = {
         throw error;
       }
 
-      return data as Account;
-      */
+      return {
+        id: data.id,
+        name: data.name,
+        bank: data.bank,
+        iban: data.iban,
+        bic: data.bic,
+        balance: Number(data.balance),
+        status: data.status,
+        type: data.type || 'Courant',
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+        last_sync: data.last_sync,
+        user_id: data.user_id
+      } as Account;
     } catch (error) {
       console.error('Error in update:', error);
       return mockAccountsService.update(id, updates);
@@ -169,11 +205,6 @@ export const accountsService = {
         return mockAccountsService.delete(id);
       }
 
-      // Utilisation temporaire du service mock
-      return mockAccountsService.delete(id);
-
-      // TODO: Uncomment when bank_accounts table is created and types are regenerated
-      /*
       const { error } = await supabase
         .from('bank_accounts')
         .delete()
@@ -187,7 +218,6 @@ export const accountsService = {
         }
         throw error;
       }
-      */
     } catch (error) {
       console.error('Error in delete:', error);
       return mockAccountsService.delete(id);
