@@ -1,9 +1,8 @@
-
 import { supabase } from '@/integrations/supabase/client';
-import { mockAccountsService } from '../mock/accounts';
+import { mockAccountsService, Account, NewAccount, UpdateAccount } from '../mock/accounts';
 
 // Export des types du service mock pour la compatibilité
-export type { Account, NewAccount, UpdateAccount } from '../mock/accounts';
+export type { Account, NewAccount, UpdateAccount };
 
 // Fonction pour vérifier si la table accounts existe
 const checkTableExists = async (): Promise<boolean> => {
