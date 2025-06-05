@@ -39,6 +39,20 @@ const ReceiptDialog = ({
       } else {
         amount = formData.amount || 0;
       }
+
+      // Validate and clean invoice_id - must be a valid UUID or null
+      let invoiceId = null;
+      if (formData.invoice && formData.invoice.trim() !== '') {
+        // Check if it's a valid UUID format (basic check)
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        if (uuidRegex.test(formData.invoice)) {
+          invoiceId = formData.invoice;
+        } else {
+          console.warn('Invalid UUID format for invoice_id:', formData.invoice);
+          // If it's not a valid UUID, set to null instead of causing an error
+          invoiceId = null;
+        }
+      }
       
       const dataToSubmit = {
         reference: formData.reference || '',
@@ -49,7 +63,7 @@ const ReceiptDialog = ({
         bank_account: formData.bank_account,
         notes: formData.notes || '',
         payment_proofs: formData.payment_proofs || [],
-        invoice_id: formData.invoice || null
+        invoice_id: invoiceId
       };
 
       console.log('Submitting receipt data:', dataToSubmit);
