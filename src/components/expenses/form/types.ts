@@ -4,13 +4,13 @@ export interface Expense {
   type?: string;
   proof_url?: string;
   date: string;
-  amount: number | string;
+  vat_amount: number | string;
+  total_amount: number | string;
   status: string;
   supplier: string;
   category: string;
-  payment_method: string;
-  bank_account: string;
-  description: string;
+  assign_to_vehicle: boolean;
+  vehicle_id?: string;
 }
 
 export interface ExpenseFormProps {

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -55,10 +54,8 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete }: ExpensesTableProps
             <TableHead>Date</TableHead>
             <TableHead>Fournisseur</TableHead>
             <TableHead>Catégorie</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Méthode de paiement</TableHead>
-            <TableHead>Compte</TableHead>
-            <TableHead>Montant</TableHead>
+            <TableHead>Montant TVA</TableHead>
+            <TableHead>Montant TTC</TableHead>
             <TableHead>Statut</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -71,10 +68,8 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete }: ExpensesTableProps
                 <TableCell>{new Date(expense.date).toLocaleDateString('fr-FR')}</TableCell>
                 <TableCell>{expense.supplier}</TableCell>
                 <TableCell>{expense.category}</TableCell>
-                <TableCell>{expense.description}</TableCell>
-                <TableCell>{expense.payment_method}</TableCell>
-                <TableCell>{expense.bank_account}</TableCell>
-                <TableCell>{formatAmount(expense.amount)}</TableCell>
+                <TableCell>{formatAmount(expense.vat_amount)}</TableCell>
+                <TableCell>{formatAmount(expense.total_amount)}</TableCell>
                 <TableCell>
                   <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(expense.status)}`}>
                     {expense.status}
@@ -126,7 +121,7 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete }: ExpensesTableProps
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={10} className="text-center py-4">
+              <TableCell colSpan={8} className="text-center py-4">
                 <div className="flex flex-col items-center justify-center py-8">
                   <TrendingDown className="h-10 w-10 text-gray-400 mb-2" />
                   <h3 className="font-medium text-gray-900">Aucun résultat</h3>

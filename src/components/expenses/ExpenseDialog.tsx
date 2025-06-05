@@ -31,10 +31,11 @@ const ExpenseDialog = ({
     setIsSubmitting(true);
     
     try {
-      // Convert amount to number for processing
+      // Convert amounts to numbers for processing
       const processedData = {
         ...formData,
-        amount: typeof formData.amount === 'string' ? parseFloat(formData.amount) || 0 : formData.amount
+        vat_amount: typeof formData.vat_amount === 'string' ? parseFloat(formData.vat_amount) || 0 : formData.vat_amount,
+        total_amount: typeof formData.total_amount === 'string' ? parseFloat(formData.total_amount) || 0 : formData.total_amount
       };
 
       // Simulate API call

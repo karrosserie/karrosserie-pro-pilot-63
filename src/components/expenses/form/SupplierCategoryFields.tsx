@@ -2,13 +2,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Expense } from './types';
 
 interface SupplierCategoryFieldsProps {
@@ -29,22 +23,19 @@ export const SupplierCategoryFields = ({ formData, onChange }: SupplierCategoryF
           required
         />
       </div>
-      
+
       <div>
         <Label htmlFor="category" required>Catégorie</Label>
         <Select value={formData.category} onValueChange={(value) => onChange('category', value)}>
           <SelectTrigger>
-            <SelectValue />
+            <SelectValue placeholder="Sélectionner une catégorie" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Pièces détachées">Pièces détachées</SelectItem>
+            <SelectItem value="Péage">Péage</SelectItem>
             <SelectItem value="Carburant">Carburant</SelectItem>
-            <SelectItem value="Électricité">Électricité</SelectItem>
-            <SelectItem value="Eau">Eau</SelectItem>
-            <SelectItem value="Assurance">Assurance</SelectItem>
-            <SelectItem value="Fournitures">Fournitures</SelectItem>
-            <SelectItem value="Maintenance">Maintenance</SelectItem>
-            <SelectItem value="Autre">Autre</SelectItem>
+            <SelectItem value="Hôtel">Hôtel</SelectItem>
+            <SelectItem value="Restaurant">Restaurant</SelectItem>
+            <SelectItem value="Autres">Autres</SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -3,9 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { TypeProofFields } from './form/TypeProofFields';
 import { BasicFields } from './form/BasicFields';
 import { SupplierCategoryFields } from './form/SupplierCategoryFields';
-import { DescriptionField } from './form/DescriptionField';
-import { AmountStatusFields } from './form/AmountStatusFields';
-import { PaymentFields } from './form/PaymentFields';
+import { StatusField } from './form/StatusField';
+import { VehicleAssignmentFields } from './form/VehicleAssignmentFields';
 import { FormActions } from './form/FormActions';
 import { Expense, ExpenseFormProps } from './form/types';
 
@@ -19,13 +18,13 @@ export const ExpenseForm = ({
     type: 'Note de frais',
     proof_url: '',
     date: new Date().toISOString().split('T')[0],
-    amount: '',
+    vat_amount: '',
+    total_amount: '',
     status: 'En attente',
     supplier: '',
-    category: 'Pièces détachées',
-    payment_method: 'Virement',
-    bank_account: 'Compte Principal',
-    description: ''
+    category: 'Péage',
+    assign_to_vehicle: false,
+    vehicle_id: ''
   });
 
   useEffect(() => {
@@ -63,17 +62,12 @@ export const ExpenseForm = ({
         onChange={handleChange}
       />
 
-      <DescriptionField
+      <StatusField
         formData={formData}
         onChange={handleChange}
       />
 
-      <AmountStatusFields
-        formData={formData}
-        onChange={handleChange}
-      />
-
-      <PaymentFields
+      <VehicleAssignmentFields
         formData={formData}
         onChange={handleChange}
       />
