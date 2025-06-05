@@ -16,6 +16,8 @@ export const useAccounts = () => {
     queryKey: ['accounts'],
     queryFn: accountsService.getAll,
     retry: (failureCount, error: any) => {
+      // Don't retry authentication errors
+      if (error?.message?.includes('not authenticated')) return false;
       // Don't retry if it's a table not found error
       if (error?.code === '42P01') return false;
       return failureCount < 2;
@@ -37,7 +39,7 @@ export const useAccounts = () => {
       console.error('Error creating account:', error);
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors de la création du compte.",
+        description: error.message || "Une erreur est survenue lors de la création du compte.",
         variant: "destructive"
       });
     },
@@ -58,7 +60,7 @@ export const useAccounts = () => {
       console.error('Error updating account:', error);
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors de la modification du compte.",
+        description: error.message || "Une erreur est survenue lors de la modification du compte.",
         variant: "destructive"
       });
     },
@@ -78,7 +80,7 @@ export const useAccounts = () => {
       console.error('Error deleting account:', error);
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors de la suppression du compte.",
+        description: error.message || "Une erreur est survenue lors de la suppression du compte.",
         variant: "destructive"
       });
     },
@@ -91,20 +93,18 @@ export const useAccounts = () => {
   };
 
   const handleSync = (account: Account) => {
-    // Pour l'instant, une simple notification
-    toast({
-      title: "Synchronisation",
-      description: `Synchronisation du compte ${account.name} en cours...`
+    // Mettre à jour le champ last_sync
+    updateAccountMutation.mutate({
+      id: account.id,
+      updates: {
+        last_sync: new Date().toISOString()
+      }
     });
     
-    // Simuler une synchronisation en rechargeant les données
-    setTimeout(() => {
-      queryClient.invalidateQueries({ queryKey: ['accounts'] });
-      toast({
-        title: "Synchronisation terminée",
-        description: `Le compte ${account.name} a été synchronisé.`
-      });
-    }, 2000);
+    toast({
+      title: "Synchronisation",
+      description: `Synchronisation du compte ${account.name} terminée.`
+    });
   };
 
   const filterAccounts = (accounts: Account[], searchTerm: string) => {

@@ -1,22 +1,14 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { mockAccountsService } from '@/services/mock/accounts';
+import type { Database } from '@/integrations/supabase/types';
+
+// Types derived from Supabase
+type BankAccountRow = Database['public']['Tables']['bank_accounts']['Row'];
+type BankAccountInsert = Database['public']['Tables']['bank_accounts']['Insert'];
+type BankAccountUpdate = Database['public']['Tables']['bank_accounts']['Update'];
 
 // Types for compatibility with existing components
-export interface Account {
-  id: string;
-  user_id: string;
-  name: string;
-  bank: string;
-  iban: string;
-  bic: string;
-  balance: number;
-  type: string;
-  status: string;
-  last_sync?: string;
-  created_at: string;
-  updated_at: string;
-}
+export interface Account extends BankAccountRow {}
 
 export interface NewAccount {
   name: string;
@@ -41,144 +33,121 @@ export interface UpdateAccount {
 export const accountsService = {
   // Get all accounts for the current user
   async getAll(): Promise<Account[]> {
-    try {
-      console.log('Attempting to fetch bank accounts from Supabase...');
-      
-      // Use the REST API directly with rpc or raw SQL
-      const { data: session } = await supabase.auth.getSession();
-      if (!session?.session?.user) {
-        console.log('No authenticated user, using mock data');
-        return mockAccountsService.getAll();
-      }
-
-      // Try using the postgrest client with explicit casting
-      const { data, error } = await (supabase as any)
-        .from('bank_accounts')
-        .select('*')
-        .eq('user_id', session.session.user.id);
-
-      if (error) {
-        console.error('Supabase error:', error);
-        console.log('Falling back to mock data');
-        return mockAccountsService.getAll();
-      }
-
-      console.log('Successfully fetched accounts from Supabase:', data);
-      return data || [];
-    } catch (error) {
-      console.error('Error fetching accounts:', error);
-      console.log('Using mock data as fallback');
-      return mockAccountsService.getAll();
+    console.log('Fetching bank accounts from Supabase...');
+    
+    const { data: session } = await supabase.auth.getSession();
+    if (!session?.session?.user) {
+      throw new Error('User not authenticated');
     }
+
+    const { data, error } = await supabase
+      .from('bank_accounts')
+      .select('*')
+      .eq('user_id', session.session.user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
+
+    console.log('Successfully fetched accounts from Supabase:', data);
+    return data || [];
   },
 
   // Get a single account by ID
   async getById(id: string): Promise<Account | null> {
-    try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session?.session?.user) {
-        return mockAccountsService.getById(id);
-      }
-
-      const { data, error } = await (supabase as any)
-        .from('bank_accounts')
-        .select('*')
-        .eq('id', id)
-        .eq('user_id', session.session.user.id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching account:', error);
-        return mockAccountsService.getById(id);
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error fetching account:', error);
-      return mockAccountsService.getById(id);
+    const { data: session } = await supabase.auth.getSession();
+    if (!session?.session?.user) {
+      throw new Error('User not authenticated');
     }
+
+    const { data, error } = await supabase
+      .from('bank_accounts')
+      .select('*')
+      .eq('id', id)
+      .eq('user_id', session.session.user.id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching account:', error);
+      throw error;
+    }
+
+    return data;
   },
 
   // Create a new account
   async create(account: NewAccount): Promise<Account> {
-    try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session?.session?.user) {
-        return mockAccountsService.create(account);
-      }
-
-      const accountData = {
-        ...account,
-        user_id: session.session.user.id,
-      };
-
-      const { data, error } = await (supabase as any)
-        .from('bank_accounts')
-        .insert([accountData])
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error creating account:', error);
-        return mockAccountsService.create(account);
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error creating account:', error);
-      return mockAccountsService.create(account);
+    const { data: session } = await supabase.auth.getSession();
+    if (!session?.session?.user) {
+      throw new Error('User not authenticated');
     }
+
+    const accountData: BankAccountInsert = {
+      name: account.name,
+      bank: account.bank,
+      iban: account.iban,
+      bic: account.bic,
+      balance: account.balance,
+      status: account.status,
+      type: account.type,
+      user_id: session.session.user.id,
+    };
+
+    const { data, error } = await supabase
+      .from('bank_accounts')
+      .insert([accountData])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating account:', error);
+      throw error;
+    }
+
+    return data;
   },
 
   // Update an existing account
   async update(id: string, updates: UpdateAccount): Promise<Account> {
-    try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session?.session?.user) {
-        return mockAccountsService.update(id, updates);
-      }
-
-      const { data, error } = await (supabase as any)
-        .from('bank_accounts')
-        .update(updates)
-        .eq('id', id)
-        .eq('user_id', session.session.user.id)
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error updating account:', error);
-        return mockAccountsService.update(id, updates);
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error updating account:', error);
-      return mockAccountsService.update(id, updates);
+    const { data: session } = await supabase.auth.getSession();
+    if (!session?.session?.user) {
+      throw new Error('User not authenticated');
     }
+
+    const { data, error } = await supabase
+      .from('bank_accounts')
+      .update(updates as BankAccountUpdate)
+      .eq('id', id)
+      .eq('user_id', session.session.user.id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating account:', error);
+      throw error;
+    }
+
+    return data;
   },
 
   // Delete an account
   async delete(id: string): Promise<void> {
-    try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session?.session?.user) {
-        return mockAccountsService.delete(id);
-      }
+    const { data: session } = await supabase.auth.getSession();
+    if (!session?.session?.user) {
+      throw new Error('User not authenticated');
+    }
 
-      const { error } = await (supabase as any)
-        .from('bank_accounts')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', session.session.user.id);
+    const { error } = await supabase
+      .from('bank_accounts')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', session.session.user.id);
 
-      if (error) {
-        console.error('Error deleting account:', error);
-        return mockAccountsService.delete(id);
-      }
-    } catch (error) {
+    if (error) {
       console.error('Error deleting account:', error);
-      return mockAccountsService.delete(id);
+      throw error;
     }
   },
 };

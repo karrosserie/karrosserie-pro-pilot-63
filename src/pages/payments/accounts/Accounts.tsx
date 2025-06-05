@@ -6,7 +6,7 @@ import AccountDialog from '@/components/accounts/AccountDialog';
 import { useAccounts } from '@/hooks/use-accounts';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Database } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 const Accounts = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -32,7 +32,10 @@ const Accounts = () => {
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Erreur lors du chargement des comptes. Vérifiez votre connexion et réessayez.
+            {error.message?.includes('not authenticated') 
+              ? 'Vous devez être connecté pour accéder à vos comptes.'
+              : 'Erreur lors du chargement des comptes. Vérifiez votre connexion et réessayez.'
+            }
           </AlertDescription>
         </Alert>
       </div>
@@ -51,22 +54,8 @@ const Accounts = () => {
     setDialogOpen(true);
   };
 
-  // Afficher une notification si on utilise le service mock
-  const isUsingMockData = accounts.length === 0 || 
-    (accounts.length > 0 && !accounts[0].user_id);
-
   return (
     <div className="page-container">
-      {isUsingMockData && (
-        <Alert className="mb-4">
-          <Database className="h-4 w-4" />
-          <AlertDescription>
-            Mode démo actif. Les données sont stockées localement. 
-            Connectez-vous à Supabase pour la persistance des données.
-          </AlertDescription>
-        </Alert>
-      )}
-      
       <AccountsHeader
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
