@@ -29,7 +29,11 @@ export const ReceiptForm = ({
 
   useEffect(() => {
     if (receipt) {
-      setFormData(receipt);
+      setFormData({
+        ...receipt,
+        // Utiliser invoice_id comme valeur pour le select
+        invoice: receipt.invoice_id || ''
+      });
     }
   }, [receipt]);
 

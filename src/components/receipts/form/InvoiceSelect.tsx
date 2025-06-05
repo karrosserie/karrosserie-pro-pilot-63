@@ -30,7 +30,7 @@ export const InvoiceSelect = ({ value, onChange }: InvoiceSelectProps) => {
             <SelectItem value="loading" disabled>Chargement...</SelectItem>
           ) : invoices && invoices.length > 0 ? (
             invoices.map((invoice) => (
-              <SelectItem key={invoice.id} value={invoice.reference}>
+              <SelectItem key={invoice.id} value={invoice.id}>
                 {invoice.reference} - {invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client non assigné'} - {invoice.amount}€
               </SelectItem>
             ))
