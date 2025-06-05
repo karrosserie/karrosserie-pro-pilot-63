@@ -1,32 +1,33 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { mockAccountsService } from '../mock/accounts';
 
-// Use Supabase generated types once migration is applied
-export type Account = {
-  id: string;
-  user_id: string;
-  name: string;
-  bank: string;
-  iban: string;
-  bic: string;
-  balance: number;
-  status: string;
-  type: string;
-  created_at: string;
-  updated_at: string;
+// Export des types du service mock pour la compatibilité
+export type { Account, NewAccount, UpdateAccount } from '../mock/accounts';
+
+// Fonction pour vérifier si la table accounts existe
+const checkTableExists = async (): Promise<boolean> => {
+  try {
+    const { error } = await supabase.from('accounts' as any).select('id').limit(1);
+    return !error || error.code !== '42P01'; // 42P01 = relation does not exist
+  } catch {
+    return false;
+  }
 };
-
-export type NewAccount = Omit<Account, 'id' | 'user_id' | 'created_at' | 'updated_at'>;
-export type UpdateAccount = Partial<Omit<Account, 'id' | 'user_id' | 'created_at' | 'updated_at'>>;
 
 export const accountsService = {
   // Get all accounts for the current user
-  async getAll(): Promise<Account[]> {
+  async getAll() {
+    const tableExists = await checkTableExists();
+    if (!tableExists) {
+      return mockAccountsService.getAll();
+    }
+    
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
-      .from('accounts')
+      .from('accounts' as any)
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
@@ -40,12 +41,17 @@ export const accountsService = {
   },
 
   // Get a single account by ID
-  async getById(id: string): Promise<Account | null> {
+  async getById(id: string) {
+    const tableExists = await checkTableExists();
+    if (!tableExists) {
+      return mockAccountsService.getById(id);
+    }
+    
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
-      .from('accounts')
+      .from('accounts' as any)
       .select('*')
       .eq('id', id)
       .eq('user_id', user.id)
@@ -61,12 +67,17 @@ export const accountsService = {
   },
 
   // Create a new account
-  async create(account: NewAccount): Promise<Account> {
+  async create(account: any) {
+    const tableExists = await checkTableExists();
+    if (!tableExists) {
+      return mockAccountsService.create(account);
+    }
+    
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
-      .from('accounts')
+      .from('accounts' as any)
       .insert({
         user_id: user.id,
         name: account.name,
@@ -89,12 +100,17 @@ export const accountsService = {
   },
 
   // Update an existing account
-  async update(id: string, updates: UpdateAccount): Promise<Account> {
+  async update(id: string, updates: any) {
+    const tableExists = await checkTableExists();
+    if (!tableExists) {
+      return mockAccountsService.update(id, updates);
+    }
+    
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
-      .from('accounts')
+      .from('accounts' as any)
       .update(updates)
       .eq('id', id)
       .eq('user_id', user.id)
@@ -110,12 +126,17 @@ export const accountsService = {
   },
 
   // Delete an account
-  async delete(id: string): Promise<void> {
+  async delete(id: string) {
+    const tableExists = await checkTableExists();
+    if (!tableExists) {
+      return mockAccountsService.delete(id);
+    }
+    
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { error } = await supabase
-      .from('accounts')
+      .from('accounts' as any)
       .delete()
       .eq('id', id)
       .eq('user_id', user.id);

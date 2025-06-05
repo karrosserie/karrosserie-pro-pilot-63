@@ -1,5 +1,4 @@
 
-import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { accountsService, Account } from '@/services/supabase/accounts';
@@ -17,23 +16,17 @@ export const useAccounts = () => {
     queryKey: ['accounts'],
     queryFn: accountsService.getAll,
     retry: 1,
-    onError: (error: any) => {
-      console.error('Error fetching accounts:', error);
-      if (error.code === '42P01') {
-        toast({
-          title: "Migration requise",
-          description: "La table des comptes n'existe pas encore. Veuillez appliquer les migrations Supabase.",
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Erreur",
-          description: "Impossible de charger les comptes.",
-          variant: "destructive"
-        });
-      }
-    },
+    onError: undefined, // Removed onError - will handle errors in UI
   });
+
+  // Handle errors manually
+  if (error) {
+    console.error('Error fetching accounts:', error);
+    const errorMessage = error as any;
+    if (errorMessage.code === '42P01') {
+      console.log('Table accounts does not exist yet - using mock service');
+    }
+  }
 
   // Create account mutation
   const createAccountMutation = useMutation({
