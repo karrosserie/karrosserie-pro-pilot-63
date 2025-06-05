@@ -1,6 +1,6 @@
 
--- Create accounts table
-create table public.accounts (
+-- Create bank_accounts table
+create table public.bank_accounts (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users not null,
   name text not null,
@@ -14,21 +14,21 @@ create table public.accounts (
 );
 
 -- Enable RLS
-alter table public.accounts enable row level security;
+alter table public.bank_accounts enable row level security;
 
 -- Create RLS policies
-create policy "Users can view their own accounts" on public.accounts
+create policy "Users can view their own bank accounts" on public.bank_accounts
   for select using (auth.uid() = user_id);
 
-create policy "Users can insert their own accounts" on public.accounts
+create policy "Users can insert their own bank accounts" on public.bank_accounts
   for insert with check (auth.uid() = user_id);
 
-create policy "Users can update their own accounts" on public.accounts
+create policy "Users can update their own bank accounts" on public.bank_accounts
   for update using (auth.uid() = user_id);
 
-create policy "Users can delete their own accounts" on public.accounts
+create policy "Users can delete their own bank accounts" on public.bank_accounts
   for delete using (auth.uid() = user_id);
 
 -- Create updated_at trigger
-create trigger handle_updated_at before update on public.accounts
+create trigger handle_updated_at before update on public.bank_accounts
   for each row execute procedure moddatetime (updated_at);
