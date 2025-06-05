@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Expense } from '@/components/expenses/form/types';
@@ -11,7 +12,6 @@ const mockExpenses: Expense[] = [
     date: '2024-01-15',
     vat_amount: 90.00,
     total_amount: 450.00,
-    status: 'Payé',
     supplier: 'Total Energies',
     category: 'Carburant',
     assign_to_vehicle: true,
@@ -24,7 +24,6 @@ const mockExpenses: Expense[] = [
     date: '2024-01-20',
     vat_amount: 24.10,
     total_amount: 120.50,
-    status: 'En attente',
     supplier: 'Autoroutes du Sud',
     category: 'Péage',
     assign_to_vehicle: false

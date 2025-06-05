@@ -6,7 +6,6 @@ export interface Expense {
   date: string;
   vat_amount: number | string;
   total_amount: number | string;
-  status: string;
   supplier: string;
   category: string;
   assign_to_vehicle: boolean;

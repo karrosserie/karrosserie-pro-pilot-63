@@ -11,6 +11,8 @@ interface SupplierCategoryFieldsProps {
 }
 
 export const SupplierCategoryFields = ({ formData, onChange }: SupplierCategoryFieldsProps) => {
+  const hasProofUploaded = formData.proof_url && formData.proof_url.trim() !== '';
+
   return (
     <div className="grid grid-cols-2 gap-4">
       <div>
@@ -21,13 +23,19 @@ export const SupplierCategoryFields = ({ formData, onChange }: SupplierCategoryF
           onChange={(e) => onChange('supplier', e.target.value)}
           placeholder="Nom du fournisseur"
           required
+          readOnly={!hasProofUploaded}
+          className={!hasProofUploaded ? 'bg-gray-100 cursor-not-allowed' : ''}
         />
       </div>
 
       <div>
         <Label htmlFor="category" required>Catégorie</Label>
-        <Select value={formData.category} onValueChange={(value) => onChange('category', value)}>
-          <SelectTrigger>
+        <Select 
+          value={formData.category} 
+          onValueChange={(value) => onChange('category', value)}
+          disabled={!hasProofUploaded}
+        >
+          <SelectTrigger className={!hasProofUploaded ? 'bg-gray-100 cursor-not-allowed' : ''}>
             <SelectValue placeholder="Sélectionner une catégorie" />
           </SelectTrigger>
           <SelectContent>

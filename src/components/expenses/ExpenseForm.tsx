@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { TypeProofFields } from './form/TypeProofFields';
 import { BasicFields } from './form/BasicFields';
 import { SupplierCategoryFields } from './form/SupplierCategoryFields';
-import { StatusField } from './form/StatusField';
 import { VehicleAssignmentFields } from './form/VehicleAssignmentFields';
 import { FormActions } from './form/FormActions';
 import { Expense, ExpenseFormProps } from './form/types';
@@ -20,7 +19,6 @@ export const ExpenseForm = ({
     date: new Date().toISOString().split('T')[0],
     vat_amount: '',
     total_amount: '',
-    status: 'En attente',
     supplier: '',
     category: 'Péage',
     assign_to_vehicle: false,
@@ -58,11 +56,6 @@ export const ExpenseForm = ({
       />
 
       <SupplierCategoryFields
-        formData={formData}
-        onChange={handleChange}
-      />
-
-      <StatusField
         formData={formData}
         onChange={handleChange}
       />

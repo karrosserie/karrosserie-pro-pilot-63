@@ -10,6 +10,8 @@ interface BasicFieldsProps {
 }
 
 export const BasicFields = ({ formData, onChange }: BasicFieldsProps) => {
+  const hasProofUploaded = formData.proof_url && formData.proof_url.trim() !== '';
+
   return (
     <div className="grid grid-cols-3 gap-4">
       <div>
@@ -20,6 +22,8 @@ export const BasicFields = ({ formData, onChange }: BasicFieldsProps) => {
           value={formData.date}
           onChange={(e) => onChange('date', e.target.value)}
           required
+          readOnly={!hasProofUploaded}
+          className={!hasProofUploaded ? 'bg-gray-100 cursor-not-allowed' : ''}
         />
       </div>
       <div>
@@ -32,6 +36,8 @@ export const BasicFields = ({ formData, onChange }: BasicFieldsProps) => {
           onChange={(e) => onChange('vat_amount', e.target.value)}
           placeholder="0.00"
           required
+          readOnly={!hasProofUploaded}
+          className={!hasProofUploaded ? 'bg-gray-100 cursor-not-allowed' : ''}
         />
       </div>
       <div>
@@ -44,6 +50,8 @@ export const BasicFields = ({ formData, onChange }: BasicFieldsProps) => {
           onChange={(e) => onChange('total_amount', e.target.value)}
           placeholder="0.00"
           required
+          readOnly={!hasProofUploaded}
+          className={!hasProofUploaded ? 'bg-gray-100 cursor-not-allowed' : ''}
         />
       </div>
     </div>
