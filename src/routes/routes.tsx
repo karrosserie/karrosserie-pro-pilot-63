@@ -1,4 +1,3 @@
-
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -20,6 +19,11 @@ import Quotes from "@/pages/documents/devis/Quotes";
 import RepairOrders from "@/pages/documents/ordres/RepairOrders";
 import Invoices from "@/pages/documents/factures/Invoices";
 import Credits from "@/pages/documents/avoirs/Credits";
+
+// Payment pages
+import Receipts from "@/pages/payments/receipts/Receipts";
+import Expenses from "@/pages/payments/expenses/Expenses";
+import Accounts from "@/pages/payments/accounts/Accounts";
 
 // Wrapper component for protected routes
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -121,6 +125,30 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <Credits />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/payments/receipts",
+    element: (
+      <ProtectedRoute>
+        <Receipts />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/payments/expenses",
+    element: (
+      <ProtectedRoute>
+        <Expenses />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/payments/accounts",
+    element: (
+      <ProtectedRoute>
+        <Accounts />
       </ProtectedRoute>
     )
   },
