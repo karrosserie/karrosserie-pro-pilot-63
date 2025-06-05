@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Printer, Mail, FileX } from 'lucide-react';
+import { Printer, Mail } from 'lucide-react';
 import { CreditDialog } from '@/components/credits/CreditDialog';
 import { EditCreditDialog } from '@/components/credits/EditCreditDialog';
 import { useCredits } from '@/hooks/use-credits';
@@ -354,11 +354,6 @@ const Credits = () => {
                           <DropdownMenuItem onClick={() => handleSendEmail(credit)}>
                             <Mail className="mr-2 h-4 w-4" />
                             Envoyer par e-mail
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleApplyToInvoice(credit)}>
-                            <FileX className="mr-2 h-4 w-4" />
-                            Appliquer à une facture
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
