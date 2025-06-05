@@ -4,7 +4,8 @@ import { useToast } from '@/hooks/use-toast';
 
 interface Expense {
   id: string;
-  reference: string;
+  type: string;
+  proof_url: string;
   date: string;
   amount: number;
   status: string;
@@ -19,7 +20,8 @@ interface Expense {
 const mockExpenses: Expense[] = [
   {
     id: '1',
-    reference: 'DEP2024-001',
+    type: 'Facture d\'achat',
+    proof_url: '',
     date: '2024-01-15',
     amount: 450.00,
     status: 'Payé',
@@ -31,7 +33,8 @@ const mockExpenses: Expense[] = [
   },
   {
     id: '2',
-    reference: 'DEP2024-002',
+    type: 'Note de frais',
+    proof_url: '',
     date: '2024-01-20',
     amount: 120.50,
     status: 'En attente',
@@ -48,19 +51,19 @@ export const useExpenses = () => {
   const { toast } = useToast();
 
   const handleDelete = (expense: Expense) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer la dépense ${expense.reference} ?`)) {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer cette dépense ?`)) {
       toast({
         title: "Suppression",
-        description: `Dépense ${expense.reference} supprimée`
+        description: `Dépense supprimée`
       });
     }
   };
 
   const filterExpenses = (expenses: Expense[], searchTerm: string) => {
     return expenses.filter(expense => 
-      expense.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
       expense.supplier.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      expense.category.toLowerCase().includes(searchTerm.toLowerCase())
+      expense.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      expense.type.toLowerCase().includes(searchTerm.toLowerCase())
     );
   };
 

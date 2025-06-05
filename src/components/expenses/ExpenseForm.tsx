@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { TypeProofFields } from './form/TypeProofFields';
 import { BasicFields } from './form/BasicFields';
 import { SupplierCategoryFields } from './form/SupplierCategoryFields';
 import { DescriptionField } from './form/DescriptionField';
@@ -15,7 +16,8 @@ export const ExpenseForm = ({
   isSubmitting
 }: ExpenseFormProps) => {
   const [formData, setFormData] = useState<Expense>({
-    reference: '',
+    type: 'Note de frais',
+    proof_url: '',
     date: new Date().toISOString().split('T')[0],
     amount: '',
     status: 'En attente',
@@ -46,6 +48,11 @@ export const ExpenseForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <TypeProofFields
+        formData={formData}
+        onChange={handleChange}
+      />
+
       <BasicFields
         formData={formData}
         onChange={handleChange}

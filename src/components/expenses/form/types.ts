@@ -1,7 +1,8 @@
 
 export interface Expense {
   id?: string;
-  reference: string;
+  type?: string;
+  proof_url?: string;
   date: string;
   amount: number | string;
   status: string;
