@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { accountsService, Account } from '@/services/supabase/accounts';
@@ -16,7 +15,6 @@ export const useAccounts = () => {
     queryKey: ['accounts'],
     queryFn: accountsService.getAll,
     retry: 1,
-    onError: undefined, // Removed onError - will handle errors in UI
   });
 
   // Handle errors manually

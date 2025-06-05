@@ -17,7 +17,7 @@ const checkTableExists = async (): Promise<boolean> => {
 
 export const accountsService = {
   // Get all accounts for the current user
-  async getAll() {
+  async getAll(): Promise<Account[]> {
     const tableExists = await checkTableExists();
     if (!tableExists) {
       return mockAccountsService.getAll();
@@ -37,11 +37,11 @@ export const accountsService = {
       throw error;
     }
 
-    return data || [];
+    return (data || []) as Account[];
   },
 
   // Get a single account by ID
-  async getById(id: string) {
+  async getById(id: string): Promise<Account | null> {
     const tableExists = await checkTableExists();
     if (!tableExists) {
       return mockAccountsService.getById(id);
@@ -63,11 +63,11 @@ export const accountsService = {
       throw error;
     }
 
-    return data;
+    return data as Account;
   },
 
   // Create a new account
-  async create(account: any) {
+  async create(account: any): Promise<Account> {
     const tableExists = await checkTableExists();
     if (!tableExists) {
       return mockAccountsService.create(account);
@@ -96,11 +96,11 @@ export const accountsService = {
       throw error;
     }
 
-    return data;
+    return data as Account;
   },
 
   // Update an existing account
-  async update(id: string, updates: any) {
+  async update(id: string, updates: any): Promise<Account> {
     const tableExists = await checkTableExists();
     if (!tableExists) {
       return mockAccountsService.update(id, updates);
@@ -122,11 +122,11 @@ export const accountsService = {
       throw error;
     }
 
-    return data;
+    return data as Account;
   },
 
   // Delete an account
-  async delete(id: string) {
+  async delete(id: string): Promise<void> {
     const tableExists = await checkTableExists();
     if (!tableExists) {
       return mockAccountsService.delete(id);
