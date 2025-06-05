@@ -14,94 +14,101 @@ export const getCredits = async (): Promise<Credit[]> => {
   }
 
   try {
-    // Try to fetch credits with joins first
-    const { data, error } = await (supabase as any)
+    // Fetch credits with separate queries for related data
+    const { data: creditsData, error } = await (supabase as any)
       .from('credits')
-      .select(`
-        *,
-        clients!inner(id, first_name, last_name),
-        vehicles!left(id, brand, model, license_plate),
-        invoices!left(id, reference)
-      `)
+      .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.log('Joins failed, falling back to basic query with separate fetches:', error);
-      
-      // Fallback to basic query without joins
-      const { data: basicData, error: basicError } = await (supabase as any)
-        .from('credits')
-        .select('*')
-        .order('created_at', { ascending: false });
+    if (error) throw error;
 
-      if (basicError) throw basicError;
+    console.log('Raw credits data:', creditsData);
 
-      // Fetch related data separately for each credit
-      const creditsWithRelations = await Promise.all(
-        (basicData || []).map(async (credit: Credit) => {
-          const enrichedCredit = { ...credit };
-
-          // Fetch client data if client_id exists
-          if (credit.client_id) {
-            try {
-              const { data: client } = await supabase
-                .from('clients')
-                .select('id, first_name, last_name')
-                .eq('id', credit.client_id)
-                .single();
-              
-              if (client) {
-                enrichedCredit.clients = client;
-              }
-            } catch (clientError) {
-              console.warn(`Could not fetch client for credit ${credit.id}:`, clientError);
-            }
-          }
-
-          // Fetch vehicle data if vehicle_id exists
-          if (credit.vehicle_id) {
-            try {
-              const { data: vehicle } = await supabase
-                .from('vehicles')
-                .select('id, brand, model, license_plate')
-                .eq('id', credit.vehicle_id)
-                .single();
-              
-              if (vehicle) {
-                enrichedCredit.vehicles = vehicle;
-              }
-            } catch (vehicleError) {
-              console.warn(`Could not fetch vehicle for credit ${credit.id}:`, vehicleError);
-            }
-          }
-
-          // Fetch invoice data if invoice_id exists
-          if (credit.invoice_id) {
-            try {
-              const { data: invoice } = await supabase
-                .from('invoices')
-                .select('id, reference')
-                .eq('id', credit.invoice_id)
-                .single();
-              
-              if (invoice) {
-                enrichedCredit.invoices = invoice;
-              }
-            } catch (invoiceError) {
-              console.warn(`Could not fetch invoice for credit ${credit.id}:`, invoiceError);
-            }
-          }
-
-          return enrichedCredit;
-        })
-      );
-
-      console.log('Credits with relations fetched:', creditsWithRelations);
-      return creditsWithRelations;
+    if (!creditsData || creditsData.length === 0) {
+      return [];
     }
 
-    console.log('Credits fetched with joins:', data);
-    return data || [];
+    // Fetch related data separately for each credit
+    const creditsWithRelations = await Promise.all(
+      creditsData.map(async (credit: Credit) => {
+        const enrichedCredit = { ...credit };
+
+        // Fetch client data if client_id exists
+        if (credit.client_id) {
+          try {
+            console.log('Fetching client for credit:', credit.id, 'client_id:', credit.client_id);
+            const { data: client, error: clientError } = await supabase
+              .from('clients')
+              .select('id, first_name, last_name')
+              .eq('id', credit.client_id)
+              .maybeSingle();
+            
+            if (clientError) {
+              console.warn('Error fetching client:', clientError);
+            } else if (client) {
+              console.log('Found client:', client);
+              enrichedCredit.clients = client;
+            } else {
+              console.log('No client found for id:', credit.client_id);
+            }
+          } catch (clientError) {
+            console.warn(`Could not fetch client for credit ${credit.id}:`, clientError);
+          }
+        }
+
+        // Fetch vehicle data if vehicle_id exists
+        if (credit.vehicle_id) {
+          try {
+            console.log('Fetching vehicle for credit:', credit.id, 'vehicle_id:', credit.vehicle_id);
+            const { data: vehicle, error: vehicleError } = await supabase
+              .from('vehicles')
+              .select('id, brand, model, license_plate')
+              .eq('id', credit.vehicle_id)
+              .maybeSingle();
+            
+            if (vehicleError) {
+              console.warn('Error fetching vehicle:', vehicleError);
+            } else if (vehicle) {
+              console.log('Found vehicle:', vehicle);
+              enrichedCredit.vehicles = vehicle;
+            } else {
+              console.log('No vehicle found for id:', credit.vehicle_id);
+            }
+          } catch (vehicleError) {
+            console.warn(`Could not fetch vehicle for credit ${credit.id}:`, vehicleError);
+          }
+        }
+
+        // Fetch invoice data if invoice_id exists
+        if (credit.invoice_id) {
+          try {
+            console.log('Fetching invoice for credit:', credit.id, 'invoice_id:', credit.invoice_id);
+            const { data: invoice, error: invoiceError } = await supabase
+              .from('invoices')
+              .select('id, reference')
+              .eq('id', credit.invoice_id)
+              .maybeSingle();
+            
+            if (invoiceError) {
+              console.warn('Error fetching invoice:', invoiceError);
+            } else if (invoice) {
+              console.log('Found invoice:', invoice);
+              enrichedCredit.invoices = invoice;
+            } else {
+              console.log('No invoice found for id:', credit.invoice_id);
+            }
+          } catch (invoiceError) {
+            console.warn(`Could not fetch invoice for credit ${credit.id}:`, invoiceError);
+          }
+        }
+
+        console.log('Enriched credit:', enrichedCredit);
+        return enrichedCredit;
+      })
+    );
+
+    console.log('Credits with relations fetched:', creditsWithRelations);
+    return creditsWithRelations;
   } catch (error) {
     console.error('Error fetching credits:', error);
     throw error;
@@ -112,61 +119,43 @@ export const getCredit = async (id: string): Promise<Credit> => {
   try {
     const { data, error } = await (supabase as any)
       .from('credits')
-      .select(`
-        *,
-        clients!left(id, first_name, last_name),
-        vehicles!left(id, brand, model, license_plate),
-        invoices!left(id, reference)
-      `)
+      .select('*')
       .eq('id', id)
       .single();
 
-    if (error) {
-      console.error('Error fetching credit with joins, trying basic fetch:', error);
-      
-      // Fallback to basic query
-      const { data: basicData, error: basicError } = await (supabase as any)
-        .from('credits')
-        .select('*')
-        .eq('id', id)
-        .single();
+    if (error) throw error;
 
-      if (basicError) throw basicError;
+    // Fetch relations separately
+    const enrichedCredit = { ...data };
 
-      // Fetch relations separately
-      const enrichedCredit = { ...basicData };
-
-      if (basicData.client_id) {
-        const { data: client } = await supabase
-          .from('clients')
-          .select('id, first_name, last_name')
-          .eq('id', basicData.client_id)
-          .single();
-        if (client) enrichedCredit.clients = client;
-      }
-
-      if (basicData.vehicle_id) {
-        const { data: vehicle } = await supabase
-          .from('vehicles')
-          .select('id, brand, model, license_plate')
-          .eq('id', basicData.vehicle_id)
-          .single();
-        if (vehicle) enrichedCredit.vehicles = vehicle;
-      }
-
-      if (basicData.invoice_id) {
-        const { data: invoice } = await supabase
-          .from('invoices')
-          .select('id, reference')
-          .eq('id', basicData.invoice_id)
-          .single();
-        if (invoice) enrichedCredit.invoices = invoice;
-      }
-
-      return enrichedCredit;
+    if (data.client_id) {
+      const { data: client } = await supabase
+        .from('clients')
+        .select('id, first_name, last_name')
+        .eq('id', data.client_id)
+        .maybeSingle();
+      if (client) enrichedCredit.clients = client;
     }
 
-    return data;
+    if (data.vehicle_id) {
+      const { data: vehicle } = await supabase
+        .from('vehicles')
+        .select('id, brand, model, license_plate')
+        .eq('id', data.vehicle_id)
+        .maybeSingle();
+      if (vehicle) enrichedCredit.vehicles = vehicle;
+    }
+
+    if (data.invoice_id) {
+      const { data: invoice } = await supabase
+        .from('invoices')
+        .select('id, reference')
+        .eq('id', data.invoice_id)
+        .maybeSingle();
+      if (invoice) enrichedCredit.invoices = invoice;
+    }
+
+    return enrichedCredit;
   } catch (error) {
     console.error('Error fetching credit:', error);
     throw error;
