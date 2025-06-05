@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { FileQuestion, Eye, Pencil, Trash, Receipt } from "lucide-react";
 import { ReceiptWithClient } from '@/services/supabase/receipts/types';
+import { useInvoices } from '@/hooks/use-invoices';
 
 interface SimpleReceiptsTableProps {
   receipts: ReceiptWithClient[];
@@ -24,6 +25,8 @@ export const SimpleReceiptsTable = ({
   onEdit,
   onDelete
 }: SimpleReceiptsTableProps) => {
+  const { invoices } = useInvoices();
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Encaissé':
@@ -46,6 +49,23 @@ export const SimpleReceiptsTable = ({
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR');
+  };
+
+  const getInvoiceDisplay = (invoiceId: string | null) => {
+    if (!invoiceId || !invoices) {
+      return 'Sans facture';
+    }
+    
+    const invoice = invoices.find(inv => inv.id === invoiceId);
+    if (!invoice) {
+      return 'Facture introuvable';
+    }
+    
+    const clientName = invoice.clients 
+      ? `${invoice.clients.first_name} ${invoice.clients.last_name}` 
+      : 'Client non assigné';
+    
+    return `${invoice.reference} - ${clientName} - ${invoice.amount}€`;
   };
 
   if (receipts.length === 0) {
@@ -78,7 +98,7 @@ export const SimpleReceiptsTable = ({
             <TableCell>
               <div className="flex items-center">
                 <Receipt className="h-4 w-4 mr-2" />
-                {receipt.invoice || 'Sans facture'}
+                {getInvoiceDisplay(receipt.invoice_id)}
               </div>
             </TableCell>
             <TableCell className="font-medium">
