@@ -4,13 +4,14 @@ import { ExpensesHeader } from '@/components/expenses/ExpensesHeader';
 import { ExpensesTable } from '@/components/expenses/ExpensesTable';
 import ExpenseDialog from '@/components/expenses/ExpenseDialog';
 import { useExpenses } from '@/hooks/use-expenses';
+import { ExpenseWithRelations } from '@/services/supabase/expenses';
 
 const Expenses = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedExpense, setSelectedExpense] = useState<any>(null);
+  const [selectedExpense, setSelectedExpense] = useState<ExpenseWithRelations | null>(null);
   
-  const { expenses, handleDelete, filterExpenses } = useExpenses();
+  const { expenses, isLoading, handleDelete, filterExpenses } = useExpenses();
   const filteredExpenses = filterExpenses(expenses, searchTerm);
 
   const handleCreateExpense = () => {
@@ -18,7 +19,7 @@ const Expenses = () => {
     setDialogOpen(true);
   };
 
-  const handleEdit = (expense: any) => {
+  const handleEdit = (expense: ExpenseWithRelations) => {
     setSelectedExpense(expense);
     setDialogOpen(true);
   };
@@ -35,6 +36,7 @@ const Expenses = () => {
         expenses={filteredExpenses}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        isLoading={isLoading}
       />
 
       <ExpenseDialog

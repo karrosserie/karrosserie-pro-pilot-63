@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Dialog,
   DialogContent,
@@ -8,11 +8,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ExpenseForm } from './ExpenseForm';
-import { useToast } from '@/hooks/use-toast';
-import { Expense } from './form/types';
+import { useExpenses } from '@/hooks/use-expenses';
+import { ExpenseWithRelations, NewExpense } from '@/services/supabase/expenses';
+import { useAuthState } from '@/hooks/use-auth-state';
 
 interface ExpenseDialogProps {
-  expense?: Expense | null;
+  expense?: ExpenseWithRelations | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -22,41 +23,36 @@ const ExpenseDialog = ({
   open,
   onOpenChange
 }: ExpenseDialogProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+  const { createExpense, updateExpense, isCreating, isUpdating } = useExpenses();
+  const { user } = useAuthState();
+  
+  const isSubmitting = isCreating || isUpdating;
 
-  const handleSubmit = async (formData: Expense) => {
-    if (isSubmitting) return;
-    
-    setIsSubmitting(true);
+  const handleSubmit = async (formData: any) => {
+    if (isSubmitting || !user) return;
     
     try {
       // Convert amounts to numbers for processing
-      const processedData = {
+      const processedData: NewExpense = {
         ...formData,
+        user_id: user.id,
         vat_amount: typeof formData.vat_amount === 'string' ? parseFloat(formData.vat_amount) || 0 : formData.vat_amount,
-        total_amount: typeof formData.total_amount === 'string' ? parseFloat(formData.total_amount) || 0 : formData.total_amount
+        total_amount: typeof formData.total_amount === 'string' ? parseFloat(formData.total_amount) || 0 : formData.total_amount,
+        vehicle_id: formData.assign_to_vehicle ? formData.vehicle_id : null
       };
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: expense ? "Dépense modifiée" : "Dépense créée",
-        description: expense 
-          ? `La dépense a été modifiée avec succès.`
-          : "La nouvelle dépense a été créée avec succès."
-      });
+      if (expense?.id) {
+        // Update existing expense
+        const { user_id, ...updates } = processedData;
+        updateExpense({ id: expense.id, updates });
+      } else {
+        // Create new expense
+        createExpense(processedData);
+      }
       
       onOpenChange(false);
     } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de l'enregistrement.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
+      console.error('Error submitting expense:', error);
     }
   };
 

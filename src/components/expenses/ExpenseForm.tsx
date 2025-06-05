@@ -5,7 +5,26 @@ import { BasicFields } from './form/BasicFields';
 import { SupplierCategoryFields } from './form/SupplierCategoryFields';
 import { VehicleAssignmentFields } from './form/VehicleAssignmentFields';
 import { FormActions } from './form/FormActions';
-import { Expense, ExpenseFormProps } from './form/types';
+import { ExpenseWithRelations } from '@/services/supabase/expenses';
+
+interface ExpenseFormData {
+  type: string;
+  proof_url?: string;
+  date: string;
+  vat_amount: number | string;
+  total_amount: number | string;
+  supplier: string;
+  category: string;
+  assign_to_vehicle: boolean;
+  vehicle_id?: string;
+}
+
+interface ExpenseFormProps {
+  expense?: ExpenseWithRelations | null;
+  onSubmit: (data: ExpenseFormData) => Promise<void>;
+  onCancel: () => void;
+  isSubmitting: boolean;
+}
 
 export const ExpenseForm = ({
   expense,
@@ -13,7 +32,7 @@ export const ExpenseForm = ({
   onCancel,
   isSubmitting
 }: ExpenseFormProps) => {
-  const [formData, setFormData] = useState<Expense>({
+  const [formData, setFormData] = useState<ExpenseFormData>({
     type: 'Note de frais',
     proof_url: '',
     date: new Date().toISOString().split('T')[0],
@@ -27,7 +46,17 @@ export const ExpenseForm = ({
 
   useEffect(() => {
     if (expense) {
-      setFormData(expense);
+      setFormData({
+        type: expense.type,
+        proof_url: expense.proof_url || '',
+        date: expense.date,
+        vat_amount: expense.vat_amount,
+        total_amount: expense.total_amount,
+        supplier: expense.supplier,
+        category: expense.category,
+        assign_to_vehicle: expense.assign_to_vehicle,
+        vehicle_id: expense.vehicle_id || ''
+      });
     }
   }, [expense]);
 
@@ -36,7 +65,7 @@ export const ExpenseForm = ({
     await onSubmit(formData);
   };
 
-  const handleChange = (field: keyof Expense, value: any) => {
+  const handleChange = (field: keyof ExpenseFormData, value: any) => {
     setFormData(prev => ({
       ...prev,
       [field]: value

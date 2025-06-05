@@ -1,59 +1,112 @@
 
-import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
-import { Expense } from '@/components/expenses/form/types';
-
-// Mock data for expenses
-const mockExpenses: Expense[] = [
-  {
-    id: '1',
-    type: 'Facture d\'achat',
-    proof_url: '',
-    date: '2024-01-15',
-    vat_amount: 90.00,
-    total_amount: 450.00,
-    supplier: 'Total Energies',
-    category: 'Carburant',
-    assign_to_vehicle: true,
-    vehicle_id: 'vehicle-1'
-  },
-  {
-    id: '2',
-    type: 'Note de frais',
-    proof_url: '',
-    date: '2024-01-20',
-    vat_amount: 24.10,
-    total_amount: 120.50,
-    supplier: 'Autoroutes du Sud',
-    category: 'Péage',
-    assign_to_vehicle: false
-  }
-];
+import { 
+  getExpenses, 
+  createExpense, 
+  updateExpense, 
+  deleteExpense,
+  type Expense,
+  type NewExpense,
+  type UpdateExpense,
+  type ExpenseWithRelations
+} from '@/services/supabase/expenses';
 
 export const useExpenses = () => {
-  const [expenses] = useState<Expense[]>(mockExpenses);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const handleDelete = (expense: Expense) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer cette dépense ?`)) {
+  const { 
+    data: expenses = [], 
+    isLoading, 
+    error 
+  } = useQuery({
+    queryKey: ['expenses'],
+    queryFn: getExpenses,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: createExpense,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
       toast({
-        title: "Suppression",
-        description: `Dépense supprimée`
+        title: "Dépense créée",
+        description: "La nouvelle dépense a été créée avec succès."
       });
+    },
+    onError: (error) => {
+      console.error('Error creating expense:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la création de la dépense.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: UpdateExpense }) =>
+      updateExpense(id, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      toast({
+        title: "Dépense modifiée",
+        description: "La dépense a été modifiée avec succès."
+      });
+    },
+    onError: (error) => {
+      console.error('Error updating expense:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la modification de la dépense.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteExpense,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      toast({
+        title: "Dépense supprimée",
+        description: "La dépense a été supprimée avec succès."
+      });
+    },
+    onError: (error) => {
+      console.error('Error deleting expense:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la suppression de la dépense.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleDelete = (expense: ExpenseWithRelations) => {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer cette dépense ?`)) {
+      deleteMutation.mutate(expense.id);
     }
   };
 
-  const filterExpenses = (expenses: Expense[], searchTerm: string) => {
+  const filterExpenses = (expenses: ExpenseWithRelations[], searchTerm: string) => {
     return expenses.filter(expense => 
       expense.supplier.toLowerCase().includes(searchTerm.toLowerCase()) ||
       expense.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (expense.type && expense.type.toLowerCase().includes(searchTerm.toLowerCase()))
+      expense.type.toLowerCase().includes(searchTerm.toLowerCase())
     );
   };
 
   return {
     expenses,
+    isLoading,
+    error,
     handleDelete,
-    filterExpenses
+    filterExpenses,
+    createExpense: createMutation.mutate,
+    updateExpense: updateMutation.mutate,
+    isCreating: createMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending
   };
 };
