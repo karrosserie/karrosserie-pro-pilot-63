@@ -8,10 +8,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FileQuestion } from "lucide-react";
-import { createReceiptsColumns } from './columns';
+import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
+import { FileQuestion, Eye, Pencil, Trash, Receipt } from "lucide-react";
 import { ReceiptWithClient } from '@/services/supabase/receipts/types';
-import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 
 interface SimpleReceiptsTableProps {
   receipts: ReceiptWithClient[];
@@ -24,67 +24,100 @@ export const SimpleReceiptsTable = ({
   onEdit,
   onDelete
 }: SimpleReceiptsTableProps) => {
-  const columns = createReceiptsColumns({ onEdit, onDelete });
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Encaissé':
+        return 'bg-green-100 text-green-800';
+      case 'En attente':
+        return 'bg-amber-100 text-amber-800';
+      case 'Annulé':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
 
-  const table = useReactTable({
-    data: receipts,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
+  const formatAmount = (amount: number) => {
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(amount);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('fr-FR');
+  };
+
+  if (receipts.length === 0) {
+    return (
+      <EmptyState
+        icon={Receipt}
+        title="Aucun encaissement"
+        description="Aucun encaissement n'a été enregistré pour le moment."
+      />
+    );
+  }
 
   return (
-    <div>
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="h-24 text-center"
-              >
-                <div className="flex flex-col items-center justify-center py-8">
-                  <FileQuestion className="h-12 w-12 text-gray-400 mb-4" />
-                  <h3 className="font-medium text-gray-900 mb-2">Aucun encaissement</h3>
-                  <p className="text-gray-500">
-                    Aucun encaissement n'a été enregistré pour le moment.
-                  </p>
-                </div>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Référence</TableHead>
+          <TableHead>Date</TableHead>
+          <TableHead>Montant</TableHead>
+          <TableHead>Méthode de paiement</TableHead>
+          <TableHead>Compte bancaire</TableHead>
+          <TableHead>Statut</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {receipts.map((receipt) => (
+          <TableRow key={receipt.id}>
+            <TableCell className="font-medium">
+              <div className="flex items-center">
+                <Receipt className="h-4 w-4 mr-2" />
+                {receipt.reference || 'Sans référence'}
+              </div>
+            </TableCell>
+            <TableCell>{formatDate(receipt.date)}</TableCell>
+            <TableCell className="font-medium">
+              {formatAmount(receipt.amount)}
+            </TableCell>
+            <TableCell>{receipt.payment_method}</TableCell>
+            <TableCell>{receipt.bank_account || 'Non spécifié'}</TableCell>
+            <TableCell>
+              <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(receipt.status)}`}>
+                {receipt.status}
+              </span>
+            </TableCell>
+            <TableCell className="text-right">
+              <div className="flex justify-end space-x-1">
+                <Button variant="ghost" size="icon" title="Voir les détails">
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => onEdit(receipt)}
+                  title="Modifier"
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-red-500 hover:text-red-700"
+                  onClick={() => onDelete(receipt)}
+                  title="Supprimer"
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 };
