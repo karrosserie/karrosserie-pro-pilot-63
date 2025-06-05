@@ -1,8 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { receiptsService, NewReceipt, UpdateReceipt, ReceiptWithClient } from '@/services/supabase/receipts';
+import { receiptsService, ReceiptWithClient } from '@/services/supabase/receipts';
 import { useToast } from '@/hooks/use-toast';
-import { invoicesService } from '@/services/supabase/invoices';
 
 export function useReceiptsData() {
   const queryClient = useQueryClient();
@@ -35,7 +34,8 @@ export function useReceiptsData() {
   }) || [];
   
   const createReceipt = useMutation({
-    mutationFn: (newReceipt: NewReceipt) => receiptsService.create(newReceipt),
+    mutationFn: (newReceipt: Omit<Parameters<typeof receiptsService.create>[0], 'user_id'>) => 
+      receiptsService.create(newReceipt),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['receipts'] });
       toast({
@@ -53,7 +53,7 @@ export function useReceiptsData() {
   });
   
   const updateReceipt = useMutation({
-    mutationFn: ({ id, data }: { id: string, data: UpdateReceipt }) => 
+    mutationFn: ({ id, data }: { id: string, data: Parameters<typeof receiptsService.update>[1] }) => 
       receiptsService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['receipts'] });

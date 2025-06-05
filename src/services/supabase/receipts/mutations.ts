@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { NewReceipt, UpdateReceipt } from './types';
 
 export const receiptMutations = {
-  create: async (receipt: NewReceipt) => {
+  create: async (receipt: Omit<NewReceipt, 'user_id'>) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 

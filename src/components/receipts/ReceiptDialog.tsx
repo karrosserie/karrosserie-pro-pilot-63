@@ -4,9 +4,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ReceiptForm } from './ReceiptForm';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { Receipt } from './form/types';
+import { Receipt as ServiceReceipt } from '@/services/supabase/receipts/types';
 
 interface ReceiptDialogProps {
-  receipt?: any;
+  receipt?: ServiceReceipt;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -52,6 +53,21 @@ const ReceiptDialog = ({ receipt, open, onOpenChange }: ReceiptDialogProps) => {
     }
   };
 
+  // Convert ServiceReceipt to form Receipt type
+  const formReceipt: Receipt | undefined = receipt ? {
+    id: receipt.id,
+    reference: receipt.reference || '',
+    date: receipt.date,
+    amount: receipt.amount,
+    status: receipt.status || 'En attente',
+    invoice: receipt.invoice_id || '',
+    payment_method: receipt.payment_method,
+    bank_account: receipt.bank_account,
+    notes: receipt.notes || '',
+    payment_proofs: receipt.payment_proofs || [],
+    invoice_id: receipt.invoice_id
+  } : undefined;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -62,7 +78,7 @@ const ReceiptDialog = ({ receipt, open, onOpenChange }: ReceiptDialogProps) => {
         </DialogHeader>
         
         <ReceiptForm
-          receipt={receipt}
+          receipt={formReceipt}
           onSubmit={handleSubmit}
           onCancel={() => onOpenChange(false)}
           isSubmitting={isSubmitting}

@@ -5,11 +5,12 @@ import { ReceiptsTable } from '@/components/receipts/ReceiptsTable';
 import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { ReceiptWithClient } from '@/services/supabase/receipts/types';
 
 const Receipts = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedReceipt, setSelectedReceipt] = useState<any>(null);
+  const [selectedReceipt, setSelectedReceipt] = useState<ReceiptWithClient | null>(null);
   
   const { receipts, isLoading, handleDelete, filterReceipts } = useReceiptsData();
   const filteredReceipts = filterReceipts(receipts, searchTerm);
@@ -19,7 +20,7 @@ const Receipts = () => {
     setDialogOpen(true);
   };
 
-  const handleEdit = (receipt: any) => {
+  const handleEdit = (receipt: ReceiptWithClient) => {
     setSelectedReceipt(receipt);
     setDialogOpen(true);
   };
