@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -9,13 +10,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Eye, Download, Pencil, Trash, MoreVertical, Printer, Mail, TrendingDown } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Eye, Download, Pencil, Trash, TrendingDown } from 'lucide-react';
 import { Expense } from '@/components/expenses/form/types';
 
 interface ExpensesTableProps {
@@ -76,27 +71,6 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete }: ExpensesTableProps
                     >
                       <Trash className="h-4 w-4" />
                     </Button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-56">
-                        <DropdownMenuItem>
-                          <Download className="mr-2 h-4 w-4" />
-                          Télécharger
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Printer className="mr-2 h-4 w-4" />
-                          Imprimer
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Mail className="mr-2 h-4 w-4" />
-                          Envoyer par e-mail
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
                   </div>
                 </TableCell>
               </TableRow>
@@ -119,3 +93,4 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete }: ExpensesTableProps
     </div>
   );
 };
+
