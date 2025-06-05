@@ -1,11 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { InvoiceSelect } from './form/InvoiceSelect';
-import { BasicInfoFields } from './form/BasicInfoFields';
 import { PaymentFields } from './form/PaymentFields';
-import { AmountAccountFields } from './form/AmountAccountFields';
 import { NotesField } from './form/NotesField';
-import { MultiplePaymentProofs } from './form/MultiplePaymentProofs';
+import MultiplePaymentProofs from './form/MultiplePaymentProofs';
 import { FormActions } from './form/FormActions';
 import { Receipt, ReceiptFormProps } from './form/types';
 
@@ -89,14 +87,43 @@ export const ReceiptForm = ({
         />
       </div>
 
-      <PaymentFields
-        status={formData.status}
-        paymentMethod={formData.payment_method}
-        bankAccount={formData.bank_account}
-        onStatusChange={(value) => handleChange('status', value)}
-        onPaymentMethodChange={(value) => handleChange('payment_method', value)}
-        onBankAccountChange={(value) => handleChange('bank_account', value)}
-      />
+      <div>
+        <label htmlFor="payment_method" className="block text-sm font-medium text-gray-700 mb-1">
+          Méthode de paiement <span className="text-red-500">*</span>
+        </label>
+        <select
+          id="payment_method"
+          value={formData.payment_method}
+          onChange={(e) => handleChange('payment_method', e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-karrosserie-orange focus:border-transparent"
+          required
+        >
+          <option value="Virement">Virement</option>
+          <option value="Chèque">Chèque</option>
+          <option value="Espèces">Espèces</option>
+          <option value="Carte bancaire">Carte bancaire</option>
+          <option value="Argent mobile">Argent mobile</option>
+          <option value="Paiement en ligne">Paiement en ligne</option>
+          <option value="Autres">Autres</option>
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor="bank_account" className="block text-sm font-medium text-gray-700 mb-1">
+          Compte bancaire <span className="text-red-500">*</span>
+        </label>
+        <select
+          id="bank_account"
+          value={formData.bank_account}
+          onChange={(e) => handleChange('bank_account', e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-karrosserie-orange focus:border-transparent"
+          required
+        >
+          <option value="Compte Principal">Compte Principal</option>
+          <option value="Compte Épargne">Compte Épargne</option>
+          <option value="Compte Professionnel">Compte Professionnel</option>
+        </select>
+      </div>
 
       <div>
         <label htmlFor="reference" className="block text-sm font-medium text-gray-700 mb-1">
@@ -109,6 +136,23 @@ export const ReceiptForm = ({
           placeholder="ENC2024-001"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-karrosserie-orange focus:border-transparent"
         />
+      </div>
+
+      <div>
+        <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+          Statut <span className="text-red-500">*</span>
+        </label>
+        <select
+          id="status"
+          value={formData.status}
+          onChange={(e) => handleChange('status', e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-karrosserie-orange focus:border-transparent"
+          required
+        >
+          <option value="En attente">En attente</option>
+          <option value="Encaissé">Encaissé</option>
+          <option value="Annulé">Annulé</option>
+        </select>
       </div>
 
       <NotesField
