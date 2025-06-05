@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { mockAccountsService, Account, NewAccount, UpdateAccount } from '../mock/accounts';
 
@@ -36,7 +37,7 @@ export const accountsService = {
       throw error;
     }
 
-    return (data || []) as Account[];
+    return (data || []) as unknown as Account[];
   },
 
   // Get a single account by ID
@@ -62,7 +63,7 @@ export const accountsService = {
       throw error;
     }
 
-    return data as Account;
+    return data as unknown as Account;
   },
 
   // Create a new account
@@ -95,7 +96,7 @@ export const accountsService = {
       throw error;
     }
 
-    return data as Account;
+    return data as unknown as Account;
   },
 
   // Update an existing account
@@ -121,7 +122,7 @@ export const accountsService = {
       throw error;
     }
 
-    return data as Account;
+    return data as unknown as Account;
   },
 
   // Delete an account
