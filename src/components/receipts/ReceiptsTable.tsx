@@ -58,7 +58,7 @@ export const ReceiptsTable = ({ receipts, onEdit, onDelete }: ReceiptsTableProps
             <TableHead>Date</TableHead>
             <TableHead>Client</TableHead>
             <TableHead>Facture</TableHead>
-            <TableHead>Méthode de paiement</TableHead>
+            <TableHead>Méthode</TableHead>
             <TableHead>Compte</TableHead>
             <TableHead>Montant</TableHead>
             <TableHead>Statut</TableHead>
