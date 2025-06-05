@@ -9,13 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Eye, Download, Pencil, Trash, MoreVertical, Printer, Mail, TrendingUp } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Eye, Download, Pencil, Trash, TrendingUp } from 'lucide-react';
 
 interface Receipt {
   id: string;
@@ -61,7 +55,6 @@ export const ReceiptsTable = ({ receipts, onEdit, onDelete }: ReceiptsTableProps
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Référence</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Client</TableHead>
             <TableHead>Facture</TableHead>
@@ -76,7 +69,6 @@ export const ReceiptsTable = ({ receipts, onEdit, onDelete }: ReceiptsTableProps
           {receipts.length > 0 ? (
             receipts.map((receipt) => (
               <TableRow key={receipt.id}>
-                <TableCell className="font-medium">{receipt.reference}</TableCell>
                 <TableCell>{new Date(receipt.date).toLocaleDateString('fr-FR')}</TableCell>
                 <TableCell>{receipt.client}</TableCell>
                 <TableCell>{receipt.invoice}</TableCell>
@@ -107,34 +99,13 @@ export const ReceiptsTable = ({ receipts, onEdit, onDelete }: ReceiptsTableProps
                     >
                       <Trash className="h-4 w-4" />
                     </Button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-56">
-                        <DropdownMenuItem>
-                          <Download className="mr-2 h-4 w-4" />
-                          Télécharger
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Printer className="mr-2 h-4 w-4" />
-                          Imprimer
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Mail className="mr-2 h-4 w-4" />
-                          Envoyer par e-mail
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
                   </div>
                 </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={9} className="text-center py-4">
+              <TableCell colSpan={8} className="text-center py-4">
                 <div className="flex flex-col items-center justify-center py-8">
                   <TrendingUp className="h-10 w-10 text-gray-400 mb-2" />
                   <h3 className="font-medium text-gray-900">Aucun résultat</h3>
