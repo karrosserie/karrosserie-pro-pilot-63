@@ -18,7 +18,7 @@ export const ReceiptForm = ({
   const [formData, setFormData] = useState<Receipt>({
     reference: '',
     date: new Date().toISOString().split('T')[0],
-    amount: 0,
+    amount: '',
     status: 'En attente',
     invoice: '',
     payment_method: 'Virement',

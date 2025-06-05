@@ -33,8 +33,8 @@ export const DateAmountFields = ({ formData, onChange }: DateAmountFieldsProps) 
           id="amount"
           type="number"
           step="0.01"
-          value={formData.amount}
-          onChange={(e) => onChange('amount', parseFloat(e.target.value) || 0)}
+          value={formData.amount || ''}
+          onChange={(e) => onChange('amount', e.target.value ? parseFloat(e.target.value) : '')}
           placeholder="0.00"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-karrosserie-orange focus:border-transparent"
           required

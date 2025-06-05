@@ -16,7 +16,7 @@ interface Expense {
   id?: string;
   reference: string;
   date: string;
-  amount: number;
+  amount: number | string;
   status: string;
   supplier: string;
   category: string;
@@ -41,7 +41,7 @@ export const ExpenseForm = ({
   const [formData, setFormData] = useState<Expense>({
     reference: '',
     date: new Date().toISOString().split('T')[0],
-    amount: 0,
+    amount: '',
     status: 'En attente',
     supplier: '',
     category: 'Pièces détachées',
@@ -144,8 +144,8 @@ export const ExpenseForm = ({
             id="amount"
             type="number"
             step="0.01"
-            value={formData.amount}
-            onChange={(e) => handleChange('amount', parseFloat(e.target.value) || 0)}
+            value={formData.amount || ''}
+            onChange={(e) => handleChange('amount', e.target.value ? parseFloat(e.target.value) : '')}
             placeholder="0.00"
             required
           />

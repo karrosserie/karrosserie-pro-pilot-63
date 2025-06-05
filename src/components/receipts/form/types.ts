@@ -3,7 +3,7 @@ export interface Receipt {
   id?: string;
   reference?: string;
   date: string;
-  amount: number;
+  amount: number | string;
   status: string;
   invoice: string;
   payment_method: string;
