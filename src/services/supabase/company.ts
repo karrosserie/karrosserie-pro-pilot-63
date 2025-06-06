@@ -39,7 +39,15 @@ export const companyService = {
       throw new Error(error.message);
     }
 
-    return data;
+    // Transform the data to match our interface
+    return {
+      ...data,
+      notifications: data.notifications as {
+        email: boolean;
+        push: boolean;
+        sms: boolean;
+      }
+    } as CompanyInfo;
   },
 
   async updateCompanyInfo(userId: string, companyData: Partial<CompanyInfo>): Promise<CompanyInfo> {
@@ -69,7 +77,15 @@ export const companyService = {
       throw new Error(error.message);
     }
 
-    return data;
+    // Transform the data to match our interface
+    return {
+      ...data,
+      notifications: data.notifications as {
+        email: boolean;
+        push: boolean;
+        sms: boolean;
+      }
+    } as CompanyInfo;
   },
 
   async deleteCompanyInfo(userId: string): Promise<void> {
