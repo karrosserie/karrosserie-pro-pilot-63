@@ -43,11 +43,11 @@ const CompanyTab: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="flex items-start space-x-6">
-            <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+            <div className="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
               {companyData.logo_url ? (
                 <img src={companyData.logo_url} alt="Logo" className="max-w-full max-h-full object-contain rounded-lg" />
               ) : (
-                <FileText className="h-12 w-12 text-gray-400" />
+                <FileText className="h-16 w-16 text-gray-400" />
               )}
             </div>
             <div className="space-y-2">
