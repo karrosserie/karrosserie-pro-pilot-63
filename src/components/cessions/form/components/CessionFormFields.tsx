@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CessionFormData, CessionFormErrors } from '../types';
-import { useBankAccounts } from '@/hooks/use-accounts';
+import { useAccounts } from '@/hooks/use-accounts';
 import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
 
 interface CessionFormFieldsProps {
@@ -18,7 +17,7 @@ export const CessionFormFields = ({
   errors,
   onFieldChange
 }: CessionFormFieldsProps) => {
-  const { accounts: bankAccounts, isLoading: isLoadingBankAccounts } = useBankAccounts();
+  const { accounts: bankAccounts, isLoading: isLoadingBankAccounts } = useAccounts();
   const { insuranceCompanies, isLoading: isLoadingInsuranceCompanies } = useInsuranceCompanies();
 
   return (
