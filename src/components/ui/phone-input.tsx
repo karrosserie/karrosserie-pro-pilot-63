@@ -39,19 +39,6 @@ export const PhoneInputField: React.FC<PhoneInputFieldProps> = ({
         className: "phone-country-select"
       }}
       countryOptionsOrder={['FR', 'US', 'GB', 'DE', 'ES', 'IT', '...']}
-      labels={{
-        'FR': 'France +33',
-        'US': 'États-Unis +1', 
-        'GB': 'Royaume-Uni +44',
-        'DE': 'Allemagne +49',
-        'ES': 'Espagne +34',
-        'IT': 'Italie +39',
-        'BE': 'Belgique +32',
-        'CH': 'Suisse +41',
-        'CA': 'Canada +1',
-        'AU': 'Australie +61',
-        'ZZ': 'International'
-      }}
     />
   );
 };
