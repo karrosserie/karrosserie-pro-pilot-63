@@ -1,6 +1,6 @@
 
 import React from 'react';
-import PhoneInput, { Country, CountryCode } from 'react-phone-number-input';
+import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { cn } from '@/lib/utils';
 
@@ -10,7 +10,7 @@ interface PhoneInputFieldProps {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
-  defaultCountry?: CountryCode;
+  defaultCountry?: string;
 }
 
 export const PhoneInputField: React.FC<PhoneInputFieldProps> = ({
@@ -19,12 +19,12 @@ export const PhoneInputField: React.FC<PhoneInputFieldProps> = ({
   placeholder = "Numéro de téléphone",
   disabled = false,
   className,
-  defaultCountry = "FR" as CountryCode
+  defaultCountry = "FR"
 }) => {
   return (
     <PhoneInput
       international
-      defaultCountry={defaultCountry}
+      defaultCountry={defaultCountry as any}
       value={value}
       onChange={onChange}
       placeholder={placeholder}
