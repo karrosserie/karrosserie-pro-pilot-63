@@ -106,17 +106,26 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
     if (!repairOrderVehicle.registration_document_back_url) missingVehicleDocuments.push("Photo verso du certificat d'immatriculation");
 
     if (missingClientFields.length > 0 || missingVehicleDocuments.length > 0) {
-      let errorMessage = "Des informations obligatoires sont manquantes :\n";
+      let errorMessage = "Des informations obligatoires sont manquantes :\n\n";
       
       if (missingClientFields.length > 0) {
-        errorMessage += `\nFiche client : ${missingClientFields.join(", ")}`;
+        errorMessage += "Fiche client :\n";
+        missingClientFields.forEach(field => {
+          errorMessage += `    - ${field}\n`;
+        });
       }
       
       if (missingVehicleDocuments.length > 0) {
-        errorMessage += `\nFiche véhicule : ${missingVehicleDocuments.join(", ")}`;
+        if (missingClientFields.length > 0) {
+          errorMessage += "\n";
+        }
+        errorMessage += "Fiche véhicule :\n";
+        missingVehicleDocuments.forEach(document => {
+          errorMessage += `    - ${document}\n`;
+        });
       }
 
-      errorMessage += "\n\nVeuillez compléter ces informations avant de pouvoir créer une cession de créance.";
+      errorMessage += "\nVeuillez compléter ces informations avant de pouvoir créer une cession de créance.";
       
       return errorMessage;
     }
