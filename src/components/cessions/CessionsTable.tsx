@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -8,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { FileText, Download, Eye, Pencil, Trash } from 'lucide-react';
+import { FileText, Download, Eye, Pencil, Trash, Play } from 'lucide-react';
 import { Cession } from '@/services/supabase/cessions';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -100,6 +101,11 @@ export const CessionsTable = ({
     return `Ordre n°${order.reference} du ${orderDate} - ${clientName} - ${vehicleInfo}`;
   };
 
+  const handleInitializeProcedure = (cession: Cession) => {
+    console.log('Initializing procedure for cession:', cession.id);
+    // TODO: Implement procedure initialization logic
+  };
+
   if (isLoading) {
     return (
       <div className="card-container">
@@ -150,6 +156,14 @@ export const CessionsTable = ({
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-1">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => handleInitializeProcedure(cession)}
+                      title="Initialiser la procédure"
+                    >
+                      <Play className="h-4 w-4" />
+                    </Button>
                     <Button variant="ghost" size="icon">
                       <Eye className="h-4 w-4" />
                     </Button>
