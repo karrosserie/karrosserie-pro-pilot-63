@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -18,6 +17,12 @@ export interface Cession extends BaseCession {
     model: string;
     license_plate: string;
   };
+  repair_orders?: {
+    reference: string;
+  };
+  insurance_companies?: {
+    name: string;
+  };
 }
 
 export interface NewCession extends Omit<BaseNewCession, 'id' | 'created_at' | 'updated_at' | 'user_id'> {
@@ -36,7 +41,9 @@ export const cessionsService = {
       .from('cessions')
       .select(`
         *,
-        vehicles(brand, model, license_plate)
+        vehicles(brand, model, license_plate),
+        repair_orders(reference),
+        insurance_companies(name)
       `)
       .order('sale_date', { ascending: false });
 
@@ -58,7 +65,9 @@ export const cessionsService = {
       .from('cessions')
       .select(`
         *,
-        vehicles(id, brand, model, license_plate)
+        vehicles(id, brand, model, license_plate),
+        repair_orders(reference),
+        insurance_companies(name)
       `)
       .eq('id', id)
       .single();
