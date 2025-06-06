@@ -109,57 +109,60 @@ export const CessionFormFields = ({
         </div>
       </div>
 
-      {/* Compagnie d'assurance seule sur sa ligne */}
-      <div className="space-y-2">
-        <Label htmlFor="insurance_company_id">
-          Compagnie d'assurance <span className="text-red-500">*</span>
-        </Label>
-        <Select
-          value={formData.insurance_company_id || ''}
-          onValueChange={(value) => {
-            console.log('Insurance company selected:', value);
-            onFieldChange('insurance_company_id', value);
-          }}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder={isLoadingInsuranceCompanies ? "Chargement..." : "Sélectionner une compagnie d'assurance"} />
-          </SelectTrigger>
-          <SelectContent>
-            {insuranceCompanies?.map((company) => (
-              <SelectItem key={company.id} value={company.id}>
-                {company.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {errors.insurance_company_id && (
-          <div className="text-sm text-red-600">{errors.insurance_company_id}</div>
-        )}
-      </div>
+      {/* Compagnie d'assurance et Compte bancaire sur la même ligne */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Compagnie d'assurance */}
+        <div className="space-y-2">
+          <Label htmlFor="insurance_company_id">
+            Compagnie d'assurance <span className="text-red-500">*</span>
+          </Label>
+          <Select
+            value={formData.insurance_company_id || ''}
+            onValueChange={(value) => {
+              console.log('Insurance company selected:', value);
+              onFieldChange('insurance_company_id', value);
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={isLoadingInsuranceCompanies ? "Chargement..." : "Sélectionner une compagnie d'assurance"} />
+            </SelectTrigger>
+            <SelectContent>
+              {insuranceCompanies?.map((company) => (
+                <SelectItem key={company.id} value={company.id}>
+                  {company.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.insurance_company_id && (
+            <div className="text-sm text-red-600">{errors.insurance_company_id}</div>
+          )}
+        </div>
 
-      {/* Compte bancaire après la compagnie d'assurance */}
-      <div className="space-y-2">
-        <Label htmlFor="bank_account_id">
-          Compte bancaire <span className="text-red-500">*</span>
-        </Label>
-        <Select
-          value={formData.bank_account_id || ''}
-          onValueChange={(value) => onFieldChange('bank_account_id', value)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder={isLoadingBankAccounts ? "Chargement..." : "Sélectionner un compte"} />
-          </SelectTrigger>
-          <SelectContent>
-            {bankAccounts?.map((account) => (
-              <SelectItem key={account.id} value={account.id}>
-                {account.name} - {account.bank}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {errors.bank_account_id && (
-          <div className="text-sm text-red-600">{errors.bank_account_id}</div>
-        )}
+        {/* Compte bancaire */}
+        <div className="space-y-2">
+          <Label htmlFor="bank_account_id">
+            Compte bancaire <span className="text-red-500">*</span>
+          </Label>
+          <Select
+            value={formData.bank_account_id || ''}
+            onValueChange={(value) => onFieldChange('bank_account_id', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={isLoadingBankAccounts ? "Chargement..." : "Sélectionner un compte"} />
+            </SelectTrigger>
+            <SelectContent>
+              {bankAccounts?.map((account) => (
+                <SelectItem key={account.id} value={account.id}>
+                  {account.name} - {account.bank}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.bank_account_id && (
+            <div className="text-sm text-red-600">{errors.bank_account_id}</div>
+          )}
+        </div>
       </div>
     </div>
   );
