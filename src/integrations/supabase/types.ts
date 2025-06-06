@@ -308,6 +308,7 @@ export type Database = {
           date: string
           id: string
           proof_url: string | null
+          status: string
           supplier: string
           total_amount: number
           type: string
@@ -323,6 +324,7 @@ export type Database = {
           date: string
           id?: string
           proof_url?: string | null
+          status?: string
           supplier: string
           total_amount?: number
           type?: string
@@ -338,6 +340,7 @@ export type Database = {
           date?: string
           id?: string
           proof_url?: string | null
+          status?: string
           supplier?: string
           total_amount?: number
           type?: string
