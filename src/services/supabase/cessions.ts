@@ -20,7 +20,7 @@ export interface Cession extends BaseCession {
   };
 }
 
-export interface NewCession extends Omit<BaseNewCession, 'id' | 'created_at' | 'updated_at'> {
+export interface NewCession extends Omit<BaseNewCession, 'id' | 'created_at' | 'updated_at' | 'user_id'> {
   reference: string;
   status?: CessionStatus;
 }
@@ -79,10 +79,21 @@ export const cessionsService = {
   create: async (cession: NewCession): Promise<Cession> => {
     console.log('Creating cession with data:', cession);
     
+    // Get current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      console.error('Error getting user:', userError);
+      throw new Error('Utilisateur non authentifié');
+    }
+    
+    // Generate a reference if not provided
+    const reference = cession.reference || `CC-${new Date().getFullYear()}-${Date.now()}`;
+    
     // Ensure insurance_company_id is properly formatted as UUID or null
     const processedCession = {
       ...cession,
-      reference: cession.reference,
+      user_id: user.id,
+      reference,
       status: cession.status || 'en_attente',
       insurance_company_id: cession.insurance_company_id || null
     };
