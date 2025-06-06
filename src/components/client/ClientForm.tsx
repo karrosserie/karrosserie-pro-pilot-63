@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PersonalInfoTab from './form/PersonalInfoTab';
@@ -34,6 +33,10 @@ const ClientForm: React.FC<ClientFormProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePhoneChange = (value: string | undefined) => {
+    setFormData(prev => ({ ...prev, phone: value || '' }));
   };
 
   const handleDriverLicenseFrontUpload = (url: string) => {
@@ -90,6 +93,7 @@ const ClientForm: React.FC<ClientFormProps> = ({
           <PersonalInfoTab 
             formData={formData} 
             handleChange={handleChange}
+            handlePhoneChange={handlePhoneChange}
             isViewMode={isViewMode}
           />
         </TabsContent>

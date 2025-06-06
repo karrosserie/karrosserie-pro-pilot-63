@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Phone } from 'lucide-react';
+import { PhoneInputField } from '@/components/ui/phone-input';
 import { Profile } from '@/services/supabase/profiles';
 
 const profileSchema = z.object({
@@ -83,10 +83,11 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
                 Numéro de téléphone <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <div className="flex items-center">
-                  <Phone className="mr-2 h-4 w-4 text-muted-foreground" />
-                  <Input {...field} placeholder="Numéro de téléphone" />
-                </div>
+                <PhoneInputField
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Numéro de téléphone"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

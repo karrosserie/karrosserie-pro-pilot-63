@@ -1,17 +1,19 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PhoneInputField } from '@/components/ui/phone-input';
 
 interface PersonalInfoTabProps {
   formData: any;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handlePhoneChange?: (value: string | undefined) => void;
   isViewMode: boolean;
 }
 
 const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
   formData,
   handleChange,
+  handlePhoneChange,
   isViewMode
 }) => {
   return (
@@ -63,14 +65,22 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
           <Label htmlFor="phone" required>
             Téléphone
           </Label>
-          <Input
-            id="phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            disabled={isViewMode}
-            required
-          />
+          {isViewMode ? (
+            <Input
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              disabled={true}
+              required
+            />
+          ) : (
+            <PhoneInputField
+              value={formData.phone}
+              onChange={handlePhoneChange || (() => {})}
+              placeholder="Numéro de téléphone"
+              disabled={isViewMode}
+            />
+          )}
         </div>
       </div>
       
