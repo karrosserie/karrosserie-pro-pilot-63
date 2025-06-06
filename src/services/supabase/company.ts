@@ -45,10 +45,10 @@ export const companyService = {
 
     console.log('Données chargées depuis la DB:', data);
     
-    // Transform the data to match our interface - handle zipCode vs zipcode
+    // Transform the data to match our interface
     const transformedData = {
       ...data,
-      zipcode: data.zipcode || data.zipCode || '', // Handle both column names
+      zipcode: data.zipcode || '', // Use only zipcode since that's what exists in DB
       notifications: data.notifications as {
         email: boolean;
         push: boolean;
@@ -97,7 +97,7 @@ export const companyService = {
     // Transform the data to match our interface
     return {
       ...data,
-      zipcode: data.zipcode || data.zipCode || '',
+      zipcode: data.zipcode || '', // Use only zipcode since that's what exists in DB
       notifications: data.notifications as {
         email: boolean;
         push: boolean;
