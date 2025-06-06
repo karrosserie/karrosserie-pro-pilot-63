@@ -129,4 +129,14 @@
   .btn-primary {
     @apply bg-karrosserie-orange text-white hover:bg-opacity-90;
   }
+
+  /* Supprimer la bordure orange au focus pour tous les éléments */
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  [role="combobox"]:focus-visible {
+    @apply outline-none ring-0;
+  }
 }
