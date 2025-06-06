@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -81,20 +82,11 @@ export const CessionsTable = ({
   };
 
   const formatRepairOrderDisplay = (cession: Cession) => {
-    if (!cession.repair_orders) return '-';
-    
-    const clientName = cession.repair_orders.clients ? 
-      `${cession.repair_orders.clients.first_name} ${cession.repair_orders.clients.last_name}` : 
-      'Client non assigné';
-    
-    const vehicleInfo = cession.repair_orders.vehicles ? 
-      `${cession.repair_orders.vehicles.brand} ${cession.repair_orders.vehicles.model} - ${cession.repair_orders.vehicles.license_plate}` : 
-      'Véhicule non assigné';
-    
-    const orderDate = cession.repair_orders.created_at ? 
-      format(new Date(cession.repair_orders.created_at), 'dd/MM/yyyy', { locale: fr }) : '';
-    
-    return `Ordre n°${cession.repair_orders.reference} du ${orderDate} - ${clientName} - ${vehicleInfo}`;
+    // For now, just show a placeholder since we need to fix the data relationships first
+    if (cession.repair_order_id) {
+      return `Ordre lié (ID: ${cession.repair_order_id})`;
+    }
+    return '-';
   };
 
   if (isLoading) {
@@ -106,6 +98,8 @@ export const CessionsTable = ({
       </div>
     );
   }
+
+  console.log('Rendering table with cessions:', cessions);
 
   return (
     <div className="card-container">

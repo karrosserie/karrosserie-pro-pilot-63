@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -47,17 +48,14 @@ export interface UpdateCession extends BaseUpdateCession {
 
 export const cessionsService = {
   getAll: async (): Promise<Cession[]> => {
+    console.log('Fetching cessions...');
+    
+    // First, try a simple query to see what data we have
     const { data, error } = await supabase
       .from('cessions')
       .select(`
         *,
         vehicles(brand, model, license_plate),
-        repair_orders!inner(
-          reference,
-          created_at,
-          clients!inner(first_name, last_name),
-          vehicles!inner(brand, model, license_plate)
-        ),
         insurance_companies(name)
       `)
       .order('sale_date', { ascending: false });
@@ -67,16 +65,13 @@ export const cessionsService = {
       throw new Error(error.message);
     }
     
-    // Transform data to match our interface by flattening arrays to single objects
+    console.log('Raw cessions data:', data);
+    
+    // Transform data to match our interface
     return (data || []).map(item => ({
       ...item,
       reference: (item as any).reference || '',
-      status: (item as any).status || 'en_attente',
-      repair_orders: item.repair_orders ? {
-        ...item.repair_orders,
-        clients: Array.isArray(item.repair_orders.clients) ? item.repair_orders.clients[0] : item.repair_orders.clients,
-        vehicles: Array.isArray(item.repair_orders.vehicles) ? item.repair_orders.vehicles[0] : item.repair_orders.vehicles
-      } : undefined
+      status: (item as any).status || 'en_attente'
     })) as Cession[];
   },
 
@@ -86,12 +81,6 @@ export const cessionsService = {
       .select(`
         *,
         vehicles(id, brand, model, license_plate),
-        repair_orders!inner(
-          reference,
-          created_at,
-          clients!inner(first_name, last_name),
-          vehicles!inner(brand, model, license_plate)
-        ),
         insurance_companies(name)
       `)
       .eq('id', id)
@@ -102,16 +91,11 @@ export const cessionsService = {
       throw new Error(error.message);
     }
     
-    // Transform data to match our interface by flattening arrays to single objects
+    // Transform data to match our interface
     return {
       ...data,
       reference: (data as any).reference || '',
-      status: (data as any).status || 'en_attente',
-      repair_orders: data.repair_orders ? {
-        ...data.repair_orders,
-        clients: Array.isArray(data.repair_orders.clients) ? data.repair_orders.clients[0] : data.repair_orders.clients,
-        vehicles: Array.isArray(data.repair_orders.vehicles) ? data.repair_orders.vehicles[0] : data.repair_orders.vehicles
-      } : undefined
+      status: (data as any).status || 'en_attente'
     } as Cession;
   },
   
