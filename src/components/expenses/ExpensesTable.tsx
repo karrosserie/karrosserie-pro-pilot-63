@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Eye, Download, Pencil, Trash, TrendingDown } from 'lucide-react';
 import { ExpenseWithRelations } from '@/services/supabase/expenses';
+import { StatusBadge } from '@/components/ui/status-badge';
 
 interface ExpensesTableProps {
   expenses: ExpenseWithRelations[];
@@ -49,6 +50,7 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete, isLoading }: Expense
             <TableHead>Date</TableHead>
             <TableHead>Fournisseur</TableHead>
             <TableHead>Catégorie</TableHead>
+            <TableHead>Statut</TableHead>
             <TableHead>Montant TVA</TableHead>
             <TableHead>Montant TTC</TableHead>
             <TableHead>Véhicule</TableHead>
@@ -63,6 +65,9 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete, isLoading }: Expense
                 <TableCell>{new Date(expense.date).toLocaleDateString('fr-FR')}</TableCell>
                 <TableCell>{expense.supplier}</TableCell>
                 <TableCell>{expense.category}</TableCell>
+                <TableCell>
+                  <StatusBadge status={expense.status} />
+                </TableCell>
                 <TableCell>{formatAmount(expense.vat_amount)}</TableCell>
                 <TableCell>{formatAmount(expense.total_amount)}</TableCell>
                 <TableCell>
@@ -99,7 +104,7 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete, isLoading }: Expense
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-4">
+              <TableCell colSpan={9} className="text-center py-4">
                 <div className="flex flex-col items-center justify-center py-8">
                   <TrendingDown className="h-10 w-10 text-gray-400 mb-2" />
                   <h3 className="font-medium text-gray-900">Aucune dépense</h3>
