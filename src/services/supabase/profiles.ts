@@ -5,6 +5,11 @@ export interface Profile {
   id: string;
   first_name: string;
   last_name: string;
+  phone_number: string;
+  address: string;
+  city: string;
+  postal_code: string;
+  country: string;
   [key: string]: any;
 }
 

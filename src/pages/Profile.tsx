@@ -9,17 +9,40 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { useForm } from 'react-hook-form';
-import { User } from 'lucide-react';
+import { User, Phone, MapPin } from 'lucide-react';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const profileSchema = z.object({
+  first_name: z.string().min(1, { message: "Le prénom est requis" }),
+  last_name: z.string().min(1, { message: "Le nom est requis" }),
+  phone_number: z.string().min(1, { message: "Le numéro de téléphone est requis" }),
+  address: z.string().min(1, { message: "L'adresse est requise" }),
+  city: z.string().min(1, { message: "La ville est requise" }),
+  postal_code: z.string().min(1, { message: "Le code postal est requis" }),
+  country: z.string().min(1, { message: "Le pays est requis" }),
+});
+
+type ProfileFormValues = z.infer<typeof profileSchema>;
 
 const ProfilePage = () => {
   const { user, profile, updateProfileState } = useAuth();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
-  const { register, handleSubmit, formState: { errors } } = useForm<Profile>({
+  
+  const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
     defaultValues: {
       first_name: profile?.first_name || '',
       last_name: profile?.last_name || '',
-    }
+      phone_number: profile?.phone_number || '',
+      address: profile?.address || '',
+      city: profile?.city || '',
+      postal_code: profile?.postal_code || '',
+      country: profile?.country || '',
+    },
+    mode: 'onChange',
   });
 
   const onSubmit = async (data: Partial<Profile>) => {
@@ -84,37 +107,131 @@ const ProfilePage = () => {
               </div>
               
               {isEditing ? (
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm mb-2">Prénom</label>
-                      <Input
-                        {...register('first_name')}
-                        placeholder="Prénom"
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="first_name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel required>Prénom</FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder="Prénom" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="last_name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel required>Nom</FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder="Nom" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
                     </div>
-                    <div>
-                      <label className="block text-sm mb-2">Nom</label>
-                      <Input
-                        {...register('last_name')}
-                        placeholder="Nom"
+                    
+                    <FormField
+                      control={form.control}
+                      name="phone_number"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel required>Numéro de téléphone</FormLabel>
+                          <FormControl>
+                            <div className="flex items-center">
+                              <Phone className="mr-2 h-4 w-4 text-muted-foreground" />
+                              <Input {...field} placeholder="Numéro de téléphone" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="space-y-4 border p-4 rounded-md bg-gray-50">
+                      <h3 className="text-md font-medium flex items-center gap-2">
+                        <MapPin className="h-4 w-4" /> Adresse postale
+                      </h3>
+                      
+                      <FormField
+                        control={form.control}
+                        name="address"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel required>Adresse</FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder="Adresse" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="city"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel required>Ville</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="Ville" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="postal_code"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel required>Code postal</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="Code postal" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      
+                      <FormField
+                        control={form.control}
+                        name="country"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel required>Pays</FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder="Pays" defaultValue="France" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
                     </div>
-                  </div>
-                  
-                  <div className="flex gap-2 justify-end">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={() => setIsEditing(false)}
-                    >
-                      Annuler
-                    </Button>
-                    <Button type="submit">Enregistrer</Button>
-                  </div>
-                </form>
+                    
+                    <div className="flex gap-2 justify-end">
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={() => setIsEditing(false)}
+                      >
+                        Annuler
+                      </Button>
+                      <Button type="submit">Enregistrer</Button>
+                    </div>
+                  </form>
+                </Form>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm mb-2">Prénom</label>
@@ -123,6 +240,28 @@ const ProfilePage = () => {
                     <div>
                       <label className="block text-sm mb-2">Nom</label>
                       <p>{profile?.last_name || '-'}</p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm mb-2">Numéro de téléphone</label>
+                    <p className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      {profile?.phone_number || '-'}
+                    </p>
+                  </div>
+
+                  <div className="border p-4 rounded-md bg-gray-50">
+                    <h3 className="text-md font-medium mb-3 flex items-center gap-2">
+                      <MapPin className="h-4 w-4" /> Adresse postale
+                    </h3>
+                    <div className="space-y-2">
+                      <p>{profile?.address || '-'}</p>
+                      <p>
+                        {profile?.postal_code ? `${profile.postal_code} ` : ''}
+                        {profile?.city || '-'}
+                      </p>
+                      <p>{profile?.country || '-'}</p>
                     </div>
                   </div>
                   
