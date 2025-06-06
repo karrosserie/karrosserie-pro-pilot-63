@@ -43,17 +43,21 @@ export const companyService = {
       throw new Error(error.message);
     }
 
-    console.log('Données chargées:', data);
+    console.log('Données chargées depuis la DB:', data);
     
-    // Transform the data to match our interface
-    return {
+    // Transform the data to match our interface - handle zipCode vs zipcode
+    const transformedData = {
       ...data,
+      zipcode: data.zipcode || data.zipCode || '', // Handle both column names
       notifications: data.notifications as {
         email: boolean;
         push: boolean;
         sms: boolean;
       }
     } as CompanyInfo;
+
+    console.log('Données transformées:', transformedData);
+    return transformedData;
   },
 
   async updateCompanyInfo(userId: string, companyData: Partial<CompanyInfo>): Promise<CompanyInfo> {
@@ -64,7 +68,7 @@ export const companyService = {
       name: companyData.name || '',
       email: companyData.email || '',
       address: companyData.address || '',
-      zipcode: companyData.zipcode || '',
+      zipcode: companyData.zipcode || '', // Use zipcode to match our interface
       city: companyData.city || '',
       phone: companyData.phone || '',
       siren: companyData.siren || '',
@@ -93,6 +97,7 @@ export const companyService = {
     // Transform the data to match our interface
     return {
       ...data,
+      zipcode: data.zipcode || data.zipCode || '',
       notifications: data.notifications as {
         email: boolean;
         push: boolean;

@@ -30,26 +30,25 @@ export function useCompany() {
   useEffect(() => {
     const loadCompanyData = async () => {
       if (!user) {
-        console.log('No user found, skipping company data load');
+        console.log('useCompany: No user found, skipping company data load');
         return;
       }
       
       setIsLoading(true);
-      console.log('Loading company data for user:', user.id);
+      console.log('useCompany: Loading company data for user:', user.id);
       
       try {
         const data = await companyService.getCompanyInfo(user.id);
-        console.log('Received company data from service:', data);
+        console.log('useCompany: Received company data from service:', data);
         
         if (data) {
-          // Mettre à jour avec les données de la base
-          console.log('Setting company data:', data);
+          console.log('useCompany: Setting company data:', data);
           setCompanyData(data);
         } else {
-          console.log('No company data found, keeping default values');
+          console.log('useCompany: No company data found, keeping default values');
         }
       } catch (error) {
-        console.error('Erreur lors du chargement des données:', error);
+        console.error('useCompany: Erreur lors du chargement des données:', error);
         toast({
           title: "Erreur",
           description: "Impossible de charger les données de l'entreprise.",
@@ -64,13 +63,16 @@ export function useCompany() {
   }, [user, toast]);
 
   const saveCompanyData = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('useCompany: No user found, cannot save');
+      return;
+    }
 
     setIsSaving(true);
     try {
-      console.log('Saving company data:', companyData);
+      console.log('useCompany: Saving company data:', companyData);
       const updatedData = await companyService.updateCompanyInfo(user.id, companyData);
-      console.log('Received updated data:', updatedData);
+      console.log('useCompany: Received updated data:', updatedData);
       setCompanyData(updatedData);
       toast({
         title: "Données sauvegardées",
@@ -78,7 +80,7 @@ export function useCompany() {
       });
       return updatedData;
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error);
+      console.error('useCompany: Erreur lors de la sauvegarde:', error);
       toast({
         title: "Erreur",
         description: "Impossible de sauvegarder les données.",
@@ -91,10 +93,10 @@ export function useCompany() {
   };
 
   const updateCompanyData = (updates: Partial<CompanyInfo>) => {
-    console.log('Updating company data with:', updates);
+    console.log('useCompany: Updating company data with:', updates);
     setCompanyData(prev => {
       const newData = { ...prev, ...updates };
-      console.log('New company data state:', newData);
+      console.log('useCompany: New company data state:', newData);
       return newData;
     });
   };
@@ -109,7 +111,12 @@ export function useCompany() {
     }));
   };
 
-  console.log('useCompany hook state:', { companyData, isLoading, isSaving });
+  console.log('useCompany hook state:', { 
+    user: user ? { id: user.id, email: user.email } : null,
+    companyData, 
+    isLoading, 
+    isSaving 
+  });
 
   return {
     companyData,
