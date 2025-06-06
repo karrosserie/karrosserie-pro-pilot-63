@@ -69,13 +69,10 @@ export const CustomPhoneInput: React.FC<CustomPhoneInputProps> = ({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-auto justify-between rounded-r-none border-r-0 px-3"
+            className="w-auto justify-center rounded-r-none border-r-0 px-3"
             disabled={disabled}
           >
-            <div className="flex items-center gap-2">
-              <span className="text-lg">{selectedCountry.flag}</span>
-              <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
-            </div>
+            <span className="text-lg">{selectedCountry.flag}</span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[300px] p-0" align="start">
