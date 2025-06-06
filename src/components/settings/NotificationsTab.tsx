@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { 
   Card,
   CardContent,
@@ -9,68 +9,73 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { useCompany } from '@/hooks/use-company';
 
-interface NotificationsTabProps {
-  notifications: {
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-  };
-  onSwitchChange: (key: string) => void;
-}
+const NotificationsTab: React.FC = () => {
+  const { companyData, isSaving, updateNotifications, saveCompanyData } = useCompany();
 
-const NotificationsTab: React.FC<NotificationsTabProps> = ({ notifications, onSwitchChange }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Préférences de notification</CardTitle>
+        <CardTitle>Préférences de notifications</CardTitle>
         <CardDescription>
-          Configurez comment vous souhaitez être notifié.
+          Configurez comment vous souhaitez recevoir les notifications.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="emailNotif">Notifications par email</Label>
+            <div className="space-y-0.5">
+              <Label htmlFor="email-notifications">Notifications par email</Label>
               <p className="text-sm text-gray-500">
-                Recevoir des notifications par email.
+                Recevez les notifications importantes par email.
               </p>
             </div>
             <Switch 
-              id="emailNotif" 
-              checked={notifications.email}
-              onCheckedChange={() => onSwitchChange('email')}
+              id="email-notifications"
+              checked={companyData.notifications?.email || false}
+              onCheckedChange={() => updateNotifications('email')}
             />
           </div>
           
           <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="pushNotif">Notifications push</Label>
+            <div className="space-y-0.5">
+              <Label htmlFor="push-notifications">Notifications push</Label>
               <p className="text-sm text-gray-500">
-                Recevoir des notifications push dans le navigateur.
+                Recevez les notifications push dans votre navigateur.
               </p>
             </div>
             <Switch 
-              id="pushNotif" 
-              checked={notifications.push}
-              onCheckedChange={() => onSwitchChange('push')}
+              id="push-notifications"
+              checked={companyData.notifications?.push || false}
+              onCheckedChange={() => updateNotifications('push')}
             />
           </div>
           
           <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="smsNotif">Notifications par SMS</Label>
+            <div className="space-y-0.5">
+              <Label htmlFor="sms-notifications">Notifications SMS</Label>
               <p className="text-sm text-gray-500">
-                Recevoir des notifications par SMS.
+                Recevez les notifications urgentes par SMS.
               </p>
             </div>
             <Switch 
-              id="smsNotif" 
-              checked={notifications.sms}
-              onCheckedChange={() => onSwitchChange('sms')}
+              id="sms-notifications"
+              checked={companyData.notifications?.sms || false}
+              onCheckedChange={() => updateNotifications('sms')}
             />
           </div>
+        </div>
+        
+        <div className="flex justify-end">
+          <Button 
+            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+            onClick={saveCompanyData}
+            disabled={isSaving}
+          >
+            {isSaving ? 'Enregistrement...' : 'Enregistrer les préférences'}
+          </Button>
         </div>
       </CardContent>
     </Card>

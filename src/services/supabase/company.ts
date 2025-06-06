@@ -25,26 +25,21 @@ export interface CompanyInfo {
 
 export const companyService = {
   async getCompanyInfo(userId: string): Promise<CompanyInfo | null> {
-    try {
-      const { data, error } = await (supabase as any)
-        .rpc('get_company_info', { p_user_id: userId });
+    const { data, error } = await supabase
+      .from('company_info')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
 
-      if (error) {
-        if (error.message.includes('does not exist')) {
-          // Table n'existe pas encore, retourner null
-          return null;
-        }
-        throw new Error(error.message);
-      }
-
-      return data && data.length > 0 ? data[0] : null;
-    } catch (error: any) {
-      if (error.message.includes('does not exist') || error.message.includes('42P01')) {
-        // Table ou fonction n'existe pas encore
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // No rows found
         return null;
       }
-      throw error;
+      throw new Error(error.message);
     }
+
+    return data;
   },
 
   async updateCompanyInfo(userId: string, companyData: Partial<CompanyInfo>): Promise<CompanyInfo> {
@@ -64,42 +59,27 @@ export const companyService = {
       updated_at: new Date().toISOString()
     };
 
-    try {
-      const { data, error } = await (supabase as any)
-        .rpc('upsert_company_info', dataToUpdate);
+    const { data, error } = await supabase
+      .from('company_info')
+      .upsert(dataToUpdate, { onConflict: 'user_id' })
+      .select()
+      .single();
 
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      return data;
-    } catch (error: any) {
-      if (error.message.includes('does not exist') || error.message.includes('42P01')) {
-        // Table n'existe pas encore, simuler une réponse pour le développement
-        return {
-          id: 'temp-id',
-          user_id: userId,
-          ...dataToUpdate,
-          created_at: new Date().toISOString()
-        } as CompanyInfo;
-      }
-      throw error;
+    if (error) {
+      throw new Error(error.message);
     }
+
+    return data;
   },
 
   async deleteCompanyInfo(userId: string): Promise<void> {
-    try {
-      const { error } = await (supabase as any)
-        .rpc('delete_company_info', { p_user_id: userId });
+    const { error } = await supabase
+      .from('company_info')
+      .delete()
+      .eq('user_id', userId);
 
-      if (error && !error.message.includes('does not exist')) {
-        throw new Error(error.message);
-      }
-    } catch (error: any) {
-      if (!error.message.includes('does not exist') && !error.message.includes('42P01')) {
-        throw error;
-      }
-      // Ignorer l'erreur si la table n'existe pas encore
+    if (error) {
+      throw new Error(error.message);
     }
   }
 };

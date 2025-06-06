@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,58 +11,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FileText, Upload } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
-import { companyService } from '@/services/supabase/company';
 import { useStorage } from '@/hooks/use-storage';
+import { useCompany } from '@/hooks/use-company';
 
-interface CompanyData {
-  name: string;
-  email: string;
-  address: string;
-  zipCode: string;
-  city: string;
-  phone: string;
-  siren: string;
-  siret: string;
-  tva: string;
-  logo_url?: string;
-  notifications: {
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-  };
-}
-
-interface CompanyTabProps {
-  userId: string;
-  accountData: CompanyData;
-  setAccountData: React.Dispatch<React.SetStateAction<CompanyData>>;
-}
-
-const CompanyTab: React.FC<CompanyTabProps> = ({ userId, accountData, setAccountData }) => {
-  const { toast } = useToast();
+const CompanyTab: React.FC = () => {
   const { uploadDocument } = useStorage();
-  const [isSaving, setIsSaving] = useState(false);
-
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      await companyService.updateCompanyInfo(userId, accountData);
-      toast({
-        title: "Données sauvegardées",
-        description: "Les informations de votre entreprise ont été mises à jour.",
-      });
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder les données.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  };
+  const { companyData, isSaving, updateCompanyData, saveCompanyData } = useCompany();
 
   const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -71,7 +25,7 @@ const CompanyTab: React.FC<CompanyTabProps> = ({ userId, accountData, setAccount
     try {
       const logoUrl = await uploadDocument(file, 'company', 'logo');
       if (logoUrl) {
-        setAccountData(prev => ({ ...prev, logo_url: logoUrl }));
+        updateCompanyData({ logo_url: logoUrl });
       }
     } catch (error) {
       console.error('Erreur lors du téléchargement du logo:', error);
@@ -90,8 +44,8 @@ const CompanyTab: React.FC<CompanyTabProps> = ({ userId, accountData, setAccount
         <CardContent>
           <div className="flex items-center space-x-4">
             <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
-              {accountData.logo_url ? (
-                <img src={accountData.logo_url} alt="Logo" className="max-w-full max-h-full object-contain rounded-lg" />
+              {companyData.logo_url ? (
+                <img src={companyData.logo_url} alt="Logo" className="max-w-full max-h-full object-contain rounded-lg" />
               ) : (
                 <FileText className="h-8 w-8 text-gray-400" />
               )}
@@ -135,8 +89,8 @@ const CompanyTab: React.FC<CompanyTabProps> = ({ userId, accountData, setAccount
               <Label htmlFor="name">Nom de l'entreprise</Label>
               <Input 
                 id="name" 
-                value={accountData.name} 
-                onChange={(e) => setAccountData({...accountData, name: e.target.value})} 
+                value={companyData.name || ''} 
+                onChange={(e) => updateCompanyData({ name: e.target.value })} 
               />
             </div>
             
@@ -145,8 +99,8 @@ const CompanyTab: React.FC<CompanyTabProps> = ({ userId, accountData, setAccount
               <Input 
                 id="email" 
                 type="email" 
-                value={accountData.email} 
-                onChange={(e) => setAccountData({...accountData, email: e.target.value})} 
+                value={companyData.email || ''} 
+                onChange={(e) => updateCompanyData({ email: e.target.value })} 
               />
             </div>
           </div>
@@ -155,8 +109,8 @@ const CompanyTab: React.FC<CompanyTabProps> = ({ userId, accountData, setAccount
             <Label htmlFor="address">Adresse</Label>
             <Input 
               id="address" 
-              value={accountData.address} 
-              onChange={(e) => setAccountData({...accountData, address: e.target.value})} 
+              value={companyData.address || ''} 
+              onChange={(e) => updateCompanyData({ address: e.target.value })} 
             />
           </div>
           
@@ -165,8 +119,8 @@ const CompanyTab: React.FC<CompanyTabProps> = ({ userId, accountData, setAccount
               <Label htmlFor="zipCode">Code postal</Label>
               <Input 
                 id="zipCode" 
-                value={accountData.zipCode} 
-                onChange={(e) => setAccountData({...accountData, zipCode: e.target.value})} 
+                value={companyData.zipCode || ''} 
+                onChange={(e) => updateCompanyData({ zipCode: e.target.value })} 
               />
             </div>
             
@@ -174,8 +128,8 @@ const CompanyTab: React.FC<CompanyTabProps> = ({ userId, accountData, setAccount
               <Label htmlFor="city">Ville</Label>
               <Input 
                 id="city" 
-                value={accountData.city} 
-                onChange={(e) => setAccountData({...accountData, city: e.target.value})} 
+                value={companyData.city || ''} 
+                onChange={(e) => updateCompanyData({ city: e.target.value })} 
               />
             </div>
             
@@ -183,8 +137,8 @@ const CompanyTab: React.FC<CompanyTabProps> = ({ userId, accountData, setAccount
               <Label htmlFor="phone">Téléphone</Label>
               <Input 
                 id="phone" 
-                value={accountData.phone} 
-                onChange={(e) => setAccountData({...accountData, phone: e.target.value})} 
+                value={companyData.phone || ''} 
+                onChange={(e) => updateCompanyData({ phone: e.target.value })} 
               />
             </div>
           </div>
@@ -194,8 +148,8 @@ const CompanyTab: React.FC<CompanyTabProps> = ({ userId, accountData, setAccount
               <Label htmlFor="siren">SIREN</Label>
               <Input 
                 id="siren" 
-                value={accountData.siren} 
-                onChange={(e) => setAccountData({...accountData, siren: e.target.value})} 
+                value={companyData.siren || ''} 
+                onChange={(e) => updateCompanyData({ siren: e.target.value })} 
               />
             </div>
             
@@ -203,8 +157,8 @@ const CompanyTab: React.FC<CompanyTabProps> = ({ userId, accountData, setAccount
               <Label htmlFor="siret">SIRET</Label>
               <Input 
                 id="siret" 
-                value={accountData.siret} 
-                onChange={(e) => setAccountData({...accountData, siret: e.target.value})} 
+                value={companyData.siret || ''} 
+                onChange={(e) => updateCompanyData({ siret: e.target.value })} 
               />
             </div>
             
@@ -212,8 +166,8 @@ const CompanyTab: React.FC<CompanyTabProps> = ({ userId, accountData, setAccount
               <Label htmlFor="tva">Numéro de TVA</Label>
               <Input 
                 id="tva" 
-                value={accountData.tva} 
-                onChange={(e) => setAccountData({...accountData, tva: e.target.value})} 
+                value={companyData.tva || ''} 
+                onChange={(e) => updateCompanyData({ tva: e.target.value })} 
               />
             </div>
           </div>
@@ -221,7 +175,7 @@ const CompanyTab: React.FC<CompanyTabProps> = ({ userId, accountData, setAccount
           <div className="flex justify-end">
             <Button 
               className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-              onClick={handleSave}
+              onClick={saveCompanyData}
               disabled={isSaving}
             >
               {isSaving ? 'Enregistrement...' : 'Enregistrer'}

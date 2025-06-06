@@ -1,90 +1,15 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreditCard, Settings as SettingsIcon, User, Bell } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/components/ui/use-toast';
-import { companyService } from '@/services/supabase/company';
 import CompanyTab from '@/components/settings/CompanyTab';
 import AppearanceTab from '@/components/settings/AppearanceTab';
 import NotificationsTab from '@/components/settings/NotificationsTab';
 import SubscriptionTab from '@/components/settings/SubscriptionTab';
-
-interface CompanyData {
-  name: string;
-  email: string;
-  address: string;
-  zipCode: string;
-  city: string;
-  phone: string;
-  siren: string;
-  siret: string;
-  tva: string;
-  logo_url?: string;
-  notifications: {
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-  };
-}
+import { useCompany } from '@/hooks/use-company';
 
 const Settings = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const [accountData, setAccountData] = useState<CompanyData>({
-    name: '',
-    email: '',
-    address: '',
-    zipCode: '',
-    city: '',
-    phone: '',
-    siren: '',
-    siret: '',
-    tva: '',
-    logo_url: '',
-    notifications: {
-      email: true,
-      push: true,
-      sms: false,
-    }
-  });
-
-  useEffect(() => {
-    const loadCompanyData = async () => {
-      if (!user) return;
-      
-      setIsLoading(true);
-      try {
-        const data = await companyService.getCompanyInfo(user.id);
-        if (data) {
-          setAccountData(data);
-        }
-      } catch (error) {
-        console.error('Erreur lors du chargement des données:', error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de charger les données de l'entreprise.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadCompanyData();
-  }, [user, toast]);
-
-  const handleSwitchChange = (key: string) => {
-    setAccountData(prev => ({
-      ...prev,
-      notifications: {
-        ...prev.notifications,
-        [key]: !prev.notifications[key]
-      }
-    }));
-  };
+  const { isLoading } = useCompany();
 
   if (isLoading) {
     return (
@@ -127,13 +52,7 @@ const Settings = () => {
         </TabsList>
         
         <TabsContent value="account" className="space-y-4">
-          {user && (
-            <CompanyTab 
-              userId={user.id}
-              accountData={accountData}
-              setAccountData={setAccountData}
-            />
-          )}
+          <CompanyTab />
         </TabsContent>
         
         <TabsContent value="appearance">
@@ -141,10 +60,7 @@ const Settings = () => {
         </TabsContent>
         
         <TabsContent value="notifications">
-          <NotificationsTab 
-            notifications={accountData.notifications}
-            onSwitchChange={handleSwitchChange}
-          />
+          <NotificationsTab />
         </TabsContent>
         
         <TabsContent value="subscription">
