@@ -2,6 +2,9 @@
 import { useState, useEffect } from 'react';
 import { Cession } from '@/services/supabase/cessions';
 import { CessionFormData, CessionFormErrors } from './types';
+import { useRepairOrder } from '@/hooks/use-repair-orders';
+import { useClient } from '@/hooks/use-clients';
+import { useClientVehicles } from '@/hooks/use-vehicles';
 
 interface UseCessionFormLogicProps {
   cession?: Cession | null;
@@ -21,6 +24,15 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
   });
 
   const [errors, setErrors] = useState<CessionFormErrors>({});
+  const [validationBlocked, setValidationBlocked] = useState(false);
+
+  // Get repair order data when one is selected
+  const { order } = useRepairOrder(formData.repair_order_id || undefined);
+  const { client } = useClient(order?.client_id || undefined);
+  const { vehicles } = useClientVehicles(order?.client_id || undefined);
+
+  // Find the specific vehicle for this repair order
+  const repairOrderVehicle = vehicles?.find(v => v.id === order?.vehicle_id);
 
   // Determiner si c'est en lecture seule
   const isReadOnly = cession?.status === 'payee';
@@ -41,6 +53,50 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
     }
   }, [cession]);
 
+  const validateRepairOrderData = (repairOrderId: string): string | null => {
+    if (!order || !client || !repairOrderVehicle) {
+      return "Impossible de récupérer les données de l'ordre de réparation, du client ou du véhicule.";
+    }
+
+    const missingClientFields = [];
+    const missingVehicleDocuments = [];
+
+    // Vérifier les champs obligatoires du client
+    if (!client.first_name) missingClientFields.push("Prénom");
+    if (!client.last_name) missingClientFields.push("Nom");
+    if (!client.email) missingClientFields.push("Email");
+    if (!client.phone) missingClientFields.push("Téléphone");
+    if (!client.address) missingClientFields.push("Adresse");
+    if (!client.city) missingClientFields.push("Ville");
+    if (!client.postal_code) missingClientFields.push("Code postal");
+
+    // Vérifier les photos du permis de conduire
+    if (!client.driver_license_front_url) missingClientFields.push("Photo recto du permis de conduire");
+    if (!client.driver_license_back_url) missingClientFields.push("Photo verso du permis de conduire");
+
+    // Vérifier les photos du certificat d'immatriculation
+    if (!repairOrderVehicle.registration_front_url) missingVehicleDocuments.push("Photo recto du certificat d'immatriculation");
+    if (!repairOrderVehicle.registration_back_url) missingVehicleDocuments.push("Photo verso du certificat d'immatriculation");
+
+    if (missingClientFields.length > 0 || missingVehicleDocuments.length > 0) {
+      let errorMessage = "Des informations obligatoires sont manquantes :\n";
+      
+      if (missingClientFields.length > 0) {
+        errorMessage += `\nFiche client : ${missingClientFields.join(", ")}`;
+      }
+      
+      if (missingVehicleDocuments.length > 0) {
+        errorMessage += `\nFiche véhicule : ${missingVehicleDocuments.join(", ")}`;
+      }
+
+      errorMessage += "\n\nVeuillez compléter ces informations avant de pouvoir créer une cession de créance.";
+      
+      return errorMessage;
+    }
+
+    return null;
+  };
+
   const handleChange = (field: keyof CessionFormData, value: any) => {
     setFormData(prev => ({
       ...prev,
@@ -54,9 +110,30 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
         [field]: undefined
       }));
     }
+
+    // Si c'est le champ repair_order_id, effectuer la validation
+    if (field === 'repair_order_id' && value) {
+      const validationError = validateRepairOrderData(value);
+      if (validationError) {
+        setErrors(prev => ({
+          ...prev,
+          repair_order_id: validationError
+        }));
+        setValidationBlocked(true);
+      } else {
+        setValidationBlocked(false);
+      }
+    } else if (field === 'repair_order_id' && !value) {
+      setValidationBlocked(false);
+    }
   };
 
   const validateForm = (): boolean => {
+    // Si la validation est bloquée à cause des données manquantes, empêcher la soumission
+    if (validationBlocked) {
+      return false;
+    }
+
     const newErrors: CessionFormErrors = {};
 
     if (!formData.repair_order_id) {
@@ -113,6 +190,7 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
     formData,
     errors,
     isReadOnly,
+    validationBlocked,
     handleChange,
     validateForm,
     prepareSubmitData

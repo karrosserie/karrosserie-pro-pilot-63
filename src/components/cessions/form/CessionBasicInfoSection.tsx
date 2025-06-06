@@ -56,7 +56,7 @@ export const CessionBasicInfoSection = ({
           </SelectContent>
         </Select>
         {errors.repair_order_id && (
-          <p className="text-sm text-red-600">{errors.repair_order_id}</p>
+          <div className="text-sm text-red-600 whitespace-pre-line">{errors.repair_order_id}</div>
         )}
       </div>
 
