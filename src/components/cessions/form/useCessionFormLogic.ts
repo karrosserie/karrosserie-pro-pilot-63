@@ -5,7 +5,6 @@ import { CessionFormData, CessionFormErrors } from './types';
 import { useRepairOrder } from '@/hooks/use-repair-orders';
 import { useClient } from '@/hooks/use-clients';
 import { useClientVehicles } from '@/hooks/use-vehicles';
-import { toast } from '@/hooks/use-toast';
 
 interface UseCessionFormLogicProps {
   cession?: Cession | null;
@@ -69,13 +68,6 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
       if (validationError) {
         setValidationErrorMessage(validationError);
         setValidationBlocked(true);
-        
-        // Show toast notification
-        toast({
-          title: "Données incomplètes",
-          description: "L'ordre de réparation sélectionné contient des données manquantes. Cliquez pour voir les détails.",
-          variant: "destructive"
-        });
       } else {
         // Clear any previous errors
         setValidationErrorMessage(null);
@@ -97,10 +89,9 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
     const missingClientFields = [];
     const missingVehicleDocuments = [];
 
-    // Vérifier les champs obligatoires du client
+    // Vérifier les champs obligatoires du client (sans l'email)
     if (!client.first_name) missingClientFields.push("Prénom");
     if (!client.last_name) missingClientFields.push("Nom");
-    if (!client.email) missingClientFields.push("Email");
     if (!client.phone) missingClientFields.push("Téléphone");
     if (!client.address) missingClientFields.push("Adresse");
     if (!client.city) missingClientFields.push("Ville");

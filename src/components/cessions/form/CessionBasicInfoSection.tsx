@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -52,7 +53,9 @@ export const CessionBasicInfoSection = ({
         
         {/* Ordre de réparation seul sur sa ligne */}
         <div className="space-y-2">
-          <Label htmlFor="repair_order_id">Ordre de réparation *</Label>
+          <Label htmlFor="repair_order_id">
+            Ordre de réparation <span className="text-red-500">*</span>
+          </Label>
           <Select
             value={formData.repair_order_id || ''}
             onValueChange={(value) => onFieldChange('repair_order_id', value)}
@@ -76,7 +79,9 @@ export const CessionBasicInfoSection = ({
         {/* Numéro de sinistre, Date du sinistre et Numéro de police sur la même ligne */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="incident_number">Numéro de sinistre *</Label>
+            <Label htmlFor="incident_number">
+              Numéro de sinistre <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="incident_number"
               value={formData.incident_number}
@@ -89,7 +94,9 @@ export const CessionBasicInfoSection = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="incident_date">Date du sinistre *</Label>
+            <Label htmlFor="incident_date">
+              Date du sinistre <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="incident_date"
               type="date"
@@ -102,7 +109,9 @@ export const CessionBasicInfoSection = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="policy_number">Numéro de police *</Label>
+            <Label htmlFor="policy_number">
+              Numéro de police <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="policy_number"
               value={formData.policy_number}
@@ -117,7 +126,9 @@ export const CessionBasicInfoSection = ({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="report_number">Numéro de rapport *</Label>
+            <Label htmlFor="report_number">
+              Numéro de rapport <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="report_number"
               value={formData.report_number}
@@ -130,7 +141,9 @@ export const CessionBasicInfoSection = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="expert_name">Nom de l'expert *</Label>
+            <Label htmlFor="expert_name">
+              Nom de l'expert <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="expert_name"
               value={formData.expert_name}
@@ -145,7 +158,9 @@ export const CessionBasicInfoSection = ({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="insurance_company_id">Assurance *</Label>
+            <Label htmlFor="insurance_company_id">
+              Assurance <span className="text-red-500">*</span>
+            </Label>
             <Select
               value={formData.insurance_company_id || ''}
               onValueChange={(value) => onFieldChange('insurance_company_id', value)}
@@ -167,7 +182,9 @@ export const CessionBasicInfoSection = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="bank_account_id">Compte bancaire *</Label>
+            <Label htmlFor="bank_account_id">
+              Compte bancaire <span className="text-red-500">*</span>
+            </Label>
             <Select
               value={formData.bank_account_id || ''}
               onValueChange={(value) => onFieldChange('bank_account_id', value)}
