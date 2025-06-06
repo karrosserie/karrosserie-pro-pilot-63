@@ -42,11 +42,11 @@ export const cessionsService = {
       throw new Error(error.message);
     }
     
-    // Transform data to match our extended interface
+    // Transform data to match our extended interface using safe property access
     return (data || []).map(item => ({
       ...item,
-      reference: item.reference || '',
-      status: (item.status as any) || 'en_attente'
+      reference: (item as any).reference || '',
+      status: (item as any).status || 'en_attente'
     })) as Cession[];
   },
 
@@ -65,11 +65,11 @@ export const cessionsService = {
       throw new Error(error.message);
     }
     
-    // Transform data to match our extended interface
+    // Transform data to match our extended interface using safe property access
     return {
       ...data,
-      reference: data.reference || '',
-      status: (data.status as any) || 'en_attente'
+      reference: (data as any).reference || '',
+      status: (data as any).status || 'en_attente'
     } as Cession;
   },
   
@@ -91,8 +91,8 @@ export const cessionsService = {
     
     return {
       ...data,
-      reference: data.reference || '',
-      status: (data.status as any) || 'en_attente'
+      reference: (data as any).reference || '',
+      status: (data as any).status || 'en_attente'
     } as Cession;
   },
   
@@ -111,8 +111,8 @@ export const cessionsService = {
     
     return {
       ...data,
-      reference: data.reference || '',
-      status: (data.status as any) || 'en_attente'
+      reference: (data as any).reference || '',
+      status: (data as any).status || 'en_attente'
     } as Cession;
   },
   
