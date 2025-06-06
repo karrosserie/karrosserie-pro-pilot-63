@@ -7,6 +7,8 @@ import { CessionFormData, CessionFormErrors } from './types';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { useAccounts } from '@/hooks/use-accounts';
 import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface CessionBasicInfoSectionProps {
   formData: CessionFormData;
@@ -22,6 +24,14 @@ export const CessionBasicInfoSection = ({
   const { orders, isLoading: isLoadingOrders } = useRepairOrders();
   const { accounts, isLoading: isLoadingAccounts } = useAccounts();
   const { insuranceCompanies, isLoading: isLoadingInsurance } = useInsuranceCompanies();
+
+  const formatRepairOrderDisplay = (order: any) => {
+    const clientName = order.clients ? `${order.clients.first_name} ${order.clients.last_name}` : 'Client non assigné';
+    const vehicleInfo = order.vehicles ? `${order.vehicles.brand} ${order.vehicles.model} - ${order.vehicles.license_plate}` : 'Véhicule non assigné';
+    const orderDate = order.created_at ? format(new Date(order.created_at), 'dd/MM/yyyy', { locale: fr }) : '';
+    
+    return `Ordre n°${order.reference} du ${orderDate} - ${clientName} - ${vehicleInfo}`;
+  };
 
   return (
     <div className="space-y-4">
@@ -40,7 +50,7 @@ export const CessionBasicInfoSection = ({
             <SelectContent>
               {orders?.map((order) => (
                 <SelectItem key={order.id} value={order.id}>
-                  {order.reference} - {order.clients ? `${order.clients.first_name} ${order.clients.last_name}` : 'Client non assigné'}
+                  {formatRepairOrderDisplay(order)}
                 </SelectItem>
               ))}
             </SelectContent>
