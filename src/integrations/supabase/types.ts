@@ -233,6 +233,60 @@ export type Database = {
         }
         Relationships: []
       }
+      company_info: {
+        Row: {
+          address: string
+          city: string
+          created_at: string
+          email: string
+          id: string
+          logo_url: string | null
+          name: string
+          notifications: Json
+          phone: string
+          siren: string
+          siret: string
+          tva: string
+          updated_at: string
+          user_id: string
+          zipcode: string
+        }
+        Insert: {
+          address?: string
+          city?: string
+          created_at?: string
+          email?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          notifications?: Json
+          phone?: string
+          siren?: string
+          siret?: string
+          tva?: string
+          updated_at?: string
+          user_id: string
+          zipcode?: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          created_at?: string
+          email?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          notifications?: Json
+          phone?: string
+          siren?: string
+          siret?: string
+          tva?: string
+          updated_at?: string
+          user_id?: string
+          zipcode?: string
+        }
+        Relationships: []
+      }
       credits: {
         Row: {
           amount: number
@@ -638,6 +692,7 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          phone_number: string | null
           role: string | null
           updated_at: string | null
         }
@@ -649,6 +704,7 @@ export type Database = {
           first_name?: string | null
           id: string
           last_name?: string | null
+          phone_number?: string | null
           role?: string | null
           updated_at?: string | null
         }
@@ -660,6 +716,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          phone_number?: string | null
           role?: string | null
           updated_at?: string | null
         }
