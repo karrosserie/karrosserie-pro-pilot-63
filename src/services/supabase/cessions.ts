@@ -77,13 +77,21 @@ export const cessionsService = {
   },
   
   create: async (cession: NewCession): Promise<Cession> => {
+    console.log('Creating cession with data:', cession);
+    
+    // Ensure insurance_company_id is properly formatted as UUID or null
+    const processedCession = {
+      ...cession,
+      reference: cession.reference,
+      status: cession.status || 'en_attente',
+      insurance_company_id: cession.insurance_company_id || null
+    };
+    
+    console.log('Processed cession data:', processedCession);
+    
     const { data, error } = await supabase
       .from('cessions')
-      .insert([{
-        ...cession,
-        reference: cession.reference,
-        status: cession.status || 'en_attente'
-      } as any])
+      .insert([processedCession as any])
       .select()
       .single();
       
