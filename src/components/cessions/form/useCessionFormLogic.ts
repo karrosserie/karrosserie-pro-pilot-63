@@ -27,9 +27,9 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
   const [validationBlocked, setValidationBlocked] = useState(false);
 
   // Get repair order data when one is selected
-  const { order } = useRepairOrder(formData.repair_order_id || undefined);
-  const { client } = useClient(order?.client_id || undefined);
-  const { vehicles } = useClientVehicles(order?.client_id || undefined);
+  const { order, isLoading: isLoadingOrder } = useRepairOrder(formData.repair_order_id || undefined);
+  const { client, isLoading: isLoadingClient } = useClient(order?.client_id || undefined);
+  const { vehicles, isLoading: isLoadingVehicles } = useClientVehicles(order?.client_id || undefined);
 
   // Find the specific vehicle for this repair order
   const repairOrderVehicle = vehicles?.find(v => v.id === order?.vehicle_id);
@@ -53,8 +53,44 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
     }
   }, [cession]);
 
-  const validateRepairOrderData = (repairOrderId: string): string | null => {
+  // Effect to validate repair order data when all data is loaded
+  useEffect(() => {
+    if (formData.repair_order_id && !isLoadingOrder && !isLoadingClient && !isLoadingVehicles) {
+      console.log('Validating repair order data:', {
+        order,
+        client,
+        repairOrderVehicle,
+        vehicles: vehicles?.length
+      });
+      
+      const validationError = validateRepairOrderData();
+      if (validationError) {
+        setErrors(prev => ({
+          ...prev,
+          repair_order_id: validationError
+        }));
+        setValidationBlocked(true);
+      } else {
+        // Clear any previous errors
+        setErrors(prev => ({
+          ...prev,
+          repair_order_id: undefined
+        }));
+        setValidationBlocked(false);
+      }
+    } else if (!formData.repair_order_id) {
+      // Clear errors and unblock validation when no repair order is selected
+      setErrors(prev => ({
+        ...prev,
+        repair_order_id: undefined
+      }));
+      setValidationBlocked(false);
+    }
+  }, [formData.repair_order_id, order, client, repairOrderVehicle, isLoadingOrder, isLoadingClient, isLoadingVehicles]);
+
+  const validateRepairOrderData = (): string | null => {
     if (!order || !client || !repairOrderVehicle) {
+      console.log('Missing data:', { order: !!order, client: !!client, repairOrderVehicle: !!repairOrderVehicle });
       return "Impossible de récupérer les données de l'ordre de réparation, du client ou du véhicule.";
     }
 
@@ -103,28 +139,12 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
       [field]: value
     }));
 
-    // Clear error when field is modified
-    if (errors[field]) {
+    // Clear error when field is modified (except for repair_order_id which will be validated in useEffect)
+    if (errors[field] && field !== 'repair_order_id') {
       setErrors(prev => ({
         ...prev,
         [field]: undefined
       }));
-    }
-
-    // Si c'est le champ repair_order_id, effectuer la validation
-    if (field === 'repair_order_id' && value) {
-      const validationError = validateRepairOrderData(value);
-      if (validationError) {
-        setErrors(prev => ({
-          ...prev,
-          repair_order_id: validationError
-        }));
-        setValidationBlocked(true);
-      } else {
-        setValidationBlocked(false);
-      }
-    } else if (field === 'repair_order_id' && !value) {
-      setValidationBlocked(false);
     }
   };
 
