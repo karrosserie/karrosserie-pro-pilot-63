@@ -9,7 +9,6 @@ import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { PersonalInfoForm } from '@/components/profile/PersonalInfoForm';
 import { PersonalInfoDisplay } from '@/components/profile/PersonalInfoDisplay';
 import { SecurityTab } from '@/components/profile/SecurityTab';
-import { PreferencesTab } from '@/components/profile/PreferencesTab';
 
 const ProfilePage = () => {
   const { user, profile, updateProfileState } = useAuth();
@@ -49,7 +48,6 @@ const ProfilePage = () => {
         <TabsList className="mb-6">
           <TabsTrigger value="personal">Informations personnelles</TabsTrigger>
           <TabsTrigger value="security">Sécurité</TabsTrigger>
-          <TabsTrigger value="preferences">Préférences</TabsTrigger>
         </TabsList>
         
         <TabsContent value="personal">
@@ -81,10 +79,6 @@ const ProfilePage = () => {
         
         <TabsContent value="security">
           <SecurityTab />
-        </TabsContent>
-        
-        <TabsContent value="preferences">
-          <PreferencesTab />
         </TabsContent>
       </Tabs>
     </div>
