@@ -7,7 +7,7 @@ export interface CompanyInfo {
   name: string;
   email: string;
   address: string;
-  zipcode: string; // Changé de zipCode à zipcode pour correspondre à la DB
+  zipcode: string;
   city: string;
   phone: string;
   siren: string;
@@ -25,6 +25,8 @@ export interface CompanyInfo {
 
 export const companyService = {
   async getCompanyInfo(userId: string): Promise<CompanyInfo | null> {
+    console.log('Chargement des données entreprise pour userId:', userId);
+    
     const { data, error } = await supabase
       .from('company_info')
       .select('*')
@@ -32,13 +34,17 @@ export const companyService = {
       .single();
 
     if (error) {
+      console.log('Erreur lors du chargement:', error);
       if (error.code === 'PGRST116') {
         // No rows found
+        console.log('Aucune donnée trouvée pour cet utilisateur');
         return null;
       }
       throw new Error(error.message);
     }
 
+    console.log('Données chargées:', data);
+    
     // Transform the data to match our interface
     return {
       ...data,
@@ -51,12 +57,14 @@ export const companyService = {
   },
 
   async updateCompanyInfo(userId: string, companyData: Partial<CompanyInfo>): Promise<CompanyInfo> {
+    console.log('Sauvegarde des données entreprise:', { userId, companyData });
+    
     const dataToUpdate = {
       user_id: userId,
       name: companyData.name || '',
       email: companyData.email || '',
       address: companyData.address || '',
-      zipcode: companyData.zipcode || '', // Changé de zipCode à zipcode
+      zipcode: companyData.zipcode || '',
       city: companyData.city || '',
       phone: companyData.phone || '',
       siren: companyData.siren || '',
@@ -67,6 +75,8 @@ export const companyService = {
       updated_at: new Date().toISOString()
     };
 
+    console.log('Données à sauvegarder:', dataToUpdate);
+
     const { data, error } = await supabase
       .from('company_info')
       .upsert(dataToUpdate, { onConflict: 'user_id' })
@@ -74,8 +84,11 @@ export const companyService = {
       .single();
 
     if (error) {
+      console.error('Erreur lors de la sauvegarde:', error);
       throw new Error(error.message);
     }
+
+    console.log('Données sauvegardées avec succès:', data);
 
     // Transform the data to match our interface
     return {

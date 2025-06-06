@@ -11,7 +11,7 @@ export function useCompany() {
     name: '',
     email: '',
     address: '',
-    zipcode: '', // Changé de zipCode à zipcode
+    zipcode: '',
     city: '',
     phone: '',
     siren: '',
@@ -35,8 +35,10 @@ export function useCompany() {
       try {
         const data = await companyService.getCompanyInfo(user.id);
         if (data) {
+          // Mettre à jour avec les données de la base
           setCompanyData(data);
         }
+        // Si data est null, on garde les valeurs par défaut
       } catch (error) {
         console.error('Erreur lors du chargement des données:', error);
         toast({
@@ -63,6 +65,7 @@ export function useCompany() {
         title: "Données sauvegardées",
         description: "Les informations de votre entreprise ont été mises à jour.",
       });
+      return updatedData;
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
       toast({
@@ -70,6 +73,7 @@ export function useCompany() {
         description: "Impossible de sauvegarder les données.",
         variant: "destructive",
       });
+      throw error;
     } finally {
       setIsSaving(false);
     }
