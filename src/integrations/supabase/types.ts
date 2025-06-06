@@ -136,42 +136,69 @@ export type Database = {
         Row: {
           bank_account_id: string | null
           buyer_contact: string | null
-          buyer_name: string
-          created_at: string | null
+          buyer_name: string | null
+          created_at: string
           document_url: string | null
+          expert_name: string | null
           id: string
+          incident_date: string | null
+          incident_number: string | null
+          insurance_company_id: string | null
           notes: string | null
-          sale_amount: number
-          sale_date: string
-          updated_at: string | null
+          policy_number: string | null
+          reference: string
+          repair_order_id: string | null
+          report_number: string | null
+          sale_amount: number | null
+          sale_date: string | null
+          status: string | null
+          updated_at: string
           user_id: string
           vehicle_id: string | null
         }
         Insert: {
           bank_account_id?: string | null
           buyer_contact?: string | null
-          buyer_name: string
-          created_at?: string | null
+          buyer_name?: string | null
+          created_at?: string
           document_url?: string | null
+          expert_name?: string | null
           id?: string
+          incident_date?: string | null
+          incident_number?: string | null
+          insurance_company_id?: string | null
           notes?: string | null
-          sale_amount: number
-          sale_date: string
-          updated_at?: string | null
+          policy_number?: string | null
+          reference?: string
+          repair_order_id?: string | null
+          report_number?: string | null
+          sale_amount?: number | null
+          sale_date?: string | null
+          status?: string | null
+          updated_at?: string
           user_id: string
           vehicle_id?: string | null
         }
         Update: {
           bank_account_id?: string | null
           buyer_contact?: string | null
-          buyer_name?: string
-          created_at?: string | null
+          buyer_name?: string | null
+          created_at?: string
           document_url?: string | null
+          expert_name?: string | null
           id?: string
+          incident_date?: string | null
+          incident_number?: string | null
+          insurance_company_id?: string | null
           notes?: string | null
-          sale_amount?: number
-          sale_date?: string
-          updated_at?: string | null
+          policy_number?: string | null
+          reference?: string
+          repair_order_id?: string | null
+          report_number?: string | null
+          sale_amount?: number | null
+          sale_date?: string | null
+          status?: string | null
+          updated_at?: string
           user_id?: string
           vehicle_id?: string | null
         }
@@ -181,6 +208,20 @@ export type Database = {
             columns: ["bank_account_id"]
             isOneToOne: false
             referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cessions_insurance_company_id_fkey"
+            columns: ["insurance_company_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cessions_repair_order_id_fkey"
+            columns: ["repair_order_id"]
+            isOneToOne: false
+            referencedRelation: "repair_orders"
             referencedColumns: ["id"]
           },
           {
