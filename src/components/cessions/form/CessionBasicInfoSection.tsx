@@ -23,8 +23,6 @@ export const CessionBasicInfoSection = ({
   return (
     <>
       <div className="space-y-4">
-        <h3 className="text-lg font-medium">Informations de base</h3>
-        
         {/* Ordre de réparation seul sur sa ligne */}
         <RepairOrderSelector 
           formData={formData}
