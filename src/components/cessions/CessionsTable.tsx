@@ -83,11 +83,18 @@ export const CessionsTable = ({
   const formatRepairOrderDisplay = (cession: Cession) => {
     if (!cession.repair_orders) return '-';
     
-    // Simuler les informations du client et du véhicule comme dans le formulaire
-    // En attendant d'avoir ces relations dans la requête
-    const orderDate = cession.created_at ? format(new Date(cession.created_at), 'dd/MM/yyyy', { locale: fr }) : '';
+    const clientName = cession.repair_orders.clients ? 
+      `${cession.repair_orders.clients.first_name} ${cession.repair_orders.clients.last_name}` : 
+      'Client non assigné';
     
-    return `Ordre n°${cession.repair_orders.reference} du ${orderDate}`;
+    const vehicleInfo = cession.repair_orders.vehicles ? 
+      `${cession.repair_orders.vehicles.brand} ${cession.repair_orders.vehicles.model} - ${cession.repair_orders.vehicles.license_plate}` : 
+      'Véhicule non assigné';
+    
+    const orderDate = cession.repair_orders.created_at ? 
+      format(new Date(cession.repair_orders.created_at), 'dd/MM/yyyy', { locale: fr }) : '';
+    
+    return `Ordre n°${cession.repair_orders.reference} du ${orderDate} - ${clientName} - ${vehicleInfo}`;
   };
 
   if (isLoading) {

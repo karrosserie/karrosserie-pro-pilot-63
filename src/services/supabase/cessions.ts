@@ -19,6 +19,16 @@ export interface Cession extends BaseCession {
   };
   repair_orders?: {
     reference: string;
+    created_at?: string;
+    clients?: {
+      first_name: string;
+      last_name: string;
+    };
+    vehicles?: {
+      brand: string;
+      model: string;
+      license_plate: string;
+    };
   };
   insurance_companies?: {
     name: string;
@@ -42,7 +52,12 @@ export const cessionsService = {
       .select(`
         *,
         vehicles(brand, model, license_plate),
-        repair_orders(reference),
+        repair_orders(
+          reference,
+          created_at,
+          clients(first_name, last_name),
+          vehicles(brand, model, license_plate)
+        ),
         insurance_companies(name)
       `)
       .order('sale_date', { ascending: false });
@@ -66,7 +81,12 @@ export const cessionsService = {
       .select(`
         *,
         vehicles(id, brand, model, license_plate),
-        repair_orders(reference),
+        repair_orders(
+          reference,
+          created_at,
+          clients(first_name, last_name),
+          vehicles(brand, model, license_plate)
+        ),
         insurance_companies(name)
       `)
       .eq('id', id)
