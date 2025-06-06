@@ -40,6 +40,7 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
 
   useEffect(() => {
     if (cession) {
+      console.log('Loading existing cession data:', cession);
       setFormData({
         repair_order_id: (cession as any).repair_order_id || null,
         bank_account_id: (cession as any).bank_account_id || null,
@@ -134,6 +135,7 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
   };
 
   const handleChange = (field: keyof CessionFormData, value: any) => {
+    console.log(`Field changed: ${field} = ${value}`);
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -149,51 +151,70 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
   };
 
   const validateForm = (): boolean => {
+    console.log('Starting form validation...');
+    console.log('Current form data:', formData);
+    console.log('Validation blocked:', validationBlocked);
+
     // Si la validation est bloquée à cause des données manquantes, empêcher la soumission
     if (validationBlocked) {
+      console.log('Validation blocked due to missing data');
       return false;
     }
 
     const newErrors: CessionFormErrors = {};
 
     if (!formData.repair_order_id) {
+      console.log('Missing repair_order_id');
       newErrors.repair_order_id = 'L\'ordre de réparation est obligatoire';
     }
 
     if (!formData.bank_account_id) {
+      console.log('Missing bank_account_id');
       newErrors.bank_account_id = 'Le compte bancaire est obligatoire';
     }
 
     if (!formData.incident_number.trim()) {
+      console.log('Missing incident_number');
       newErrors.incident_number = 'Le numéro de sinistre est obligatoire';
     }
 
     if (!formData.incident_date) {
+      console.log('Missing incident_date');
       newErrors.incident_date = 'La date du sinistre est obligatoire';
     }
 
     if (!formData.policy_number.trim()) {
+      console.log('Missing policy_number');
       newErrors.policy_number = 'Le numéro de police est obligatoire';
     }
 
     if (!formData.report_number.trim()) {
+      console.log('Missing report_number');
       newErrors.report_number = 'Le numéro de rapport est obligatoire';
     }
 
     if (!formData.expert_name.trim()) {
+      console.log('Missing expert_name');
       newErrors.expert_name = 'Le nom de l\'expert est obligatoire';
     }
 
     if (!formData.insurance_company_id) {
+      console.log('Missing insurance_company_id');
       newErrors.insurance_company_id = 'L\'assurance est obligatoire';
     }
 
+    console.log('Validation errors found:', newErrors);
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    
+    const isValid = Object.keys(newErrors).length === 0;
+    console.log('Form is valid:', isValid);
+    
+    return isValid;
   };
 
   const prepareSubmitData = (): Partial<Cession> => {
-    return {
+    console.log('Preparing submit data...');
+    const submitData = {
       repair_order_id: formData.repair_order_id,
       bank_account_id: formData.bank_account_id,
       incident_number: formData.incident_number,
@@ -204,6 +225,9 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
       insurance_company_id: formData.insurance_company_id,
       status: formData.status
     } as any;
+    
+    console.log('Submit data prepared:', submitData);
+    return submitData;
   };
 
   const clearValidationError = () => {

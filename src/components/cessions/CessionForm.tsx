@@ -35,9 +35,17 @@ export const CessionForm = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (isSubmitting) return;
+    console.log('Form submission started...');
+    console.log('isSubmitting:', isSubmitting);
     
+    if (isSubmitting) {
+      console.log('Already submitting, skipping...');
+      return;
+    }
+    
+    console.log('Starting form validation...');
     if (!validateForm()) {
+      console.log('Form validation failed');
       toast({
         title: "Erreur de validation",
         description: "Veuillez corriger les erreurs dans le formulaire.",
@@ -47,10 +55,14 @@ export const CessionForm = ({
     }
     
     try {
+      console.log('Form validation passed, preparing data...');
       const submitData = prepareSubmitData();
+      console.log('Calling onSubmit with data:', submitData);
       await onSubmit(submitData);
+      console.log('onSubmit completed successfully');
     } catch (error: any) {
       console.error('Error submitting cession:', error);
+      console.error('Error details:', error.message, error.stack);
     }
   };
 
