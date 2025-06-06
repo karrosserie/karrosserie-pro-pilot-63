@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,26 +11,115 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CreditCard, Settings as SettingsIcon, User, FileText, Bell } from 'lucide-react';
+import { CreditCard, Settings as SettingsIcon, User, FileText, Bell, Upload } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
+import { companyService } from '@/services/supabase/company';
+import { useStorage } from '@/hooks/use-storage';
+
+interface CompanyData {
+  name: string;
+  email: string;
+  address: string;
+  zipCode: string;
+  city: string;
+  phone: string;
+  siren: string;
+  siret: string;
+  tva: string;
+  logo_url?: string;
+  notifications: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+  };
+}
 
 const Settings = () => {
-  const [accountData, setAccountData] = useState({
-    name: 'Carrosserie Dupont',
-    email: 'contact@carrosseriedupont.fr',
-    address: '123 Rue des Réparations',
-    zipCode: '75001',
-    city: 'Paris',
-    phone: '01 23 45 67 89',
-    siren: '123456789',
-    siret: '12345678901234',
-    tva: 'FR12345678901',
-    logo: null,
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const { uploadDocument } = useStorage();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  
+  const [accountData, setAccountData] = useState<CompanyData>({
+    name: '',
+    email: '',
+    address: '',
+    zipCode: '',
+    city: '',
+    phone: '',
+    siren: '',
+    siret: '',
+    tva: '',
+    logo_url: '',
     notifications: {
       email: true,
       push: true,
       sms: false,
     }
   });
+
+  useEffect(() => {
+    const loadCompanyData = async () => {
+      if (!user) return;
+      
+      setIsLoading(true);
+      try {
+        const data = await companyService.getCompanyInfo(user.id);
+        if (data) {
+          setAccountData(data);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des données:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger les données de l'entreprise.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCompanyData();
+  }, [user, toast]);
+
+  const handleSave = async () => {
+    if (!user) return;
+    
+    setIsSaving(true);
+    try {
+      await companyService.updateCompanyInfo(user.id, accountData);
+      toast({
+        title: "Données sauvegardées",
+        description: "Les informations de votre entreprise ont été mises à jour.",
+      });
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder les données.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    try {
+      const logoUrl = await uploadDocument(file, 'company', 'logo');
+      if (logoUrl) {
+        setAccountData(prev => ({ ...prev, logo_url: logoUrl }));
+      }
+    } catch (error) {
+      console.error('Erreur lors du téléchargement du logo:', error);
+    }
+  };
 
   const handleSwitchChange = (key: string) => {
     setAccountData(prev => ({
@@ -41,6 +130,19 @@ const Settings = () => {
       }
     }));
   };
+
+  if (isLoading) {
+    return (
+      <div className="page-container">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-karrosserie-orange mx-auto"></div>
+            <p className="mt-2 text-gray-600">Chargement...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-container">
@@ -70,6 +172,48 @@ const Settings = () => {
         </TabsList>
         
         <TabsContent value="account" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Logo de l'entreprise</CardTitle>
+              <CardDescription>
+                Ajoutez votre logo pour l'afficher sur vos documents.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center space-x-4">
+                <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
+                  {accountData.logo_url ? (
+                    <img src={accountData.logo_url} alt="Logo" className="max-w-full max-h-full object-contain rounded-lg" />
+                  ) : (
+                    <FileText className="h-8 w-8 text-gray-400" />
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Input 
+                      type="file" 
+                      id="logo" 
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden" 
+                    />
+                    <Button 
+                      type="button" 
+                      variant="outline"
+                      onClick={() => document.getElementById('logo')?.click()}
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Choisir un fichier
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Formats acceptés : PNG, JPG. Taille maximale : 2 MB.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
           <Card>
             <CardHeader>
               <CardTitle>Informations de l'entreprise</CardTitle>
@@ -167,35 +311,13 @@ const Settings = () => {
               </div>
               
               <div className="flex justify-end">
-                <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
-                  Enregistrer
+                <Button 
+                  className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+                  onClick={handleSave}
+                  disabled={isSaving}
+                >
+                  {isSaving ? 'Enregistrement...' : 'Enregistrer'}
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Logo de l'entreprise</CardTitle>
-              <CardDescription>
-                Ajoutez votre logo pour l'afficher sur vos documents.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center space-x-4">
-                <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
-                  {accountData.logo ? (
-                    <img src={accountData.logo} alt="Logo" className="max-w-full max-h-full" />
-                  ) : (
-                    <FileText className="h-8 w-8 text-gray-400" />
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Input type="file" id="logo" className="w-full" />
-                  <p className="text-xs text-gray-500">
-                    Formats acceptés : PNG, JPG. Taille maximale : 2 MB.
-                  </p>
-                </div>
               </div>
             </CardContent>
           </Card>
