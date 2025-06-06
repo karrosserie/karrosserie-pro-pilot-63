@@ -30,14 +30,13 @@
   margin-right: 8px !important;
   width: 20px !important;
   height: 15px !important;
+  flex-shrink: 0 !important;
 }
 
-/* Ajouter le nom du pays et l'indicatif après le drapeau */
-.PhoneInputCountrySelectDropdown .PhoneInputCountrySelectOption::after {
-  content: attr(data-country-name) " " attr(data-calling-code) !important;
+.PhoneInputCountrySelectDropdown .PhoneInputCountrySelectOption .PhoneInputCountryName {
   font-size: 14px !important;
   color: hsl(var(--foreground)) !important;
-  margin-left: 8px !important;
+  margin-left: 4px !important;
 }
 
 /* Style pour l'option sélectionnée */
@@ -46,52 +45,6 @@
   color: hsl(var(--primary-foreground)) !important;
 }
 
-.PhoneInputCountrySelectDropdown .PhoneInputCountrySelectOption[aria-selected="true"]::after {
+.PhoneInputCountrySelectDropdown .PhoneInputCountrySelectOption[aria-selected="true"] .PhoneInputCountryName {
   color: hsl(var(--primary-foreground)) !important;
-}
-
-/* Masquer le texte par défaut pour ne garder que le drapeau */
-.PhoneInputCountrySelectDropdown .PhoneInputCountrySelectOption .PhoneInputCountryName {
-  display: none !important;
-}
-
-/* Personnalisation pour afficher le texte complet */
-.PhoneInputCountrySelectDropdown .PhoneInputCountrySelectOption[data-country="FR"]::after {
-  content: "France +33" !important;
-}
-
-.PhoneInputCountrySelectDropdown .PhoneInputCountrySelectOption[data-country="US"]::after {
-  content: "États-Unis +1" !important;
-}
-
-.PhoneInputCountrySelectDropdown .PhoneInputCountrySelectOption[data-country="GB"]::after {
-  content: "Royaume-Uni +44" !important;
-}
-
-.PhoneInputCountrySelectDropdown .PhoneInputCountrySelectOption[data-country="DE"]::after {
-  content: "Allemagne +49" !important;
-}
-
-.PhoneInputCountrySelectDropdown .PhoneInputCountrySelectOption[data-country="ES"]::after {
-  content: "Espagne +34" !important;
-}
-
-.PhoneInputCountrySelectDropdown .PhoneInputCountrySelectOption[data-country="IT"]::after {
-  content: "Italie +39" !important;
-}
-
-.PhoneInputCountrySelectDropdown .PhoneInputCountrySelectOption[data-country="BE"]::after {
-  content: "Belgique +32" !important;
-}
-
-.PhoneInputCountrySelectDropdown .PhoneInputCountrySelectOption[data-country="CH"]::after {
-  content: "Suisse +41" !important;
-}
-
-.PhoneInputCountrySelectDropdown .PhoneInputCountrySelectOption[data-country="CA"]::after {
-  content: "Canada +1" !important;
-}
-
-.PhoneInputCountrySelectDropdown .PhoneInputCountrySelectOption[data-country="AU"]::after {
-  content: "Australie +61" !important;
 }
