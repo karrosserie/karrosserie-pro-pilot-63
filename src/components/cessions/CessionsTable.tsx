@@ -96,11 +96,8 @@ export const CessionsTable = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Référence</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Acheteur</TableHead>
-            <TableHead>Véhicule</TableHead>
-            <TableHead>Montant</TableHead>
+            <TableHead>Ordre de réparation</TableHead>
+            <TableHead>Assurance</TableHead>
             <TableHead>Statut</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -109,18 +106,18 @@ export const CessionsTable = ({
           {cessions.length > 0 ? (
             cessions.map((cession) => (
               <TableRow key={cession.id}>
-                <TableCell className="font-medium">{cession.reference}</TableCell>
-                <TableCell>
-                  {cession.sale_date ? format(new Date(cession.sale_date), 'dd/MM/yyyy', { locale: fr }) : '-'}
-                </TableCell>
-                <TableCell>{cession.buyer_name}</TableCell>
-                <TableCell>
-                  {cession.vehicles ? 
-                    `${cession.vehicles.brand} ${cession.vehicles.model} - ${cession.vehicles.license_plate}` 
+                <TableCell className="font-medium">
+                  {cession.repair_orders ? 
+                    cession.repair_orders.reference 
                     : '-'
                   }
                 </TableCell>
-                <TableCell>{Number(cession.sale_amount).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</TableCell>
+                <TableCell>
+                  {cession.insurance_companies ? 
+                    cession.insurance_companies.name 
+                    : '-'
+                  }
+                </TableCell>
                 <TableCell>
                   <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(cession.status || '')}`}>
                     {getStatusLabel(cession.status || '')}
@@ -155,7 +152,7 @@ export const CessionsTable = ({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-4">
+              <TableCell colSpan={4} className="text-center py-4">
                 <div className="flex flex-col items-center justify-center py-8">
                   <FileText className="h-10 w-10 text-gray-400 mb-2" />
                   <h3 className="font-medium text-gray-900">Aucun résultat</h3>
