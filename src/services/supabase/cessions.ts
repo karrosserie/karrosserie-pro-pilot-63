@@ -42,7 +42,12 @@ export const cessionsService = {
       throw new Error(error.message);
     }
     
-    return data as Cession[];
+    // Transform data to match our extended interface
+    return (data || []).map(item => ({
+      ...item,
+      reference: item.reference || '',
+      status: (item.status as any) || 'en_attente'
+    })) as Cession[];
   },
 
   getById: async (id: string): Promise<Cession> => {
@@ -60,13 +65,22 @@ export const cessionsService = {
       throw new Error(error.message);
     }
     
-    return data as Cession;
+    // Transform data to match our extended interface
+    return {
+      ...data,
+      reference: data.reference || '',
+      status: (data.status as any) || 'en_attente'
+    } as Cession;
   },
   
   create: async (cession: NewCession): Promise<Cession> => {
     const { data, error } = await supabase
       .from('cessions')
-      .insert([cession as any])
+      .insert([{
+        ...cession,
+        reference: cession.reference,
+        status: cession.status || 'en_attente'
+      } as any])
       .select()
       .single();
       
@@ -75,7 +89,11 @@ export const cessionsService = {
       throw new Error(error.message);
     }
     
-    return data as Cession;
+    return {
+      ...data,
+      reference: data.reference || '',
+      status: (data.status as any) || 'en_attente'
+    } as Cession;
   },
   
   update: async (id: string, cession: UpdateCession): Promise<Cession> => {
@@ -91,7 +109,11 @@ export const cessionsService = {
       throw new Error(error.message);
     }
     
-    return data as Cession;
+    return {
+      ...data,
+      reference: data.reference || '',
+      status: (data.status as any) || 'en_attente'
+    } as Cession;
   },
   
   delete: async (id: string): Promise<boolean> => {

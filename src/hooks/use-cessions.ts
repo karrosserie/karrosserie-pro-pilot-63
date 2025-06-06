@@ -17,7 +17,18 @@ export function useCessions() {
   });
   
   const createCession = useMutation({
-    mutationFn: (newCession: NewCession) => cessionsService.create(newCession),
+    mutationFn: (newCession: Partial<NewCession>) => {
+      // Ensure required fields are present
+      const cessionData: NewCession = {
+        reference: newCession.reference || '',
+        buyer_name: newCession.buyer_name || '',
+        sale_amount: newCession.sale_amount || 0,
+        sale_date: newCession.sale_date || new Date().toISOString().split('T')[0],
+        ...newCession
+      } as NewCession;
+      
+      return cessionsService.create(cessionData);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cessions'] });
       toast({
