@@ -1,6 +1,6 @@
 
 import React from 'react';
-import PhoneInput from 'react-phone-number-input';
+import PhoneInput, { Country } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { cn } from '@/lib/utils';
 
@@ -10,7 +10,7 @@ interface PhoneInputFieldProps {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
-  defaultCountry?: string;
+  defaultCountry?: Country;
 }
 
 export const PhoneInputField: React.FC<PhoneInputFieldProps> = ({
@@ -35,9 +35,14 @@ export const PhoneInputField: React.FC<PhoneInputFieldProps> = ({
       )}
       style={{
         '--PhoneInputCountryFlag-aspectRatio': '1.5',
-        '--PhoneInputCountryFlag-height': '1em',
+        '--PhoneInputCountryFlag-height': '1.2em',
         '--PhoneInputCountrySelectArrow-color': 'currentColor',
-        '--PhoneInputCountrySelectArrow-opacity': '0.45'
+        '--PhoneInputCountrySelectArrow-opacity': '0.45',
+        '--PhoneInputCountrySelect-borderColor': 'hsl(var(--border))',
+        '--PhoneInputCountrySelect-borderRadius': '0.375rem',
+        '--PhoneInputCountrySelect-backgroundColor': 'hsl(var(--background))',
+        '--PhoneInputCountrySelect-boxShadow': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+        '--PhoneInputCountrySelect-zIndex': '50'
       } as any}
     />
   );
