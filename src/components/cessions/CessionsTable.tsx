@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -81,6 +80,16 @@ export const CessionsTable = ({
     }
   };
 
+  const formatRepairOrderDisplay = (cession: Cession) => {
+    if (!cession.repair_orders) return '-';
+    
+    // Simuler les informations du client et du véhicule comme dans le formulaire
+    // En attendant d'avoir ces relations dans la requête
+    const orderDate = cession.created_at ? format(new Date(cession.created_at), 'dd/MM/yyyy', { locale: fr }) : '';
+    
+    return `Ordre n°${cession.repair_orders.reference} du ${orderDate}`;
+  };
+
   if (isLoading) {
     return (
       <div className="card-container">
@@ -96,6 +105,7 @@ export const CessionsTable = ({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Date</TableHead>
             <TableHead>Ordre de réparation</TableHead>
             <TableHead>Assurance</TableHead>
             <TableHead>Statut</TableHead>
@@ -106,11 +116,14 @@ export const CessionsTable = ({
           {cessions.length > 0 ? (
             cessions.map((cession) => (
               <TableRow key={cession.id}>
-                <TableCell className="font-medium">
-                  {cession.repair_orders ? 
-                    cession.repair_orders.reference 
+                <TableCell>
+                  {cession.sale_date ? 
+                    format(new Date(cession.sale_date), 'dd/MM/yyyy', { locale: fr })
                     : '-'
                   }
+                </TableCell>
+                <TableCell className="font-medium">
+                  {formatRepairOrderDisplay(cession)}
                 </TableCell>
                 <TableCell>
                   {cession.insurance_companies ? 
@@ -152,7 +165,7 @@ export const CessionsTable = ({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={4} className="text-center py-4">
+              <TableCell colSpan={5} className="text-center py-4">
                 <div className="flex flex-col items-center justify-center py-8">
                   <FileText className="h-10 w-10 text-gray-400 mb-2" />
                   <h3 className="font-medium text-gray-900">Aucun résultat</h3>
