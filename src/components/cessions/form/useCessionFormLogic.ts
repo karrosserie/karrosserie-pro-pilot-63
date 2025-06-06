@@ -74,9 +74,9 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
     if (!client.driver_license_front_url) missingClientFields.push("Photo recto du permis de conduire");
     if (!client.driver_license_back_url) missingClientFields.push("Photo verso du permis de conduire");
 
-    // Vérifier les photos du certificat d'immatriculation
-    if (!repairOrderVehicle.registration_front_url) missingVehicleDocuments.push("Photo recto du certificat d'immatriculation");
-    if (!repairOrderVehicle.registration_back_url) missingVehicleDocuments.push("Photo verso du certificat d'immatriculation");
+    // Vérifier les photos du certificat d'immatriculation - corriger les noms des propriétés
+    if (!repairOrderVehicle.registration_document_front_url) missingVehicleDocuments.push("Photo recto du certificat d'immatriculation");
+    if (!repairOrderVehicle.registration_document_back_url) missingVehicleDocuments.push("Photo verso du certificat d'immatriculation");
 
     if (missingClientFields.length > 0 || missingVehicleDocuments.length > 0) {
       let errorMessage = "Des informations obligatoires sont manquantes :\n";
