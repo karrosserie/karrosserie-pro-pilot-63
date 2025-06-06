@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -74,25 +73,50 @@ export const cessionsService = {
         if (cession.repair_order_id) {
           console.log(`Fetching repair order for cession ${cession.id}, repair_order_id: ${cession.repair_order_id}`);
           
-          // Get repair order with client and vehicle info
-          const { data: repairOrder, error: repairOrderError } = await supabase
-            .from('repair_orders')
-            .select(`
-              reference,
-              created_at,
-              client_id,
-              vehicle_id,
-              clients(first_name, last_name),
-              vehicles(brand, model, license_plate)
-            `)
-            .eq('id', cession.repair_order_id)
-            .single();
-            
-          if (repairOrderError) {
-            console.error(`Error fetching repair order ${cession.repair_order_id}:`, repairOrderError);
-          } else {
-            console.log('Repair order data:', repairOrder);
-            repairOrderData = repairOrder;
+          try {
+            // First get the repair order
+            const { data: repairOrder, error: repairOrderError } = await supabase
+              .from('repair_orders')
+              .select('reference, created_at, client_id, vehicle_id')
+              .eq('id', cession.repair_order_id)
+              .single();
+              
+            if (repairOrderError) {
+              console.error(`Error fetching repair order ${cession.repair_order_id}:`, repairOrderError);
+            } else if (repairOrder) {
+              console.log('Repair order data:', repairOrder);
+              
+              // Get client data if client_id exists
+              let clientData = null;
+              if (repairOrder.client_id) {
+                const { data: client } = await supabase
+                  .from('clients')
+                  .select('first_name, last_name')
+                  .eq('id', repairOrder.client_id)
+                  .single();
+                clientData = client;
+              }
+              
+              // Get vehicle data if vehicle_id exists
+              let vehicleData = null;
+              if (repairOrder.vehicle_id) {
+                const { data: vehicle } = await supabase
+                  .from('vehicles')
+                  .select('brand, model, license_plate')
+                  .eq('id', repairOrder.vehicle_id)
+                  .single();
+                vehicleData = vehicle;
+              }
+              
+              repairOrderData = {
+                reference: repairOrder.reference,
+                created_at: repairOrder.created_at,
+                clients: clientData,
+                vehicles: vehicleData
+              };
+            }
+          } catch (error) {
+            console.error(`Error in repair order enrichment for ${cession.repair_order_id}:`, error);
           }
         }
         
