@@ -130,13 +130,28 @@
     @apply bg-karrosserie-orange text-white hover:bg-opacity-90;
   }
 
-  /* Supprimer la bordure orange au focus pour tous les éléments */
+  /* Supprimer complètement toutes les bordures orange au focus */
+  *:focus,
+  *:focus-visible,
+  input:focus,
   input:focus-visible,
+  textarea:focus,
   textarea:focus-visible,
+  select:focus,
   select:focus-visible,
+  button:focus,
   button:focus-visible,
+  [role="button"]:focus,
   [role="button"]:focus-visible,
-  [role="combobox"]:focus-visible {
-    @apply outline-none ring-0;
+  [role="combobox"]:focus,
+  [role="combobox"]:focus-visible,
+  [role="textbox"]:focus,
+  [role="textbox"]:focus-visible,
+  [data-radix-collection-item]:focus,
+  [data-radix-collection-item]:focus-visible {
+    @apply outline-none ring-0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: hsl(var(--border)) !important;
   }
 }
