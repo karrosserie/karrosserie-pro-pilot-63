@@ -4,9 +4,13 @@ import { useAuthActions } from './auth/use-auth-actions';
 import { useAuthUtilities } from './auth/use-auth-utilities';
 
 export const useAuthState = () => {
-  const { session, user, profile, loading, setLoading } = useAuthSession();
+  const { session, user, profile, loading, setLoading, setProfile } = useAuthSession();
   const { signIn, signUp, signOut } = useAuthActions(setLoading);
   const { resendEmailVerification, resetPassword, updatePassword } = useAuthUtilities(setLoading);
+  
+  const updateProfileState = (newProfile) => {
+    setProfile(newProfile);
+  };
 
   return {
     session,
@@ -19,5 +23,6 @@ export const useAuthState = () => {
     resendEmailVerification,
     resetPassword,
     updatePassword,
+    updateProfileState,
   };
 };

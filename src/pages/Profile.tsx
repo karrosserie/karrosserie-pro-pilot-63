@@ -12,7 +12,7 @@ import { useForm } from 'react-hook-form';
 import { User } from 'lucide-react';
 
 const ProfilePage = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, updateProfileState } = useAuth();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm<Profile>({
@@ -26,7 +26,11 @@ const ProfilePage = () => {
     if (!user) return;
     
     try {
-      await profileService.updateProfile(user.id, data);
+      const updatedProfile = await profileService.updateProfile(user.id, data);
+      // Update the profile state in AuthContext
+      if (updatedProfile) {
+        updateProfileState(updatedProfile);
+      }
       toast({
         title: "Profil mis à jour",
         description: "Vos informations ont été mises à jour avec succès.",

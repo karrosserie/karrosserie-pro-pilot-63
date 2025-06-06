@@ -63,5 +63,6 @@ export const useAuthSession = () => {
     profile,
     loading,
     setLoading,
+    setProfile,
   };
 };
