@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { TypeProofFields } from './form/TypeProofFields';
 import { BasicFields } from './form/BasicFields';
@@ -14,6 +15,7 @@ interface ExpenseFormData {
   total_amount: number | string;
   supplier: string;
   category: string;
+  status: string;
   assign_to_vehicle: boolean;
   vehicle_id?: string;
 }
@@ -39,6 +41,7 @@ export const ExpenseForm = ({
     total_amount: '',
     supplier: '',
     category: 'Autres',
+    status: 'En attente',
     assign_to_vehicle: false,
     vehicle_id: ''
   });
@@ -53,6 +56,7 @@ export const ExpenseForm = ({
         total_amount: expense.total_amount,
         supplier: expense.supplier,
         category: expense.category,
+        status: expense.status || 'En attente',
         assign_to_vehicle: expense.assign_to_vehicle,
         vehicle_id: expense.vehicle_id || ''
       });

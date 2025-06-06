@@ -23,13 +23,33 @@ export const VehicleAssignmentFields = ({ formData, onChange }: VehicleAssignmen
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center space-x-2">
-        <Switch
-          id="assign_to_vehicle"
-          checked={formData.assign_to_vehicle}
-          onCheckedChange={handleSwitchChange}
-        />
-        <Label htmlFor="assign_to_vehicle">Affecter à un véhicule existant ?</Label>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="status" required>Statut</Label>
+          <Select 
+            value={formData.status} 
+            onValueChange={(value) => onChange('status', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Sélectionner un statut" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="En attente">En attente</SelectItem>
+              <SelectItem value="Validé">Validé</SelectItem>
+              <SelectItem value="Payé">Payé</SelectItem>
+              <SelectItem value="Refusé">Refusé</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center space-x-2 pt-6">
+          <Switch
+            id="assign_to_vehicle"
+            checked={formData.assign_to_vehicle}
+            onCheckedChange={handleSwitchChange}
+          />
+          <Label htmlFor="assign_to_vehicle">Affecter à un véhicule existant ?</Label>
+        </div>
       </div>
 
       {formData.assign_to_vehicle && (

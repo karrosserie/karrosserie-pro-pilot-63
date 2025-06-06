@@ -10,6 +10,7 @@ export interface Expense {
   total_amount: number | string;
   supplier: string;
   category: string;
+  status: string;
   assign_to_vehicle: boolean;
   vehicle_id?: string;
 }
