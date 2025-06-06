@@ -37,51 +37,31 @@ export const CessionBasicInfoSection = ({
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Informations de base</h3>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="repair_order_id">Ordre de réparation *</Label>
-          <Select
-            value={formData.repair_order_id || ''}
-            onValueChange={(value) => onFieldChange('repair_order_id', value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={isLoadingOrders ? "Chargement..." : "Sélectionner un ordre de réparation"} />
-            </SelectTrigger>
-            <SelectContent>
-              {orders?.map((order) => (
-                <SelectItem key={order.id} value={order.id}>
-                  {formatRepairOrderDisplay(order)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.repair_order_id && (
-            <p className="text-sm text-red-600">{errors.repair_order_id}</p>
-          )}
-        </div>
+      {/* Ordre de réparation seul sur sa ligne */}
+      <div className="space-y-2">
+        <Label htmlFor="repair_order_id">Ordre de réparation *</Label>
+        <Select
+          value={formData.repair_order_id || ''}
+          onValueChange={(value) => onFieldChange('repair_order_id', value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder={isLoadingOrders ? "Chargement..." : "Sélectionner un ordre de réparation"} />
+          </SelectTrigger>
+          <SelectContent>
+            {orders?.map((order) => (
+              <SelectItem key={order.id} value={order.id}>
+                {formatRepairOrderDisplay(order)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {errors.repair_order_id && (
+          <p className="text-sm text-red-600">{errors.repair_order_id}</p>
+        )}
+      </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="bank_account_id">Compte bancaire *</Label>
-          <Select
-            value={formData.bank_account_id || ''}
-            onValueChange={(value) => onFieldChange('bank_account_id', value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={isLoadingAccounts ? "Chargement..." : "Sélectionner un compte bancaire"} />
-            </SelectTrigger>
-            <SelectContent>
-              {accounts?.map((account) => (
-                <SelectItem key={account.id} value={account.id}>
-                  {account.name} - {account.iban}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.bank_account_id && (
-            <p className="text-sm text-red-600">{errors.bank_account_id}</p>
-          )}
-        </div>
-
+      {/* Numéro de sinistre, Date du sinistre et Numéro de police sur la même ligne */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="incident_number">Numéro de sinistre *</Label>
           <Input
@@ -120,7 +100,9 @@ export const CessionBasicInfoSection = ({
             <p className="text-sm text-red-600">{errors.policy_number}</p>
           )}
         </div>
+      </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="report_number">Numéro de rapport *</Label>
           <Input
@@ -146,7 +128,9 @@ export const CessionBasicInfoSection = ({
             <p className="text-sm text-red-600">{errors.expert_name}</p>
           )}
         </div>
+      </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="insurance_company_id">Assurance *</Label>
           <Select
@@ -166,6 +150,28 @@ export const CessionBasicInfoSection = ({
           </Select>
           {errors.insurance_company_id && (
             <p className="text-sm text-red-600">{errors.insurance_company_id}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="bank_account_id">Compte bancaire *</Label>
+          <Select
+            value={formData.bank_account_id || ''}
+            onValueChange={(value) => onFieldChange('bank_account_id', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={isLoadingAccounts ? "Chargement..." : "Sélectionner un compte bancaire"} />
+            </SelectTrigger>
+            <SelectContent>
+              {accounts?.map((account) => (
+                <SelectItem key={account.id} value={account.id}>
+                  {account.name} - {account.iban}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.bank_account_id && (
+            <p className="text-sm text-red-600">{errors.bank_account_id}</p>
           )}
         </div>
       </div>
