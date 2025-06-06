@@ -134,6 +134,7 @@ export type Database = {
       }
       cessions: {
         Row: {
+          bank_account_id: string | null
           buyer_contact: string | null
           buyer_name: string
           created_at: string | null
@@ -147,6 +148,7 @@ export type Database = {
           vehicle_id: string | null
         }
         Insert: {
+          bank_account_id?: string | null
           buyer_contact?: string | null
           buyer_name: string
           created_at?: string | null
@@ -160,6 +162,7 @@ export type Database = {
           vehicle_id?: string | null
         }
         Update: {
+          bank_account_id?: string | null
           buyer_contact?: string | null
           buyer_name?: string
           created_at?: string | null
@@ -173,6 +176,13 @@ export type Database = {
           vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "cessions_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "cessions_vehicle_id_fkey"
             columns: ["vehicle_id"]
