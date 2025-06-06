@@ -1,40 +1,20 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { profileService, Profile } from '@/services/supabase/profiles';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
-import { useForm } from 'react-hook-form';
-import { User, Phone } from 'lucide-react';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-
-const profileSchema = z.object({
-  first_name: z.string().min(1, { message: "Le prénom est requis" }),
-  last_name: z.string().min(1, { message: "Le nom est requis" }),
-  phone_number: z.string().min(1, { message: "Le numéro de téléphone est requis" }),
-});
-
-type ProfileFormValues = z.infer<typeof profileSchema>;
+import { ProfileHeader } from '@/components/profile/ProfileHeader';
+import { PersonalInfoForm } from '@/components/profile/PersonalInfoForm';
+import { PersonalInfoDisplay } from '@/components/profile/PersonalInfoDisplay';
+import { SecurityTab } from '@/components/profile/SecurityTab';
+import { PreferencesTab } from '@/components/profile/PreferencesTab';
 
 const ProfilePage = () => {
   const { user, profile, updateProfileState } = useAuth();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
-  
-  const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      first_name: profile?.first_name || '',
-      last_name: profile?.last_name || '',
-      phone_number: profile?.phone_number || '',
-    },
-    mode: 'onChange',
-  });
 
   const onSubmit = async (data: Partial<Profile>) => {
     if (!user) return;
@@ -81,153 +61,30 @@ const ProfilePage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-6 mb-6">
-                <Avatar className="h-20 w-20">
-                  <AvatarImage src={profile?.avatar_url || ''} />
-                  <AvatarFallback className="bg-primary text-xl">
-                    {profile?.first_name?.[0]}{profile?.last_name?.[0]}
-                  </AvatarFallback>
-                </Avatar>
-                
-                <div>
-                  <h3 className="text-lg font-medium">
-                    {profile?.first_name} {profile?.last_name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">{user?.email}</p>
-                </div>
-              </div>
+              <ProfileHeader profile={profile} user={user} />
               
               {isEditing ? (
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="first_name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-sm font-medium">
-                              Prénom <span className="text-red-500">*</span>
-                            </FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="Prénom" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="last_name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-sm font-medium">
-                              Nom <span className="text-red-500">*</span>
-                            </FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="Nom" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    
-                    <FormField
-                      control={form.control}
-                      name="phone_number"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm font-medium">
-                            Numéro de téléphone <span className="text-red-500">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <div className="flex items-center">
-                              <Phone className="mr-2 h-4 w-4 text-muted-foreground" />
-                              <Input {...field} placeholder="Numéro de téléphone" />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <div className="flex gap-2 justify-end">
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        onClick={() => setIsEditing(false)}
-                      >
-                        Annuler
-                      </Button>
-                      <Button type="submit">Enregistrer</Button>
-                    </div>
-                  </form>
-                </Form>
+                <PersonalInfoForm
+                  profile={profile}
+                  onSubmit={onSubmit}
+                  onCancel={() => setIsEditing(false)}
+                />
               ) : (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm mb-2">Prénom</label>
-                      <p>{profile?.first_name || '-'}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm mb-2">Nom</label>
-                      <p>{profile?.last_name || '-'}</p>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm mb-2">Numéro de téléphone</label>
-                    <p className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      {profile?.phone_number || '-'}
-                    </p>
-                  </div>
-                  
-                  <div className="flex justify-end">
-                    <Button 
-                      onClick={() => setIsEditing(true)}
-                    >
-                      Modifier
-                    </Button>
-                  </div>
-                </div>
+                <PersonalInfoDisplay
+                  profile={profile}
+                  onEdit={() => setIsEditing(true)}
+                />
               )}
             </CardContent>
           </Card>
         </TabsContent>
         
         <TabsContent value="security">
-          <Card>
-            <CardHeader>
-              <CardTitle>Sécurité</CardTitle>
-              <CardDescription>
-                Gérez vos paramètres de sécurité et de connexion
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Options de sécurité à venir dans une prochaine mise à jour.
-              </p>
-            </CardContent>
-          </Card>
+          <SecurityTab />
         </TabsContent>
         
         <TabsContent value="preferences">
-          <Card>
-            <CardHeader>
-              <CardTitle>Préférences</CardTitle>
-              <CardDescription>
-                Personnalisez votre expérience
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Options de personnalisation à venir dans une prochaine mise à jour.
-              </p>
-            </CardContent>
-          </Card>
+          <PreferencesTab />
         </TabsContent>
       </Tabs>
     </div>
