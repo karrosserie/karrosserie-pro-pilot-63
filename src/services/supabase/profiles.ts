@@ -9,7 +9,6 @@ export interface Profile {
   address?: string;
   city?: string;
   postal_code?: string;
-  country?: string;
   [key: string]: any;
 }
 

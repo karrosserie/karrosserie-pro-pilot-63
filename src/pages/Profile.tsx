@@ -21,7 +21,6 @@ const profileSchema = z.object({
   address: z.string().min(1, { message: "L'adresse est requise" }),
   city: z.string().min(1, { message: "La ville est requise" }),
   postal_code: z.string().min(1, { message: "Le code postal est requis" }),
-  country: z.string().min(1, { message: "Le pays est requis" }),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -40,7 +39,6 @@ const ProfilePage = () => {
       address: profile?.address || '',
       city: profile?.city || '',
       postal_code: profile?.postal_code || '',
-      country: profile?.country || '',
     },
     mode: 'onChange',
   });
@@ -115,7 +113,9 @@ const ProfilePage = () => {
                         name="first_name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel required>Prénom</FormLabel>
+                            <FormLabel className="text-sm font-medium">
+                              Prénom <span className="text-red-500">*</span>
+                            </FormLabel>
                             <FormControl>
                               <Input {...field} placeholder="Prénom" />
                             </FormControl>
@@ -128,7 +128,9 @@ const ProfilePage = () => {
                         name="last_name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel required>Nom</FormLabel>
+                            <FormLabel className="text-sm font-medium">
+                              Nom <span className="text-red-500">*</span>
+                            </FormLabel>
                             <FormControl>
                               <Input {...field} placeholder="Nom" />
                             </FormControl>
@@ -143,7 +145,9 @@ const ProfilePage = () => {
                       name="phone_number"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel required>Numéro de téléphone</FormLabel>
+                          <FormLabel className="text-sm font-medium">
+                            Numéro de téléphone <span className="text-red-500">*</span>
+                          </FormLabel>
                           <FormControl>
                             <div className="flex items-center">
                               <Phone className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -155,62 +159,51 @@ const ProfilePage = () => {
                       )}
                     />
 
-                    <div className="space-y-4 border p-4 rounded-md bg-gray-50">
-                      <h3 className="text-md font-medium flex items-center gap-2">
-                        <MapPin className="h-4 w-4" /> Adresse postale
-                      </h3>
-                      
+                    <FormField
+                      control={form.control}
+                      name="address"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium">
+                            Adresse <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <div className="flex items-center">
+                              <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
+                              <Input {...field} placeholder="Adresse" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
-                        name="address"
+                        name="city"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel required>Adresse</FormLabel>
+                            <FormLabel className="text-sm font-medium">
+                              Ville <span className="text-red-500">*</span>
+                            </FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Adresse" />
+                              <Input {...field} placeholder="Ville" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="city"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel required>Ville</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="Ville" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="postal_code"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel required>Code postal</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="Code postal" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      
                       <FormField
                         control={form.control}
-                        name="country"
+                        name="postal_code"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel required>Pays</FormLabel>
+                            <FormLabel className="text-sm font-medium">
+                              Code postal <span className="text-red-500">*</span>
+                            </FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Pays" defaultValue="France" />
+                              <Input {...field} placeholder="Code postal" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -251,17 +244,22 @@ const ProfilePage = () => {
                     </p>
                   </div>
 
-                  <div className="border p-4 rounded-md bg-gray-50">
-                    <h3 className="text-md font-medium mb-3 flex items-center gap-2">
-                      <MapPin className="h-4 w-4" /> Adresse postale
-                    </h3>
-                    <div className="space-y-2">
-                      <p>{profile?.address || '-'}</p>
-                      <p>
-                        {profile?.postal_code ? `${profile.postal_code} ` : ''}
-                        {profile?.city || '-'}
-                      </p>
-                      <p>{profile?.country || '-'}</p>
+                  <div>
+                    <label className="block text-sm mb-2">Adresse</label>
+                    <p className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      {profile?.address || '-'}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm mb-2">Ville</label>
+                      <p>{profile?.city || '-'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm mb-2">Code postal</label>
+                      <p>{profile?.postal_code || '-'}</p>
                     </div>
                   </div>
                   
