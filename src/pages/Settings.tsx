@@ -108,7 +108,7 @@ const Settings = () => {
                 />
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="zipCode">Code postal</Label>
                   <Input 
@@ -126,18 +126,18 @@ const Settings = () => {
                     onChange={(e) => setAccountData({...accountData, city: e.target.value})} 
                   />
                 </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Téléphone</Label>
+                  <Input 
+                    id="phone" 
+                    value={accountData.phone} 
+                    onChange={(e) => setAccountData({...accountData, phone: e.target.value})} 
+                  />
+                </div>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="phone">Téléphone</Label>
-                <Input 
-                  id="phone" 
-                  value={accountData.phone} 
-                  onChange={(e) => setAccountData({...accountData, phone: e.target.value})} 
-                />
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="siren">SIREN</Label>
                   <Input 
@@ -155,15 +155,15 @@ const Settings = () => {
                     onChange={(e) => setAccountData({...accountData, siret: e.target.value})} 
                   />
                 </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="tva">Numéro de TVA</Label>
-                <Input 
-                  id="tva" 
-                  value={accountData.tva} 
-                  onChange={(e) => setAccountData({...accountData, tva: e.target.value})} 
-                />
+                
+                <div className="space-y-2">
+                  <Label htmlFor="tva">Numéro de TVA</Label>
+                  <Input 
+                    id="tva" 
+                    value={accountData.tva} 
+                    onChange={(e) => setAccountData({...accountData, tva: e.target.value})} 
+                  />
+                </div>
               </div>
               
               <div className="flex justify-end">
