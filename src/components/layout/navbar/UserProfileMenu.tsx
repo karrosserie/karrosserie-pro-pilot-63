@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { User, Bell, LogOut } from 'lucide-react';
+import { User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
   DropdownMenu,
@@ -35,13 +35,9 @@ const UserProfileMenu = () => {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <User className="mr-2 h-4 w-4" />
-            <span>Profil</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Link to="/settings" className="flex items-center w-full">
-              <Bell className="mr-2 h-4 w-4" />
-              <span>Paramètres</span>
+            <Link to="/profile" className="flex items-center w-full">
+              <User className="mr-2 h-4 w-4" />
+              <span>Profil</span>
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>

@@ -12,6 +12,7 @@ import Settings from "@/pages/Settings";
 import Accounting from "@/pages/Accounting";
 import Cessions from "@/pages/Cessions";
 import Auth from "@/pages/Auth";
+import Profile from "@/pages/Profile";
 
 // Document pages
 import ExpertiseReports from "@/pages/documents/expertise/ExpertiseReports";
@@ -61,6 +62,14 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <Index />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/profile",
+    element: (
+      <ProtectedRoute>
+        <Profile />
       </ProtectedRoute>
     )
   },
