@@ -3,6 +3,7 @@ import React from 'react';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -35,6 +36,9 @@ export const CessionDialog = ({
           <DialogTitle>
             {cession ? 'Modifier la cession' : 'Nouvelle cession de créance'}
           </DialogTitle>
+          <DialogDescription>
+            Saisissez les informations nécessaires pour créer une cession de créance avec la compagnie d'assurance.
+          </DialogDescription>
         </DialogHeader>
         
         <CessionForm

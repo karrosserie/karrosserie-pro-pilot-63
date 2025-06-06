@@ -23,11 +23,6 @@ export const CessionBasicInfoSection = ({
   return (
     <>
       <div className="space-y-4">
-        {/* Description sous le titre */}
-        <p className="text-gray-600 text-sm">
-          Saisissez les informations nécessaires pour créer une cession de créance avec la compagnie d'assurance.
-        </p>
-
         {/* Ordre de réparation seul sur sa ligne */}
         <RepairOrderSelector 
           formData={formData}
