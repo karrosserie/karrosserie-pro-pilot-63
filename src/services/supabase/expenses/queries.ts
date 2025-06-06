@@ -21,7 +21,11 @@ export const getExpenses = async (): Promise<ExpenseWithRelations[]> => {
     throw error;
   }
 
-  return data || [];
+  // Map the data to include the status field
+  return (data || []).map(expense => ({
+    ...expense,
+    status: expense.status || 'En attente' // Default status if not present
+  }));
 };
 
 export const getExpenseById = async (id: string): Promise<ExpenseWithRelations | null> => {
@@ -44,5 +48,11 @@ export const getExpenseById = async (id: string): Promise<ExpenseWithRelations |
     throw error;
   }
 
-  return data;
+  if (!data) return null;
+
+  // Add status field to the returned expense
+  return {
+    ...data,
+    status: data.status || 'En attente' // Default status if not present
+  };
 };
