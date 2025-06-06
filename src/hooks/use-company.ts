@@ -11,7 +11,7 @@ export function useCompany() {
     name: '',
     email: '',
     address: '',
-    zipCode: '',
+    zipcode: '', // Changé de zipCode à zipcode
     city: '',
     phone: '',
     siren: '',

@@ -7,7 +7,7 @@ export interface CompanyInfo {
   name: string;
   email: string;
   address: string;
-  zipCode: string;
+  zipcode: string; // Changé de zipCode à zipcode pour correspondre à la DB
   city: string;
   phone: string;
   siren: string;
@@ -48,7 +48,7 @@ export const companyService = {
       name: companyData.name || '',
       email: companyData.email || '',
       address: companyData.address || '',
-      zipCode: companyData.zipCode || '',
+      zipcode: companyData.zipcode || '', // Changé de zipCode à zipcode
       city: companyData.city || '',
       phone: companyData.phone || '',
       siren: companyData.siren || '',

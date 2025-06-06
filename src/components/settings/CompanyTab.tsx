@@ -116,11 +116,11 @@ const CompanyTab: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="zipCode">Code postal</Label>
+              <Label htmlFor="zipcode">Code postal</Label>
               <Input 
-                id="zipCode" 
-                value={companyData.zipCode || ''} 
-                onChange={(e) => updateCompanyData({ zipCode: e.target.value })} 
+                id="zipcode" 
+                value={companyData.zipcode || ''} 
+                onChange={(e) => updateCompanyData({ zipcode: e.target.value })} 
               />
             </div>
             
