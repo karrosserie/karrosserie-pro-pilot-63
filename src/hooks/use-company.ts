@@ -29,25 +29,16 @@ export function useCompany() {
 
   useEffect(() => {
     const loadCompanyData = async () => {
-      if (!user) {
-        console.log('No user found, skipping company data load');
-        return;
-      }
+      if (!user) return;
       
       setIsLoading(true);
-      console.log('Loading company data for user:', user.id);
-      
       try {
         const data = await companyService.getCompanyInfo(user.id);
-        console.log('Received company data from service:', data);
-        
         if (data) {
           // Mettre à jour avec les données de la base
-          console.log('Setting company data:', data);
           setCompanyData(data);
-        } else {
-          console.log('No company data found, keeping default values');
         }
+        // Si data est null, on garde les valeurs par défaut
       } catch (error) {
         console.error('Erreur lors du chargement des données:', error);
         toast({
@@ -68,9 +59,7 @@ export function useCompany() {
 
     setIsSaving(true);
     try {
-      console.log('Saving company data:', companyData);
       const updatedData = await companyService.updateCompanyInfo(user.id, companyData);
-      console.log('Received updated data:', updatedData);
       setCompanyData(updatedData);
       toast({
         title: "Données sauvegardées",
@@ -91,12 +80,7 @@ export function useCompany() {
   };
 
   const updateCompanyData = (updates: Partial<CompanyInfo>) => {
-    console.log('Updating company data with:', updates);
-    setCompanyData(prev => {
-      const newData = { ...prev, ...updates };
-      console.log('New company data state:', newData);
-      return newData;
-    });
+    setCompanyData(prev => ({ ...prev, ...updates }));
   };
 
   const updateNotifications = (key: string) => {
@@ -108,8 +92,6 @@ export function useCompany() {
       }
     }));
   };
-
-  console.log('useCompany hook state:', { companyData, isLoading, isSaving });
 
   return {
     companyData,

@@ -16,10 +16,7 @@ import { useCompany } from '@/hooks/use-company';
 
 const CompanyTab: React.FC = () => {
   const { uploadDocument } = useStorage();
-  const { companyData, isSaving, isLoading, updateCompanyData, saveCompanyData } = useCompany();
-
-  console.log('CompanyTab render - companyData:', companyData);
-  console.log('CompanyTab render - isLoading:', isLoading);
+  const { companyData, isSaving, updateCompanyData, saveCompanyData } = useCompany();
 
   const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -34,17 +31,6 @@ const CompanyTab: React.FC = () => {
       console.error('Erreur lors du téléchargement du logo:', error);
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-karrosserie-orange mx-auto"></div>
-          <p className="mt-2 text-gray-600">Chargement des données...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4">
@@ -105,7 +91,6 @@ const CompanyTab: React.FC = () => {
                 id="name" 
                 value={companyData.name || ''} 
                 onChange={(e) => updateCompanyData({ name: e.target.value })} 
-                placeholder="Nom de votre entreprise"
               />
             </div>
             
@@ -116,7 +101,6 @@ const CompanyTab: React.FC = () => {
                 type="email" 
                 value={companyData.email || ''} 
                 onChange={(e) => updateCompanyData({ email: e.target.value })} 
-                placeholder="contact@entreprise.com"
               />
             </div>
           </div>
@@ -127,7 +111,6 @@ const CompanyTab: React.FC = () => {
               id="address" 
               value={companyData.address || ''} 
               onChange={(e) => updateCompanyData({ address: e.target.value })} 
-              placeholder="Adresse complète"
             />
           </div>
           
@@ -138,7 +121,6 @@ const CompanyTab: React.FC = () => {
                 id="zipcode" 
                 value={companyData.zipcode || ''} 
                 onChange={(e) => updateCompanyData({ zipcode: e.target.value })} 
-                placeholder="75000"
               />
             </div>
             
@@ -148,7 +130,6 @@ const CompanyTab: React.FC = () => {
                 id="city" 
                 value={companyData.city || ''} 
                 onChange={(e) => updateCompanyData({ city: e.target.value })} 
-                placeholder="Paris"
               />
             </div>
             
@@ -158,7 +139,6 @@ const CompanyTab: React.FC = () => {
                 id="phone" 
                 value={companyData.phone || ''} 
                 onChange={(e) => updateCompanyData({ phone: e.target.value })} 
-                placeholder="01 23 45 67 89"
               />
             </div>
           </div>
@@ -170,7 +150,6 @@ const CompanyTab: React.FC = () => {
                 id="siren" 
                 value={companyData.siren || ''} 
                 onChange={(e) => updateCompanyData({ siren: e.target.value })} 
-                placeholder="123 456 789"
               />
             </div>
             
@@ -180,7 +159,6 @@ const CompanyTab: React.FC = () => {
                 id="siret" 
                 value={companyData.siret || ''} 
                 onChange={(e) => updateCompanyData({ siret: e.target.value })} 
-                placeholder="123 456 789 00012"
               />
             </div>
             
@@ -190,7 +168,6 @@ const CompanyTab: React.FC = () => {
                 id="tva" 
                 value={companyData.tva || ''} 
                 onChange={(e) => updateCompanyData({ tva: e.target.value })} 
-                placeholder="FR12345678901"
               />
             </div>
           </div>
