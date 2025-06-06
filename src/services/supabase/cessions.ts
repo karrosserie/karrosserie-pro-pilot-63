@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -52,11 +53,11 @@ export const cessionsService = {
       .select(`
         *,
         vehicles(brand, model, license_plate),
-        repair_orders(
+        repair_orders!inner(
           reference,
           created_at,
-          clients(first_name, last_name),
-          vehicles(brand, model, license_plate)
+          clients!inner(first_name, last_name),
+          vehicles!inner(brand, model, license_plate)
         ),
         insurance_companies(name)
       `)
@@ -81,11 +82,11 @@ export const cessionsService = {
       .select(`
         *,
         vehicles(id, brand, model, license_plate),
-        repair_orders(
+        repair_orders!inner(
           reference,
           created_at,
-          clients(first_name, last_name),
-          vehicles(brand, model, license_plate)
+          clients!inner(first_name, last_name),
+          vehicles!inner(brand, model, license_plate)
         ),
         insurance_companies(name)
       `)
