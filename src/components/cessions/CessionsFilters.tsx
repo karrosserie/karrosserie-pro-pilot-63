@@ -19,32 +19,9 @@ export const CessionsFilters = ({
   onStatusChange,
   onCreateCession
 }: CessionsFiltersProps) => {
-  const statusButtons = [
-    { key: 'all', label: 'Toutes' },
-    { key: 'en_attente', label: 'En attente' },
-    { key: 'en_attente_signature', label: 'En attente de signature' },
-    { key: 'signee', label: 'Signées' },
-    { key: 'signature_refusee', label: 'Signature refusée' },
-    { key: 'lettre_recommandee_envoyee', label: 'LR envoyées' },
-    { key: 'lettre_recommandee_recue', label: 'LR reçues' },
-    { key: 'payee', label: 'Payées' }
-  ];
-
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-      <div className="flex items-center mb-4 md:mb-0 overflow-x-auto pb-2">
-        {statusButtons.map(({ key, label }) => (
-          <Button 
-            key={key}
-            variant={selectedStatus === key ? "default" : "outline"} 
-            size="sm" 
-            className="mr-2 whitespace-nowrap"
-            onClick={() => onStatusChange(key)}
-          >
-            {label}
-          </Button>
-        ))}
-      </div>
+      <div className="flex-1" />
       
       <div className="flex items-center w-full md:w-auto space-x-2">
         <div className="relative flex-1 md:w-60">
