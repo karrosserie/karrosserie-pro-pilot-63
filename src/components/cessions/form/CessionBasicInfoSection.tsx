@@ -62,7 +62,7 @@ export const CessionBasicInfoSection = ({
             <SelectContent>
               {accounts?.map((account) => (
                 <SelectItem key={account.id} value={account.id}>
-                  {account.name} - {account.account_number}
+                  {account.name} - {account.iban}
                 </SelectItem>
               ))}
             </SelectContent>
