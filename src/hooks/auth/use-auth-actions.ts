@@ -51,14 +51,15 @@ export const useAuthActions = (setLoading: (loading: boolean) => void) => {
   }, [navigate, setLoading]);
 
   // Sign up with email and password
-  const signUp = useCallback(async (email: string, password: string, firstName: string, lastName: string) => {
+  const signUp = useCallback(async (email: string, password: string, firstName: string, lastName: string, phoneNumber: string) => {
     try {
       setLoading(true);
       const { user: newUser, session: newSession } = await authService.signUp({ 
         email, 
         password, 
         firstName, 
-        lastName 
+        lastName,
+        phoneNumber
       });
       
       if (!newUser) {

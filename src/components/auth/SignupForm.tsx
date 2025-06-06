@@ -26,6 +26,7 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
       firstName: "",
       lastName: "",
       email: "",
+      phoneNumber: "",
       password: "",
       confirmPassword: "",
     },
@@ -35,7 +36,7 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
     setIsLoading(true);
 
     try {
-      await signUp(data.email, data.password, data.firstName, data.lastName);
+      await signUp(data.email, data.password, data.firstName, data.lastName, data.phoneNumber);
       // Le message de succès est maintenant géré dans useAuthState
       onToggleMode(); // Retour vers le formulaire de connexion
     } catch (error: any) {

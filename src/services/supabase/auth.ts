@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 export interface AuthSignUpData {
   firstName: string;
   lastName: string;
+  phoneNumber: string;
   email: string;
   password: string;
 }
@@ -41,7 +42,7 @@ export const authService = {
   /**
    * Sign up with email and password
    */
-  signUp: async ({ email, password, firstName, lastName }: AuthSignUpData) => {
+  signUp: async ({ email, password, firstName, lastName, phoneNumber }: AuthSignUpData) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -49,6 +50,7 @@ export const authService = {
         data: {
           first_name: firstName,
           last_name: lastName,
+          phone_number: phoneNumber,
         },
         emailRedirectTo: `${window.location.origin}/auth`,
       },
