@@ -2,6 +2,9 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
+// Import the status type from the form types
+import { CessionStatus } from '@/components/cessions/form/types';
+
 // Extend the base types to include the new columns
 type BaseCession = Database['public']['Tables']['cessions']['Row'];
 type BaseNewCession = Database['public']['Tables']['cessions']['Insert'];
@@ -9,7 +12,7 @@ type BaseUpdateCession = Database['public']['Tables']['cessions']['Update'];
 
 export interface Cession extends BaseCession {
   reference: string;
-  status: 'en_attente' | 'envoyee' | 'signee' | 'payee';
+  status: CessionStatus;
   vehicles?: {
     brand: string;
     model: string;
@@ -19,12 +22,12 @@ export interface Cession extends BaseCession {
 
 export interface NewCession extends Omit<BaseNewCession, 'id' | 'created_at' | 'updated_at'> {
   reference: string;
-  status?: 'en_attente' | 'envoyee' | 'signee' | 'payee';
+  status?: CessionStatus;
 }
 
 export interface UpdateCession extends BaseUpdateCession {
   reference?: string;
-  status?: 'en_attente' | 'envoyee' | 'signee' | 'payee';
+  status?: CessionStatus;
 }
 
 export const cessionsService = {

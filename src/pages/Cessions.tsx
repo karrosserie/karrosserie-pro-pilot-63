@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,12 +43,24 @@ const Cessions = () => {
     switch (status) {
       case 'en_attente':
         return 'bg-gray-100 text-gray-800';
-      case 'envoyee':
-        return 'bg-purple-100 text-purple-800';
+      case 'en_attente_signature':
+        return 'bg-yellow-100 text-yellow-800';
       case 'signee':
-        return 'bg-blue-100 text-blue-800';
-      case 'payee':
         return 'bg-green-100 text-green-800';
+      case 'signature_refusee':
+        return 'bg-red-100 text-red-800';
+      case 'lettre_recommandee_envoyee':
+        return 'bg-blue-100 text-blue-800';
+      case 'lettre_recommandee_recue':
+        return 'bg-indigo-100 text-indigo-800';
+      case 'lettre_recommandee_non_recuperee':
+        return 'bg-orange-100 text-orange-800';
+      case 'lettre_recommandee_refusee':
+        return 'bg-red-100 text-red-800';
+      case 'lettre_recommandee_presentee':
+        return 'bg-purple-100 text-purple-800';
+      case 'payee':
+        return 'bg-emerald-100 text-emerald-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -58,11 +69,23 @@ const Cessions = () => {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'en_attente':
-        return 'En attente d\'envoi';
-      case 'envoyee':
-        return 'Envoyée à l\'assurance';
+        return 'En attente';
+      case 'en_attente_signature':
+        return 'En attente de signature';
       case 'signee':
         return 'Signée';
+      case 'signature_refusee':
+        return 'Signature refusée';
+      case 'lettre_recommandee_envoyee':
+        return 'Lettre recommandée envoyée';
+      case 'lettre_recommandee_recue':
+        return 'Lettre recommandée reçue';
+      case 'lettre_recommandee_non_recuperee':
+        return 'Lettre recommandée non récupérée';
+      case 'lettre_recommandee_refusee':
+        return 'Lettre recommandée refusée';
+      case 'lettre_recommandee_presentee':
+        return 'Lettre recommandée présentée';
       case 'payee':
         return 'Payée';
       default:
@@ -108,9 +131,12 @@ const Cessions = () => {
 
   const statusButtons = [
     { key: 'all', label: 'Toutes' },
-    { key: 'en_attente', label: 'En attente d\'envoi' },
-    { key: 'envoyee', label: 'Envoyées' },
+    { key: 'en_attente', label: 'En attente' },
+    { key: 'en_attente_signature', label: 'En attente de signature' },
     { key: 'signee', label: 'Signées' },
+    { key: 'signature_refusee', label: 'Signature refusée' },
+    { key: 'lettre_recommandee_envoyee', label: 'LR envoyées' },
+    { key: 'lettre_recommandee_recue', label: 'LR reçues' },
     { key: 'payee', label: 'Payées' }
   ];
   
