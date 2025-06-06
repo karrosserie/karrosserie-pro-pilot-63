@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -68,11 +67,16 @@ export const cessionsService = {
       throw new Error(error.message);
     }
     
-    // Transform data to match our extended interface using safe property access
+    // Transform data to match our interface by flattening arrays to single objects
     return (data || []).map(item => ({
       ...item,
       reference: (item as any).reference || '',
-      status: (item as any).status || 'en_attente'
+      status: (item as any).status || 'en_attente',
+      repair_orders: item.repair_orders ? {
+        ...item.repair_orders,
+        clients: Array.isArray(item.repair_orders.clients) ? item.repair_orders.clients[0] : item.repair_orders.clients,
+        vehicles: Array.isArray(item.repair_orders.vehicles) ? item.repair_orders.vehicles[0] : item.repair_orders.vehicles
+      } : undefined
     })) as Cession[];
   },
 
@@ -98,11 +102,16 @@ export const cessionsService = {
       throw new Error(error.message);
     }
     
-    // Transform data to match our extended interface using safe property access
+    // Transform data to match our interface by flattening arrays to single objects
     return {
       ...data,
       reference: (data as any).reference || '',
-      status: (data as any).status || 'en_attente'
+      status: (data as any).status || 'en_attente',
+      repair_orders: data.repair_orders ? {
+        ...data.repair_orders,
+        clients: Array.isArray(data.repair_orders.clients) ? data.repair_orders.clients[0] : data.repair_orders.clients,
+        vehicles: Array.isArray(data.repair_orders.vehicles) ? data.repair_orders.vehicles[0] : data.repair_orders.vehicles
+      } : undefined
     } as Cession;
   },
   
