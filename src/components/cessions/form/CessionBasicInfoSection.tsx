@@ -1,15 +1,12 @@
 
 import React from 'react';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CessionFormData, CessionFormErrors } from './types';
+import { useRepairOrders } from '@/hooks/use-repair-orders';
+import { useAccounts } from '@/hooks/use-accounts';
+import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
 
 interface CessionBasicInfoSectionProps {
   formData: CessionFormData;
@@ -22,73 +19,143 @@ export const CessionBasicInfoSection = ({
   errors,
   onFieldChange
 }: CessionBasicInfoSectionProps) => {
+  const { orders, isLoading: isLoadingOrders } = useRepairOrders();
+  const { accounts, isLoading: isLoadingAccounts } = useAccounts();
+  const { insuranceCompanies, isLoading: isLoadingInsurance } = useInsuranceCompanies();
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Informations de base</h3>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="reference">Référence de la cession *</Label>
-          <Input
-            id="reference"
-            value={formData.reference}
-            onChange={(e) => onFieldChange('reference', e.target.value)}
-            placeholder="CC-2024-001"
-            className={errors.reference ? 'border-red-500' : ''}
-          />
-          {errors.reference && (
-            <p className="text-sm text-red-500">{errors.reference}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="status">Statut</Label>
-          <Select 
-            value={formData.status} 
-            onValueChange={(value) => onFieldChange('status', value)}
+          <Label htmlFor="repair_order_id">Ordre de réparation *</Label>
+          <Select
+            value={formData.repair_order_id || ''}
+            onValueChange={(value) => onFieldChange('repair_order_id', value)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Sélectionner un statut" />
+              <SelectValue placeholder={isLoadingOrders ? "Chargement..." : "Sélectionner un ordre de réparation"} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="en_attente">En attente d'envoi</SelectItem>
-              <SelectItem value="envoyee">Envoyée à l'assurance</SelectItem>
-              <SelectItem value="signee">Signée</SelectItem>
-              <SelectItem value="payee">Payée</SelectItem>
+              {orders?.map((order) => (
+                <SelectItem key={order.id} value={order.id}>
+                  {order.reference} - {order.clients ? `${order.clients.first_name} ${order.clients.last_name}` : 'Client non assigné'}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="sale_amount">Montant de la vente (€) *</Label>
-          <Input
-            id="sale_amount"
-            type="number"
-            step="0.01"
-            min="0"
-            value={formData.sale_amount}
-            onChange={(e) => onFieldChange('sale_amount', parseFloat(e.target.value) || 0)}
-            placeholder="0.00"
-            className={errors.sale_amount ? 'border-red-500' : ''}
-          />
-          {errors.sale_amount && (
-            <p className="text-sm text-red-500">{errors.sale_amount}</p>
+          {errors.repair_order_id && (
+            <p className="text-sm text-red-600">{errors.repair_order_id}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="sale_date">Date de vente *</Label>
+          <Label htmlFor="bank_account_id">Compte bancaire *</Label>
+          <Select
+            value={formData.bank_account_id || ''}
+            onValueChange={(value) => onFieldChange('bank_account_id', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={isLoadingAccounts ? "Chargement..." : "Sélectionner un compte bancaire"} />
+            </SelectTrigger>
+            <SelectContent>
+              {accounts?.map((account) => (
+                <SelectItem key={account.id} value={account.id}>
+                  {account.name} - {account.account_number}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.bank_account_id && (
+            <p className="text-sm text-red-600">{errors.bank_account_id}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="incident_number">Numéro de sinistre *</Label>
           <Input
-            id="sale_date"
-            type="date"
-            value={formData.sale_date}
-            onChange={(e) => onFieldChange('sale_date', e.target.value)}
-            className={errors.sale_date ? 'border-red-500' : ''}
+            id="incident_number"
+            value={formData.incident_number}
+            onChange={(e) => onFieldChange('incident_number', e.target.value)}
+            placeholder="Saisir le numéro de sinistre"
           />
-          {errors.sale_date && (
-            <p className="text-sm text-red-500">{errors.sale_date}</p>
+          {errors.incident_number && (
+            <p className="text-sm text-red-600">{errors.incident_number}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="incident_date">Date du sinistre *</Label>
+          <Input
+            id="incident_date"
+            type="date"
+            value={formData.incident_date}
+            onChange={(e) => onFieldChange('incident_date', e.target.value)}
+          />
+          {errors.incident_date && (
+            <p className="text-sm text-red-600">{errors.incident_date}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="policy_number">Numéro de police *</Label>
+          <Input
+            id="policy_number"
+            value={formData.policy_number}
+            onChange={(e) => onFieldChange('policy_number', e.target.value)}
+            placeholder="Numéro de contrat d'assurance"
+          />
+          {errors.policy_number && (
+            <p className="text-sm text-red-600">{errors.policy_number}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="report_number">Numéro de rapport *</Label>
+          <Input
+            id="report_number"
+            value={formData.report_number}
+            onChange={(e) => onFieldChange('report_number', e.target.value)}
+            placeholder="Saisir le numéro de rapport"
+          />
+          {errors.report_number && (
+            <p className="text-sm text-red-600">{errors.report_number}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="expert_name">Nom de l'expert *</Label>
+          <Input
+            id="expert_name"
+            value={formData.expert_name}
+            onChange={(e) => onFieldChange('expert_name', e.target.value)}
+            placeholder="Nom de l'expert"
+          />
+          {errors.expert_name && (
+            <p className="text-sm text-red-600">{errors.expert_name}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="insurance_company_id">Assurance *</Label>
+          <Select
+            value={formData.insurance_company_id || ''}
+            onValueChange={(value) => onFieldChange('insurance_company_id', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={isLoadingInsurance ? "Chargement..." : "Sélectionner une compagnie d'assurance"} />
+            </SelectTrigger>
+            <SelectContent>
+              {insuranceCompanies?.map((company) => (
+                <SelectItem key={company.id} value={company.id}>
+                  {company.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.insurance_company_id && (
+            <p className="text-sm text-red-600">{errors.insurance_company_id}</p>
           )}
         </div>
       </div>

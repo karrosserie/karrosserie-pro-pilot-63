@@ -9,14 +9,15 @@ interface UseCessionFormLogicProps {
 
 export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
   const [formData, setFormData] = useState<CessionFormData>({
-    reference: '',
-    vehicle_id: null,
-    buyer_name: '',
-    buyer_contact: '',
-    sale_amount: 0,
-    sale_date: new Date().toISOString().split('T')[0],
-    status: 'en_attente',
-    notes: ''
+    repair_order_id: null,
+    bank_account_id: null,
+    incident_number: '',
+    incident_date: new Date().toISOString().split('T')[0],
+    policy_number: '',
+    report_number: '',
+    expert_name: '',
+    insurance_company_id: null,
+    status: 'en_attente'
   });
 
   const [errors, setErrors] = useState<CessionFormErrors>({});
@@ -27,14 +28,15 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
   useEffect(() => {
     if (cession) {
       setFormData({
-        reference: cession.reference || '',
-        vehicle_id: cession.vehicle_id || null,
-        buyer_name: cession.buyer_name || '',
-        buyer_contact: cession.buyer_contact || '',
-        sale_amount: Number(cession.sale_amount) || 0,
-        sale_date: cession.sale_date || new Date().toISOString().split('T')[0],
-        status: (cession.status as any) || 'en_attente',
-        notes: cession.notes || ''
+        repair_order_id: (cession as any).repair_order_id || null,
+        bank_account_id: (cession as any).bank_account_id || null,
+        incident_number: (cession as any).incident_number || '',
+        incident_date: (cession as any).incident_date || new Date().toISOString().split('T')[0],
+        policy_number: (cession as any).policy_number || '',
+        report_number: (cession as any).report_number || '',
+        expert_name: (cession as any).expert_name || '',
+        insurance_company_id: (cession as any).insurance_company_id || null,
+        status: (cession.status as any) || 'en_attente'
       });
     }
   }, [cession]);
@@ -57,28 +59,36 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
   const validateForm = (): boolean => {
     const newErrors: CessionFormErrors = {};
 
-    if (!formData.reference.trim()) {
-      newErrors.reference = 'La référence est obligatoire';
+    if (!formData.repair_order_id) {
+      newErrors.repair_order_id = 'L\'ordre de réparation est obligatoire';
     }
 
-    if (!formData.vehicle_id) {
-      newErrors.vehicle_id = 'Le véhicule est obligatoire';
+    if (!formData.bank_account_id) {
+      newErrors.bank_account_id = 'Le compte bancaire est obligatoire';
     }
 
-    if (!formData.buyer_name.trim()) {
-      newErrors.buyer_name = 'Le nom de l\'acheteur est obligatoire';
+    if (!formData.incident_number.trim()) {
+      newErrors.incident_number = 'Le numéro de sinistre est obligatoire';
     }
 
-    if (!formData.buyer_contact.trim()) {
-      newErrors.buyer_contact = 'Le contact de l\'acheteur est obligatoire';
+    if (!formData.incident_date) {
+      newErrors.incident_date = 'La date du sinistre est obligatoire';
     }
 
-    if (!formData.sale_amount || formData.sale_amount <= 0) {
-      newErrors.sale_amount = 'Le montant de vente doit être supérieur à 0';
+    if (!formData.policy_number.trim()) {
+      newErrors.policy_number = 'Le numéro de police est obligatoire';
     }
 
-    if (!formData.sale_date) {
-      newErrors.sale_date = 'La date de vente est obligatoire';
+    if (!formData.report_number.trim()) {
+      newErrors.report_number = 'Le numéro de rapport est obligatoire';
+    }
+
+    if (!formData.expert_name.trim()) {
+      newErrors.expert_name = 'Le nom de l\'expert est obligatoire';
+    }
+
+    if (!formData.insurance_company_id) {
+      newErrors.insurance_company_id = 'L\'assurance est obligatoire';
     }
 
     setErrors(newErrors);
@@ -87,15 +97,16 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
 
   const prepareSubmitData = (): Partial<Cession> => {
     return {
-      reference: formData.reference,
-      vehicle_id: formData.vehicle_id,
-      buyer_name: formData.buyer_name,
-      buyer_contact: formData.buyer_contact,
-      sale_amount: formData.sale_amount,
-      sale_date: formData.sale_date,
-      status: formData.status,
-      notes: formData.notes
-    };
+      repair_order_id: formData.repair_order_id,
+      bank_account_id: formData.bank_account_id,
+      incident_number: formData.incident_number,
+      incident_date: formData.incident_date,
+      policy_number: formData.policy_number,
+      report_number: formData.report_number,
+      expert_name: formData.expert_name,
+      insurance_company_id: formData.insurance_company_id,
+      status: formData.status
+    } as any;
   };
 
   return {
