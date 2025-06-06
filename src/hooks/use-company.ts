@@ -27,8 +27,16 @@ export function useCompany() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Debug auth context
+  console.log('useCompany - Auth context state:', {
+    user: user ? { id: user.id, email: user.email } : null,
+    userExists: !!user
+  });
+
   useEffect(() => {
     const loadCompanyData = async () => {
+      console.log('useCompany: useEffect triggered with user:', user ? { id: user.id, email: user.email } : null);
+      
       if (!user) {
         console.log('useCompany: No user found, skipping company data load');
         return;
@@ -111,7 +119,7 @@ export function useCompany() {
     }));
   };
 
-  console.log('useCompany hook state:', { 
+  console.log('useCompany hook final state:', { 
     user: user ? { id: user.id, email: user.email } : null,
     companyData, 
     isLoading, 

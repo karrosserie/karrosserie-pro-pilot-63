@@ -13,11 +13,14 @@ import {
 import { FileText, Upload } from 'lucide-react';
 import { useStorage } from '@/hooks/use-storage';
 import { useCompany } from '@/hooks/use-company';
+import { useAuth } from '@/contexts/AuthContext';
 
 const CompanyTab: React.FC = () => {
   const { uploadDocument } = useStorage();
   const { companyData, isSaving, isLoading, updateCompanyData, saveCompanyData } = useCompany();
+  const { user } = useAuth();
 
+  console.log('CompanyTab render - Auth user:', user ? { id: user.id, email: user.email } : null);
   console.log('CompanyTab render - companyData:', companyData);
   console.log('CompanyTab render - isLoading:', isLoading);
 
@@ -35,12 +38,25 @@ const CompanyTab: React.FC = () => {
     }
   };
 
+  // Show authentication status
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-gray-600">Vous devez être connecté pour voir les données de l'entreprise.</p>
+          <p className="text-sm text-gray-400 mt-2">État d'authentification: non connecté</p>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-karrosserie-orange mx-auto"></div>
           <p className="mt-2 text-gray-600">Chargement des données...</p>
+          <p className="text-sm text-gray-400 mt-1">Utilisateur: {user.email}</p>
         </div>
       </div>
     );
@@ -48,6 +64,13 @@ const CompanyTab: React.FC = () => {
 
   return (
     <div className="space-y-4">
+      {/* Debug info */}
+      <div className="bg-gray-50 p-4 rounded-lg text-sm">
+        <p><strong>Debug info:</strong></p>
+        <p>Utilisateur connecté: {user.email} (ID: {user.id})</p>
+        <p>Données chargées: {JSON.stringify(companyData).length > 100 ? 'Oui' : 'Non'}</p>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Logo de l'entreprise</CardTitle>
