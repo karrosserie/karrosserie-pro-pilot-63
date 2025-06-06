@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { PhoneInputField } from '@/components/ui/phone-input';
+import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
 import { Profile } from '@/services/supabase/profiles';
 
 const profileSchema = z.object({
@@ -83,7 +83,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
                 Numéro de téléphone <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <PhoneInputField
+                <CustomPhoneInput
                   value={field.value}
                   onChange={field.onChange}
                   placeholder="Numéro de téléphone"

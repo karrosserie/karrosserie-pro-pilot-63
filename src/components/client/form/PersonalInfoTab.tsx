@@ -1,7 +1,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { PhoneInputField } from '@/components/ui/phone-input';
+import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
 
 interface PersonalInfoTabProps {
   formData: any;
@@ -74,7 +74,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
               required
             />
           ) : (
-            <PhoneInputField
+            <CustomPhoneInput
               value={formData.phone}
               onChange={handlePhoneChange || (() => {})}
               placeholder="Numéro de téléphone"
