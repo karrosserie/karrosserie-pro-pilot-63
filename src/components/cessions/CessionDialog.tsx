@@ -37,7 +37,10 @@ export const CessionDialog = ({
             {cession ? 'Modifier la cession' : 'Nouvelle cession de créance'}
           </DialogTitle>
           <DialogDescription>
-            Saisissez les informations nécessaires pour créer une cession de créance avec la compagnie d'assurance.
+            {cession 
+              ? 'Saisissez les informations nécessaires pour modifier la cession de créance avec la compagnie d\'assurance.'
+              : 'Saisissez les informations nécessaires pour créer une cession de créance avec la compagnie d\'assurance.'
+            }
           </DialogDescription>
         </DialogHeader>
         
