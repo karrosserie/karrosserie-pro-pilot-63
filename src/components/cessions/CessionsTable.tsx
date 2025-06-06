@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -82,11 +81,23 @@ export const CessionsTable = ({
   };
 
   const formatRepairOrderDisplay = (cession: Cession) => {
-    // For now, just show a placeholder since we need to fix the data relationships first
-    if (cession.repair_order_id) {
-      return `Ordre lié (ID: ${cession.repair_order_id})`;
+    if (!cession.repair_orders) {
+      return cession.repair_order_id ? `Ordre lié (ID: ${cession.repair_order_id})` : '-';
     }
-    return '-';
+    
+    const order = cession.repair_orders;
+    const clientName = order.clients ? 
+      `${order.clients.first_name} ${order.clients.last_name}` : 
+      'Client non assigné';
+    
+    const vehicleInfo = order.vehicles ? 
+      `${order.vehicles.brand} ${order.vehicles.model} - ${order.vehicles.license_plate}` : 
+      'Véhicule non assigné';
+    
+    const orderDate = order.created_at ? 
+      format(new Date(order.created_at), 'dd/MM/yyyy', { locale: fr }) : '';
+    
+    return `Ordre n°${order.reference} du ${orderDate} - ${clientName} - ${vehicleInfo}`;
   };
 
   if (isLoading) {

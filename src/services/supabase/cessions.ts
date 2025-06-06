@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -50,8 +49,8 @@ export const cessionsService = {
   getAll: async (): Promise<Cession[]> => {
     console.log('Fetching cessions...');
     
-    // First, try a simple query to see what data we have
-    const { data, error } = await supabase
+    // First, get basic cessions data
+    const { data: basicCessions, error: basicError } = await supabase
       .from('cessions')
       .select(`
         *,
@@ -60,23 +59,49 @@ export const cessionsService = {
       `)
       .order('sale_date', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching cessions:', error);
-      throw new Error(error.message);
+    if (basicError) {
+      console.error('Error fetching cessions:', basicError);
+      throw new Error(basicError.message);
     }
     
-    console.log('Raw cessions data:', data);
+    console.log('Raw cessions data:', basicCessions);
     
-    // Transform data to match our interface
-    return (data || []).map(item => ({
-      ...item,
-      reference: (item as any).reference || '',
-      status: (item as any).status || 'en_attente'
-    })) as Cession[];
+    // Now enrich with repair order data
+    const enrichedCessions = await Promise.all(
+      (basicCessions || []).map(async (cession) => {
+        let repairOrderData = null;
+        
+        if (cession.repair_order_id) {
+          // Get repair order with client and vehicle info
+          const { data: repairOrder } = await supabase
+            .from('repair_orders')
+            .select(`
+              reference,
+              created_at,
+              clients(first_name, last_name),
+              vehicles(brand, model, license_plate)
+            `)
+            .eq('id', cession.repair_order_id)
+            .single();
+            
+          repairOrderData = repairOrder;
+        }
+        
+        return {
+          ...cession,
+          reference: (cession as any).reference || '',
+          status: (cession as any).status || 'en_attente',
+          repair_orders: repairOrderData
+        };
+      })
+    );
+    
+    return enrichedCessions as Cession[];
   },
 
   getById: async (id: string): Promise<Cession> => {
-    const { data, error } = await supabase
+    // Get basic cession data
+    const { data: basicCession, error: basicError } = await supabase
       .from('cessions')
       .select(`
         *,
@@ -86,16 +111,34 @@ export const cessionsService = {
       .eq('id', id)
       .single();
       
-    if (error) {
-      console.error(`Error fetching cession with id ${id}:`, error);
-      throw new Error(error.message);
+    if (basicError) {
+      console.error(`Error fetching cession with id ${id}:`, basicError);
+      throw new Error(basicError.message);
+    }
+    
+    // Enrich with repair order data if exists
+    let repairOrderData = null;
+    if (basicCession.repair_order_id) {
+      const { data: repairOrder } = await supabase
+        .from('repair_orders')
+        .select(`
+          reference,
+          created_at,
+          clients(first_name, last_name),
+          vehicles(brand, model, license_plate)
+        `)
+        .eq('id', basicCession.repair_order_id)
+        .single();
+        
+      repairOrderData = repairOrder;
     }
     
     // Transform data to match our interface
     return {
-      ...data,
-      reference: (data as any).reference || '',
-      status: (data as any).status || 'en_attente'
+      ...basicCession,
+      reference: (basicCession as any).reference || '',
+      status: (basicCession as any).status || 'en_attente',
+      repair_orders: repairOrderData
     } as Cession;
   },
   
