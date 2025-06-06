@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -56,7 +55,6 @@ const CompanyTab: React.FC = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-karrosserie-orange mx-auto"></div>
           <p className="mt-2 text-gray-600">Chargement des données...</p>
-          <p className="text-sm text-gray-400 mt-1">Utilisateur: {user.email}</p>
         </div>
       </div>
     );
@@ -64,13 +62,6 @@ const CompanyTab: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {/* Debug info */}
-      <div className="bg-gray-50 p-4 rounded-lg text-sm">
-        <p><strong>Debug info:</strong></p>
-        <p>Utilisateur connecté: {user.email} (ID: {user.id})</p>
-        <p>Données chargées: {JSON.stringify(companyData).length > 100 ? 'Oui' : 'Non'}</p>
-      </div>
-
       <Card>
         <CardHeader>
           <CardTitle>Logo de l'entreprise</CardTitle>

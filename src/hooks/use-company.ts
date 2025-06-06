@@ -27,33 +27,19 @@ export function useCompany() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Debug auth context
-  console.log('useCompany - Auth context state:', {
-    user: user ? { id: user.id, email: user.email } : null,
-    userExists: !!user
-  });
-
   useEffect(() => {
     const loadCompanyData = async () => {
-      console.log('useCompany: useEffect triggered with user:', user ? { id: user.id, email: user.email } : null);
-      
       if (!user) {
-        console.log('useCompany: No user found, skipping company data load');
         return;
       }
       
       setIsLoading(true);
-      console.log('useCompany: Loading company data for user:', user.id);
       
       try {
         const data = await companyService.getCompanyInfo(user.id);
-        console.log('useCompany: Received company data from service:', data);
         
         if (data) {
-          console.log('useCompany: Setting company data:', data);
           setCompanyData(data);
-        } else {
-          console.log('useCompany: No company data found, keeping default values');
         }
       } catch (error) {
         console.error('useCompany: Erreur lors du chargement des données:', error);
@@ -72,15 +58,12 @@ export function useCompany() {
 
   const saveCompanyData = async () => {
     if (!user) {
-      console.log('useCompany: No user found, cannot save');
       return;
     }
 
     setIsSaving(true);
     try {
-      console.log('useCompany: Saving company data:', companyData);
       const updatedData = await companyService.updateCompanyInfo(user.id, companyData);
-      console.log('useCompany: Received updated data:', updatedData);
       setCompanyData(updatedData);
       toast({
         title: "Données sauvegardées",
@@ -101,12 +84,7 @@ export function useCompany() {
   };
 
   const updateCompanyData = (updates: Partial<CompanyInfo>) => {
-    console.log('useCompany: Updating company data with:', updates);
-    setCompanyData(prev => {
-      const newData = { ...prev, ...updates };
-      console.log('useCompany: New company data state:', newData);
-      return newData;
-    });
+    setCompanyData(prev => ({ ...prev, ...updates }));
   };
 
   const updateNotifications = (key: string) => {
@@ -118,13 +96,6 @@ export function useCompany() {
       }
     }));
   };
-
-  console.log('useCompany hook final state:', { 
-    user: user ? { id: user.id, email: user.email } : null,
-    companyData, 
-    isLoading, 
-    isSaving 
-  });
 
   return {
     companyData,
