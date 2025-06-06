@@ -50,10 +50,10 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete, isLoading }: Expense
             <TableHead>Date</TableHead>
             <TableHead>Fournisseur</TableHead>
             <TableHead>Catégorie</TableHead>
+            <TableHead>Véhicule</TableHead>
             <TableHead>Statut</TableHead>
             <TableHead>Montant TVA</TableHead>
             <TableHead>Montant TTC</TableHead>
-            <TableHead>Véhicule</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -66,11 +66,6 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete, isLoading }: Expense
                 <TableCell>{expense.supplier}</TableCell>
                 <TableCell>{expense.category}</TableCell>
                 <TableCell>
-                  <StatusBadge status={expense.status} />
-                </TableCell>
-                <TableCell>{formatAmount(expense.vat_amount)}</TableCell>
-                <TableCell>{formatAmount(expense.total_amount)}</TableCell>
-                <TableCell>
                   {expense.vehicle ? (
                     <span className="text-sm">
                       {expense.vehicle.license_plate} - {expense.vehicle.brand} {expense.vehicle.model}
@@ -79,6 +74,11 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete, isLoading }: Expense
                     <span className="text-gray-400 text-sm">Non assigné</span>
                   )}
                 </TableCell>
+                <TableCell>
+                  <StatusBadge status={expense.status} />
+                </TableCell>
+                <TableCell>{formatAmount(expense.vat_amount)}</TableCell>
+                <TableCell>{formatAmount(expense.total_amount)}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-1">
                     <Button variant="ghost" size="icon">
