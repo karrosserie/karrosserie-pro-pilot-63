@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -156,14 +157,6 @@ export const CessionsTable = ({
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-1">
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => handleInitializeProcedure(cession)}
-                      title="Initialiser la procédure"
-                    >
-                      <Play className="h-4 w-4" />
-                    </Button>
                     <Button variant="ghost" size="icon">
                       <Eye className="h-4 w-4" />
                     </Button>
@@ -184,6 +177,14 @@ export const CessionsTable = ({
                       onClick={() => onDeleteCession(cession.id)}
                     >
                       <Trash className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => handleInitializeProcedure(cession)}
+                      title="Initialiser la procédure"
+                    >
+                      <Play className="h-4 w-4" />
                     </Button>
                   </div>
                 </TableCell>
@@ -207,3 +208,4 @@ export const CessionsTable = ({
     </div>
   );
 };
+
