@@ -1,3 +1,4 @@
+
 -- Create all tables for the application
 
 -- Create profiles table (extends auth.users)
@@ -138,10 +139,12 @@ CREATE TABLE IF NOT EXISTS public.cessions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   vehicle_id UUID REFERENCES public.vehicles(id) ON DELETE SET NULL,
+  reference TEXT NOT NULL,
   buyer_name TEXT NOT NULL,
   buyer_contact TEXT,
   sale_amount DECIMAL NOT NULL,
   sale_date DATE NOT NULL,
+  status TEXT DEFAULT 'en_attente',
   notes TEXT,
   document_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
