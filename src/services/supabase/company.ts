@@ -26,7 +26,7 @@ export interface CompanyInfo {
 export const companyService = {
   async getCompanyInfo(userId: string): Promise<CompanyInfo | null> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .rpc('get_company_info', { p_user_id: userId });
 
       if (error) {
@@ -65,7 +65,7 @@ export const companyService = {
     };
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .rpc('upsert_company_info', dataToUpdate);
 
       if (error) {
@@ -89,7 +89,7 @@ export const companyService = {
 
   async deleteCompanyInfo(userId: string): Promise<void> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .rpc('delete_company_info', { p_user_id: userId });
 
       if (error && !error.message.includes('does not exist')) {
