@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { profileService, Profile } from '@/services/supabase/profiles';
@@ -9,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { useForm } from 'react-hook-form';
-import { User, Phone, MapPin } from 'lucide-react';
+import { User, Phone } from 'lucide-react';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,9 +17,6 @@ const profileSchema = z.object({
   first_name: z.string().min(1, { message: "Le prénom est requis" }),
   last_name: z.string().min(1, { message: "Le nom est requis" }),
   phone_number: z.string().min(1, { message: "Le numéro de téléphone est requis" }),
-  address: z.string().min(1, { message: "L'adresse est requise" }),
-  city: z.string().min(1, { message: "La ville est requise" }),
-  postal_code: z.string().min(1, { message: "Le code postal est requis" }),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -36,9 +32,6 @@ const ProfilePage = () => {
       first_name: profile?.first_name || '',
       last_name: profile?.last_name || '',
       phone_number: profile?.phone_number || '',
-      address: profile?.address || '',
-      city: profile?.city || '',
-      postal_code: profile?.postal_code || '',
     },
     mode: 'onChange',
   });
@@ -158,58 +151,6 @@ const ProfilePage = () => {
                         </FormItem>
                       )}
                     />
-
-                    <FormField
-                      control={form.control}
-                      name="address"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm font-medium">
-                            Adresse <span className="text-red-500">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <div className="flex items-center">
-                              <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
-                              <Input {...field} placeholder="Adresse" />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="city"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-sm font-medium">
-                              Ville <span className="text-red-500">*</span>
-                            </FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="Ville" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="postal_code"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-sm font-medium">
-                              Code postal <span className="text-red-500">*</span>
-                            </FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="Code postal" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
                     
                     <div className="flex gap-2 justify-end">
                       <Button 
@@ -242,25 +183,6 @@ const ProfilePage = () => {
                       <Phone className="h-4 w-4 text-muted-foreground" />
                       {profile?.phone_number || '-'}
                     </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm mb-2">Adresse</label>
-                    <p className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-muted-foreground" />
-                      {profile?.address || '-'}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm mb-2">Ville</label>
-                      <p>{profile?.city || '-'}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm mb-2">Code postal</label>
-                      <p>{profile?.postal_code || '-'}</p>
-                    </div>
                   </div>
                   
                   <div className="flex justify-end">

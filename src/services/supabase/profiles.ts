@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface Profile {
@@ -6,9 +5,6 @@ export interface Profile {
   first_name: string;
   last_name: string;
   phone_number?: string;
-  address?: string;
-  city?: string;
-  postal_code?: string;
   [key: string]: any;
 }
 
