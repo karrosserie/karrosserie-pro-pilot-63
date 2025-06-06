@@ -5,6 +5,7 @@ import { CessionFormData, CessionFormErrors } from './types';
 import { useRepairOrder } from '@/hooks/use-repair-orders';
 import { useClient } from '@/hooks/use-clients';
 import { useClientVehicles } from '@/hooks/use-vehicles';
+import { toast } from '@/hooks/use-toast';
 
 interface UseCessionFormLogicProps {
   cession?: Cession | null;
@@ -25,6 +26,7 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
 
   const [errors, setErrors] = useState<CessionFormErrors>({});
   const [validationBlocked, setValidationBlocked] = useState(false);
+  const [validationErrorMessage, setValidationErrorMessage] = useState<string | null>(null);
 
   // Get repair order data when one is selected
   const { order, isLoading: isLoadingOrder } = useRepairOrder(formData.repair_order_id || undefined);
@@ -65,25 +67,23 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
       
       const validationError = validateRepairOrderData();
       if (validationError) {
-        setErrors(prev => ({
-          ...prev,
-          repair_order_id: validationError
-        }));
+        setValidationErrorMessage(validationError);
         setValidationBlocked(true);
+        
+        // Show toast notification
+        toast({
+          title: "Données incomplètes",
+          description: "L'ordre de réparation sélectionné contient des données manquantes. Cliquez pour voir les détails.",
+          variant: "destructive"
+        });
       } else {
         // Clear any previous errors
-        setErrors(prev => ({
-          ...prev,
-          repair_order_id: undefined
-        }));
+        setValidationErrorMessage(null);
         setValidationBlocked(false);
       }
     } else if (!formData.repair_order_id) {
       // Clear errors and unblock validation when no repair order is selected
-      setErrors(prev => ({
-        ...prev,
-        repair_order_id: undefined
-      }));
+      setValidationErrorMessage(null);
       setValidationBlocked(false);
     }
   }, [formData.repair_order_id, order, client, repairOrderVehicle, isLoadingOrder, isLoadingClient, isLoadingVehicles]);
@@ -110,7 +110,7 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
     if (!client.driver_license_front_url) missingClientFields.push("Photo recto du permis de conduire");
     if (!client.driver_license_back_url) missingClientFields.push("Photo verso du permis de conduire");
 
-    // Vérifier les photos du certificat d'immatriculation - corriger les noms des propriétés
+    // Vérifier les photos du certificat d'immatriculation
     if (!repairOrderVehicle.registration_document_front_url) missingVehicleDocuments.push("Photo recto du certificat d'immatriculation");
     if (!repairOrderVehicle.registration_document_back_url) missingVehicleDocuments.push("Photo verso du certificat d'immatriculation");
 
@@ -139,8 +139,8 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
       [field]: value
     }));
 
-    // Clear error when field is modified (except for repair_order_id which will be validated in useEffect)
-    if (errors[field] && field !== 'repair_order_id') {
+    // Clear error when field is modified
+    if (errors[field]) {
       setErrors(prev => ({
         ...prev,
         [field]: undefined
@@ -206,13 +206,19 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
     } as any;
   };
 
+  const clearValidationError = () => {
+    setValidationErrorMessage(null);
+  };
+
   return {
     formData,
     errors,
     isReadOnly,
     validationBlocked,
+    validationErrorMessage,
     handleChange,
     validateForm,
-    prepareSubmitData
+    prepareSubmitData,
+    clearValidationError
   };
 };

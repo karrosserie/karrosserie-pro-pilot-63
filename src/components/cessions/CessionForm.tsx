@@ -25,9 +25,11 @@ export const CessionForm = ({
     formData,
     errors,
     isReadOnly,
+    validationErrorMessage,
     handleChange,
     validateForm,
-    prepareSubmitData
+    prepareSubmitData,
+    clearValidationError
   } = useCessionFormLogic({ cession });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,7 +59,9 @@ export const CessionForm = ({
       <CessionBasicInfoSection 
         formData={formData}
         errors={errors}
+        validationErrorMessage={validationErrorMessage}
         onFieldChange={handleChange}
+        onClearValidationError={clearValidationError}
       />
 
       <CessionFormActions 
