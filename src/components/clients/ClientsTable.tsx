@@ -9,10 +9,9 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Eye, Pencil, UserPlus, MoreHorizontal, Trash2 } from 'lucide-react';
+import { Eye, Download, Pencil, Trash2, UserPlus, MoreHorizontal } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { StatusBadge } from '@/components/ui/status-badge';
-import ClientDeleteDialog from '@/components/client/ClientDeleteDialog';
 import { Client } from '@/services/supabase/clients';
 
 interface ClientsTableProps {
@@ -67,6 +66,9 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                     <div className="flex justify-end space-x-1">
                       <Button variant="ghost" size="icon" onClick={() => onViewClient(client)}>
                         <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon">
+                        <Download className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => onEditClient(client)}>
                         <Pencil className="h-4 w-4" />

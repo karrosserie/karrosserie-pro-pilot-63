@@ -6,8 +6,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { StatusBadge } from '@/components/ui/status-badge';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
-import { MoreHorizontal, Trash2 } from 'lucide-react';
-import ClientDeleteDialog from './ClientDeleteDialog';
+import { Eye, Download, Pencil, Trash2, MoreHorizontal } from 'lucide-react';
 
 interface ClientListTableProps {
   clients: Client[];
@@ -61,12 +60,15 @@ const ClientListTable: React.FC<ClientListTableProps> = ({
       id: "actions",
       header: "Actions",
       cell: ({ row }) => (
-        <div className="text-right space-x-2 flex items-center justify-end">
-          <Button variant="ghost" size="sm" onClick={() => onViewClient(row.original)}>
-            Voir
+        <div className="text-right space-x-1 flex items-center justify-end">
+          <Button variant="ghost" size="icon" onClick={() => onViewClient(row.original)}>
+            <Eye className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="sm" onClick={() => onEditClient(row.original)}>
-            Éditer
+          <Button variant="ghost" size="icon">
+            <Download className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => onEditClient(row.original)}>
+            <Pencil className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" onClick={() => onDeleteClient(row.original)}>
             <Trash2 className="h-4 w-4" />

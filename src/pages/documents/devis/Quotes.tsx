@@ -9,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { Search, FileText, Plus, Filter, Eye, Download, Pencil, Trash2, MoreHorizontal } from 'lucide-react';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useToast } from '@/hooks/use-toast';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
@@ -95,27 +95,12 @@ const Quotes = () => {
   
   return (
     <div className="page-container">
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Devis</h1>
-        <p className="text-gray-600 mt-1">
-          Consultez et gérez les devis de réparation.
-        </p>
-      </div>
-      
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <div className="flex items-center mb-4 md:mb-0">
-          <Button variant="outline" size="sm" className="mr-2">
-            Tous
-          </Button>
-          <Button variant="outline" size="sm" className="mr-2">
-            En attente
-          </Button>
-          <Button variant="outline" size="sm" className="mr-2">
-            Signés
-          </Button>
-          <Button variant="outline" size="sm">
-            Facturés
-          </Button>
+        <div className="mb-4 md:mb-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Devis</h1>
+          <p className="text-gray-600 mt-1">
+            Consultez et gérez les devis de réparation.
+          </p>
         </div>
         
         <div className="flex items-center w-full md:w-auto space-x-2">
@@ -123,13 +108,13 @@ const Quotes = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input 
               placeholder="Rechercher un devis..." 
-              className="pl-10"
+              className="pl-10 bg-white border border-gray-200 focus:outline-none focus:ring-1 focus:ring-karrosserie-orange"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" className="bg-white">
             <Filter className="h-4 w-4" />
           </Button>
           
@@ -196,34 +181,34 @@ const Quotes = () => {
                       <Button variant="ghost" size="icon" onClick={() => handleEditQuote(quote)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700" onClick={() => handleDeleteQuote(quote.id)}>
-                        <Trash className="h-4 w-4" />
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteQuote(quote.id)}>
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
-                            <MoreVertical className="h-4 w-4" />
+                            <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-56">
-                          <DropdownMenuItem onClick={() => handleDownload(quote)}>
+                          <DropdownMenuItem>
                             <Download className="mr-2 h-4 w-4" />
                             Télécharger
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handlePrint(quote)}>
+                          <DropdownMenuItem>
                             <Printer className="mr-2 h-4 w-4" />
                             Imprimer
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleSendEmail(quote)}>
+                          <DropdownMenuItem>
                             <Mail className="mr-2 h-4 w-4" />
                             Envoyer par e-mail
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleRequestDocuments(quote)}>
+                          <DropdownMenuItem>
                             <FileCheck className="mr-2 h-4 w-4" />
                             Demander les justificatifs
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleConvertToRepairOrder(quote)}>
+                          <DropdownMenuItem>
                             <ArrowRight className="mr-2 h-4 w-4" />
                             Convertir en ordre de réparation
                           </DropdownMenuItem>

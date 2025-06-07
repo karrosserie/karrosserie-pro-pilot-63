@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Car, User, Edit, Eye, Trash2, MoreHorizontal } from 'lucide-react';
+import { Car, User, Eye, Download, Pencil, Trash2, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
@@ -125,9 +125,12 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
             <Eye className="h-4 w-4" />
           </Button>
         )}
+        <Button variant="ghost" size="icon">
+          <Download className="h-4 w-4" />
+        </Button>
         {onEdit && (
           <Button variant="ghost" size="icon" onClick={onEdit}>
-            <Edit className="h-4 w-4" />
+            <Pencil className="h-4 w-4" />
           </Button>
         )}
         {onDelete && (
