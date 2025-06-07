@@ -1,7 +1,5 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,7 +10,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Trash2 } from 'lucide-react';
 import { Client } from '@/services/supabase/clients';
 
 interface ClientDeleteDialogProps {
@@ -20,14 +20,11 @@ interface ClientDeleteDialogProps {
   onDelete: (client: Client) => void;
 }
 
-const ClientDeleteDialog: React.FC<ClientDeleteDialogProps> = ({
-  client,
-  onDelete
-}) => {
+const ClientDeleteDialog: React.FC<ClientDeleteDialogProps> = ({ client, onDelete }) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+        <Button variant="ghost" size="sm">
           <Trash2 className="h-4 w-4" />
         </Button>
       </AlertDialogTrigger>
@@ -43,7 +40,7 @@ const ClientDeleteDialog: React.FC<ClientDeleteDialogProps> = ({
           <AlertDialogCancel>Annuler</AlertDialogCancel>
           <AlertDialogAction 
             onClick={() => onDelete(client)}
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             Supprimer
           </AlertDialogAction>

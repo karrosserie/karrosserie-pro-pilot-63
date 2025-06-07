@@ -1,19 +1,14 @@
 
-
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { cn } from '@/lib/utils';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface VehicleDateStatusProps {
   formData: any;
@@ -29,105 +24,75 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
   onSelectChange
 }) => {
   const statusOptions = [
-    { value: 'En attente', label: 'En attente' },
-    { value: 'Diagnostic', label: 'Diagnostic' },
-    { value: 'En réparation', label: 'En réparation' },
-    { value: 'Terminé', label: 'Terminé' }
+    'En attente',
+    'En réparation', 
+    'Diagnostic',
+    'Terminé',
+    'Annulé',
+    'Réservé'
   ];
 
-  const handleArrivalDateTimeChange = (date: Date | undefined, time: string) => {
-    if (date) {
-      const [hours, minutes] = time.split(':');
-      const dateTime = new Date(date);
-      dateTime.setHours(parseInt(hours), parseInt(minutes));
-      
-      // Format as ISO string for the backend
-      const isoString = dateTime.toISOString();
-      onSelectChange('arrivalDate', isoString);
-    }
-  };
-
-  const getArrivalDateValue = () => {
-    if (!formData.arrivalDate) return undefined;
-    return new Date(formData.arrivalDate);
-  };
-
-  const getArrivalTimeValue = () => {
-    if (!formData.arrivalDate) return '09:00';
-    const date = new Date(formData.arrivalDate);
-    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-  };
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-      <div className="md:col-span-2 space-y-2">
-        <Label htmlFor="arrivalDate">Date & heure d'arrivée</Label>
-        <div className="flex space-x-2">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "flex-1 justify-start text-left font-normal",
-                  !getArrivalDateValue() && "text-muted-foreground"
-                )}
-                disabled={isViewMode}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {getArrivalDateValue() ? (
-                  format(getArrivalDateValue()!, "dd/MM/yyyy", { locale: fr })
-                ) : (
-                  <span>Sélectionner une date</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={getArrivalDateValue()}
-                onSelect={(date) => handleArrivalDateTimeChange(date, getArrivalTimeValue())}
-                initialFocus
-                locale={fr}
-                className={cn("p-3 pointer-events-auto")}
-              />
-            </PopoverContent>
-          </Popover>
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="arrivalDate">Date d'arrivée</Label>
           <Input
-            type="time"
-            value={getArrivalTimeValue()}
-            onChange={(e) => handleArrivalDateTimeChange(getArrivalDateValue()!, e.target.value)}
+            id="arrivalDate"
+            name="arrivalDate"
+            type="date"
+            value={formData.arrivalDate || ''}
+            onChange={onInputChange}
             disabled={isViewMode}
-            className="w-24"
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="startDate">Date de début</Label>
+          <Input
+            id="startDate"
+            name="startDate"
+            type="date"
+            value={formData.startDate || ''}
+            onChange={onInputChange}
+            disabled={isViewMode}
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="endDate">Date de fin</Label>
+          <Input
+            id="endDate"
+            name="endDate"
+            type="date"
+            value={formData.endDate || ''}
+            onChange={onInputChange}
+            disabled={isViewMode}
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="startDate">Date de début</Label>
-        <Input
-          id="startDate"
-          name="startDate"
-          type="date"
-          value={formData.startDate || ''}
-          onChange={onInputChange}
-          disabled={isViewMode}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="endDate">Date de fin</Label>
-        <Input
-          id="endDate"
-          name="endDate"
-          type="date"
-          value={formData.endDate || ''}
-          onChange={onInputChange}
-          disabled={isViewMode}
-        />
+        <Label htmlFor="status">Statut</Label>
+        <Select 
+          disabled={isViewMode} 
+          value={formData.status || 'En attente'} 
+          onValueChange={(value) => onSelectChange('status', value)}
+        >
+          <SelectTrigger id="status">
+            <SelectValue placeholder="Sélectionner un statut" />
+          </SelectTrigger>
+          <SelectContent>
+            {statusOptions.map(status => (
+              <SelectItem key={status} value={status}>
+                {status}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
 };
 
 export default VehicleDateStatus;
-

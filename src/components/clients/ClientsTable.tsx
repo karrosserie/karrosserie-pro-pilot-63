@@ -9,7 +9,9 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Eye, Pencil, UserPlus } from 'lucide-react';
+import { Eye, Pencil, UserPlus, MoreHorizontal } from 'lucide-react';
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
+import { StatusBadge } from '@/components/ui/status-badge';
 import ClientDeleteDialog from '@/components/client/ClientDeleteDialog';
 import { Client } from '@/services/supabase/clients';
 
@@ -35,37 +37,66 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
             <TableHead>Email</TableHead>
             <TableHead>Téléphone</TableHead>
             <TableHead>Ville</TableHead>
-            <TableHead>Société</TableHead>
+            <TableHead>Permis de conduire</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {clients.length > 0 ? (
-            clients.map((client) => (
-              <TableRow key={client.id}>
-                <TableCell className="font-medium">
-                  {client.first_name} {client.last_name}
-                </TableCell>
-                <TableCell>{client.email || '-'}</TableCell>
-                <TableCell>{client.phone}</TableCell>
-                <TableCell>{client.city}</TableCell>
-                <TableCell>{(client as any).company || '-'}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end space-x-1">
-                    <Button variant="ghost" size="icon" onClick={() => onViewClient(client)}>
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => onEditClient(client)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <ClientDeleteDialog 
-                      client={client}
-                      onDelete={onDeleteClient}
+            clients.map((client) => {
+              const clientData = client as any;
+              const hasFrontLicense = clientData.driver_license_front_url;
+              const hasBackLicense = clientData.driver_license_back_url;
+              const hasCompleteLicense = hasFrontLicense && hasBackLicense;
+              
+              return (
+                <TableRow key={client.id}>
+                  <TableCell className="font-medium">
+                    {client.first_name} {client.last_name}
+                  </TableCell>
+                  <TableCell>{client.email || '-'}</TableCell>
+                  <TableCell>{client.phone}</TableCell>
+                  <TableCell>{client.city}</TableCell>
+                  <TableCell>
+                    <StatusBadge 
+                      status={hasCompleteLicense ? "Permis importé" : "Pas de permis"}
                     />
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end space-x-1">
+                      <Button variant="ghost" size="icon" onClick={() => onViewClient(client)}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => onEditClient(client)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <ClientDeleteDialog 
+                        client={client}
+                        onDelete={onDeleteClient}
+                      />
+                      <ContextMenu>
+                        <ContextMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </ContextMenuTrigger>
+                        <ContextMenuContent>
+                          <ContextMenuItem>
+                            Créer un devis
+                          </ContextMenuItem>
+                          <ContextMenuItem>
+                            Créer une facture
+                          </ContextMenuItem>
+                          <ContextMenuItem>
+                            Créer un avoir
+                          </ContextMenuItem>
+                        </ContextMenuContent>
+                      </ContextMenu>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })
           ) : (
             <TableRow>
               <TableCell colSpan={6} className="text-center py-4">

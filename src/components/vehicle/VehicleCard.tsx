@@ -1,6 +1,9 @@
+
 import React from 'react';
-import { Car, User, Edit, Eye, Trash2 } from 'lucide-react';
+import { Car, User, Edit, Eye, Trash2, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { StatusBadge } from '@/components/ui/status-badge';
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
 
 interface VehicleCardProps {
   brand: string;
@@ -11,6 +14,8 @@ interface VehicleCardProps {
   owner: string;
   imageUrl?: string;
   vehicleImages?: string[];
+  registrationFrontUrl?: string;
+  registrationBackUrl?: string;
   onView?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
@@ -24,6 +29,8 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
   owner,
   imageUrl,
   vehicleImages,
+  registrationFrontUrl,
+  registrationBackUrl,
   onView,
   onEdit,
   onDelete
@@ -66,6 +73,9 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
   };
 
   const firstImage = getFirstImage();
+  
+  // Check if registration certificate is complete
+  const hasCompleteRegistration = registrationFrontUrl && registrationBackUrl;
 
   return (
     <div className="card-container flex flex-col h-full animate-fade-in">
@@ -100,24 +110,45 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
           <User className="h-4 w-4 mr-1" />
           <span>Client: {owner}</span>
         </div>
+        
+        <div className="mt-2">
+          <StatusBadge 
+            status={hasCompleteRegistration ? "Certificat d'immatriculation importé" : "Pas de certificat d'immatriculation"}
+          />
+        </div>
       </div>
       
-      <div className="border-t border-gray-100 mt-4 pt-4 flex justify-end space-x-2">
+      <div className="border-t border-gray-100 mt-4 pt-4 flex justify-end space-x-1">
         {onView && (
-          <Button variant="outline" size="sm" onClick={onView}>
+          <Button variant="ghost" size="icon" onClick={onView}>
             <Eye className="h-4 w-4" />
           </Button>
         )}
         {onEdit && (
-          <Button variant="outline" size="sm" onClick={onEdit}>
+          <Button variant="ghost" size="icon" onClick={onEdit}>
             <Edit className="h-4 w-4" />
           </Button>
         )}
         {onDelete && (
-          <Button variant="destructive" size="sm" onClick={onDelete}>
-            <Trash2 className="h-4 w-4" />
+          <Button variant="ghost" size="icon" onClick={onDelete}>
+            <Trash2 className="h-4 w-4 text-red-500" />
           </Button>
         )}
+        <ContextMenu>
+          <ContextMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </ContextMenuTrigger>
+          <ContextMenuContent>
+            <ContextMenuItem>
+              Créer un devis
+            </ContextMenuItem>
+            <ContextMenuItem>
+              Créer une facture
+            </ContextMenuItem>
+          </ContextMenuContent>
+        </ContextMenu>
       </div>
     </div>
   );

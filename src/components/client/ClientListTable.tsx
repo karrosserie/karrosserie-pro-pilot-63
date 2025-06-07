@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Client } from '@/services/supabase/clients';
 import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
+import { StatusBadge } from '@/components/ui/status-badge';
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
+import { MoreHorizontal } from 'lucide-react';
 import ClientDeleteDialog from './ClientDeleteDialog';
 
 interface ClientListTableProps {
@@ -38,10 +41,26 @@ const ClientListTable: React.FC<ClientListTableProps> = ({
       header: "Téléphone",
     },
     {
+      id: "license_status",
+      header: "Permis de conduire",
+      cell: ({ row }) => {
+        const client = row.original as any;
+        const hasFrontLicense = client.driver_license_front_url;
+        const hasBackLicense = client.driver_license_back_url;
+        const hasCompleteLicense = hasFrontLicense && hasBackLicense;
+        
+        return (
+          <StatusBadge 
+            status={hasCompleteeLicense ? "Permis importé" : "Pas de permis"}
+          />
+        );
+      },
+    },
+    {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => (
-        <div className="text-right space-x-2">
+        <div className="text-right space-x-2 flex items-center justify-end">
           <Button variant="ghost" size="sm" onClick={() => onViewClient(row.original)}>
             Voir
           </Button>
@@ -52,6 +71,24 @@ const ClientListTable: React.FC<ClientListTableProps> = ({
             client={row.original}
             onDelete={onDeleteClient}
           />
+          <ContextMenu>
+            <ContextMenuTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </ContextMenuTrigger>
+            <ContextMenuContent>
+              <ContextMenuItem>
+                Créer un devis
+              </ContextMenuItem>
+              <ContextMenuItem>
+                Créer une facture
+              </ContextMenuItem>
+              <ContextMenuItem>
+                Créer un avoir
+              </ContextMenuItem>
+            </ContextMenuContent>
+          </ContextMenu>
         </div>
       ),
     },

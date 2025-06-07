@@ -72,13 +72,7 @@ export const CustomPhoneInput: React.FC<CustomPhoneInputProps> = ({
             className="w-auto justify-center rounded-r-none border-r-0 px-3"
             disabled={disabled}
           >
-            <span 
-              className="text-lg leading-none" 
-              style={{ 
-                fontFamily: 'Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, serif',
-                fontSize: '18px'
-              }}
-            >
+            <span className="flag-emoji text-lg leading-none">
               {selectedCountry.flag}
             </span>
           </Button>
@@ -96,13 +90,7 @@ export const CustomPhoneInput: React.FC<CustomPhoneInputProps> = ({
                     onSelect={() => handleCountrySelect(country)}
                     className="flex items-center gap-2 cursor-pointer"
                   >
-                    <span 
-                      className="text-lg"
-                      style={{ 
-                        fontFamily: 'Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, serif',
-                        fontSize: '18px'
-                      }}
-                    >
+                    <span className="flag-emoji text-lg">
                       {country.flag}
                     </span>
                     <span className="flex-1">{country.name}</span>

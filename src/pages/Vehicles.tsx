@@ -2,7 +2,6 @@
 import React from 'react';
 import VehicleDialog from '@/components/vehicle/VehicleDialog';
 import VehiclesHeader from '@/components/vehicle/VehiclesHeader';
-import VehiclesFilters from '@/components/vehicle/VehiclesFilters';
 import VehiclesGrid from '@/components/vehicle/VehiclesGrid';
 import VehiclesEmptyState from '@/components/vehicle/VehiclesEmptyState';
 import { TableLoading } from '@/components/ui/loading';
@@ -14,13 +13,11 @@ const Vehicles = () => {
     dialogOpen,
     dialogMode,
     selectedVehicle,
-    statusFilter,
     searchQuery,
     vehicles,
     isLoading,
     error,
     setDialogOpen,
-    setStatusFilter,
     setSearchQuery,
     handleCreateVehicle,
     handleViewVehicle,
@@ -34,19 +31,16 @@ const Vehicles = () => {
 
   return (
     <div className="page-container">
-      <VehiclesHeader onCreateVehicle={handleCreateVehicle} />
-      
-      <VehiclesFilters
-        statusFilter={statusFilter}
+      <VehiclesHeader 
+        onCreateVehicle={handleCreateVehicle}
         searchQuery={searchQuery}
-        onStatusFilterChange={setStatusFilter}
         onSearchQueryChange={setSearchQuery}
       />
       
       {vehicles.length === 0 ? (
         <VehiclesEmptyState
           searchQuery={searchQuery}
-          statusFilter={statusFilter}
+          statusFilter="Tous"
           onCreateVehicle={handleCreateVehicle}
         />
       ) : (

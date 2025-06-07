@@ -48,3 +48,25 @@
 .PhoneInputCountrySelectDropdown .PhoneInputCountrySelectOption[aria-selected="true"] .PhoneInputCountryName {
   color: hsl(var(--primary-foreground)) !important;
 }
+
+/* Styles pour améliorer l'affichage des emojis de drapeaux */
+.flag-emoji {
+  font-family: 'Segoe UI Emoji', 'Noto Color Emoji', 'Apple Color Emoji', sans-serif !important;
+  font-variant-emoji: emoji !important;
+  text-rendering: optimizeQuality !important;
+  -webkit-font-feature-settings: "liga" on, "calt" on !important;
+  font-feature-settings: "liga" on, "calt" on !important;
+}
+
+/* Fallback pour les systèmes qui ne supportent pas les emojis */
+@supports not (font-variant-emoji: emoji) {
+  .flag-emoji {
+    font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif !important;
+  }
+  
+  .flag-emoji::before {
+    content: attr(data-country-code) !important;
+    font-size: 0.75rem !important;
+    color: hsl(var(--muted-foreground)) !important;
+  }
+}
