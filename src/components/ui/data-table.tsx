@@ -78,7 +78,7 @@ export function DataTable<TData, TValue>({
               onChange={(event) =>
                 table.getColumn(searchKey)?.setFilterValue(event.target.value)
               }
-              className="pl-10 max-w-sm"
+              className="pl-10 max-w-sm bg-white border border-gray-200 focus:outline-none focus:ring-1 focus:ring-karrosserie-orange"
             />
           </div>
         ) : (

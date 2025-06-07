@@ -9,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Eye, Pencil, UserPlus, MoreHorizontal } from 'lucide-react';
+import { Eye, Pencil, UserPlus, MoreHorizontal, Trash2 } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { StatusBadge } from '@/components/ui/status-badge';
 import ClientDeleteDialog from '@/components/client/ClientDeleteDialog';
@@ -60,6 +60,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                   <TableCell>
                     <StatusBadge 
                       status={hasCompleteLicense ? "Permis importé" : "Pas de permis"}
+                      className={hasCompleteLicense ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-amber-100 text-amber-800 hover:bg-amber-100"}
                     />
                   </TableCell>
                   <TableCell className="text-right">
@@ -70,10 +71,9 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                       <Button variant="ghost" size="icon" onClick={() => onEditClient(client)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <ClientDeleteDialog 
-                        client={client}
-                        onDelete={onDeleteClient}
-                      />
+                      <Button variant="ghost" size="icon" onClick={() => onDeleteClient(client)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                       <ContextMenu>
                         <ContextMenuTrigger asChild>
                           <Button variant="ghost" size="icon">

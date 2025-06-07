@@ -44,6 +44,7 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
             value={formData.arrivalDate || ''}
             onChange={onInputChange}
             disabled={isViewMode}
+            className="w-full"
           />
         </div>
         
@@ -56,6 +57,7 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
             value={formData.startDate || ''}
             onChange={onInputChange}
             disabled={isViewMode}
+            className="w-full"
           />
         </div>
         
@@ -68,6 +70,7 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
             value={formData.endDate || ''}
             onChange={onInputChange}
             disabled={isViewMode}
+            className="w-full"
           />
         </div>
       </div>

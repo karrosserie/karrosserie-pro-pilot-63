@@ -6,7 +6,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { StatusBadge } from '@/components/ui/status-badge';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Trash2 } from 'lucide-react';
 import ClientDeleteDialog from './ClientDeleteDialog';
 
 interface ClientListTableProps {
@@ -52,6 +52,7 @@ const ClientListTable: React.FC<ClientListTableProps> = ({
         return (
           <StatusBadge 
             status={hasCompleteLicense ? "Permis importé" : "Pas de permis"}
+            className={hasCompleteLicense ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-amber-100 text-amber-800 hover:bg-amber-100"}
           />
         );
       },
@@ -67,13 +68,12 @@ const ClientListTable: React.FC<ClientListTableProps> = ({
           <Button variant="outline" size="sm" onClick={() => onEditClient(row.original)}>
             Éditer
           </Button>
-          <ClientDeleteDialog 
-            client={row.original}
-            onDelete={onDeleteClient}
-          />
+          <Button variant="ghost" size="icon" onClick={() => onDeleteClient(row.original)}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
           <ContextMenu>
             <ContextMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="icon">
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </ContextMenuTrigger>

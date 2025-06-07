@@ -30,7 +30,7 @@ const VehiclesHeader: React.FC<VehiclesHeaderProps> = ({
           />
         </div>
         
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="bg-white">
           <Filter className="h-4 w-4 mr-2" />
           Filtres
         </Button>

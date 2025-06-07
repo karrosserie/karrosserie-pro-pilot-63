@@ -114,6 +114,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
         <div className="mt-2">
           <StatusBadge 
             status={hasCompleteRegistration ? "Certificat d'immatriculation importé" : "Pas de certificat d'immatriculation"}
+            className={hasCompleteRegistration ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-amber-100 text-amber-800 hover:bg-amber-100"}
           />
         </div>
       </div>
@@ -131,7 +132,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
         )}
         {onDelete && (
           <Button variant="ghost" size="icon" onClick={onDelete}>
-            <Trash2 className="h-4 w-4 text-red-500" />
+            <Trash2 className="h-4 w-4" />
           </Button>
         )}
         <ContextMenu>
