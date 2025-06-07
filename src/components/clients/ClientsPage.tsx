@@ -93,14 +93,12 @@ const ClientsPage = () => {
 
   return (
     <div className="page-container">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-        <ClientsHeader />
-        <ClientsFilters 
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          onCreateClient={handleCreateClient}
-        />
-      </div>
+      <ClientsHeader />
+      <ClientsFilters 
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onCreateClient={handleCreateClient}
+      />
       
       <ClientsTable 
         clients={filteredClients}
