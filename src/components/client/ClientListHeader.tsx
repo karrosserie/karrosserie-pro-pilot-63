@@ -24,7 +24,7 @@ const ClientListHeader: React.FC<ClientListHeaderProps> = ({
             placeholder="Rechercher un client..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10"
+            className="pl-10 bg-white border border-gray-200 focus:outline-none focus:ring-1 focus:ring-karrosserie-orange"
           />
         </div>
         

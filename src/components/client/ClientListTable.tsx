@@ -5,7 +5,7 @@ import { Client } from '@/services/supabase/clients';
 import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { StatusBadge } from '@/components/ui/status-badge';
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Eye, Download, Pencil, Trash2, MoreHorizontal } from 'lucide-react';
 
 interface ClientListTableProps {
@@ -73,24 +73,24 @@ const ClientListTable: React.FC<ClientListTableProps> = ({
           <Button variant="ghost" size="icon" onClick={() => onDeleteClient(row.original)}>
             <Trash2 className="h-4 w-4" />
           </Button>
-          <ContextMenu>
-            <ContextMenuTrigger asChild>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
-            </ContextMenuTrigger>
-            <ContextMenuContent>
-              <ContextMenuItem>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuItem>
                 Créer un devis
-              </ContextMenuItem>
-              <ContextMenuItem>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
                 Créer une facture
-              </ContextMenuItem>
-              <ContextMenuItem>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
                 Créer un avoir
-              </ContextMenuItem>
-            </ContextMenuContent>
-          </ContextMenu>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       ),
     },

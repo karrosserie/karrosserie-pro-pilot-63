@@ -10,7 +10,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Eye, Download, Pencil, Trash2, UserPlus, MoreHorizontal } from 'lucide-react';
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Client } from '@/services/supabase/clients';
 
@@ -76,24 +76,24 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                       <Button variant="ghost" size="icon" onClick={() => onDeleteClient(client)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
-                      <ContextMenu>
-                        <ContextMenuTrigger asChild>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
-                        </ContextMenuTrigger>
-                        <ContextMenuContent>
-                          <ContextMenuItem>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56">
+                          <DropdownMenuItem>
                             Créer un devis
-                          </ContextMenuItem>
-                          <ContextMenuItem>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
                             Créer une facture
-                          </ContextMenuItem>
-                          <ContextMenuItem>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
                             Créer un avoir
-                          </ContextMenuItem>
-                        </ContextMenuContent>
-                      </ContextMenu>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </TableCell>
                 </TableRow>
