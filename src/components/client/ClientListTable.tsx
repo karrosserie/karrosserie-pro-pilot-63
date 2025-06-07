@@ -51,7 +51,7 @@ const ClientListTable: React.FC<ClientListTableProps> = ({
         
         return (
           <StatusBadge 
-            status={hasCompleteeLicense ? "Permis importé" : "Pas de permis"}
+            status={hasCompleteLicense ? "Permis importé" : "Pas de permis"}
           />
         );
       },
