@@ -73,9 +73,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                       <Button variant="ghost" size="icon" onClick={() => onEditClient(client)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => onDeleteClient(client)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700" onClick={() => onDeleteClient(client) />
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
