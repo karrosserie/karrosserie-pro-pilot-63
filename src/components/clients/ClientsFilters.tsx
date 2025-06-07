@@ -26,8 +26,8 @@ const ClientsFilters: React.FC<ClientsFiltersProps> = ({
       <div className="flex-1" />
       
       <div className="flex items-center w-full md:w-auto space-x-2">
-        <div className="relative flex-1 md:w-60">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input 
           placeholder="Rechercher un client..." 
           className="pl-10 bg-white border border-gray-200 focus:outline-none"
