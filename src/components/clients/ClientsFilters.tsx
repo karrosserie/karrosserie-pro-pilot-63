@@ -22,8 +22,11 @@ const ClientsFilters: React.FC<ClientsFiltersProps> = ({
   onCreateClient
 }) => {
   return (
-    <div className="flex items-center space-x-3">
-      <div className="relative">
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+      <div className="flex-1" />
+      
+      <div className="flex items-center w-full md:w-auto space-x-2">
+        <div className="relative flex-1 md:w-60">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input 
           placeholder="Rechercher un client..." 
@@ -53,6 +56,7 @@ const ClientsFilters: React.FC<ClientsFiltersProps> = ({
         <UserPlus className="h-4 w-4 mr-2" />
         Nouveau client
       </Button>
+      </div>
     </div>
   );
 };
