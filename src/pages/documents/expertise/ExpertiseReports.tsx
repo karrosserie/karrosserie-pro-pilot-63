@@ -13,7 +13,6 @@ import ExpertiseReportTable from '@/components/expertise/ExpertiseReportTable';
 
 const ExpertiseReports = () => {
   const { reports, isLoading, error, deleteReport } = useExpertiseReports();
-  const [searchTerm, setSearchTerm] = useState('');
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);

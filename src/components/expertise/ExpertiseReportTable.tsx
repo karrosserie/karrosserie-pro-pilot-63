@@ -33,6 +33,8 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
   if (error) {
     return <ExpertiseReportTableError error={error} />;
   }
+  
+  const [searchTerm, setSearchTerm] = useState('');
 
   return (
     <TooltipProvider>      

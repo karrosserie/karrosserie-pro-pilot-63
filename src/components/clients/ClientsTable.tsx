@@ -30,6 +30,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
   onEditClient,
   onDeleteClient
 }) => {
+  
   const [searchTerm, setSearchTerm] = useState('');
   
   return (
