@@ -35,6 +35,12 @@ const ClientsPage = () => {
     setDialogOpen(true);
   };
 
+  const handleCreateClient = () => {
+    setSelectedClient(null);
+    setDialogMode('create');
+    setDialogOpen(true);
+  };
+
   const handleEditClient = (client: Client) => {
     setSelectedClient(client);
     setDialogMode('edit');
