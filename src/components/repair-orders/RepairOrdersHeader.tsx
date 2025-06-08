@@ -25,20 +25,6 @@ export const RepairOrdersHeader = ({
       </div>
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <div className="flex items-center mb-4 md:mb-0">
-          <Button variant="outline" size="sm" className="mr-2">
-            Tous
-          </Button>
-          <Button variant="outline" size="sm" className="mr-2">
-            En cours
-          </Button>
-          <Button variant="outline" size="sm" className="mr-2">
-            En attente
-          </Button>
-          <Button variant="outline" size="sm">
-            Terminés
-          </Button>
-        </div>
         
         <div className="flex items-center w-full md:w-auto space-x-2">
           <div className="relative flex-1 md:w-60">

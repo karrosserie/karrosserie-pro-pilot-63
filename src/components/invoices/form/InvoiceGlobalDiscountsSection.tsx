@@ -3,7 +3,7 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Percent, Plus, Trash2 } from 'lucide-react';
+import { Percent, Plus, Trash } from 'lucide-react';
 import { InvoiceDiscountItem } from './types';
 
 interface InvoiceGlobalDiscountsSectionProps {
@@ -93,7 +93,7 @@ export const InvoiceGlobalDiscountsSection = ({ discounts, onDiscountsChange, is
                     onClick={() => removeDiscount(discount.id)}
                     className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash className="h-4 w-4" />
                   </Button>
                 )}
               </div>
