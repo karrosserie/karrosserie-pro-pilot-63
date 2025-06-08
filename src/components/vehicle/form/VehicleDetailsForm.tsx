@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash } from 'lucide-react';
 import FuelGauge from './FuelGauge';
 import { 
   Select,
@@ -140,7 +140,7 @@ const VehicleDetailsForm: React.FC<VehicleDetailsFormProps> = ({
                   onClick={() => onRemoveWorkItem(index)}
                   className="text-red-500 hover:text-red-700"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash className="h-4 w-4" />
                 </Button>
               )}
             </div>
