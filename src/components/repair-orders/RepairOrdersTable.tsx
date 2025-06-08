@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
-import { Eye, Pencil, Trash2, FileText, MoreVertical } from 'lucide-react';
+import { Eye, Pencil, Trash, FileText, MoreVertical } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import {
   DropdownMenu,
@@ -114,7 +114,7 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
                     <Pencil className="h-4 w-4" />
                   </Button>
                   <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
-                    <Trash2 className="h-4 w-4" />
+                    <Trash className="h-4 w-4" />
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
