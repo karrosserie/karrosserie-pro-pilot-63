@@ -73,7 +73,7 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Référence</TableHead>
+            <TableHead>Numéro</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Client</TableHead>
             <TableHead>Véhicule</TableHead>

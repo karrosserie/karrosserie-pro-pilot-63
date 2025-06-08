@@ -266,7 +266,7 @@ const Credits = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Référence</TableHead>
+              <TableHead>Numéro</TableHead>
               <TableHead>Date de création</TableHead>
               <TableHead>Client</TableHead>
               <TableHead>Véhicule</TableHead>
