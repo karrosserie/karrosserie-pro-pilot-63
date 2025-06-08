@@ -24,9 +24,9 @@ export const CessionFormFields = ({
   return (
     <div className="space-y-4">
       {/* Numéro de sinistre, Date du sinistre et Numéro de police sur la même ligne */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         {/* Numéro de sinistre */}
-        <div className="space-y-2">
+        <div className="md:col-span-2 space-y-2">
           <Label htmlFor="incident_number">
             Numéro de sinistre <span className="text-red-500">*</span>
           </Label>
