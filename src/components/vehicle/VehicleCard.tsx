@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Car, User, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { Car, User, Eye, Pencil, Trash2, MoreHorizontal, FileText, Receipt, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -51,12 +51,10 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
     }
   };
 
-  // Obtenir la première image disponible
   const getFirstImage = () => {
     if (imageUrl) return imageUrl;
     
     if (vehicleImages && vehicleImages.length > 0) {
-      // Parse les images si c'est une chaîne JSON
       if (typeof vehicleImages === 'string') {
         try {
           const parsed = JSON.parse(vehicleImages);
@@ -65,7 +63,6 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
           return null;
         }
       }
-      // Si c'est déjà un tableau
       return Array.isArray(vehicleImages) && vehicleImages.length > 0 ? vehicleImages[0] : null;
     }
     
@@ -73,8 +70,6 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
   };
 
   const firstImage = getFirstImage();
-  
-  // Check if registration certificate is complete
   const hasCompleteRegistration = registrationFrontUrl && registrationBackUrl;
 
   return (
@@ -134,24 +129,29 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
           <Button 
             variant="ghost" 
             size="icon"
-            className="text-red-500 hover:text-red-700"
             onClick={onDelete}
             >
-            <Trash className="h-4 w-4" />
+            <Trash2 className="h-4 w-4" />
           </Button>
         )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">
-              <MoreVertical className="h-4 w-4" />
+              <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
             <DropdownMenuItem>
+              <FileText className="h-4 w-4 mr-2" />
               Créer un devis
             </DropdownMenuItem>
             <DropdownMenuItem>
+              <Receipt className="h-4 w-4 mr-2" />
               Créer une facture
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <CreditCard className="h-4 w-4 mr-2" />
+              Créer un avoir
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

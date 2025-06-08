@@ -6,7 +6,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { StatusBadge } from '@/components/ui/status-badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { Eye, Download, Pencil, Trash2, MoreHorizontal } from 'lucide-react';
+import { Eye, Download, Pencil, Trash2, MoreHorizontal, FileText, Receipt, CreditCard } from 'lucide-react';
 
 interface ClientListTableProps {
   clients: Client[];
@@ -81,12 +81,15 @@ const ClientListTable: React.FC<ClientListTableProps> = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               <DropdownMenuItem>
+                <FileText className="h-4 w-4 mr-2" />
                 Créer un devis
               </DropdownMenuItem>
               <DropdownMenuItem>
+                <Receipt className="h-4 w-4 mr-2" />
                 Créer une facture
               </DropdownMenuItem>
               <DropdownMenuItem>
+                <CreditCard className="h-4 w-4 mr-2" />
                 Créer un avoir
               </DropdownMenuItem>
             </DropdownMenuContent>

@@ -9,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Eye, Download, Pencil, Trash, UserPlus, MoreVertical } from 'lucide-react';
+import { Eye, Download, Pencil, Trash2, UserPlus, MoreHorizontal, FileText, Receipt, CreditCard } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Client } from '@/services/supabase/clients';
@@ -73,28 +73,26 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                       <Button variant="ghost" size="icon" onClick={() => onEditClient(client)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-red-500 hover:text-red-700" 
-                        onClick={() => onDeleteClient(client)}
-                        >
-                        <Trash className="h-4 w-4" />
+                      <Button variant="ghost" size="icon" onClick={() => onDeleteClient(client)}>
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
-                            <MoreVertical className="h-4 w-4" />
+                            <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-56">
                           <DropdownMenuItem>
+                            <FileText className="h-4 w-4 mr-2" />
                             Créer un devis
                           </DropdownMenuItem>
                           <DropdownMenuItem>
+                            <Receipt className="h-4 w-4 mr-2" />
                             Créer une facture
                           </DropdownMenuItem>
                           <DropdownMenuItem>
+                            <CreditCard className="h-4 w-4 mr-2" />
                             Créer un avoir
                           </DropdownMenuItem>
                         </DropdownMenuContent>
