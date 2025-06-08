@@ -1,5 +1,5 @@
 import React from 'react';
-import { Car, User, Eye, Pencil, Trash2, MoreVertical, FileText, Receipt, CreditCard } from 'lucide-react';
+import { Car, User, Eye, Pencil, Trash2, MoreVertical, FileText, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -147,10 +147,6 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
             <DropdownMenuItem>
               <Receipt className="h-4 w-4 mr-2" />
               Créer une facture
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <CreditCard className="h-4 w-4 mr-2" />
-              Créer un avoir
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
