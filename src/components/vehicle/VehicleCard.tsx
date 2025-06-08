@@ -69,7 +69,12 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
   };
 
   const firstImage = getFirstImage();
-  const hasCompleteRegistration = registrationFrontUrl && registrationBackUrl;
+  
+  // Vérification correcte des certificats d'immatriculation
+  const hasCompleteRegistration = registrationFrontUrl && 
+                                  registrationFrontUrl.trim() !== '' && 
+                                  registrationBackUrl && 
+                                  registrationBackUrl.trim() !== '';
 
   return (
     <div className="card-container flex flex-col h-full animate-fade-in">

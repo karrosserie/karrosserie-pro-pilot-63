@@ -65,22 +65,12 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
           <Label htmlFor="phone" required>
             Téléphone
           </Label>
-          {isViewMode ? (
-            <Input
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              disabled={true}
-              required
-            />
-          ) : (
-            <CustomPhoneInput
-              value={formData.phone}
-              onChange={handlePhoneChange || (() => {})}
-              placeholder="Numéro de téléphone"
-              disabled={isViewMode}
-            />
-          )}
+          <CustomPhoneInput
+            value={formData.phone}
+            onChange={handlePhoneChange || (() => {})}
+            placeholder="Numéro de téléphone"
+            disabled={isViewMode}
+          />
         </div>
       </div>
       
