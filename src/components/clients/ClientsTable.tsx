@@ -37,7 +37,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
       <ClientsFilters 
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        onCreateClient={handleCreateClient}
+        onCreateClient={onCreateClient}
       />
       <Table>
         <TableHeader>
