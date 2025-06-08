@@ -3,7 +3,7 @@ import React from 'react';
 import { Car, User, Eye, Pencil, Trash, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface VehicleCardProps {
   brand: string;
@@ -140,24 +140,21 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
             <Trash className="h-4 w-4" />
           </Button>
         )}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        <ContextMenu>
+          <ContextMenuTrigger asChild>
             <Button variant="ghost" size="icon">
-              <MoreVertical className="h-4 w-4" />
+              <MoreHorizontal className="h-4 w-4" />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            <DropdownMenuItem>
+          </ContextMenuTrigger>
+          <ContextMenuContent>
+            <ContextMenuItem>
               Créer un devis
-            </DropdownMenuItem>
-            <DropdownMenuItem>
+            </ContextMenuItem>
+            <ContextMenuItem>
               Créer une facture
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              Créer un avoir
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </ContextMenuItem>
+          </ContextMenuContent>
+        </ContextMenu>
       </div>
     </div>
   );
