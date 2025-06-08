@@ -34,7 +34,7 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div className="space-y-2">
           <Label htmlFor="arrivalDate">Date d'arrivée</Label>
           <Input
