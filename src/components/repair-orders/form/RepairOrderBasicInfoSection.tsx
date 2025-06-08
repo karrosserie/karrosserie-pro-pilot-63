@@ -90,7 +90,7 @@ export const RepairOrderBasicInfoSection = ({
             )}
           </div>
 
-          <div className="md:grid-cols-2">
+          <div className="md:col-span-3">
             <Label htmlFor="status">Statut</Label>
             <Select
               value={formData.status || 'En cours'}
