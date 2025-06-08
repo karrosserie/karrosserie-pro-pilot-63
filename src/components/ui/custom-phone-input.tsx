@@ -6,19 +6,20 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Check, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { FlagSvg } from './flag-svg';
 
 // Liste des pays avec leurs drapeaux, noms et indicatifs
 const countries = [
-  { code: 'FR', flag: '🇫🇷', name: 'France', dialCode: '+33' },
-  { code: 'US', flag: '🇺🇸', name: 'États-Unis', dialCode: '+1' },
-  { code: 'GB', flag: '🇬🇧', name: 'Royaume-Uni', dialCode: '+44' },
-  { code: 'DE', flag: '🇩🇪', name: 'Allemagne', dialCode: '+49' },
-  { code: 'ES', flag: '🇪🇸', name: 'Espagne', dialCode: '+34' },
-  { code: 'IT', flag: '🇮🇹', name: 'Italie', dialCode: '+39' },
-  { code: 'BE', flag: '🇧🇪', name: 'Belgique', dialCode: '+32' },
-  { code: 'CH', flag: '🇨🇭', name: 'Suisse', dialCode: '+41' },
-  { code: 'CA', flag: '🇨🇦', name: 'Canada', dialCode: '+1' },
-  { code: 'AU', flag: '🇦🇺', name: 'Australie', dialCode: '+61' },
+  { code: 'FR', name: 'France', dialCode: '+33' },
+  { code: 'US', name: 'États-Unis', dialCode: '+1' },
+  { code: 'GB', name: 'Royaume-Uni', dialCode: '+44' },
+  { code: 'DE', name: 'Allemagne', dialCode: '+49' },
+  { code: 'ES', name: 'Espagne', dialCode: '+34' },
+  { code: 'IT', name: 'Italie', dialCode: '+39' },
+  { code: 'BE', name: 'Belgique', dialCode: '+32' },
+  { code: 'CH', name: 'Suisse', dialCode: '+41' },
+  { code: 'CA', name: 'Canada', dialCode: '+1' },
+  { code: 'AU', name: 'Australie', dialCode: '+61' },
 ];
 
 interface CustomPhoneInputProps {
@@ -72,9 +73,7 @@ export const CustomPhoneInput: React.FC<CustomPhoneInputProps> = ({
             className="w-auto justify-center rounded-r-none border-r-0 px-3"
             disabled={disabled}
           >
-            <span className="flag-emoji text-lg leading-none">
-              {selectedCountry.flag}
-            </span>
+            <FlagSvg countryCode={selectedCountry.code} />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[300px] p-0" align="start">
@@ -90,9 +89,7 @@ export const CustomPhoneInput: React.FC<CustomPhoneInputProps> = ({
                     onSelect={() => handleCountrySelect(country)}
                     className="flex items-center gap-2 cursor-pointer"
                   >
-                    <span className="flag-emoji text-lg">
-                      {country.flag}
-                    </span>
+                    <FlagSvg countryCode={country.code} />
                     <span className="flex-1">{country.name}</span>
                     <span className="text-muted-foreground text-sm">{country.dialCode}</span>
                     <Check
