@@ -3,6 +3,7 @@ import React from 'react';
 import { Table, TableBody } from "@/components/ui/table";
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import ExpertiseReportFilters from '@/components/expertise/ExpertiseReportFilters';
 import { ExpertiseReportTableHeader } from './table/ExpertiseReportTableHeader';
 import { ExpertiseReportTableRow } from './table/ExpertiseReportTableRow';
 import { ExpertiseReportTableEmpty } from './table/ExpertiseReportTableEmpty';

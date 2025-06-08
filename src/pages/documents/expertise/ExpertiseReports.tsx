@@ -8,7 +8,6 @@ import { ExpertiseReportUploader } from '@/components/expertise/ExpertiseReportU
 import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 import ExpertiseReportHeader from '@/components/expertise/ExpertiseReportHeader';
-import ExpertiseReportFilters from '@/components/expertise/ExpertiseReportFilters';
 import ExpertiseReportTable from '@/components/expertise/ExpertiseReportTable';
 
 const ExpertiseReports = () => {
