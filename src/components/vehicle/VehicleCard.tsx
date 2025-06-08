@@ -140,24 +140,24 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
             <Trash className="h-4 w-4" />
           </Button>
         )}
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56">
-                          <DropdownMenuItem>
-                            Créer un devis
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            Créer une facture
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            Créer un avoir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuItem>
+              Créer un devis
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              Créer une facture
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              Créer un avoir
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
