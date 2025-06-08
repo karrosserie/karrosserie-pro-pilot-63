@@ -104,7 +104,6 @@ const ClientsPage = () => {
       <ClientsTable 
         clients={filteredClients}
         onViewClient={handleViewClient}
-        onCreateClient={handleCreateClient}
         onEditClient={handleEditClient}
         onDeleteClient={handleDeleteClient}
       />
