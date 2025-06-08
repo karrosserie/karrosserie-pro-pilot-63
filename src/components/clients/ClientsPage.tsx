@@ -98,7 +98,6 @@ const ClientsPage = () => {
       <ClientsFilters 
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        onCreateClient={onCreateClient}
       />
       
       <ClientsTable 
