@@ -25,20 +25,7 @@ export const ExpensesHeader = ({
       </div>
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <div className="flex items-center mb-4 md:mb-0">
-          <Button variant="outline" size="sm" className="mr-2">
-            Toutes
-          </Button>
-          <Button variant="outline" size="sm" className="mr-2">
-            Payées
-          </Button>
-          <Button variant="outline" size="sm" className="mr-2">
-            En attente
-          </Button>
-          <Button variant="outline" size="sm">
-            Annulées
-          </Button>
-        </div>
+        <div className="flex-1" />
         
         <div className="flex items-center w-full md:w-auto space-x-2">
           <div className="relative flex-1 md:w-60">
