@@ -9,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, FileText, Plus, Filter, Eye, Download, Pencil, Trash2, MoreVertical } from 'lucide-react';
+import { Search, FileText, Plus, Filter, Eye, Download, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useToast } from '@/hooks/use-toast';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
@@ -102,6 +102,8 @@ const Quotes = () => {
             Consultez et gérez les devis de réparation.
           </p>
         </div>
+      
+        <div className="flex-1" />
         
         <div className="flex items-center w-full md:w-auto space-x-2">
           <div className="relative flex-1 md:w-60">
@@ -181,8 +183,13 @@ const Quotes = () => {
                       <Button variant="ghost" size="icon" onClick={() => handleEditQuote(quote)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDeleteQuote(quote.id)}>
-                        <Trash2 className="h-4 w-4" />
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-red-500 hover:text-red-700" 
+                        onClick={() => handleDeleteQuote(quote.id)}
+                        >
+                        <Trash className="h-4 w-4" />
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
