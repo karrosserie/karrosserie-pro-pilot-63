@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FileUpload } from '@/components/ui/file-upload';
 import { Button } from '@/components/ui/button';
-import { Loader2, FileIcon, DownloadIcon, Trash2, CropIcon } from 'lucide-react';
+import { Loader2, FileIcon, DownloadIcon, Trash, CropIcon } from 'lucide-react';
 import { useStorage } from '@/hooks/use-storage';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -202,7 +202,7 @@ export function DocumentUploader({
                     {isDeleting ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <Trash2 className="h-4 w-4" />
+                      <Trash className="h-4 w-4" />
                     )}
                   </Button>
                 </div>
@@ -237,7 +237,7 @@ export function DocumentUploader({
                     {isDeleting ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <Trash2 className="h-4 w-4" />
+                      <Trash className="h-4 w-4" />
                     )}
                   </Button>
                 </div>
