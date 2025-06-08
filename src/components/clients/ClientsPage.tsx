@@ -98,7 +98,7 @@ const ClientsPage = () => {
       <ClientsFilters 
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        onCreateClient={onCreateClient}
+        onCreateClient={handleCreateClient}
       />
       
       <ClientsTable 
