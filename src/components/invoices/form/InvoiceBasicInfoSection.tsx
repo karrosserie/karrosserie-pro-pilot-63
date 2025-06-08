@@ -84,7 +84,7 @@ export const InvoiceBasicInfoSection = ({
             )}
           </div>
 
-          <div className="md:col-span-2">
+          <div className="md:col-span-3">
             <Label htmlFor="status">Statut</Label>
             <Select
               value={formData.status || 'En attente de paiement'}
