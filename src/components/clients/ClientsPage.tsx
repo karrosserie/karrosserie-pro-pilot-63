@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import ClientsHeader from './ClientsHeader';
 import ClientsTable from './ClientsTable';
 import ClientDialog from '@/components/client/ClientDialog';
@@ -14,6 +14,7 @@ const ClientsPage = () => {
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const { clients, isLoading, error, createClient, updateClient, deleteClient } = useClients();
+  const [searchTerm, setSearchTerm] = useState('');
   const { user } = useAuth();
 
   const filteredClients = clients?.filter(client => {
@@ -96,6 +97,7 @@ const ClientsPage = () => {
       <ClientsTable 
         clients={filteredClients}
         onViewClient={handleViewClient}
+        onCreateClient={handleCreateClient}
         onEditClient={handleEditClient}
         onDeleteClient={handleDeleteClient}
       />
