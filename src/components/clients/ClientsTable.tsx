@@ -26,6 +26,7 @@ interface ClientsTableProps {
 const ClientsTable: React.FC<ClientsTableProps> = ({
   clients,
   onViewClient,
+  onCreateClient,
   onEditClient,
   onDeleteClient
 }) => {
