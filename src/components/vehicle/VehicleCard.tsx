@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Car, User, Eye, Pencil, Trash, MoreHorizontal } from 'lucide-react';
+import { Car, User, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
