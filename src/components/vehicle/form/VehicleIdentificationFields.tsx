@@ -27,7 +27,9 @@ const VehicleIdentificationFields: React.FC<VehicleIdentificationFieldsProps> = 
     { value: 'En attente', label: 'En attente' },
     { value: 'Diagnostic', label: 'Diagnostic' },
     { value: 'En réparation', label: 'En réparation' },
-    { value: 'Terminé', label: 'Terminé' }
+    { value: 'Terminé', label: 'Terminé' },
+    { value: 'Annulé', label: 'Annulé' },
+    { value: 'Réservé', label: 'Réservé' }
   ];
 
   // Effect pour détecter automatiquement la marque et le modèle quand le VIN change
