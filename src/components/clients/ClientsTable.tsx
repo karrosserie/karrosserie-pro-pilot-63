@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import ClientsFilters from './ClientsFilters';
 import { Button } from '@/components/ui/button';
 import { 
   Table, 
@@ -18,7 +17,6 @@ import { Client } from '@/services/supabase/clients';
 interface ClientsTableProps {
   clients: Client[];
   onViewClient: (client: Client) => void;
-  onCreateClient: () => void;
   onEditClient: (client: Client) => void;
   onDeleteClient: (client: Client) => void;
 }
@@ -26,20 +24,12 @@ interface ClientsTableProps {
 const ClientsTable: React.FC<ClientsTableProps> = ({
   clients,
   onViewClient,
-  onCreateClient,
   onEditClient,
   onDeleteClient
 }) => {
   
-  const [searchTerm, setSearchTerm] = useState('');
-  
   return (
     <div className="card-container">
-      <ClientsFilters 
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        onCreateClient={onCreateClient}
-      />
       <Table>
         <TableHeader>
           <TableRow>

@@ -3,7 +3,6 @@ import React from 'react';
 import { Table, TableBody } from "@/components/ui/table";
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import ExpertiseReportFilters from './ExpertiseReportFilters';
 import { ExpertiseReportTableHeader } from './table/ExpertiseReportTableHeader';
 import { ExpertiseReportTableRow } from './table/ExpertiseReportTableRow';
 import { ExpertiseReportTableEmpty } from './table/ExpertiseReportTableEmpty';
@@ -34,24 +33,9 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
   if (error) {
     return <ExpertiseReportTableError error={error} />;
   }
-  
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  const filteredReports = reports?.filter(report => 
-    report.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (report.clients?.first_name + ' ' + report.clients?.last_name)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (report.vehicles?.brand + ' ' + report.vehicles?.model)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    report.expert_name?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
 
   return (
-    <TooltipProvider>      
-      <ExpertiseReportFilters 
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        onImportClick={() => setImportDialogOpen(true)}
-      />
-      
+    <TooltipProvider>
       <Table>
         <ExpertiseReportTableHeader />
         {reports.length > 0 ? (

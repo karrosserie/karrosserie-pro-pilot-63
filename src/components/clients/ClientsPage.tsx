@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import ClientsHeader from './ClientsHeader';
 import ClientsTable from './ClientsTable';
+import ClientsFilters from './ClientsFilters';
 import ClientDialog from '@/components/client/ClientDialog';
 import { useClients } from '@/hooks/use-clients';
 import { Client } from '@/services/supabase/clients';
@@ -93,6 +94,12 @@ const ClientsPage = () => {
   return (
     <div className="page-container">
       <ClientsHeader />
+      
+      <ClientsFilters 
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onCreateClient={onCreateClient}
+      />
       
       <ClientsTable 
         clients={filteredClients}

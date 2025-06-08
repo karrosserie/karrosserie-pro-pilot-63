@@ -8,15 +8,24 @@ import { ExpertiseReportUploader } from '@/components/expertise/ExpertiseReportU
 import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 import ExpertiseReportHeader from '@/components/expertise/ExpertiseReportHeader';
+import ExpertiseReportFilters from '@/components/expertise/ExpertiseReportFilters';
 import ExpertiseReportTable from '@/components/expertise/ExpertiseReportTable';
 
 const ExpertiseReports = () => {
   const { reports, isLoading, error, deleteReport } = useExpertiseReports();
+  const [searchTerm, setSearchTerm] = useState('');
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<ExpertiseReport | null>(null);
   const { toast } = useToast();
+  
+  const filteredReports = reports?.filter(report => 
+    report.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (report.clients?.first_name + ' ' + report.clients?.last_name)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (report.vehicles?.brand + ' ' + report.vehicles?.model)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    report.expert_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
   
   const handleViewReport = (report: ExpertiseReport) => {
     setSelectedReport(report);
@@ -51,6 +60,12 @@ const ExpertiseReports = () => {
       <ExpertiseReportHeader 
         title="Rapports d'expertise"
         description="Consultez et gérez les rapports d'expertise automobile."
+      />
+      
+      <ExpertiseReportFilters 
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onImportClick={() => setImportDialogOpen(true)}
       />
       
       <div className="card-container">
