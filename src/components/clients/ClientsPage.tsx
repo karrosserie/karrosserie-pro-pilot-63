@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import ClientsHeader from './ClientsHeader';
-import ClientsFilters from './ClientsFilters';
 import ClientsTable from './ClientsTable';
 import ClientDialog from '@/components/client/ClientDialog';
 import { useClients } from '@/hooks/use-clients';
@@ -94,11 +93,6 @@ const ClientsPage = () => {
   return (
     <div className="page-container">
       <ClientsHeader />
-      <ClientsFilters 
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        onCreateClient={handleCreateClient}
-      />
       
       <ClientsTable 
         clients={filteredClients}
