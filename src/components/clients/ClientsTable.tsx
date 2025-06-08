@@ -28,6 +28,14 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
   onEditClient,
   onDeleteClient
 }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleCreateClient = () => {
+    setSelectedClient(null);
+    setDialogMode('create');
+    setDialogOpen(true);
+  };
+  
   return (
     <div className="card-container">
       <ClientsFilters 

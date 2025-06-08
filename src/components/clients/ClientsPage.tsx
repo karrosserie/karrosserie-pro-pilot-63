@@ -13,7 +13,6 @@ const ClientsPage = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
   const { clients, isLoading, error, createClient, updateClient, deleteClient } = useClients();
   const { user } = useAuth();
 
@@ -29,12 +28,6 @@ const ClientsPage = () => {
     
     return matchesSearch;
   }) || [];
-
-  const handleCreateClient = () => {
-    setSelectedClient(null);
-    setDialogMode('create');
-    setDialogOpen(true);
-  };
 
   const handleViewClient = (client: Client) => {
     setSelectedClient(client);
