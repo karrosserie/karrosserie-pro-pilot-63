@@ -62,12 +62,6 @@ const ExpertiseReports = () => {
         description="Consultez et gérez les rapports d'expertise automobile."
       />
       
-      <ExpertiseReportFilters 
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        onImportClick={() => setImportDialogOpen(true)}
-      />
-      
       <div className="card-container">
         <ExpertiseReportTable 
           reports={filteredReports}

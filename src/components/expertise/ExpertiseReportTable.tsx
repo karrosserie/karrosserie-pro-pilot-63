@@ -35,7 +35,13 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
   }
 
   return (
-    <TooltipProvider>
+    <TooltipProvider>      
+      <ExpertiseReportFilters 
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onImportClick={() => setImportDialogOpen(true)}
+      />
+      
       <Table>
         <ExpertiseReportTableHeader />
         {reports.length > 0 ? (
