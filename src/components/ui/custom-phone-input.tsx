@@ -117,6 +117,9 @@ export const CustomPhoneInput: React.FC<CustomPhoneInputProps> = ({
           className="rounded-l-none pl-16"
         />
         {/* Affichage de l'indicatif dans le champ */}
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none">
+          {selectedCountry.dialCode}
+        </div>
       </div>
     </div>
   );
