@@ -95,7 +95,7 @@ export const QuoteBasicInfoSection = ({
             )}
           </div>
           
-          <div className="md:col-span-2 space-y-2">
+          <div className="md:col-span-2">
             <Label htmlFor="status" className={cn(errors.status && "text-red-500")}>
               Statut
             </Label>
