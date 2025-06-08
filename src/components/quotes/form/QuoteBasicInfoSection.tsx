@@ -51,7 +51,7 @@ export const QuoteBasicInfoSection = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div>
             <Label htmlFor="reference" required className={cn(errors.reference && "text-red-500")}>
               Numéro
@@ -94,8 +94,8 @@ export const QuoteBasicInfoSection = ({
               </p>
             )}
           </div>
-
-          <div>
+          
+          <div className="md:col-span-2 space-y-2">
             <Label htmlFor="status" className={cn(errors.status && "text-red-500")}>
               Statut
             </Label>
