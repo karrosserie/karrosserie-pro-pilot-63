@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -42,8 +42,25 @@ export const CustomPhoneInput: React.FC<CustomPhoneInputProps> = ({
   const [selectedCountry, setSelectedCountry] = useState(
     countries.find(country => country.code === defaultCountry) || countries[0]
   );
-  const [phoneNumber, setPhoneNumber] = useState(value.replace(/^\+\d+/, '').trim());
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [open, setOpen] = useState(false);
+
+  // Effet pour analyser la valeur initiale
+  useEffect(() => {
+    if (value) {
+      // Trouver le pays correspondant à l'indicatif dans la valeur
+      const matchingCountry = countries.find(country => value.startsWith(country.dialCode));
+      if (matchingCountry) {
+        setSelectedCountry(matchingCountry);
+        setPhoneNumber(value.substring(matchingCountry.dialCode.length));
+      } else {
+        // Si aucun indicatif trouvé, utiliser la valeur complète comme numéro
+        setPhoneNumber(value);
+      }
+    } else {
+      setPhoneNumber('');
+    }
+  }, [value]);
 
   const handleCountrySelect = (country: typeof countries[0]) => {
     setSelectedCountry(country);

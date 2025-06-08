@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Car, User, Eye, Pencil, Trash, MoreVertical, FileText, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -70,7 +71,8 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
 
   const firstImage = getFirstImage();
   
-  // Vérification correcte des certificats d'immatriculation
+  // Vérification correcte des certificats d'immatriculation avec les vraies propriétés de la DB
+  console.log('Registration data:', { registrationFrontUrl, registrationBackUrl });
   const hasCompleteRegistration = registrationFrontUrl && 
                                   registrationFrontUrl.trim() !== '' && 
                                   registrationBackUrl && 
