@@ -1,6 +1,12 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import { Car, Search, Filter } from 'lucide-react';
 
 interface VehiclesHeaderProps {
@@ -30,10 +36,18 @@ const VehiclesHeader: React.FC<VehiclesHeaderProps> = ({
           />
         </div>
         
-        <Button variant="outline" size="sm" className="bg-white">
-          <Filter className="h-4 w-4 mr-2" />
-          Filtres
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon" className="bg-white border-gray-200">
+              <Filter className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="bg-white">
+            <DropdownMenuItem>Tous les clients</DropdownMenuItem>
+            <DropdownMenuItem>Clients récents</DropdownMenuItem>
+            <DropdownMenuItem>Clients actifs</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         
         <Button className="btn-primary" onClick={onCreateVehicle}>
           <Car className="h-4 w-4 mr-2" />
