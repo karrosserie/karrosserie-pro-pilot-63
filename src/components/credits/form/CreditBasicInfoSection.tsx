@@ -36,13 +36,13 @@ export const CreditBasicInfoSection = ({
           Informations de base
         </CardTitle>
         <CardDescription>
-          Référence, facture et statut de l'avoir
+          Numéro, facture et statut de l'avoir
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="reference">Référence</Label>
+            <Label htmlFor="reference">Numéro</Label>
             <Input
               id="reference"
               value={formData.reference}
