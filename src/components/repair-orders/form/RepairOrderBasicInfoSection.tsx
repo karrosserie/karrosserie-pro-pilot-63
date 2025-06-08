@@ -50,7 +50,7 @@ export const RepairOrderBasicInfoSection = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <Label htmlFor="reference" required>Numéro</Label>
             <Input
@@ -90,7 +90,7 @@ export const RepairOrderBasicInfoSection = ({
             )}
           </div>
 
-          <div>
+          <div className="md:grid-cols-2">
             <Label htmlFor="status">Statut</Label>
             <Select
               value={formData.status || 'En cours'}
