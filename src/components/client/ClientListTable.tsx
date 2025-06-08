@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Client } from '@/services/supabase/clients';
@@ -6,7 +5,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { StatusBadge } from '@/components/ui/status-badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { Eye, Download, Pencil, Trash2, MoreHorizontal, FileText, Receipt, CreditCard } from 'lucide-react';
+import { Eye, Download, Pencil, Trash2, MoreVertical, FileText, Receipt, CreditCard } from 'lucide-react';
 
 interface ClientListTableProps {
   clients: Client[];
@@ -76,7 +75,7 @@ const ClientListTable: React.FC<ClientListTableProps> = ({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
-                <MoreHorizontal className="h-4 w-4" />
+                <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">

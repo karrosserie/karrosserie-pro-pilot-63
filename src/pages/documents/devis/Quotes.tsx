@@ -9,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, FileText, Plus, Filter, Eye, Download, Pencil, Trash2, MoreHorizontal } from 'lucide-react';
+import { Search, FileText, Plus, Filter, Eye, Download, Pencil, Trash2, MoreVertical } from 'lucide-react';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useToast } from '@/hooks/use-toast';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
@@ -187,7 +187,7 @@ const Quotes = () => {
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
+                            <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-56">

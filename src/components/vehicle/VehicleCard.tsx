@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Car, User, Eye, Pencil, Trash2, MoreHorizontal, FileText, Receipt, CreditCard } from 'lucide-react';
+import { Car, User, Eye, Pencil, Trash2, MoreVertical, FileText, Receipt, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -137,7 +136,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">
-              <MoreHorizontal className="h-4 w-4" />
+              <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
