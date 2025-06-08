@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import ClientsFilters from './ClientsFilters';
 import { Button } from '@/components/ui/button';
 import { 
@@ -28,7 +28,9 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
   onViewClient,
   onEditClient,
   onDeleteClient
-}) => {  
+}) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  
   return (
     <div className="card-container">
       <ClientsFilters 
