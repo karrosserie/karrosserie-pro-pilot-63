@@ -153,9 +153,6 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
             <DropdownMenuItem>
               Créer une facture
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              Créer un avoir
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
