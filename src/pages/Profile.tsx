@@ -15,7 +15,7 @@ const ProfilePage = () => {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
 
-  const onSave = async (data: Partial<Profile>) => {
+  const onSubmit = async (data: Partial<Profile>) => {
     if (!user) return;
     
     try {
@@ -64,7 +64,7 @@ const ProfilePage = () => {
               {isEditing ? (
                 <PersonalInfoForm
                   profile={profile}
-                  onSave={onSave}
+                  onSubmit={onSubmit}
                   onCancel={() => setIsEditing(false)}
                 />
               ) : (

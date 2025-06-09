@@ -8,7 +8,6 @@ export interface CompanyInfo {
   email: string;
   address: string;
   zipcode: string;
-  postal_code: string;
   city: string;
   phone: string;
   siren: string;
@@ -49,8 +48,7 @@ export const companyService = {
     // Transform the data to match our interface
     const transformedData = {
       ...data,
-      zipcode: data.zipcode || '',
-      postal_code: data.zipcode || '', // Map zipcode to postal_code for compatibility
+      zipcode: data.zipcode || '', // Use only zipcode since that's what exists in DB
       notifications: data.notifications as {
         email: boolean;
         push: boolean;
@@ -70,7 +68,7 @@ export const companyService = {
       name: companyData.name || '',
       email: companyData.email || '',
       address: companyData.address || '',
-      zipcode: companyData.postal_code || companyData.zipcode || '',
+      zipcode: companyData.zipcode || '', // Use zipcode to match our interface
       city: companyData.city || '',
       phone: companyData.phone || '',
       siren: companyData.siren || '',
@@ -99,8 +97,7 @@ export const companyService = {
     // Transform the data to match our interface
     return {
       ...data,
-      zipcode: data.zipcode || '',
-      postal_code: data.zipcode || '',
+      zipcode: data.zipcode || '', // Use only zipcode since that's what exists in DB
       notifications: data.notifications as {
         email: boolean;
         push: boolean;

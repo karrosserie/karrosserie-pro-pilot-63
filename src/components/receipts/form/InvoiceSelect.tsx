@@ -1,41 +1,56 @@
 
 import React from 'react';
-import { SearchableSelect } from '@/components/ui/searchable-select';
+import { Label } from '@/components/ui/label';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useInvoices } from '@/hooks/use-invoices';
 
 interface InvoiceSelectProps {
   value: string;
   onChange: (value: string) => void;
-  disabled?: boolean;
 }
 
-export const InvoiceSelect = ({ value, onChange, disabled }: InvoiceSelectProps) => {
-  const { invoices } = useInvoices();
+export const InvoiceSelect = ({ value, onChange }: InvoiceSelectProps) => {
+  const { invoices, isLoading: isLoadingInvoices } = useInvoices();
 
-  // Prepare invoice options for searchable select
-  const invoiceOptions = invoices?.map(invoice => {
+  const formatInvoiceDisplay = (invoice: any) => {
     const clientName = invoice.clients 
-      ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
-      : 'Client inconnu';
-    const formattedAmount = new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR'
-    }).format(invoice.amount).replace('.', ',');
-    
-    return {
-      value: invoice.id,
-      label: `Facture n°${invoice.reference} - ${clientName} - ${formattedAmount}`
-    };
-  }) || [];
+      ? `${invoice.clients.first_name} ${invoice.clients.last_name}` 
+      : 'Client non assigné';
+    const amount = typeof invoice.amount === 'number' 
+      ? invoice.amount.toFixed(2).replace('.', ',')
+      : '0,00';
+    return `Facture n°${invoice.reference} - ${clientName} - ${amount} €`;
+  };
 
   return (
-    <SearchableSelect
-      options={invoiceOptions}
-      value={value}
-      onValueChange={onChange}
-      placeholder="Sélectionner une facture"
-      searchPlaceholder="Rechercher une facture..."
-      disabled={disabled}
-    />
+    <div>
+      <Label htmlFor="invoice" className="block text-sm font-medium text-gray-700 mb-1">
+        Facture <span className="text-red-500">*</span>
+      </Label>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger>
+          <SelectValue placeholder="Sélectionner une facture" />
+        </SelectTrigger>
+        <SelectContent>
+          {isLoadingInvoices ? (
+            <SelectItem value="loading" disabled>Chargement...</SelectItem>
+          ) : invoices && invoices.length > 0 ? (
+            invoices.map((invoice) => (
+              <SelectItem key={invoice.id} value={invoice.id}>
+                {formatInvoiceDisplay(invoice)}
+              </SelectItem>
+            ))
+          ) : (
+            <SelectItem value="no-invoices" disabled>Aucune facture disponible</SelectItem>
+          )}
+        </SelectContent>
+      </Select>
+    </div>
   );
 };

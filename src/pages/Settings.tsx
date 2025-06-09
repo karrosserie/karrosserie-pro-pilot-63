@@ -2,7 +2,7 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreditCard, Settings as SettingsIcon, User, Bell } from 'lucide-react';
-import { CompanyTab } from '@/components/settings/CompanyTab';
+import CompanyTab from '@/components/settings/CompanyTab';
 import AppearanceTab from '@/components/settings/AppearanceTab';
 import NotificationsTab from '@/components/settings/NotificationsTab';
 import SubscriptionTab from '@/components/settings/SubscriptionTab';

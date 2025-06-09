@@ -1,41 +1,45 @@
 
 import React from 'react';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent } from '@/components/ui/card';
+import { GlobalTotals } from './types';
 
 interface InvoiceDetailsSectionProps {
-  formData: any;
+  description: string;
   onFieldChange: (field: string, value: any) => void;
-  globalTotals?: any;
+  globalTotals: GlobalTotals;
   isReadOnly?: boolean;
 }
 
-export const InvoiceDetailsSection = ({ formData, onFieldChange, globalTotals, isReadOnly }: InvoiceDetailsSectionProps) => {
+export const InvoiceDetailsSection = ({ description, onFieldChange, globalTotals, isReadOnly }: InvoiceDetailsSectionProps) => {
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="notes">Notes</Label>
-        <Textarea
-          id="notes"
-          value={formData.notes || ''}
-          onChange={(e) => onFieldChange('notes', e.target.value)}
-          placeholder="Notes supplémentaires..."
-          disabled={isReadOnly}
-          rows={3}
-        />
-      </div>
+    <Card>
+      <CardContent className="space-y-4 pt-6">
+        {/* Totaux globaux */}
+        <div className="space-y-2">
+          <div className="flex justify-end space-x-8 text-sm">
+            <div>Sous-total : <span className="font-medium">{globalTotals.subTotal.toFixed(2)} €</span></div>
+            <div>TVA : <span className="font-medium">{globalTotals.totalVat.toFixed(2)} €</span></div>
+            <div>Remises totales : <span className="font-medium">{globalTotals.totalDiscount.toFixed(2)} €</span></div>
+          </div>
+          <div className="flex justify-end text-lg font-bold">
+            Total : <span className="ml-2">{globalTotals.total.toFixed(2)} €</span>
+          </div>
+        </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="paymentDetails">Détails de paiement</Label>
-        <Textarea
-          id="paymentDetails"
-          value={formData.paymentDetails || ''}
-          onChange={(e) => onFieldChange('paymentDetails', e.target.value)}
-          placeholder="Détails concernant le paiement..."
-          disabled={isReadOnly}
-          rows={3}
-        />
-      </div>
-    </div>
+        <div className="border-t pt-4">
+          <Label htmlFor="description">Notes</Label>
+          <Textarea
+            id="description"
+            value={description}
+            onChange={(e) => onFieldChange('description', e.target.value)}
+            placeholder="Notes et observations concernant la facture..."
+            rows={4}
+            readOnly={isReadOnly}
+          />
+        </div>
+      </CardContent>
+    </Card>
   );
 };

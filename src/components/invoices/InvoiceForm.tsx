@@ -122,7 +122,7 @@ export const InvoiceForm = ({
       />
 
       <InvoiceDetailsSection 
-        formData={formData}
+        description={description}
         onFieldChange={handleChange}
         globalTotals={globalTotals}
         isReadOnly={isReadOnly}
