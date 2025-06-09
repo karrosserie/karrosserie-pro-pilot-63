@@ -9,7 +9,7 @@ interface DateAmountFieldsProps {
 
 export const DateAmountFields = ({ formData, onChange }: DateAmountFieldsProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
         <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
           Date <span className="text-red-500">*</span>
@@ -24,7 +24,7 @@ export const DateAmountFields = ({ formData, onChange }: DateAmountFieldsProps) 
         />
       </div>
 
-      <div>
+      <div className="md:grid-col-2">
         <label htmlFor="payment_method" className="block text-sm font-medium text-gray-700 mb-1">
           Méthode de paiement <span className="text-red-500">*</span>
         </label>
