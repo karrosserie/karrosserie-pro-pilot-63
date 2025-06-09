@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -57,10 +56,8 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
   };
 
   const getOrderAmount = (order: RepairOrder) => {
-    // Essayer d'obtenir le montant depuis différentes sources possibles
+    // Essayer d'obtenir le montant depuis les quotes liées
     if (order.quotes?.amount) return order.quotes.amount;
-    if (order.amount) return order.amount;
-    if (order.total_amount) return order.total_amount;
     return null;
   };
 
