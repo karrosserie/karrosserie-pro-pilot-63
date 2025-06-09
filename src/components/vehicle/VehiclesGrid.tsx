@@ -53,6 +53,8 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
     status: 'En attente' as 'En réparation' | 'Terminé' | 'En attente' | 'Diagnostic', // Default status since not in database
     owner: vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Non assigné',
     vehicleImages: convertToImageArray(vehicle.vehicle_images),
+    registrationDocumentFrontUrl: vehicle.registration_document_front_url,
+    registrationDocumentBackUrl: vehicle.registration_document_back_url,
     onView: () => onViewVehicle(vehicle),
     onEdit: () => onEditVehicle(vehicle),
     onDelete: () => onDeleteVehicle(vehicle.id)
@@ -70,6 +72,8 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
           status={vehicle.status}
           owner={vehicle.owner}
           vehicleImages={vehicle.vehicleImages}
+          registrationDocumentFrontUrl={vehicle.registrationDocumentFrontUrl}
+          registrationDocumentBackUrl={vehicle.registrationDocumentBackUrl}
           onView={vehicle.onView}
           onEdit={vehicle.onEdit}
           onDelete={vehicle.onDelete}
