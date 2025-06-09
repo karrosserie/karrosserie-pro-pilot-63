@@ -72,7 +72,7 @@ export const CompanyTab = () => {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="city">Ville</Label>
               <Input
@@ -90,16 +90,6 @@ export const CompanyTab = () => {
                 value={companyData.postal_code || ''}
                 onChange={(e) => handleInputChange('postal_code', e.target.value)}
                 placeholder="Code postal"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="country">Pays</Label>
-              <Input
-                id="country"
-                value={companyData.country || ''}
-                onChange={(e) => handleInputChange('country', e.target.value)}
-                placeholder="Pays"
               />
             </div>
           </div>
