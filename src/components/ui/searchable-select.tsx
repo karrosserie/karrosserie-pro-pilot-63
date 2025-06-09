@@ -37,7 +37,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("w-full justify-between", className)}
+          className={cn("w-full justify-between font-normal", className)}
           disabled={disabled}
         >
           {selectedOption ? selectedOption.label : placeholder}

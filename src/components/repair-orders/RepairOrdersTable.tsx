@@ -56,8 +56,32 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
   };
 
   const getOrderAmount = (order: RepairOrder) => {
-    // Essayer d'obtenir le montant depuis les quotes liées
-    if (order.quotes?.amount) return order.quotes.amount;
+    // Essayer d'obtenir le montant depuis total_amount_ttc directement
+    if (order.total_amount_ttc) {
+      return order.total_amount_ttc;
+    }
+    
+    // Fallback: essayer de calculer depuis les éléments
+    if (order.repair_items && order.repair_items.length > 0) {
+      const totalRepairs = order.repair_items.reduce((sum, item) => {
+        return sum + (item.quantity * item.unit_price);
+      }, 0);
+      
+      if (totalRepairs > 0) {
+        return totalRepairs;
+      }
+    }
+    
+    if (order.part_items && order.part_items.length > 0) {
+      const totalParts = order.part_items.reduce((sum, item) => {
+        return sum + (item.quantity * item.unit_price);
+      }, 0);
+      
+      if (totalParts > 0) {
+        return totalParts;
+      }
+    }
+    
     return null;
   };
 

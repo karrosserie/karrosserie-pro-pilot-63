@@ -1,6 +1,4 @@
 
-import { ExpenseWithRelations, NewExpense } from '@/services/supabase/expenses';
-
 export interface Expense {
   id?: string;
   type: string;
@@ -13,11 +11,20 @@ export interface Expense {
   status: string;
   assign_to_vehicle: boolean;
   vehicle_id?: string;
+  user_id?: string;
+  created_at?: string;
+  updated_at?: string;
+  vehicles?: {
+    id: string;
+    brand: string;
+    model: string;
+    license_plate: string;
+  };
 }
 
 export interface ExpenseFormProps {
-  expense?: ExpenseWithRelations | null;
-  onSubmit: (data: NewExpense) => Promise<void>;
+  expense?: Expense | null;
+  onSubmit: (data: any) => Promise<void>;
   onCancel: () => void;
   isSubmitting: boolean;
 }

@@ -2,6 +2,13 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface VehicleDateStatusProps {
   formData: any;
@@ -13,11 +20,12 @@ interface VehicleDateStatusProps {
 const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
   formData,
   isViewMode,
-  onInputChange
+  onInputChange,
+  onSelectChange
 }) => {
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="space-y-2">
           <Label htmlFor="arrivalDate">Date d'arrivée</Label>
           <Input
@@ -55,6 +63,25 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
             disabled={isViewMode}
             className="w-full"
           />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="status">Statut</Label>
+          <Select 
+            value={formData.status || ''} 
+            onValueChange={(value) => onSelectChange('status', value)}
+            disabled={isViewMode}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Sélectionner un statut" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="En attente">En attente</SelectItem>
+              <SelectItem value="En cours">En cours</SelectItem>
+              <SelectItem value="Terminé">Terminé</SelectItem>
+              <SelectItem value="Annulé">Annulé</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </div>
