@@ -13,7 +13,7 @@ export const BasicFields = ({ formData, onChange }: BasicFieldsProps) => {
   const hasProofUploaded = formData.proof_url && formData.proof_url.trim() !== '';
 
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-3 gap-4">
       <div>
         <Label htmlFor="date" required>Date</Label>
         <Input
@@ -26,7 +26,7 @@ export const BasicFields = ({ formData, onChange }: BasicFieldsProps) => {
           className={!hasProofUploaded ? 'bg-gray-100 cursor-not-allowed' : ''}
         />
       </div>
-      <div>
+      <div className="md:col-span-2">
         <Label htmlFor="supplier" required>Fournisseur</Label>
         <Input
           id="supplier"
