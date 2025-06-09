@@ -7,23 +7,24 @@ import { useVehicles } from '@/hooks/use-vehicles';
 
 interface QuoteAssignmentSectionProps {
   formData: any;
-  isViewMode: boolean;
   onChange: (field: string, value: any) => void;
+  clientOptions?: any[];
+  isLoadingClients?: boolean;
 }
 
-export const QuoteAssignmentSection = ({ formData, isViewMode, onChange }: QuoteAssignmentSectionProps) => {
+export const QuoteAssignmentSection = ({ formData, onChange, clientOptions, isLoadingClients }: QuoteAssignmentSectionProps) => {
   const { clients } = useClients();
   const { vehicles } = useVehicles();
 
-  // Prepare client options for searchable select
-  const clientOptions = clients?.map(client => ({
+  // Use provided clientOptions or fallback to hook data
+  const availableClientOptions = clientOptions || clients?.map(client => ({
     value: client.id,
     label: `${client.first_name} ${client.last_name}`
   })) || [];
 
   // Filter vehicles by selected client if any
-  const filteredVehicles = formData.clientId 
-    ? vehicles?.filter(vehicle => vehicle.client_id === formData.clientId) || []
+  const filteredVehicles = formData.client_id 
+    ? vehicles?.filter(vehicle => vehicle.client_id === formData.client_id) || []
     : vehicles || [];
 
   // Prepare vehicle options for searchable select
@@ -33,36 +34,35 @@ export const QuoteAssignmentSection = ({ formData, isViewMode, onChange }: Quote
   }));
 
   const handleClientChange = (value: string) => {
-    onChange('clientId', value);
+    onChange('client_id', value);
     // Reset vehicle selection when client changes
-    if (formData.vehicleId) {
-      onChange('vehicleId', '');
+    if (formData.vehicle_id) {
+      onChange('vehicle_id', '');
     }
   };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
-        <Label htmlFor="clientId" required>Client</Label>
+        <Label htmlFor="client_id" required>Client</Label>
         <SearchableSelect
-          options={clientOptions}
-          value={formData.clientId || ''}
+          options={availableClientOptions}
+          value={formData.client_id || ''}
           onValueChange={handleClientChange}
           placeholder="Sélectionner un client"
           searchPlaceholder="Rechercher un client..."
-          disabled={isViewMode}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="vehicleId" required>Véhicule</Label>
+        <Label htmlFor="vehicle_id" required>Véhicule</Label>
         <SearchableSelect
           options={vehicleOptions}
-          value={formData.vehicleId || ''}
-          onValueChange={(value) => onChange('vehicleId', value)}
+          value={formData.vehicle_id || ''}
+          onValueChange={(value) => onChange('vehicle_id', value)}
           placeholder="Sélectionner un véhicule"
           searchPlaceholder="Rechercher un véhicule..."
-          disabled={isViewMode || !formData.clientId}
+          disabled={!formData.client_id}
         />
       </div>
     </div>

@@ -1,38 +1,47 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
+import { Profile } from '@/services/supabase/profiles';
 
 interface PersonalInfoFormProps {
-  profile: any;
-  isEditing: boolean;
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onPhoneChange: (value: string | undefined) => void;
-  onSave: () => void;
+  profile: Profile | null;
   onCancel: () => void;
+  onSave: (data: Partial<Profile>) => Promise<void>;
 }
 
-export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
-  profile,
-  isEditing,
-  onInputChange,
-  onPhoneChange,
-  onSave,
-  onCancel
-}) => {
+export const PersonalInfoForm = ({ profile, onCancel, onSave }: PersonalInfoFormProps) => {
+  const [formData, setFormData] = useState({
+    first_name: profile?.first_name || '',
+    last_name: profile?.last_name || '',
+    phone: profile?.phone || '',
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      await onSave(formData);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <div className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 mt-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="first_name">Prénom</Label>
           <Input
             id="first_name"
-            name="first_name"
-            value={profile.first_name || ''}
-            onChange={onInputChange}
-            disabled={!isEditing}
+            value={formData.first_name}
+            onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
+            placeholder="Votre prénom"
           />
         </div>
         
@@ -40,69 +49,30 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
           <Label htmlFor="last_name">Nom</Label>
           <Input
             id="last_name"
-            name="last_name"
-            value={profile.last_name || ''}
-            onChange={onInputChange}
-            disabled={!isEditing}
+            value={formData.last_name}
+            onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
+            placeholder="Votre nom"
           />
         </div>
       </div>
-
+      
       <div className="space-y-2">
         <Label htmlFor="phone">Téléphone</Label>
         <CustomPhoneInput
-          value={profile.phone || ''}
-          onChange={onPhoneChange}
-          disabled={!isEditing}
+          value={formData.phone}
+          onChange={(value) => setFormData(prev => ({ ...prev, phone: value || '' }))}
           placeholder="Numéro de téléphone"
         />
       </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="address">Adresse</Label>
-        <Input
-          id="address"
-          name="address"
-          value={profile.address || ''}
-          onChange={onInputChange}
-          disabled={!isEditing}
-        />
+      
+      <div className="flex justify-end space-x-2 pt-4">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Annuler
+        </Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Enregistrement...' : 'Enregistrer'}
+        </Button>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="city">Ville</Label>
-          <Input
-            id="city"
-            name="city"
-            value={profile.city || ''}
-            onChange={onInputChange}
-            disabled={!isEditing}
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="postal_code">Code postal</Label>
-          <Input
-            id="postal_code"
-            name="postal_code"
-            value={profile.postal_code || ''}
-            onChange={onInputChange}
-            disabled={!isEditing}
-          />
-        </div>
-      </div>
-
-      {isEditing && (
-        <div className="flex justify-end space-x-2 pt-4">
-          <Button variant="outline" onClick={onCancel}>
-            Annuler
-          </Button>
-          <Button onClick={onSave}>
-            Enregistrer
-          </Button>
-        </div>
-      )}
-    </div>
+    </form>
   );
 };

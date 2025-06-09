@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search, Car, Calendar } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FleetReservationList } from '@/components/fleet/FleetReservationList';
+import FleetReservationList from '@/components/fleet/FleetReservationList';
 import FleetVehicleDialog from '@/components/fleet/FleetVehicleDialog';
 import FleetVehicleCard from '@/components/fleet/FleetVehicleCard';
 import FleetReservationDialog from '@/components/fleet/FleetReservationDialog';
@@ -114,7 +114,7 @@ const Fleet = () => {
                 vehicle={vehicle}
                 onEdit={() => handleEditVehicle(vehicle)}
                 onReserve={() => {
-                  setSelectedReservation({ vehicle_id: vehicle.id });
+                  setSelectedReservation({ fleet_vehicle_id: vehicle.id });
                   setReservationDialogOpen(true);
                 }}
               />

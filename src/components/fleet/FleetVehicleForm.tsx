@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface FleetVehicleFormProps {
   vehicle?: any;
@@ -16,6 +17,7 @@ interface FleetVehicleFormProps {
 const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({ vehicle, onClose }) => {
   const { createVehicle, updateVehicle } = useFleetVehicles();
   const { toast } = useToast();
+  const { user } = useAuth();
   
   const [formData, setFormData] = useState({
     brand: vehicle?.brand || '',
@@ -40,15 +42,29 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({ vehicle, onClose })
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user) {
+      toast({
+        title: "Erreur",
+        description: "Utilisateur non connecté",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     try {
+      const submitData = {
+        ...formData,
+        user_id: user.id
+      };
+
       if (vehicle) {
-        await updateVehicle.mutateAsync({ id: vehicle.id, data: formData });
+        await updateVehicle.mutateAsync({ id: vehicle.id, data: submitData });
         toast({
           title: "Véhicule modifié",
           description: "Le véhicule a été modifié avec succès."
         });
       } else {
-        await createVehicle.mutateAsync(formData);
+        await createVehicle.mutateAsync(submitData);
         toast({
           title: "Véhicule ajouté",
           description: "Le véhicule a été ajouté à la flotte avec succès."

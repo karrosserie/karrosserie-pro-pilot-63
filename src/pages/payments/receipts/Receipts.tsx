@@ -25,6 +25,10 @@ const Receipts = () => {
     setDialogOpen(true);
   };
 
+  const handleDeleteReceipt = (receiptId: string) => {
+    handleDelete(receiptId);
+  };
+
   if (isLoading) {
     return (
       <div className="page-container">
@@ -47,7 +51,7 @@ const Receipts = () => {
         <ReceiptsTable
           receipts={filteredReceipts}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onDelete={handleDeleteReceipt}
         />
       </div>
 

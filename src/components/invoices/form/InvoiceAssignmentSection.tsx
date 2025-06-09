@@ -7,16 +7,17 @@ import { useVehicles } from '@/hooks/use-vehicles';
 
 interface InvoiceAssignmentSectionProps {
   formData: any;
-  isViewMode: boolean;
-  onChange: (field: string, value: any) => void;
+  onFieldChange: (field: string, value: any) => void;
+  clientOptions?: any[];
+  isLoadingClients?: boolean;
 }
 
-export const InvoiceAssignmentSection = ({ formData, isViewMode, onChange }: InvoiceAssignmentSectionProps) => {
+export const InvoiceAssignmentSection = ({ formData, onFieldChange, clientOptions, isLoadingClients }: InvoiceAssignmentSectionProps) => {
   const { clients } = useClients();
   const { vehicles } = useVehicles();
 
-  // Prepare client options for searchable select
-  const clientOptions = clients?.map(client => ({
+  // Use provided clientOptions or fallback to hook data
+  const availableClientOptions = clientOptions || clients?.map(client => ({
     value: client.id,
     label: `${client.first_name} ${client.last_name}`
   })) || [];
@@ -33,10 +34,10 @@ export const InvoiceAssignmentSection = ({ formData, isViewMode, onChange }: Inv
   }));
 
   const handleClientChange = (value: string) => {
-    onChange('clientId', value);
+    onFieldChange('clientId', value);
     // Reset vehicle selection when client changes
     if (formData.vehicleId) {
-      onChange('vehicleId', '');
+      onFieldChange('vehicleId', '');
     }
   };
 
@@ -45,12 +46,11 @@ export const InvoiceAssignmentSection = ({ formData, isViewMode, onChange }: Inv
       <div className="space-y-2">
         <Label htmlFor="clientId" required>Client</Label>
         <SearchableSelect
-          options={clientOptions}
+          options={availableClientOptions}
           value={formData.clientId || ''}
           onValueChange={handleClientChange}
           placeholder="Sélectionner un client"
           searchPlaceholder="Rechercher un client..."
-          disabled={isViewMode}
         />
       </div>
 
@@ -59,10 +59,10 @@ export const InvoiceAssignmentSection = ({ formData, isViewMode, onChange }: Inv
         <SearchableSelect
           options={vehicleOptions}
           value={formData.vehicleId || ''}
-          onValueChange={(value) => onChange('vehicleId', value)}
+          onValueChange={(value) => onFieldChange('vehicleId', value)}
           placeholder="Sélectionner un véhicule"
           searchPlaceholder="Rechercher un véhicule..."
-          disabled={isViewMode || !formData.clientId}
+          disabled={!formData.clientId}
         />
       </div>
     </div>

@@ -2,11 +2,8 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Eye, Pencil, Trash, Download } from 'lucide-react';
+import { Eye, Edit, Trash2 } from 'lucide-react';
 import { ReceiptWithClient } from '@/services/supabase/receipts/types';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 
 interface ReceiptsTableProps {
   receipts: ReceiptWithClient[];
@@ -15,28 +12,6 @@ interface ReceiptsTableProps {
 }
 
 export const ReceiptsTable = ({ receipts, onEdit, onDelete }: ReceiptsTableProps) => {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Encaissé':
-        return 'bg-green-100 text-green-800';
-      case 'En attente':
-        return 'bg-amber-100 text-amber-800';
-      case 'Annulé':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return '-';
-    try {
-      return format(new Date(dateString), 'dd/MM/yyyy', { locale: fr });
-    } catch (error) {
-      return '-';
-    }
-  };
-
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
@@ -44,15 +19,22 @@ export const ReceiptsTable = ({ receipts, onEdit, onDelete }: ReceiptsTableProps
     }).format(amount).replace('.', ',');
   };
 
-  const formatInvoiceInfo = (receipt: ReceiptWithClient) => {
-    if (!receipt.invoices) return '-';
+  const formatInvoiceInfo = (receipt: any) => {
+    if (!receipt.invoices) return 'N/A';
     
-    const clientName = receipt.invoices.clients 
-      ? `${receipt.invoices.clients.first_name} ${receipt.invoices.clients.last_name}`
+    const invoice = receipt.invoices;
+    const clientName = invoice.clients 
+      ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
       : 'Client inconnu';
-    const formattedAmount = formatAmount(receipt.invoices.amount);
     
-    return `Facture n°${receipt.invoices.reference} - ${clientName} - ${formattedAmount}`;
+    const formattedAmount = formatAmount(invoice.amount);
+    
+    return `Facture n°${invoice.reference} - ${clientName} - ${formattedAmount}`;
+  };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('fr-FR');
   };
 
   return (
@@ -60,10 +42,9 @@ export const ReceiptsTable = ({ receipts, onEdit, onDelete }: ReceiptsTableProps
       <TableHeader>
         <TableRow>
           <TableHead>Référence</TableHead>
-          <TableHead>Date</TableHead>
           <TableHead>Facture</TableHead>
+          <TableHead>Date</TableHead>
           <TableHead>Montant</TableHead>
-          <TableHead>Mode de paiement</TableHead>
           <TableHead>Statut</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
@@ -72,33 +53,30 @@ export const ReceiptsTable = ({ receipts, onEdit, onDelete }: ReceiptsTableProps
         {receipts.map((receipt) => (
           <TableRow key={receipt.id}>
             <TableCell className="font-medium">{receipt.reference}</TableCell>
-            <TableCell>{formatDate(receipt.payment_date)}</TableCell>
             <TableCell>{formatInvoiceInfo(receipt)}</TableCell>
+            <TableCell>{formatDate(receipt.date)}</TableCell>
             <TableCell>{formatAmount(receipt.amount)}</TableCell>
-            <TableCell>{receipt.payment_method}</TableCell>
             <TableCell>
-              <Badge className={getStatusColor(receipt.status || 'En attente')}>
-                {receipt.status || 'En attente'}
-              </Badge>
+              <span className={`px-2 py-1 rounded-full text-xs ${
+                receipt.status === 'Payé' 
+                  ? 'bg-green-100 text-green-800' 
+                  : 'bg-yellow-100 text-yellow-800'
+              }`}>
+                {receipt.status}
+              </span>
             </TableCell>
             <TableCell className="text-right">
-              <div className="flex justify-end space-x-1">
-                <Button variant="ghost" size="icon">
-                  <Eye className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon">
-                  <Download className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={() => onEdit(receipt)}>
-                  <Pencil className="h-4 w-4" />
+              <div className="flex justify-end space-x-2">
+                <Button variant="ghost" size="sm" onClick={() => onEdit(receipt)}>
+                  <Edit className="h-4 w-4" />
                 </Button>
                 <Button 
                   variant="ghost" 
-                  size="icon" 
-                  className="text-red-500 hover:text-red-700"
+                  size="sm" 
                   onClick={() => onDelete(receipt.id)}
+                  className="text-red-600 hover:text-red-800"
                 >
-                  <Trash className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             </TableCell>

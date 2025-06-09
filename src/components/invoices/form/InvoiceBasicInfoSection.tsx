@@ -6,11 +6,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 interface InvoiceBasicInfoSectionProps {
   formData: any;
-  isViewMode: boolean;
-  onChange: (field: string, value: any) => void;
+  onFieldChange: (field: string, value: any) => void;
+  claimNumber?: string;
+  currentMileage?: string;
+  onClaimNumberChange?: (value: string) => void;
+  onCurrentMileageChange?: (value: string) => void;
 }
 
-export const InvoiceBasicInfoSection = ({ formData, isViewMode, onChange }: InvoiceBasicInfoSectionProps) => {
+export const InvoiceBasicInfoSection = ({ 
+  formData, 
+  onFieldChange,
+  claimNumber,
+  currentMileage,
+  onClaimNumberChange,
+  onCurrentMileageChange
+}: InvoiceBasicInfoSectionProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       <div className="space-y-2">
@@ -18,9 +28,8 @@ export const InvoiceBasicInfoSection = ({ formData, isViewMode, onChange }: Invo
         <Input
           id="reference"
           value={formData.reference || ''}
-          onChange={(e) => onChange('reference', e.target.value)}
+          onChange={(e) => onFieldChange('reference', e.target.value)}
           placeholder="N° de facture"
-          disabled={isViewMode}
           required
         />
       </div>
@@ -31,8 +40,7 @@ export const InvoiceBasicInfoSection = ({ formData, isViewMode, onChange }: Invo
           id="date"
           type="date"
           value={formData.date || ''}
-          onChange={(e) => onChange('date', e.target.value)}
-          disabled={isViewMode}
+          onChange={(e) => onFieldChange('date', e.target.value)}
           required
         />
       </div>
@@ -43,8 +51,7 @@ export const InvoiceBasicInfoSection = ({ formData, isViewMode, onChange }: Invo
           id="dueDate"
           type="date"
           value={formData.dueDate || ''}
-          onChange={(e) => onChange('dueDate', e.target.value)}
-          disabled={isViewMode}
+          onChange={(e) => onFieldChange('dueDate', e.target.value)}
         />
       </div>
 
@@ -52,8 +59,7 @@ export const InvoiceBasicInfoSection = ({ formData, isViewMode, onChange }: Invo
         <Label htmlFor="status">Statut</Label>
         <Select 
           value={formData.status || ''} 
-          onValueChange={(value) => onChange('status', value)}
-          disabled={isViewMode}
+          onValueChange={(value) => onFieldChange('status', value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Sélectionner un statut" />

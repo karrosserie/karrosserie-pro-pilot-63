@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { SearchableSelect } from '@/components/ui/searchable-select';
-import { RepairOrderSelector } from './RepairOrderSelector';
 import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
 
 interface CessionFormFieldsProps {
@@ -48,15 +47,6 @@ export const CessionFormFields = ({ formData, isViewMode, onChange }: CessionFor
             required
           />
         </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="repairOrderId" required>Ordre de réparation</Label>
-        <RepairOrderSelector
-          value={formData.repairOrderId || ''}
-          onChange={(value) => onChange('repairOrderId', value)}
-          disabled={isViewMode}
-        />
       </div>
 
       <div className="space-y-2">

@@ -5,11 +5,12 @@ import { Label } from '@/components/ui/label';
 
 interface InvoiceDetailsSectionProps {
   formData: any;
-  isViewMode: boolean;
-  onChange: (field: string, value: any) => void;
+  onFieldChange: (field: string, value: any) => void;
+  globalTotals?: any;
+  isReadOnly?: boolean;
 }
 
-export const InvoiceDetailsSection = ({ formData, isViewMode, onChange }: InvoiceDetailsSectionProps) => {
+export const InvoiceDetailsSection = ({ formData, onFieldChange, globalTotals, isReadOnly }: InvoiceDetailsSectionProps) => {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -17,9 +18,9 @@ export const InvoiceDetailsSection = ({ formData, isViewMode, onChange }: Invoic
         <Textarea
           id="notes"
           value={formData.notes || ''}
-          onChange={(e) => onChange('notes', e.target.value)}
+          onChange={(e) => onFieldChange('notes', e.target.value)}
           placeholder="Notes supplémentaires..."
-          disabled={isViewMode}
+          disabled={isReadOnly}
           rows={3}
         />
       </div>
@@ -29,9 +30,9 @@ export const InvoiceDetailsSection = ({ formData, isViewMode, onChange }: Invoic
         <Textarea
           id="paymentDetails"
           value={formData.paymentDetails || ''}
-          onChange={(e) => onChange('paymentDetails', e.target.value)}
+          onChange={(e) => onFieldChange('paymentDetails', e.target.value)}
           placeholder="Détails concernant le paiement..."
-          disabled={isViewMode}
+          disabled={isReadOnly}
           rows={3}
         />
       </div>

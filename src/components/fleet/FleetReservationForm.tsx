@@ -10,6 +10,7 @@ import { useFleetReservations } from '@/hooks/use-fleet-reservations';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { useClients } from '@/hooks/use-clients';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface FleetReservationFormProps {
   reservation?: any;
@@ -21,10 +22,11 @@ const FleetReservationForm: React.FC<FleetReservationFormProps> = ({ reservation
   const { vehicles } = useFleetVehicles();
   const { clients } = useClients();
   const { toast } = useToast();
+  const { user } = useAuth();
   
   const [formData, setFormData] = useState({
     client_id: reservation?.client_id || '',
-    vehicle_id: reservation?.vehicle_id || '',
+    fleet_vehicle_id: reservation?.fleet_vehicle_id || reservation?.vehicle_id || '',
     start_date: reservation?.start_date || '',
     end_date: reservation?.end_date || '',
     status: reservation?.status || 'Confirmée',
@@ -37,7 +39,7 @@ const FleetReservationForm: React.FC<FleetReservationFormProps> = ({ reservation
     label: `${client.first_name} ${client.last_name}`
   })) || [];
 
-  const vehicleOptions = vehicles?.filter(v => v.status === 'Disponible' || v.id === formData.vehicle_id)
+  const vehicleOptions = vehicles?.filter(v => v.status === 'Disponible' || v.id === formData.fleet_vehicle_id)
     .map(vehicle => ({
       value: vehicle.id,
       label: `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`
@@ -55,15 +57,29 @@ const FleetReservationForm: React.FC<FleetReservationFormProps> = ({ reservation
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user) {
+      toast({
+        title: "Erreur",
+        description: "Utilisateur non connecté",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     try {
+      const submitData = {
+        ...formData,
+        user_id: user.id
+      };
+
       if (reservation?.id) {
-        await updateReservation.mutateAsync({ id: reservation.id, data: formData });
+        await updateReservation.mutateAsync({ id: reservation.id, data: submitData });
         toast({
           title: "Réservation modifiée",
           description: "La réservation a été modifiée avec succès."
         });
       } else {
-        await createReservation.mutateAsync(formData);
+        await createReservation.mutateAsync(submitData);
         toast({
           title: "Réservation créée",
           description: "La réservation a été créée avec succès."
@@ -94,11 +110,11 @@ const FleetReservationForm: React.FC<FleetReservationFormProps> = ({ reservation
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="vehicle_id" required>Véhicule</Label>
+          <Label htmlFor="fleet_vehicle_id" required>Véhicule</Label>
           <SearchableSelect
             options={vehicleOptions}
-            value={formData.vehicle_id}
-            onValueChange={(value) => handleSelectChange('vehicle_id', value)}
+            value={formData.fleet_vehicle_id}
+            onValueChange={(value) => handleSelectChange('fleet_vehicle_id', value)}
             placeholder="Sélectionner un véhicule"
             searchPlaceholder="Rechercher un véhicule..."
           />
