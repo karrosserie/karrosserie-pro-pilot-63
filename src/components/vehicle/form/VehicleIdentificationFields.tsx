@@ -23,14 +23,6 @@ const VehicleIdentificationFields: React.FC<VehicleIdentificationFieldsProps> = 
   onInputChange,
   onSelectChange
 }) => {
-  const statusOptions = [
-    { value: 'En attente', label: 'En attente' },
-    { value: 'Diagnostic', label: 'Diagnostic' },
-    { value: 'En réparation', label: 'En réparation' },
-    { value: 'Terminé', label: 'Terminé' },
-    { value: 'Annulé', label: 'Annulé' },
-    { value: 'Réservé', label: 'Réservé' }
-  ];
 
   // Effect pour détecter automatiquement la marque et le modèle quand le VIN change
   useEffect(() => {
@@ -61,8 +53,8 @@ const VehicleIdentificationFields: React.FC<VehicleIdentificationFieldsProps> = 
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-12 gap-4">
-        <div className="col-span-5 space-y-2">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
           <Label htmlFor="vin">
             Numéro de série (VIN) <span className="text-red-500">*</span>
           </Label>
@@ -91,7 +83,7 @@ const VehicleIdentificationFields: React.FC<VehicleIdentificationFieldsProps> = 
           )}
         </div>
 
-        <div className="col-span-4 space-y-2">
+        <div className="space-y-2">
           <Label htmlFor="engineNumber">Numéro de moteur</Label>
           <Input
             id="engineNumber"
@@ -100,26 +92,6 @@ const VehicleIdentificationFields: React.FC<VehicleIdentificationFieldsProps> = 
             onChange={onInputChange}
             disabled={isViewMode}
           />
-        </div>
-
-        <div className="col-span-3 space-y-2">
-          <Label htmlFor="status">Statut</Label>
-          <Select 
-            disabled={isViewMode} 
-            value={formData.status || 'En attente'} 
-            onValueChange={(value) => onSelectChange && onSelectChange('status', value)}
-          >
-            <SelectTrigger id="status">
-              <SelectValue placeholder="Sélectionner un statut" />
-            </SelectTrigger>
-            <SelectContent>
-              {statusOptions.map(option => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
       </div>
     </div>

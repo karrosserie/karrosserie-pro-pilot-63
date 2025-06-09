@@ -77,6 +77,7 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="En attente">En attente</SelectItem>
+              <SelectItem value="Réservé">Réservé</SelectItem>
               <SelectItem value="En cours">En cours</SelectItem>
               <SelectItem value="Terminé">Terminé</SelectItem>
               <SelectItem value="Annulé">Annulé</SelectItem>
