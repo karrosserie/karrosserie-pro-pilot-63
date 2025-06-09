@@ -71,8 +71,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
 
   const firstImage = getFirstImage();
   
-  // Vérification correcte des certificats d'immatriculation avec les bonnes propriétés
-  console.log('Registration data:', { registrationDocumentFrontUrl, registrationDocumentBackUrl });
+  // Vérification correcte des certificats d'immatriculation
   const hasCompleteRegistration = registrationDocumentFrontUrl && 
                                   registrationDocumentFrontUrl.trim() !== '' && 
                                   registrationDocumentBackUrl && 

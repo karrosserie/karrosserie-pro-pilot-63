@@ -53,7 +53,15 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'EUR'
-    }).format(amount);
+    }).format(amount).replace('.', ',');
+  };
+
+  const getOrderAmount = (order: RepairOrder) => {
+    // Essayer d'obtenir le montant depuis différentes sources possibles
+    if (order.quotes?.amount) return order.quotes.amount;
+    if (order.amount) return order.amount;
+    if (order.total_amount) return order.total_amount;
+    return null;
   };
 
   if (orders.length === 0) {
@@ -99,7 +107,7 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
                   : '-'
                 }
               </TableCell>
-              <TableCell>{formatAmount(order.quotes?.amount)}</TableCell>
+              <TableCell>{formatAmount(getOrderAmount(order))}</TableCell>
               <TableCell>
                 <Badge className={getStatusColor(order.status || 'En attente')}>
                   {order.status || 'En attente'}

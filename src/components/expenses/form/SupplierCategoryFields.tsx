@@ -14,20 +14,7 @@ export const SupplierCategoryFields = ({ formData, onChange }: SupplierCategoryF
   const hasProofUploaded = formData.proof_url && formData.proof_url.trim() !== '';
 
   return (
-    <div className="grid grid-cols-2 gap-4">
-      <div>
-        <Label htmlFor="supplier" required>Fournisseur</Label>
-        <Input
-          id="supplier"
-          value={formData.supplier}
-          onChange={(e) => onChange('supplier', e.target.value)}
-          placeholder="Nom du fournisseur"
-          required
-          readOnly={!hasProofUploaded}
-          className={!hasProofUploaded ? 'bg-gray-100 cursor-not-allowed' : ''}
-        />
-      </div>
-
+    <div className="grid grid-cols-3 gap-4">
       <div>
         <Label htmlFor="category" required>Catégorie</Label>
         <Select 
@@ -46,6 +33,36 @@ export const SupplierCategoryFields = ({ formData, onChange }: SupplierCategoryF
             <SelectItem value="Autres">Autres</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+
+      <div>
+        <Label htmlFor="vat_amount" required>Montant TVA</Label>
+        <Input
+          id="vat_amount"
+          type="number"
+          step="0.01"
+          value={formData.vat_amount}
+          onChange={(e) => onChange('vat_amount', e.target.value)}
+          placeholder="0,00"
+          required
+          readOnly={!hasProofUploaded}
+          className={!hasProofUploaded ? 'bg-gray-100 cursor-not-allowed' : ''}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="total_amount" required>Montant TTC</Label>
+        <Input
+          id="total_amount"
+          type="number"
+          step="0.01"
+          value={formData.total_amount}
+          onChange={(e) => onChange('total_amount', e.target.value)}
+          placeholder="0,00"
+          required
+          readOnly={!hasProofUploaded}
+          className={!hasProofUploaded ? 'bg-gray-100 cursor-not-allowed' : ''}
+        />
       </div>
     </div>
   );
