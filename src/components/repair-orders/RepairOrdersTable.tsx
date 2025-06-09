@@ -57,7 +57,13 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
   };
 
   const getOrderAmount = (order: RepairOrder) => {
-    // Essayer d'obtenir le montant depuis les quotes liées
+    // Utiliser globalTotals comme dans les formulaires
+    if (order.global_totals && typeof order.global_totals === 'object') {
+      const totals = order.global_totals as any;
+      return totals.totalTTC || totals.total_ttc || null;
+    }
+    
+    // Fallback sur les quotes si disponible
     if (order.quotes?.amount) {
       return order.quotes.amount;
     }

@@ -1,245 +1,156 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Car, Plus, Search, Calendar, User } from 'lucide-react';
-
-// Données mockées pour l'exemple
-const mockVehicles = [
-  {
-    id: '1',
-    brand: 'Peugeot',
-    model: '208',
-    licensePlate: 'AA-111-BB',
-    status: 'Disponible',
-    lastRental: 'Jamais',
-    color: 'Blanc'
-  },
-  {
-    id: '2',
-    brand: 'Renault',
-    model: 'Clio',
-    licensePlate: 'CC-222-DD',
-    status: 'Loué',
-    lastRental: 'Depuis le 15/05/2023',
-    color: 'Noir'
-  },
-  {
-    id: '3',
-    brand: 'Citroën',
-    model: 'C3',
-    licensePlate: 'EE-333-FF',
-    status: 'Disponible',
-    lastRental: '10/05/2023',
-    color: 'Gris'
-  },
-  {
-    id: '4',
-    brand: 'Toyota',
-    model: 'Yaris',
-    licensePlate: 'GG-444-HH',
-    status: 'Loué',
-    lastRental: 'Depuis le 12/05/2023',
-    color: 'Rouge'
-  }
-];
-
-// Données mockées pour les prêts en cours
-const currentLoans = [
-  {
-    id: '1',
-    vehicle: 'Renault Clio - CC-222-DD',
-    client: 'Marie Martin',
-    startDate: '15/05/2023',
-    expectedReturnDate: '22/05/2023'
-  },
-  {
-    id: '2',
-    vehicle: 'Toyota Yaris - GG-444-HH',
-    client: 'Pierre Durand',
-    startDate: '12/05/2023',
-    expectedReturnDate: '19/05/2023'
-  }
-];
+import { Input } from '@/components/ui/input';
+import { Plus, Search, Car, Calendar } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FleetReservationList } from '@/components/fleet/FleetReservationList';
+import FleetVehicleDialog from '@/components/fleet/FleetVehicleDialog';
+import FleetVehicleCard from '@/components/fleet/FleetVehicleCard';
+import FleetReservationDialog from '@/components/fleet/FleetReservationDialog';
+import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
+import { useFleetReservations } from '@/hooks/use-fleet-reservations';
+import LoadingSpinner from '@/components/ui/loading-spinner';
+import { ErrorMessage } from '@/components/ui/error-message';
 
 const Fleet = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [vehicleDialogOpen, setVehicleDialogOpen] = useState(false);
+  const [reservationDialogOpen, setReservationDialogOpen] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [selectedReservation, setSelectedReservation] = useState(null);
+
+  const { vehicles: fleetVehicles, isLoading: vehiclesLoading, error: vehiclesError } = useFleetVehicles();
+  const { reservations, isLoading: reservationsLoading, error: reservationsError } = useFleetReservations();
+
+  const filteredVehicles = fleetVehicles?.filter(vehicle =>
+    vehicle.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vehicle.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vehicle.license_plate?.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
+
+  const handleCreateVehicle = () => {
+    setSelectedVehicle(null);
+    setVehicleDialogOpen(true);
+  };
+
+  const handleEditVehicle = (vehicle: any) => {
+    setSelectedVehicle(vehicle);
+    setVehicleDialogOpen(true);
+  };
+
+  const handleCreateReservation = () => {
+    setSelectedReservation(null);
+    setReservationDialogOpen(true);
+  };
+
+  const handleEditReservation = (reservation: any) => {
+    setSelectedReservation(reservation);
+    setReservationDialogOpen(true);
+  };
+
+  if (vehiclesLoading || reservationsLoading) {
+    return (
+      <div className="page-container">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (vehiclesError || reservationsError) {
+    return (
+      <div className="page-container">
+        <ErrorMessage message="Erreur lors du chargement des données de la flotte" />
+      </div>
+    );
+  }
+
   return (
     <div className="page-container">
       <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Flotte de véhicules</h1>
-        <p className="text-gray-600 mt-1">Gérez vos véhicules de courtoisie et les prêts clients.</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Véhicules de courtoisie</h1>
+        <p className="text-gray-600 mt-1">
+          Gérez votre flotte de véhicules de courtoisie et leurs réservations.
+        </p>
       </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <div className="card-container mb-6">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">Mes véhicules de courtoisie</h2>
-              
-              <div className="flex items-center mt-4 md:mt-0 w-full md:w-auto space-x-2">
-                <div className="relative flex-1 md:w-60">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <input 
-                    type="text" 
-                    placeholder="Rechercher..." 
-                    className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-karrosserie-orange"
-                  />
-                </div>
-                
-                <Button className="btn-primary">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Ajouter
-                </Button>
-              </div>
+
+      <Tabs defaultValue="vehicles" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="vehicles">
+            <Car className="h-4 w-4 mr-2" />
+            Véhicules
+          </TabsTrigger>
+          <TabsTrigger value="reservations">
+            <Calendar className="h-4 w-4 mr-2" />
+            Réservations
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="vehicles" className="space-y-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="relative flex-1 md:max-w-sm">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Rechercher un véhicule..."
+                className="pl-10"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
-                  <tr>
-                    <th className="px-4 py-3 rounded-tl-lg">Véhicule</th>
-                    <th className="px-4 py-3">Immatriculation</th>
-                    <th className="px-4 py-3">Couleur</th>
-                    <th className="px-4 py-3">Statut</th>
-                    <th className="px-4 py-3">Dernier prêt</th>
-                    <th className="px-4 py-3 rounded-tr-lg">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {mockVehicles.map((vehicle) => (
-                    <tr key={vehicle.id} className="border-b hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium">{vehicle.brand} {vehicle.model}</td>
-                      <td className="px-4 py-3 text-gray-600">{vehicle.licensePlate}</td>
-                      <td className="px-4 py-3 text-gray-600">{vehicle.color}</td>
-                      <td className="px-4 py-3">
-                        <span 
-                          className={`text-xs font-medium px-2.5 py-0.5 rounded ${
-                            vehicle.status === 'Disponible' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-amber-100 text-amber-800'
-                          }`}
-                        >
-                          {vehicle.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-gray-600">{vehicle.lastRental}</td>
-                      <td className="px-4 py-3 space-x-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          disabled={vehicle.status === 'Loué'}
-                        >
-                          Prêter
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          Détails
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+
+            <Button
+              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+              onClick={handleCreateVehicle}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Ajouter un véhicule
+            </Button>
           </div>
-          
-          <div className="card-container">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Historique des prêts</h2>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
-                  <tr>
-                    <th className="px-4 py-3 rounded-tl-lg">Véhicule</th>
-                    <th className="px-4 py-3">Client</th>
-                    <th className="px-4 py-3">Date de début</th>
-                    <th className="px-4 py-3">Date de fin</th>
-                    <th className="px-4 py-3 rounded-tr-lg">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium">Peugeot 208</td>
-                    <td className="px-4 py-3">Jean Dupont</td>
-                    <td className="px-4 py-3 text-gray-600">01/05/2023</td>
-                    <td className="px-4 py-3 text-gray-600">09/05/2023</td>
-                    <td className="px-4 py-3">
-                      <Button variant="ghost" size="sm">
-                        Voir
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium">Citroën C3</td>
-                    <td className="px-4 py-3">Sophie Bernard</td>
-                    <td className="px-4 py-3 text-gray-600">25/04/2023</td>
-                    <td className="px-4 py-3 text-gray-600">05/05/2023</td>
-                    <td className="px-4 py-3">
-                      <Button variant="ghost" size="sm">
-                        Voir
-                      </Button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredVehicles.map((vehicle) => (
+              <FleetVehicleCard
+                key={vehicle.id}
+                vehicle={vehicle}
+                onEdit={() => handleEditVehicle(vehicle)}
+                onReserve={() => {
+                  setSelectedReservation({ vehicle_id: vehicle.id });
+                  setReservationDialogOpen(true);
+                }}
+              />
+            ))}
           </div>
-        </div>
-        
-        <div className="space-y-6">
-          <div className="card-container">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Prêts en cours</h2>
-            
-            <div className="space-y-4">
-              {currentLoans.map((loan) => (
-                <div 
-                  key={loan.id}
-                  className="border border-gray-200 rounded-lg p-4"
-                >
-                  <div className="flex items-center mb-2">
-                    <Car className="h-4 w-4 text-gray-600 mr-2" />
-                    <h4 className="font-medium">{loan.vehicle}</h4>
-                  </div>
-                  
-                  <div className="space-y-2 text-sm text-gray-600 ml-6">
-                    <div className="flex items-center">
-                      <User className="h-4 w-4 mr-2" />
-                      <span>{loan.client}</span>
-                    </div>
-                    
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      <span>Du {loan.startDate} au {loan.expectedReturnDate}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-4 space-x-2">
-                    <Button variant="outline" size="sm">Détails</Button>
-                    <Button className="btn-primary" size="sm">Retour</Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            <div className="mt-6">
-              <Button className="w-full" variant="outline">
-                <Calendar className="h-4 w-4 mr-2" />
-                Nouveau prêt
-              </Button>
-            </div>
+        </TabsContent>
+
+        <TabsContent value="reservations" className="space-y-6">
+          <div className="flex justify-end">
+            <Button
+              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+              onClick={handleCreateReservation}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Nouvelle réservation
+            </Button>
           </div>
-          
-          <div className="card-container">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Contraventions</h2>
-            
-            <div className="text-center py-8">
-              <Car className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">Aucune contravention en attente</p>
-              <Button className="mt-4" variant="outline">
-                Importer une contravention
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+
+          <FleetReservationList
+            reservations={reservations || []}
+            onEdit={handleEditReservation}
+          />
+        </TabsContent>
+      </Tabs>
+
+      <FleetVehicleDialog
+        vehicle={selectedVehicle}
+        open={vehicleDialogOpen}
+        onOpenChange={setVehicleDialogOpen}
+      />
+
+      <FleetReservationDialog
+        reservation={selectedReservation}
+        open={reservationDialogOpen}
+        onOpenChange={setReservationDialogOpen}
+      />
     </div>
   );
 };

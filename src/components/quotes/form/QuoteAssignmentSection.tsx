@@ -1,163 +1,70 @@
 
-import React, { useEffect, useState } from 'react';
-import { Input } from '@/components/ui/input';
+import React from 'react';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, AlertCircle } from 'lucide-react';
-import { Quote } from '@/services/supabase/quotes';
-import { vehiclesService } from '@/services/supabase/vehicles';
-import { cn } from '@/lib/utils';
+import { SearchableSelect } from '@/components/ui/searchable-select';
+import { useClients } from '@/hooks/use-clients';
+import { useVehicles } from '@/hooks/use-vehicles';
 
 interface QuoteAssignmentSectionProps {
-  formData: Partial<Quote>;
-  onFieldChange: (field: string, value: any) => void;
-  clientOptions: any[];
-  isLoadingClients: boolean;
-  errors?: Record<string, string>;
+  formData: any;
+  isViewMode: boolean;
+  onChange: (field: string, value: any) => void;
 }
 
-export const QuoteAssignmentSection = ({ 
-  formData, 
-  onFieldChange, 
-  clientOptions, 
-  isLoadingClients,
-  errors = {}
-}: QuoteAssignmentSectionProps) => {
-  const [vehicles, setVehicles] = useState<any[]>([]);
-  const [isLoadingVehicles, setIsLoadingVehicles] = useState(false);
+export const QuoteAssignmentSection = ({ formData, isViewMode, onChange }: QuoteAssignmentSectionProps) => {
+  const { clients } = useClients();
+  const { vehicles } = useVehicles();
 
-  console.log('QuoteAssignmentSection - Errors received:', errors);
-  console.log('QuoteAssignmentSection - client_id error:', errors.client_id);
+  // Prepare client options for searchable select
+  const clientOptions = clients?.map(client => ({
+    value: client.id,
+    label: `${client.first_name} ${client.last_name}`
+  })) || [];
 
-  // Charger les véhicules quand un client est sélectionné
-  useEffect(() => {
-    const loadVehicles = async () => {
-      if (formData.client_id) {
-        setIsLoadingVehicles(true);
-        try {
-          console.log('Loading vehicles for client:', formData.client_id);
-          const clientVehicles = await vehiclesService.getByClientId(formData.client_id);
-          console.log('Vehicles loaded:', clientVehicles);
-          setVehicles(clientVehicles || []);
-        } catch (error) {
-          console.error('Error loading vehicles:', error);
-          setVehicles([]);
-        } finally {
-          setIsLoadingVehicles(false);
-        }
-      } else {
-        setVehicles([]);
-      }
-    };
+  // Filter vehicles by selected client if any
+  const filteredVehicles = formData.clientId 
+    ? vehicles?.filter(vehicle => vehicle.client_id === formData.clientId) || []
+    : vehicles || [];
 
-    loadVehicles();
-  }, [formData.client_id]);
+  // Prepare vehicle options for searchable select
+  const vehicleOptions = filteredVehicles.map(vehicle => ({
+    value: vehicle.id,
+    label: `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`
+  }));
 
-  // Réinitialiser le véhicule sélectionné quand le client change
-  useEffect(() => {
-    if (formData.client_id && formData.vehicle_id) {
-      // Vérifier si le véhicule sélectionné appartient toujours au client
-      const vehicleExists = vehicles.some(v => v.id === formData.vehicle_id);
-      if (!vehicleExists) {
-        console.log('Resetting vehicle selection as it does not belong to selected client');
-        onFieldChange('vehicle_id', '');
-      }
+  const handleClientChange = (value: string) => {
+    onChange('clientId', value);
+    // Reset vehicle selection when client changes
+    if (formData.vehicleId) {
+      onChange('vehicleId', '');
     }
-  }, [vehicles, formData.vehicle_id, formData.client_id, onFieldChange]);
+  };
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center text-lg">
-          <Users className="h-5 w-5 mr-2" />
-          Attribution
-        </CardTitle>
-        <CardDescription>
-          Sélectionner le client et le véhicule pour ce devis
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="client_id" required className={cn(errors.client_id && "text-red-500")}>
-              Client
-            </Label>
-            <Select
-              value={formData.client_id || ''}
-              onValueChange={(value) => onFieldChange('client_id', value)}
-            >
-              <SelectTrigger 
-                id="client_id"
-                className={cn(
-                  errors.client_id && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
-                )}
-              >
-                <SelectValue placeholder={isLoadingClients ? "Chargement..." : "Sélectionner un client"} />
-              </SelectTrigger>
-              <SelectContent>
-                {clientOptions.map((client) => (
-                  <SelectItem key={client.id} value={client.id}>
-                    {client.firstName} {client.lastName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.client_id && (
-              <p className="text-sm text-red-500 mt-1 flex items-center">
-                <AlertCircle className="h-4 w-4 mr-1" />
-                {errors.client_id}
-              </p>
-            )}
-          </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="space-y-2">
+        <Label htmlFor="clientId" required>Client</Label>
+        <SearchableSelect
+          options={clientOptions}
+          value={formData.clientId || ''}
+          onValueChange={handleClientChange}
+          placeholder="Sélectionner un client"
+          searchPlaceholder="Rechercher un client..."
+          disabled={isViewMode}
+        />
+      </div>
 
-          <div>
-            <Label htmlFor="vehicle_id" required className={cn(errors.vehicle_id && "text-red-500")}>
-              Véhicule
-            </Label>
-            <Select
-              value={formData.vehicle_id || ''}
-              onValueChange={(value) => onFieldChange('vehicle_id', value)}
-              disabled={!formData.client_id}
-            >
-              <SelectTrigger 
-                id="vehicle_id"
-                className={cn(
-                  errors.vehicle_id && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
-                )}
-              >
-                <SelectValue 
-                  placeholder={
-                    !formData.client_id 
-                      ? "Sélectionner d'abord un client" 
-                      : isLoadingVehicles 
-                        ? "Chargement des véhicules..." 
-                        : vehicles.length === 0 
-                          ? "Aucun véhicule trouvé" 
-                          : "Sélectionner un véhicule"
-                  } 
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {vehicles.length === 0 && !isLoadingVehicles && formData.client_id && (
-                  <SelectItem value="no-vehicle" disabled>Aucun véhicule disponible</SelectItem>
-                )}
-                {vehicles.map((vehicle) => (
-                  <SelectItem key={vehicle.id} value={vehicle.id}>
-                    {vehicle.brand} {vehicle.model} - {vehicle.license_plate}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.vehicle_id && (
-              <p className="text-sm text-red-500 mt-1 flex items-center">
-                <AlertCircle className="h-4 w-4 mr-1" />
-                {errors.vehicle_id}
-              </p>
-            )}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      <div className="space-y-2">
+        <Label htmlFor="vehicleId" required>Véhicule</Label>
+        <SearchableSelect
+          options={vehicleOptions}
+          value={formData.vehicleId || ''}
+          onValueChange={(value) => onChange('vehicleId', value)}
+          placeholder="Sélectionner un véhicule"
+          searchPlaceholder="Rechercher un véhicule..."
+          disabled={isViewMode || !formData.clientId}
+        />
+      </div>
+    </div>
   );
 };

@@ -3,127 +3,115 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, AlertCircle } from 'lucide-react';
-import { CreditFormData } from './types';
-import { cn } from '@/lib/utils';
+import { SearchableSelect } from '@/components/ui/searchable-select';
+import { Switch } from '@/components/ui/switch';
 import { useInvoices } from '@/hooks/use-invoices';
 
 interface CreditBasicInfoSectionProps {
-  formData: CreditFormData;
-  errors: Record<string, string>;
-  onFieldChange: (field: keyof CreditFormData, value: any) => void;
+  formData: any;
+  isViewMode: boolean;
+  onChange: (field: string, value: any) => void;
 }
 
-export const CreditBasicInfoSection = ({ 
-  formData, 
-  errors, 
-  onFieldChange 
-}: CreditBasicInfoSectionProps) => {
+export const CreditBasicInfoSection = ({ formData, isViewMode, onChange }: CreditBasicInfoSectionProps) => {
   const { invoices } = useInvoices();
-  
-  const statusOptions = [
-    { value: 'En attente', label: 'En attente' },
-    { value: 'Payé', label: 'Payé' }
-  ];
+
+  // Prepare invoice options for searchable select
+  const invoiceOptions = invoices?.map(invoice => {
+    const clientName = invoice.clients 
+      ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
+      : 'Client inconnu';
+    const formattedAmount = new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(invoice.amount).replace('.', ',');
+    
+    return {
+      value: invoice.id,
+      label: `Facture n°${invoice.reference} - ${clientName} - ${formattedAmount}`
+    };
+  }) || [];
+
+  const handleFranchiseChange = (checked: boolean) => {
+    onChange('isFranchise', checked);
+    if (!checked) {
+      // Reset status when franchise is turned off
+      onChange('status', 'En attente');
+    }
+  };
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center text-lg">
-          <FileText className="h-5 w-5 mr-2" />
-          Informations de base
-        </CardTitle>
-        <CardDescription>
-          Numéro, facture et statut de l'avoir
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="reference">Numéro</Label>
-            <Input
-              id="reference"
-              value={formData.reference}
-              readOnly
-              className="bg-gray-50"
-            />
-          </div>
+    <div className="space-y-4">
+      {/* Switch pour franchise offerte */}
+      <div className="flex items-center space-x-2 p-4 border rounded-lg bg-blue-50">
+        <Switch
+          id="isFranchise"
+          checked={formData.isFranchise || false}
+          onCheckedChange={handleFranchiseChange}
+          disabled={isViewMode}
+        />
+        <Label htmlFor="isFranchise" className="text-sm">
+          Cet avoir correspond à une franchise offerte (nécessite la sélection d'une facture dans la liste ci-dessus)
+        </Label>
+      </div>
 
-          <div>
+      <div className={`grid grid-cols-1 md:grid-cols-${formData.isFranchise ? '2' : '3'} gap-4`}>
+        <div className="space-y-2">
+          <Label htmlFor="reference" required>Numéro</Label>
+          <Input
+            id="reference"
+            value={formData.reference || ''}
+            onChange={(e) => onChange('reference', e.target.value)}
+            placeholder="N° d'avoir"
+            disabled={isViewMode}
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="date" required>Date</Label>
+          <Input
+            id="date"
+            type="date"
+            value={formData.date || ''}
+            onChange={(e) => onChange('date', e.target.value)}
+            disabled={isViewMode}
+            required
+          />
+        </div>
+
+        {!formData.isFranchise && (
+          <div className="space-y-2">
             <Label htmlFor="status">Statut</Label>
-            <Select
-              value={formData.status}
-              onValueChange={(value) => onFieldChange('status', value)}
+            <Select 
+              value={formData.status || ''} 
+              onValueChange={(value) => onChange('status', value)}
+              disabled={isViewMode}
             >
-              <SelectTrigger 
-                id="status"
-                className={cn(
-                  errors.status && "border-red-500 focus-visible:ring-red-500"
-                )}
-              >
+              <SelectTrigger>
                 <SelectValue placeholder="Sélectionner un statut" />
               </SelectTrigger>
               <SelectContent>
-                {statusOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
+                <SelectItem value="En attente">En attente</SelectItem>
+                <SelectItem value="Validé">Validé</SelectItem>
+                <SelectItem value="Annulé">Annulé</SelectItem>
               </SelectContent>
             </Select>
-            {errors.status && (
-              <p className="text-sm text-red-500 mt-1 flex items-center">
-                <AlertCircle className="h-4 w-4 mr-1" />
-                {errors.status}
-              </p>
-            )}
           </div>
-        </div>
+        )}
+      </div>
 
-        <div>
-          <Label htmlFor="invoice_id" required>Facture</Label>
-          <Select
-            value={formData.invoice_id || ''}
-            onValueChange={(value) => onFieldChange('invoice_id', value)}
-          >
-            <SelectTrigger 
-              id="invoice_id"
-              className={cn(
-                errors.invoice_id && "border-red-500 focus-visible:ring-red-500"
-              )}
-            >
-              <SelectValue placeholder="Sélectionner une facture" />
-            </SelectTrigger>
-            <SelectContent>
-              {invoices?.map((invoice) => (
-                <SelectItem key={invoice.id} value={invoice.id}>
-                  {invoice.reference} - {invoice.amount}€
-                  {invoice.clients && ` - ${invoice.clients.first_name} ${invoice.clients.last_name}`}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.invoice_id && (
-            <p className="text-sm text-red-500 mt-1 flex items-center">
-              <AlertCircle className="h-4 w-4 mr-1" />
-              {errors.invoice_id}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <Label htmlFor="notes">Notes</Label>
-          <Textarea
-            id="notes"
-            value={formData.notes || ''}
-            onChange={(e) => onFieldChange('notes', e.target.value)}
-            placeholder="Notes additionnelles..."
-            rows={3}
-          />
-        </div>
-      </CardContent>
-    </Card>
+      <div className="space-y-2">
+        <Label htmlFor="invoiceId" required>Facture</Label>
+        <SearchableSelect
+          options={invoiceOptions}
+          value={formData.invoiceId || ''}
+          onValueChange={(value) => onChange('invoiceId', value)}
+          placeholder="Sélectionner une facture"
+          searchPlaceholder="Rechercher une facture..."
+          disabled={isViewMode}
+        />
+      </div>
+    </div>
   );
 };

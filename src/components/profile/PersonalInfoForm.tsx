@@ -1,110 +1,108 @@
 
 import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
-import { Profile } from '@/services/supabase/profiles';
-
-const profileSchema = z.object({
-  first_name: z.string().min(1, { message: "Le prénom est requis" }),
-  last_name: z.string().min(1, { message: "Le nom est requis" }),
-  phone_number: z.string().min(1, { message: "Le numéro de téléphone est requis" }),
-});
-
-type ProfileFormValues = z.infer<typeof profileSchema>;
 
 interface PersonalInfoFormProps {
-  profile: Profile | null;
-  onSubmit: (data: Partial<Profile>) => Promise<void>;
+  profile: any;
+  isEditing: boolean;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onPhoneChange: (value: string | undefined) => void;
+  onSave: () => void;
   onCancel: () => void;
 }
 
-export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ 
-  profile, 
-  onSubmit, 
-  onCancel 
+export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
+  profile,
+  isEditing,
+  onInputChange,
+  onPhoneChange,
+  onSave,
+  onCancel
 }) => {
-  const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      first_name: profile?.first_name || '',
-      last_name: profile?.last_name || '',
-      phone_number: profile?.phone_number || '',
-    },
-    mode: 'onChange',
-  });
-
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="first_name">Prénom</Label>
+          <Input
+            id="first_name"
             name="first_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium">
-                  Prénom <span className="text-red-500">*</span>
-                </FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Prénom" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="last_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium">
-                  Nom <span className="text-red-500">*</span>
-                </FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Nom" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            value={profile.first_name || ''}
+            onChange={onInputChange}
+            disabled={!isEditing}
           />
         </div>
         
-        <FormField
-          control={form.control}
-          name="phone_number"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm font-medium">
-                Numéro de téléphone <span className="text-red-500">*</span>
-              </FormLabel>
-              <FormControl>
-                <CustomPhoneInput
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder="Numéro de téléphone"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+        <div className="space-y-2">
+          <Label htmlFor="last_name">Nom</Label>
+          <Input
+            id="last_name"
+            name="last_name"
+            value={profile.last_name || ''}
+            onChange={onInputChange}
+            disabled={!isEditing}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="phone">Téléphone</Label>
+        <CustomPhoneInput
+          value={profile.phone || ''}
+          onChange={onPhoneChange}
+          disabled={!isEditing}
+          placeholder="Numéro de téléphone"
         />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="address">Adresse</Label>
+        <Input
+          id="address"
+          name="address"
+          value={profile.address || ''}
+          onChange={onInputChange}
+          disabled={!isEditing}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="city">Ville</Label>
+          <Input
+            id="city"
+            name="city"
+            value={profile.city || ''}
+            onChange={onInputChange}
+            disabled={!isEditing}
+          />
+        </div>
         
-        <div className="flex gap-2 justify-end">
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={onCancel}
-          >
+        <div className="space-y-2">
+          <Label htmlFor="postal_code">Code postal</Label>
+          <Input
+            id="postal_code"
+            name="postal_code"
+            value={profile.postal_code || ''}
+            onChange={onInputChange}
+            disabled={!isEditing}
+          />
+        </div>
+      </div>
+
+      {isEditing && (
+        <div className="flex justify-end space-x-2 pt-4">
+          <Button variant="outline" onClick={onCancel}>
             Annuler
           </Button>
-          <Button type="submit">Enregistrer</Button>
+          <Button onClick={onSave}>
+            Enregistrer
+          </Button>
         </div>
-      </form>
-    </Form>
+      )}
+    </div>
   );
 };

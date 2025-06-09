@@ -2,13 +2,7 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
 
 interface VehicleInsuranceInfoProps {
@@ -26,26 +20,24 @@ const VehicleInsuranceInfo: React.FC<VehicleInsuranceInfoProps> = ({
 }) => {
   const { insuranceCompanies } = useInsuranceCompanies();
 
+  // Prepare insurance company options for searchable select
+  const insuranceOptions = insuranceCompanies.map(company => ({
+    value: company.name,
+    label: company.name
+  }));
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
       <div className="md:col-span-4 space-y-2">
         <Label htmlFor="insuranceCompany">Compagnie d'assurance</Label>
-        <Select 
-          disabled={isViewMode} 
-          value={formData.insuranceCompany || ''} 
+        <SearchableSelect
+          options={insuranceOptions}
+          value={formData.insuranceCompany || ''}
           onValueChange={(value) => onSelectChange('insuranceCompany', value)}
-        >
-          <SelectTrigger id="insuranceCompany">
-            <SelectValue placeholder="Sélectionner une compagnie" />
-          </SelectTrigger>
-          <SelectContent>
-            {insuranceCompanies.map(company => (
-              <SelectItem key={company.id} value={company.name}>
-                {company.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          placeholder="Sélectionner une compagnie"
+          searchPlaceholder="Rechercher une compagnie..."
+          disabled={isViewMode}
+        />
       </div>
 
       <div className="space-y-2">
