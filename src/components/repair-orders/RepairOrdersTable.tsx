@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Edit, Trash2 } from 'lucide-react';
+import { Eye, Edit, Trash2, MoreHorizontal } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 
 interface RepairOrdersTableProps {
@@ -105,6 +105,9 @@ export const RepairOrdersTable = ({ orders, onView, onEdit, onDelete, contextMen
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 )}
+                <Button variant="ghost" size="sm">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
               </div>
             </TableCell>
           </TableRow>

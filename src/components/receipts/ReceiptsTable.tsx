@@ -2,7 +2,7 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Eye, Edit, Trash2 } from 'lucide-react';
+import { Eye, Edit, Trash2, Download, Mail, Print } from 'lucide-react';
 import { ReceiptWithClient } from '@/services/supabase/receipts/types';
 
 interface ReceiptsTableProps {
@@ -67,8 +67,20 @@ export const ReceiptsTable = ({ receipts, onEdit, onDelete }: ReceiptsTableProps
             </TableCell>
             <TableCell className="text-right">
               <div className="flex justify-end space-x-2">
+                <Button variant="ghost" size="sm">
+                  <Eye className="h-4 w-4" />
+                </Button>
                 <Button variant="ghost" size="sm" onClick={() => onEdit(receipt)}>
                   <Edit className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="sm">
+                  <Download className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="sm">
+                  <Print className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="sm">
+                  <Mail className="h-4 w-4" />
                 </Button>
                 <Button 
                   variant="ghost" 

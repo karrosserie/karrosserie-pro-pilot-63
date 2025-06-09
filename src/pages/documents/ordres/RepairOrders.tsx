@@ -99,18 +99,20 @@ const RepairOrders = () => {
         onCreateOrder={handleCreateOrder}
       />
       
-      <RepairOrdersTable
-        orders={filteredOrders}
-        onEdit={handleEditOrder}
-        contextMenuProps={{
-          onDownload: handleDownload,
-          onPrint: handlePrint,
-          onSendEmail: handleSendEmail,
-          onSignOrder: handleSignOrder,
-          onRequestDocuments: handleRequestDocuments,
-          onConvertToInvoice: handleConvertToInvoice
-        }}
-      />
+      <div className="card-container">
+        <RepairOrdersTable
+          orders={filteredOrders}
+          onEdit={handleEditOrder}
+          contextMenuProps={{
+            onDownload: handleDownload,
+            onPrint: handlePrint,
+            onSendEmail: handleSendEmail,
+            onSignOrder: handleSignOrder,
+            onRequestDocuments: handleRequestDocuments,
+            onConvertToInvoice: handleConvertToInvoice
+          }}
+        />
+      </div>
 
       <RepairOrderDialog
         order={selectedOrder}
