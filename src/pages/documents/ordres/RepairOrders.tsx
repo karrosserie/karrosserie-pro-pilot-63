@@ -101,7 +101,7 @@ const RepairOrders = () => {
       
       <RepairOrdersTable
         orders={filteredOrders}
-        onEditOrder={handleEditOrder}
+        onEdit={handleEditOrder}
         contextMenuProps={{
           onDownload: handleDownload,
           onPrint: handlePrint,

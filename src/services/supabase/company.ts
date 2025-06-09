@@ -10,7 +10,6 @@ export interface CompanyInfo {
   zipcode: string;
   postal_code: string;
   city: string;
-  country: string;
   phone: string;
   siren: string;
   siret: string;
@@ -52,7 +51,6 @@ export const companyService = {
       ...data,
       zipcode: data.zipcode || '',
       postal_code: data.zipcode || '', // Map zipcode to postal_code for compatibility
-      country: data.country || '',
       notifications: data.notifications as {
         email: boolean;
         push: boolean;
@@ -74,7 +72,6 @@ export const companyService = {
       address: companyData.address || '',
       zipcode: companyData.postal_code || companyData.zipcode || '',
       city: companyData.city || '',
-      country: companyData.country || '',
       phone: companyData.phone || '',
       siren: companyData.siren || '',
       siret: companyData.siret || '',
@@ -104,7 +101,6 @@ export const companyService = {
       ...data,
       zipcode: data.zipcode || '',
       postal_code: data.zipcode || '',
-      country: data.country || '',
       notifications: data.notifications as {
         email: boolean;
         push: boolean;

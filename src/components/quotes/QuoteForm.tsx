@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useClients } from '@/hooks/use-clients';
@@ -103,7 +104,7 @@ export const QuoteForm = ({
 
       <QuoteAssignmentSection 
         formData={formData}
-        onFieldChange={handleChange}
+        onChange={handleChange}
         clientOptions={clientOptions}
         isLoadingClients={isLoadingClients}
         errors={errors}
