@@ -50,7 +50,7 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
     model: vehicle.model || '',
     year: vehicle.year || new Date().getFullYear(),
     licensePlate: vehicle.license_plate || '',
-    status: 'En attente' | 'Réservé' | 'En cours' | 'Terminé' | 'Annulé', // Default status since not in database
+    status: 'En attente' as 'En réparation' | 'Terminé' | 'En attente' | 'Diagnostic', // Default status since not in database
     owner: vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Non assigné',
     vehicleImages: convertToImageArray(vehicle.vehicle_images),
     registrationDocumentFrontUrl: vehicle.registration_document_front_url,

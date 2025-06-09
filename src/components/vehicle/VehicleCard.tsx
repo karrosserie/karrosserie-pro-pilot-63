@@ -10,7 +10,7 @@ interface VehicleCardProps {
   model: string;
   year: number;
   licensePlate: string;
-  status: 'En attente' | 'Réservé' | 'En cours' | 'Terminé' | 'Annulé';
+  status: 'En réparation' | 'Terminé' | 'En attente' | 'Diagnostic';
   owner: string;
   imageUrl?: string;
   vehicleImages?: string[];
