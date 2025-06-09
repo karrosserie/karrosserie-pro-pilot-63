@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Label } from '@/components/ui/label';
 import { Receipt } from './types';
 
 interface DateAmountFieldsProps {
@@ -26,19 +25,24 @@ export const DateAmountFields = ({ formData, onChange }: DateAmountFieldsProps) 
       </div>
 
       <div>
-        <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
-          Montant <span className="text-red-500">*</span>
+        <label htmlFor="payment_method" className="block text-sm font-medium text-gray-700 mb-1">
+          Méthode de paiement <span className="text-red-500">*</span>
         </label>
-        <input
-          id="amount"
-          type="number"
-          step="0.01"
-          value={formData.amount || ''}
-          onChange={(e) => onChange('amount', e.target.value ? parseFloat(e.target.value) : '')}
-          placeholder="0.00"
+        <select
+          id="payment_method"
+          value={formData.payment_method}
+          onChange={(e) => onChange('payment_method', e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-karrosserie-orange focus:border-transparent"
           required
-        />
+        >
+          <option value="Virement">Virement</option>
+          <option value="Chèque">Chèque</option>
+          <option value="Espèces">Espèces</option>
+          <option value="Carte bancaire">Carte bancaire</option>
+          <option value="Argent mobile">Argent mobile</option>
+          <option value="Paiement en ligne">Paiement en ligne</option>
+          <option value="Autres">Autres</option>
+        </select>
       </div>
     </div>
   );

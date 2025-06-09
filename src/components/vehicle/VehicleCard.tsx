@@ -14,8 +14,8 @@ interface VehicleCardProps {
   owner: string;
   imageUrl?: string;
   vehicleImages?: string[];
-  registrationFrontUrl?: string;
-  registrationBackUrl?: string;
+  registrationDocumentFrontUrl?: string;
+  registrationDocumentBackUrl?: string;
   onView?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
@@ -29,8 +29,8 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
   owner,
   imageUrl,
   vehicleImages,
-  registrationFrontUrl,
-  registrationBackUrl,
+  registrationDocumentFrontUrl,
+  registrationDocumentBackUrl,
   onView,
   onEdit,
   onDelete
@@ -71,12 +71,12 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
 
   const firstImage = getFirstImage();
   
-  // Vérification correcte des certificats d'immatriculation avec les vraies propriétés de la DB
-  console.log('Registration data:', { registrationFrontUrl, registrationBackUrl });
-  const hasCompleteRegistration = registrationFrontUrl && 
-                                  registrationFrontUrl.trim() !== '' && 
-                                  registrationBackUrl && 
-                                  registrationBackUrl.trim() !== '';
+  // Vérification correcte des certificats d'immatriculation avec les bonnes propriétés
+  console.log('Registration data:', { registrationDocumentFrontUrl, registrationDocumentBackUrl });
+  const hasCompleteRegistration = registrationDocumentFrontUrl && 
+                                  registrationDocumentFrontUrl.trim() !== '' && 
+                                  registrationDocumentBackUrl && 
+                                  registrationDocumentBackUrl.trim() !== '';
 
   return (
     <div className="card-container flex flex-col h-full animate-fade-in">

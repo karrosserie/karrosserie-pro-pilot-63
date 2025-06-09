@@ -2,13 +2,6 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface VehicleDateStatusProps {
   formData: any;
@@ -20,21 +13,11 @@ interface VehicleDateStatusProps {
 const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
   formData,
   isViewMode,
-  onInputChange,
-  onSelectChange
+  onInputChange
 }) => {
-  const statusOptions = [
-    'En attente',
-    'En réparation', 
-    'Diagnostic',
-    'Terminé',
-    'Annulé',
-    'Réservé'
-  ];
-
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="arrivalDate">Date d'arrivée</Label>
           <Input
@@ -73,26 +56,6 @@ const VehicleDateStatus: React.FC<VehicleDateStatusProps> = ({
             className="w-full"
           />
         </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="status">Statut</Label>
-        <Select 
-          disabled={isViewMode} 
-          value={formData.status || 'En attente'} 
-          onValueChange={(value) => onSelectChange('status', value)}
-        >
-          <SelectTrigger id="status">
-            <SelectValue placeholder="Sélectionner un statut" />
-          </SelectTrigger>
-          <SelectContent>
-            {statusOptions.map(status => (
-              <SelectItem key={status} value={status}>
-                {status}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
     </div>
   );

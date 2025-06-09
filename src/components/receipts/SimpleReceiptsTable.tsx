@@ -44,7 +44,7 @@ export const SimpleReceiptsTable = ({
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'EUR'
-    }).format(amount);
+    }).format(amount).replace('.', ',');
   };
 
   const formatDate = (dateString: string) => {
@@ -65,7 +65,11 @@ export const SimpleReceiptsTable = ({
       ? `${invoice.clients.first_name} ${invoice.clients.last_name}` 
       : 'Client non assigné';
     
-    return `${invoice.reference} - ${clientName} - ${invoice.amount}€`;
+    const amount = typeof invoice.amount === 'number' 
+      ? invoice.amount.toFixed(2).replace('.', ',')
+      : '0,00';
+    
+    return `Facture n°${invoice.reference} - ${clientName} - ${amount} €`;
   };
 
   if (receipts.length === 0) {

@@ -18,9 +18,21 @@ interface InvoiceSelectProps {
 export const InvoiceSelect = ({ value, onChange }: InvoiceSelectProps) => {
   const { invoices, isLoading: isLoadingInvoices } = useInvoices();
 
+  const formatInvoiceDisplay = (invoice: any) => {
+    const clientName = invoice.clients 
+      ? `${invoice.clients.first_name} ${invoice.clients.last_name}` 
+      : 'Client non assigné';
+    const amount = typeof invoice.amount === 'number' 
+      ? invoice.amount.toFixed(2).replace('.', ',')
+      : '0,00';
+    return `Facture n°${invoice.reference} - ${clientName} - ${amount} €`;
+  };
+
   return (
     <div>
-      <Label htmlFor="invoice" required>Facture</Label>
+      <Label htmlFor="invoice" className="block text-sm font-medium text-gray-700 mb-1">
+        Facture <span className="text-red-500">*</span>
+      </Label>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger>
           <SelectValue placeholder="Sélectionner une facture" />
@@ -31,7 +43,7 @@ export const InvoiceSelect = ({ value, onChange }: InvoiceSelectProps) => {
           ) : invoices && invoices.length > 0 ? (
             invoices.map((invoice) => (
               <SelectItem key={invoice.id} value={invoice.id}>
-                {invoice.reference} - {invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client non assigné'} - {invoice.amount}€
+                {formatInvoiceDisplay(invoice)}
               </SelectItem>
             ))
           ) : (
