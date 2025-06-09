@@ -8,10 +8,11 @@ import { InvoiceSelect } from '@/components/receipts/form/InvoiceSelect';
 
 interface CreditBasicInfoSectionProps {
   formData: any;
+  errors?: Record<string, string>;
   onFieldChange: (field: string, value: any) => void;
 }
 
-export const CreditBasicInfoSection = ({ formData, onFieldChange }: CreditBasicInfoSectionProps) => {
+export const CreditBasicInfoSection = ({ formData, errors, onFieldChange }: CreditBasicInfoSectionProps) => {
   const isFranchiseOffer = formData.is_franchise_offer || false;
 
   return (
@@ -39,6 +40,9 @@ export const CreditBasicInfoSection = ({ formData, onFieldChange }: CreditBasicI
             placeholder="Numéro de l'avoir"
             required
           />
+          {errors?.reference && (
+            <p className="text-sm text-red-500">{errors.reference}</p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -50,6 +54,9 @@ export const CreditBasicInfoSection = ({ formData, onFieldChange }: CreditBasicI
             onChange={(e) => onFieldChange('date', e.target.value)}
             required
           />
+          {errors?.date && (
+            <p className="text-sm text-red-500">{errors.date}</p>
+          )}
         </div>
 
         {!isFranchiseOffer && (
@@ -75,6 +82,9 @@ export const CreditBasicInfoSection = ({ formData, onFieldChange }: CreditBasicI
           value={formData.invoice_id || ''}
           onChange={(value) => onFieldChange('invoice_id', value)}
         />
+        {errors?.invoice_id && (
+          <p className="text-sm text-red-500">{errors.invoice_id}</p>
+        )}
       </div>
     </div>
   );

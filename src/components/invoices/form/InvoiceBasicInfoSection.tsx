@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 interface InvoiceBasicInfoSectionProps {
   formData: any;
+  errors?: Record<string, string>;
   onFieldChange: (field: string, value: any) => void;
   claimNumber?: string;
   currentMileage?: string;
@@ -15,6 +16,7 @@ interface InvoiceBasicInfoSectionProps {
 
 export const InvoiceBasicInfoSection = ({ 
   formData, 
+  errors,
   onFieldChange,
   claimNumber,
   currentMileage,
@@ -32,6 +34,9 @@ export const InvoiceBasicInfoSection = ({
           placeholder="N° de facture"
           required
         />
+        {errors?.reference && (
+          <p className="text-sm text-red-500">{errors.reference}</p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -43,6 +48,9 @@ export const InvoiceBasicInfoSection = ({
           onChange={(e) => onFieldChange('date', e.target.value)}
           required
         />
+        {errors?.date && (
+          <p className="text-sm text-red-500">{errors.date}</p>
+        )}
       </div>
 
       <div className="space-y-2">

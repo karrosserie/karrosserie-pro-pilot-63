@@ -10,9 +10,10 @@ interface QuoteAssignmentSectionProps {
   onChange: (field: string, value: any) => void;
   clientOptions?: any[];
   isLoadingClients?: boolean;
+  errors?: Record<string, string>;
 }
 
-export const QuoteAssignmentSection = ({ formData, onChange, clientOptions, isLoadingClients }: QuoteAssignmentSectionProps) => {
+export const QuoteAssignmentSection = ({ formData, onChange, clientOptions, isLoadingClients, errors }: QuoteAssignmentSectionProps) => {
   const { clients } = useClients();
   const { vehicles } = useVehicles();
 
@@ -52,6 +53,9 @@ export const QuoteAssignmentSection = ({ formData, onChange, clientOptions, isLo
           placeholder="Sélectionner un client"
           searchPlaceholder="Rechercher un client..."
         />
+        {errors?.client_id && (
+          <p className="text-sm text-red-500">{errors.client_id}</p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -64,6 +68,9 @@ export const QuoteAssignmentSection = ({ formData, onChange, clientOptions, isLo
           searchPlaceholder="Rechercher un véhicule..."
           disabled={!formData.client_id}
         />
+        {errors?.vehicle_id && (
+          <p className="text-sm text-red-500">{errors.vehicle_id}</p>
+        )}
       </div>
     </div>
   );

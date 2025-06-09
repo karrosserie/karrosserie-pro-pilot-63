@@ -7,12 +7,13 @@ import { useVehicles } from '@/hooks/use-vehicles';
 
 interface InvoiceAssignmentSectionProps {
   formData: any;
+  errors?: Record<string, string>;
   onFieldChange: (field: string, value: any) => void;
   clientOptions?: any[];
   isLoadingClients?: boolean;
 }
 
-export const InvoiceAssignmentSection = ({ formData, onFieldChange, clientOptions, isLoadingClients }: InvoiceAssignmentSectionProps) => {
+export const InvoiceAssignmentSection = ({ formData, errors, onFieldChange, clientOptions, isLoadingClients }: InvoiceAssignmentSectionProps) => {
   const { clients } = useClients();
   const { vehicles } = useVehicles();
 
@@ -52,6 +53,9 @@ export const InvoiceAssignmentSection = ({ formData, onFieldChange, clientOption
           placeholder="Sélectionner un client"
           searchPlaceholder="Rechercher un client..."
         />
+        {errors?.clientId && (
+          <p className="text-sm text-red-500">{errors.clientId}</p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -64,6 +68,9 @@ export const InvoiceAssignmentSection = ({ formData, onFieldChange, clientOption
           searchPlaceholder="Rechercher un véhicule..."
           disabled={!formData.clientId}
         />
+        {errors?.vehicleId && (
+          <p className="text-sm text-red-500">{errors.vehicleId}</p>
+        )}
       </div>
     </div>
   );

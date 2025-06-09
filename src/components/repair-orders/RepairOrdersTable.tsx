@@ -8,12 +8,13 @@ import { RepairOrder } from '@/services/supabase/repair-orders';
 
 interface RepairOrdersTableProps {
   orders: RepairOrder[];
-  onView: (order: RepairOrder) => void;
+  onView?: (order: RepairOrder) => void;
   onEdit: (order: RepairOrder) => void;
-  onDelete: (order: RepairOrder) => void;
+  onDelete?: (order: RepairOrder) => void;
+  contextMenuProps?: any;
 }
 
-export const RepairOrdersTable = ({ orders, onView, onEdit, onDelete }: RepairOrdersTableProps) => {
+export const RepairOrdersTable = ({ orders, onView, onEdit, onDelete, contextMenuProps }: RepairOrdersTableProps) => {
   // Calculate order amount from quotes or return 0
   const getOrderAmount = (order: RepairOrder) => {
     // Check if quotes exist and have amount
@@ -86,20 +87,24 @@ export const RepairOrdersTable = ({ orders, onView, onEdit, onDelete }: RepairOr
             <TableCell>{getStatusBadge(order.status || 'En attente')}</TableCell>
             <TableCell className="text-right">
               <div className="flex justify-end space-x-2">
-                <Button variant="ghost" size="sm" onClick={() => onView(order)}>
-                  <Eye className="h-4 w-4" />
-                </Button>
+                {onView && (
+                  <Button variant="ghost" size="sm" onClick={() => onView(order)}>
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                )}
                 <Button variant="ghost" size="sm" onClick={() => onEdit(order)}>
                   <Edit className="h-4 w-4" />
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => onDelete(order)}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {onDelete && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => onDelete(order)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             </TableCell>
           </TableRow>

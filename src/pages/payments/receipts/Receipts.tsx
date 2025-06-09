@@ -26,7 +26,10 @@ const Receipts = () => {
   };
 
   const handleDeleteReceipt = (receiptId: string) => {
-    handleDelete(receiptId);
+    const receipt = receipts.find(r => r.id === receiptId);
+    if (receipt) {
+      handleDelete(receipt);
+    }
   };
 
   if (isLoading) {
