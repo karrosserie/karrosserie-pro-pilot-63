@@ -24,7 +24,7 @@ export const DateAmountFields = ({ formData, onChange }: DateAmountFieldsProps) 
         />
       </div>
 
-      <div className="md:grid-col-2">
+      <div className="md:col-span-2">
         <label htmlFor="payment_method" className="block text-sm font-medium text-gray-700 mb-1">
           Méthode de paiement <span className="text-red-500">*</span>
         </label>
