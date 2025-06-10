@@ -1,18 +1,18 @@
 
-import React, { useEffect, useState } from 'react';
-import { Input } from '@/components/ui/input';
+import React from 'react';
 import { Label } from '@/components/ui/label';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, AlertCircle } from 'lucide-react';
 import { Quote } from '@/services/supabase/quotes';
-import { vehiclesService } from '@/services/supabase/vehicles';
+import { Client } from '@/services/supabase/clients';
+import { useVehicles } from '@/hooks/use-vehicles';
 import { cn } from '@/lib/utils';
 
 interface QuoteAssignmentSectionProps {
   formData: Partial<Quote>;
   onChange: (field: string, value: any) => void;
-  clientOptions: any[];
+  clientOptions: Client[];
   isLoadingClients: boolean;
   errors?: Record<string, string>;
 }
@@ -24,55 +24,38 @@ export const QuoteAssignmentSection = ({
   isLoadingClients,
   errors = {}
 }: QuoteAssignmentSectionProps) => {
-  const [vehicles, setVehicles] = useState<any[]>([]);
-  const [isLoadingVehicles, setIsLoadingVehicles] = useState(false);
+  const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
+  
+  console.log('QuoteAssignmentSection - clientOptions:', clientOptions);
+  console.log('QuoteAssignmentSection - formData.client_id:', formData.client_id);
+  
+  // Filtrer les véhicules pour le client sélectionné
+  const clientVehicles = vehicles?.filter(vehicle => 
+    vehicle.client_id === formData.client_id
+  ) || [];
 
-  console.log('QuoteAssignmentSection - Errors received:', errors);
-  console.log('QuoteAssignmentSection - client_id error:', errors.client_id);
+  console.log('QuoteAssignmentSection - clientVehicles:', clientVehicles);
 
-  // Charger les véhicules quand un client est sélectionné
-  useEffect(() => {
-    const loadVehicles = async () => {
-      if (formData.client_id) {
-        setIsLoadingVehicles(true);
-        try {
-          console.log('Loading vehicles for client:', formData.client_id);
-          const clientVehicles = await vehiclesService.getByClientId(formData.client_id);
-          console.log('Vehicles loaded:', clientVehicles);
-          setVehicles(clientVehicles || []);
-        } catch (error) {
-          console.error('Error loading vehicles:', error);
-          setVehicles([]);
-        } finally {
-          setIsLoadingVehicles(false);
-        }
-      } else {
-        setVehicles([]);
-      }
-    };
+  const handleClientChange = (clientId: string) => {
+    console.log('Client changed to:', clientId);
+    console.log('Calling onChange with client_id:', clientId);
+    onChange('client_id', clientId);
+    // Réinitialiser le véhicule quand on change de client
+    onChange('vehicle_id', null);
+  };
 
-    loadVehicles();
-  }, [formData.client_id]);
-
-  // Réinitialiser le véhicule sélectionné quand le client change
-  useEffect(() => {
-    if (formData.client_id && formData.vehicle_id) {
-      // Vérifier si le véhicule sélectionné appartient toujours au client
-      const vehicleExists = vehicles.some(v => v.id === formData.vehicle_id);
-      if (!vehicleExists) {
-        console.log('Resetting vehicle selection as it does not belong to selected client');
-        onChange('vehicle_id', '');
-      }
-    }
-  }, [vehicles, formData.vehicle_id, formData.client_id, onChange]);
+  const handleVehicleChange = (vehicleId: string) => {
+    console.log('Vehicle changed to:', vehicleId);
+    onChange('vehicle_id', vehicleId);
+  };
 
   // Préparer les options pour SearchableSelect
-  const clientSelectOptions = clientOptions.map(client => ({
+  const clientSelectOptions = (clientOptions || []).map(client => ({
     value: client.id,
-    label: `${client.firstName} ${client.lastName}`
+    label: `${client.first_name} ${client.last_name}`
   }));
 
-  const vehicleSelectOptions = vehicles.map(vehicle => ({
+  const vehicleSelectOptions = clientVehicles.map(vehicle => ({
     value: vehicle.id,
     label: `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`
   }));
@@ -85,24 +68,22 @@ export const QuoteAssignmentSection = ({
           Attribution
         </CardTitle>
         <CardDescription>
-          Sélectionner le client et le véhicule pour ce devis
+          Sélectionnez le client et le véhicule concernés
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="client_id" required className={cn(errors.client_id && "text-red-500")}>
-              Client
-            </Label>
+            <Label htmlFor="client_id" required>Client</Label>
             <SearchableSelect
               options={clientSelectOptions}
               value={formData.client_id || ''}
-              onValueChange={(value) => onChange('client_id', value)}
+              onValueChange={handleClientChange}
               placeholder={isLoadingClients ? "Chargement..." : "Sélectionner un client"}
               searchPlaceholder="Rechercher un client..."
               disabled={isLoadingClients}
               className={cn(
-                errors.client_id && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
+                errors.client_id && "border-red-500 focus-visible:ring-red-500"
               )}
             />
             {errors.client_id && (
@@ -114,26 +95,24 @@ export const QuoteAssignmentSection = ({
           </div>
 
           <div>
-            <Label htmlFor="vehicle_id" required className={cn(errors.vehicle_id && "text-red-500")}>
-              Véhicule
-            </Label>
+            <Label htmlFor="vehicle_id" required>Véhicule</Label>
             <SearchableSelect
               options={vehicleSelectOptions}
               value={formData.vehicle_id || ''}
-              onValueChange={(value) => onChange('vehicle_id', value)}
+              onValueChange={handleVehicleChange}
               placeholder={
                 !formData.client_id 
-                  ? "Sélectionner d'abord un client" 
+                  ? "Sélectionnez d'abord un client"
                   : isLoadingVehicles 
-                    ? "Chargement des véhicules..." 
-                    : vehicles.length === 0 
-                      ? "Aucun véhicule trouvé" 
-                      : "Sélectionner un véhicule"
+                  ? "Chargement..."
+                  : clientVehicles.length === 0
+                  ? "Aucun véhicule trouvé pour ce client"
+                  : "Sélectionner un véhicule"
               }
               searchPlaceholder="Rechercher un véhicule..."
               disabled={!formData.client_id || isLoadingVehicles}
               className={cn(
-                errors.vehicle_id && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
+                errors.vehicle_id && "border-red-500 focus-visible:ring-red-500"
               )}
             />
             {errors.vehicle_id && (
