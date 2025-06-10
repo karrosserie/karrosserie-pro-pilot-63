@@ -50,6 +50,7 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
     if (order) {
       console.log('Loading order data:', order);
       
+      // Charger toutes les données de l'ordre en une seule fois
       const initialData = {
         reference: order.reference || '',
         client_id: order.client_id || null,
@@ -61,6 +62,7 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
         notes: order.notes || ''
       };
       
+      console.log('Setting form data with vehicle_id:', initialData.vehicle_id);
       setFormData(initialData);
       
       if (!order.vehicle_id) {
@@ -84,7 +86,7 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
         setDiscounts([]);
       }
       
-      console.log('Form data set to:', {
+      console.log('Form data initialized:', {
         reference: order.reference,
         client_id: order.client_id,
         vehicle_id: order.vehicle_id,

@@ -25,25 +25,36 @@ export const RepairOrderAssignmentSection = ({
   isLoadingClients
 }: RepairOrderAssignmentSectionProps) => {
   const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
-  const initialLoadRef = useRef(true);
+  const isInitializing = useRef(true);
   
   // Filtrer les véhicules pour le client sélectionné
   const clientVehicles = vehicles?.filter(vehicle => 
     vehicle.client_id === formData.client_id
   ) || [];
 
-  // Marquer que le chargement initial est terminé après le premier rendu
+  // Marquer la fin de l'initialisation une fois que les données sont chargées
   useEffect(() => {
-    if (initialLoadRef.current && formData.client_id) {
-      initialLoadRef.current = false;
+    if (formData.client_id && formData.vehicle_id && isInitializing.current) {
+      console.log('Initial data loaded, stopping initialization phase');
+      isInitializing.current = false;
     }
-  }, [formData.client_id]);
+  }, [formData.client_id, formData.vehicle_id]);
 
   const handleClientChange = (clientId: string) => {
+    console.log('Client change triggered, isInitializing:', isInitializing.current);
     onFieldChange('client_id', clientId);
-    // Ne réinitialiser le véhicule que si ce n'est pas le chargement initial
-    if (!initialLoadRef.current) {
-      onFieldChange('vehicle_id', null);
+    
+    // Ne réinitialiser le véhicule que si ce n'est pas la phase d'initialisation
+    // et si le nouveau client n'a pas le véhicule actuellement sélectionné
+    if (!isInitializing.current && formData.vehicle_id) {
+      const vehicleExistsForNewClient = vehicles?.some(vehicle => 
+        vehicle.client_id === clientId && vehicle.id === formData.vehicle_id
+      );
+      
+      if (!vehicleExistsForNewClient) {
+        console.log('Vehicle does not exist for new client, resetting vehicle selection');
+        onFieldChange('vehicle_id', null);
+      }
     }
   };
 
