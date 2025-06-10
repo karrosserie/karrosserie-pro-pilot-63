@@ -25,29 +25,53 @@ export const RepairOrderAssignmentSection = ({
   isLoadingClients
 }: RepairOrderAssignmentSectionProps) => {
   const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
-  const hasInitializedData = useRef(false);
+  const hasInitializedClient = useRef(false);
+  const hasInitializedVehicle = useRef(false);
+  const expectedVehicleId = useRef<string | null>(null);
   
   // Filtrer les véhicules pour le client sélectionné
   const clientVehicles = vehicles?.filter(vehicle => 
     vehicle.client_id === formData.client_id
   ) || [];
 
-  // Détecter quand l'initialisation des données est terminée
+  // Étape 1: Sélectionner automatiquement le client une fois les données chargées
   useEffect(() => {
-    // Si nous avons un client_id et vehicle_id dans formData et que les données sont chargées
-    if (formData.client_id && formData.vehicle_id && !isLoadingClients && !isLoadingVehicles && vehicles && clientOptions.length > 0) {
-      console.log('Data initialization detected, marking as initialized');
-      hasInitializedData.current = true;
+    if (!hasInitializedClient.current && 
+        formData.client_id && 
+        !isLoadingClients && 
+        clientOptions.length > 0) {
+      console.log('Auto-selecting client:', formData.client_id);
+      hasInitializedClient.current = true;
+      expectedVehicleId.current = formData.vehicle_id || null;
     }
-  }, [formData.client_id, formData.vehicle_id, isLoadingClients, isLoadingVehicles, vehicles, clientOptions]);
+  }, [formData.client_id, isLoadingClients, clientOptions]);
+
+  // Étape 2: Sélectionner automatiquement le véhicule une fois les véhicules du client chargés
+  useEffect(() => {
+    if (hasInitializedClient.current && 
+        !hasInitializedVehicle.current && 
+        expectedVehicleId.current && 
+        formData.client_id && 
+        !isLoadingVehicles && 
+        clientVehicles.length > 0) {
+      
+      // Vérifier que le véhicule attendu existe dans la liste des véhicules du client
+      const vehicleExists = clientVehicles.some(vehicle => vehicle.id === expectedVehicleId.current);
+      
+      if (vehicleExists) {
+        console.log('Auto-selecting vehicle:', expectedVehicleId.current);
+        onFieldChange('vehicle_id', expectedVehicleId.current);
+        hasInitializedVehicle.current = true;
+      }
+    }
+  }, [hasInitializedClient.current, formData.client_id, isLoadingVehicles, clientVehicles, expectedVehicleId.current]);
 
   const handleClientChange = (clientId: string) => {
-    console.log('Client change - initialized:', hasInitializedData.current);
+    console.log('Manual client change to:', clientId);
     onFieldChange('client_id', clientId);
     
-    // Seulement réinitialiser le véhicule si les données sont initialisées (pas pendant le chargement initial)
-    // et si le véhicule actuel n'appartient pas au nouveau client
-    if (hasInitializedData.current && formData.vehicle_id) {
+    // Réinitialiser le véhicule uniquement si c'est un changement manuel (après initialisation)
+    if (hasInitializedClient.current && formData.vehicle_id) {
       const vehicleExistsForNewClient = vehicles?.some(vehicle => 
         vehicle.client_id === clientId && vehicle.id === formData.vehicle_id
       );
@@ -60,7 +84,7 @@ export const RepairOrderAssignmentSection = ({
   };
 
   const handleVehicleChange = (vehicleId: string) => {
-    console.log('Vehicle change - initialized:', hasInitializedData.current);
+    console.log('Manual vehicle change to:', vehicleId);
     onFieldChange('vehicle_id', vehicleId);
   };
 
