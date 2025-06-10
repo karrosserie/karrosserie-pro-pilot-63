@@ -45,7 +45,7 @@ export const InvoiceBasicInfoSection = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div>
             <Label htmlFor="reference">Numéro *</Label>
             <Input
@@ -104,7 +104,7 @@ export const InvoiceBasicInfoSection = ({
             )}
           </div>
 
-          <div>
+          <div className="md:col-span-2">
             <Label htmlFor="status">Statut</Label>
             <Select
               value={formData.status || 'En attente de paiement'}
