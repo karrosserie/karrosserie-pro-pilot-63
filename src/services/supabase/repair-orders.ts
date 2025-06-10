@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -30,130 +31,59 @@ export const repairOrdersService = {
   getAll: async () => {
     console.log('Fetching repair orders...');
     
-    // First, try to get repair orders with joins
-    const { data: ordersWithJoins, error: joinError } = await supabase
+    // Get basic repair orders data
+    const { data: basicOrders, error: basicError } = await supabase
       .from('repair_orders')
-      .select(`
-        *,
-        clients (
-          id,
-          first_name,
-          last_name
-        ),
-        vehicles (
-          id,
-          brand,
-          model,
-          license_plate
-        ),
-        quotes (
-          id,
-          reference,
-          amount
-        )
-      `)
+      .select('*')
       .order('created_at', { ascending: false });
 
-    // If joins fail, fall back to basic query
-    if (joinError) {
-      console.log('Joins failed, falling back to basic query:', joinError);
-      
-      const { data: basicOrders, error: basicError } = await supabase
-        .from('repair_orders')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (basicError) {
-        console.error('Error fetching repair orders (basic):', basicError);
-        throw new Error(basicError.message);
-      }
-
-      // Enrich with client and vehicle data separately
-      const enrichedOrders = await Promise.all(
-        (basicOrders || []).map(async (order) => {
-          let clientData = null;
-          let vehicleData = null;
-
-          // Try to get client data
-          if (order.client_id) {
-            const { data: client } = await supabase
-              .from('clients')
-              .select('id, first_name, last_name')
-              .eq('id', order.client_id)
-              .single();
-            clientData = client;
-          }
-
-          // Try to get vehicle data
-          if (order.vehicle_id) {
-            const { data: vehicle } = await supabase
-              .from('vehicles')
-              .select('id, brand, model, license_plate')
-              .eq('id', order.vehicle_id)
-              .single();
-            vehicleData = vehicle;
-          }
-
-          return {
-            ...order,
-            clients: clientData,
-            vehicles: vehicleData,
-            quotes: null
-          };
-        })
-      );
-
-      return enrichedOrders;
+    if (basicError) {
+      console.error('Error fetching repair orders:', basicError);
+      throw new Error(basicError.message);
     }
-    
-    return ordersWithJoins;
+
+    // Enrich with client and vehicle data separately
+    const enrichedOrders = await Promise.all(
+      (basicOrders || []).map(async (order) => {
+        let clientData = null;
+        let vehicleData = null;
+
+        // Try to get client data
+        if (order.client_id) {
+          const { data: client } = await supabase
+            .from('clients')
+            .select('id, first_name, last_name')
+            .eq('id', order.client_id)
+            .single();
+          clientData = client;
+        }
+
+        // Try to get vehicle data
+        if (order.vehicle_id) {
+          const { data: vehicle } = await supabase
+            .from('vehicles')
+            .select('id, brand, model, license_plate')
+            .eq('id', order.vehicle_id)
+            .single();
+          vehicleData = vehicle;
+        }
+
+        return {
+          ...order,
+          clients: clientData,
+          vehicles: vehicleData,
+          quotes: null
+        };
+      })
+    );
+
+    return enrichedOrders;
   },
 
   getById: async (id: string) => {
     console.log(`Fetching repair order with id ${id}...`);
     
-    // Try with joins first
-    const { data: orderWithJoins, error: joinError } = await supabase
-      .from('repair_orders')
-      .select(`
-        *,
-        clients (
-          id,
-          first_name,
-          last_name,
-          email,
-          phone,
-          address,
-          city,
-          postal_code,
-          driver_license_front_url,
-          driver_license_back_url
-        ),
-        vehicles (
-          id,
-          brand,
-          model,
-          license_plate,
-          registration_document_front_url,
-          registration_document_back_url
-        ),
-        quotes (
-          id,
-          reference,
-          amount
-        )
-      `)
-      .eq('id', id)
-      .single();
-      
-    if (!joinError && orderWithJoins) {
-      console.log('Successfully fetched repair order with joins:', orderWithJoins);
-      return orderWithJoins;
-    }
-    
-    console.log('Joins failed, falling back to separate queries:', joinError);
-    
-    // Fallback: get basic order data and enrich separately
+    // Get basic order data
     const { data: basicOrder, error: basicError } = await supabase
       .from('repair_orders')
       .select('*')
