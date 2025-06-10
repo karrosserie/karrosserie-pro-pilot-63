@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useAuth } from '@/contexts/AuthContext';
+import { isValidVin } from '@/services/vin-decoder';
 
 interface FleetVehicleFormProps {
   vehicle?: FleetVehicle | null;
@@ -27,10 +28,14 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
   const isViewMode = mode === 'view';
 
   const [formData, setFormData] = useState({
+    vin: '',
+    engine_number: '',
     brand: '',
     model: '',
     year: new Date().getFullYear(),
     license_plate: '',
+    color: '',
+    mileage: '',
     status: 'Disponible',
     notes: ''
   });
@@ -38,10 +43,14 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
   useEffect(() => {
     if (vehicle) {
       setFormData({
+        vin: vehicle.vin || '',
+        engine_number: vehicle.engine_number || '',
         brand: vehicle.brand || '',
         model: vehicle.model || '',
         year: vehicle.year || new Date().getFullYear(),
         license_plate: vehicle.license_plate || '',
+        color: vehicle.color || '',
+        mileage: vehicle.mileage?.toString() || '',
         status: vehicle.status || 'Disponible',
         notes: vehicle.notes || ''
       });
@@ -72,14 +81,27 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
     }
     
     try {
+      const submissionData = {
+        vin: formData.vin,
+        engine_number: formData.engine_number,
+        brand: formData.brand,
+        model: formData.model,
+        year: formData.year,
+        license_plate: formData.license_plate,
+        color: formData.color,
+        mileage: formData.mileage ? parseInt(formData.mileage) : null,
+        status: formData.status,
+        notes: formData.notes
+      };
+
       if (mode === 'edit' && vehicle) {
         await updateVehicle.mutateAsync({
           id: vehicle.id,
-          data: formData
+          data: submissionData
         });
       } else if (mode === 'create') {
         await createVehicle.mutateAsync({
-          ...formData,
+          ...submissionData,
           user_id: user.id
         });
       }
@@ -91,6 +113,52 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* VIN and Engine Number */}
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="vin">
+              Numéro de série (VIN) <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="vin"
+              name="vin"
+              value={formData.vin}
+              onChange={handleInputChange}
+              disabled={isViewMode}
+              required
+              placeholder="17 caractères"
+              maxLength={17}
+              style={{
+                textTransform: 'uppercase'
+              }}
+            />
+            {formData.vin && !isValidVin(formData.vin) && (
+              <p className="text-sm text-red-500 mt-1">
+                Le VIN doit contenir exactement 17 caractères alphanumériques (sans I, O, Q)
+              </p>
+            )}
+            {formData.vin && isValidVin(formData.vin) && (
+              <p className="text-sm text-green-600 mt-1">
+                ✓ VIN valide
+              </p>
+            )}
+          </div>
+          
+          <div>
+            <Label htmlFor="engine_number">Numéro de moteur</Label>
+            <Input
+              id="engine_number"
+              name="engine_number"
+              value={formData.engine_number}
+              onChange={handleInputChange}
+              disabled={isViewMode}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Brand and Model */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="brand">Marque *</Label>
@@ -116,22 +184,12 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      {/* License Plate, Year, Color, and Mileage */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div>
-          <Label htmlFor="year">Année</Label>
-          <Input
-            id="year"
-            name="year"
-            type="number"
-            value={formData.year}
-            onChange={handleInputChange}
-            disabled={isViewMode}
-            min="1900"
-            max={new Date().getFullYear() + 1}
-          />
-        </div>
-        <div>
-          <Label htmlFor="license_plate">Immatriculation *</Label>
+          <Label htmlFor="license_plate">
+            Plaque d'immatriculation <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="license_plate"
             name="license_plate"
@@ -141,8 +199,46 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
             required
           />
         </div>
+        
+        <div>
+          <Label htmlFor="year">Année</Label>
+          <Input
+            id="year"
+            name="year"
+            type="number"
+            min="1900"
+            max={new Date().getFullYear() + 1}
+            value={formData.year}
+            onChange={handleInputChange}
+            disabled={isViewMode}
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="color">Couleur</Label>
+          <Input
+            id="color"
+            name="color"
+            value={formData.color}
+            onChange={handleInputChange}
+            disabled={isViewMode}
+          />
+        </div>
+        
+        <div>
+          <Label htmlFor="mileage">Kilométrage</Label>
+          <Input
+            id="mileage"
+            name="mileage"
+            type="number"
+            value={formData.mileage}
+            onChange={handleInputChange}
+            disabled={isViewMode}
+          />
+        </div>
       </div>
 
+      {/* Status */}
       <div>
         <Label htmlFor="status">Statut</Label>
         <Select 
@@ -162,6 +258,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
         </Select>
       </div>
 
+      {/* Notes */}
       <div>
         <Label htmlFor="notes">Notes</Label>
         <Textarea

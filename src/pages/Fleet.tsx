@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Car, Plus, Search, Calendar, User } from 'lucide-react';
@@ -56,7 +57,8 @@ const Fleet = () => {
   const filteredVehicles = vehicles?.filter(vehicle =>
     vehicle.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     vehicle.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.license_plate?.toLowerCase().includes(searchTerm.toLowerCase())
+    vehicle.license_plate?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vehicle.vin?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
   if (error) {
@@ -112,8 +114,11 @@ const Fleet = () => {
                   <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
                     <tr>
                       <th className="px-4 py-3 rounded-tl-lg">Véhicule</th>
+                      <th className="px-4 py-3">VIN</th>
                       <th className="px-4 py-3">Immatriculation</th>
                       <th className="px-4 py-3">Année</th>
+                      <th className="px-4 py-3">Couleur</th>
+                      <th className="px-4 py-3">Kilométrage</th>
                       <th className="px-4 py-3">Statut</th>
                       <th className="px-4 py-3 rounded-tr-lg">Actions</th>
                     </tr>
@@ -123,8 +128,15 @@ const Fleet = () => {
                       filteredVehicles.map((vehicle) => (
                         <tr key={vehicle.id} className="border-b hover:bg-gray-50">
                           <td className="px-4 py-3 font-medium">{vehicle.brand} {vehicle.model}</td>
+                          <td className="px-4 py-3 text-gray-600 font-mono text-xs">
+                            {vehicle.vin ? vehicle.vin.substring(0, 8) + '...' : '-'}
+                          </td>
                           <td className="px-4 py-3 text-gray-600">{vehicle.license_plate}</td>
                           <td className="px-4 py-3 text-gray-600">{vehicle.year || '-'}</td>
+                          <td className="px-4 py-3 text-gray-600">{vehicle.color || '-'}</td>
+                          <td className="px-4 py-3 text-gray-600">
+                            {vehicle.mileage ? `${vehicle.mileage.toLocaleString()} km` : '-'}
+                          </td>
                           <td className="px-4 py-3">
                             <span 
                               className={`text-xs font-medium px-2.5 py-0.5 rounded ${
@@ -167,7 +179,7 @@ const Fleet = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                        <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
                           {searchTerm ? 'Aucun véhicule trouvé' : 'Aucun véhicule de courtoisie'}
                         </td>
                       </tr>
