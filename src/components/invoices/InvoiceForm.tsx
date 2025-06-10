@@ -11,10 +11,6 @@ import { InvoiceGlobalDiscountsSection } from './form/InvoiceGlobalDiscountsSect
 import { InvoiceDetailsSection } from './form/InvoiceDetailsSection';
 import { InvoiceFormActions } from './form/InvoiceFormActions';
 import { useInvoiceFormLogic } from './form/useInvoiceFormLogic';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CreditCard } from 'lucide-react';
 
 interface InvoiceFormProps {
   invoice?: Invoice | null;
@@ -83,9 +79,6 @@ export const InvoiceForm = ({
 
   // S'assurer que clientOptions est un tableau valide
   const clientOptions = Array.isArray(clients) ? clients.filter(client => client && client.id) : [];
-  
-  console.log('InvoiceForm - clients from useClients:', clients);
-  console.log('InvoiceForm - clientOptions after filtering:', clientOptions);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto">
@@ -130,32 +123,8 @@ export const InvoiceForm = ({
         onFieldChange={handleChange}
         globalTotals={globalTotals}
         isReadOnly={isReadOnly}
+        paymentDetails={formData.payment_details || ''}
       />
-
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center text-lg">
-            <CreditCard className="h-5 w-5 mr-2" />
-            Détails de paiement
-          </CardTitle>
-          <CardDescription>
-            Informations supplémentaires concernant le paiement
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div>
-            <Label htmlFor="payment_details">Détails de paiement</Label>
-            <Textarea
-              id="payment_details"
-              value={formData.payment_details || ''}
-              onChange={(e) => handleChange('payment_details', e.target.value)}
-              placeholder="Détails concernant le paiement (modalités, échéances, etc.)"
-              rows={3}
-              disabled={isReadOnly}
-            />
-          </div>
-        </CardContent>
-      </Card>
 
       <InvoiceFormActions 
         invoice={invoice}

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -49,7 +48,7 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
   };
 
   const formatAmount = (amount: number | null | undefined) => {
-    if (!amount) return '-';
+    if (amount === null || amount === undefined || isNaN(Number(amount))) return '-';
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'EUR'
@@ -68,10 +67,10 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
         
         if (Array.isArray(repairs)) {
           repairs.forEach((repair: any) => {
-            const unitPrice = repair.unitPrice || repair.unit_price || 0;
-            const quantity = repair.quantity || 0;
-            const discount = repair.discount || 0;
-            const vat = repair.vat || 0;
+            const unitPrice = Number(repair.unitPrice || repair.unit_price || 0);
+            const quantity = Number(repair.quantity || 0);
+            const discount = Number(repair.discount || 0);
+            const vat = Number(repair.vat || 0);
             
             const subtotal = quantity * unitPrice;
             const discountAmount = subtotal * (discount / 100);
@@ -94,10 +93,10 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
         
         if (Array.isArray(parts)) {
           parts.forEach((part: any) => {
-            const unitPrice = part.unitPrice || part.unit_price || 0;
-            const quantity = part.quantity || 0;
-            const discount = part.discount || 0;
-            const vat = part.vat || 0;
+            const unitPrice = Number(part.unitPrice || part.unit_price || 0);
+            const quantity = Number(part.quantity || 0);
+            const discount = Number(part.discount || 0);
+            const vat = Number(part.vat || 0);
             
             const subtotal = quantity * unitPrice;
             const discountAmount = subtotal * (discount / 100);
@@ -120,7 +119,7 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
         
         if (Array.isArray(discounts)) {
           discounts.forEach((discount: any) => {
-            const value = discount.value || discount.amount || 0;
+            const value = Number(discount.value || discount.amount || 0);
             if (discount.type === 'percentage') {
               totalAmount -= totalAmount * (value / 100);
             } else if (discount.type === 'fixed') {
@@ -133,7 +132,7 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
       }
     }
 
-    return totalAmount > 0 ? totalAmount : null;
+    return totalAmount > 0 ? totalAmount : 0;
   };
 
   if (orders.length === 0) {

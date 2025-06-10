@@ -54,7 +54,7 @@ export const CreditBasicInfoSection = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center space-x-2 p-4 bg-blue-50 rounded-lg">
+        <div className="flex items-center space-x-2 p-4 rounded-lg border">
           <Switch 
             id="franchise-switch"
             checked={isFranchiseCredit}
@@ -67,7 +67,7 @@ export const CreditBasicInfoSection = ({
 
         <div className="grid gap-4 grid-cols-1 md:grid-cols-5">
           <div>
-            <Label htmlFor="reference">Numéro *</Label>
+            <Label htmlFor="reference" required>Numéro</Label>
             <Input
               id="reference"
               value={formData.reference || ''}
@@ -141,7 +141,7 @@ export const CreditBasicInfoSection = ({
         </div>
 
         <div>
-          <Label htmlFor="invoice_id">Facture d'origine *</Label>
+          <Label htmlFor="invoice_id" required>Facture d'origine</Label>
           <SearchableSelect
             options={invoiceOptions}
             value={formData.invoice_id || ''}
