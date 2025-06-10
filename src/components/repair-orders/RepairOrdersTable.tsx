@@ -56,13 +56,73 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
     }).format(amount).replace('.', ',');
   };
 
-  const getOrderAmount = (order: RepairOrder) => {
-    // Essayer d'obtenir le montant depuis les quotes liées
-    if (order.quotes?.amount) {
-      return order.quotes.amount;
+  const calculateOrderAmount = (order: RepairOrder) => {
+    let totalAmount = 0;
+
+    // Calculer le total des réparations
+    if (order.repairs_data) {
+      try {
+        const repairs = typeof order.repairs_data === 'string' 
+          ? JSON.parse(order.repairs_data) 
+          : order.repairs_data;
+        
+        if (Array.isArray(repairs)) {
+          repairs.forEach((repair: any) => {
+            const repairTotal = (repair.quantity || 0) * (repair.unit_price || 0);
+            const discountAmount = repairTotal * ((repair.discount || 0) / 100);
+            const afterDiscount = repairTotal - discountAmount;
+            const vatAmount = afterDiscount * ((repair.vat || 0) / 100);
+            totalAmount += afterDiscount + vatAmount;
+          });
+        }
+      } catch (error) {
+        console.error('Error parsing repairs_data:', error);
+      }
     }
-    
-    return null;
+
+    // Calculer le total des pièces
+    if (order.parts_data) {
+      try {
+        const parts = typeof order.parts_data === 'string' 
+          ? JSON.parse(order.parts_data) 
+          : order.parts_data;
+        
+        if (Array.isArray(parts)) {
+          parts.forEach((part: any) => {
+            const partTotal = (part.quantity || 0) * (part.unit_price || 0);
+            const discountAmount = partTotal * ((part.discount || 0) / 100);
+            const afterDiscount = partTotal - discountAmount;
+            const vatAmount = afterDiscount * ((part.vat || 0) / 100);
+            totalAmount += afterDiscount + vatAmount;
+          });
+        }
+      } catch (error) {
+        console.error('Error parsing parts_data:', error);
+      }
+    }
+
+    // Appliquer les remises globales
+    if (order.discounts_data) {
+      try {
+        const discounts = typeof order.discounts_data === 'string' 
+          ? JSON.parse(order.discounts_data) 
+          : order.discounts_data;
+        
+        if (Array.isArray(discounts)) {
+          discounts.forEach((discount: any) => {
+            if (discount.type === 'percentage') {
+              totalAmount -= totalAmount * ((discount.value || 0) / 100);
+            } else if (discount.type === 'fixed') {
+              totalAmount -= discount.value || 0;
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Error parsing discounts_data:', error);
+      }
+    }
+
+    return totalAmount > 0 ? totalAmount : null;
   };
 
   if (orders.length === 0) {
@@ -108,7 +168,7 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
                   : '-'
                 }
               </TableCell>
-              <TableCell>{formatAmount(getOrderAmount(order))}</TableCell>
+              <TableCell>{formatAmount(calculateOrderAmount(order))}</TableCell>
               <TableCell>
                 <Badge className={getStatusColor(order.status || 'En attente')}>
                   {order.status || 'En attente'}

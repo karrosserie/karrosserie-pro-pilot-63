@@ -22,6 +22,7 @@ import { Printer, Mail } from 'lucide-react';
 import { CreditDialog } from '@/components/credits/CreditDialog';
 import { EditCreditDialog } from '@/components/credits/EditCreditDialog';
 import { useCredits } from '@/hooks/use-credits';
+import { useInvoices } from '@/hooks/use-invoices';
 
 // Mock data for credits - to be replaced with real data later
 const mockCredits = [
@@ -81,6 +82,7 @@ const Credits = () => {
   const { toast } = useToast();
   
   const { credits = [], isLoading, deleteCredit, error } = useCredits();
+  const { invoices } = useInvoices();
   
   const filteredCredits = credits.filter(credit => 
     credit.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -115,6 +117,27 @@ const Credits = () => {
       style: 'currency',
       currency: 'EUR'
     }).format(amount);
+  };
+
+  const getInvoiceDisplay = (invoiceId: string | null) => {
+    if (!invoiceId || !invoices) {
+      return 'Sans facture';
+    }
+    
+    const invoice = invoices.find(inv => inv.id === invoiceId);
+    if (!invoice) {
+      return 'Facture introuvable';
+    }
+    
+    const clientName = invoice.clients 
+      ? `${invoice.clients.first_name} ${invoice.clients.last_name}` 
+      : 'Client non assigné';
+    
+    const amount = typeof invoice.amount === 'number' 
+      ? invoice.amount.toFixed(2).replace('.', ',')
+      : '0,00';
+    
+    return `Facture n°${invoice.reference} - ${clientName} - ${amount} €`;
   };
   
   const handleCreateCredit = () => {
@@ -268,7 +291,6 @@ const Credits = () => {
             <TableRow>
               <TableHead>Numéro</TableHead>
               <TableHead>Date de création</TableHead>
-              <TableHead>Client</TableHead>
               <TableHead>Véhicule</TableHead>
               <TableHead>Facture d'origine</TableHead>
               <TableHead>Montant</TableHead>
@@ -283,19 +305,13 @@ const Credits = () => {
                   <TableCell className="font-medium">{credit.reference}</TableCell>
                   <TableCell>{formatDate(credit.created_at)}</TableCell>
                   <TableCell>
-                    {credit.clients 
-                      ? `${credit.clients.first_name} ${credit.clients.last_name}`
-                      : '-'
-                    }
-                  </TableCell>
-                  <TableCell>
                     {credit.vehicles 
                       ? `${credit.vehicles.brand} ${credit.vehicles.model} - ${credit.vehicles.license_plate}`
                       : '-'
                     }
                   </TableCell>
                   <TableCell>
-                    {credit.invoices?.reference || '-'}
+                    {getInvoiceDisplay(credit.invoice_id)}
                   </TableCell>
                   <TableCell>{formatAmount(credit.amount)}</TableCell>
                   <TableCell>
@@ -350,7 +366,7 @@ const Credits = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-4">
+                <TableCell colSpan={7} className="text-center py-4">
                   <div className="flex flex-col items-center justify-center py-8">
                     <FileText className="h-10 w-10 text-gray-400 mb-2" />
                     <h3 className="font-medium text-gray-900">Aucun résultat</h3>
@@ -391,3 +407,5 @@ const Credits = () => {
 };
 
 export default Credits;
+
+}
