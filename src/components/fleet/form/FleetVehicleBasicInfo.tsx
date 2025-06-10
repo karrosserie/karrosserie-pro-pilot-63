@@ -74,7 +74,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
           )}
           {formData.vin && isValidVin(formData.vin) && (
             <p className="text-sm text-green-600 mt-1">
-              ✓ VIN valide
+              ✓ VIN valide - Marque et modèle détectés
             </p>
           )}
         </div>
