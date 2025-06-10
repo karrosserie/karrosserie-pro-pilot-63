@@ -1,10 +1,7 @@
 
 export const calculateOrderAmount = (order: any) => {
   let totalAmount = 0;
-
-  console.log('order');
-  console.log(order);
-
+  
   // Calculer le total des réparations
   if (order.repairs_data) {
     try {
