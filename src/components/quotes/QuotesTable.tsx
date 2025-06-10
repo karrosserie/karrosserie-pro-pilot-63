@@ -6,10 +6,16 @@ import { FileText } from 'lucide-react';
 import { Quote } from '@/services/supabase/quotes';
 import { QuoteTableRow } from './QuoteTableRow';
 
+// Extended Quote type that includes the related data fetched by quotesService.getAll()
+type QuoteWithRelations = Quote & {
+  clients: { id: string; first_name: string; last_name: string } | null;
+  vehicles: { id: string; brand: string; model: string; license_plate: string } | null;
+};
+
 interface QuotesTableProps {
-  quotes: Quote[];
-  onEdit: (quote: Quote) => void;
-  onDelete: (quote: Quote) => void;
+  quotes: QuoteWithRelations[];
+  onEdit: (quote: QuoteWithRelations) => void;
+  onDelete: (quote: QuoteWithRelations) => void;
 }
 
 export const QuotesTable = ({ quotes, onEdit, onDelete }: QuotesTableProps) => {
