@@ -16,7 +16,9 @@ export const useFormValidation = (
 
   const clearFieldError = (field: string, errors: Record<string, string>) => {
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      const newErrors = { ...errors };
+      delete newErrors[field];
+      setErrors(newErrors);
     }
   };
 
