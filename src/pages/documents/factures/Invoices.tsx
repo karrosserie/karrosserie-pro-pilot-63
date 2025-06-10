@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +10,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import { useInvoices } from '@/hooks/use-invoices';
 import { Invoice } from '@/services/supabase/invoices';
@@ -25,7 +26,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Printer, Mail, Signature, CreditCard, FileX } from 'lucide-react';
+import { Printer, Mail, Signature, CreditCard, FileX, Download } from 'lucide-react';
 
 const Invoices = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -222,9 +223,6 @@ const Invoices = () => {
                     <div className="flex justify-end space-x-1">
                       <Button variant="ghost" size="icon">
                         <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Download className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => handleEditInvoice(invoice)}>
                         <Pencil className="h-4 w-4" />

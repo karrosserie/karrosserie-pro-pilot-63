@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +10,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, FileText, Plus, Filter, Eye, Download, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useToast } from '@/hooks/use-toast';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
@@ -22,7 +23,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Printer, Mail, FileCheck, ArrowRight } from 'lucide-react';
+import { Printer, Mail, FileCheck, ArrowRight, Download } from 'lucide-react';
 
 const Quotes = () => {
   const { quotes, isLoading, error, deleteQuote } = useQuotes();
@@ -176,9 +177,6 @@ const Quotes = () => {
                     <div className="flex justify-end space-x-1">
                       <Button variant="ghost" size="icon">
                         <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Download className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => handleEditQuote(quote)}>
                         <Pencil className="h-4 w-4" />
