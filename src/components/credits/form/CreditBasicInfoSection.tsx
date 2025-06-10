@@ -107,6 +107,7 @@ export const CreditBasicInfoSection = ({
           
           <div className="md:col-span-2">
             {!isFranchiseCredit && (
+              <>
                 <Label htmlFor="status">Statut</Label>
                 <Select
                   value={formData.status || 'En attente'}
@@ -134,8 +135,9 @@ export const CreditBasicInfoSection = ({
                     {errors.status}
                   </p>
                 )}
+              </>
             )}
-            </div>
+          </div>
         </div>
 
         <div>
