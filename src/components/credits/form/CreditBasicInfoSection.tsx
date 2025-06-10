@@ -29,7 +29,7 @@ export const CreditBasicInfoSection = ({
     { value: 'Payé', label: 'Payé' }
   ];
 
-  // Préparer les options pour SearchableSelect
+  // Préparer les options pour SearchableSelect avec le format demandé
   const invoiceOptions = (invoices || []).map(invoice => {
     const clientName = invoice.clients 
       ? `${invoice.clients.first_name} ${invoice.clients.last_name}` 
@@ -39,7 +39,7 @@ export const CreditBasicInfoSection = ({
       : '0,00';
     return {
       value: invoice.id,
-      label: `${invoice.reference} - ${clientName} - ${amount} €`
+      label: `Facture n°${invoice.reference} - ${clientName} - ${amount} €`
     };
   });
 

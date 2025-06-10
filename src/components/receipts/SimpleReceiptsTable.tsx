@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
-import { FileQuestion, Eye, Pencil, Trash, Receipt } from "lucide-react";
+import { Eye, Pencil, Trash, Receipt } from "lucide-react";
 import { ReceiptWithClient } from '@/services/supabase/receipts/types';
 import { useInvoices } from '@/hooks/use-invoices';
 
@@ -100,10 +100,7 @@ export const SimpleReceiptsTable = ({
           <TableRow key={receipt.id}>
             <TableCell>{formatDate(receipt.date)}</TableCell>
             <TableCell>
-              <div className="flex items-center">
-                <Receipt className="h-4 w-4 mr-2" />
-                {getInvoiceDisplay(receipt.invoice_id)}
-              </div>
+              {getInvoiceDisplay(receipt.invoice_id)}
             </TableCell>
             <TableCell className="font-medium">
               {formatAmount(receipt.amount)}
