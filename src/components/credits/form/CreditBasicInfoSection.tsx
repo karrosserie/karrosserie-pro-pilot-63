@@ -3,6 +3,7 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, AlertCircle } from 'lucide-react';
@@ -27,6 +28,20 @@ export const CreditBasicInfoSection = ({
     { value: 'En attente', label: 'En attente' },
     { value: 'Payé', label: 'Payé' }
   ];
+
+  // Préparer les options pour SearchableSelect
+  const invoiceOptions = (invoices || []).map(invoice => {
+    const clientName = invoice.clients 
+      ? `${invoice.clients.first_name} ${invoice.clients.last_name}` 
+      : 'Client non assigné';
+    const amount = typeof invoice.amount === 'number' 
+      ? invoice.amount.toFixed(2).replace('.', ',')
+      : '0,00';
+    return {
+      value: invoice.id,
+      label: `${invoice.reference} - ${clientName} - ${amount} €`
+    };
+  });
 
   return (
     <Card>
@@ -84,27 +99,16 @@ export const CreditBasicInfoSection = ({
 
         <div>
           <Label htmlFor="invoice_id" required>Facture</Label>
-          <Select
+          <SearchableSelect
+            options={invoiceOptions}
             value={formData.invoice_id || ''}
             onValueChange={(value) => onFieldChange('invoice_id', value)}
-          >
-            <SelectTrigger 
-              id="invoice_id"
-              className={cn(
-                errors.invoice_id && "border-red-500 focus-visible:ring-red-500"
-              )}
-            >
-              <SelectValue placeholder="Sélectionner une facture" />
-            </SelectTrigger>
-            <SelectContent>
-              {invoices?.map((invoice) => (
-                <SelectItem key={invoice.id} value={invoice.id}>
-                  {invoice.reference} - {invoice.amount}€
-                  {invoice.clients && ` - ${invoice.clients.first_name} ${invoice.clients.last_name}`}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            placeholder="Sélectionner une facture"
+            searchPlaceholder="Rechercher une facture..."
+            className={cn(
+              errors.invoice_id && "border-red-500 focus-visible:ring-red-500"
+            )}
+          />
           {errors.invoice_id && (
             <p className="text-sm text-red-500 mt-1 flex items-center">
               <AlertCircle className="h-4 w-4 mr-1" />

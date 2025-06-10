@@ -3,6 +3,7 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { CessionFormData, CessionFormErrors } from '../types';
 import { useAccounts } from '@/hooks/use-accounts';
 import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
@@ -20,6 +21,17 @@ export const CessionFormFields = ({
 }: CessionFormFieldsProps) => {
   const { accounts: bankAccounts, isLoading: isLoadingBankAccounts } = useAccounts();
   const { insuranceCompanies, isLoading: isLoadingInsuranceCompanies } = useInsuranceCompanies();
+
+  // Préparer les options pour SearchableSelect
+  const insuranceOptions = (insuranceCompanies || []).map(company => ({
+    value: company.id,
+    label: company.name
+  }));
+
+  const bankAccountOptions = (bankAccounts || []).map(account => ({
+    value: account.id,
+    label: `${account.name} - ${account.bank}`
+  }));
 
   return (
     <div className="space-y-4">
@@ -116,24 +128,17 @@ export const CessionFormFields = ({
           <Label htmlFor="insurance_company_id">
             Compagnie d'assurance <span className="text-red-500">*</span>
           </Label>
-          <Select
+          <SearchableSelect
+            options={insuranceOptions}
             value={formData.insurance_company_id || ''}
             onValueChange={(value) => {
               console.log('Insurance company selected:', value);
               onFieldChange('insurance_company_id', value);
             }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={isLoadingInsuranceCompanies ? "Chargement..." : "Sélectionner une compagnie d'assurance"} />
-            </SelectTrigger>
-            <SelectContent>
-              {insuranceCompanies?.map((company) => (
-                <SelectItem key={company.id} value={company.id}>
-                  {company.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            placeholder={isLoadingInsuranceCompanies ? "Chargement..." : "Sélectionner une compagnie d'assurance"}
+            searchPlaceholder="Rechercher une compagnie..."
+            disabled={isLoadingInsuranceCompanies}
+          />
           {errors.insurance_company_id && (
             <div className="text-sm text-red-600">{errors.insurance_company_id}</div>
           )}

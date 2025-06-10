@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, AlertCircle } from 'lucide-react';
 import { Quote } from '@/services/supabase/quotes';
@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 
 interface QuoteAssignmentSectionProps {
   formData: Partial<Quote>;
-  onFieldChange: (field: string, value: any) => void;
+  onChange: (field: string, value: any) => void;
   clientOptions: any[];
   isLoadingClients: boolean;
   errors?: Record<string, string>;
@@ -19,7 +19,7 @@ interface QuoteAssignmentSectionProps {
 
 export const QuoteAssignmentSection = ({ 
   formData, 
-  onFieldChange, 
+  onChange, 
   clientOptions, 
   isLoadingClients,
   errors = {}
@@ -61,10 +61,21 @@ export const QuoteAssignmentSection = ({
       const vehicleExists = vehicles.some(v => v.id === formData.vehicle_id);
       if (!vehicleExists) {
         console.log('Resetting vehicle selection as it does not belong to selected client');
-        onFieldChange('vehicle_id', '');
+        onChange('vehicle_id', '');
       }
     }
-  }, [vehicles, formData.vehicle_id, formData.client_id, onFieldChange]);
+  }, [vehicles, formData.vehicle_id, formData.client_id, onChange]);
+
+  // Préparer les options pour SearchableSelect
+  const clientSelectOptions = clientOptions.map(client => ({
+    value: client.id,
+    label: `${client.firstName} ${client.lastName}`
+  }));
+
+  const vehicleSelectOptions = vehicles.map(vehicle => ({
+    value: vehicle.id,
+    label: `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`
+  }));
 
   return (
     <Card>
@@ -83,26 +94,17 @@ export const QuoteAssignmentSection = ({
             <Label htmlFor="client_id" required className={cn(errors.client_id && "text-red-500")}>
               Client
             </Label>
-            <Select
+            <SearchableSelect
+              options={clientSelectOptions}
               value={formData.client_id || ''}
-              onValueChange={(value) => onFieldChange('client_id', value)}
-            >
-              <SelectTrigger 
-                id="client_id"
-                className={cn(
-                  errors.client_id && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
-                )}
-              >
-                <SelectValue placeholder={isLoadingClients ? "Chargement..." : "Sélectionner un client"} />
-              </SelectTrigger>
-              <SelectContent>
-                {clientOptions.map((client) => (
-                  <SelectItem key={client.id} value={client.id}>
-                    {client.firstName} {client.lastName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              onValueChange={(value) => onChange('client_id', value)}
+              placeholder={isLoadingClients ? "Chargement..." : "Sélectionner un client"}
+              searchPlaceholder="Rechercher un client..."
+              disabled={isLoadingClients}
+              className={cn(
+                errors.client_id && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
+              )}
+            />
             {errors.client_id && (
               <p className="text-sm text-red-500 mt-1 flex items-center">
                 <AlertCircle className="h-4 w-4 mr-1" />
@@ -115,40 +117,25 @@ export const QuoteAssignmentSection = ({
             <Label htmlFor="vehicle_id" required className={cn(errors.vehicle_id && "text-red-500")}>
               Véhicule
             </Label>
-            <Select
+            <SearchableSelect
+              options={vehicleSelectOptions}
               value={formData.vehicle_id || ''}
-              onValueChange={(value) => onFieldChange('vehicle_id', value)}
-              disabled={!formData.client_id}
-            >
-              <SelectTrigger 
-                id="vehicle_id"
-                className={cn(
-                  errors.vehicle_id && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
-                )}
-              >
-                <SelectValue 
-                  placeholder={
-                    !formData.client_id 
-                      ? "Sélectionner d'abord un client" 
-                      : isLoadingVehicles 
-                        ? "Chargement des véhicules..." 
-                        : vehicles.length === 0 
-                          ? "Aucun véhicule trouvé" 
-                          : "Sélectionner un véhicule"
-                  } 
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {vehicles.length === 0 && !isLoadingVehicles && formData.client_id && (
-                  <SelectItem value="no-vehicle" disabled>Aucun véhicule disponible</SelectItem>
-                )}
-                {vehicles.map((vehicle) => (
-                  <SelectItem key={vehicle.id} value={vehicle.id}>
-                    {vehicle.brand} {vehicle.model} - {vehicle.license_plate}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              onValueChange={(value) => onChange('vehicle_id', value)}
+              placeholder={
+                !formData.client_id 
+                  ? "Sélectionner d'abord un client" 
+                  : isLoadingVehicles 
+                    ? "Chargement des véhicules..." 
+                    : vehicles.length === 0 
+                      ? "Aucun véhicule trouvé" 
+                      : "Sélectionner un véhicule"
+              }
+              searchPlaceholder="Rechercher un véhicule..."
+              disabled={!formData.client_id || isLoadingVehicles}
+              className={cn(
+                errors.vehicle_id && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
+              )}
+            />
             {errors.vehicle_id && (
               <p className="text-sm text-red-500 mt-1 flex items-center">
                 <AlertCircle className="h-4 w-4 mr-1" />

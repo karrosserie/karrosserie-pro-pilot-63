@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { CessionFormData, CessionFormErrors } from '../types';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { format } from 'date-fns';
@@ -28,26 +28,25 @@ export const RepairOrderSelector = ({
     return `Ordre n°${order.reference} du ${orderDate} - ${clientName} - ${vehicleInfo}`;
   };
 
+  // Préparer les options pour SearchableSelect
+  const repairOrderOptions = (orders || []).map(order => ({
+    value: order.id,
+    label: formatRepairOrderDisplay(order)
+  }));
+
   return (
     <div className="space-y-2">
       <Label htmlFor="repair_order_id">
         Ordre de réparation <span className="text-red-500">*</span>
       </Label>
-      <Select
+      <SearchableSelect
+        options={repairOrderOptions}
         value={formData.repair_order_id || ''}
         onValueChange={(value) => onFieldChange('repair_order_id', value)}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder={isLoadingOrders ? "Chargement..." : "Sélectionner un ordre de réparation"} />
-        </SelectTrigger>
-        <SelectContent>
-          {orders?.map((order) => (
-            <SelectItem key={order.id} value={order.id}>
-              {formatRepairOrderDisplay(order)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+        placeholder={isLoadingOrders ? "Chargement..." : "Sélectionner un ordre de réparation"}
+        searchPlaceholder="Rechercher un ordre de réparation..."
+        disabled={isLoadingOrders}
+      />
       {errors.repair_order_id && (
         <div className="text-sm text-red-600">{errors.repair_order_id}</div>
       )}

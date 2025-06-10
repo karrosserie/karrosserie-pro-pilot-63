@@ -3,6 +3,7 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { Expense } from './types';
 
@@ -20,6 +21,12 @@ export const VehicleAssignmentFields = ({ formData, onChange }: VehicleAssignmen
       onChange('vehicle_id', '');
     }
   };
+
+  // Préparer les options pour SearchableSelect
+  const vehicleOptions = (vehicles || []).map(vehicle => ({
+    value: vehicle.id,
+    label: `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`
+  }));
 
   return (
     <div className="space-y-4">
@@ -55,27 +62,14 @@ export const VehicleAssignmentFields = ({ formData, onChange }: VehicleAssignmen
       {formData.assign_to_vehicle && (
         <div>
           <Label htmlFor="vehicle_id" required>Véhicule</Label>
-          <Select 
-            value={formData.vehicle_id || ''} 
+          <SearchableSelect
+            options={vehicleOptions}
+            value={formData.vehicle_id || ''}
             onValueChange={(value) => onChange('vehicle_id', value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Sélectionner un véhicule" />
-            </SelectTrigger>
-            <SelectContent>
-              {isLoading ? (
-                <SelectItem value="" disabled>Chargement...</SelectItem>
-              ) : vehicles && vehicles.length > 0 ? (
-                vehicles.map((vehicle) => (
-                  <SelectItem key={vehicle.id} value={vehicle.id}>
-                    {vehicle.brand} {vehicle.model} - {vehicle.license_plate}
-                  </SelectItem>
-                ))
-              ) : (
-                <SelectItem value="" disabled>Aucun véhicule disponible</SelectItem>
-              )}
-            </SelectContent>
-          </Select>
+            placeholder={isLoading ? "Chargement..." : "Sélectionner un véhicule"}
+            searchPlaceholder="Rechercher un véhicule..."
+            disabled={isLoading}
+          />
         </div>
       )}
     </div>
