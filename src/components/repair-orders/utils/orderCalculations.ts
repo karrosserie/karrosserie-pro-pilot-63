@@ -2,12 +2,21 @@
 export const calculateOrderAmount = (order: any) => {
   let totalAmount = 0;
   
-  // Calculer le total des réparations
-  if (order.repairs_data) {
+  // Parse notes to get repair data
+  let notesData = null;
+  if (order.notes) {
     try {
-      const repairs = typeof order.repairs_data === 'string' 
-        ? JSON.parse(order.repairs_data) 
-        : order.repairs_data;
+      notesData = typeof order.notes === 'string' ? JSON.parse(order.notes) : order.notes;
+    } catch (error) {
+      console.error('Error parsing notes data:', error);
+      return 0;
+    }
+  }
+
+  // Calculer le total des réparations
+  if (notesData?.repairs) {
+    try {
+      const repairs = notesData.repairs;
       
       if (Array.isArray(repairs)) {
         repairs.forEach((repair: any) => {
@@ -24,16 +33,14 @@ export const calculateOrderAmount = (order: any) => {
         });
       }
     } catch (error) {
-      console.error('Error parsing repairs_data:', error);
+      console.error('Error calculating repairs total:', error);
     }
   }
 
   // Calculer le total des pièces
-  if (order.parts_data) {
+  if (notesData?.parts) {
     try {
-      const parts = typeof order.parts_data === 'string' 
-        ? JSON.parse(order.parts_data) 
-        : order.parts_data;
+      const parts = notesData.parts;
       
       if (Array.isArray(parts)) {
         parts.forEach((part: any) => {
@@ -50,16 +57,14 @@ export const calculateOrderAmount = (order: any) => {
         });
       }
     } catch (error) {
-      console.error('Error parsing parts_data:', error);
+      console.error('Error calculating parts total:', error);
     }
   }
 
   // Appliquer les remises globales
-  if (order.discounts_data) {
+  if (notesData?.discounts) {
     try {
-      const discounts = typeof order.discounts_data === 'string' 
-        ? JSON.parse(order.discounts_data) 
-        : order.discounts_data;
+      const discounts = notesData.discounts;
       
       if (Array.isArray(discounts)) {
         discounts.forEach((discount: any) => {
@@ -72,7 +77,7 @@ export const calculateOrderAmount = (order: any) => {
         });
       }
     } catch (error) {
-      console.error('Error parsing discounts_data:', error);
+      console.error('Error applying discounts:', error);
     }
   }
 
