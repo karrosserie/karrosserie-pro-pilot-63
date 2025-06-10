@@ -1,14 +1,13 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { useVehicleReservations } from '@/hooks/use-fleet-reservations';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useAuth } from '@/contexts/AuthContext';
-import { isValidVin, decodeVin } from '@/services/vin-decoder';
-import { useCarBrands } from '@/hooks/use-car-brands';
-import { useCarModels } from '@/hooks/use-car-models';
+import { useFleetVehicleForm } from '@/hooks/use-fleet-vehicle-form';
+import { useVinDecoder } from '@/hooks/use-vin-decoder';
 import FleetVehicleBasicInfo from './form/FleetVehicleBasicInfo';
 import FleetVehicleDetails from './form/FleetVehicleDetails';
 import FleetLoansHistoryTab from './form/FleetLoansHistoryTab';
@@ -29,149 +28,37 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
   const { createVehicle, updateVehicle } = useFleetVehicles();
   const { reservations } = useVehicleReservations(vehicle?.id);
   const { user } = useAuth();
-  const { carBrands } = useCarBrands();
   const isViewMode = mode === 'view';
 
-  const [formData, setFormData] = useState({
-    vin: '',
-    engine_number: '',
-    brand: '',
-    model: '',
-    year: new Date().getFullYear(),
-    license_plate: '',
-    color: '',
-    status: 'Disponible'
-  });
+  const { formData, setFormData, handleInputChange, handleSelectChange } = useFleetVehicleForm(vehicle);
+  
+  const {
+    selectedBrandId,
+    carModels,
+    handleVinChange,
+    handleBrandChange,
+    handleModelChange
+  } = useVinDecoder(formData, setFormData);
 
-  const [selectedBrandId, setSelectedBrandId] = useState<string>('');
-  const { carModels } = useCarModels(selectedBrandId);
-  const [pendingVinModel, setPendingVinModel] = useState<string>('');
-
-  useEffect(() => {
-    if (vehicle) {
-      setFormData({
-        vin: vehicle.vin || '',
-        engine_number: vehicle.engine_number || '',
-        brand: vehicle.brand || '',
-        model: vehicle.model || '',
-        year: vehicle.year || new Date().getFullYear(),
-        license_plate: vehicle.license_plate || '',
-        color: vehicle.color || '',
-        status: vehicle.status || 'Disponible'
-      });
-
-      // Trouver l'ID de la marque correspondante
-      if (vehicle.brand && carBrands.length > 0) {
-        const matchingBrand = carBrands.find(brand => brand.name === vehicle.brand);
-        if (matchingBrand) {
-          setSelectedBrandId(matchingBrand.id);
-        }
-      }
-    }
-  }, [vehicle, carBrands]);
-
-  // Effet pour sélectionner le modèle une fois que les modèles sont chargés
-  useEffect(() => {
-    console.log('Checking pending VIN model:', pendingVinModel, 'Available models:', carModels);
-    
-    if (pendingVinModel && carModels.length > 0) {
-      // Recherche plus flexible du modèle
-      const matchingModel = carModels.find(model => {
-        const modelName = model.name.toLowerCase();
-        const pendingName = pendingVinModel.toLowerCase();
-        
-        // Correspondance exacte ou partielle
-        return modelName === pendingName || 
-               modelName.includes(pendingName) || 
-               pendingName.includes(modelName);
-      });
-      
-      console.log('Found matching model:', matchingModel);
-      
-      if (matchingModel) {
-        setFormData(prev => ({
-          ...prev,
-          model: matchingModel.name
-        }));
-        console.log('Model set to:', matchingModel.name);
-        setPendingVinModel(''); // Réinitialiser après sélection
-      } else {
-        console.log('No matching model found for:', pendingVinModel);
-      }
-    }
-  }, [carModels, pendingVinModel]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleVinInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
     if (name === 'vin') {
-      const upperValue = value.toUpperCase();
-      setFormData(prev => ({
-        ...prev,
-        [name]: upperValue
-      }));
-
-      // Décoder automatiquement le VIN si valide
-      if (isValidVin(upperValue)) {
-        const vinInfo = decodeVin(upperValue);
-        console.log('VIN décodé:', vinInfo);
-        
-        if (vinInfo.brand) {
-          // Trouver la marque correspondante
-          const matchingBrand = carBrands.find(brand => 
-            brand.name.toLowerCase() === vinInfo.brand?.toLowerCase()
-          );
-          
-          if (matchingBrand) {
-            setSelectedBrandId(matchingBrand.id);
-            setFormData(prev => ({
-              ...prev,
-              brand: matchingBrand.name,
-              year: vinInfo.year || prev.year
-            }));
-
-            // Stocker le modèle en attente si disponible et valide
-            if (vinInfo.model && typeof vinInfo.model === 'string' && vinInfo.model.trim()) {
-              console.log('Setting pending VIN model:', vinInfo.model);
-              setPendingVinModel(vinInfo.model);
-            }
-          }
-        }
-      }
+      const updatedFormData = handleVinChange(value, formData);
+      setFormData(updatedFormData);
     } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: name === 'year' ? parseInt(value) || 0 : value
-      }));
+      handleInputChange(e);
     }
   };
 
-  const handleBrandChange = (brandId: string) => {
-    const selectedBrand = carBrands.find(brand => brand.id === brandId);
-    if (selectedBrand) {
-      setSelectedBrandId(brandId);
-      setFormData(prev => ({
-        ...prev,
-        brand: selectedBrand.name,
-        model: '' // Reset model when brand changes
-      }));
-      setPendingVinModel(''); // Réinitialiser le modèle en attente
-    }
+  const handleBrandSelectChange = (brandId: string) => {
+    const updatedFormData = handleBrandChange(brandId, formData);
+    setFormData(updatedFormData);
   };
 
-  const handleModelChange = (modelName: string) => {
-    setFormData(prev => ({
-      ...prev,
-      model: modelName
-    }));
-    setPendingVinModel(''); // Réinitialiser si l'utilisateur sélectionne manuellement
-  };
-
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const handleModelSelectChange = (modelName: string) => {
+    const updatedFormData = handleModelChange(modelName, formData);
+    setFormData(updatedFormData);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -231,9 +118,9 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
               }}
               selectedBrandId={selectedBrandId}
               isViewMode={isViewMode}
-              onInputChange={handleInputChange}
-              onBrandChange={handleBrandChange}
-              onModelChange={handleModelChange}
+              onInputChange={handleVinInputChange}
+              onBrandChange={handleBrandSelectChange}
+              onModelChange={handleModelSelectChange}
               onSelectChange={handleSelectChange}
             />
 
