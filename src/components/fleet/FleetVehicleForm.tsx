@@ -40,9 +40,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
     year: new Date().getFullYear(),
     license_plate: '',
     color: '',
-    mileage: '',
-    status: 'Disponible',
-    notes: ''
+    status: 'Disponible'
   });
 
   const [selectedBrandId, setSelectedBrandId] = useState<string>('');
@@ -58,9 +56,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
         year: vehicle.year || new Date().getFullYear(),
         license_plate: vehicle.license_plate || '',
         color: vehicle.color || '',
-        mileage: vehicle.mileage?.toString() || '',
-        status: vehicle.status || 'Disponible',
-        notes: vehicle.notes || ''
+        status: vehicle.status || 'Disponible'
       });
 
       // Trouver l'ID de la marque correspondante
@@ -156,9 +152,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
         year: formData.year,
         license_plate: formData.license_plate,
         color: formData.color,
-        mileage: formData.mileage ? parseInt(formData.mileage) : null,
-        status: formData.status,
-        notes: formData.notes
+        status: formData.status
       };
 
       if (mode === 'edit' && vehicle) {
@@ -180,18 +174,6 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Description */}
-      <div className="text-center">
-        <p className="text-muted-foreground">
-          {mode === 'create' 
-            ? "Saisissez les informations du nouveau véhicule." 
-            : mode === 'edit' 
-              ? "Modifiez les informations du véhicule." 
-              : "Consultez les informations du véhicule."
-          }
-        </p>
-      </div>
-
       <Tabs defaultValue="vehicle-info" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="vehicle-info">Informations sur le véhicule</TabsTrigger>
@@ -219,9 +201,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
                 year: formData.year,
                 license_plate: formData.license_plate,
                 color: formData.color,
-                mileage: formData.mileage,
-                status: formData.status,
-                notes: formData.notes
+                status: formData.status
               }}
               isViewMode={isViewMode}
               onInputChange={handleInputChange}
