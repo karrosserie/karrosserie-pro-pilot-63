@@ -11,7 +11,7 @@ export const calculateOrderAmount = (order: any) => {
       
       if (Array.isArray(repairs)) {
         repairs.forEach((repair: any) => {
-          const unitPrice = Number(repair.unitPrice || repair.unit_price || repair.unitCost || 0);
+          const unitPrice = Number(repair.unitCost || repair.unit_price || repair.unitPrice || 0);
           const quantity = Number(repair.quantity || 0);
           const discount = Number(repair.discount || 0);
           const vat = Number(repair.vat || 0);
@@ -37,7 +37,7 @@ export const calculateOrderAmount = (order: any) => {
       
       if (Array.isArray(parts)) {
         parts.forEach((part: any) => {
-          const unitPrice = Number(part.unitPrice || part.unit_price || part.unitCost || 0);
+          const unitPrice = Number(part.unitCost || part.unit_price || part.unitPrice || 0);
           const quantity = Number(part.quantity || 0);
           const discount = Number(part.discount || 0);
           const vat = Number(part.vat || 0);

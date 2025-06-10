@@ -50,6 +50,14 @@ export const RepairOrderRepairsSection = ({ repairs, onRepairsChange, isReadOnly
     onRepairsChange(updatedRepairs);
   };
 
+  const formatForDisplay = (value: number) => {
+    return value.toString().replace('.', ',');
+  };
+
+  const parseFromDisplay = (value: string) => {
+    return parseFloat(value.replace(',', '.')) || 0;
+  };
+
   const calculateTotals = () => {
     const subTotal = repairs.reduce((sum, repair) => sum + (repair.quantity * repair.unitCost), 0);
     const totalVat = repairs.reduce((sum, repair) => {
@@ -109,44 +117,35 @@ export const RepairOrderRepairsSection = ({ repairs, onRepairsChange, isReadOnly
                   className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <Input
-                  type="number"
-                  value={repair.quantity}
-                  onChange={(e) => updateRepair(repair.id, 'quantity', parseFloat(e.target.value) || 0)}
-                  min="0"
-                  step="0.01"
+                  type="text"
+                  value={formatForDisplay(repair.quantity)}
+                  onChange={(e) => updateRepair(repair.id, 'quantity', parseFromDisplay(e.target.value))}
                   readOnly={isReadOnly}
                   className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <Input
-                  type="number"
-                  value={repair.unitCost}
-                  onChange={(e) => updateRepair(repair.id, 'unitCost', parseFloat(e.target.value) || 0)}
-                  min="0"
-                  step="0.01"
+                  type="text"
+                  value={formatForDisplay(repair.unitCost)}
+                  onChange={(e) => updateRepair(repair.id, 'unitCost', parseFromDisplay(e.target.value))}
                   readOnly={isReadOnly}
                   className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <Input
-                  type="number"
-                  value={repair.discount}
-                  onChange={(e) => updateRepair(repair.id, 'discount', parseFloat(e.target.value) || 0)}
-                  min="0"
-                  max="100"
-                  step="0.1"
+                  type="text"
+                  value={formatForDisplay(repair.discount)}
+                  onChange={(e) => updateRepair(repair.id, 'discount', parseFromDisplay(e.target.value))}
                   readOnly={isReadOnly}
                   className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <Input
-                  type="number"
-                  value={repair.vat}
-                  onChange={(e) => updateRepair(repair.id, 'vat', parseFloat(e.target.value) || 0)}
-                  min="0"
-                  step="0.1"
+                  type="text"
+                  value={formatForDisplay(repair.vat)}
+                  onChange={(e) => updateRepair(repair.id, 'vat', parseFromDisplay(e.target.value))}
                   readOnly={isReadOnly}
                   className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <div className="text-right font-medium">
-                  {repair.total.toFixed(2)} €
+                  {repair.total.toFixed(2).replace('.', ',')} €
                 </div>
                 {!isReadOnly && (
                   <Button
@@ -181,12 +180,12 @@ export const RepairOrderRepairsSection = ({ repairs, onRepairsChange, isReadOnly
         {repairs.length > 0 && (
           <div className="border-t pt-4 space-y-2">
             <div className="flex justify-end space-x-8 text-sm">
-              <div>Sous-total : <span className="font-medium">{totals.subTotal.toFixed(2)} €</span></div>
-              <div>TVA : <span className="font-medium">{totals.totalVat.toFixed(2)} €</span></div>
-              <div>Remise TTC : <span className="font-medium">{totals.totalDiscount.toFixed(2)} €</span></div>
+              <div>Sous-total : <span className="font-medium">{totals.subTotal.toFixed(2).replace('.', ',')} €</span></div>
+              <div>TVA : <span className="font-medium">{totals.totalVat.toFixed(2).replace('.', ',')} €</span></div>
+              <div>Remise TTC : <span className="font-medium">{totals.totalDiscount.toFixed(2).replace('.', ',')} €</span></div>
             </div>
             <div className="flex justify-end text-lg font-bold">
-              Total : <span className="ml-2">{totals.total.toFixed(2)} €</span>
+              Total : <span className="ml-2">{totals.total.toFixed(2).replace('.', ',')} €</span>
             </div>
           </div>
         )}
