@@ -3,9 +3,10 @@ import React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Pencil, Trash } from 'lucide-react';
+import { Pencil, Trash, Eye } from 'lucide-react';
 import { Quote } from '@/services/supabase/quotes';
 import { formatCurrency } from '@/lib/utils';
+import { DocumentContextMenu } from '@/components/ui/document-context-menu';
 
 // Extended Quote type that includes the related data fetched by quotesService.getAll()
 type QuoteWithRelations = Quote & {
@@ -41,43 +42,64 @@ export const QuoteTableRow = ({ quote, onEdit, onDelete }: QuoteTableRowProps) =
     return new Date(dateString).toLocaleDateString('fr-FR');
   };
 
+  const handleDownload = () => {
+    console.log('Télécharger le devis:', quote.reference);
+  };
+
+  const handlePrint = () => {
+    console.log('Imprimer le devis:', quote.reference);
+  };
+
+  const handleSendEmail = () => {
+    console.log('Envoyer par e-mail le devis:', quote.reference);
+  };
+
   return (
-    <TableRow>
-      <TableCell className="font-medium">{quote.reference}</TableCell>
-      <TableCell>{formatDate(quote.created_at)}</TableCell>
-      <TableCell>
-        {quote.clients 
-          ? `${quote.clients.first_name} ${quote.clients.last_name}`
-          : '-'
-        }
-      </TableCell>
-      <TableCell>
-        {quote.vehicles 
-          ? `${quote.vehicles.brand} ${quote.vehicles.model} - ${quote.vehicles.license_plate}`
-          : '-'
-        }
-      </TableCell>
-      <TableCell>{formatCurrency(quote.amount || 0)}</TableCell>
-      <TableCell>
-        <Badge className={getStatusColor(quote.status || 'Brouillon')}>
-          {quote.status || 'Brouillon'}
-        </Badge>
-      </TableCell>
-      <TableCell className="text-right">
-        <div className="flex justify-end space-x-1">
-          <Button variant="ghost" size="icon" onClick={() => onEdit(quote)}>
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-red-500 hover:text-red-700"
-            onClick={() => onDelete(quote)}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        </div>
-      </TableCell>
-    </TableRow>
+    <DocumentContextMenu
+      onDownload={handleDownload}
+      onPrint={handlePrint}
+      onSendEmail={handleSendEmail}
+    >
+      <TableRow>
+        <TableCell className="font-medium">{quote.reference}</TableCell>
+        <TableCell>{formatDate(quote.created_at)}</TableCell>
+        <TableCell>
+          {quote.clients 
+            ? `${quote.clients.first_name} ${quote.clients.last_name}`
+            : '-'
+          }
+        </TableCell>
+        <TableCell>
+          {quote.vehicles 
+            ? `${quote.vehicles.brand} ${quote.vehicles.model} - ${quote.vehicles.license_plate}`
+            : '-'
+          }
+        </TableCell>
+        <TableCell>{formatCurrency(quote.amount || 0)}</TableCell>
+        <TableCell>
+          <Badge className={getStatusColor(quote.status || 'Brouillon')}>
+            {quote.status || 'Brouillon'}
+          </Badge>
+        </TableCell>
+        <TableCell className="text-right">
+          <div className="flex justify-end space-x-1">
+            <Button variant="ghost" size="icon">
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => onEdit(quote)}>
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-red-500 hover:text-red-700"
+              onClick={() => onDelete(quote)}
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          </div>
+        </TableCell>
+      </TableRow>
+    </DocumentContextMenu>
   );
 };
