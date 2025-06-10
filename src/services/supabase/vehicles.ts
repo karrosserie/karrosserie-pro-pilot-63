@@ -1,6 +1,6 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
+import { VehicleStatus } from '@/types/vehicle';
 
 export type Vehicle = Database['public']['Tables']['vehicles']['Row'];
 export type NewVehicle = Database['public']['Tables']['vehicles']['Insert'];
@@ -56,6 +56,11 @@ export const vehiclesService = {
       throw new Error('Les champs Client, Numéro de série (VIN), Marque, Modèle et Plaque d\'immatriculation sont obligatoires.');
     }
 
+    // Ensure status is valid
+    if (vehicle.status && !['En attente', 'Réservé', 'En cours', 'Terminé', 'Annulé'].includes(vehicle.status)) {
+      vehicle.status = 'En attente';
+    }
+
     console.log('Creating vehicle with data:', vehicle);
 
     const { data, error } = await supabase
@@ -74,6 +79,11 @@ export const vehiclesService = {
   },
   
   update: async (id: string, vehicle: UpdateVehicle) => {
+    // Ensure status is valid
+    if (vehicle.status && !['En attente', 'Réservé', 'En cours', 'Terminé', 'Annulé'].includes(vehicle.status)) {
+      vehicle.status = 'En attente';
+    }
+
     console.log('Updating vehicle with id:', id, 'and data:', vehicle);
 
     const { data, error } = await supabase

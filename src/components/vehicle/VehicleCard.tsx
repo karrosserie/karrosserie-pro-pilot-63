@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Car, User, Eye, Pencil, Trash, MoreVertical, FileText, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ interface VehicleCardProps {
   model: string;
   year: number;
   licensePlate: string;
-  status: 'En réparation' | 'Terminé' | 'En attente' | 'Diagnostic';
+  status: 'En attente' | 'Réservé' | 'En cours' | 'Terminé' | 'Annulé';
   owner: string;
   imageUrl?: string;
   vehicleImages?: string[];
@@ -38,14 +37,16 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
   // Détermine la couleur du statut
   const getStatusColor = () => {
     switch (status) {
-      case 'En réparation':
+      case 'En cours':
         return 'bg-amber-100 text-amber-800';
       case 'Terminé':
         return 'bg-green-100 text-green-800';
       case 'En attente':
         return 'bg-blue-100 text-blue-800';
-      case 'Diagnostic':
+      case 'Réservé':
         return 'bg-purple-100 text-purple-800';
+      case 'Annulé':
+        return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
