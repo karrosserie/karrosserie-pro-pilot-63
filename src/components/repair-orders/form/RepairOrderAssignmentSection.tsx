@@ -1,7 +1,7 @@
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, AlertCircle } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
@@ -26,10 +26,15 @@ export const RepairOrderAssignmentSection = ({
 }: RepairOrderAssignmentSectionProps) => {
   const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
   
+  console.log('RepairOrderAssignmentSection - clientOptions:', clientOptions);
+  console.log('RepairOrderAssignmentSection - formData.client_id:', formData.client_id);
+  
   // Filtrer les véhicules pour le client sélectionné
   const clientVehicles = vehicles?.filter(vehicle => 
     vehicle.client_id === formData.client_id
   ) || [];
+
+  console.log('RepairOrderAssignmentSection - clientVehicles:', clientVehicles);
 
   const handleClientChange = (clientId: string) => {
     console.log('Client changed to:', clientId);
@@ -43,6 +48,17 @@ export const RepairOrderAssignmentSection = ({
     console.log('Vehicle changed to:', vehicleId);
     onFieldChange('vehicle_id', vehicleId);
   };
+
+  // Préparer les options pour SearchableSelect
+  const clientSelectOptions = (clientOptions || []).map(client => ({
+    value: client.id,
+    label: `${client.first_name} ${client.last_name}`
+  }));
+
+  const vehicleSelectOptions = clientVehicles.map(vehicle => ({
+    value: vehicle.id,
+    label: `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`
+  }));
 
   return (
     <Card>
@@ -59,27 +75,17 @@ export const RepairOrderAssignmentSection = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label htmlFor="client_id" required>Client</Label>
-            <Select
+            <SearchableSelect
+              options={clientSelectOptions}
               value={formData.client_id || ''}
               onValueChange={handleClientChange}
+              placeholder={isLoadingClients ? "Chargement..." : "Sélectionner un client"}
+              searchPlaceholder="Rechercher un client..."
               disabled={isLoadingClients}
-            >
-              <SelectTrigger 
-                id="client_id"
-                className={cn(
-                  errors.client_id && "border-red-500 focus-visible:ring-red-500"
-                )}
-              >
-                <SelectValue placeholder="Sélectionner un client" />
-              </SelectTrigger>
-              <SelectContent>
-                {clientOptions.map((client) => (
-                  <SelectItem key={client.id} value={client.id}>
-                    {client.first_name} {client.last_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              className={cn(
+                errors.client_id && "border-red-500 focus-visible:ring-red-500"
+              )}
+            />
             {errors.client_id && (
               <p className="text-sm text-red-500 mt-1 flex items-center">
                 <AlertCircle className="h-4 w-4 mr-1" />
@@ -90,36 +96,29 @@ export const RepairOrderAssignmentSection = ({
 
           <div>
             <Label htmlFor="vehicle_id" required>Véhicule</Label>
-            <Select
+            <SearchableSelect
+              options={vehicleSelectOptions}
               value={formData.vehicle_id || ''}
               onValueChange={handleVehicleChange}
+              placeholder={
+                !formData.client_id 
+                  ? "Sélectionnez d'abord un client"
+                  : isLoadingVehicles 
+                  ? "Chargement..."
+                  : clientVehicles.length === 0
+                  ? "Aucun véhicule trouvé pour ce client"
+                  : "Sélectionner un véhicule"
+              }
+              searchPlaceholder="Rechercher un véhicule..."
               disabled={!formData.client_id || isLoadingVehicles}
-            >
-              <SelectTrigger 
-                id="vehicle_id"
-                className={cn(
-                  errors.vehicle_id && "border-red-500 focus-visible:ring-red-500"
-                )}
-              >
-                <SelectValue placeholder="Sélectionner un véhicule" />
-              </SelectTrigger>
-              <SelectContent>
-                {clientVehicles.map((vehicle) => (
-                  <SelectItem key={vehicle.id} value={vehicle.id}>
-                    {vehicle.brand} {vehicle.model} - {vehicle.license_plate}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              className={cn(
+                errors.vehicle_id && "border-red-500 focus-visible:ring-red-500"
+              )}
+            />
             {errors.vehicle_id && (
               <p className="text-sm text-red-500 mt-1 flex items-center">
                 <AlertCircle className="h-4 w-4 mr-1" />
                 {errors.vehicle_id}
-              </p>
-            )}
-            {formData.client_id && clientVehicles.length === 0 && !isLoadingVehicles && (
-              <p className="text-sm text-gray-500 mt-1">
-                Aucun véhicule trouvé pour ce client
               </p>
             )}
           </div>
