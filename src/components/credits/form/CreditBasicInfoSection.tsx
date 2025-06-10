@@ -65,7 +65,7 @@ export const CreditBasicInfoSection = ({
           </Label>
         </div>
 
-        <div className={cn("grid gap-4", isFranchiseCredit ? "grid-cols-1 md:grid-cols-3" : "grid-cols-1 md:grid-cols-4")}>
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-4">
           <div>
             <Label htmlFor="reference">Numéro *</Label>
             <Input
@@ -104,38 +104,38 @@ export const CreditBasicInfoSection = ({
               </p>
             )}
           </div>
-
-          {!isFranchiseCredit && (
-            <div className="md:col-span-2">
-              <Label htmlFor="status">Statut</Label>
-              <Select
-                value={formData.status || 'En attente'}
-                onValueChange={(value) => onFieldChange('status', value)}
-              >
-                <SelectTrigger 
-                  id="status"
-                  className={cn(
-                    errors.status && "border-red-500 focus-visible:ring-red-500"
-                  )}
+          
+          <div className="md:col-span-2">
+            {!isFranchiseCredit && (
+                <Label htmlFor="status">Statut</Label>
+                <Select
+                  value={formData.status || 'En attente'}
+                  onValueChange={(value) => onFieldChange('status', value)}
                 >
-                  <SelectValue placeholder="Sélectionner un statut" />
-                </SelectTrigger>
-                <SelectContent>
-                  {statusOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.status && (
-                <p className="text-sm text-red-500 mt-1 flex items-center">
-                  <AlertCircle className="h-4 w-4 mr-1" />
-                  {errors.status}
-                </p>
-              )}
+                  <SelectTrigger 
+                    id="status"
+                    className={cn(
+                      errors.status && "border-red-500 focus-visible:ring-red-500"
+                    )}
+                  >
+                    <SelectValue placeholder="Sélectionner un statut" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {statusOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.status && (
+                  <p className="text-sm text-red-500 mt-1 flex items-center">
+                    <AlertCircle className="h-4 w-4 mr-1" />
+                    {errors.status}
+                  </p>
+                )}
+            )}
             </div>
-          )}
         </div>
 
         <div>
