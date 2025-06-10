@@ -65,7 +65,7 @@ export const CreditBasicInfoSection = ({
           </Label>
         </div>
 
-        <div className={cn("grid gap-4", isFranchiseCredit ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1 md:grid-cols-3")}>
+        <div className={cn("grid gap-4", isFranchiseCredit ? "grid-cols-1 md:grid-cols-3" : "grid-cols-1 md:grid-cols-4")}>
           <div>
             <Label htmlFor="reference">Numéro *</Label>
             <Input
@@ -106,7 +106,7 @@ export const CreditBasicInfoSection = ({
           </div>
 
           {!isFranchiseCredit && (
-            <div>
+            <div className="md:col-span-2">
               <Label htmlFor="status">Statut</Label>
               <Select
                 value={formData.status || 'En attente'}
