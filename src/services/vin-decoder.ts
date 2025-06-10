@@ -108,6 +108,12 @@ const vinToModel: Record<string, Record<string, string[]>> = {
     '308': ['4A', '4B', '4C'],
     '3008': ['0U', 'P84'],
     '5008': ['0A', 'P87'],
+  },
+  'Citroën': {
+    'C3': ['A51', 'FC', 'SC'],
+    'C4': ['B7', 'N2', 'LC'],
+    'C5': ['DC', 'DE', 'RD'],
+    'Berlingo': ['B9', 'MF', 'VP']
   }
 };
 
@@ -136,7 +142,7 @@ export function decodeVin(vin: string): VinInfo {
     'F': 2015, 'G': 2016, 'H': 2017, 'J': 2018, 'K': 2019,
     'L': 2020, 'M': 2021, 'N': 2022, 'P': 2023, 'R': 2024,
     '1': 2001, '2': 2002, '3': 2003, '4': 2004, '5': 2005,
-    '6': 2006, '7': 2007, '8': 2008, '9': 2009
+    '6': 2006, '7': 2007, '8': 2008, '9': 2009, 'Y': 2017
   };
   
   if (yearMapping[yearChar]) {
@@ -151,18 +157,26 @@ export function decodeVin(vin: string): VinInfo {
     // Extraire des segments du VIN pour la détection de modèle
     const segment1 = vin.substring(3, 5);
     const segment2 = vin.substring(4, 6);
+    const segment3 = vin.substring(5, 7);
     
     for (const [modelName, codes] of Object.entries(modelCodes)) {
-      if (codes.some(code => vin.includes(code) || segment1.includes(code) || segment2.includes(code))) {
+      if (codes.some(code => 
+        vin.includes(code) || 
+        segment1.includes(code) || 
+        segment2.includes(code) ||
+        segment3.includes(code)
+      )) {
         model = modelName;
         break;
       }
     }
   }
 
+  console.log('VIN décodé - brand:', brand, 'model:', model, 'year:', year);
+  
   return {
     brand,
-    model: typeof model === 'string' ? model : undefined, // S'assurer que c'est une chaîne
+    model, // S'assurer que c'est une chaîne simple ou undefined
     year
   };
 }

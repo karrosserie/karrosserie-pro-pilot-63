@@ -45,6 +45,8 @@ export function useVinDecoder(initialFormData: any, onFormDataChange: (data: any
         setPendingVinModel('');
       } else {
         console.log('No matching model found for:', pendingVinModel);
+        // Si aucun modèle correspondant trouvé, on efface le pending model
+        setPendingVinModel('');
       }
     }
   }, [carModels, pendingVinModel, onFormDataChange]);
@@ -70,12 +72,19 @@ export function useVinDecoder(initialFormData: any, onFormDataChange: (data: any
           updatedFormData.brand = matchingBrand.name;
           updatedFormData.year = vinInfo.year || currentFormData.year;
 
+          // Vérifier que le modèle est une chaîne valide
           if (vinInfo.model && typeof vinInfo.model === 'string' && vinInfo.model.trim()) {
             console.log('Setting pending VIN model:', vinInfo.model);
             setPendingVinModel(vinInfo.model);
+          } else {
+            console.log('No valid model detected from VIN');
+            setPendingVinModel('');
           }
         }
       }
+    } else {
+      // Si le VIN n'est pas valide, on nettoie les pending models
+      setPendingVinModel('');
     }
 
     return updatedFormData;
