@@ -31,9 +31,6 @@ const Fleet = () => {
   } = useFleetVehicles();
 
   const { 
-    reservations, 
-    isLoading: reservationsLoading, 
-    error: reservationsError, 
     createReservation, 
     updateReservation, 
     deleteReservation 
@@ -193,13 +190,7 @@ const Fleet = () => {
           </div>
 
           {/* Reservations List */}
-          {reservationsLoading ? (
-            <TableLoading />
-          ) : reservationsError ? (
-            <ErrorMessage message={reservationsError.message} />
-          ) : (
-            <FleetReservationList reservations={reservations || []} />
-          )}
+          <FleetReservationList />
         </TabsContent>
       </Tabs>
 
