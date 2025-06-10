@@ -68,10 +68,15 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
         
         if (Array.isArray(repairs)) {
           repairs.forEach((repair: any) => {
-            const repairTotal = (repair.quantity || 0) * (repair.unitCost || repair.unit_price || 0);
-            const discountAmount = repairTotal * ((repair.discount || 0) / 100);
-            const afterDiscount = repairTotal - discountAmount;
-            const vatAmount = afterDiscount * ((repair.vat || 0) / 100);
+            const unitPrice = repair.unitPrice || repair.unit_price || 0;
+            const quantity = repair.quantity || 0;
+            const discount = repair.discount || 0;
+            const vat = repair.vat || 0;
+            
+            const subtotal = quantity * unitPrice;
+            const discountAmount = subtotal * (discount / 100);
+            const afterDiscount = subtotal - discountAmount;
+            const vatAmount = afterDiscount * (vat / 100);
             totalAmount += afterDiscount + vatAmount;
           });
         }
@@ -89,10 +94,15 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
         
         if (Array.isArray(parts)) {
           parts.forEach((part: any) => {
-            const partTotal = (part.quantity || 0) * (part.unitCost || part.unit_price || 0);
-            const discountAmount = partTotal * ((part.discount || 0) / 100);
-            const afterDiscount = partTotal - discountAmount;
-            const vatAmount = afterDiscount * ((part.vat || 0) / 100);
+            const unitPrice = part.unitPrice || part.unit_price || 0;
+            const quantity = part.quantity || 0;
+            const discount = part.discount || 0;
+            const vat = part.vat || 0;
+            
+            const subtotal = quantity * unitPrice;
+            const discountAmount = subtotal * (discount / 100);
+            const afterDiscount = subtotal - discountAmount;
+            const vatAmount = afterDiscount * (vat / 100);
             totalAmount += afterDiscount + vatAmount;
           });
         }
@@ -110,10 +120,11 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
         
         if (Array.isArray(discounts)) {
           discounts.forEach((discount: any) => {
+            const value = discount.value || discount.amount || 0;
             if (discount.type === 'percentage') {
-              totalAmount -= totalAmount * ((discount.value || discount.amount || 0) / 100);
+              totalAmount -= totalAmount * (value / 100);
             } else if (discount.type === 'fixed') {
-              totalAmount -= discount.value || discount.amount || 0;
+              totalAmount -= value;
             }
           });
         }

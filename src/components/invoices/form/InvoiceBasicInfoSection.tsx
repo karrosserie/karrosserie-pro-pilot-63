@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -44,7 +45,7 @@ export const InvoiceBasicInfoSection = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <Label htmlFor="reference">Numéro *</Label>
             <Input
@@ -84,7 +85,26 @@ export const InvoiceBasicInfoSection = ({
             )}
           </div>
 
-          <div className="md:col-span-3">
+          <div>
+            <Label htmlFor="payment_due_date">Date d'échéance</Label>
+            <Input
+              id="payment_due_date"
+              type="date"
+              value={formData.payment_due_date || ''}
+              onChange={(e) => onFieldChange('payment_due_date', e.target.value)}
+              className={cn(
+                errors.payment_due_date && "border-red-500 focus-visible:ring-red-500"
+              )}
+            />
+            {errors.payment_due_date && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.payment_due_date}
+              </p>
+            )}
+          </div>
+
+          <div>
             <Label htmlFor="status">Statut</Label>
             <Select
               value={formData.status || 'En attente de paiement'}
