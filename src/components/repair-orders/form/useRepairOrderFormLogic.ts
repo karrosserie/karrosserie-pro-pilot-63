@@ -148,10 +148,11 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
 
   useEffect(() => {
     if (order) {
+      console.log('Loading order data:', order);
       setFormData({
         reference: order.reference,
         client_id: order.client_id,
-        vehicle_id: order.vehicle_id,
+        vehicle_id: order.vehicle_id, // S'assurer que le vehicle_id est bien chargé
         status: order.status || 'En cours',
         start_date: order.start_date,
         end_date: order.end_date,
@@ -192,6 +193,13 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
         setParts([]);
         setDiscounts([]);
       }
+      
+      console.log('Form data set to:', {
+        reference: order.reference,
+        client_id: order.client_id,
+        vehicle_id: order.vehicle_id,
+        status: order.status || 'En cours'
+      });
     } else {
       // Pour un nouvel ordre de réparation, définir la date du jour
       const today = new Date().toISOString().split('T')[0];
