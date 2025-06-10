@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useFleetVehicleForm } from '@/hooks/use-fleet-vehicle-form';
 import { useVinDecoder } from '@/hooks/use-vin-decoder';
 import FleetVehicleBasicInfo from './form/FleetVehicleBasicInfo';
-import FleetVehicleDetails from './form/FleetLoansHistoryTab';
+import FleetVehicleDetails from './form/FleetVehicleDetails';
 import FleetLoansHistoryTab from './form/FleetLoansHistoryTab';
 
 interface FleetVehicleFormProps {
