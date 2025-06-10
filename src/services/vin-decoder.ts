@@ -162,7 +162,7 @@ export function decodeVin(vin: string): VinInfo {
 
   return {
     brand,
-    model,
+    model: typeof model === 'string' ? model : undefined, // S'assurer que c'est une chaîne
     year
   };
 }

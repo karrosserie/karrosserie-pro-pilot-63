@@ -69,19 +69,33 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
     }
   }, [vehicle, carBrands]);
 
-  // Nouvel effet pour sélectionner le modèle une fois que les modèles sont chargés
+  // Effet pour sélectionner le modèle une fois que les modèles sont chargés
   useEffect(() => {
+    console.log('Checking pending VIN model:', pendingVinModel, 'Available models:', carModels);
+    
     if (pendingVinModel && carModels.length > 0) {
-      const matchingModel = carModels.find(model => 
-        model.name.toLowerCase() === pendingVinModel.toLowerCase()
-      );
+      // Recherche plus flexible du modèle
+      const matchingModel = carModels.find(model => {
+        const modelName = model.name.toLowerCase();
+        const pendingName = pendingVinModel.toLowerCase();
+        
+        // Correspondance exacte ou partielle
+        return modelName === pendingName || 
+               modelName.includes(pendingName) || 
+               pendingName.includes(modelName);
+      });
+      
+      console.log('Found matching model:', matchingModel);
       
       if (matchingModel) {
         setFormData(prev => ({
           ...prev,
           model: matchingModel.name
         }));
+        console.log('Model set to:', matchingModel.name);
         setPendingVinModel(''); // Réinitialiser après sélection
+      } else {
+        console.log('No matching model found for:', pendingVinModel);
       }
     }
   }, [carModels, pendingVinModel]);
@@ -115,8 +129,9 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
               year: vinInfo.year || prev.year
             }));
 
-            // Stocker le modèle en attente si disponible
-            if (vinInfo.model) {
+            // Stocker le modèle en attente si disponible et valide
+            if (vinInfo.model && typeof vinInfo.model === 'string' && vinInfo.model.trim()) {
+              console.log('Setting pending VIN model:', vinInfo.model);
               setPendingVinModel(vinInfo.model);
             }
           }
@@ -260,3 +275,5 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
 };
 
 export default FleetVehicleForm;
+
+}
