@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -162,7 +163,7 @@ export const CreditBasicInfoSection = ({
 
         <div>
           <Label htmlFor="notes">Notes</Label>
-          <Input
+          <Textarea
             id="notes"
             value={formData.notes || ''}
             onChange={(e) => onFieldChange('notes', e.target.value)}
@@ -170,6 +171,7 @@ export const CreditBasicInfoSection = ({
             className={cn(
               errors.notes && "border-red-500 focus-visible:ring-red-500"
             )}
+            rows={3}
           />
           {errors.notes && (
             <p className="text-sm text-red-500 mt-1 flex items-center">
