@@ -15,6 +15,7 @@ export const useInvoiceFormState = ({ invoice }: UseInvoiceFormStateProps) => {
     status: 'En attente de paiement',
     due_date: null,
     payment_method: null,
+    payment_date: null,
     notes: ''
   });
 

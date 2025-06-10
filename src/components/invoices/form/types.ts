@@ -26,8 +26,8 @@ export interface InvoiceDiscountItem {
 }
 
 export interface GlobalTotals {
-  subTotal: number;
-  totalVat: number;
-  totalDiscount: number;
+  subtotal: number;
+  vatTotal: number;
+  discountTotal: number;
   total: number;
 }

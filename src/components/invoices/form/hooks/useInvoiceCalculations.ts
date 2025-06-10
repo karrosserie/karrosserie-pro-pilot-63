@@ -14,12 +14,12 @@ export const useInvoiceCalculations = () => {
       const vatAmount = afterDiscount * (repair.vat / 100);
       
       return {
-        subTotal: acc.subTotal + subtotal,
-        totalVat: acc.totalVat + vatAmount,
-        totalDiscount: acc.totalDiscount + discountAmount,
+        subtotal: acc.subtotal + subtotal,
+        vatTotal: acc.vatTotal + vatAmount,
+        discountTotal: acc.discountTotal + discountAmount,
         total: acc.total + repair.total
       };
-    }, { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 });
+    }, { subtotal: 0, vatTotal: 0, discountTotal: 0, total: 0 });
 
     const partTotals = parts.reduce((acc, part) => {
       const subtotal = part.quantity * part.unitCost;
@@ -28,19 +28,19 @@ export const useInvoiceCalculations = () => {
       const vatAmount = afterDiscount * (part.vat / 100);
       
       return {
-        subTotal: acc.subTotal + subtotal,
-        totalVat: acc.totalVat + vatAmount,
-        totalDiscount: acc.totalDiscount + discountAmount,
+        subtotal: acc.subtotal + subtotal,
+        vatTotal: acc.vatTotal + vatAmount,
+        discountTotal: acc.discountTotal + discountAmount,
         total: acc.total + part.total
       };
-    }, { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 });
+    }, { subtotal: 0, vatTotal: 0, discountTotal: 0, total: 0 });
 
     const globalDiscounts = discounts.reduce((sum, discount) => sum + discount.amount, 0);
 
     return {
-      subTotal: repairTotals.subTotal + partTotals.subTotal,
-      totalVat: repairTotals.totalVat + partTotals.totalVat,
-      totalDiscount: repairTotals.totalDiscount + partTotals.totalDiscount + globalDiscounts,
+      subtotal: repairTotals.subtotal + partTotals.subtotal,
+      vatTotal: repairTotals.vatTotal + partTotals.vatTotal,
+      discountTotal: repairTotals.discountTotal + partTotals.discountTotal + globalDiscounts,
       total: repairTotals.total + partTotals.total - globalDiscounts
     };
   };
