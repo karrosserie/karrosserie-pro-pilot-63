@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -86,7 +87,6 @@ const Credits = () => {
   
   const filteredCredits = credits.filter(credit => 
     credit.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (credit.clients && `${credit.clients.first_name} ${credit.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (credit.vehicles && `${credit.vehicles.brand} ${credit.vehicles.model} - ${credit.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
   );
   
@@ -407,5 +407,3 @@ const Credits = () => {
 };
 
 export default Credits;
-
-}
