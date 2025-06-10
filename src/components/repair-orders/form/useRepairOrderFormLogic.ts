@@ -73,6 +73,7 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
   };
 
   const validateForm = () => {
+    console.log('Validating form with data:', formData);
     const validationResult = validateRepairOrderForm(formData, claimNumber, currentMileage);
     setErrors(validationResult.errors);
     return validationResult.isValid;
@@ -87,6 +88,7 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
       setDescription(value);
     } else {
       setFormData(prev => ({ ...prev, [field]: value }));
+      console.log(`Field ${field} changed to:`, value);
     }
     
     // Effacer l'erreur quand l'utilisateur commence à taper
@@ -149,16 +151,25 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
   useEffect(() => {
     if (order) {
       console.log('Loading order data:', order);
-      setFormData({
-        reference: order.reference,
-        client_id: order.client_id,
-        vehicle_id: order.vehicle_id, // S'assurer que le vehicle_id est bien chargé
+      
+      // S'assurer que les données initiales du formulaire sont correctement définies
+      const initialData = {
+        reference: order.reference || '',
+        client_id: order.client_id || null,
+        vehicle_id: order.vehicle_id || null,
         status: order.status || 'En cours',
-        start_date: order.start_date,
-        end_date: order.end_date,
-        estimated_hours: order.estimated_hours,
+        start_date: order.start_date || null,
+        end_date: order.end_date || null,
+        estimated_hours: order.estimated_hours || null,
         notes: order.notes || ''
-      });
+      };
+      
+      setFormData(initialData);
+      
+      // Vérifier explicitement que vehicle_id est défini
+      if (!order.vehicle_id) {
+        console.warn('Warning: vehicle_id is not defined in the order data');
+      }
       
       // Charger les données depuis les notes (format JSON)
       if (order.notes) {
