@@ -25,30 +25,29 @@ export const RepairOrderAssignmentSection = ({
   isLoadingClients
 }: RepairOrderAssignmentSectionProps) => {
   const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
-  const isUserAction = useRef(false);
+  const hasInitializedData = useRef(false);
   
   // Filtrer les véhicules pour le client sélectionné
   const clientVehicles = vehicles?.filter(vehicle => 
     vehicle.client_id === formData.client_id
   ) || [];
 
-  // Marquer que les prochaines actions seront des actions utilisateur
+  // Détecter quand l'initialisation des données est terminée
   useEffect(() => {
-    // Délai pour permettre l'initialisation complète
-    const timer = setTimeout(() => {
-      isUserAction.current = true;
-    }, 1000);
-    
-    return () => clearTimeout(timer);
-  }, []);
+    // Si nous avons un client_id et vehicle_id dans formData et que les données sont chargées
+    if (formData.client_id && formData.vehicle_id && !isLoadingClients && !isLoadingVehicles && vehicles && clientOptions.length > 0) {
+      console.log('Data initialization detected, marking as initialized');
+      hasInitializedData.current = true;
+    }
+  }, [formData.client_id, formData.vehicle_id, isLoadingClients, isLoadingVehicles, vehicles, clientOptions]);
 
   const handleClientChange = (clientId: string) => {
-    console.log('Client change - user action:', isUserAction.current);
+    console.log('Client change - initialized:', hasInitializedData.current);
     onFieldChange('client_id', clientId);
     
-    // Seulement réinitialiser le véhicule si c'est une action utilisateur
+    // Seulement réinitialiser le véhicule si les données sont initialisées (pas pendant le chargement initial)
     // et si le véhicule actuel n'appartient pas au nouveau client
-    if (isUserAction.current && formData.vehicle_id) {
+    if (hasInitializedData.current && formData.vehicle_id) {
       const vehicleExistsForNewClient = vehicles?.some(vehicle => 
         vehicle.client_id === clientId && vehicle.id === formData.vehicle_id
       );
@@ -61,7 +60,7 @@ export const RepairOrderAssignmentSection = ({
   };
 
   const handleVehicleChange = (vehicleId: string) => {
-    console.log('Vehicle change - user action:', isUserAction.current);
+    console.log('Vehicle change - initialized:', hasInitializedData.current);
     onFieldChange('vehicle_id', vehicleId);
   };
 
