@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +14,7 @@ import { FileText, Upload } from 'lucide-react';
 import { useStorage } from '@/hooks/use-storage';
 import { useCompany } from '@/hooks/use-company';
 import { useAuth } from '@/contexts/AuthContext';
+import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
 
 const CompanyTab: React.FC = () => {
   const { uploadDocument } = useStorage();
@@ -168,11 +170,10 @@ const CompanyTab: React.FC = () => {
             
             <div className="space-y-2">
               <Label htmlFor="phone">Téléphone</Label>
-              <Input 
-                id="phone" 
-                value={companyData.phone || ''} 
-                onChange={(e) => updateCompanyData({ phone: e.target.value })} 
-                placeholder="01 23 45 67 89"
+              <CustomPhoneInput
+                value={companyData.phone || ''}
+                onChange={(value) => updateCompanyData({ phone: value || '' })}
+                placeholder="Numéro de téléphone"
               />
             </div>
           </div>
