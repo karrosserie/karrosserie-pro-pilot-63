@@ -2,6 +2,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { isValidVin } from '@/services/vin-decoder';
 import { useCarBrands } from '@/hooks/use-car-brands';
@@ -13,12 +14,14 @@ interface FleetVehicleBasicInfoProps {
     engine_number: string;
     brand: string;
     model: string;
+    status: string;
   };
   selectedBrandId: string;
   isViewMode: boolean;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBrandChange: (brandId: string) => void;
   onModelChange: (modelName: string) => void;
+  onSelectChange: (name: string, value: string) => void;
 }
 
 const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
@@ -27,10 +30,21 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
   isViewMode,
   onInputChange,
   onBrandChange,
-  onModelChange
+  onModelChange,
+  onSelectChange
 }) => {
   const { carBrands } = useCarBrands();
   const { carModels } = useCarModels(selectedBrandId);
+
+  const brandOptions = carBrands.map(brand => ({
+    value: brand.id,
+    label: brand.name
+  }));
+
+  const modelOptions = carModels.map(model => ({
+    value: model.name,
+    label: model.name
+  }));
 
   return (
     <div className="space-y-4">
@@ -77,43 +91,45 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
         </div>
       </div>
 
-      {/* Brand and Model */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* Brand, Model and Status */}
+      <div className="grid grid-cols-3 gap-4">
         <div>
           <Label htmlFor="brand">Marque *</Label>
-          <Select
+          <SearchableSelect
+            options={brandOptions}
             value={selectedBrandId}
             onValueChange={onBrandChange}
+            placeholder="Sélectionner une marque"
             disabled={isViewMode}
-          >
-            <SelectTrigger id="brand">
-              <SelectValue placeholder="Sélectionner une marque" />
-            </SelectTrigger>
-            <SelectContent>
-              {carBrands.map((brand) => (
-                <SelectItem key={brand.id} value={brand.id}>
-                  {brand.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            searchPlaceholder="Rechercher une marque..."
+          />
         </div>
         <div>
           <Label htmlFor="model">Modèle *</Label>
-          <Select
+          <SearchableSelect
+            options={modelOptions}
             value={formData.model}
             onValueChange={onModelChange}
+            placeholder="Sélectionner un modèle"
             disabled={isViewMode || !selectedBrandId}
+            searchPlaceholder="Rechercher un modèle..."
+          />
+        </div>
+        <div>
+          <Label htmlFor="status">Statut</Label>
+          <Select 
+            value={formData.status} 
+            onValueChange={(value) => onSelectChange('status', value)}
+            disabled={isViewMode}
           >
-            <SelectTrigger id="model">
-              <SelectValue placeholder="Sélectionner un modèle" />
+            <SelectTrigger>
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {carModels.map((model) => (
-                <SelectItem key={model.id} value={model.name}>
-                  {model.name}
-                </SelectItem>
-              ))}
+              <SelectItem value="Disponible">Disponible</SelectItem>
+              <SelectItem value="En prêt">En prêt</SelectItem>
+              <SelectItem value="En maintenance">En maintenance</SelectItem>
+              <SelectItem value="Hors service">Hors service</SelectItem>
             </SelectContent>
           </Select>
         </div>

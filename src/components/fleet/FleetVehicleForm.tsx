@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -187,25 +186,25 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
                 vin: formData.vin,
                 engine_number: formData.engine_number,
                 brand: formData.brand,
-                model: formData.model
+                model: formData.model,
+                status: formData.status
               }}
               selectedBrandId={selectedBrandId}
               isViewMode={isViewMode}
               onInputChange={handleInputChange}
               onBrandChange={handleBrandChange}
               onModelChange={handleModelChange}
+              onSelectChange={handleSelectChange}
             />
 
             <FleetVehicleDetails
               formData={{
                 year: formData.year,
                 license_plate: formData.license_plate,
-                color: formData.color,
-                status: formData.status
+                color: formData.color
               }}
               isViewMode={isViewMode}
               onInputChange={handleInputChange}
-              onSelectChange={handleSelectChange}
             />
 
             <div className="flex justify-end space-x-2 pt-4 border-t">

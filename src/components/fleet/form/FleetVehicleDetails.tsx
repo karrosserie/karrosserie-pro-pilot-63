@@ -2,25 +2,21 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface FleetVehicleDetailsProps {
   formData: {
     year: number;
     license_plate: string;
     color: string;
-    status: string;
   };
   isViewMode: boolean;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  onSelectChange: (name: string, value: string) => void;
 }
 
 const FleetVehicleDetails: React.FC<FleetVehicleDetailsProps> = ({
   formData,
   isViewMode,
-  onInputChange,
-  onSelectChange
+  onInputChange
 }) => {
   return (
     <div className="space-y-4">
@@ -64,26 +60,6 @@ const FleetVehicleDetails: React.FC<FleetVehicleDetailsProps> = ({
             disabled={isViewMode}
           />
         </div>
-      </div>
-
-      {/* Status */}
-      <div>
-        <Label htmlFor="status">Statut</Label>
-        <Select 
-          value={formData.status} 
-          onValueChange={(value) => onSelectChange('status', value)}
-          disabled={isViewMode}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Disponible">Disponible</SelectItem>
-            <SelectItem value="En prêt">En prêt</SelectItem>
-            <SelectItem value="En maintenance">En maintenance</SelectItem>
-            <SelectItem value="Hors service">Hors service</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
     </div>
   );
