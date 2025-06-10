@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,16 +25,26 @@ export const RepairOrderAssignmentSection = ({
   isLoadingClients
 }: RepairOrderAssignmentSectionProps) => {
   const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
+  const initialLoadRef = useRef(true);
   
   // Filtrer les véhicules pour le client sélectionné
   const clientVehicles = vehicles?.filter(vehicle => 
     vehicle.client_id === formData.client_id
   ) || [];
 
+  // Marquer que le chargement initial est terminé après le premier rendu
+  useEffect(() => {
+    if (initialLoadRef.current && formData.client_id) {
+      initialLoadRef.current = false;
+    }
+  }, [formData.client_id]);
+
   const handleClientChange = (clientId: string) => {
     onFieldChange('client_id', clientId);
-    // Réinitialiser le véhicule quand on change de client
-    onFieldChange('vehicle_id', null);
+    // Ne réinitialiser le véhicule que si ce n'est pas le chargement initial
+    if (!initialLoadRef.current) {
+      onFieldChange('vehicle_id', null);
+    }
   };
 
   return (
