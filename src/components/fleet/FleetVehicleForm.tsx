@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface FleetVehicleFormProps {
   vehicle?: FleetVehicle | null;
@@ -22,6 +23,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
   onCancel
 }) => {
   const { createVehicle, updateVehicle } = useFleetVehicles();
+  const { user } = useAuth();
   const isViewMode = mode === 'view';
 
   const [formData, setFormData] = useState({
@@ -64,6 +66,11 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user) {
+      console.error('User not authenticated');
+      return;
+    }
+    
     try {
       if (mode === 'edit' && vehicle) {
         await updateVehicle.mutateAsync({
@@ -71,7 +78,10 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
           data: formData
         });
       } else if (mode === 'create') {
-        await createVehicle.mutateAsync(formData);
+        await createVehicle.mutateAsync({
+          ...formData,
+          user_id: user.id
+        });
       }
       onSuccess();
     } catch (error) {
