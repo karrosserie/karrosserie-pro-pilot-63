@@ -3,7 +3,7 @@ import React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Pencil, Trash } from 'lucide-react';
+import { Pencil, Trash } from 'lucide-react';
 import { Invoice } from '@/services/supabase/invoices';
 import { formatCurrency } from '@/lib/utils';
 
@@ -51,7 +51,7 @@ export const InvoiceTableRow = ({ invoice, onEdit, onDelete }: InvoiceTableRowPr
           : '-'
         }
       </TableCell>
-      <TableCell>{formatCurrency(invoice.total_amount)}</TableCell>
+      <TableCell>{formatCurrency(invoice.amount || 0)}</TableCell>
       <TableCell>
         <Badge className={getStatusColor(invoice.status || 'Brouillon')}>
           {invoice.status || 'Brouillon'}
@@ -59,9 +59,6 @@ export const InvoiceTableRow = ({ invoice, onEdit, onDelete }: InvoiceTableRowPr
       </TableCell>
       <TableCell className="text-right">
         <div className="flex justify-end space-x-1">
-          <Button variant="ghost" size="icon">
-            <Eye className="h-4 w-4" />
-          </Button>
           <Button variant="ghost" size="icon" onClick={() => onEdit(invoice)}>
             <Pencil className="h-4 w-4" />
           </Button>

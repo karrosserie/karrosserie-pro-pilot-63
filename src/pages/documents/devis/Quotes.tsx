@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { QuotesHeader } from '@/components/quotes/QuotesHeader';
 import { QuotesTable } from '@/components/quotes/QuotesTable';
-import { QuoteDialog } from '@/components/quotes/QuoteDialog';
+import QuoteDialog from '@/components/quotes/QuoteDialog';
 import { useQuotes } from '@/hooks/use-quotes';
 import { Quote } from '@/services/supabase/quotes';
 import LoadingSpinner from '@/components/ui/loading-spinner';

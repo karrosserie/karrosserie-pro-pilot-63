@@ -3,7 +3,7 @@ import React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Pencil, Trash } from 'lucide-react';
+import { Pencil, Trash } from 'lucide-react';
 import { Quote } from '@/services/supabase/quotes';
 import { formatCurrency } from '@/lib/utils';
 
@@ -51,7 +51,7 @@ export const QuoteTableRow = ({ quote, onEdit, onDelete }: QuoteTableRowProps) =
           : '-'
         }
       </TableCell>
-      <TableCell>{formatCurrency(quote.total_amount)}</TableCell>
+      <TableCell>{formatCurrency(quote.amount || 0)}</TableCell>
       <TableCell>
         <Badge className={getStatusColor(quote.status || 'Brouillon')}>
           {quote.status || 'Brouillon'}
@@ -59,9 +59,6 @@ export const QuoteTableRow = ({ quote, onEdit, onDelete }: QuoteTableRowProps) =
       </TableCell>
       <TableCell className="text-right">
         <div className="flex justify-end space-x-1">
-          <Button variant="ghost" size="icon">
-            <Eye className="h-4 w-4" />
-          </Button>
           <Button variant="ghost" size="icon" onClick={() => onEdit(quote)}>
             <Pencil className="h-4 w-4" />
           </Button>

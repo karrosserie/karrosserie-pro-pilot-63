@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { InvoicesHeader } from '@/components/invoices/InvoicesHeader';
 import { InvoicesTable } from '@/components/invoices/InvoicesTable';
-import { InvoiceDialog } from '@/components/invoices/InvoiceDialog';
+import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import { useInvoices } from '@/hooks/use-invoices';
 import { Invoice } from '@/services/supabase/invoices';
 import LoadingSpinner from '@/components/ui/loading-spinner';
