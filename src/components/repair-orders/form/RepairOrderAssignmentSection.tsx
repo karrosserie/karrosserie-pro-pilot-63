@@ -25,28 +25,30 @@ export const RepairOrderAssignmentSection = ({
   isLoadingClients
 }: RepairOrderAssignmentSectionProps) => {
   const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
-  const hasInitialized = useRef(false);
+  const isUserAction = useRef(false);
   
   // Filtrer les véhicules pour le client sélectionné
   const clientVehicles = vehicles?.filter(vehicle => 
     vehicle.client_id === formData.client_id
   ) || [];
 
-  // Marquer que l'initialisation est terminée une fois que nous avons les données complètes
+  // Marquer que les prochaines actions seront des actions utilisateur
   useEffect(() => {
-    if (formData.client_id && formData.vehicle_id && !hasInitialized.current) {
-      console.log('Marking initialization as complete');
-      hasInitialized.current = true;
-    }
-  }, [formData.client_id, formData.vehicle_id]);
+    // Délai pour permettre l'initialisation complète
+    const timer = setTimeout(() => {
+      isUserAction.current = true;
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleClientChange = (clientId: string) => {
-    console.log('Client change, hasInitialized:', hasInitialized.current);
+    console.log('Client change - user action:', isUserAction.current);
     onFieldChange('client_id', clientId);
     
-    // Seulement réinitialiser le véhicule si l'initialisation est terminée
+    // Seulement réinitialiser le véhicule si c'est une action utilisateur
     // et si le véhicule actuel n'appartient pas au nouveau client
-    if (hasInitialized.current && formData.vehicle_id) {
+    if (isUserAction.current && formData.vehicle_id) {
       const vehicleExistsForNewClient = vehicles?.some(vehicle => 
         vehicle.client_id === clientId && vehicle.id === formData.vehicle_id
       );
@@ -59,6 +61,7 @@ export const RepairOrderAssignmentSection = ({
   };
 
   const handleVehicleChange = (vehicleId: string) => {
+    console.log('Vehicle change - user action:', isUserAction.current);
     onFieldChange('vehicle_id', vehicleId);
   };
 
