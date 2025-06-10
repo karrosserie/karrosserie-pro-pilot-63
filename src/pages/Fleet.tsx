@@ -1,47 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Car, Plus, Search, Calendar, User } from 'lucide-react';
-
-// Données mockées pour l'exemple
-const mockVehicles = [
-  {
-    id: '1',
-    brand: 'Peugeot',
-    model: '208',
-    licensePlate: 'AA-111-BB',
-    status: 'Disponible',
-    lastRental: 'Jamais',
-    color: 'Blanc'
-  },
-  {
-    id: '2',
-    brand: 'Renault',
-    model: 'Clio',
-    licensePlate: 'CC-222-DD',
-    status: 'Loué',
-    lastRental: 'Depuis le 15/05/2023',
-    color: 'Noir'
-  },
-  {
-    id: '3',
-    brand: 'Citroën',
-    model: 'C3',
-    licensePlate: 'EE-333-FF',
-    status: 'Disponible',
-    lastRental: '10/05/2023',
-    color: 'Gris'
-  },
-  {
-    id: '4',
-    brand: 'Toyota',
-    model: 'Yaris',
-    licensePlate: 'GG-444-HH',
-    status: 'Loué',
-    lastRental: 'Depuis le 12/05/2023',
-    color: 'Rouge'
-  }
-];
+import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
+import FleetVehicleDialog from '@/components/fleet/FleetVehicleDialog';
+import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 
 // Données mockées pour les prêts en cours
 const currentLoans = [
@@ -62,6 +25,51 @@ const currentLoans = [
 ];
 
 const Fleet = () => {
+  const { vehicles, isLoading, error } = useFleetVehicles();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState<FleetVehicle | null>(null);
+  const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleAddVehicle = () => {
+    setSelectedVehicle(null);
+    setDialogMode('create');
+    setIsDialogOpen(true);
+  };
+
+  const handleEditVehicle = (vehicle: FleetVehicle) => {
+    setSelectedVehicle(vehicle);
+    setDialogMode('edit');
+    setIsDialogOpen(true);
+  };
+
+  const handleViewVehicle = (vehicle: FleetVehicle) => {
+    setSelectedVehicle(vehicle);
+    setDialogMode('view');
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedVehicle(null);
+  };
+
+  const filteredVehicles = vehicles?.filter(vehicle =>
+    vehicle.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vehicle.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vehicle.license_plate?.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
+
+  if (error) {
+    return (
+      <div className="page-container">
+        <div className="text-center py-8">
+          <p className="text-red-600">Erreur lors du chargement des véhicules: {error.message}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="page-container">
       <div className="mb-6">
@@ -82,63 +90,95 @@ const Fleet = () => {
                     type="text" 
                     placeholder="Rechercher..." 
                     className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-karrosserie-orange"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
                 
-                <Button className="btn-primary">
+                <Button className="btn-primary" onClick={handleAddVehicle}>
                   <Plus className="h-4 w-4 mr-2" />
                   Ajouter
                 </Button>
               </div>
             </div>
             
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
-                  <tr>
-                    <th className="px-4 py-3 rounded-tl-lg">Véhicule</th>
-                    <th className="px-4 py-3">Immatriculation</th>
-                    <th className="px-4 py-3">Couleur</th>
-                    <th className="px-4 py-3">Statut</th>
-                    <th className="px-4 py-3">Dernier prêt</th>
-                    <th className="px-4 py-3 rounded-tr-lg">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {mockVehicles.map((vehicle) => (
-                    <tr key={vehicle.id} className="border-b hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium">{vehicle.brand} {vehicle.model}</td>
-                      <td className="px-4 py-3 text-gray-600">{vehicle.licensePlate}</td>
-                      <td className="px-4 py-3 text-gray-600">{vehicle.color}</td>
-                      <td className="px-4 py-3">
-                        <span 
-                          className={`text-xs font-medium px-2.5 py-0.5 rounded ${
-                            vehicle.status === 'Disponible' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-amber-100 text-amber-800'
-                          }`}
-                        >
-                          {vehicle.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-gray-600">{vehicle.lastRental}</td>
-                      <td className="px-4 py-3 space-x-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          disabled={vehicle.status === 'Loué'}
-                        >
-                          Prêter
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          Détails
-                        </Button>
-                      </td>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                <span className="ml-2">Chargement...</span>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
+                    <tr>
+                      <th className="px-4 py-3 rounded-tl-lg">Véhicule</th>
+                      <th className="px-4 py-3">Immatriculation</th>
+                      <th className="px-4 py-3">Couleur</th>
+                      <th className="px-4 py-3">Statut</th>
+                      <th className="px-4 py-3">Kilométrage</th>
+                      <th className="px-4 py-3 rounded-tr-lg">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {filteredVehicles.length > 0 ? (
+                      filteredVehicles.map((vehicle) => (
+                        <tr key={vehicle.id} className="border-b hover:bg-gray-50">
+                          <td className="px-4 py-3 font-medium">{vehicle.brand} {vehicle.model}</td>
+                          <td className="px-4 py-3 text-gray-600">{vehicle.license_plate}</td>
+                          <td className="px-4 py-3 text-gray-600">{vehicle.color || '-'}</td>
+                          <td className="px-4 py-3">
+                            <span 
+                              className={`text-xs font-medium px-2.5 py-0.5 rounded ${
+                                vehicle.status === 'Disponible' 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : vehicle.status === 'Loué'
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : vehicle.status === 'En maintenance'
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : 'bg-red-100 text-red-800'
+                              }`}
+                            >
+                              {vehicle.status || 'Disponible'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-gray-600">{vehicle.mileage ? `${vehicle.mileage} km` : '-'}</td>
+                          <td className="px-4 py-3 space-x-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              disabled={vehicle.status === 'Loué'}
+                            >
+                              Prêter
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleViewVehicle(vehicle)}
+                            >
+                              Détails
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleEditVehicle(vehicle)}
+                            >
+                              Modifier
+                            </Button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                          {searchTerm ? 'Aucun véhicule trouvé' : 'Aucun véhicule de courtoisie'}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
           
           <div className="card-container">
@@ -240,6 +280,13 @@ const Fleet = () => {
           </div>
         </div>
       </div>
+
+      <FleetVehicleDialog
+        isOpen={isDialogOpen}
+        onClose={handleCloseDialog}
+        vehicle={selectedVehicle}
+        mode={dialogMode}
+      />
     </div>
   );
 };
