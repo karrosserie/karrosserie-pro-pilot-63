@@ -13,6 +13,21 @@ export const PersonalInfoDisplay: React.FC<PersonalInfoDisplayProps> = ({
   profile, 
   onEdit 
 }) => {
+  const formatPhoneNumber = (phoneNumber?: string) => {
+    if (!phoneNumber) return '-';
+    
+    // Si le numéro commence par +33, on le formate à la française
+    if (phoneNumber.startsWith('+33')) {
+      const number = phoneNumber.substring(3);
+      if (number.length === 9) {
+        return `+33 ${number.substring(0, 1)} ${number.substring(1, 3)} ${number.substring(3, 5)} ${number.substring(5, 7)} ${number.substring(7)}`;
+      }
+    }
+    
+    // Sinon on retourne le numéro tel quel
+    return phoneNumber;
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -30,7 +45,7 @@ export const PersonalInfoDisplay: React.FC<PersonalInfoDisplayProps> = ({
         <label className="block text-sm mb-2">Numéro de téléphone</label>
         <p className="flex items-center gap-2">
           <Phone className="h-4 w-4 text-muted-foreground" />
-          {profile?.phone_number || '-'}
+          {formatPhoneNumber(profile?.phone_number)}
         </p>
       </div>
       

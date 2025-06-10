@@ -54,7 +54,7 @@ export const CreditBasicInfoSection = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center space-x-2 p-4 rounded-lg border">
+        <div className="flex items-center space-x-2 p-4 rounded-lg">
           <Switch 
             id="franchise-switch"
             checked={isFranchiseCredit}

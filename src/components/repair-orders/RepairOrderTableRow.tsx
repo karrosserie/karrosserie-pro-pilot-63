@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Eye, Pencil, Trash } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { RepairOrderActionsDropdown } from './RepairOrderActionsDropdown';
-import { calculateOrderAmount } from './utils/orderCalculations';
+import { calculateOrderAmount, formatAmount } from './utils/orderCalculations';
 
 interface RepairOrderTableRowProps {
   order: RepairOrder;
@@ -39,14 +39,6 @@ export const RepairOrderTableRow = ({ order, onEditOrder, contextMenuProps }: Re
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR');
-  };
-
-  const formatAmount = (amount: number | null | undefined) => {
-    if (amount === null || amount === undefined || isNaN(Number(amount))) return '-';
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR'
-    }).format(amount).replace('.', ',');
   };
 
   return (
