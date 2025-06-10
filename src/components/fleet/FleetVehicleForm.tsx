@@ -45,6 +45,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
     
     if (name === 'vin') {
       const updatedFormData = handleVinChange(value, formData);
+      console.log(updatedFormData);
       setFormData(updatedFormData);
     } else {
       handleInputChange(e);
