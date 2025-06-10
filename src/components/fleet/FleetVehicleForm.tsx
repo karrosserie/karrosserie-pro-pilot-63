@@ -29,15 +29,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
     model: '',
     year: new Date().getFullYear(),
     license_plate: '',
-    color: '',
-    fuel_type: '',
-    transmission: '',
-    mileage: 0,
     status: 'Disponible',
-    insurance_company: '',
-    insurance_policy: '',
-    insurance_expiry: '',
-    maintenance_notes: '',
     notes: ''
   });
 
@@ -48,15 +40,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
         model: vehicle.model || '',
         year: vehicle.year || new Date().getFullYear(),
         license_plate: vehicle.license_plate || '',
-        color: vehicle.color || '',
-        fuel_type: vehicle.fuel_type || '',
-        transmission: vehicle.transmission || '',
-        mileage: vehicle.mileage || 0,
         status: vehicle.status || 'Disponible',
-        insurance_company: vehicle.insurance_company || '',
-        insurance_policy: vehicle.insurance_policy || '',
-        insurance_expiry: vehicle.insurance_expiry || '',
-        maintenance_notes: vehicle.maintenance_notes || '',
         notes: vehicle.notes || ''
       });
     }
@@ -66,7 +50,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'year' || name === 'mileage' ? parseInt(value) || 0 : value
+      [name]: name === 'year' ? parseInt(value) || 0 : value
     }));
   };
 
@@ -149,68 +133,6 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="color">Couleur</Label>
-          <Input
-            id="color"
-            name="color"
-            value={formData.color}
-            onChange={handleInputChange}
-            disabled={isViewMode}
-          />
-        </div>
-        <div>
-          <Label htmlFor="fuel_type">Carburant</Label>
-          <Select 
-            value={formData.fuel_type} 
-            onValueChange={(value) => handleSelectChange('fuel_type', value)}
-            disabled={isViewMode}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Sélectionner" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Essence">Essence</SelectItem>
-              <SelectItem value="Diesel">Diesel</SelectItem>
-              <SelectItem value="Hybride">Hybride</SelectItem>
-              <SelectItem value="Électrique">Électrique</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="transmission">Transmission</Label>
-          <Select 
-            value={formData.transmission} 
-            onValueChange={(value) => handleSelectChange('transmission', value)}
-            disabled={isViewMode}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Sélectionner" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Manuelle">Manuelle</SelectItem>
-              <SelectItem value="Automatique">Automatique</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label htmlFor="mileage">Kilométrage</Label>
-          <Input
-            id="mileage"
-            name="mileage"
-            type="number"
-            value={formData.mileage}
-            onChange={handleInputChange}
-            disabled={isViewMode}
-            min="0"
-          />
-        </div>
-      </div>
-
       <div>
         <Label htmlFor="status">Statut</Label>
         <Select 
@@ -230,55 +152,8 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
         </Select>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="insurance_company">Assurance</Label>
-          <Input
-            id="insurance_company"
-            name="insurance_company"
-            value={formData.insurance_company}
-            onChange={handleInputChange}
-            disabled={isViewMode}
-          />
-        </div>
-        <div>
-          <Label htmlFor="insurance_policy">N° Police</Label>
-          <Input
-            id="insurance_policy"
-            name="insurance_policy"
-            value={formData.insurance_policy}
-            onChange={handleInputChange}
-            disabled={isViewMode}
-          />
-        </div>
-      </div>
-
       <div>
-        <Label htmlFor="insurance_expiry">Expiration assurance</Label>
-        <Input
-          id="insurance_expiry"
-          name="insurance_expiry"
-          type="date"
-          value={formData.insurance_expiry}
-          onChange={handleInputChange}
-          disabled={isViewMode}
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="maintenance_notes">Notes de maintenance</Label>
-        <Textarea
-          id="maintenance_notes"
-          name="maintenance_notes"
-          value={formData.maintenance_notes}
-          onChange={handleInputChange}
-          disabled={isViewMode}
-          rows={3}
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="notes">Notes générales</Label>
+        <Label htmlFor="notes">Notes</Label>
         <Textarea
           id="notes"
           name="notes"

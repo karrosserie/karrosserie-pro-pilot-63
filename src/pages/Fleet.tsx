@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Car, Plus, Search, Calendar, User } from 'lucide-react';
@@ -114,9 +113,8 @@ const Fleet = () => {
                     <tr>
                       <th className="px-4 py-3 rounded-tl-lg">Véhicule</th>
                       <th className="px-4 py-3">Immatriculation</th>
-                      <th className="px-4 py-3">Couleur</th>
+                      <th className="px-4 py-3">Année</th>
                       <th className="px-4 py-3">Statut</th>
-                      <th className="px-4 py-3">Kilométrage</th>
                       <th className="px-4 py-3 rounded-tr-lg">Actions</th>
                     </tr>
                   </thead>
@@ -126,7 +124,7 @@ const Fleet = () => {
                         <tr key={vehicle.id} className="border-b hover:bg-gray-50">
                           <td className="px-4 py-3 font-medium">{vehicle.brand} {vehicle.model}</td>
                           <td className="px-4 py-3 text-gray-600">{vehicle.license_plate}</td>
-                          <td className="px-4 py-3 text-gray-600">{vehicle.color || '-'}</td>
+                          <td className="px-4 py-3 text-gray-600">{vehicle.year || '-'}</td>
                           <td className="px-4 py-3">
                             <span 
                               className={`text-xs font-medium px-2.5 py-0.5 rounded ${
@@ -142,7 +140,6 @@ const Fleet = () => {
                               {vehicle.status || 'Disponible'}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-gray-600">{vehicle.mileage ? `${vehicle.mileage} km` : '-'}</td>
                           <td className="px-4 py-3 space-x-2">
                             <Button 
                               variant="outline" 
@@ -170,7 +167,7 @@ const Fleet = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                        <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
                           {searchTerm ? 'Aucun véhicule trouvé' : 'Aucun véhicule de courtoisie'}
                         </td>
                       </tr>
