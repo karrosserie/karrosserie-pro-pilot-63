@@ -8,7 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useAuth } from '@/contexts/AuthContext';
-import { isValidVin } from '@/services/vin-decoder';
+import { isValidVin, decodeVin } from '@/services/vin-decoder';
+import { useCarBrands } from '@/hooks/use-car-brands';
+import { useCarModels } from '@/hooks/use-car-models';
 
 interface FleetVehicleFormProps {
   vehicle?: FleetVehicle | null;
@@ -25,6 +27,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
 }) => {
   const { createVehicle, updateVehicle } = useFleetVehicles();
   const { user } = useAuth();
+  const { carBrands } = useCarBrands();
   const isViewMode = mode === 'view';
 
   const [formData, setFormData] = useState({
@@ -40,6 +43,9 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
     notes: ''
   });
 
+  const [selectedBrandId, setSelectedBrandId] = useState<string>('');
+  const { carModels } = useCarModels(selectedBrandId);
+
   useEffect(() => {
     if (vehicle) {
       setFormData({
@@ -54,14 +60,73 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
         status: vehicle.status || 'Disponible',
         notes: vehicle.notes || ''
       });
+
+      // Trouver l'ID de la marque correspondante
+      if (vehicle.brand && carBrands.length > 0) {
+        const matchingBrand = carBrands.find(brand => brand.name === vehicle.brand);
+        if (matchingBrand) {
+          setSelectedBrandId(matchingBrand.id);
+        }
+      }
     }
-  }, [vehicle]);
+  }, [vehicle, carBrands]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    
+    if (name === 'vin') {
+      const upperValue = value.toUpperCase();
+      setFormData(prev => ({
+        ...prev,
+        [name]: upperValue
+      }));
+
+      // Décoder automatiquement le VIN si valide
+      if (isValidVin(upperValue)) {
+        const vinInfo = decodeVin(upperValue);
+        console.log('VIN décodé:', vinInfo);
+        
+        if (vinInfo.brand) {
+          // Trouver la marque correspondante
+          const matchingBrand = carBrands.find(brand => 
+            brand.name.toLowerCase() === vinInfo.brand?.toLowerCase()
+          );
+          
+          if (matchingBrand) {
+            setSelectedBrandId(matchingBrand.id);
+            setFormData(prev => ({
+              ...prev,
+              brand: matchingBrand.name,
+              model: vinInfo.model || prev.model,
+              year: vinInfo.year || prev.year
+            }));
+          }
+        }
+      }
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: name === 'year' ? parseInt(value) || 0 : value
+      }));
+    }
+  };
+
+  const handleBrandChange = (brandId: string) => {
+    const selectedBrand = carBrands.find(brand => brand.id === brandId);
+    if (selectedBrand) {
+      setSelectedBrandId(brandId);
+      setFormData(prev => ({
+        ...prev,
+        brand: selectedBrand.name,
+        model: '' // Reset model when brand changes
+      }));
+    }
+  };
+
+  const handleModelChange = (modelName: string) => {
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'year' ? parseInt(value) || 0 : value
+      model: modelName
     }));
   };
 
@@ -162,25 +227,41 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="brand">Marque *</Label>
-          <Input
-            id="brand"
-            name="brand"
-            value={formData.brand}
-            onChange={handleInputChange}
+          <Select
+            value={selectedBrandId}
+            onValueChange={handleBrandChange}
             disabled={isViewMode}
-            required
-          />
+          >
+            <SelectTrigger id="brand">
+              <SelectValue placeholder="Sélectionner une marque" />
+            </SelectTrigger>
+            <SelectContent>
+              {carBrands.map((brand) => (
+                <SelectItem key={brand.id} value={brand.id}>
+                  {brand.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <Label htmlFor="model">Modèle *</Label>
-          <Input
-            id="model"
-            name="model"
+          <Select
             value={formData.model}
-            onChange={handleInputChange}
-            disabled={isViewMode}
-            required
-          />
+            onValueChange={handleModelChange}
+            disabled={isViewMode || !selectedBrandId}
+          >
+            <SelectTrigger id="model">
+              <SelectValue placeholder="Sélectionner un modèle" />
+            </SelectTrigger>
+            <SelectContent>
+              {carModels.map((model) => (
+                <SelectItem key={model.id} value={model.name}>
+                  {model.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
