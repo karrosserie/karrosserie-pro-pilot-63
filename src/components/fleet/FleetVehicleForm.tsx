@@ -44,6 +44,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
 
   const [selectedBrandId, setSelectedBrandId] = useState<string>('');
   const { carModels } = useCarModels(selectedBrandId);
+  const [pendingVinModel, setPendingVinModel] = useState<string>('');
 
   useEffect(() => {
     if (vehicle) {
@@ -67,6 +68,23 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
       }
     }
   }, [vehicle, carBrands]);
+
+  // Nouvel effet pour sélectionner le modèle une fois que les modèles sont chargés
+  useEffect(() => {
+    if (pendingVinModel && carModels.length > 0) {
+      const matchingModel = carModels.find(model => 
+        model.name.toLowerCase() === pendingVinModel.toLowerCase()
+      );
+      
+      if (matchingModel) {
+        setFormData(prev => ({
+          ...prev,
+          model: matchingModel.name
+        }));
+        setPendingVinModel(''); // Réinitialiser après sélection
+      }
+    }
+  }, [carModels, pendingVinModel]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -94,9 +112,13 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
             setFormData(prev => ({
               ...prev,
               brand: matchingBrand.name,
-              model: vinInfo.model || prev.model,
               year: vinInfo.year || prev.year
             }));
+
+            // Stocker le modèle en attente si disponible
+            if (vinInfo.model) {
+              setPendingVinModel(vinInfo.model);
+            }
           }
         }
       }
@@ -117,6 +139,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
         brand: selectedBrand.name,
         model: '' // Reset model when brand changes
       }));
+      setPendingVinModel(''); // Réinitialiser le modèle en attente
     }
   };
 
@@ -125,6 +148,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
       ...prev,
       model: modelName
     }));
+    setPendingVinModel(''); // Réinitialiser si l'utilisateur sélectionne manuellement
   };
 
   const handleSelectChange = (name: string, value: string) => {
