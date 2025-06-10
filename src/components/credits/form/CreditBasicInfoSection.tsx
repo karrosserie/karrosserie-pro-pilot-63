@@ -65,7 +65,7 @@ export const CreditBasicInfoSection = ({
           </Label>
         </div>
 
-        <div className="grid gap-4 grid-cols-1 md:grid-cols-4">
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-5">
           <div>
             <Label htmlFor="reference">Numéro *</Label>
             <Input
@@ -105,7 +105,7 @@ export const CreditBasicInfoSection = ({
             )}
           </div>
           
-          <div className="md:col-span-2">
+          <div className="md:col-span-3">
             {!isFranchiseCredit && (
               <>
                 <Label htmlFor="status">Statut</Label>
