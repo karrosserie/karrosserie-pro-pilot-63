@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -30,8 +29,8 @@ const FleetReservationForm: React.FC<FleetReservationFormProps> = ({
   onCancel
 }) => {
   const { clients } = useClients();
-  const { fleetVehicles } = useFleetVehicles();
-  const { repairOrders } = useRepairOrders();
+  const { vehicles: fleetVehicles } = useFleetVehicles();
+  const { orders: repairOrders } = useRepairOrders();
 
   const [formData, setFormData] = useState({
     client_id: defaultValues.client_id || '',
