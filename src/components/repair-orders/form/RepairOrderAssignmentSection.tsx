@@ -25,66 +25,22 @@ export const RepairOrderAssignmentSection = ({
   isLoadingClients
 }: RepairOrderAssignmentSectionProps) => {
   const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
-  const hasInitializedClient = useRef(false);
-  const hasInitializedVehicle = useRef(false);
-  const expectedVehicleId = useRef<string | null>(null);
   
   // Filtrer les véhicules pour le client sélectionné
   const clientVehicles = vehicles?.filter(vehicle => 
     vehicle.client_id === formData.client_id
   ) || [];
 
-  // Étape 1: Sélectionner automatiquement le client une fois les données chargées
-  useEffect(() => {
-    if (!hasInitializedClient.current && 
-        formData.client_id && 
-        !isLoadingClients && 
-        clientOptions.length > 0) {
-      console.log('Auto-selecting client:', formData.client_id);
-      hasInitializedClient.current = true;
-      expectedVehicleId.current = formData.vehicle_id || null;
-    }
-  }, [formData.client_id, isLoadingClients, clientOptions]);
-
-  // Étape 2: Sélectionner automatiquement le véhicule une fois les véhicules du client chargés
-  useEffect(() => {
-    if (hasInitializedClient.current && 
-        !hasInitializedVehicle.current && 
-        expectedVehicleId.current && 
-        formData.client_id && 
-        !isLoadingVehicles && 
-        clientVehicles.length > 0) {
-      
-      // Vérifier que le véhicule attendu existe dans la liste des véhicules du client
-      const vehicleExists = clientVehicles.some(vehicle => vehicle.id === expectedVehicleId.current);
-      
-      if (vehicleExists) {
-        console.log('Auto-selecting vehicle:', expectedVehicleId.current);
-        onFieldChange('vehicle_id', expectedVehicleId.current);
-        hasInitializedVehicle.current = true;
-      }
-    }
-  }, [hasInitializedClient.current, formData.client_id, isLoadingVehicles, clientVehicles, expectedVehicleId.current]);
-
   const handleClientChange = (clientId: string) => {
-    console.log('Manual client change to:', clientId);
+    console.log('Client changed to:', clientId);
+    console.log('Calling onFieldChange with client_id:', clientId);
     onFieldChange('client_id', clientId);
-    
-    // Réinitialiser le véhicule uniquement si c'est un changement manuel (après initialisation)
-    if (hasInitializedClient.current && formData.vehicle_id) {
-      const vehicleExistsForNewClient = vehicles?.some(vehicle => 
-        vehicle.client_id === clientId && vehicle.id === formData.vehicle_id
-      );
-      
-      if (!vehicleExistsForNewClient) {
-        console.log('Resetting vehicle as it does not belong to new client');
-        onFieldChange('vehicle_id', null);
-      }
-    }
+    // Réinitialiser le véhicule quand on change de client
+    onFieldChange('vehicle_id', null);
   };
 
   const handleVehicleChange = (vehicleId: string) => {
-    console.log('Manual vehicle change to:', vehicleId);
+    console.log('Vehicle changed to:', vehicleId);
     onFieldChange('vehicle_id', vehicleId);
   };
 
