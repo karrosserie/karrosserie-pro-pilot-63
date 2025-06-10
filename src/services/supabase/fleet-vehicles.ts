@@ -1,25 +1,21 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
 export type FleetVehicle = Database['public']['Tables']['fleet_vehicles']['Row'] & {
   vin?: string;
   engine_number?: string;
-  color?: string;
   mileage?: number;
 };
 
 export type NewFleetVehicle = Database['public']['Tables']['fleet_vehicles']['Insert'] & {
   vin?: string;
   engine_number?: string;
-  color?: string;
   mileage?: number;
 };
 
 export type UpdateFleetVehicle = Database['public']['Tables']['fleet_vehicles']['Update'] & {
   vin?: string;
   engine_number?: string;
-  color?: string;
   mileage?: number;
 };
 

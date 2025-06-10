@@ -9,7 +9,7 @@ export interface FleetVehicleFormData {
   model: string;
   year: number;
   license_plate: string;
-  color: string;
+  color: string; // Garder pour l'interface utilisateur mais ne pas l'envoyer à la DB
   status: string;
 }
 
@@ -34,7 +34,7 @@ export function useFleetVehicleForm(vehicle?: FleetVehicle | null) {
         model: vehicle.model || '',
         year: vehicle.year || new Date().getFullYear(),
         license_plate: vehicle.license_plate || '',
-        color: vehicle.color || '',
+        color: '', // Toujours vide car pas dans la DB
         status: vehicle.status || 'Disponible'
       });
     }
