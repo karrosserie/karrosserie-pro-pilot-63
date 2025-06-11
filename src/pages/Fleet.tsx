@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const Fleet = () => {
   const { vehicles, isLoading, error } = useFleetVehicles();
-  const { reservations } = useFleetReservations();
+  const { reservations, deleteReservation } = useFleetReservations();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<FleetVehicle | null>(null);
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
@@ -136,6 +136,23 @@ const Fleet = () => {
       expectedReturnDate: new Date(reservation.expected_return_date).toLocaleDateString('fr-FR')
     }));
 
+  const handleDeleteLoan = async (loanId: string) => {
+    try {
+      await deleteReservation.mutateAsync(loanId);
+      toast({
+        title: "Prêt supprimé",
+        description: "Le prêt a été supprimé avec succès."
+      });
+    } catch (error) {
+      console.error('Error deleting loan:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer le prêt.",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (error) {
     return (
       <div className="page-container">
@@ -174,6 +191,7 @@ const Fleet = () => {
             currentLoans={currentLoans}
             onViewDetails={handleViewLoanDetails}
             onReturnVehicle={handleReturnVehicle}
+            onDeleteLoan={handleDeleteLoan}
             onNewLoan={handleNewLoan}
           />
           <FleetViolations />

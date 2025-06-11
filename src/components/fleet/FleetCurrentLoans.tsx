@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Car, Calendar, User } from 'lucide-react';
+import { Car, Calendar, User, Trash2 } from 'lucide-react';
 
 interface CurrentLoan {
   id: string;
@@ -15,6 +15,7 @@ interface FleetCurrentLoansProps {
   currentLoans: CurrentLoan[];
   onViewDetails?: (loanId: string) => void;
   onReturnVehicle?: (loanId: string) => void;
+  onDeleteLoan?: (loanId: string) => void;
   onNewLoan?: () => void;
 }
 
@@ -22,6 +23,7 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
   currentLoans, 
   onViewDetails,
   onReturnVehicle,
+  onDeleteLoan,
   onNewLoan 
 }) => {
   return (
@@ -51,7 +53,7 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
               </div>
             </div>
             
-            <div className="mt-4 space-x-2">
+            <div className="mt-4 flex flex-wrap gap-2">
               <Button 
                 variant="outline" 
                 size="sm"
@@ -65,6 +67,14 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
                 onClick={() => onReturnVehicle?.(loan.id)}
               >
                 Retour
+              </Button>
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => onDeleteLoan?.(loan.id)}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                <Trash2 className="h-4 w-4" />
               </Button>
             </div>
           </div>
