@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Search, Plus } from 'lucide-react';
+import { Search, Car } from 'lucide-react';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 
 interface FleetVehiclesTableProps {
@@ -48,7 +49,7 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
           </div>
           
           <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white" onClick={onAddVehicle}>
-            <Plus className="h-4 w-4 mr-2" />
+            <Car className="h-4 w-4 mr-2" />
             Ajouter
           </Button>
         </div>

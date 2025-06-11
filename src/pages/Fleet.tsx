@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
@@ -49,6 +50,7 @@ const Fleet = () => {
 
   const handleLendVehicle = (vehicle: FleetVehicle) => {
     setVehicleToLend(vehicle);
+    setSelectedLoanId(null);
     setLoanDialogMode('create');
     setIsLoanDialogOpen(true);
   };
@@ -71,6 +73,7 @@ const Fleet = () => {
   const handleViewLoanDetails = (loanId: string) => {
     console.log('Opening loan details for:', loanId);
     setSelectedLoanId(loanId);
+    setVehicleToLend(null);
     setLoanDialogMode('edit');
     setIsLoanDialogOpen(true);
   };
@@ -78,12 +81,15 @@ const Fleet = () => {
   const handleReturnVehicle = (loanId: string) => {
     console.log('Processing vehicle return for:', loanId);
     setSelectedLoanId(loanId);
+    setVehicleToLend(null);
     setLoanDialogMode('return');
     setIsLoanDialogOpen(true);
   };
 
   const handleNewLoan = () => {
     console.log('Creating new loan');
+    setVehicleToLend(null);
+    setSelectedLoanId(null);
     setLoanDialogMode('create');
     setIsLoanDialogOpen(true);
   };
@@ -91,6 +97,7 @@ const Fleet = () => {
   const handleViewLoan = (loanId: string) => {
     console.log('Viewing loan:', loanId);
     setSelectedLoanId(loanId);
+    setVehicleToLend(null);
     setLoanDialogMode('view');
     setIsLoanDialogOpen(true);
   };
