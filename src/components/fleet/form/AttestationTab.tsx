@@ -2,9 +2,9 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import SignaturePad from '@/components/shared/SignaturePad';
 import { LoanFormData } from '../FleetLoanForm';
 
 interface AttestationTabProps {
@@ -137,13 +137,12 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
                   </div>
                 </div>
 
-                {/* Signature Area */}
-                <div className="border-2 border-dashed border-gray-300 h-32 flex items-center justify-center bg-gray-50">
-                  <div className="text-center text-gray-500">
-                    <div>Zone de signature</div>
-                    <div className="text-sm">(À implémenter avec une solution de signature électronique)</div>
-                  </div>
-                </div>
+                {/* Electronic Signature */}
+                <SignaturePad
+                  value={formData.clientSignature || ''}
+                  onSignatureChange={(signature) => onSignatureChange('clientSignature', signature)}
+                  disabled={isViewMode}
+                />
               </div>
             </div>
           </div>

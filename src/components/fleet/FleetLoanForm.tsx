@@ -47,6 +47,7 @@ export interface LoanFormData {
   insurancePostalCode?: string;
   // Attestation fields
   attestationAccepted?: boolean;
+  clientSignature?: string;
 }
 
 interface DamageItem {
@@ -60,6 +61,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
   onSubmit,
   onCancel
 }) => {
+  const [activeTab, setActiveTab] = useState('client-info');
   const [formData, setFormData] = useState<LoanFormData>({
     vehicleId: vehicle.id,
     clientId: '',
@@ -90,7 +92,8 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     insuranceAddress: '',
     insuranceCity: '',
     insurancePostalCode: '',
-    attestationAccepted: false
+    attestationAccepted: false,
+    clientSignature: ''
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -182,6 +185,32 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     return basicValid && insuranceValid;
   };
 
+  const tabs = [
+    { value: 'client-info', label: 'Informations sur le client' },
+    { value: 'insurance', label: 'Assurance' },
+    { value: 'damages', label: 'Chocs & rayures' },
+    { value: 'vehicle-details', label: 'Détails du véhicule & photos' },
+    { value: 'attestation', label: 'Attestation & Signature' }
+  ];
+
+  const currentTabIndex = tabs.findIndex(tab => tab.value === activeTab);
+  const isFirstTab = currentTabIndex === 0;
+  const isLastTab = currentTabIndex === tabs.length - 1;
+
+  const handleNext = () => {
+    if (!isLastTab) {
+      const nextTab = tabs[currentTabIndex + 1];
+      setActiveTab(nextTab.value);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (!isFirstTab) {
+      const prevTab = tabs[currentTabIndex - 1];
+      setActiveTab(prevTab.value);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isFormValid()) {
@@ -198,13 +227,13 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
         </h3>
       </div>
 
-      <Tabs defaultValue="client-info" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="client-info">Informations sur le client</TabsTrigger>
-          <TabsTrigger value="insurance">Assurance</TabsTrigger>
-          <TabsTrigger value="damages">Chocs & rayures</TabsTrigger>
-          <TabsTrigger value="vehicle-details">Détails du véhicule & photos</TabsTrigger>
-          <TabsTrigger value="attestation">Attestation & Signature</TabsTrigger>
+          {tabs.map(tab => (
+            <TabsTrigger key={tab.value} value={tab.value}>
+              {tab.label}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
         <TabsContent value="client-info" className="space-y-6 mt-6">
@@ -257,18 +286,35 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
         </TabsContent>
       </Tabs>
 
-      <div className="flex justify-end space-x-3 pt-6 border-t">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Annuler
-        </Button>
-        <Button 
-          type="submit" 
-          className="btn-primary"
-          onClick={handleSubmit}
-          disabled={!isFormValid()}
-        >
-          Confirmer le prêt
-        </Button>
+      <div className="flex justify-between items-center pt-6 border-t">
+        <div>
+          {!isFirstTab && (
+            <Button type="button" variant="outline" onClick={handlePrevious}>
+              Précédent
+            </Button>
+          )}
+        </div>
+        
+        <div className="flex space-x-3">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Annuler
+          </Button>
+          
+          {!isLastTab ? (
+            <Button type="button" onClick={handleNext}>
+              Suivant
+            </Button>
+          ) : (
+            <Button 
+              type="submit" 
+              className="btn-primary"
+              onClick={handleSubmit}
+              disabled={!isFormValid()}
+            >
+              Confirmer le prêt
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
