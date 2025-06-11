@@ -580,6 +580,7 @@ export type Database = {
           start_mileage: number
           status: string
           updated_at: string | null
+          user_id: string
           vehicle_images: Json | null
         }
         Insert: {
@@ -616,6 +617,7 @@ export type Database = {
           start_mileage?: number
           status?: string
           updated_at?: string | null
+          user_id: string
           vehicle_images?: Json | null
         }
         Update: {
@@ -652,6 +654,7 @@ export type Database = {
           start_mileage?: number
           status?: string
           updated_at?: string | null
+          user_id?: string
           vehicle_images?: Json | null
         }
         Relationships: [
@@ -667,6 +670,13 @@ export type Database = {
             columns: ["fleet_vehicle_id"]
             isOneToOne: false
             referencedRelation: "fleet_vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_reservations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
