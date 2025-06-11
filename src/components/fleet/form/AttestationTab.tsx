@@ -29,6 +29,13 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
   const { companyData } = useCompany();
   const { client } = useClient(formData.clientId);
 
+  // Format date to French format
+  const formatDateToFrench = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR');
+  };
+
   // Automatically fill client name when client is selected
   React.useEffect(() => {
     if (client && (!formData.clientName || formData.clientName.trim() === '')) {
@@ -52,7 +59,8 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
                 <Label className="font-semibold">De :</Label>
                 <div className="mt-2 space-y-1">
                   <div>{companyData?.name || 'KORPORATE'}</div>
-                  <div>{companyData?.address || '25 COURS PIERRE PUGET 13006 MARSEILLE'}</div>
+                  <div>{companyData?.address || '25 COURS PIERRE PUGET'}</div>
+                  <div>{companyData?.zipCode} {companyData?.city || '13006 MARSEILLE'}</div>
                   <div>{companyData?.phone || '+33646465242'}</div>
                   <div>{companyData?.email || 'ggobeyn@outlook.fr'}</div>
                   <div>{companyData?.siren || '917 775 835'}</div>
@@ -65,11 +73,9 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
                 <Label className="font-semibold">Au Client:</Label>
                 <div className="mt-2 space-y-1">
                   <div>{client ? `${client.firstName} ${client.lastName}` : 'Nom du client'}</div>
+                  <div>{client?.address} {client?.zipCode} {client?.city}</div>
                   <div>{client?.phone || 'Téléphone'}</div>
-                  <div>{client?.email || 'Email'}</div>
-                  <div>{client?.address || 'Adresse'}</div>
-                  <div>{client?.city} {client?.zipCode}</div>
-                  <div>N° :</div>
+                  {client?.email && <div>{client.email}</div>}
                 </div>
               </div>
             </div>
@@ -92,7 +98,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
               <div>
                 <Label className="font-semibold">Départ:</Label>
                 <div className="mt-2 space-y-1">
-                  <div>Le : {formData.startDate}</div>
+                  <div>Le : {formatDateToFrench(formData.startDate)}</div>
                   <div>Kilométrage : {formData.mileage}Km</div>
                 </div>
               </div>
@@ -100,7 +106,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
               <div>
                 <Label className="font-semibold">Retour:</Label>
                 <div className="mt-2 space-y-1">
-                  <div>Le : {formData.expectedReturnDate}</div>
+                  <div>Le : {formatDateToFrench(formData.expectedReturnDate)}</div>
                   <div>Kilométrage : - - - Km</div>
                 </div>
               </div>

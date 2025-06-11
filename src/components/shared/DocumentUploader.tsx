@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { FileUpload } from '@/components/ui/file-upload';
 import { Button } from '@/components/ui/button';
@@ -179,7 +180,6 @@ export function DocumentUploader({
             </div>
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="font-medium truncate">{getFilename(currentDocumentUrl)}</p>
                 <p className="text-xs text-gray-500">Image téléchargée</p>
               </div>
               {!isViewMode && (
