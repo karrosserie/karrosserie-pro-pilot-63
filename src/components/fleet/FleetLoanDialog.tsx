@@ -31,15 +31,17 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-6xl h-[90vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>Nouveau prêt de véhicule</DialogTitle>
         </DialogHeader>
-        <FleetLoanForm
-          vehicle={vehicle}
-          onSubmit={handleSubmit}
-          onCancel={onClose}
-        />
+        <div className="flex-1 overflow-hidden">
+          <FleetLoanForm
+            vehicle={vehicle}
+            onSubmit={handleSubmit}
+            onCancel={onClose}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
+import { useFleetReservations } from '@/hooks/use-fleet-reservations';
 import FleetVehicleDialog from '@/components/fleet/FleetVehicleDialog';
 import FleetVehiclesTable from '@/components/fleet/FleetVehiclesTable';
 import FleetLoansHistory from '@/components/fleet/FleetLoansHistory';
@@ -10,26 +12,9 @@ import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { LoanFormData } from '@/components/fleet/FleetLoanForm';
 import { useToast } from '@/hooks/use-toast';
 
-// Données mockées pour les prêts en cours
-const currentLoans = [
-  {
-    id: '1',
-    vehicle: 'Renault Clio - CC-222-DD',
-    client: 'Marie Martin',
-    startDate: '15/05/2023',
-    expectedReturnDate: '22/05/2023'
-  },
-  {
-    id: '2',
-    vehicle: 'Toyota Yaris - GG-444-HH',
-    client: 'Pierre Durand',
-    startDate: '12/05/2023',
-    expectedReturnDate: '19/05/2023'
-  }
-];
-
 const Fleet = () => {
   const { vehicles, isLoading, error } = useFleetVehicles();
+  const { reservations } = useFleetReservations();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<FleetVehicle | null>(null);
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
@@ -70,15 +55,25 @@ const Fleet = () => {
     console.log('Loan data:', loanData);
     toast({
       title: "Prêt enregistré",
-      description: `Le véhicule ${vehicleToLend?.brand} ${vehicleToLend?.model} a été prêté à ${loanData.clientName}.`
+      description: `Le véhicule ${vehicleToLend?.brand} ${vehicleToLend?.model} a été prêté avec succès.`
     });
-    // TODO: Implement loan creation in database
   };
 
   const handleCloseLoanDialog = () => {
     setIsLoanDialogOpen(false);
     setVehicleToLend(null);
   };
+
+  // Convert reservations to current loans format
+  const currentLoans = (reservations || [])
+    .filter(reservation => reservation.status === 'active')
+    .map(reservation => ({
+      id: reservation.id,
+      vehicle: `${reservation.fleet_vehicles?.brand} ${reservation.fleet_vehicles?.model} - ${reservation.fleet_vehicles?.license_plate}`,
+      client: `${reservation.clients?.first_name} ${reservation.clients?.last_name}`,
+      startDate: new Date(reservation.start_date).toLocaleDateString('fr-FR'),
+      expectedReturnDate: new Date(reservation.expected_return_date).toLocaleDateString('fr-FR')
+    }));
 
   if (error) {
     return (

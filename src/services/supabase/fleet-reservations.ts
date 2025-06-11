@@ -12,9 +12,8 @@ export const fleetReservationsService = {
       .from('fleet_reservations')
       .select(`
         *,
-        clients(first_name, last_name),
-        fleet_vehicles(brand, model, license_plate),
-        repair_orders(reference)
+        clients(first_name, last_name, phone, email, address, city, zip_code),
+        fleet_vehicles(brand, model, license_plate)
       `)
       .order('start_date', { ascending: false });
 
@@ -31,9 +30,8 @@ export const fleetReservationsService = {
       .from('fleet_reservations')
       .select(`
         *,
-        clients(id, first_name, last_name),
-        fleet_vehicles(id, brand, model, license_plate),
-        repair_orders(id, reference)
+        clients(id, first_name, last_name, phone, email, address, city, zip_code),
+        fleet_vehicles(id, brand, model, license_plate)
       `)
       .eq('id', id)
       .single();
@@ -51,7 +49,7 @@ export const fleetReservationsService = {
       .from('fleet_reservations')
       .select(`
         *,
-        clients(first_name, last_name)
+        clients(first_name, last_name, phone, email)
       `)
       .eq('fleet_vehicle_id', vehicleId)
       .order('start_date');

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
+import { useFleetReservations } from '@/hooks/use-fleet-reservations';
 import DamageAssessmentTab from './form/DamageAssessmentTab';
 import VehicleDetailsTab from './form/VehicleDetailsTab';
 import ClientInfoTab from './form/ClientInfoTab';
@@ -63,6 +64,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
   onCancel
 }) => {
   const [activeTab, setActiveTab] = useState('client-info');
+  const { createReservation } = useFleetReservations();
   const [formData, setFormData] = useState<LoanFormData>({
     vehicleId: vehicle.id,
     clientId: '',
@@ -221,82 +223,129 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isFormValid()) {
       return;
     }
-    onSubmit(formData);
+
+    try {
+      // Prepare data for database
+      const reservationData = {
+        fleet_vehicle_id: formData.vehicleId,
+        client_id: formData.clientId,
+        start_date: formData.startDate,
+        expected_return_date: formData.expectedReturnDate,
+        start_mileage: formData.mileage,
+        fuel_level_start: formData.fuelLevel,
+        notes: formData.notes || '',
+        status: 'active' as const,
+        // License information
+        license_number: formData.licenseNumber,
+        license_issue_date: formData.licenseIssueDate,
+        prefecture: formData.prefecture,
+        holder_info: formData.holderInfo,
+        date_of_birth: formData.dateOfBirth,
+        place_of_birth: formData.placeOfBirth,
+        // Document URLs
+        driver_license_front_url: formData.driverLicenseFrontUrl,
+        driver_license_back_url: formData.driverLicenseBackUrl,
+        // Insurance information
+        client_insurance: formData.clientInsurance,
+        insurance_company_name: formData.insuranceCompanyName,
+        insurance_phone: formData.insurancePhone,
+        insurance_email: formData.insuranceEmail,
+        insurance_contract_number: formData.insuranceContractNumber,
+        insurance_address: formData.insuranceAddress,
+        insurance_city: formData.insuranceCity,
+        insurance_postal_code: formData.insurancePostalCode,
+        // Attestation
+        attestation_accepted: formData.attestationAccepted,
+        client_signature: formData.clientSignature,
+        // Additional data as JSON
+        vehicle_images: formData.vehicleImages,
+        damages: formData.damages
+      };
+
+      await createReservation.mutateAsync(reservationData);
+      onSubmit(formData);
+    } catch (error) {
+      console.error('Error creating reservation:', error);
+    }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="mb-4">
+    <div className="h-full flex flex-col">
+      <div className="mb-4 flex-shrink-0">
         <h3 className="text-lg font-medium text-gray-900">
           Prêt du véhicule: {vehicle.brand} {vehicle.model} ({vehicle.license_plate})
         </h3>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          {tabs.map(tab => (
-            <TabsTrigger key={tab.value} value={tab.value}>
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      <div className="flex-1 flex flex-col min-h-0">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+          <TabsList className="grid w-full grid-cols-5 flex-shrink-0">
+            {tabs.map(tab => (
+              <TabsTrigger key={tab.value} value={tab.value}>
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
 
-        <TabsContent value="client-info" className="space-y-6 mt-6">
-          <ClientInfoTab
-            formData={formData}
-            onInputChange={handleInputChange}
-            onClientSelect={handleClientSelect}
-            onDriverLicenseFrontUpload={handleDriverLicenseFrontUpload}
-            onDriverLicenseBackUpload={handleDriverLicenseBackUpload}
-          />
-        </TabsContent>
+          <div className="flex-1 min-h-0">
+            <TabsContent value="client-info" className="h-full overflow-y-auto space-y-6 mt-6">
+              <ClientInfoTab
+                formData={formData}
+                onInputChange={handleInputChange}
+                onClientSelect={handleClientSelect}
+                onDriverLicenseFrontUpload={handleDriverLicenseFrontUpload}
+                onDriverLicenseBackUpload={handleDriverLicenseBackUpload}
+              />
+            </TabsContent>
 
-        <TabsContent value="insurance" className="space-y-6 mt-6">
-          <InsuranceTab
-            formData={formData}
-            onInputChange={handleInputChange}
-            onSwitchChange={handleInsuranceSwitchChange}
-            onPhoneChange={handleInsurancePhoneChange}
-          />
-        </TabsContent>
+            <TabsContent value="insurance" className="h-full overflow-y-auto space-y-6 mt-6">
+              <InsuranceTab
+                formData={formData}
+                onInputChange={handleInputChange}
+                onSwitchChange={handleInsuranceSwitchChange}
+                onPhoneChange={handleInsurancePhoneChange}
+              />
+            </TabsContent>
 
-        <TabsContent value="damages" className="space-y-6 mt-6">
-          <DamageAssessmentTab
-            damages={formData.damages}
-            onDamageUpdate={handleDamageUpdate}
-          />
-        </TabsContent>
+            <TabsContent value="damages" className="h-full overflow-y-auto space-y-6 mt-6">
+              <DamageAssessmentTab
+                damages={formData.damages}
+                onDamageUpdate={handleDamageUpdate}
+              />
+            </TabsContent>
 
-        <TabsContent value="vehicle-details" className="space-y-6 mt-6">
-          <VehicleDetailsTab
-            vehicleId={vehicle.id}
-            mileage={formData.mileage}
-            fuelLevel={formData.fuelLevel}
-            vehicleImages={formData.vehicleImages}
-            onMileageChange={handleMileageChange}
-            onFuelLevelChange={handleFuelLevelChange}
-            onImageAdd={handleImageAdd}
-            onImageRemove={handleImageRemove}
-            onImageUpdate={handleImageUpdate}
-          />
-        </TabsContent>
+            <TabsContent value="vehicle-details" className="h-full overflow-y-auto space-y-6 mt-6">
+              <VehicleDetailsTab
+                vehicleId={vehicle.id}
+                mileage={formData.mileage}
+                fuelLevel={formData.fuelLevel}
+                vehicleImages={formData.vehicleImages}
+                onMileageChange={handleMileageChange}
+                onFuelLevelChange={handleFuelLevelChange}
+                onImageAdd={handleImageAdd}
+                onImageRemove={handleImageRemove}
+                onImageUpdate={handleImageUpdate}
+              />
+            </TabsContent>
 
-        <TabsContent value="attestation" className="space-y-6 mt-6">
-          <AttestationTab
-            formData={formData}
-            vehicle={vehicle}
-            onInputChange={handleInputChange}
-            onSignatureChange={handleSignatureChange}
-          />
-        </TabsContent>
-      </Tabs>
+            <TabsContent value="attestation" className="h-full overflow-y-auto space-y-6 mt-6">
+              <AttestationTab
+                formData={formData}
+                vehicle={vehicle}
+                onInputChange={handleInputChange}
+                onSignatureChange={handleSignatureChange}
+              />
+            </TabsContent>
+          </div>
+        </Tabs>
+      </div>
 
-      <div className="flex justify-between items-center pt-6 border-t">
+      <div className="flex justify-between items-center pt-6 border-t flex-shrink-0">
         <div>
           {!isFirstTab && (
             <Button type="button" variant="outline" onClick={handlePrevious}>
@@ -319,9 +368,9 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
               type="submit" 
               className="btn-primary"
               onClick={handleSubmit}
-              disabled={!isFormValid()}
+              disabled={!isFormValid() || createReservation.isPending}
             >
-              Confirmer le prêt
+              {createReservation.isPending ? 'Enregistrement...' : 'Confirmer le prêt'}
             </Button>
           )}
         </div>
