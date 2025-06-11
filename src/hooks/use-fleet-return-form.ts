@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useFleetReturns } from '@/hooks/use-fleet-returns';
 import { useFleetReservation } from '@/hooks/use-fleet-reservations';
@@ -128,10 +129,13 @@ export const useFleetReturnForm = (
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
+      console.error('No user found');
       return;
     }
 
     try {
+      console.log('Submitting fleet return form with data:', formData);
+      
       // Prepare data for database
       const returnData = {
         fleet_reservation_id: formData.reservationId,
@@ -152,7 +156,12 @@ export const useFleetReturnForm = (
         damages: formData.damages as any
       };
 
-      await createReturn.mutateAsync(returnData);
+      console.log('Prepared return data for database:', returnData);
+      
+      const result = await createReturn.mutateAsync(returnData);
+      console.log('Fleet return created successfully:', result);
+      
+      // Call the parent onSubmit callback
       onSubmit(formData);
     } catch (error) {
       console.error('Error saving fleet return:', error);
@@ -163,7 +172,7 @@ export const useFleetReturnForm = (
     activeTab,
     setActiveTab,
     formData,
-    reservation, // Add reservation to the returned object
+    reservation,
     createReturn,
     handleInputChange,
     handleClientSelect,
