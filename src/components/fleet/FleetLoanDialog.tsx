@@ -49,6 +49,28 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
     }
   };
 
+  // Create a complete FleetVehicle object from the partial data
+  const createCompleteVehicle = (partialVehicle: any): FleetVehicle => {
+    return {
+      id: partialVehicle.id,
+      brand: partialVehicle.brand || '',
+      model: partialVehicle.model || '',
+      license_plate: partialVehicle.license_plate || '',
+      color: partialVehicle.color || '',
+      year: partialVehicle.year || new Date().getFullYear(),
+      vin: partialVehicle.vin || '',
+      engine_number: partialVehicle.engine_number || '',
+      mileage: partialVehicle.mileage || 0,
+      status: partialVehicle.status || 'Disponible',
+      insurance_card_url: partialVehicle.insurance_card_url || '',
+      registration_front_url: partialVehicle.registration_front_url || '',
+      registration_back_url: partialVehicle.registration_back_url || '',
+      created_at: partialVehicle.created_at || new Date().toISOString(),
+      updated_at: partialVehicle.updated_at || new Date().toISOString(),
+      user_id: partialVehicle.user_id || ''
+    };
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
@@ -64,7 +86,7 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
           />
         ) : mode === 'edit' && reservation && reservation.fleet_vehicles ? (
           <FleetLoanForm
-            vehicle={reservation.fleet_vehicles}
+            vehicle={createCompleteVehicle(reservation.fleet_vehicles)}
             reservation={reservation}
             onSubmit={handleSubmit}
             onCancel={onClose}
@@ -72,7 +94,7 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
           />
         ) : mode === 'view' && reservation && reservation.fleet_vehicles ? (
           <FleetLoanForm
-            vehicle={reservation.fleet_vehicles}
+            vehicle={createCompleteVehicle(reservation.fleet_vehicles)}
             reservation={reservation}
             onSubmit={handleSubmit}
             onCancel={onClose}
