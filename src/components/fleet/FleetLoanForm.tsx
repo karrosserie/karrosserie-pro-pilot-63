@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import DamageAssessmentTab from './form/DamageAssessmentTab';
 import VehicleDetailsTab from './form/VehicleDetailsTab';
-import DocumentsTab from './form/DocumentsTab';
 
 interface FleetLoanFormProps {
   vehicle: FleetVehicle;
@@ -24,9 +23,6 @@ export interface LoanFormData {
   fuelLevel: number;
   vehicleImages: string[];
   damages: DamageItem[];
-  registrationFrontUrl: string;
-  registrationBackUrl: string;
-  insuranceCardUrl: string;
 }
 
 interface DamageItem {
@@ -51,10 +47,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     mileage: vehicle.mileage || 0,
     fuelLevel: 100,
     vehicleImages: [],
-    damages: [],
-    registrationFrontUrl: '',
-    registrationBackUrl: '',
-    insuranceCardUrl: ''
+    damages: []
   });
 
   const handleMileageChange = (mileage: number) => {
@@ -116,10 +109,9 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
       </div>
 
       <Tabs defaultValue="damages" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="damages">Chocs & rayures</TabsTrigger>
           <TabsTrigger value="vehicle-details">Détails du véhicule & photos</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
         </TabsList>
 
         <TabsContent value="damages" className="space-y-6 mt-6">
@@ -142,21 +134,20 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             onImageUpdate={handleImageUpdate}
           />
         </TabsContent>
-
-        <TabsContent value="documents" className="space-y-6 mt-6">
-          <DocumentsTab
-            vehicleId={vehicle.id}
-            registrationFrontUrl={formData.registrationFrontUrl}
-            registrationBackUrl={formData.registrationBackUrl}
-            insuranceCardUrl={formData.insuranceCardUrl}
-            onRegistrationFrontUpload={handleRegistrationFrontUpload}
-            onRegistrationBackUpload={handleRegistrationBackUpload}
-            onInsuranceCardUpload={handleInsuranceCardUpload}
-            onSubmit={handleSubmit}
-            onCancel={onCancel}
-          />
-        </TabsContent>
       </Tabs>
+
+      <div className="flex justify-end space-x-3 pt-6 border-t">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Annuler
+        </Button>
+        <Button 
+          type="submit" 
+          className="btn-primary"
+          onClick={handleSubmit}
+        >
+          Confirmer le prêt
+        </Button>
+      </div>
     </div>
   );
 };

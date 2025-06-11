@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
@@ -11,6 +10,7 @@ import { useVinDecoder } from '@/hooks/use-vin-decoder';
 import FleetVehicleBasicInfo from './form/FleetVehicleBasicInfo';
 import FleetVehicleDetails from './form/FleetVehicleDetails';
 import FleetLoansHistoryTab from './form/FleetLoansHistoryTab';
+import DocumentsTab from './form/DocumentsTab';
 
 interface FleetVehicleFormProps {
   vehicle?: FleetVehicle | null;
@@ -39,6 +39,12 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
     handleBrandChange,
     handleModelChange
   } = useVinDecoder(formData, setFormData);
+
+  const [documentsData, setDocumentsData] = useState({
+    registrationFrontUrl: '',
+    registrationBackUrl: '',
+    insuranceCardUrl: ''
+  });
 
   const handleVinInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -99,11 +105,24 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
     }
   };
 
+  const handleRegistrationFrontUpload = (url: string) => {
+    setDocumentsData(prev => ({ ...prev, registrationFrontUrl: url }));
+  };
+
+  const handleRegistrationBackUpload = (url: string) => {
+    setDocumentsData(prev => ({ ...prev, registrationBackUrl: url }));
+  };
+
+  const handleInsuranceCardUpload = (url: string) => {
+    setDocumentsData(prev => ({ ...prev, insuranceCardUrl: url }));
+  };
+
   return (
     <div className="space-y-6">
       <Tabs defaultValue="vehicle-info" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="vehicle-info">Informations sur le véhicule</TabsTrigger>
+          <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="loans-history">Historique des prêts</TabsTrigger>
         </TabsList>
 
@@ -153,6 +172,21 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
               )}
             </div>
           </form>
+        </TabsContent>
+
+        <TabsContent value="documents" className="space-y-6 mt-6">
+          <DocumentsTab
+            vehicleId={vehicle?.id || 'new'}
+            registrationFrontUrl={documentsData.registrationFrontUrl}
+            registrationBackUrl={documentsData.registrationBackUrl}
+            insuranceCardUrl={documentsData.insuranceCardUrl}
+            onRegistrationFrontUpload={handleRegistrationFrontUpload}
+            onRegistrationBackUpload={handleRegistrationBackUpload}
+            onInsuranceCardUpload={handleInsuranceCardUpload}
+            onSubmit={handleSubmit}
+            onCancel={onCancel}
+            isViewMode={isViewMode}
+          />
         </TabsContent>
 
         <TabsContent value="loans-history" className="space-y-6 mt-6">

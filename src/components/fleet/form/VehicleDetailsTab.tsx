@@ -37,20 +37,8 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left column: Photos du véhicule */}
-        <div className="space-y-4">
-          <MultipleVehicleImages
-            vehicleId={vehicleId}
-            vehicleImages={vehicleImages}
-            isViewMode={isViewMode}
-            onImageAdd={onImageAdd}
-            onImageRemove={onImageRemove}
-            onImageUpdate={onImageUpdate}
-          />
-        </div>
-
-        {/* Right column: Kilométrage et carburant */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left column: Kilométrage et carburant - réduite */}
         <div className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="mileage">Kilométrage actuel *</Label>
@@ -76,6 +64,18 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
               />
             </div>
           </div>
+        </div>
+
+        {/* Right column: Photos du véhicule - élargie */}
+        <div className="lg:col-span-2 space-y-4">
+          <MultipleVehicleImages
+            vehicleId={vehicleId}
+            vehicleImages={vehicleImages}
+            isViewMode={isViewMode}
+            onImageAdd={onImageAdd}
+            onImageRemove={onImageRemove}
+            onImageUpdate={onImageUpdate}
+          />
         </div>
       </div>
     </div>
