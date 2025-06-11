@@ -60,7 +60,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
                 <div className="mt-2 space-y-1">
                   <div>{companyData?.name || 'KORPORATE'}</div>
                   <div>{companyData?.address || '25 COURS PIERRE PUGET'}</div>
-                  <div>{companyData?.zipCode} {companyData?.city || '13006 MARSEILLE'}</div>
+                  <div>{companyData?.zipcode} {companyData?.city || '13006 MARSEILLE'}</div>
                   <div>{companyData?.phone || '+33646465242'}</div>
                   <div>{companyData?.email || 'ggobeyn@outlook.fr'}</div>
                   <div>{companyData?.siren || '917 775 835'}</div>
@@ -136,7 +136,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
                     onCheckedChange={(checked) => onSignatureChange('attestationAccepted', checked)}
                     disabled={isViewMode}
                   />
-                  <Label htmlFor="attestationAccepted" className="text-sm leading-relaxed font-normal">
+                  <Label htmlFor="attestationAccepted" className="text-sm leading-relaxed">
                     Je certifie avoir pris connaissance de l'intégralité du document présent, et reconnais que ma signature apposée électroniquement sur la présente tablette vaut engagement ferme et personnel. Je confirme que cette signature constitue l'expression de mon consentement libre et éclairé, et engage ma pleine responsabilité juridique.
                   </Label>
                 </div>
