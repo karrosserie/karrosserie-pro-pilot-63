@@ -6,9 +6,7 @@ import { Card } from '@/components/ui/card';
 interface DamageItem {
   id: string;
   name: string;
-  rayure: number;
-  choc: number;
-  hs: number; // Hors service
+  type: 'none' | 'rayure' | 'choc' | 'hs'; // Changed to single selection
 }
 
 interface DamageAssessmentTabProps {
@@ -24,48 +22,50 @@ const DamageAssessmentTab: React.FC<DamageAssessmentTabProps> = ({
 }) => {
   const defaultDamages: DamageItem[] = [
     // Partie Avant
-    { id: 'capot', name: 'Capot', rayure: 0, choc: 0, hs: 0 },
-    { id: 'calandre', name: 'Calandre', rayure: 0, choc: 0, hs: 0 },
-    { id: 'phare', name: 'Phare', rayure: 0, choc: 0, hs: 0 },
-    { id: 'clignotants-av', name: 'Clignotants', rayure: 0, choc: 0, hs: 0 },
-    { id: 'pare-chocs-av', name: 'Pare Chocs', rayure: 0, choc: 0, hs: 0 },
-    { id: 'passages-roues-av', name: 'Passages De Roues', rayure: 0, choc: 0, hs: 0 },
-    { id: 'pare-brise', name: 'Pare Brise', rayure: 0, choc: 0, hs: 0 },
-    { id: 'pavillon', name: 'Pavillon', rayure: 0, choc: 0, hs: 0 },
+    { id: 'capot', name: 'Capot', type: 'none' },
+    { id: 'calandre', name: 'Calandre', type: 'none' },
+    { id: 'phare', name: 'Phare', type: 'none' },
+    { id: 'clignotants-av', name: 'Clignotants', type: 'none' },
+    { id: 'pare-chocs-av', name: 'Pare Chocs', type: 'none' },
+    { id: 'passages-roues-av', name: 'Passages De Roues', type: 'none' },
+    { id: 'pare-brise', name: 'Pare Brise', type: 'none' },
+    { id: 'pavillon', name: 'Pavillon', type: 'none' },
     
     // Partie Latérale Gauche
-    { id: 'aile-av-g', name: 'Aile Av', rayure: 0, choc: 0, hs: 0 },
-    { id: 'porte-av-g', name: 'Porte Av', rayure: 0, choc: 0, hs: 0 },
-    { id: 'porte-ar-g', name: 'Porte Ar', rayure: 0, choc: 0, hs: 0 },
-    { id: 'panneau-caisse-g', name: 'Panneau Caisse', rayure: 0, choc: 0, hs: 0 },
-    { id: 'aile-ar-g', name: 'Aile Ar', rayure: 0, choc: 0, hs: 0 },
-    { id: 'bas-caisse-g', name: 'Bas De Caisse', rayure: 0, choc: 0, hs: 0 },
-    { id: 'retroviseur-g', name: 'Retroviseur', rayure: 0, choc: 0, hs: 0 },
+    { id: 'aile-av-g', name: 'Aile Av', type: 'none' },
+    { id: 'porte-av-g', name: 'Porte Av', type: 'none' },
+    { id: 'porte-ar-g', name: 'Porte Ar', type: 'none' },
+    { id: 'panneau-caisse-g', name: 'Panneau Caisse', type: 'none' },
+    { id: 'aile-ar-g', name: 'Aile Ar', type: 'none' },
+    { id: 'bas-caisse-g', name: 'Bas De Caisse', type: 'none' },
+    { id: 'retroviseur-g', name: 'Retroviseur', type: 'none' },
     
     // Partie Arrière
-    { id: 'hayon', name: 'Hayon', rayure: 0, choc: 0, hs: 0 },
-    { id: 'feux-arriere', name: 'Feux arrière', rayure: 0, choc: 0, hs: 0 },
-    { id: 'clignotants-ar', name: 'Clignotants', rayure: 0, choc: 0, hs: 0 },
-    { id: 'pare-chocs-ar', name: 'Pare Chocs', rayure: 0, choc: 0, hs: 0 },
-    { id: 'passages-roues-ar', name: 'Passages De Roues', rayure: 0, choc: 0, hs: 0 },
-    { id: 'lunette-arriere', name: 'Lunette Arrière', rayure: 0, choc: 0, hs: 0 },
-    { id: 'pavillon-ar', name: 'Pavillon', rayure: 0, choc: 0, hs: 0 },
+    { id: 'hayon', name: 'Hayon', type: 'none' },
+    { id: 'feux-arriere', name: 'Feux arrière', type: 'none' },
+    { id: 'clignotants-ar', name: 'Clignotants', type: 'none' },
+    { id: 'pare-chocs-ar', name: 'Pare Chocs', type: 'none' },
+    { id: 'passages-roues-ar', name: 'Passages De Roues', type: 'none' },
+    { id: 'lunette-arriere', name: 'Lunette Arrière', type: 'none' },
+    { id: 'pavillon-ar', name: 'Pavillon', type: 'none' },
     
     // Partie Latérale Droite
-    { id: 'aile-av-d', name: 'Aile Av', rayure: 0, choc: 0, hs: 0 },
-    { id: 'porte-av-d', name: 'Porte Av', rayure: 0, choc: 0, hs: 0 },
-    { id: 'porte-ar-d', name: 'Porte Ar', rayure: 0, choc: 0, hs: 0 },
-    { id: 'panneau-caisse-d', name: 'Panneau Caisse', rayure: 0, choc: 0, hs: 0 },
-    { id: 'aile-ar-d', name: 'Aile Ar', rayure: 0, choc: 0, hs: 0 },
-    { id: 'bas-caisse-d', name: 'Bas De Caisse', rayure: 0, choc: 0, hs: 0 },
-    { id: 'retroviseur-d', name: 'Retroviseur', rayure: 0, choc: 0, hs: 0 }
+    { id: 'aile-av-d', name: 'Aile Av', type: 'none' },
+    { id: 'porte-av-d', name: 'Porte Av', type: 'none' },
+    { id: 'porte-ar-d', name: 'Porte Ar', type: 'none' },
+    { id: 'panneau-caisse-d', name: 'Panneau Caisse', type: 'none' },
+    { id: 'aile-ar-d', name: 'Aile Ar', type: 'none' },
+    { id: 'bas-caisse-d', name: 'Bas De Caisse', type: 'none' },
+    { id: 'retroviseur-d', name: 'Retroviseur', type: 'none' }
   ];
 
   const currentDamages = damages.length > 0 ? damages : defaultDamages;
 
-  const handleDamageChange = (itemId: string, type: 'rayure' | 'choc' | 'hs', value: number) => {
+  const handleDamageChange = (itemId: string, newType: 'rayure' | 'choc' | 'hs') => {
     const updatedDamages = currentDamages.map(item =>
-      item.id === itemId ? { ...item, [type]: value } : item
+      item.id === itemId 
+        ? { ...item, type: item.type === newType ? 'none' : newType } 
+        : item
     );
     onDamageUpdate(updatedDamages);
   };
@@ -80,31 +80,31 @@ const DamageAssessmentTab: React.FC<DamageAssessmentTabProps> = ({
             <div className="flex justify-center">
               <div 
                 className={`w-full h-10 rounded cursor-pointer border transition-colors ${
-                  item.rayure > 0 
+                  item.type === 'rayure'
                     ? 'bg-karrosserie-orange border-karrosserie-orange' 
                     : 'bg-gray-100 border-gray-200 hover:bg-gray-200'
                 } ${isViewMode ? 'cursor-default' : 'cursor-pointer'}`}
-                onClick={() => !isViewMode && handleDamageChange(item.id, 'rayure', item.rayure > 0 ? 0 : 1)}
+                onClick={() => !isViewMode && handleDamageChange(item.id, 'rayure')}
               />
             </div>
             <div className="flex justify-center">
               <div 
                 className={`w-full h-10 rounded cursor-pointer border transition-colors ${
-                  item.choc > 0 
+                  item.type === 'choc'
                     ? 'bg-karrosserie-orange border-karrosserie-orange' 
                     : 'bg-gray-100 border-gray-200 hover:bg-gray-200'
                 } ${isViewMode ? 'cursor-default' : 'cursor-pointer'}`}
-                onClick={() => !isViewMode && handleDamageChange(item.id, 'choc', item.choc > 0 ? 0 : 1)}
+                onClick={() => !isViewMode && handleDamageChange(item.id, 'choc')}
               />
             </div>
             <div className="flex justify-center">
               <div 
                 className={`w-full h-10 rounded cursor-pointer border transition-colors ${
-                  item.hs > 0 
+                  item.type === 'hs'
                     ? 'bg-karrosserie-orange border-karrosserie-orange' 
                     : 'bg-gray-100 border-gray-200 hover:bg-gray-200'
                 } ${isViewMode ? 'cursor-default' : 'cursor-pointer'}`}
-                onClick={() => !isViewMode && handleDamageChange(item.id, 'hs', item.hs > 0 ? 0 : 1)}
+                onClick={() => !isViewMode && handleDamageChange(item.id, 'hs')}
               />
             </div>
           </div>

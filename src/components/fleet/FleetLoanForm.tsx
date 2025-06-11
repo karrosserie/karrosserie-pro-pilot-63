@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
@@ -29,9 +28,7 @@ export interface LoanFormData {
 interface DamageItem {
   id: string;
   name: string;
-  rayure: number;
-  choc: number;
-  hs: number;
+  type: 'none' | 'rayure' | 'choc' | 'hs';
 }
 
 const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
