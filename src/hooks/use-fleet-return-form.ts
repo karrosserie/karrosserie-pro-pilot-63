@@ -1,6 +1,6 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useFleetReturns } from '@/hooks/use-fleet-returns';
+import { useFleetReservation } from '@/hooks/use-fleet-reservations';
 import { useAuth } from '@/contexts/AuthContext';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { FleetReturnFormData, ReturnDamageItem } from '@/components/fleet/FleetReturnForm.types';
@@ -12,6 +12,7 @@ export const useFleetReturnForm = (
 ) => {
   const [activeTab, setActiveTab] = useState('damages');
   const { createReturn } = useFleetReturns();
+  const { reservation } = useFleetReservation(reservationId);
   const { user } = useAuth();
   
   // Helper function to get current date/time for datetime-local input
@@ -39,6 +40,19 @@ export const useFleetReturnForm = (
     clientSignature: '',
     clientName: ''
   });
+
+  // Update form data when reservation data is loaded
+  useEffect(() => {
+    if (reservation) {
+      setFormData(prev => ({
+        ...prev,
+        clientId: reservation.client_id || '',
+        clientName: reservation.clients ? `${reservation.clients.first_name} ${reservation.clients.last_name}` : '',
+        damages: reservation.damages || [],
+        returnMileage: reservation.start_mileage || vehicle.mileage || 0
+      }));
+    }
+  }, [reservation, vehicle.mileage]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -131,6 +145,7 @@ export const useFleetReturnForm = (
     activeTab,
     setActiveTab,
     formData,
+    reservation, // Add reservation to the returned object
     createReturn,
     handleInputChange,
     handleClientSelect,

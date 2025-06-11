@@ -12,6 +12,7 @@ import { useClient } from '@/hooks/use-clients';
 interface ReturnAttestationTabProps {
   formData: Pick<FleetReturnFormData, 'clientId' | 'clientName' | 'returnDate' | 'attestationAccepted' | 'clientSignature'>;
   vehicle: any;
+  reservation?: any; // Add reservation prop
   clientData?: any;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onSignatureChange: (field: string, value: any) => void;
@@ -21,6 +22,7 @@ interface ReturnAttestationTabProps {
 const ReturnAttestationTab: React.FC<ReturnAttestationTabProps> = ({
   formData,
   vehicle,
+  reservation,
   clientData,
   onInputChange,
   onSignatureChange,
@@ -59,6 +61,27 @@ const ReturnAttestationTab: React.FC<ReturnAttestationTabProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Date et heure de retour field */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Date et heure de retour</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div>
+            <Label htmlFor="returnDate">Date et heure de retour</Label>
+            <Input
+              id="returnDate"
+              name="returnDate"
+              type="datetime-local"
+              value={formData.returnDate}
+              onChange={onInputChange}
+              disabled={isViewMode}
+              className="mt-2"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-center text-lg font-bold">
@@ -96,7 +119,7 @@ const ReturnAttestationTab: React.FC<ReturnAttestationTabProps> = ({
             </div>
           </div>
 
-          {/* Vehicle Information */}
+          {/* Vehicle Information and Loan Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-4">
               <div>
@@ -111,7 +134,16 @@ const ReturnAttestationTab: React.FC<ReturnAttestationTabProps> = ({
 
             <div className="space-y-4">
               <div>
-                <Label className="font-semibold">Retour:</Label>
+                <Label className="font-semibold">Informations du prêt initial:</Label>
+                <div className="mt-2 space-y-1">
+                  <div>Départ le : {reservation?.start_date ? formatDateTimeToFrench(reservation.start_date) : 'N/A'}</div>
+                  <div>Kilométrage départ : {reservation?.start_mileage || 'N/A'} Km</div>
+                  <div>Retour prévu le : {reservation?.expected_return_date ? formatDateTimeToFrench(reservation.expected_return_date) : 'N/A'}</div>
+                </div>
+              </div>
+              
+              <div>
+                <Label className="font-semibold">Retour effectif:</Label>
                 <div className="mt-2 space-y-1">
                   <div>Le : {formatDateTimeToFrench(formData.returnDate)}</div>
                 </div>

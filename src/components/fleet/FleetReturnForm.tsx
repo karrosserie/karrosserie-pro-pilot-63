@@ -26,6 +26,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
     activeTab,
     setActiveTab,
     formData,
+    reservation, // Get reservation from the hook
     createReturn,
     handleInputChange,
     handleClientSelect,
@@ -121,6 +122,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
               clientSignature: formData.clientSignature
             }}
             vehicle={vehicle}
+            reservation={reservation} // Pass reservation data
             onInputChange={handleInputChange}
             onSignatureChange={handleSignatureChange}
           />
