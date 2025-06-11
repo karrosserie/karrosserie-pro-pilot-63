@@ -1,4 +1,3 @@
-
 import React from 'react';
 import FleetVehicleDialog from '@/components/fleet/FleetVehicleDialog';
 import FleetVehiclesTable from '@/components/fleet/FleetVehiclesTable';
@@ -31,6 +30,10 @@ const FleetPageContent = () => {
     // Setters
     setSearchTerm,
     setIsVehicleSelectionOpen,
+    setSelectedLoanId,
+    setLoanDialogMode,
+    setVehicleToLend,
+    setIsLoanDialogOpen,
     
     // Handlers
     handleAddVehicle,
