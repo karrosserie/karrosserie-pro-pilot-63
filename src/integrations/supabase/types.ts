@@ -681,6 +681,95 @@ export type Database = {
           },
         ]
       }
+      fleet_returns: {
+        Row: {
+          attestation_accepted: boolean | null
+          client_id: string
+          client_name: string | null
+          client_signature: string | null
+          created_at: string | null
+          damages: Json | null
+          fleet_reservation_id: string
+          fleet_vehicle_id: string
+          fuel_level_return: number
+          id: string
+          notes: string | null
+          return_date: string
+          return_mileage: number
+          status: string
+          updated_at: string | null
+          user_id: string
+          vehicle_images: Json | null
+        }
+        Insert: {
+          attestation_accepted?: boolean | null
+          client_id: string
+          client_name?: string | null
+          client_signature?: string | null
+          created_at?: string | null
+          damages?: Json | null
+          fleet_reservation_id: string
+          fleet_vehicle_id: string
+          fuel_level_return?: number
+          id?: string
+          notes?: string | null
+          return_date?: string
+          return_mileage?: number
+          status?: string
+          updated_at?: string | null
+          user_id: string
+          vehicle_images?: Json | null
+        }
+        Update: {
+          attestation_accepted?: boolean | null
+          client_id?: string
+          client_name?: string | null
+          client_signature?: string | null
+          created_at?: string | null
+          damages?: Json | null
+          fleet_reservation_id?: string
+          fleet_vehicle_id?: string
+          fuel_level_return?: number
+          id?: string
+          notes?: string | null
+          return_date?: string
+          return_mileage?: number
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+          vehicle_images?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_returns_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_returns_fleet_reservation_id_fkey"
+            columns: ["fleet_reservation_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_reservations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_returns_fleet_vehicle_id_fkey"
+            columns: ["fleet_vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_returns_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fleet_vehicles: {
         Row: {
           brand: string
