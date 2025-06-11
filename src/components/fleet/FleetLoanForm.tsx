@@ -232,7 +232,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     }
 
     try {
-      // Prepare data for database
+      // Prepare data for database with proper JSON conversion
       const reservationData = {
         fleet_vehicle_id: formData.vehicleId,
         client_id: formData.clientId,
@@ -242,6 +242,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
         fuel_level_start: formData.fuelLevel,
         notes: formData.notes || '',
         status: 'active' as const,
+        user_id: user.id,
         // License information
         license_number: formData.licenseNumber,
         license_issue_date: formData.licenseIssueDate,
@@ -264,9 +265,9 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
         // Attestation
         attestation_accepted: formData.attestationAccepted,
         client_signature: formData.clientSignature,
-        // Additional data as JSON
-        vehicle_images: formData.vehicleImages,
-        damages: formData.damages
+        // Convert arrays to JSON format for database storage
+        vehicle_images: formData.vehicleImages as any,
+        damages: formData.damages as any
       };
 
       await createReservation.mutateAsync(reservationData);
