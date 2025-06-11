@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
@@ -49,6 +48,7 @@ const Fleet = () => {
   };
 
   const handleLendVehicle = (vehicle: FleetVehicle) => {
+    console.log('Lending vehicle:', vehicle);
     setVehicleToLend(vehicle);
     setSelectedLoanId(null);
     setLoanDialogMode('create');
@@ -168,6 +168,8 @@ const Fleet = () => {
         isOpen={isLoanDialogOpen}
         onClose={handleCloseLoanDialog}
         vehicle={vehicleToLend}
+        loanId={selectedLoanId}
+        mode={loanDialogMode}
         onSubmit={handleLoanSubmit}
       />
     </div>
