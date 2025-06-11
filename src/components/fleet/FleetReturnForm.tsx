@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useFleetReturnForm } from '@/hooks/use-fleet-return-form';
 import FleetReturnFormNavigation from './form/FleetReturnFormNavigation';
@@ -26,7 +28,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
     activeTab,
     setActiveTab,
     formData,
-    reservation, // Get reservation from the hook
+    reservation,
     createReturn,
     handleInputChange,
     handleClientSelect,
@@ -82,6 +84,19 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
         </h3>
       </div>
 
+      {/* Date et heure de retour field - outside tabs */}
+      <div>
+        <Label htmlFor="returnDate">Date et heure de retour</Label>
+        <Input
+          id="returnDate"
+          name="returnDate"
+          type="datetime-local"
+          value={formData.returnDate}
+          onChange={handleInputChange}
+          className="mt-2"
+        />
+      </div>
+
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
           {tabs.map(tab => (
@@ -122,7 +137,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
               clientSignature: formData.clientSignature
             }}
             vehicle={vehicle}
-            reservation={reservation} // Pass reservation data
+            reservation={reservation}
             onInputChange={handleInputChange}
             onSignatureChange={handleSignatureChange}
           />

@@ -12,7 +12,7 @@ import { useClient } from '@/hooks/use-clients';
 interface ReturnAttestationTabProps {
   formData: Pick<FleetReturnFormData, 'clientId' | 'clientName' | 'returnDate' | 'attestationAccepted' | 'clientSignature'>;
   vehicle: any;
-  reservation?: any; // Add reservation prop
+  reservation?: any;
   clientData?: any;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onSignatureChange: (field: string, value: any) => void;
@@ -61,20 +61,6 @@ const ReturnAttestationTab: React.FC<ReturnAttestationTabProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Date et heure de retour field - without Card wrapper */}
-      <div>
-        <Label htmlFor="returnDate">Date et heure de retour</Label>
-        <Input
-          id="returnDate"
-          name="returnDate"
-          type="datetime-local"
-          value={formData.returnDate}
-          onChange={onInputChange}
-          disabled={isViewMode}
-          className="mt-2"
-        />
-      </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-center text-lg font-bold">
