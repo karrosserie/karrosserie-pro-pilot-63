@@ -12,6 +12,7 @@ interface FleetVehiclesTableProps {
   onAddVehicle: () => void;
   onViewVehicle: (vehicle: FleetVehicle) => void;
   onEditVehicle: (vehicle: FleetVehicle) => void;
+  onLendVehicle: (vehicle: FleetVehicle) => void;
 }
 
 const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
@@ -21,7 +22,8 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
   onSearchTermChange,
   onAddVehicle,
   onViewVehicle,
-  onEditVehicle
+  onEditVehicle,
+  onLendVehicle
 }) => {
   const filteredVehicles = vehicles?.filter(vehicle =>
     vehicle.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -40,7 +42,7 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
             <input 
               type="text" 
               placeholder="Rechercher..." 
-              className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-karrosserie-orange"
+              className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-karrosserie-orange"
               value={searchTerm}
               onChange={(e) => onSearchTermChange(e.target.value)}
             />
@@ -61,23 +63,23 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
               <tr>
-                <th className="px-4 py-3 rounded-tl-lg">Véhicule</th>
-                <th className="px-4 py-3">Immatriculation</th>
-                <th className="px-4 py-3">Année</th>
-                <th className="px-4 py-3">Statut</th>
-                <th className="px-4 py-3 rounded-tr-lg">Actions</th>
+                <th scope="col" className="px-6 py-3">Véhicule</th>
+                <th scope="col" className="px-6 py-3">Immatriculation</th>
+                <th scope="col" className="px-6 py-3">Année</th>
+                <th scope="col" className="px-6 py-3">Statut</th>
+                <th scope="col" className="px-6 py-3">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredVehicles.length > 0 ? (
                 filteredVehicles.map((vehicle) => (
-                  <tr key={vehicle.id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium">{vehicle.brand} {vehicle.model}</td>
-                    <td className="px-4 py-3 text-gray-600">{vehicle.license_plate}</td>
-                    <td className="px-4 py-3 text-gray-600">{vehicle.year || '-'}</td>
-                    <td className="px-4 py-3">
+                  <tr key={vehicle.id} className="bg-white border-b hover:bg-gray-50">
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{vehicle.brand} {vehicle.model}</td>
+                    <td className="px-6 py-4">{vehicle.license_plate}</td>
+                    <td className="px-6 py-4">{vehicle.year || '-'}</td>
+                    <td className="px-6 py-4">
                       <span 
                         className={`text-xs font-medium px-2.5 py-0.5 rounded ${
                           vehicle.status === 'Disponible' 
@@ -92,20 +94,14 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
                         {vehicle.status || 'Disponible'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 space-x-2">
+                    <td className="px-6 py-4 space-x-2">
                       <Button 
                         variant="outline" 
                         size="sm"
                         disabled={vehicle.status === 'Loué'}
+                        onClick={() => onLendVehicle(vehicle)}
                       >
                         Prêter
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => onViewVehicle(vehicle)}
-                      >
-                        Détails
                       </Button>
                       <Button 
                         variant="ghost" 
@@ -119,7 +115,7 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
                     {searchTerm ? 'Aucun véhicule trouvé' : 'Aucun véhicule de courtoisie'}
                   </td>
                 </tr>

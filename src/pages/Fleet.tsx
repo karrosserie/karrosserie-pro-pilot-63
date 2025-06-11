@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import FleetVehicleDialog from '@/components/fleet/FleetVehicleDialog';
@@ -6,7 +5,10 @@ import FleetVehiclesTable from '@/components/fleet/FleetVehiclesTable';
 import FleetLoansHistory from '@/components/fleet/FleetLoansHistory';
 import FleetCurrentLoans from '@/components/fleet/FleetCurrentLoans';
 import FleetViolations from '@/components/fleet/FleetViolations';
+import FleetLoanDialog from '@/components/fleet/FleetLoanDialog';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
+import { LoanFormData } from '@/components/fleet/FleetLoanForm';
+import { useToast } from '@/hooks/use-toast';
 
 // Données mockées pour les prêts en cours
 const currentLoans = [
@@ -32,6 +34,9 @@ const Fleet = () => {
   const [selectedVehicle, setSelectedVehicle] = useState<FleetVehicle | null>(null);
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isLoanDialogOpen, setIsLoanDialogOpen] = useState(false);
+  const [vehicleToLend, setVehicleToLend] = useState<FleetVehicle | null>(null);
+  const { toast } = useToast();
 
   const handleAddVehicle = () => {
     setSelectedVehicle(null);
@@ -54,6 +59,25 @@ const Fleet = () => {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setSelectedVehicle(null);
+  };
+
+  const handleLendVehicle = (vehicle: FleetVehicle) => {
+    setVehicleToLend(vehicle);
+    setIsLoanDialogOpen(true);
+  };
+
+  const handleLoanSubmit = (loanData: LoanFormData) => {
+    console.log('Loan data:', loanData);
+    toast({
+      title: "Prêt enregistré",
+      description: `Le véhicule ${vehicleToLend?.brand} ${vehicleToLend?.model} a été prêté à ${loanData.clientName}.`
+    });
+    // TODO: Implement loan creation in database
+  };
+
+  const handleCloseLoanDialog = () => {
+    setIsLoanDialogOpen(false);
+    setVehicleToLend(null);
   };
 
   if (error) {
@@ -83,6 +107,7 @@ const Fleet = () => {
             onAddVehicle={handleAddVehicle}
             onViewVehicle={handleViewVehicle}
             onEditVehicle={handleEditVehicle}
+            onLendVehicle={handleLendVehicle}
           />
           
           <FleetLoansHistory />
@@ -99,6 +124,13 @@ const Fleet = () => {
         onClose={handleCloseDialog}
         vehicle={selectedVehicle}
         mode={dialogMode}
+      />
+
+      <FleetLoanDialog
+        isOpen={isLoanDialogOpen}
+        onClose={handleCloseLoanDialog}
+        vehicle={vehicleToLend}
+        onSubmit={handleLoanSubmit}
       />
     </div>
   );
