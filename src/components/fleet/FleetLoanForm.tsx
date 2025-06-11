@@ -159,9 +159,16 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
   };
 
   const isFormValid = () => {
+    // Validation des dates
+    const isDateValid = () => {
+      if (!formData.startDate || !formData.expectedReturnDate) return false;
+      return new Date(formData.expectedReturnDate) > new Date(formData.startDate);
+    };
+
     const basicValid = formData.clientId && 
                       formData.startDate && 
                       formData.expectedReturnDate &&
+                      isDateValid() &&
                       formData.driverLicenseFrontUrl &&
                       formData.driverLicenseBackUrl &&
                       formData.licenseNumber &&
@@ -170,7 +177,9 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
                       formData.holderInfo &&
                       formData.dateOfBirth &&
                       formData.placeOfBirth &&
-                      formData.attestationAccepted;
+                      formData.attestationAccepted &&
+                      formData.clientSignature && 
+                      formData.clientSignature.trim() !== '';
 
     const insuranceValid = !formData.clientInsurance || (
       formData.insuranceCompanyName &&
@@ -321,3 +330,5 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
 };
 
 export default FleetLoanForm;
+
+}

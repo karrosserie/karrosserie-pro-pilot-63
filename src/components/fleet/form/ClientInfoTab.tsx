@@ -31,6 +31,12 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
     label: `${client.firstName} ${client.lastName}`
   }));
 
+  // Validation des dates
+  const validateEndDate = (endDate: string, startDate: string) => {
+    if (!endDate || !startDate) return true;
+    return new Date(endDate) > new Date(startDate);
+  };
+
   return (
     <div className="space-y-6">
       {/* Client, Start Date, and End Date on the same line */}
@@ -76,7 +82,11 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
             onChange={onInputChange}
             required
             disabled={isViewMode}
+            className={!validateEndDate(formData.expectedReturnDate, formData.startDate) ? 'border-red-500' : ''}
           />
+          {!validateEndDate(formData.expectedReturnDate, formData.startDate) && formData.expectedReturnDate && formData.startDate && (
+            <p className="text-sm text-red-500">La date de fin doit être supérieure à la date de début</p>
+          )}
         </div>
       </div>
 

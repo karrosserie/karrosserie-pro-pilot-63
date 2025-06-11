@@ -6,6 +6,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import SignaturePad from '@/components/shared/SignaturePad';
 import { LoanFormData } from '../FleetLoanForm';
+import { useCompany } from '@/hooks/use-company';
+import { useClient } from '@/hooks/use-clients';
 
 interface AttestationTabProps {
   formData: LoanFormData;
@@ -24,6 +26,16 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
   onSignatureChange,
   isViewMode = false
 }) => {
+  const { companyData } = useCompany();
+  const { client } = useClient(formData.clientId);
+
+  // Automatically fill client name when client is selected
+  React.useEffect(() => {
+    if (client && (!formData.clientName || formData.clientName.trim() === '')) {
+      onSignatureChange('clientName', `${client.firstName} ${client.lastName}`);
+    }
+  }, [client, formData.clientName, onSignatureChange]);
+
   return (
     <div className="space-y-6">
       <Card>
@@ -39,11 +51,11 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
               <div>
                 <Label className="font-semibold">De :</Label>
                 <div className="mt-2 space-y-1">
-                  <div>KORPORATE</div>
-                  <div>25 COURS PIERRE PUGET 13006 MARSEILLE</div>
-                  <div>+33646465242</div>
-                  <div>ggobeyn@outlook.fr</div>
-                  <div>917 775 835</div>
+                  <div>{companyData?.name || 'KORPORATE'}</div>
+                  <div>{companyData?.address || '25 COURS PIERRE PUGET 13006 MARSEILLE'}</div>
+                  <div>{companyData?.phone || '+33646465242'}</div>
+                  <div>{companyData?.email || 'ggobeyn@outlook.fr'}</div>
+                  <div>{companyData?.siren || '917 775 835'}</div>
                 </div>
               </div>
             </div>
@@ -52,11 +64,11 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
               <div>
                 <Label className="font-semibold">Au Client:</Label>
                 <div className="mt-2 space-y-1">
-                  <div>{formData.holderInfo || 'Nom du client'}</div>
-                  <div>{formData.insurancePhone || 'Téléphone'}</div>
-                  <div>{formData.insuranceEmail || 'Email'}</div>
-                  <div>{formData.insuranceAddress || 'Adresse'}</div>
-                  <div>{formData.insuranceCity} {formData.insurancePostalCode}</div>
+                  <div>{client ? `${client.firstName} ${client.lastName}` : 'Nom du client'}</div>
+                  <div>{client?.phone || 'Téléphone'}</div>
+                  <div>{client?.email || 'Email'}</div>
+                  <div>{client?.address || 'Adresse'}</div>
+                  <div>{client?.city} {client?.zipCode}</div>
                   <div>N° :</div>
                 </div>
               </div>
@@ -104,7 +116,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
                   <Input
                     id="clientName"
                     name="clientName"
-                    value={formData.holderInfo || ''}
+                    value={formData.clientName || (client ? `${client.firstName} ${client.lastName}` : '')}
                     onChange={onInputChange}
                     disabled={isViewMode}
                     className="mt-2"
@@ -118,13 +130,20 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
                     onCheckedChange={(checked) => onSignatureChange('attestationAccepted', checked)}
                     disabled={isViewMode}
                   />
-                  <Label htmlFor="attestationAccepted" className="text-sm leading-relaxed">
+                  <Label htmlFor="attestationAccepted" className="text-sm leading-relaxed font-normal">
                     Je certifie avoir pris connaissance de l'intégralité du document présent, et reconnais que ma signature apposée électroniquement sur la présente tablette vaut engagement ferme et personnel. Je confirme que cette signature constitue l'expression de mon consentement libre et éclairé, et engage ma pleine responsabilité juridique.
                   </Label>
                 </div>
               </div>
 
               <div className="space-y-4">
+                {/* Electronic Signature */}
+                <SignaturePad
+                  value={formData.clientSignature || ''}
+                  onSignatureChange={(signature) => onSignatureChange('clientSignature', signature)}
+                  disabled={isViewMode}
+                />
+
                 <div className="text-right space-y-2">
                   <div className="text-sm text-muted-foreground">
                     La signature électronique a la même valeur légale qu'une signature manuscrite.
@@ -136,13 +155,6 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
                     Toute modification du présent document nécessitera une nouvelle signature du client
                   </div>
                 </div>
-
-                {/* Electronic Signature */}
-                <SignaturePad
-                  value={formData.clientSignature || ''}
-                  onSignatureChange={(signature) => onSignatureChange('clientSignature', signature)}
-                  disabled={isViewMode}
-                />
               </div>
             </div>
           </div>
