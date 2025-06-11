@@ -63,10 +63,10 @@ const FleetPageContent = () => {
         <p className="text-gray-600">Gérez vos véhicules de courtoisie et les prêts clients.</p>
       </div>
 
-      {/* Two column layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left column */}
-        <div className="space-y-6">
+      {/* Two column layout with asymmetric columns */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left column - wider (2/3) */}
+        <div className="lg:col-span-2 space-y-6">
           <FleetVehiclesTable
             vehicles={vehicles}
             isLoading={isLoading}
@@ -84,7 +84,7 @@ const FleetPageContent = () => {
           />
         </div>
 
-        {/* Right column */}
+        {/* Right column - narrower (1/3) */}
         <div className="space-y-6">
           <FleetCurrentLoans
             currentLoans={currentLoans}
