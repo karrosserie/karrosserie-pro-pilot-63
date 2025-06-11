@@ -122,7 +122,6 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
                 <Label className="font-semibold">Retour:</Label>
                 <div className="mt-2 space-y-1">
                   <div>Le : {formatDateTimeToFrench(formData.expectedReturnDate)}</div>
-                  <div>Kilométrage : - - - Km</div>
                 </div>
               </div>
             </div>

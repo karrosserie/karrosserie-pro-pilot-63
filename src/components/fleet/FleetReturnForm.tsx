@@ -77,7 +77,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-medium text-gray-900">
-          Retour du véhicule: {vehicle.brand} {vehicle.model} ({vehicle.license_plate})
+          {vehicle.brand} {vehicle.model} ({vehicle.license_plate})
         </h3>
       </div>
 
