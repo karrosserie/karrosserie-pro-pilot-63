@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,8 +6,11 @@ import { LoanFormData, DamageItem } from '@/components/fleet/FleetLoanForm';
 
 export const useFleetLoanForm = (vehicle: FleetVehicle, onSubmit: (loanData: LoanFormData) => void, defaultValues?: any) => {
   const [activeTab, setActiveTab] = useState('client-info');
-  const { createReservation } = useFleetReservations();
+  const { createReservation, updateReservation } = useFleetReservations();
   const { user } = useAuth();
+  
+  // Determine if we're editing an existing reservation
+  const isEditing = Boolean(defaultValues?.id);
   
   const [formData, setFormData] = useState<LoanFormData>({
     vehicleId: vehicle.id,
@@ -169,10 +171,20 @@ export const useFleetLoanForm = (vehicle: FleetVehicle, onSubmit: (loanData: Loa
         damages: formData.damages as any
       };
 
-      await createReservation.mutateAsync(reservationData);
+      if (isEditing && defaultValues?.id) {
+        // Update existing reservation
+        await updateReservation.mutateAsync({
+          id: defaultValues.id,
+          data: reservationData
+        });
+      } else {
+        // Create new reservation
+        await createReservation.mutateAsync(reservationData);
+      }
+      
       onSubmit(formData);
     } catch (error) {
-      console.error('Error creating reservation:', error);
+      console.error('Error saving reservation:', error);
     }
   };
 
@@ -180,7 +192,7 @@ export const useFleetLoanForm = (vehicle: FleetVehicle, onSubmit: (loanData: Loa
     activeTab,
     setActiveTab,
     formData,
-    createReservation,
+    createReservation: isEditing ? updateReservation : createReservation,
     handleInputChange,
     handleClientSelect,
     handleMileageChange,
