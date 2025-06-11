@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
 import FleetVehicleDialog from '@/components/fleet/FleetVehicleDialog';
@@ -26,6 +25,21 @@ const Fleet = () => {
   const [selectedLoanId, setSelectedLoanId] = useState<string | null>(null);
   const [isVehicleSelectionOpen, setIsVehicleSelectionOpen] = useState(false);
   const { toast } = useToast();
+
+  // Update vehicle statuses based on active loans
+  const vehiclesWithUpdatedStatus = useMemo(() => {
+    if (!vehicles || !reservations) return vehicles || [];
+    
+    const activeReservations = reservations.filter(r => r.status === 'active');
+    
+    return vehicles.map(vehicle => {
+      const hasActiveLoan = activeReservations.some(r => r.fleet_vehicle_id === vehicle.id);
+      return {
+        ...vehicle,
+        status: hasActiveLoan ? 'En prêt' : (vehicle.status || 'Disponible')
+      };
+    });
+  }, [vehicles, reservations]);
 
   const handleAddVehicle = () => {
     setSelectedVehicle(null);
@@ -74,7 +88,7 @@ const Fleet = () => {
 
   // Handlers for loan actions
   const handleViewLoanDetails = (loanId: string) => {
-    console.log('Opening loan details for:', loanId);
+    console.log('Opening loan details for modification:', loanId);
     setSelectedLoanId(loanId);
     setVehicleToLend(null);
     setLoanDialogMode('edit');
@@ -104,7 +118,7 @@ const Fleet = () => {
   };
 
   const handleViewLoan = (loanId: string) => {
-    console.log('Viewing loan:', loanId);
+    console.log('Viewing loan in read-only mode:', loanId);
     setSelectedLoanId(loanId);
     setVehicleToLend(null);
     setLoanDialogMode('view');
@@ -142,7 +156,7 @@ const Fleet = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <FleetVehiclesTable
-            vehicles={vehicles || []}
+            vehicles={vehiclesWithUpdatedStatus}
             isLoading={isLoading}
             searchTerm={searchTerm}
             onSearchTermChange={setSearchTerm}
