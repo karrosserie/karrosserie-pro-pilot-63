@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Car, Calendar, User } from 'lucide-react';
@@ -88,8 +87,7 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
       
       <div className="mt-6">
         <Button 
-          className="w-full" 
-          variant="outline"
+          className="w-full bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
           onClick={handleNewLoan}
         >
           <Calendar className="h-4 w-4 mr-2" />

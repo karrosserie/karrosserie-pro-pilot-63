@@ -96,7 +96,7 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
                     </td>
                     <td className="px-6 py-4 space-x-2">
                       <Button 
-                        variant="outline" 
+                        className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
                         size="sm"
                         disabled={vehicle.status === 'Loué'}
                         onClick={() => onLendVehicle(vehicle)}

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
@@ -21,6 +20,8 @@ const Fleet = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoanDialogOpen, setIsLoanDialogOpen] = useState(false);
   const [vehicleToLend, setVehicleToLend] = useState<FleetVehicle | null>(null);
+  const [loanDialogMode, setLoanDialogMode] = useState<'create' | 'edit' | 'view' | 'return'>('create');
+  const [selectedLoanId, setSelectedLoanId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleAddVehicle = () => {
@@ -48,6 +49,7 @@ const Fleet = () => {
 
   const handleLendVehicle = (vehicle: FleetVehicle) => {
     setVehicleToLend(vehicle);
+    setLoanDialogMode('create');
     setIsLoanDialogOpen(true);
   };
 
@@ -62,43 +64,35 @@ const Fleet = () => {
   const handleCloseLoanDialog = () => {
     setIsLoanDialogOpen(false);
     setVehicleToLend(null);
+    setSelectedLoanId(null);
   };
 
   // Handlers for loan actions
   const handleViewLoanDetails = (loanId: string) => {
     console.log('Opening loan details for:', loanId);
-    // TODO: Implement loan details dialog
-    toast({
-      title: "Détails du prêt",
-      description: `Ouverture des détails pour le prêt ${loanId}`
-    });
+    setSelectedLoanId(loanId);
+    setLoanDialogMode('edit');
+    setIsLoanDialogOpen(true);
   };
 
   const handleReturnVehicle = (loanId: string) => {
     console.log('Processing vehicle return for:', loanId);
-    // TODO: Implement vehicle return process
-    toast({
-      title: "Retour de véhicule",
-      description: `Traitement du retour pour le prêt ${loanId}`
-    });
+    setSelectedLoanId(loanId);
+    setLoanDialogMode('return');
+    setIsLoanDialogOpen(true);
   };
 
   const handleNewLoan = () => {
     console.log('Creating new loan');
-    // TODO: Open new loan creation dialog
-    toast({
-      title: "Nouveau prêt",
-      description: "Ouverture du formulaire de nouveau prêt"
-    });
+    setLoanDialogMode('create');
+    setIsLoanDialogOpen(true);
   };
 
   const handleViewLoan = (loanId: string) => {
     console.log('Viewing loan:', loanId);
-    // TODO: Implement loan view dialog
-    toast({
-      title: "Consultation du prêt",
-      description: `Consultation du prêt ${loanId}`
-    });
+    setSelectedLoanId(loanId);
+    setLoanDialogMode('view');
+    setIsLoanDialogOpen(true);
   };
 
   // Convert reservations to current loans format
