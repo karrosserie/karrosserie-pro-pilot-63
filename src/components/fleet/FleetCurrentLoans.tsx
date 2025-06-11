@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Car, Calendar, User, Trash2 } from 'lucide-react';
+import { Car, Calendar, User, Trash } from 'lucide-react';
 
 interface CurrentLoan {
   id: string;
@@ -74,7 +74,7 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
                 onClick={() => onDeleteLoan?.(loan.id)}
                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash className="h-4 w-4" />
               </Button>
             </div>
           </div>
