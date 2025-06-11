@@ -20,7 +20,7 @@ const DamageAssessmentTab: React.FC<DamageAssessmentTabProps> = ({
   onDamageUpdate,
   isViewMode = false
 }) => {
-  const defaultDamages: DamageItem[] = [
+  const defaultDamages = [
     // Partie Avant
     { id: 'capot', name: 'Capot', type: 'none' },
     { id: 'calandre', name: 'Calandre', type: 'none' },
@@ -57,7 +57,7 @@ const DamageAssessmentTab: React.FC<DamageAssessmentTabProps> = ({
     { id: 'aile-ar-d', name: 'Aile Ar', type: 'none' },
     { id: 'bas-caisse-d', name: 'Bas De Caisse', type: 'none' },
     { id: 'retroviseur-d', name: 'Retroviseur', type: 'none' }
-  ];
+  ] as const satisfies readonly DamageItem[];
 
   const currentDamages = damages.length > 0 ? damages : defaultDamages;
 
