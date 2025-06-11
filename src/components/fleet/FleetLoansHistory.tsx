@@ -5,9 +5,10 @@ import { useFleetReservations } from '@/hooks/use-fleet-reservations';
 
 interface FleetLoansHistoryProps {
   onViewLoan?: (loanId: string) => void;
+  onViewReturn?: (loanId: string) => void;
 }
 
-const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ onViewLoan }) => {
+const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ onViewLoan, onViewReturn }) => {
   const { reservations, isLoading } = useFleetReservations();
 
   // Filter for completed/past reservations
@@ -62,13 +63,22 @@ const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ onViewLoan }) => 
                     }
                   </td>
                   <td className="px-4 py-3">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => onViewLoan?.(reservation.id)}
-                    >
-                      Voir
-                    </Button>
+                    <div className="flex space-x-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => onViewLoan?.(reservation.id)}
+                      >
+                        Sortie
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => onViewReturn?.(reservation.id)}
+                      >
+                        Retour
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))

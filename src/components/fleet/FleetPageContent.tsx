@@ -48,6 +48,15 @@ const FleetPageContent = () => {
     handleDeleteLoan
   } = useFleetPage();
 
+  // Handler for viewing return form in read-only mode
+  const handleViewReturn = (loanId: string) => {
+    console.log('Opening return form in read-only mode for loan:', loanId);
+    setSelectedLoanId(loanId);
+    setVehicleToLend(null);
+    setLoanDialogMode('view'); // This will show the return form in read-only mode
+    setIsLoanDialogOpen(true);
+  };
+
   if (error) {
     return (
       <div className="page-container">
@@ -78,7 +87,10 @@ const FleetPageContent = () => {
             onLendVehicle={handleLendVehicle}
           />
           
-          <FleetLoansHistory onViewLoan={handleViewLoan} />
+          <FleetLoansHistory 
+            onViewLoan={handleViewLoan} 
+            onViewReturn={handleViewReturn}
+          />
         </div>
         
         <div className="space-y-6">
