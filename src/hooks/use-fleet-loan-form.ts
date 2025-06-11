@@ -62,24 +62,42 @@ export const useFleetLoanForm = (vehicle: FleetVehicle, onSubmit: (loanData: Loa
   };
 
   const handleImageAdd = (url: string) => {
-    setFormData(prev => ({
-      ...prev,
-      vehicleImages: [...prev.vehicleImages, url]
-    }));
+    console.log('useFleetLoanForm - Adding image:', url);
+    console.log('Current vehicleImages:', formData.vehicleImages);
+    
+    setFormData(prev => {
+      const newImages = [...prev.vehicleImages, url];
+      console.log('New vehicleImages after add:', newImages);
+      return {
+        ...prev,
+        vehicleImages: newImages
+      };
+    });
   };
 
   const handleImageRemove = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      vehicleImages: prev.vehicleImages.filter((_, i) => i !== index)
-    }));
+    console.log('useFleetLoanForm - Removing image at index:', index);
+    setFormData(prev => {
+      const newImages = prev.vehicleImages.filter((_, i) => i !== index);
+      console.log('New vehicleImages after remove:', newImages);
+      return {
+        ...prev,
+        vehicleImages: newImages
+      };
+    });
   };
 
   const handleImageUpdate = (index: number, url: string) => {
-    setFormData(prev => ({
-      ...prev,
-      vehicleImages: prev.vehicleImages.map((img, i) => i === index ? url : img)
-    }));
+    console.log('useFleetLoanForm - Updating image at index:', index, 'with url:', url);
+    setFormData(prev => {
+      const newImages = [...prev.vehicleImages];
+      newImages[index] = url;
+      console.log('New vehicleImages after update:', newImages);
+      return {
+        ...prev,
+        vehicleImages: newImages
+      };
+    });
   };
 
   const handleDamageUpdate = (damages: DamageItem[]) => {

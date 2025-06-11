@@ -35,6 +35,25 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
     onMileageChange(value);
   };
 
+  const handleImageAdd = (url: string) => {
+    console.log('VehicleDetailsTab - Adding image:', url);
+    console.log('Current images before add:', vehicleImages);
+    onImageAdd(url);
+  };
+
+  const handleImageRemove = (index: number) => {
+    console.log('VehicleDetailsTab - Removing image at index:', index);
+    onImageRemove(index);
+  };
+
+  const handleImageUpdate = (index: number, url: string) => {
+    console.log('VehicleDetailsTab - Updating image at index:', index, 'with url:', url);
+    onImageUpdate(index, url);
+  };
+
+  // S'assurer qu'il y a au moins un slot vide pour ajouter une image
+  const displayImages = vehicleImages.length === 0 ? [''] : vehicleImages;
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
@@ -70,11 +89,11 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
         <div className="lg:col-span-4 space-y-4">
           <MultipleVehicleImages
             vehicleId={vehicleId}
-            vehicleImages={vehicleImages}
+            vehicleImages={displayImages}
             isViewMode={isViewMode}
-            onImageAdd={onImageAdd}
-            onImageRemove={onImageRemove}
-            onImageUpdate={onImageUpdate}
+            onImageAdd={handleImageAdd}
+            onImageRemove={handleImageRemove}
+            onImageUpdate={handleImageUpdate}
           />
         </div>
       </div>
