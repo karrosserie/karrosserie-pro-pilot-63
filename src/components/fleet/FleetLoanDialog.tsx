@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import FleetLoanForm, { LoanFormData } from './FleetLoanForm';
+import FleetReturnForm from './FleetReturnForm';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useFleetReservation } from '@/hooks/use-fleet-reservations';
 
@@ -99,46 +100,13 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
             defaultValues={reservation}
             isViewMode={true}
           />
-        ) : mode === 'return' && reservation ? (
-          <div className="p-4">
-            <h3 className="text-lg font-medium mb-4">Formulaire de retour de véhicule</h3>
-            <p className="text-gray-600 mb-4">Prêt: {reservation.id}</p>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">État du véhicule au retour</label>
-                <textarea 
-                  className="w-full p-2 border rounded-md"
-                  placeholder="Décrivez l'état du véhicule..."
-                  rows={3}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Kilométrage de retour</label>
-                <input 
-                  type="number" 
-                  className="w-full p-2 border rounded-md"
-                  placeholder="Kilométrage..."
-                />
-              </div>
-              <div className="flex justify-end space-x-2">
-                <button 
-                  onClick={onClose}
-                  className="px-4 py-2 border rounded-md hover:bg-gray-50"
-                >
-                  Annuler
-                </button>
-                <button 
-                  onClick={() => {
-                    console.log('Retour validé pour le prêt:', loanId);
-                    onClose();
-                  }}
-                  className="px-4 py-2 bg-karrosserie-orange text-white rounded-md hover:bg-karrosserie-orange/90"
-                >
-                  Valider le retour
-                </button>
-              </div>
-            </div>
-          </div>
+        ) : mode === 'return' && reservation && reservation.fleet_vehicles ? (
+          <FleetReturnForm
+            vehicle={createCompleteVehicle(reservation.fleet_vehicles)}
+            onSubmit={handleSubmit}
+            onCancel={onClose}
+            defaultValues={reservation}
+          />
         ) : (
           <div className="p-4">
             <p className="text-gray-600">Chargement des données...</p>
