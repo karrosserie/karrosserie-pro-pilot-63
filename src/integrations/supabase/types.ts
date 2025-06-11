@@ -547,43 +547,112 @@ export type Database = {
       }
       fleet_reservations: {
         Row: {
-          client_id: string | null
+          actual_return_date: string | null
+          attestation_accepted: boolean | null
+          client_id: string
+          client_insurance: boolean | null
+          client_signature: string | null
           created_at: string | null
-          end_date: string
+          damages: Json | null
+          date_of_birth: string | null
+          driver_license_back_url: string | null
+          driver_license_front_url: string | null
+          end_mileage: number | null
+          expected_return_date: string
           fleet_vehicle_id: string
+          fuel_level_end: number | null
+          fuel_level_start: number
+          holder_info: string | null
           id: string
+          insurance_address: string | null
+          insurance_city: string | null
+          insurance_company_name: string | null
+          insurance_contract_number: string | null
+          insurance_email: string | null
+          insurance_phone: string | null
+          insurance_postal_code: string | null
+          license_issue_date: string | null
+          license_number: string | null
           notes: string | null
-          repair_order_id: string | null
+          place_of_birth: string | null
+          prefecture: string | null
           start_date: string
-          status: string | null
+          start_mileage: number
+          status: string
           updated_at: string | null
-          user_id: string
+          vehicle_images: Json | null
         }
         Insert: {
-          client_id?: string | null
+          actual_return_date?: string | null
+          attestation_accepted?: boolean | null
+          client_id: string
+          client_insurance?: boolean | null
+          client_signature?: string | null
           created_at?: string | null
-          end_date: string
+          damages?: Json | null
+          date_of_birth?: string | null
+          driver_license_back_url?: string | null
+          driver_license_front_url?: string | null
+          end_mileage?: number | null
+          expected_return_date: string
           fleet_vehicle_id: string
+          fuel_level_end?: number | null
+          fuel_level_start?: number
+          holder_info?: string | null
           id?: string
+          insurance_address?: string | null
+          insurance_city?: string | null
+          insurance_company_name?: string | null
+          insurance_contract_number?: string | null
+          insurance_email?: string | null
+          insurance_phone?: string | null
+          insurance_postal_code?: string | null
+          license_issue_date?: string | null
+          license_number?: string | null
           notes?: string | null
-          repair_order_id?: string | null
+          place_of_birth?: string | null
+          prefecture?: string | null
           start_date: string
-          status?: string | null
+          start_mileage?: number
+          status?: string
           updated_at?: string | null
-          user_id: string
+          vehicle_images?: Json | null
         }
         Update: {
-          client_id?: string | null
+          actual_return_date?: string | null
+          attestation_accepted?: boolean | null
+          client_id?: string
+          client_insurance?: boolean | null
+          client_signature?: string | null
           created_at?: string | null
-          end_date?: string
+          damages?: Json | null
+          date_of_birth?: string | null
+          driver_license_back_url?: string | null
+          driver_license_front_url?: string | null
+          end_mileage?: number | null
+          expected_return_date?: string
           fleet_vehicle_id?: string
+          fuel_level_end?: number | null
+          fuel_level_start?: number
+          holder_info?: string | null
           id?: string
+          insurance_address?: string | null
+          insurance_city?: string | null
+          insurance_company_name?: string | null
+          insurance_contract_number?: string | null
+          insurance_email?: string | null
+          insurance_phone?: string | null
+          insurance_postal_code?: string | null
+          license_issue_date?: string | null
+          license_number?: string | null
           notes?: string | null
-          repair_order_id?: string | null
+          place_of_birth?: string | null
+          prefecture?: string | null
           start_date?: string
-          status?: string | null
+          start_mileage?: number
+          status?: string
           updated_at?: string | null
-          user_id?: string
+          vehicle_images?: Json | null
         }
         Relationships: [
           {
@@ -594,10 +663,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fleet_reservations_repair_order_id_fkey"
-            columns: ["repair_order_id"]
+            foreignKeyName: "fleet_reservations_fleet_vehicle_id_fkey"
+            columns: ["fleet_vehicle_id"]
             isOneToOne: false
-            referencedRelation: "repair_orders"
+            referencedRelation: "fleet_vehicles"
             referencedColumns: ["id"]
           },
         ]
