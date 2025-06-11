@@ -10,7 +10,7 @@ import { useCompany } from '@/hooks/use-company';
 import { useClient } from '@/hooks/use-clients';
 
 interface ReturnAttestationTabProps {
-  formData: Pick<FleetReturnFormData, 'clientId' | 'clientName' | 'returnDate' | 'attestationAccepted' | 'clientSignature'>;
+  formData: Pick<FleetReturnFormData, 'clientId' | 'clientName' | 'returnDate' | 'returnMileage' | 'attestationAccepted' | 'clientSignature'>;
   vehicle: any;
   reservation?: any;
   clientData?: any;
