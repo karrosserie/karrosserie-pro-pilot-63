@@ -50,7 +50,7 @@ const QuoteDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={!isSubmitting ? onOpenChange : undefined}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {quote ? `Modifier le devis - ${quote.reference}` : "Créer un nouveau devis"}

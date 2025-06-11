@@ -114,75 +114,71 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="mb-4 flex-shrink-0">
+    <div className="space-y-6">
+      <div>
         <h3 className="text-lg font-medium text-gray-900">
           Prêt du véhicule: {vehicle.brand} {vehicle.model} ({vehicle.license_plate})
         </h3>
       </div>
 
-      <div className="flex-1 flex flex-col min-h-0">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-          <TabsList className="grid w-full grid-cols-5 flex-shrink-0">
-            {tabs.map(tab => (
-              <TabsTrigger key={tab.value} value={tab.value}>
-                {tab.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5">
+          {tabs.map(tab => (
+            <TabsTrigger key={tab.value} value={tab.value}>
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-          <div className="flex-1 min-h-0">
-            <TabsContent value="client-info" className="h-full overflow-y-auto space-y-6 mt-6">
-              <ClientInfoTab
-                formData={formData}
-                onInputChange={handleInputChange}
-                onClientSelect={handleClientSelect}
-                onDriverLicenseFrontUpload={handleDriverLicenseFrontUpload}
-                onDriverLicenseBackUpload={handleDriverLicenseBackUpload}
-              />
-            </TabsContent>
+        <TabsContent value="client-info" className="space-y-6">
+          <ClientInfoTab
+            formData={formData}
+            onInputChange={handleInputChange}
+            onClientSelect={handleClientSelect}
+            onDriverLicenseFrontUpload={handleDriverLicenseFrontUpload}
+            onDriverLicenseBackUpload={handleDriverLicenseBackUpload}
+          />
+        </TabsContent>
 
-            <TabsContent value="insurance" className="h-full overflow-y-auto space-y-6 mt-6">
-              <InsuranceTab
-                formData={formData}
-                onInputChange={handleInputChange}
-                onSwitchChange={handleInsuranceSwitchChange}
-                onPhoneChange={handleInsurancePhoneChange}
-              />
-            </TabsContent>
+        <TabsContent value="insurance" className="space-y-6">
+          <InsuranceTab
+            formData={formData}
+            onInputChange={handleInputChange}
+            onSwitchChange={handleInsuranceSwitchChange}
+            onPhoneChange={handleInsurancePhoneChange}
+          />
+        </TabsContent>
 
-            <TabsContent value="damages" className="h-full overflow-y-auto space-y-6 mt-6">
-              <DamageAssessmentTab
-                damages={formData.damages}
-                onDamageUpdate={handleDamageUpdate}
-              />
-            </TabsContent>
+        <TabsContent value="damages" className="space-y-6">
+          <DamageAssessmentTab
+            damages={formData.damages}
+            onDamageUpdate={handleDamageUpdate}
+          />
+        </TabsContent>
 
-            <TabsContent value="vehicle-details" className="h-full overflow-y-auto space-y-6 mt-6">
-              <VehicleDetailsTab
-                vehicleId={vehicle.id}
-                mileage={formData.mileage}
-                fuelLevel={formData.fuelLevel}
-                vehicleImages={formData.vehicleImages}
-                onMileageChange={handleMileageChange}
-                onFuelLevelChange={handleFuelLevelChange}
-                onImageAdd={handleImageAdd}
-                onImageRemove={handleImageRemove}
-                onImageUpdate={handleImageUpdate}
-              />
-            </TabsContent>
+        <TabsContent value="vehicle-details" className="space-y-6">
+          <VehicleDetailsTab
+            vehicleId={vehicle.id}
+            mileage={formData.mileage}
+            fuelLevel={formData.fuelLevel}
+            vehicleImages={formData.vehicleImages}
+            onMileageChange={handleMileageChange}
+            onFuelLevelChange={handleFuelLevelChange}
+            onImageAdd={handleImageAdd}
+            onImageRemove={handleImageRemove}
+            onImageUpdate={handleImageUpdate}
+          />
+        </TabsContent>
 
-            <TabsContent value="attestation" className="h-full overflow-y-auto space-y-6 mt-6">
-              <AttestationTab
-                formData={formData}
-                vehicle={vehicle}
-                onInputChange={handleInputChange}
-                onSignatureChange={handleSignatureChange}
-              />
-            </TabsContent>
-          </div>
-        </Tabs>
-      </div>
+        <TabsContent value="attestation" className="space-y-6">
+          <AttestationTab
+            formData={formData}
+            vehicle={vehicle}
+            onInputChange={handleInputChange}
+            onSignatureChange={handleSignatureChange}
+          />
+        </TabsContent>
+      </Tabs>
 
       <FleetLoanFormNavigation
         activeTab={activeTab}
