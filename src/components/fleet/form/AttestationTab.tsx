@@ -48,7 +48,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
       <Card>
         <CardHeader>
           <CardTitle className="text-center text-lg font-bold">
-            Attestation de Prêt de Véhicule
+            Attestation de prêt de véhicule
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -58,12 +58,12 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
               <div>
                 <Label className="font-semibold">De :</Label>
                 <div className="mt-2 space-y-1">
-                  <div>{companyData?.name || 'KORPORATE'}</div>
-                  <div>{companyData?.address || '25 COURS PIERRE PUGET'}</div>
-                  <div>{companyData?.zipcode} {companyData?.city || '13006 MARSEILLE'}</div>
-                  <div>{companyData?.phone || '+33646465242'}</div>
-                  <div>{companyData?.email || 'ggobeyn@outlook.fr'}</div>
-                  <div>{companyData?.siren || '917 775 835'}</div>
+                  <div>{companyData?.name}</div>
+                  <div>{companyData?.address}</div>
+                  <div>{companyData?.zipcode} {companyData?.city}</div>
+                  <div>{companyData?.phone}</div>
+                  <div>{companyData?.email}</div>
+                  <div>{companyData?.siren}</div>
                 </div>
               </div>
             </div>
@@ -87,9 +87,9 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
               <div>
                 <Label className="font-semibold">Désignation du véhicule d'emprunt:</Label>
                 <div className="mt-2 space-y-1">
-                  <div>Marque : {vehicle?.brand || 'AUDI'}</div>
-                  <div>Model : {vehicle?.model || 'Q2'}</div>
-                  <div>N° Immatriculation : {vehicle?.license_plate || 'AC-426-FB'}</div>
+                  <div>Marque : {vehicle?.brand}</div>
+                  <div>Model : {vehicle?.model}</div>
+                  <div>N° Immatriculation : {vehicle?.license_plate}</div>
                 </div>
               </div>
             </div>
@@ -136,7 +136,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
                     onCheckedChange={(checked) => onSignatureChange('attestationAccepted', checked)}
                     disabled={isViewMode}
                   />
-                  <Label htmlFor="attestationAccepted" className="text-sm leading-relaxed">
+                  <Label htmlFor="attestationAccepted" className="text-sm">
                     Je certifie avoir pris connaissance de l'intégralité du document présent, et reconnais que ma signature apposée électroniquement sur la présente tablette vaut engagement ferme et personnel. Je confirme que cette signature constitue l'expression de mon consentement libre et éclairé, et engage ma pleine responsabilité juridique.
                   </Label>
                 </div>
@@ -153,11 +153,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
                 <div className="text-right space-y-2">
                   <div className="text-sm text-muted-foreground">
                     La signature électronique a la même valeur légale qu'une signature manuscrite.
-                  </div>
-                  <div className="text-sm text-muted-foreground">
                     Exigence issue du Règlement eIDAS et du Code civil français, art. 1366-1367).
-                  </div>
-                  <div className="text-sm text-muted-foreground">
                     Toute modification du présent document nécessitera une nouvelle signature du client
                   </div>
                 </div>
