@@ -7,7 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ScrollArea } from '@/components/ui/scroll-area';
 import VehicleForm from './VehicleForm';
 
 interface VehicleDialogProps {
@@ -40,21 +39,17 @@ const VehicleDialog: React.FC<VehicleDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
-        <DialogHeader className="flex-shrink-0">
+      <DialogContent className="max-w-4xl">
+        <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
-        <div className="flex-1 overflow-hidden min-h-0">
-          <ScrollArea className="h-full pr-4">
-            <VehicleForm 
-              onSubmit={handleSubmit}
-              defaultValues={defaultValues}
-              isViewMode={mode === 'view'}
-              onCancel={handleCancel}
-            />
-          </ScrollArea>
-        </div>
+        <VehicleForm 
+          onSubmit={handleSubmit}
+          defaultValues={defaultValues}
+          isViewMode={mode === 'view'}
+          onCancel={handleCancel}
+        />
       </DialogContent>
     </Dialog>
   );

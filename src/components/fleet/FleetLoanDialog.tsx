@@ -35,7 +35,7 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
         <DialogHeader className="flex-shrink-0">
           <DialogTitle>Nouveau prêt de véhicule</DialogTitle>
         </DialogHeader>
-        <div className="flex-1 overflow-hidden min-h-0">
+        <div className="flex-1 overflow-hidden">
           <FleetLoanForm
             vehicle={vehicle}
             onSubmit={handleSubmit}
