@@ -29,6 +29,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
   const { user } = useAuth();
   const { toast } = useToast();
   const isViewMode = mode === 'view';
+  const [activeTab, setActiveTab] = useState('vehicle-info');
 
   const { formData, setFormData, handleInputChange, handleSelectChange } = useFleetVehicleForm(vehicle);
   
@@ -89,6 +90,12 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
     return basicInfoValid && documentsValid;
   };
 
+  const handleNext = () => {
+    if (activeTab === 'vehicle-info') {
+      setActiveTab('documents');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -141,7 +148,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
   return (
     <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Tabs defaultValue="vehicle-info" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="vehicle-info">Informations sur le véhicule</TabsTrigger>
             <TabsTrigger value="documents">Documents</TabsTrigger>
@@ -194,16 +201,29 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
             {isViewMode ? "Fermer" : "Annuler"}
           </Button>
           {!isViewMode && (
-            <Button 
-              type="submit" 
-              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-              disabled={createVehicle.isPending || updateVehicle.isPending || !isFormValid()}
-            >
-              {createVehicle.isPending || updateVehicle.isPending 
-                ? "Enregistrement..." 
-                : (mode === 'edit' ? "Mettre à jour" : "Enregistrer")
-              }
-            </Button>
+            <>
+              {activeTab === 'vehicle-info' && (
+                <Button 
+                  type="button" 
+                  className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+                  onClick={handleNext}
+                >
+                  Suivant
+                </Button>
+              )}
+              {activeTab === 'documents' && (
+                <Button 
+                  type="submit" 
+                  className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+                  disabled={createVehicle.isPending || updateVehicle.isPending || !isFormValid()}
+                >
+                  {createVehicle.isPending || updateVehicle.isPending 
+                    ? "Enregistrement..." 
+                    : (mode === 'edit' ? "Mettre à jour" : "Enregistrer")
+                  }
+                </Button>
+              )}
+            </>
           )}
         </div>
       </form>

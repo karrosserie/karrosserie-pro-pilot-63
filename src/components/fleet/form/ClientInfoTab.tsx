@@ -33,9 +33,12 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Client, Start Date, and End Date on the same line */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="client" className="text-destructive">Client *</Label>
+          <Label htmlFor="client">
+            Client <span className="text-destructive">*</span>
+          </Label>
           <SearchableSelect
             options={clientOptions}
             value={formData.clientId}
@@ -47,7 +50,9 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="startDate" className="text-destructive">Date de début *</Label>
+          <Label htmlFor="startDate">
+            Date de début <span className="text-destructive">*</span>
+          </Label>
           <Input
             id="startDate"
             name="startDate"
@@ -60,7 +65,9 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="expectedReturnDate" className="text-destructive">Date de fin *</Label>
+          <Label htmlFor="expectedReturnDate">
+            Date de fin <span className="text-destructive">*</span>
+          </Label>
           <Input
             id="expectedReturnDate"
             name="expectedReturnDate"
@@ -73,9 +80,12 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
         </div>
       </div>
 
+      {/* Driver's License Documents */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label className="text-destructive">Permis de conduire (Recto) *</Label>
+          <Label>
+            Permis de conduire (Recto) <span className="text-destructive">*</span>
+          </Label>
           <DocumentUploader
             documentType="license"
             documentId={`${formData.clientId || 'new'}-front`}
@@ -86,13 +96,105 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label className="text-destructive">Permis de conduire (Verso) *</Label>
+          <Label>
+            Permis de conduire (Verso) <span className="text-destructive">*</span>
+          </Label>
           <DocumentUploader
             documentType="license"
             documentId={`${formData.clientId || 'new'}-back`}
             currentDocumentUrl={formData.driverLicenseBackUrl}
             onUploadComplete={onDriverLicenseBackUpload}
             isViewMode={isViewMode}
+          />
+        </div>
+      </div>
+
+      {/* License Details */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <Label htmlFor="licenseNumber">
+            Numéro de permis <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="licenseNumber"
+            name="licenseNumber"
+            value={formData.licenseNumber || ''}
+            onChange={onInputChange}
+            disabled={isViewMode}
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="licenseIssueDate">
+            Date de délivrance <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="licenseIssueDate"
+            name="licenseIssueDate"
+            type="date"
+            value={formData.licenseIssueDate || ''}
+            onChange={onInputChange}
+            disabled={isViewMode}
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="prefecture">
+            Préfecture (N° Département) <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="prefecture"
+            name="prefecture"
+            value={formData.prefecture || ''}
+            onChange={onInputChange}
+            disabled={isViewMode}
+            placeholder="Ex: 75, 33, 69..."
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="holderInfo">
+            Information Titulaire <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="holderInfo"
+            name="holderInfo"
+            value={formData.holderInfo || ''}
+            onChange={onInputChange}
+            disabled={isViewMode}
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="dateOfBirth">
+            Date de naissance <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="dateOfBirth"
+            name="dateOfBirth"
+            type="date"
+            value={formData.dateOfBirth || ''}
+            onChange={onInputChange}
+            disabled={isViewMode}
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="placeOfBirth">
+            Lieu de naissance <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="placeOfBirth"
+            name="placeOfBirth"
+            value={formData.placeOfBirth || ''}
+            onChange={onInputChange}
+            disabled={isViewMode}
+            required
           />
         </div>
       </div>

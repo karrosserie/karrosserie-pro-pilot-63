@@ -6,6 +6,7 @@ import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import DamageAssessmentTab from './form/DamageAssessmentTab';
 import VehicleDetailsTab from './form/VehicleDetailsTab';
 import ClientInfoTab from './form/ClientInfoTab';
+import InsuranceTab from './form/InsuranceTab';
 
 interface FleetLoanFormProps {
   vehicle: FleetVehicle;
@@ -28,6 +29,22 @@ export interface LoanFormData {
   damages: DamageItem[];
   driverLicenseFrontUrl: string;
   driverLicenseBackUrl: string;
+  // New license fields
+  licenseNumber?: string;
+  licenseIssueDate?: string;
+  prefecture?: string;
+  holderInfo?: string;
+  dateOfBirth?: string;
+  placeOfBirth?: string;
+  // Insurance fields
+  clientInsurance?: boolean;
+  insuranceCompanyName?: string;
+  insurancePhone?: string;
+  insuranceEmail?: string;
+  insuranceContractNumber?: string;
+  insuranceAddress?: string;
+  insuranceCity?: string;
+  insurancePostalCode?: string;
 }
 
 interface DamageItem {
@@ -55,7 +72,22 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     vehicleImages: [],
     damages: [],
     driverLicenseFrontUrl: '',
-    driverLicenseBackUrl: ''
+    driverLicenseBackUrl: '',
+    // New fields
+    licenseNumber: '',
+    licenseIssueDate: '',
+    prefecture: '',
+    holderInfo: '',
+    dateOfBirth: '',
+    placeOfBirth: '',
+    clientInsurance: false,
+    insuranceCompanyName: '',
+    insurancePhone: '',
+    insuranceEmail: '',
+    insuranceContractNumber: '',
+    insuranceAddress: '',
+    insuranceCity: '',
+    insurancePostalCode: ''
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,12 +140,38 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     setFormData(prev => ({ ...prev, driverLicenseBackUrl: url }));
   };
 
+  const handleInsuranceSwitchChange = (checked: boolean) => {
+    setFormData(prev => ({ ...prev, clientInsurance: checked }));
+  };
+
+  const handleInsurancePhoneChange = (value: string | undefined) => {
+    setFormData(prev => ({ ...prev, insurancePhone: value || '' }));
+  };
+
   const isFormValid = () => {
-    return formData.clientId && 
-           formData.startDate && 
-           formData.expectedReturnDate &&
-           formData.driverLicenseFrontUrl &&
-           formData.driverLicenseBackUrl;
+    const basicValid = formData.clientId && 
+                      formData.startDate && 
+                      formData.expectedReturnDate &&
+                      formData.driverLicenseFrontUrl &&
+                      formData.driverLicenseBackUrl &&
+                      formData.licenseNumber &&
+                      formData.licenseIssueDate &&
+                      formData.prefecture &&
+                      formData.holderInfo &&
+                      formData.dateOfBirth &&
+                      formData.placeOfBirth;
+
+    const insuranceValid = !formData.clientInsurance || (
+      formData.insuranceCompanyName &&
+      formData.insurancePhone &&
+      formData.insuranceEmail &&
+      formData.insuranceContractNumber &&
+      formData.insuranceAddress &&
+      formData.insuranceCity &&
+      formData.insurancePostalCode
+    );
+
+    return basicValid && insuranceValid;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -133,8 +191,9 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
       </div>
 
       <Tabs defaultValue="client-info" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="client-info">Informations sur le client</TabsTrigger>
+          <TabsTrigger value="insurance">Assurance</TabsTrigger>
           <TabsTrigger value="damages">Chocs & rayures</TabsTrigger>
           <TabsTrigger value="vehicle-details">Détails du véhicule & photos</TabsTrigger>
         </TabsList>
@@ -146,6 +205,15 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             onClientSelect={handleClientSelect}
             onDriverLicenseFrontUpload={handleDriverLicenseFrontUpload}
             onDriverLicenseBackUpload={handleDriverLicenseBackUpload}
+          />
+        </TabsContent>
+
+        <TabsContent value="insurance" className="space-y-6 mt-6">
+          <InsuranceTab
+            formData={formData}
+            onInputChange={handleInputChange}
+            onSwitchChange={handleInsuranceSwitchChange}
+            onPhoneChange={handleInsurancePhoneChange}
           />
         </TabsContent>
 

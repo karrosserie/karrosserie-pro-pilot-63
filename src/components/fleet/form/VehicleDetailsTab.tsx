@@ -37,8 +37,8 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Left column: Kilométrage et carburant - encore plus réduite */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        {/* Left column: Kilométrage et carburant - encore plus compacte */}
         <div className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="mileage">Kilométrage actuel *</Label>
@@ -67,7 +67,7 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
         </div>
 
         {/* Right column: Photos du véhicule - encore plus élargie */}
-        <div className="lg:col-span-3 space-y-4">
+        <div className="lg:col-span-4 space-y-4">
           <MultipleVehicleImages
             vehicleId={vehicleId}
             vehicleImages={vehicleImages}
