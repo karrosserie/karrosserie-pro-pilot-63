@@ -37,16 +37,18 @@ const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>{getTitle()}</DialogTitle>
         </DialogHeader>
-        <FleetVehicleForm
-          vehicle={vehicle}
-          mode={mode}
-          onSuccess={onClose}
-          onCancel={onClose}
-        />
+        <div className="flex-1 overflow-hidden min-h-0">
+          <FleetVehicleForm
+            vehicle={vehicle}
+            mode={mode}
+            onSuccess={onClose}
+            onCancel={onClose}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

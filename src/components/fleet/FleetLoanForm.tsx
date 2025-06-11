@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useFleetLoanForm } from '@/hooks/use-fleet-loan-form';
 import { useFleetLoanFormValidation } from './form/FleetLoanFormValidation';
@@ -131,54 +131,74 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             ))}
           </TabsList>
 
-          <div className="flex-1 min-h-0">
-            <TabsContent value="client-info" className="h-full overflow-y-auto space-y-6 mt-6">
-              <ClientInfoTab
-                formData={formData}
-                onInputChange={handleInputChange}
-                onClientSelect={handleClientSelect}
-                onDriverLicenseFrontUpload={handleDriverLicenseFrontUpload}
-                onDriverLicenseBackUpload={handleDriverLicenseBackUpload}
-              />
+          <div className="flex-1 min-h-0 mt-6">
+            <TabsContent value="client-info" className="h-full m-0">
+              <ScrollArea className="h-full pr-4">
+                <div className="space-y-6">
+                  <ClientInfoTab
+                    formData={formData}
+                    onInputChange={handleInputChange}
+                    onClientSelect={handleClientSelect}
+                    onDriverLicenseFrontUpload={handleDriverLicenseFrontUpload}
+                    onDriverLicenseBackUpload={handleDriverLicenseBackUpload}
+                  />
+                </div>
+              </ScrollArea>
             </TabsContent>
 
-            <TabsContent value="insurance" className="h-full overflow-y-auto space-y-6 mt-6">
-              <InsuranceTab
-                formData={formData}
-                onInputChange={handleInputChange}
-                onSwitchChange={handleInsuranceSwitchChange}
-                onPhoneChange={handleInsurancePhoneChange}
-              />
+            <TabsContent value="insurance" className="h-full m-0">
+              <ScrollArea className="h-full pr-4">
+                <div className="space-y-6">
+                  <InsuranceTab
+                    formData={formData}
+                    onInputChange={handleInputChange}
+                    onSwitchChange={handleInsuranceSwitchChange}
+                    onPhoneChange={handleInsurancePhoneChange}
+                  />
+                </div>
+              </ScrollArea>
             </TabsContent>
 
-            <TabsContent value="damages" className="h-full overflow-y-auto space-y-6 mt-6">
-              <DamageAssessmentTab
-                damages={formData.damages}
-                onDamageUpdate={handleDamageUpdate}
-              />
+            <TabsContent value="damages" className="h-full m-0">
+              <ScrollArea className="h-full pr-4">
+                <div className="space-y-6">
+                  <DamageAssessmentTab
+                    damages={formData.damages}
+                    onDamageUpdate={handleDamageUpdate}
+                  />
+                </div>
+              </ScrollArea>
             </TabsContent>
 
-            <TabsContent value="vehicle-details" className="h-full overflow-y-auto space-y-6 mt-6">
-              <VehicleDetailsTab
-                vehicleId={vehicle.id}
-                mileage={formData.mileage}
-                fuelLevel={formData.fuelLevel}
-                vehicleImages={formData.vehicleImages}
-                onMileageChange={handleMileageChange}
-                onFuelLevelChange={handleFuelLevelChange}
-                onImageAdd={handleImageAdd}
-                onImageRemove={handleImageRemove}
-                onImageUpdate={handleImageUpdate}
-              />
+            <TabsContent value="vehicle-details" className="h-full m-0">
+              <ScrollArea className="h-full pr-4">
+                <div className="space-y-6">
+                  <VehicleDetailsTab
+                    vehicleId={vehicle.id}
+                    mileage={formData.mileage}
+                    fuelLevel={formData.fuelLevel}
+                    vehicleImages={formData.vehicleImages}
+                    onMileageChange={handleMileageChange}
+                    onFuelLevelChange={handleFuelLevelChange}
+                    onImageAdd={handleImageAdd}
+                    onImageRemove={handleImageRemove}
+                    onImageUpdate={handleImageUpdate}
+                  />
+                </div>
+              </ScrollArea>
             </TabsContent>
 
-            <TabsContent value="attestation" className="h-full overflow-y-auto space-y-6 mt-6">
-              <AttestationTab
-                formData={formData}
-                vehicle={vehicle}
-                onInputChange={handleInputChange}
-                onSignatureChange={handleSignatureChange}
-              />
+            <TabsContent value="attestation" className="h-full m-0">
+              <ScrollArea className="h-full pr-4">
+                <div className="space-y-6">
+                  <AttestationTab
+                    formData={formData}
+                    vehicle={vehicle}
+                    onInputChange={handleInputChange}
+                    onSignatureChange={handleSignatureChange}
+                  />
+                </div>
+              </ScrollArea>
             </TabsContent>
           </div>
         </Tabs>
