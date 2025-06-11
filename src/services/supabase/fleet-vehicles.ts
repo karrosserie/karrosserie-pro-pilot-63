@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -7,6 +6,9 @@ export type FleetVehicle = Database['public']['Tables']['fleet_vehicles']['Row']
   engine_number?: string;
   color?: string;
   mileage?: number;
+  registration_front_url?: string;
+  registration_back_url?: string;
+  insurance_card_url?: string;
 };
 
 export type NewFleetVehicle = Database['public']['Tables']['fleet_vehicles']['Insert'] & {
@@ -14,6 +16,9 @@ export type NewFleetVehicle = Database['public']['Tables']['fleet_vehicles']['In
   engine_number?: string;
   color?: string;
   mileage?: number;
+  registration_front_url?: string;
+  registration_back_url?: string;
+  insurance_card_url?: string;
 };
 
 export type UpdateFleetVehicle = Database['public']['Tables']['fleet_vehicles']['Update'] & {
@@ -21,6 +26,9 @@ export type UpdateFleetVehicle = Database['public']['Tables']['fleet_vehicles'][
   engine_number?: string;
   color?: string;
   mileage?: number;
+  registration_front_url?: string;
+  registration_back_url?: string;
+  insurance_card_url?: string;
 };
 
 export const fleetVehiclesService = {
