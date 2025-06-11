@@ -29,11 +29,14 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
   const { companyData } = useCompany();
   const { client } = useClient(formData.clientId);
 
-  // Format date to French format
-  const formatDateToFrench = (dateString: string) => {
+  // Format date and time to French format
+  const formatDateTimeToFrench = (dateString: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR');
+    return date.toLocaleDateString('fr-FR') + ' à ' + date.toLocaleTimeString('fr-FR', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
   };
 
   // Automatically fill client name when client is selected
@@ -110,7 +113,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
               <div>
                 <Label className="font-semibold">Départ:</Label>
                 <div className="mt-2 space-y-1">
-                  <div>Le : {formatDateToFrench(formData.startDate)}</div>
+                  <div>Le : {formatDateTimeToFrench(formData.startDate)}</div>
                   <div>Kilométrage : {formData.mileage} Km</div>
                 </div>
               </div>
@@ -118,7 +121,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
               <div>
                 <Label className="font-semibold">Retour:</Label>
                 <div className="mt-2 space-y-1">
-                  <div>Le : {formatDateToFrench(formData.expectedReturnDate)}</div>
+                  <div>Le : {formatDateTimeToFrench(formData.expectedReturnDate)}</div>
                   <div>Kilométrage : - - - Km</div>
                 </div>
               </div>
