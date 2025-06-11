@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
+import DamageAssessmentTab from './form/DamageAssessmentTab';
+import VehicleDetailsTab from './form/VehicleDetailsTab';
+import ClientInfoTab from './form/ClientInfoTab';
 
 interface FleetLoanFormProps {
   vehicle: FleetVehicle;
@@ -20,6 +20,18 @@ export interface LoanFormData {
   startDate: string;
   expectedReturnDate: string;
   notes?: string;
+  mileage: number;
+  fuelLevel: number;
+  vehicleImages: string[];
+  damages: DamageItem[];
+}
+
+interface DamageItem {
+  id: string;
+  name: string;
+  rayure: number;
+  choc: number;
+  hs: number;
 }
 
 const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
@@ -34,7 +46,11 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     clientEmail: '',
     startDate: new Date().toISOString().split('T')[0],
     expectedReturnDate: '',
-    notes: ''
+    notes: '',
+    mileage: vehicle.mileage || 0,
+    fuelLevel: 100,
+    vehicleImages: [],
+    damages: []
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -45,104 +61,90 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     }));
   };
 
+  const handleMileageChange = (mileage: number) => {
+    setFormData(prev => ({ ...prev, mileage }));
+  };
+
+  const handleFuelLevelChange = (fuelLevel: number) => {
+    setFormData(prev => ({ ...prev, fuelLevel }));
+  };
+
+  const handleImageAdd = (url: string) => {
+    setFormData(prev => ({
+      ...prev,
+      vehicleImages: [...prev.vehicleImages, url]
+    }));
+  };
+
+  const handleImageRemove = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      vehicleImages: prev.vehicleImages.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleImageUpdate = (index: number, url: string) => {
+    setFormData(prev => ({
+      ...prev,
+      vehicleImages: prev.vehicleImages.map((img, i) => i === index ? url : img)
+    }));
+  };
+
+  const handleDamageUpdate = (damages: DamageItem[]) => {
+    setFormData(prev => ({ ...prev, damages }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="md:col-span-2">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Prêt du véhicule: {vehicle.brand} {vehicle.model} ({vehicle.license_plate})
-          </h3>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="clientName">Nom du client *</Label>
-          <Input
-            id="clientName"
-            name="clientName"
-            type="text"
-            value={formData.clientName}
-            onChange={handleInputChange}
-            placeholder="Nom complet du client"
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="clientPhone">Téléphone *</Label>
-          <Input
-            id="clientPhone"
-            name="clientPhone"
-            type="tel"
-            value={formData.clientPhone}
-            onChange={handleInputChange}
-            placeholder="06 12 34 56 78"
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="clientEmail">Email</Label>
-          <Input
-            id="clientEmail"
-            name="clientEmail"
-            type="email"
-            value={formData.clientEmail}
-            onChange={handleInputChange}
-            placeholder="client@example.com"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="startDate">Date de début *</Label>
-          <Input
-            id="startDate"
-            name="startDate"
-            type="date"
-            value={formData.startDate}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="expectedReturnDate">Date de retour prévue *</Label>
-          <Input
-            id="expectedReturnDate"
-            name="expectedReturnDate"
-            type="date"
-            value={formData.expectedReturnDate}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-
-        <div className="md:col-span-2 space-y-2">
-          <Label htmlFor="notes">Notes</Label>
-          <Textarea
-            id="notes"
-            name="notes"
-            value={formData.notes}
-            onChange={handleInputChange}
-            placeholder="Informations complémentaires..."
-            rows={3}
-          />
-        </div>
+    <div className="space-y-6">
+      <div className="mb-4">
+        <h3 className="text-lg font-medium text-gray-900">
+          Prêt du véhicule: {vehicle.brand} {vehicle.model} ({vehicle.license_plate})
+        </h3>
       </div>
 
-      <div className="flex justify-end space-x-3 pt-6 border-t">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Annuler
-        </Button>
-        <Button type="submit" className="btn-primary">
-          Confirmer le prêt
-        </Button>
-      </div>
-    </form>
+      <Tabs defaultValue="damages" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="damages">Chocs & rayures</TabsTrigger>
+          <TabsTrigger value="vehicle-details">Détails du véhicule & photos</TabsTrigger>
+          <TabsTrigger value="client-info">Informations sur le client</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="damages" className="space-y-6 mt-6">
+          <DamageAssessmentTab
+            damages={formData.damages}
+            onDamageUpdate={handleDamageUpdate}
+          />
+        </TabsContent>
+
+        <TabsContent value="vehicle-details" className="space-y-6 mt-6">
+          <VehicleDetailsTab
+            vehicleId={vehicle.id}
+            mileage={formData.mileage}
+            fuelLevel={formData.fuelLevel}
+            vehicleImages={formData.vehicleImages}
+            onMileageChange={handleMileageChange}
+            onFuelLevelChange={handleFuelLevelChange}
+            onImageAdd={handleImageAdd}
+            onImageRemove={handleImageRemove}
+            onImageUpdate={handleImageUpdate}
+          />
+        </TabsContent>
+
+        <TabsContent value="client-info" className="space-y-6 mt-6">
+          <ClientInfoTab
+            formData={formData}
+            onInputChange={handleInputChange}
+            onSubmit={handleSubmit}
+            onCancel={onCancel}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 
