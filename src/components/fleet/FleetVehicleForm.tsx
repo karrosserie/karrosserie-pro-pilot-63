@@ -9,7 +9,6 @@ import { useFleetVehicleForm } from '@/hooks/use-fleet-vehicle-form';
 import { useVinDecoder } from '@/hooks/use-vin-decoder';
 import FleetVehicleBasicInfo from './form/FleetVehicleBasicInfo';
 import FleetVehicleDetails from './form/FleetVehicleDetails';
-import DocumentsTab from './form/DocumentsTab';
 import { useToast } from '@/hooks/use-toast';
 
 interface FleetVehicleFormProps {
@@ -41,12 +40,6 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
     handleModelChange
   } = useVinDecoder(formData, setFormData);
 
-  const [documentsData, setDocumentsData] = useState({
-    registrationFrontUrl: vehicle?.registration_front_url || '',
-    registrationBackUrl: vehicle?.registration_back_url || '',
-    insuranceCardUrl: vehicle?.insurance_card_url || ''
-  });
-
   const handleVinInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
@@ -69,30 +62,14 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
     setFormData(updatedFormData);
   };
 
-  const handleRegistrationFrontUpload = (url: string) => {
-    setDocumentsData(prev => ({ ...prev, registrationFrontUrl: url }));
-  };
-
-  const handleRegistrationBackUpload = (url: string) => {
-    setDocumentsData(prev => ({ ...prev, registrationBackUrl: url }));
-  };
-
-  const handleInsuranceCardUpload = (url: string) => {
-    setDocumentsData(prev => ({ ...prev, insuranceCardUrl: url }));
-  };
-
   const isFormValid = () => {
     const basicInfoValid = formData.vin && formData.brand && formData.model && formData.license_plate;
-    const documentsValid = documentsData.registrationFrontUrl && 
-                          documentsData.registrationBackUrl && 
-                          documentsData.insuranceCardUrl;
-    
-    return basicInfoValid && documentsValid;
+    return basicInfoValid;
   };
 
   const handleNext = () => {
     if (activeTab === 'vehicle-info') {
-      setActiveTab('documents');
+      setActiveTab('vehicle-details');
     }
   };
 
@@ -106,8 +83,8 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
 
     if (!isFormValid()) {
       toast({
-        title: "Documents manquants",
-        description: "Veuillez importer tous les documents obligatoires (certificat d'immatriculation recto/verso et carte verte d'assurance).",
+        title: "Champs obligatoires",
+        description: "Veuillez remplir tous les champs obligatoires.",
         variant: "destructive"
       });
       return;
@@ -122,10 +99,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
         year: formData.year,
         license_plate: formData.license_plate,
         color: formData.color,
-        status: formData.status,
-        registration_front_url: documentsData.registrationFrontUrl,
-        registration_back_url: documentsData.registrationBackUrl,
-        insurance_card_url: documentsData.insuranceCardUrl
+        status: formData.status
       };
 
       if (mode === 'edit' && vehicle) {
@@ -151,7 +125,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="vehicle-info">Informations sur le véhicule</TabsTrigger>
-            <TabsTrigger value="documents">Documents</TabsTrigger>
+            <TabsTrigger value="vehicle-details">Détails du véhicule</TabsTrigger>
           </TabsList>
 
           <TabsContent value="vehicle-info" className="space-y-6 mt-6">
@@ -170,7 +144,9 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
               onModelChange={handleModelSelectChange}
               onSelectChange={handleSelectChange}
             />
+          </TabsContent>
 
+          <TabsContent value="vehicle-details" className="space-y-6 mt-6">
             <FleetVehicleDetails
               formData={{
                 year: formData.year,
@@ -179,19 +155,6 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
               }}
               isViewMode={isViewMode}
               onInputChange={handleInputChange}
-            />
-          </TabsContent>
-
-          <TabsContent value="documents" className="space-y-6 mt-6">
-            <DocumentsTab
-              vehicleId={vehicle?.id || 'new'}
-              registrationFrontUrl={documentsData.registrationFrontUrl}
-              registrationBackUrl={documentsData.registrationBackUrl}
-              insuranceCardUrl={documentsData.insuranceCardUrl}
-              onRegistrationFrontUpload={handleRegistrationFrontUpload}
-              onRegistrationBackUpload={handleRegistrationBackUpload}
-              onInsuranceCardUpload={handleInsuranceCardUpload}
-              isViewMode={isViewMode}
             />
           </TabsContent>
         </Tabs>
@@ -211,7 +174,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
                   Suivant
                 </Button>
               )}
-              {activeTab === 'documents' && (
+              {activeTab === 'vehicle-details' && (
                 <Button 
                   type="submit" 
                   className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
