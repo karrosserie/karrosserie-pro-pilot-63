@@ -19,10 +19,6 @@ export function useFleetReservations() {
     mutationFn: (newReservation: NewFleetReservation) => fleetReservationsService.create(newReservation),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fleetReservations'] });
-      toast({
-        title: "Prêt enregistré",
-        description: "Le prêt a été enregistré avec succès."
-      });
     },
     onError: (error) => {
       toast({
