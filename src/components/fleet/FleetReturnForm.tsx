@@ -135,6 +135,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
               clientId: formData.clientId,
               clientName: formData.clientName,
               returnDate: formData.returnDate,
+              returnMileage: formData.returnMileage,
               attestationAccepted: formData.attestationAccepted,
               clientSignature: formData.clientSignature
             }}
