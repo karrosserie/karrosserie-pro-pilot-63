@@ -11,7 +11,6 @@ import { useCarModels } from '@/hooks/use-car-models';
 interface FleetVehicleBasicInfoProps {
   formData: {
     vin: string;
-    engine_number: string;
     brand: string;
     model: string;
     status: string;
@@ -48,47 +47,34 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* VIN and Engine Number */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="vin">
-            Numéro de série (VIN) <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            id="vin"
-            name="vin"
-            value={formData.vin}
-            onChange={onInputChange}
-            disabled={isViewMode}
-            required
-            placeholder="17 caractères"
-            maxLength={17}
-            style={{
-              textTransform: 'uppercase'
-            }}
-          />
-          {formData.vin && !isValidVin(formData.vin) && (
-            <p className="text-sm text-red-500 mt-1">
-              Le VIN doit contenir exactement 17 caractères alphanumériques (sans I, O, Q)
-            </p>
-          )}
-          {formData.vin && isValidVin(formData.vin) && (
-            <p className="text-sm text-green-600 mt-1">
-              ✓ VIN valide - Marque et modèle détectés
-            </p>
-          )}
-        </div>
-        
-        <div>
-          <Label htmlFor="engine_number">Numéro de moteur</Label>
-          <Input
-            id="engine_number"
-            name="engine_number"
-            value={formData.engine_number}
-            onChange={onInputChange}
-            disabled={isViewMode}
-          />
-        </div>
+      {/* VIN field */}
+      <div>
+        <Label htmlFor="vin">
+          Numéro de série (VIN) <span className="text-red-500">*</span>
+        </Label>
+        <Input
+          id="vin"
+          name="vin"
+          value={formData.vin}
+          onChange={onInputChange}
+          disabled={isViewMode}
+          required
+          placeholder="17 caractères"
+          maxLength={17}
+          style={{
+            textTransform: 'uppercase'
+          }}
+        />
+        {formData.vin && !isValidVin(formData.vin) && (
+          <p className="text-sm text-red-500 mt-1">
+            Le VIN doit contenir exactement 17 caractères alphanumériques (sans I, O, Q)
+          </p>
+        )}
+        {formData.vin && isValidVin(formData.vin) && (
+          <p className="text-sm text-green-600 mt-1">
+            ✓ VIN valide - Marque et modèle détectés
+          </p>
+        )}
       </div>
 
       {/* Brand, Model and Status */}

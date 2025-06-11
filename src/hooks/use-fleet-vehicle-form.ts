@@ -1,10 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 
 export interface FleetVehicleFormData {
   vin: string;
-  engine_number: string;
   brand: string;
   model: string;
   year: number;
@@ -16,7 +14,6 @@ export interface FleetVehicleFormData {
 export function useFleetVehicleForm(vehicle?: FleetVehicle | null) {
   const [formData, setFormData] = useState<FleetVehicleFormData>({
     vin: '',
-    engine_number: '',
     brand: '',
     model: '',
     year: new Date().getFullYear(),
@@ -29,7 +26,6 @@ export function useFleetVehicleForm(vehicle?: FleetVehicle | null) {
     if (vehicle) {
       setFormData({
         vin: vehicle.vin || '',
-        engine_number: vehicle.engine_number || '',
         brand: vehicle.brand || '',
         model: vehicle.model || '',
         year: vehicle.year || new Date().getFullYear(),
