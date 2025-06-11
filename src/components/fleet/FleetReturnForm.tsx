@@ -83,6 +83,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
           <h3 className="text-lg font-medium text-gray-900">
             {vehicle.brand} {vehicle.model} ({vehicle.license_plate})
           </h3>
+          <div>Client : {formData.clientName}</div>
         </div>
   
         {/* Date et heure de retour field - outside tabs */}
