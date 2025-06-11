@@ -15,6 +15,8 @@ interface FleetLoanFormProps {
   vehicle: FleetVehicle;
   onSubmit: (loanData: LoanFormData) => void;
   onCancel: () => void;
+  defaultValues?: any;
+  isViewMode?: boolean;
 }
 
 export interface LoanFormData {
@@ -62,7 +64,9 @@ export interface DamageItem {
 const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
   vehicle,
   onSubmit,
-  onCancel
+  onCancel,
+  defaultValues,
+  isViewMode = false
 }) => {
   const {
     activeTab,
@@ -83,7 +87,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     handleInsurancePhoneChange,
     handleSignatureChange,
     handleSubmit
-  } = useFleetLoanForm(vehicle, onSubmit);
+  } = useFleetLoanForm(vehicle, onSubmit, defaultValues);
 
   const { isFormValid } = useFleetLoanFormValidation(formData);
 
@@ -137,6 +141,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             onClientSelect={handleClientSelect}
             onDriverLicenseFrontUpload={handleDriverLicenseFrontUpload}
             onDriverLicenseBackUpload={handleDriverLicenseBackUpload}
+            isViewMode={isViewMode}
           />
         </TabsContent>
 
@@ -146,6 +151,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             onInputChange={handleInputChange}
             onSwitchChange={handleInsuranceSwitchChange}
             onPhoneChange={handleInsurancePhoneChange}
+            isViewMode={isViewMode}
           />
         </TabsContent>
 
@@ -153,6 +159,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
           <DamageAssessmentTab
             damages={formData.damages}
             onDamageUpdate={handleDamageUpdate}
+            isViewMode={isViewMode}
           />
         </TabsContent>
 
@@ -167,6 +174,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             onImageAdd={handleImageAdd}
             onImageRemove={handleImageRemove}
             onImageUpdate={handleImageUpdate}
+            isViewMode={isViewMode}
           />
         </TabsContent>
 
@@ -176,6 +184,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             vehicle={vehicle}
             onInputChange={handleInputChange}
             onSignatureChange={handleSignatureChange}
+            isViewMode={isViewMode}
           />
         </TabsContent>
       </Tabs>
@@ -190,6 +199,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
         isPending={createReservation.isPending}
         isFirstTab={isFirstTab}
         isLastTab={isLastTab}
+        isViewMode={isViewMode}
       />
     </div>
   );

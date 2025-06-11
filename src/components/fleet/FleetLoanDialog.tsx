@@ -87,18 +87,17 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
         ) : mode === 'edit' && reservation && reservation.fleet_vehicles ? (
           <FleetLoanForm
             vehicle={createCompleteVehicle(reservation.fleet_vehicles)}
-            reservation={reservation}
             onSubmit={handleSubmit}
             onCancel={onClose}
-            mode="edit"
+            defaultValues={reservation}
           />
         ) : mode === 'view' && reservation && reservation.fleet_vehicles ? (
           <FleetLoanForm
             vehicle={createCompleteVehicle(reservation.fleet_vehicles)}
-            reservation={reservation}
             onSubmit={handleSubmit}
             onCancel={onClose}
-            mode="view"
+            defaultValues={reservation}
+            isViewMode={true}
           />
         ) : mode === 'return' && reservation ? (
           <div className="p-4">
