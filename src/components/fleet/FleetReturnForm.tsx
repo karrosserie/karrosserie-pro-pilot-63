@@ -10,6 +10,7 @@ import ReturnDamageAssessmentTab from './form/ReturnDamageAssessmentTab';
 import VehicleDetailsTab from './form/VehicleDetailsTab';
 import ReturnAttestationTab from './form/ReturnAttestationTab';
 import { FleetReturnFormData } from './FleetReturnForm.types';
+import { FleetReturn } from '@/services/supabase/fleet-returns';
 
 interface FleetReturnFormProps {
   vehicle: FleetVehicle;
@@ -17,6 +18,7 @@ interface FleetReturnFormProps {
   onSubmit: (returnData: FleetReturnFormData) => void;
   onCancel: () => void;
   isViewMode?: boolean;
+  existingReturnData?: FleetReturn | null;
 }
 
 const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
@@ -24,14 +26,14 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
   reservationId,
   onSubmit,
   onCancel,
-  isViewMode = false
+  isViewMode = false,
+  existingReturnData
 }) => {
   const {
     activeTab,
     setActiveTab,
     formData,
     reservation,
-    fleetReturn,
     createReturn,
     handleInputChange,
     handleClientSelect,
@@ -43,10 +45,11 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
     handleDamageUpdate,
     handleSignatureChange,
     handleSubmit
-  } = useFleetReturnForm(vehicle, onSubmit, reservationId);
+  } = useFleetReturnForm(vehicle, onSubmit, reservationId, existingReturnData);
 
   // Simple validation for return form
   const isFormValid = () => {
+    if (isViewMode) return true; // Skip validation in view mode
     return formData.clientId && 
            formData.returnMileage >= 0 && 
            formData.fuelLevelReturn >= 0 && 
@@ -87,11 +90,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
             {vehicle.brand} {vehicle.model} ({vehicle.license_plate})
           </h3>
           <div>Client : {formData.clientName}</div>
-          {fleetReturn && (
-            <div className="text-sm text-green-600">
-              ✓ Retour déjà effectué le {new Date(fleetReturn.return_date).toLocaleDateString('fr-FR')}
-            </div>
-          )}
+          {isViewMode && <div className="text-sm text-muted-foreground">Mode lecture seule</div>}
         </div>
   
         {/* Date et heure de retour field - outside tabs */}
@@ -103,8 +102,8 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
             type="datetime-local"
             value={formData.returnDate}
             onChange={handleInputChange}
-            className="mt-2"
             disabled={isViewMode}
+            className="mt-2"
           />
         </div>
       </div>
@@ -160,31 +159,18 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
         </TabsContent>
       </Tabs>
 
-      {!isViewMode && (
-        <FleetReturnFormNavigation
-          activeTab={activeTab}
-          onCancel={onCancel}
-          onPrevious={handlePrevious}
-          onNext={handleNext}
-          onSubmit={handleSubmit}
-          isFormValid={Boolean(isFormValid())}
-          isPending={createReturn.isPending}
-          isFirstTab={isFirstTab}
-          isLastTab={isLastTab}
-        />
-      )}
-
-      {isViewMode && (
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300"
-          >
-            Fermer
-          </div>
-        )}
-      )}
+      <FleetReturnFormNavigation
+        activeTab={activeTab}
+        onCancel={onCancel}
+        onPrevious={handlePrevious}
+        onNext={handleNext}
+        onSubmit={handleSubmit}
+        isFormValid={Boolean(isFormValid())}
+        isPending={createReturn.isPending}
+        isFirstTab={isFirstTab}
+        isLastTab={isLastTab}
+        isViewMode={isViewMode}
+      />
     </div>
   );
 };
