@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
 import { useAuth } from '@/contexts/AuthContext';
@@ -157,7 +156,7 @@ export const useFleetLoanForm = (vehicle: FleetVehicle, onSubmit: (loanData: Loa
         fleet_vehicle_id: formData.vehicleId,
         client_id: formData.clientId,
         start_date: formData.startDate,
-        expected_return_date: formData.expectedReturnDate,
+        expected_return_date: formData.expectedReturnDate || null, // Convert empty string to null
         start_mileage: formData.mileage,
         fuel_level_start: formData.fuelLevel,
         notes: formData.notes || '',
@@ -165,10 +164,10 @@ export const useFleetLoanForm = (vehicle: FleetVehicle, onSubmit: (loanData: Loa
         user_id: user.id,
         // License information
         license_number: formData.licenseNumber,
-        license_issue_date: formData.licenseIssueDate,
+        license_issue_date: formData.licenseIssueDate || null, // Convert empty string to null
         prefecture: formData.prefecture,
         holder_info: formData.holderInfo,
-        date_of_birth: formData.dateOfBirth,
+        date_of_birth: formData.dateOfBirth || null, // Convert empty string to null
         place_of_birth: formData.placeOfBirth,
         // Document URLs
         driver_license_front_url: formData.driverLicenseFrontUrl,
