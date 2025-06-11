@@ -84,7 +84,7 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
                         className={`text-xs font-medium px-2.5 py-0.5 rounded ${
                           vehicle.status === 'Disponible' 
                             ? 'bg-green-100 text-green-800' 
-                            : vehicle.status === 'Loué'
+                            : vehicle.status === 'En prêt'
                             ? 'bg-amber-100 text-amber-800'
                             : vehicle.status === 'En maintenance'
                             ? 'bg-blue-100 text-blue-800'
@@ -95,14 +95,15 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
                       </span>
                     </td>
                     <td className="px-6 py-4 space-x-2">
-                      <Button 
-                        className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
-                        size="sm"
-                        disabled={vehicle.status === 'Loué'}
-                        onClick={() => onLendVehicle(vehicle)}
-                      >
-                        Prêter
-                      </Button>
+                      {vehicle.status === 'Disponible' && (
+                        <Button 
+                          className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
+                          size="sm"
+                          onClick={() => onLendVehicle(vehicle)}
+                        >
+                          Prêter
+                        </Button>
+                      )}
                       <Button 
                         variant="outline" 
                         size="sm"

@@ -1,12 +1,32 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { useFleetReservations } from '@/hooks/use-fleet-reservations';
 
 interface FleetLoansHistoryProps {
   onViewLoan?: (loanId: string) => void;
 }
 
 const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ onViewLoan }) => {
+  const { reservations, isLoading } = useFleetReservations();
+
+  // Filter for completed/past reservations
+  const completedReservations = (reservations || [])
+    .filter(reservation => reservation.status === 'completed' || reservation.status === 'returned')
+    .slice(0, 10); // Show only the 10 most recent
+
+  if (isLoading) {
+    return (
+      <div className="card-container">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Historique des prêts</h2>
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          <span className="ml-2">Chargement...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="card-container">
       <h2 className="text-lg font-semibold text-gray-800 mb-4">Historique des prêts</h2>
@@ -23,36 +43,42 @@ const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ onViewLoan }) => 
             </tr>
           </thead>
           <tbody>
-            <tr className="border-b hover:bg-gray-50">
-              <td className="px-4 py-3 font-medium">Peugeot 208</td>
-              <td className="px-4 py-3">Jean Dupont</td>
-              <td className="px-4 py-3 text-gray-600">01/05/2023</td>
-              <td className="px-4 py-3 text-gray-600">09/05/2023</td>
-              <td className="px-4 py-3">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => onViewLoan?.('loan-1')}
-                >
-                  Voir
-                </Button>
-              </td>
-            </tr>
-            <tr className="border-b hover:bg-gray-50">
-              <td className="px-4 py-3 font-medium">Citroën C3</td>
-              <td className="px-4 py-3">Sophie Bernard</td>
-              <td className="px-4 py-3 text-gray-600">25/04/2023</td>
-              <td className="px-4 py-3 text-gray-600">05/05/2023</td>
-              <td className="px-4 py-3">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => onViewLoan?.('loan-2')}
-                >
-                  Voir
-                </Button>
-              </td>
-            </tr>
+            {completedReservations.length > 0 ? (
+              completedReservations.map((reservation) => (
+                <tr key={reservation.id} className="border-b hover:bg-gray-50">
+                  <td className="px-4 py-3 font-medium">
+                    {reservation.fleet_vehicles?.brand} {reservation.fleet_vehicles?.model}
+                  </td>
+                  <td className="px-4 py-3">
+                    {reservation.clients?.first_name} {reservation.clients?.last_name}
+                  </td>
+                  <td className="px-4 py-3 text-gray-600">
+                    {new Date(reservation.start_date).toLocaleDateString('fr-FR')}
+                  </td>
+                  <td className="px-4 py-3 text-gray-600">
+                    {reservation.actual_return_date 
+                      ? new Date(reservation.actual_return_date).toLocaleDateString('fr-FR')
+                      : new Date(reservation.expected_return_date).toLocaleDateString('fr-FR')
+                    }
+                  </td>
+                  <td className="px-4 py-3">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => onViewLoan?.(reservation.id)}
+                    >
+                      Voir
+                    </Button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                  Aucun historique de prêt trouvé
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
