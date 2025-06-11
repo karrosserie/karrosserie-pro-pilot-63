@@ -17,7 +17,7 @@ interface FleetLoanDialogProps {
   onClose: () => void;
   vehicle: FleetVehicle | null;
   loanId: string | null;
-  mode: 'create' | 'edit' | 'view' | 'return';
+  mode: 'create' | 'edit' | 'view' | 'return' | 'view_return';
   onSubmit: (loanData: LoanFormData | FleetReturnFormData) => void;
 }
 
@@ -51,6 +51,8 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
         return 'Détails du prêt';
       case 'return':
         return 'Retour de véhicule';
+      case 'view_return':
+        return 'Détails du retour';
       default:
         return 'Prêt de véhicule';
     }
@@ -112,6 +114,14 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
             reservationId={reservation.id}
             onSubmit={handleReturnSubmit}
             onCancel={onClose}
+          />
+        ) : mode === 'view_return' && reservation && reservation.fleet_vehicles ? (
+          <FleetReturnForm
+            vehicle={createCompleteVehicle(reservation.fleet_vehicles)}
+            reservationId={reservation.id}
+            onSubmit={handleReturnSubmit}
+            onCancel={onClose}
+            isViewMode={true}
           />
         ) : (
           <div className="p-4">

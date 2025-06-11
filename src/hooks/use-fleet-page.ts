@@ -14,7 +14,7 @@ export const useFleetPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoanDialogOpen, setIsLoanDialogOpen] = useState(false);
   const [vehicleToLend, setVehicleToLend] = useState<FleetVehicle | null>(null);
-  const [loanDialogMode, setLoanDialogMode] = useState<'create' | 'edit' | 'view' | 'return'>('create');
+  const [loanDialogMode, setLoanDialogMode] = useState<'create' | 'edit' | 'view' | 'return' | 'view_return'>('create');
   const [selectedLoanId, setSelectedLoanId] = useState<string | null>(null);
   const [isVehicleSelectionOpen, setIsVehicleSelectionOpen] = useState(false);
   const { toast } = useToast();
@@ -106,6 +106,14 @@ export const useFleetPage = () => {
     setIsLoanDialogOpen(true);
   };
 
+  const handleViewReturn = (loanId: string) => {
+    console.log('Viewing return details for:', loanId);
+    setSelectedLoanId(loanId);
+    setVehicleToLend(null);
+    setLoanDialogMode('view_return');
+    setIsLoanDialogOpen(true);
+  };
+
   const handleNewLoan = () => {
     console.log('Opening vehicle selection for new loan');
     setIsVehicleSelectionOpen(true);
@@ -184,6 +192,7 @@ export const useFleetPage = () => {
     handleNewLoan,
     handleVehicleSelected,
     handleViewLoan,
+    handleViewReturn,
     handleDeleteLoan
   };
 };

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useFleetReturns } from '@/hooks/use-fleet-returns';
+import { useFleetReturns, useFleetReturnByReservation } from '@/hooks/use-fleet-returns';
 import { useFleetReservation } from '@/hooks/use-fleet-reservations';
 import { useAuth } from '@/contexts/AuthContext';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
@@ -14,6 +14,7 @@ export const useFleetReturnForm = (
   const [activeTab, setActiveTab] = useState('damages');
   const { createReturn } = useFleetReturns();
   const { reservation } = useFleetReservation(reservationId);
+  const { fleetReturn } = useFleetReturnByReservation(reservationId);
   const { user } = useAuth();
   
   // Helper function to get current date/time for datetime-local input
@@ -60,6 +61,15 @@ export const useFleetReturnForm = (
     return [];
   };
 
+  // Helper function to safely convert JSON to string array
+  const jsonToStringArray = (json: any): string[] => {
+    if (!json) return [];
+    if (Array.isArray(json)) {
+      return json.filter(item => typeof item === 'string') as string[];
+    }
+    return [];
+  };
+
   // Update form data when reservation data is loaded
   useEffect(() => {
     if (reservation) {
@@ -72,6 +82,25 @@ export const useFleetReturnForm = (
       }));
     }
   }, [reservation, vehicle.mileage]);
+
+  // Update form data when fleet return data is loaded (for viewing existing returns)
+  useEffect(() => {
+    if (fleetReturn && reservation) {
+      setFormData(prev => ({
+        ...prev,
+        clientId: reservation.client_id || '',
+        clientName: reservation.clients ? `${reservation.clients.first_name} ${reservation.clients.last_name}` : '',
+        returnDate: fleetReturn.return_date || getCurrentDateTime(),
+        returnMileage: fleetReturn.return_mileage || 0,
+        fuelLevelReturn: fleetReturn.fuel_level_return || 100,
+        vehicleImages: jsonToStringArray(fleetReturn.vehicle_images),
+        damages: parseDamagesFromReservation(fleetReturn.damages),
+        notes: fleetReturn.notes || '',
+        attestationAccepted: fleetReturn.attestation_accepted || false,
+        clientSignature: fleetReturn.client_signature || '',
+      }));
+    }
+  }, [fleetReturn, reservation]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -173,6 +202,7 @@ export const useFleetReturnForm = (
     setActiveTab,
     formData,
     reservation,
+    fleetReturn,
     createReturn,
     handleInputChange,
     handleClientSelect,

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
@@ -15,19 +16,22 @@ interface FleetReturnFormProps {
   reservationId: string;
   onSubmit: (returnData: FleetReturnFormData) => void;
   onCancel: () => void;
+  isViewMode?: boolean;
 }
 
 const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
   vehicle,
   reservationId,
   onSubmit,
-  onCancel
+  onCancel,
+  isViewMode = false
 }) => {
   const {
     activeTab,
     setActiveTab,
     formData,
     reservation,
+    fleetReturn,
     createReturn,
     handleInputChange,
     handleClientSelect,
@@ -83,6 +87,11 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
             {vehicle.brand} {vehicle.model} ({vehicle.license_plate})
           </h3>
           <div>Client : {formData.clientName}</div>
+          {fleetReturn && (
+            <div className="text-sm text-green-600">
+              ✓ Retour déjà effectué le {new Date(fleetReturn.return_date).toLocaleDateString('fr-FR')}
+            </div>
+          )}
         </div>
   
         {/* Date et heure de retour field - outside tabs */}
@@ -95,6 +104,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
             value={formData.returnDate}
             onChange={handleInputChange}
             className="mt-2"
+            disabled={isViewMode}
           />
         </div>
       </div>
@@ -112,6 +122,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
           <ReturnDamageAssessmentTab
             damages={formData.damages}
             onDamageUpdate={handleDamageUpdate}
+            isViewMode={isViewMode}
           />
         </TabsContent>
 
@@ -126,6 +137,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
             onImageAdd={handleImageAdd}
             onImageRemove={handleImageRemove}
             onImageUpdate={handleImageUpdate}
+            isViewMode={isViewMode}
           />
         </TabsContent>
 
@@ -143,21 +155,36 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
             reservation={reservation}
             onInputChange={handleInputChange}
             onSignatureChange={handleSignatureChange}
+            isViewMode={isViewMode}
           />
         </TabsContent>
       </Tabs>
 
-      <FleetReturnFormNavigation
-        activeTab={activeTab}
-        onCancel={onCancel}
-        onPrevious={handlePrevious}
-        onNext={handleNext}
-        onSubmit={handleSubmit}
-        isFormValid={Boolean(isFormValid())}
-        isPending={createReturn.isPending}
-        isFirstTab={isFirstTab}
-        isLastTab={isLastTab}
-      />
+      {!isViewMode && (
+        <FleetReturnFormNavigation
+          activeTab={activeTab}
+          onCancel={onCancel}
+          onPrevious={handlePrevious}
+          onNext={handleNext}
+          onSubmit={handleSubmit}
+          isFormValid={Boolean(isFormValid())}
+          isPending={createReturn.isPending}
+          isFirstTab={isFirstTab}
+          isLastTab={isLastTab}
+        />
+      )}
+
+      {isViewMode && (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300"
+          >
+            Fermer
+          </div>
+        )}
+      )}
     </div>
   );
 };
