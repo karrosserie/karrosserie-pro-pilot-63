@@ -3,15 +3,14 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
-import { useVehicleReservations } from '@/hooks/use-fleet-reservations';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFleetVehicleForm } from '@/hooks/use-fleet-vehicle-form';
 import { useVinDecoder } from '@/hooks/use-vin-decoder';
 import FleetVehicleBasicInfo from './form/FleetVehicleBasicInfo';
 import FleetVehicleDetails from './form/FleetVehicleDetails';
-import FleetLoansHistoryTab from './form/FleetLoansHistoryTab';
 import DocumentsTab from './form/DocumentsTab';
+import { useToast } from '@/hooks/use-toast';
 
 interface FleetVehicleFormProps {
   vehicle?: FleetVehicle | null;
@@ -27,8 +26,8 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
   onCancel
 }) => {
   const { createVehicle, updateVehicle } = useFleetVehicles();
-  const { reservations } = useVehicleReservations(vehicle?.id);
   const { user } = useAuth();
+  const { toast } = useToast();
   const isViewMode = mode === 'view';
 
   const { formData, setFormData, handleInputChange, handleSelectChange } = useFleetVehicleForm(vehicle);
@@ -42,9 +41,9 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
   } = useVinDecoder(formData, setFormData);
 
   const [documentsData, setDocumentsData] = useState({
-    registrationFrontUrl: '',
-    registrationBackUrl: '',
-    insuranceCardUrl: ''
+    registrationFrontUrl: vehicle?.registration_front_url || '',
+    registrationBackUrl: vehicle?.registration_back_url || '',
+    insuranceCardUrl: vehicle?.insurance_card_url || ''
   });
 
   const handleVinInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,11 +68,41 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
     setFormData(updatedFormData);
   };
 
+  const handleRegistrationFrontUpload = (url: string) => {
+    setDocumentsData(prev => ({ ...prev, registrationFrontUrl: url }));
+  };
+
+  const handleRegistrationBackUpload = (url: string) => {
+    setDocumentsData(prev => ({ ...prev, registrationBackUrl: url }));
+  };
+
+  const handleInsuranceCardUpload = (url: string) => {
+    setDocumentsData(prev => ({ ...prev, insuranceCardUrl: url }));
+  };
+
+  const isFormValid = () => {
+    const basicInfoValid = formData.vin && formData.brand && formData.model && formData.license_plate;
+    const documentsValid = documentsData.registrationFrontUrl && 
+                          documentsData.registrationBackUrl && 
+                          documentsData.insuranceCardUrl;
+    
+    return basicInfoValid && documentsValid;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!user) {
       console.error('User not authenticated');
+      return;
+    }
+
+    if (!isFormValid()) {
+      toast({
+        title: "Documents manquants",
+        description: "Veuillez importer tous les documents obligatoires (certificat d'immatriculation recto/verso et carte verte d'assurance).",
+        variant: "destructive"
+      });
       return;
     }
     
@@ -86,7 +115,10 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
         year: formData.year,
         license_plate: formData.license_plate,
         color: formData.color,
-        status: formData.status
+        status: formData.status,
+        registration_front_url: documentsData.registrationFrontUrl,
+        registration_back_url: documentsData.registrationBackUrl,
+        insurance_card_url: documentsData.insuranceCardUrl
       };
 
       if (mode === 'edit' && vehicle) {
@@ -106,26 +138,13 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
     }
   };
 
-  const handleRegistrationFrontUpload = (url: string) => {
-    setDocumentsData(prev => ({ ...prev, registrationFrontUrl: url }));
-  };
-
-  const handleRegistrationBackUpload = (url: string) => {
-    setDocumentsData(prev => ({ ...prev, registrationBackUrl: url }));
-  };
-
-  const handleInsuranceCardUpload = (url: string) => {
-    setDocumentsData(prev => ({ ...prev, insuranceCardUrl: url }));
-  };
-
   return (
     <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-6">
         <Tabs defaultValue="vehicle-info" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="vehicle-info">Informations sur le véhicule</TabsTrigger>
             <TabsTrigger value="documents">Documents</TabsTrigger>
-            <TabsTrigger value="loans-history">Historique des prêts</TabsTrigger>
           </TabsList>
 
           <TabsContent value="vehicle-info" className="space-y-6 mt-6">
@@ -168,10 +187,6 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
               isViewMode={isViewMode}
             />
           </TabsContent>
-
-          <TabsContent value="loans-history" className="space-y-6 mt-6">
-            <FleetLoansHistoryTab reservations={reservations} />
-          </TabsContent>
         </Tabs>
 
         <div className="flex justify-end space-x-2 pt-4 border-t">
@@ -182,7 +197,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
             <Button 
               type="submit" 
               className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-              disabled={createVehicle.isPending || updateVehicle.isPending}
+              disabled={createVehicle.isPending || updateVehicle.isPending || !isFormValid()}
             >
               {createVehicle.isPending || updateVehicle.isPending 
                 ? "Enregistrement..." 

@@ -1,9 +1,11 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import DamageAssessmentTab from './form/DamageAssessmentTab';
 import VehicleDetailsTab from './form/VehicleDetailsTab';
+import ClientInfoTab from './form/ClientInfoTab';
 
 interface FleetLoanFormProps {
   vehicle: FleetVehicle;
@@ -13,6 +15,7 @@ interface FleetLoanFormProps {
 
 export interface LoanFormData {
   vehicleId: string;
+  clientId: string;
   clientName: string;
   clientPhone: string;
   clientEmail: string;
@@ -23,6 +26,8 @@ export interface LoanFormData {
   fuelLevel: number;
   vehicleImages: string[];
   damages: DamageItem[];
+  driverLicenseFrontUrl: string;
+  driverLicenseBackUrl: string;
 }
 
 interface DamageItem {
@@ -38,6 +43,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
 }) => {
   const [formData, setFormData] = useState<LoanFormData>({
     vehicleId: vehicle.id,
+    clientId: '',
     clientName: '',
     clientPhone: '',
     clientEmail: '',
@@ -47,8 +53,19 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     mileage: vehicle.mileage || 0,
     fuelLevel: 100,
     vehicleImages: [],
-    damages: []
+    damages: [],
+    driverLicenseFrontUrl: '',
+    driverLicenseBackUrl: ''
   });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleClientSelect = (clientId: string) => {
+    setFormData(prev => ({ ...prev, clientId }));
+  };
 
   const handleMileageChange = (mileage: number) => {
     setFormData(prev => ({ ...prev, mileage }));
@@ -83,20 +100,27 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     setFormData(prev => ({ ...prev, damages }));
   };
 
-  const handleRegistrationFrontUpload = (url: string) => {
-    setFormData(prev => ({ ...prev, registrationFrontUrl: url }));
+  const handleDriverLicenseFrontUpload = (url: string) => {
+    setFormData(prev => ({ ...prev, driverLicenseFrontUrl: url }));
   };
 
-  const handleRegistrationBackUpload = (url: string) => {
-    setFormData(prev => ({ ...prev, registrationBackUrl: url }));
+  const handleDriverLicenseBackUpload = (url: string) => {
+    setFormData(prev => ({ ...prev, driverLicenseBackUrl: url }));
   };
 
-  const handleInsuranceCardUpload = (url: string) => {
-    setFormData(prev => ({ ...prev, insuranceCardUrl: url }));
+  const isFormValid = () => {
+    return formData.clientId && 
+           formData.startDate && 
+           formData.expectedReturnDate &&
+           formData.driverLicenseFrontUrl &&
+           formData.driverLicenseBackUrl;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isFormValid()) {
+      return;
+    }
     onSubmit(formData);
   };
 
@@ -108,11 +132,22 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
         </h3>
       </div>
 
-      <Tabs defaultValue="damages" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+      <Tabs defaultValue="client-info" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="client-info">Informations sur le client</TabsTrigger>
           <TabsTrigger value="damages">Chocs & rayures</TabsTrigger>
           <TabsTrigger value="vehicle-details">Détails du véhicule & photos</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="client-info" className="space-y-6 mt-6">
+          <ClientInfoTab
+            formData={formData}
+            onInputChange={handleInputChange}
+            onClientSelect={handleClientSelect}
+            onDriverLicenseFrontUpload={handleDriverLicenseFrontUpload}
+            onDriverLicenseBackUpload={handleDriverLicenseBackUpload}
+          />
+        </TabsContent>
 
         <TabsContent value="damages" className="space-y-6 mt-6">
           <DamageAssessmentTab
@@ -144,6 +179,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
           type="submit" 
           className="btn-primary"
           onClick={handleSubmit}
+          disabled={!isFormValid()}
         >
           Confirmer le prêt
         </Button>

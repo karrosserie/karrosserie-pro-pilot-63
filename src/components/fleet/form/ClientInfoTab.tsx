@@ -1,72 +1,53 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { SearchableSelect } from '@/components/ui/searchable-select';
+import { DocumentUploader } from '@/components/shared/DocumentUploader';
+import { useClients } from '@/hooks/use-clients';
 import { LoanFormData } from '../FleetLoanForm';
 
 interface ClientInfoTabProps {
   formData: LoanFormData;
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  onCancel: () => void;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onClientSelect: (clientId: string) => void;
+  onDriverLicenseFrontUpload: (url: string) => void;
+  onDriverLicenseBackUpload: (url: string) => void;
   isViewMode?: boolean;
 }
 
 const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
   formData,
   onInputChange,
-  onSubmit,
-  onCancel,
+  onClientSelect,
+  onDriverLicenseFrontUpload,
+  onDriverLicenseBackUpload,
   isViewMode = false
 }) => {
+  const { clients } = useClients();
+
+  const clientOptions = (clients || []).map(client => ({
+    value: client.id,
+    label: `${client.firstName} ${client.lastName}`
+  }));
+
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="clientName">Nom du client *</Label>
-          <Input
-            id="clientName"
-            name="clientName"
-            type="text"
-            value={formData.clientName}
-            onChange={onInputChange}
-            placeholder="Nom complet du client"
-            required
+          <Label htmlFor="client" className="text-destructive">Client *</Label>
+          <SearchableSelect
+            options={clientOptions}
+            value={formData.clientId}
+            onValueChange={onClientSelect}
+            placeholder="Sélectionner un client"
             disabled={isViewMode}
+            searchPlaceholder="Rechercher un client..."
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="clientPhone">Téléphone *</Label>
-          <Input
-            id="clientPhone"
-            name="clientPhone"
-            type="tel"
-            value={formData.clientPhone}
-            onChange={onInputChange}
-            placeholder="06 12 34 56 78"
-            required
-            disabled={isViewMode}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="clientEmail">Email</Label>
-          <Input
-            id="clientEmail"
-            name="clientEmail"
-            type="email"
-            value={formData.clientEmail}
-            onChange={onInputChange}
-            placeholder="client@example.com"
-            disabled={isViewMode}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="startDate">Date de début *</Label>
+          <Label htmlFor="startDate" className="text-destructive">Date de début *</Label>
           <Input
             id="startDate"
             name="startDate"
@@ -79,7 +60,7 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="expectedReturnDate">Date de retour prévue *</Label>
+          <Label htmlFor="expectedReturnDate" className="text-destructive">Date de fin *</Label>
           <Input
             id="expectedReturnDate"
             name="expectedReturnDate"
@@ -90,32 +71,32 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
             disabled={isViewMode}
           />
         </div>
+      </div>
 
-        <div className="md:col-span-2 space-y-2">
-          <Label htmlFor="notes">Notes</Label>
-          <Textarea
-            id="notes"
-            name="notes"
-            value={formData.notes}
-            onChange={onInputChange}
-            placeholder="Informations complémentaires..."
-            rows={3}
-            disabled={isViewMode}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <Label className="text-destructive">Permis de conduire (Recto) *</Label>
+          <DocumentUploader
+            documentType="license"
+            documentId={`${formData.clientId || 'new'}-front`}
+            currentDocumentUrl={formData.driverLicenseFrontUrl}
+            onUploadComplete={onDriverLicenseFrontUpload}
+            isViewMode={isViewMode}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label className="text-destructive">Permis de conduire (Verso) *</Label>
+          <DocumentUploader
+            documentType="license"
+            documentId={`${formData.clientId || 'new'}-back`}
+            currentDocumentUrl={formData.driverLicenseBackUrl}
+            onUploadComplete={onDriverLicenseBackUpload}
+            isViewMode={isViewMode}
           />
         </div>
       </div>
-
-      <div className="flex justify-end space-x-3 pt-6 border-t">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          {isViewMode ? "Fermer" : "Annuler"}
-        </Button>
-        {!isViewMode && (
-          <Button type="submit" className="btn-primary">
-            Confirmer le prêt
-          </Button>
-        )}
-      </div>
-    </form>
+    </div>
   );
 };
 
