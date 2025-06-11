@@ -3,6 +3,11 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 
 const FleetLoansHistory: React.FC = () => {
+  const handleViewLoan = (loanId: string) => {
+    console.log('Viewing loan:', loanId);
+    // TODO: Implement loan details view
+  };
+
   return (
     <div className="card-container">
       <h2 className="text-lg font-semibold text-gray-800 mb-4">Historique des prêts</h2>
@@ -25,7 +30,11 @@ const FleetLoansHistory: React.FC = () => {
               <td className="px-4 py-3 text-gray-600">01/05/2023</td>
               <td className="px-4 py-3 text-gray-600">09/05/2023</td>
               <td className="px-4 py-3">
-                <Button variant="ghost" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleViewLoan('loan-1')}
+                >
                   Voir
                 </Button>
               </td>
@@ -36,7 +45,11 @@ const FleetLoansHistory: React.FC = () => {
               <td className="px-4 py-3 text-gray-600">25/04/2023</td>
               <td className="px-4 py-3 text-gray-600">05/05/2023</td>
               <td className="px-4 py-3">
-                <Button variant="ghost" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleViewLoan('loan-2')}
+                >
                   Voir
                 </Button>
               </td>

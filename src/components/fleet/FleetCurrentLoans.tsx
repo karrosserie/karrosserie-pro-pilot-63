@@ -16,6 +16,21 @@ interface FleetCurrentLoansProps {
 }
 
 const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({ currentLoans }) => {
+  const handleViewDetails = (loanId: string) => {
+    console.log('Viewing loan details:', loanId);
+    // TODO: Implement loan details view
+  };
+
+  const handleReturnVehicle = (loanId: string) => {
+    console.log('Processing vehicle return:', loanId);
+    // TODO: Implement vehicle return process
+  };
+
+  const handleNewLoan = () => {
+    console.log('Creating new loan');
+    // TODO: Implement new loan creation
+  };
+
   return (
     <div className="card-container">
       <h2 className="text-lg font-semibold text-gray-800 mb-4">Prêts en cours</h2>
@@ -44,15 +59,31 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({ currentLoans }) =
             </div>
             
             <div className="mt-4 space-x-2">
-              <Button variant="outline" size="sm">Détails</Button>
-              <Button className="btn-primary" size="sm">Retour</Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => handleViewDetails(loan.id)}
+              >
+                Détails
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => handleReturnVehicle(loan.id)}
+              >
+                Retour
+              </Button>
             </div>
           </div>
         ))}
       </div>
       
       <div className="mt-6">
-        <Button className="w-full" variant="outline">
+        <Button 
+          className="w-full" 
+          variant="outline"
+          onClick={handleNewLoan}
+        >
           <Calendar className="h-4 w-4 mr-2" />
           Nouveau prêt
         </Button>
