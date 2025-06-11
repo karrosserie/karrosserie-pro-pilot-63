@@ -115,8 +115,8 @@ const ReturnAttestationTab: React.FC<ReturnAttestationTabProps> = ({
               <div>
                 <Label className="font-semibold">Départ:</Label>
                 <div className="mt-2 space-y-1">
-                  <div>Le : {formatDateTimeToFrench(reservation.startDate)}</div>
-                  <div>Kilométrage : {reservation.mileage} Km</div>
+                  <div>Le : {reservation?.start_date ? formatDateTimeToFrench(reservation.start_date) : 'N/A'}</div>
+                  <div>Kilométrage : {reservation?.start_mileage || 0} Km</div>
                 </div>
               </div>
               
