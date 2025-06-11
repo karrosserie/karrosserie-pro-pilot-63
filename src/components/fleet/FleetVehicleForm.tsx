@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -119,15 +120,15 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
 
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="vehicle-info" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="vehicle-info">Informations sur le véhicule</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
-          <TabsTrigger value="loans-history">Historique des prêts</TabsTrigger>
-        </TabsList>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <Tabs defaultValue="vehicle-info" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="vehicle-info">Informations sur le véhicule</TabsTrigger>
+            <TabsTrigger value="documents">Documents</TabsTrigger>
+            <TabsTrigger value="loans-history">Historique des prêts</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="vehicle-info" className="space-y-6 mt-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <TabsContent value="vehicle-info" className="space-y-6 mt-6">
             <FleetVehicleBasicInfo
               formData={{
                 vin: formData.vin,
@@ -153,46 +154,44 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
               isViewMode={isViewMode}
               onInputChange={handleInputChange}
             />
+          </TabsContent>
 
-            <div className="flex justify-end space-x-2 pt-4 border-t">
-              <Button type="button" variant="outline" onClick={onCancel}>
-                {isViewMode ? "Fermer" : "Annuler"}
-              </Button>
-              {!isViewMode && (
-                <Button 
-                  type="submit" 
-                  className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-                  disabled={createVehicle.isPending || updateVehicle.isPending}
-                >
-                  {createVehicle.isPending || updateVehicle.isPending 
-                    ? "Enregistrement..." 
-                    : (mode === 'edit' ? "Mettre à jour" : "Enregistrer")
-                  }
-                </Button>
-              )}
-            </div>
-          </form>
-        </TabsContent>
+          <TabsContent value="documents" className="space-y-6 mt-6">
+            <DocumentsTab
+              vehicleId={vehicle?.id || 'new'}
+              registrationFrontUrl={documentsData.registrationFrontUrl}
+              registrationBackUrl={documentsData.registrationBackUrl}
+              insuranceCardUrl={documentsData.insuranceCardUrl}
+              onRegistrationFrontUpload={handleRegistrationFrontUpload}
+              onRegistrationBackUpload={handleRegistrationBackUpload}
+              onInsuranceCardUpload={handleInsuranceCardUpload}
+              isViewMode={isViewMode}
+            />
+          </TabsContent>
 
-        <TabsContent value="documents" className="space-y-6 mt-6">
-          <DocumentsTab
-            vehicleId={vehicle?.id || 'new'}
-            registrationFrontUrl={documentsData.registrationFrontUrl}
-            registrationBackUrl={documentsData.registrationBackUrl}
-            insuranceCardUrl={documentsData.insuranceCardUrl}
-            onRegistrationFrontUpload={handleRegistrationFrontUpload}
-            onRegistrationBackUpload={handleRegistrationBackUpload}
-            onInsuranceCardUpload={handleInsuranceCardUpload}
-            onSubmit={handleSubmit}
-            onCancel={onCancel}
-            isViewMode={isViewMode}
-          />
-        </TabsContent>
+          <TabsContent value="loans-history" className="space-y-6 mt-6">
+            <FleetLoansHistoryTab reservations={reservations} />
+          </TabsContent>
+        </Tabs>
 
-        <TabsContent value="loans-history" className="space-y-6 mt-6">
-          <FleetLoansHistoryTab reservations={reservations} />
-        </TabsContent>
-      </Tabs>
+        <div className="flex justify-end space-x-2 pt-4 border-t">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            {isViewMode ? "Fermer" : "Annuler"}
+          </Button>
+          {!isViewMode && (
+            <Button 
+              type="submit" 
+              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+              disabled={createVehicle.isPending || updateVehicle.isPending}
+            >
+              {createVehicle.isPending || updateVehicle.isPending 
+                ? "Enregistrement..." 
+                : (mode === 'edit' ? "Mettre à jour" : "Enregistrer")
+              }
+            </Button>
+          )}
+        </div>
+      </form>
     </div>
   );
 };

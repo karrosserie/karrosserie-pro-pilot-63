@@ -23,8 +23,8 @@ const FleetVehicleDetails: React.FC<FleetVehicleDetailsProps> = ({
       {/* License Plate, Year, Color */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div>
-          <Label htmlFor="license_plate">
-            Plaque d'immatriculation <span className="text-red-500">*</span>
+          <Label htmlFor="license_plate" required>
+            Plaque d'immatriculation
           </Label>
           <Input
             id="license_plate"

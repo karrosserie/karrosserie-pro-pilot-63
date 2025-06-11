@@ -51,8 +51,8 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
       {/* VIN and Engine Number */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="vin">
-            Numéro de série (VIN) <span className="text-red-500">*</span>
+          <Label htmlFor="vin" required>
+            Numéro de série (VIN)
           </Label>
           <Input
             id="vin"
@@ -94,7 +94,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
       {/* Brand, Model and Status */}
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <Label htmlFor="brand">Marque *</Label>
+          <Label htmlFor="brand" required>Marque</Label>
           <SearchableSelect
             options={brandOptions}
             value={selectedBrandId}
@@ -105,7 +105,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
           />
         </div>
         <div>
-          <Label htmlFor="model">Modèle *</Label>
+          <Label htmlFor="model" required>Modèle</Label>
           <SearchableSelect
             options={modelOptions}
             value={formData.model}
