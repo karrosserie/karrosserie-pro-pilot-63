@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
@@ -7,6 +8,7 @@ import FleetLoansHistory from '@/components/fleet/FleetLoansHistory';
 import FleetCurrentLoans from '@/components/fleet/FleetCurrentLoans';
 import FleetViolations from '@/components/fleet/FleetViolations';
 import FleetLoanDialog from '@/components/fleet/FleetLoanDialog';
+import VehicleSelectionDialog from '@/components/fleet/VehicleSelectionDialog';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { LoanFormData } from '@/components/fleet/FleetLoanForm';
 import { useToast } from '@/hooks/use-toast';
@@ -22,6 +24,7 @@ const Fleet = () => {
   const [vehicleToLend, setVehicleToLend] = useState<FleetVehicle | null>(null);
   const [loanDialogMode, setLoanDialogMode] = useState<'create' | 'edit' | 'view' | 'return'>('create');
   const [selectedLoanId, setSelectedLoanId] = useState<string | null>(null);
+  const [isVehicleSelectionOpen, setIsVehicleSelectionOpen] = useState(false);
   const { toast } = useToast();
 
   const handleAddVehicle = () => {
@@ -87,10 +90,16 @@ const Fleet = () => {
   };
 
   const handleNewLoan = () => {
-    console.log('Creating new loan');
-    setVehicleToLend(null);
+    console.log('Opening vehicle selection for new loan');
+    setIsVehicleSelectionOpen(true);
+  };
+
+  const handleVehicleSelected = (vehicle: FleetVehicle) => {
+    console.log('Vehicle selected for new loan:', vehicle);
+    setVehicleToLend(vehicle);
     setSelectedLoanId(null);
     setLoanDialogMode('create');
+    setIsVehicleSelectionOpen(false);
     setIsLoanDialogOpen(true);
   };
 
@@ -171,6 +180,13 @@ const Fleet = () => {
         loanId={selectedLoanId}
         mode={loanDialogMode}
         onSubmit={handleLoanSubmit}
+      />
+
+      <VehicleSelectionDialog
+        isOpen={isVehicleSelectionOpen}
+        onClose={() => setIsVehicleSelectionOpen(false)}
+        vehicles={vehicles || []}
+        onVehicleSelect={handleVehicleSelected}
       />
     </div>
   );
