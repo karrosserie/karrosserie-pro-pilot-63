@@ -78,10 +78,7 @@ export const useFleetPage = () => {
 
   const handleLoanSubmit = (loanData: LoanFormData) => {
     console.log('Loan data:', loanData);
-    toast({
-      title: "Prêt enregistré",
-      description: `Le véhicule ${vehicleToLend?.brand} ${vehicleToLend?.model} a été prêté avec succès.`
-    });
+    // Toast is now handled by the mutation in useFleetReservations
   };
 
   const handleCloseLoanDialog = () => {
@@ -139,10 +136,7 @@ export const useFleetPage = () => {
   const handleDeleteLoan = async (loanId: string) => {
     try {
       await deleteReservation.mutateAsync(loanId);
-      toast({
-        title: "Prêt supprimé",
-        description: "Le prêt a été supprimé avec succès."
-      });
+      // Toast is already handled by the mutation
     } catch (error) {
       console.error('Error deleting loan:', error);
       toast({
