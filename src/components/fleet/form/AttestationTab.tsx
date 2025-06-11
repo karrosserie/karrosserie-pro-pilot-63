@@ -72,7 +72,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
               <div>
                 <Label className="font-semibold">Au Client:</Label>
                 <div className="mt-2 space-y-1">
-                  <div>{{client.firstName} ${client.lastName}}</div>
+                  <div>{client.firstName} ${client.lastName}</div>
                   <div>{client?.address} {client?.zipCode} {client?.city}</div>
                   <div>{client?.phone}</div>
                   {client?.email && <div>{client.email}</div>}
