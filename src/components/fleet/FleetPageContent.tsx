@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useFleetPage } from '@/hooks/use-fleet-page';
 import FleetVehicleDialog from './FleetVehicleDialog';
@@ -64,12 +63,21 @@ const FleetPageContent = () => {
         </button>
       </div>
 
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Rechercher un véhicule..."
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <FleetVehiclesTable
           vehicles={vehicles}
-          isLoading={isLoading}
           searchTerm={searchTerm}
-          onSearchTermChange={setSearchTerm}
+          onSearchChange={setSearchTerm}
           onAddVehicle={handleAddVehicle}
           onEditVehicle={handleEditVehicle}
           onViewVehicle={handleViewVehicle}
@@ -78,8 +86,8 @@ const FleetPageContent = () => {
 
         <div className="space-y-6">
           <FleetCurrentLoans
-            currentLoans={currentLoans}
-            onViewDetails={handleViewLoanDetails}
+            loans={currentLoans}
+            onViewLoan={handleViewLoanDetails}
             onReturnVehicle={handleReturnVehicle}
             onNewLoan={handleNewLoan}
             onDeleteLoan={handleDeleteLoan}
@@ -111,8 +119,7 @@ const FleetPageContent = () => {
       <VehicleSelectionDialog
         isOpen={isVehicleSelectionOpen}
         onClose={() => setIsVehicleSelectionOpen(false)}
-        vehicles={vehicles}
-        onVehicleSelect={handleVehicleSelected}
+        onVehicleSelected={handleVehicleSelected}
       />
     </div>
   );
