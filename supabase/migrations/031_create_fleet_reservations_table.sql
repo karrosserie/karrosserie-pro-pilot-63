@@ -1,4 +1,7 @@
 
+-- Drop existing table if it exists
+DROP TABLE IF EXISTS fleet_reservations;
+
 -- Create fleet_reservations table
 CREATE TABLE fleet_reservations (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,

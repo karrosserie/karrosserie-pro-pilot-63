@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
@@ -69,8 +68,8 @@ const Fleet = () => {
     .filter(reservation => reservation.status === 'active')
     .map(reservation => ({
       id: reservation.id,
-      vehicle: `${reservation.fleet_vehicles?.brand} ${reservation.fleet_vehicles?.model} - ${reservation.fleet_vehicles?.license_plate}`,
-      client: `${reservation.clients?.first_name} ${reservation.clients?.last_name}`,
+      vehicle: `${reservation.fleet_vehicles?.brand || 'N/A'} ${reservation.fleet_vehicles?.model || 'N/A'} - ${reservation.fleet_vehicles?.license_plate || 'N/A'}`,
+      client: `${reservation.clients?.first_name || ''} ${reservation.clients?.last_name || ''}`,
       startDate: new Date(reservation.start_date).toLocaleDateString('fr-FR'),
       expectedReturnDate: new Date(reservation.expected_return_date).toLocaleDateString('fr-FR')
     }));
