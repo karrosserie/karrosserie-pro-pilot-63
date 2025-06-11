@@ -40,6 +40,15 @@ export const useFleetReturnForm = (
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
+
+  // Helper function to safely convert Json array to string array
+  const convertJsonArrayToStringArray = (jsonArray: any): string[] => {
+    if (!jsonArray) return [];
+    if (Array.isArray(jsonArray)) {
+      return jsonArray.filter(item => typeof item === 'string') as string[];
+    }
+    return [];
+  };
   
   const [formData, setFormData] = useState<FleetReturnFormData>({
     reservationId,
@@ -96,7 +105,7 @@ export const useFleetReturnForm = (
         returnDate: formatDateTimeForInput(existingReturnData.return_date),
         returnMileage: existingReturnData.return_mileage || 0,
         fuelLevelReturn: existingReturnData.fuel_level_return || 100,
-        vehicleImages: Array.isArray(existingReturnData.vehicle_images) ? existingReturnData.vehicle_images : [],
+        vehicleImages: convertJsonArrayToStringArray(existingReturnData.vehicle_images),
         damages: parseDamagesFromData(existingReturnData.damages),
         notes: existingReturnData.notes || '',
         attestationAccepted: existingReturnData.attestation_accepted || false,
