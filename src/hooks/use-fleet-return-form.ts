@@ -5,11 +5,13 @@ import { useFleetReservation } from '@/hooks/use-fleet-reservations';
 import { useAuth } from '@/contexts/AuthContext';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { FleetReturnFormData, ReturnDamageItem } from '@/components/fleet/FleetReturnForm.types';
+import { FleetReturn } from '@/services/supabase/fleet-returns';
 
 export const useFleetReturnForm = (
   vehicle: FleetVehicle, 
   onSubmit: (returnData: FleetReturnFormData) => void, 
-  reservationId: string
+  reservationId: string,
+  existingReturnData?: FleetReturn | null
 ) => {
   const [activeTab, setActiveTab] = useState('damages');
   const { createReturn } = useFleetReturns();
@@ -24,6 +26,18 @@ export const useFleetReturnForm = (
     const day = String(now.getDate()).padStart(2, '0');
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+  // Helper function to format date for datetime-local input
+  const formatDateTimeForInput = (dateString: string) => {
+    if (!dateString) return getCurrentDateTime();
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
   
@@ -42,8 +56,8 @@ export const useFleetReturnForm = (
     clientName: ''
   });
 
-  // Helper function to safely parse damages from reservation
-  const parseDamagesFromReservation = (damages: any): ReturnDamageItem[] => {
+  // Helper function to safely parse damages from reservation or return
+  const parseDamagesFromData = (damages: any): ReturnDamageItem[] => {
     if (!damages) return [];
     
     // If damages is already an array of the correct type
@@ -67,11 +81,30 @@ export const useFleetReturnForm = (
         ...prev,
         clientId: reservation.client_id || '',
         clientName: reservation.clients ? `${reservation.clients.first_name} ${reservation.clients.last_name}` : '',
-        damages: parseDamagesFromReservation(reservation.damages),
+        damages: parseDamagesFromData(reservation.damages),
         returnMileage: reservation.start_mileage || vehicle.mileage || 0
       }));
     }
   }, [reservation, vehicle.mileage]);
+
+  // Update form data when existing return data is loaded (for view mode)
+  useEffect(() => {
+    if (existingReturnData) {
+      console.log('Loading existing return data:', existingReturnData);
+      setFormData(prev => ({
+        ...prev,
+        returnDate: formatDateTimeForInput(existingReturnData.return_date),
+        returnMileage: existingReturnData.return_mileage || 0,
+        fuelLevelReturn: existingReturnData.fuel_level_return || 100,
+        vehicleImages: Array.isArray(existingReturnData.vehicle_images) ? existingReturnData.vehicle_images : [],
+        damages: parseDamagesFromData(existingReturnData.damages),
+        notes: existingReturnData.notes || '',
+        attestationAccepted: existingReturnData.attestation_accepted || false,
+        clientSignature: existingReturnData.client_signature || '',
+        clientName: existingReturnData.client_name || ''
+      }));
+    }
+  }, [existingReturnData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
