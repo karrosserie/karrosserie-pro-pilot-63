@@ -26,7 +26,7 @@ export function useFleetReturns() {
         description: "Le retour du véhicule a été enregistré avec succès."
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Erreur",
         description: `Impossible d'enregistrer le retour: ${error.message}`,
@@ -45,7 +45,7 @@ export function useFleetReturns() {
         description: "Le retour a été mis à jour avec succès."
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Erreur",
         description: `Impossible de mettre à jour le retour: ${error.message}`,
@@ -63,7 +63,7 @@ export function useFleetReturns() {
         description: "Le retour a été supprimé avec succès."
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Erreur",
         description: `Impossible de supprimer le retour: ${error.message}`,

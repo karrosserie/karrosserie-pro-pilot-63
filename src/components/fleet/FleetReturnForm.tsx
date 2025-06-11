@@ -3,11 +3,10 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useFleetReturnForm } from '@/hooks/use-fleet-return-form';
-import { useFleetLoanFormValidation } from './form/FleetLoanFormValidation';
 import FleetReturnFormNavigation from './form/FleetReturnFormNavigation';
-import DamageAssessmentTab from './form/DamageAssessmentTab';
+import ReturnDamageAssessmentTab from './form/ReturnDamageAssessmentTab';
 import VehicleDetailsTab from './form/VehicleDetailsTab';
-import AttestationTab from './form/AttestationTab';
+import ReturnAttestationTab from './form/ReturnAttestationTab';
 import { FleetReturnFormData } from './FleetReturnForm.types';
 
 interface FleetReturnFormProps {
@@ -92,7 +91,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
         </TabsList>
 
         <TabsContent value="damages" className="space-y-6">
-          <DamageAssessmentTab
+          <ReturnDamageAssessmentTab
             damages={formData.damages}
             onDamageUpdate={handleDamageUpdate}
           />
@@ -113,12 +112,11 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
         </TabsContent>
 
         <TabsContent value="attestation" className="space-y-6">
-          <AttestationTab
+          <ReturnAttestationTab
             formData={{
               clientId: formData.clientId,
               clientName: formData.clientName,
-              startDate: '',
-              expectedReturnDate: formData.returnDate,
+              returnDate: formData.returnDate,
               attestationAccepted: formData.attestationAccepted,
               clientSignature: formData.clientSignature
             }}

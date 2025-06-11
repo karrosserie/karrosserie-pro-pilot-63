@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dialog';
 import FleetLoanForm, { LoanFormData } from './FleetLoanForm';
 import FleetReturnForm from './FleetReturnForm';
+import { FleetReturnFormData } from './FleetReturnForm.types';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useFleetReservation } from '@/hooks/use-fleet-reservations';
 
@@ -17,7 +18,7 @@ interface FleetLoanDialogProps {
   vehicle: FleetVehicle | null;
   loanId: string | null;
   mode: 'create' | 'edit' | 'view' | 'return';
-  onSubmit: (loanData: LoanFormData) => void;
+  onSubmit: (loanData: LoanFormData | FleetReturnFormData) => void;
 }
 
 const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
@@ -30,8 +31,13 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
 }) => {
   const { reservation } = useFleetReservation(loanId || undefined);
 
-  const handleSubmit = (loanData: LoanFormData) => {
+  const handleLoanSubmit = (loanData: LoanFormData) => {
     onSubmit(loanData);
+    onClose();
+  };
+
+  const handleReturnSubmit = (returnData: FleetReturnFormData) => {
+    onSubmit(returnData);
     onClose();
   };
 
@@ -82,20 +88,20 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
         {mode === 'create' && vehicle ? (
           <FleetLoanForm
             vehicle={vehicle}
-            onSubmit={handleSubmit}
+            onSubmit={handleLoanSubmit}
             onCancel={onClose}
           />
         ) : mode === 'edit' && reservation && reservation.fleet_vehicles ? (
           <FleetLoanForm
             vehicle={createCompleteVehicle(reservation.fleet_vehicles)}
-            onSubmit={handleSubmit}
+            onSubmit={handleLoanSubmit}
             onCancel={onClose}
             defaultValues={reservation}
           />
         ) : mode === 'view' && reservation && reservation.fleet_vehicles ? (
           <FleetLoanForm
             vehicle={createCompleteVehicle(reservation.fleet_vehicles)}
-            onSubmit={handleSubmit}
+            onSubmit={handleLoanSubmit}
             onCancel={onClose}
             defaultValues={reservation}
             isViewMode={true}
@@ -104,7 +110,7 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
           <FleetReturnForm
             vehicle={createCompleteVehicle(reservation.fleet_vehicles)}
             reservationId={reservation.id}
-            onSubmit={handleSubmit}
+            onSubmit={handleReturnSubmit}
             onCancel={onClose}
           />
         ) : (

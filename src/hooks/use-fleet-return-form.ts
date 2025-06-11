@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useFleetReturns } from '@/hooks/use-fleet-returns';
 import { useAuth } from '@/contexts/AuthContext';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
-import { FleetReturnFormData, DamageItem } from '@/components/fleet/FleetReturnForm.types';
+import { FleetReturnFormData, ReturnDamageItem } from '@/components/fleet/FleetReturnForm.types';
 
 export const useFleetReturnForm = (
   vehicle: FleetVehicle, 
@@ -85,7 +85,7 @@ export const useFleetReturnForm = (
     });
   };
 
-  const handleDamageUpdate = (damages: DamageItem[]) => {
+  const handleDamageUpdate = (damages: ReturnDamageItem[]) => {
     setFormData(prev => ({ ...prev, damages }));
   };
 

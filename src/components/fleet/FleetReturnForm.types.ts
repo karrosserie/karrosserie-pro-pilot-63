@@ -7,18 +7,16 @@ export interface FleetReturnFormData {
   returnMileage: number;
   fuelLevelReturn: number;
   vehicleImages: string[];
-  damages: DamageItem[];
+  damages: ReturnDamageItem[];
   notes: string;
   attestationAccepted: boolean;
   clientSignature: string;
   clientName: string;
 }
 
-export interface DamageItem {
+// Type pour les dommages dans le retour (compatible avec DamageAssessmentTab)
+export interface ReturnDamageItem {
   id: string;
-  type: string;
-  description: string;
-  severity: 'light' | 'moderate' | 'severe';
-  location: string;
-  images: string[];
+  name: string;
+  type: 'none' | 'rayure' | 'choc' | 'hs';
 }
