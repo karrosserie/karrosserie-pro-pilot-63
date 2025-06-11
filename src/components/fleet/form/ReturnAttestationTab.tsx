@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
-import { SignaturePad } from '@/components/shared/SignaturePad';
+import SignaturePad from '@/components/shared/SignaturePad';
 import { FleetReturnFormData } from '@/components/fleet/FleetReturnForm.types';
 
 interface ReturnAttestationTabProps {
