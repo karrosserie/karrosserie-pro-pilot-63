@@ -78,23 +78,25 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-medium text-gray-900">
-          {vehicle.brand} {vehicle.model} ({vehicle.license_plate})
-        </h3>
-      </div>
-
-      {/* Date et heure de retour field - outside tabs */}
-      <div>
-        <Label htmlFor="returnDate">Date et heure de retour</Label>
-        <Input
-          id="returnDate"
-          name="returnDate"
-          type="datetime-local"
-          value={formData.returnDate}
-          onChange={handleInputChange}
-          className="mt-2"
-        />
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+        <div className="col-span-4 space-y-2">
+          <h3 className="text-lg font-medium text-gray-900">
+            {vehicle.brand} {vehicle.model} ({vehicle.license_plate})
+          </h3>
+        </div>
+  
+        {/* Date et heure de retour field - outside tabs */}
+        <div className="space-y-2">
+          <Label htmlFor="returnDate">Date et heure de retour</Label>
+          <Input
+            id="returnDate"
+            name="returnDate"
+            type="datetime-local"
+            value={formData.returnDate}
+            onChange={handleInputChange}
+            className="mt-2"
+          />
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">

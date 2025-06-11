@@ -113,18 +113,18 @@ const ReturnAttestationTab: React.FC<ReturnAttestationTabProps> = ({
 
             <div className="space-y-4">
               <div>
-                <Label className="font-semibold">Informations du prêt initial:</Label>
+                <Label className="font-semibold">Départ:</Label>
                 <div className="mt-2 space-y-1">
-                  <div>Départ le : {reservation?.start_date ? formatDateTimeToFrench(reservation.start_date) : 'N/A'}</div>
-                  <div>Kilométrage départ : {reservation?.start_mileage || 'N/A'} Km</div>
-                  <div>Retour prévu le : {reservation?.expected_return_date ? formatDateTimeToFrench(reservation.expected_return_date) : 'N/A'}</div>
+                  <div>Le : {formatDateTimeToFrench(reservation.startDate)}</div>
+                  <div>Kilométrage : {reservation.mileage} Km</div>
                 </div>
               </div>
               
               <div>
-                <Label className="font-semibold">Retour effectif:</Label>
+                <Label className="font-semibold">Retour:</Label>
                 <div className="mt-2 space-y-1">
                   <div>Le : {formatDateTimeToFrench(formData.returnDate)}</div>
+                  <div>Kilométrage : {formData.mileage} Km</div>
                 </div>
               </div>
             </div>
