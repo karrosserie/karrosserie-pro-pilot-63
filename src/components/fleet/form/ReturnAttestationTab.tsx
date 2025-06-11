@@ -101,7 +101,7 @@ const ReturnAttestationTab: React.FC<ReturnAttestationTabProps> = ({
         <div className="space-y-4">
           <SignaturePad
             value={formData.clientSignature}
-            onChange={(signature) => onSignatureChange('clientSignature', signature)}
+            onSignatureChange={(signature) => onSignatureChange('clientSignature', signature)}
             disabled={isViewMode}
           />
         </div>
