@@ -41,6 +41,24 @@ export const useFleetReturnForm = (
     clientName: ''
   });
 
+  // Helper function to safely parse damages from reservation
+  const parseDamagesFromReservation = (damages: any): ReturnDamageItem[] => {
+    if (!damages) return [];
+    
+    // If damages is already an array of the correct type
+    if (Array.isArray(damages)) {
+      return damages.filter(item => 
+        item && 
+        typeof item === 'object' && 
+        'id' in item && 
+        'name' in item && 
+        'type' in item
+      ) as ReturnDamageItem[];
+    }
+    
+    return [];
+  };
+
   // Update form data when reservation data is loaded
   useEffect(() => {
     if (reservation) {
@@ -48,7 +66,7 @@ export const useFleetReturnForm = (
         ...prev,
         clientId: reservation.client_id || '',
         clientName: reservation.clients ? `${reservation.clients.first_name} ${reservation.clients.last_name}` : '',
-        damages: reservation.damages || [],
+        damages: parseDamagesFromReservation(reservation.damages),
         returnMileage: reservation.start_mileage || vehicle.mileage || 0
       }));
     }
