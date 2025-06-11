@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useFleetPage } from '@/hooks/use-fleet-page';
 import FleetVehicleDialog from './FleetVehicleDialog';
@@ -76,8 +77,9 @@ const FleetPageContent = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <FleetVehiclesTable
           vehicles={vehicles}
+          isLoading={isLoading}
           searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
+          onSearchTermChange={setSearchTerm}
           onAddVehicle={handleAddVehicle}
           onEditVehicle={handleEditVehicle}
           onViewVehicle={handleViewVehicle}
@@ -86,7 +88,7 @@ const FleetPageContent = () => {
 
         <div className="space-y-6">
           <FleetCurrentLoans
-            loans={currentLoans}
+            currentLoans={currentLoans}
             onViewLoan={handleViewLoanDetails}
             onReturnVehicle={handleReturnVehicle}
             onNewLoan={handleNewLoan}
@@ -119,7 +121,8 @@ const FleetPageContent = () => {
       <VehicleSelectionDialog
         isOpen={isVehicleSelectionOpen}
         onClose={() => setIsVehicleSelectionOpen(false)}
-        onVehicleSelected={handleVehicleSelected}
+        vehicles={vehicles}
+        onVehicleSelect={handleVehicleSelected}
       />
     </div>
   );
