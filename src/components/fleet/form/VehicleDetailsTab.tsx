@@ -66,7 +66,7 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
         <Label>Photos du véhicule au retour</Label>
         <MultipleVehicleImages
           vehicleId={vehicleId}
-          currentImages={vehicleImages}
+          images={vehicleImages}
           onImageAdd={onImageAdd}
           onImageRemove={onImageRemove}
           onImageUpdate={onImageUpdate}

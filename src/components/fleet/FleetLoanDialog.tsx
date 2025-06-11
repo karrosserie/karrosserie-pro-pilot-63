@@ -62,7 +62,7 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
         {mode === 'return' ? (
           reservation?.fleet_vehicles ? (
             <FleetReturnForm
-              vehicle={reservation.fleet_vehicles}
+              vehicle={reservation.fleet_vehicles as FleetVehicle}
               reservationId={loanId || ''}
               onSubmit={handleReturnSubmit}
               onCancel={onClose}
@@ -77,7 +77,6 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
         ) : (
           <FleetLoanForm
             vehicle={vehicle}
-            loanId={loanId}
             mode={mode}
             onSubmit={onSubmit || (() => {})}
             onCancel={onClose}
