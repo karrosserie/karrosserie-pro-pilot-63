@@ -77,9 +77,9 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
         ) : (
           <FleetLoanForm
             vehicle={vehicle}
-            mode={mode}
             onSubmit={onSubmit || (() => {})}
             onCancel={onClose}
+            isViewMode={mode === 'view'}
           />
         )}
       </DialogContent>

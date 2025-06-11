@@ -66,11 +66,11 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
         <Label>Photos du véhicule au retour</Label>
         <MultipleVehicleImages
           vehicleId={vehicleId}
-          images={vehicleImages}
+          vehicleImages={vehicleImages}
           onImageAdd={onImageAdd}
           onImageRemove={onImageRemove}
           onImageUpdate={onImageUpdate}
-          disabled={isViewMode}
+          isViewMode={isViewMode}
         />
         {isViewMode && vehicleImages.length === 0 && (
           <p className="text-sm text-muted-foreground">Aucune photo disponible</p>
