@@ -104,7 +104,7 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
                         Prêter
                       </Button>
                       <Button 
-                        variant="ghost" 
+                        variant="outline" 
                         size="sm"
                         onClick={() => onEditVehicle(vehicle)}
                       >

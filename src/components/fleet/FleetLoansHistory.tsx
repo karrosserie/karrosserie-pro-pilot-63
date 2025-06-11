@@ -2,10 +2,14 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 
-const FleetLoansHistory: React.FC = () => {
+interface FleetLoansHistoryProps {
+  onViewLoan?: (loanId: string) => void;
+}
+
+const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ onViewLoan }) => {
   const handleViewLoan = (loanId: string) => {
     console.log('Viewing loan:', loanId);
-    // TODO: Implement loan details view
+    onViewLoan?.(loanId);
   };
 
   return (

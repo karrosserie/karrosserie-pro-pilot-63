@@ -64,6 +64,43 @@ const Fleet = () => {
     setVehicleToLend(null);
   };
 
+  // Handlers for loan actions
+  const handleViewLoanDetails = (loanId: string) => {
+    console.log('Opening loan details for:', loanId);
+    // TODO: Implement loan details dialog
+    toast({
+      title: "Détails du prêt",
+      description: `Ouverture des détails pour le prêt ${loanId}`
+    });
+  };
+
+  const handleReturnVehicle = (loanId: string) => {
+    console.log('Processing vehicle return for:', loanId);
+    // TODO: Implement vehicle return process
+    toast({
+      title: "Retour de véhicule",
+      description: `Traitement du retour pour le prêt ${loanId}`
+    });
+  };
+
+  const handleNewLoan = () => {
+    console.log('Creating new loan');
+    // TODO: Open new loan creation dialog
+    toast({
+      title: "Nouveau prêt",
+      description: "Ouverture du formulaire de nouveau prêt"
+    });
+  };
+
+  const handleViewLoan = (loanId: string) => {
+    console.log('Viewing loan:', loanId);
+    // TODO: Implement loan view dialog
+    toast({
+      title: "Consultation du prêt",
+      description: `Consultation du prêt ${loanId}`
+    });
+  };
+
   // Convert reservations to current loans format
   const currentLoans = (reservations || [])
     .filter(reservation => reservation.status === 'active')
@@ -105,11 +142,16 @@ const Fleet = () => {
             onLendVehicle={handleLendVehicle}
           />
           
-          <FleetLoansHistory />
+          <FleetLoansHistory onViewLoan={handleViewLoan} />
         </div>
         
         <div className="space-y-6">
-          <FleetCurrentLoans currentLoans={currentLoans} />
+          <FleetCurrentLoans 
+            currentLoans={currentLoans}
+            onViewDetails={handleViewLoanDetails}
+            onReturnVehicle={handleReturnVehicle}
+            onNewLoan={handleNewLoan}
+          />
           <FleetViolations />
         </div>
       </div>

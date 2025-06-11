@@ -13,22 +13,30 @@ interface CurrentLoan {
 
 interface FleetCurrentLoansProps {
   currentLoans: CurrentLoan[];
+  onViewDetails?: (loanId: string) => void;
+  onReturnVehicle?: (loanId: string) => void;
+  onNewLoan?: () => void;
 }
 
-const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({ currentLoans }) => {
+const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({ 
+  currentLoans, 
+  onViewDetails,
+  onReturnVehicle,
+  onNewLoan 
+}) => {
   const handleViewDetails = (loanId: string) => {
     console.log('Viewing loan details:', loanId);
-    // TODO: Implement loan details view
+    onViewDetails?.(loanId);
   };
 
   const handleReturnVehicle = (loanId: string) => {
     console.log('Processing vehicle return:', loanId);
-    // TODO: Implement vehicle return process
+    onReturnVehicle?.(loanId);
   };
 
   const handleNewLoan = () => {
     console.log('Creating new loan');
-    // TODO: Implement new loan creation
+    onNewLoan?.();
   };
 
   return (
@@ -67,7 +75,7 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({ currentLoans }) =
                 Détails
               </Button>
               <Button 
-                variant="outline" 
+                className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
                 size="sm"
                 onClick={() => handleReturnVehicle(loan.id)}
               >
