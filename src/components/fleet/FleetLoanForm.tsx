@@ -14,6 +14,9 @@ interface FleetLoanFormProps {
 
 export interface LoanFormData {
   vehicleId: string;
+  clientName: string;
+  clientPhone: string;
+  clientEmail: string;
   startDate: string;
   expectedReturnDate: string;
   notes?: string;
@@ -39,6 +42,9 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
 }) => {
   const [formData, setFormData] = useState<LoanFormData>({
     vehicleId: vehicle.id,
+    clientName: '',
+    clientPhone: '',
+    clientEmail: '',
     startDate: new Date().toISOString().split('T')[0],
     expectedReturnDate: '',
     notes: '',
