@@ -56,7 +56,7 @@ const FleetPageContent = () => {
     console.log('Opening return form in read-only mode for loan:', loanId);
     setSelectedLoanId(loanId);
     setVehicleToLend(null);
-    setLoanDialogMode('view'); // This will show the return form in read-only mode
+    setLoanDialogMode('return'); // Use 'return' mode to show the return form
     setIsLoanDialogOpen(true);
   };
 
