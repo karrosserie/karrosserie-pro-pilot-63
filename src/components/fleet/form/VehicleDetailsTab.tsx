@@ -37,40 +37,46 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label htmlFor="mileage">Kilométrage actuel *</Label>
-          <Input
-            id="mileage"
-            name="mileage"
-            type="number"
-            value={mileage}
-            onChange={handleMileageChange}
-            placeholder="Ex: 45000"
-            disabled={isViewMode}
-            min="0"
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left column: Photos du véhicule */}
+        <div className="space-y-4">
+          <MultipleVehicleImages
+            vehicleId={vehicleId}
+            vehicleImages={vehicleImages}
+            isViewMode={isViewMode}
+            onImageAdd={onImageAdd}
+            onImageRemove={onImageRemove}
+            onImageUpdate={onImageUpdate}
           />
         </div>
 
-        <div className="space-y-2">
-          <Label>Niveau de carburant</Label>
-          <FuelGauge
-            value={fuelLevel}
-            onChange={onFuelLevelChange}
-            disabled={isViewMode}
-          />
-        </div>
-      </div>
+        {/* Right column: Kilométrage et carburant */}
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="mileage">Kilométrage actuel *</Label>
+            <Input
+              id="mileage"
+              name="mileage"
+              type="number"
+              value={mileage}
+              onChange={handleMileageChange}
+              placeholder="Ex: 45000"
+              disabled={isViewMode}
+              min="0"
+            />
+          </div>
 
-      <div className="space-y-4">
-        <MultipleVehicleImages
-          vehicleId={vehicleId}
-          vehicleImages={vehicleImages}
-          isViewMode={isViewMode}
-          onImageAdd={onImageAdd}
-          onImageRemove={onImageRemove}
-          onImageUpdate={onImageUpdate}
-        />
+          <div className="space-y-2">
+            <Label>Niveau de carburant</Label>
+            <div className="flex justify-center">
+              <FuelGauge
+                value={fuelLevel}
+                onChange={onFuelLevelChange}
+                disabled={isViewMode}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import DamageAssessmentTab from './form/DamageAssessmentTab';
 import VehicleDetailsTab from './form/VehicleDetailsTab';
-import ClientInfoTab from './form/ClientInfoTab';
+import DocumentsTab from './form/DocumentsTab';
 
 interface FleetLoanFormProps {
   vehicle: FleetVehicle;
@@ -13,9 +14,6 @@ interface FleetLoanFormProps {
 
 export interface LoanFormData {
   vehicleId: string;
-  clientName: string;
-  clientPhone: string;
-  clientEmail: string;
   startDate: string;
   expectedReturnDate: string;
   notes?: string;
@@ -23,6 +21,9 @@ export interface LoanFormData {
   fuelLevel: number;
   vehicleImages: string[];
   damages: DamageItem[];
+  registrationFrontUrl: string;
+  registrationBackUrl: string;
+  insuranceCardUrl: string;
 }
 
 interface DamageItem {
@@ -38,25 +39,17 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
 }) => {
   const [formData, setFormData] = useState<LoanFormData>({
     vehicleId: vehicle.id,
-    clientName: '',
-    clientPhone: '',
-    clientEmail: '',
     startDate: new Date().toISOString().split('T')[0],
     expectedReturnDate: '',
     notes: '',
     mileage: vehicle.mileage || 0,
     fuelLevel: 100,
     vehicleImages: [],
-    damages: []
+    damages: [],
+    registrationFrontUrl: '',
+    registrationBackUrl: '',
+    insuranceCardUrl: ''
   });
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
 
   const handleMileageChange = (mileage: number) => {
     setFormData(prev => ({ ...prev, mileage }));
@@ -91,6 +84,18 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     setFormData(prev => ({ ...prev, damages }));
   };
 
+  const handleRegistrationFrontUpload = (url: string) => {
+    setFormData(prev => ({ ...prev, registrationFrontUrl: url }));
+  };
+
+  const handleRegistrationBackUpload = (url: string) => {
+    setFormData(prev => ({ ...prev, registrationBackUrl: url }));
+  };
+
+  const handleInsuranceCardUpload = (url: string) => {
+    setFormData(prev => ({ ...prev, insuranceCardUrl: url }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
@@ -108,7 +113,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="damages">Chocs & rayures</TabsTrigger>
           <TabsTrigger value="vehicle-details">Détails du véhicule & photos</TabsTrigger>
-          <TabsTrigger value="client-info">Informations sur le client</TabsTrigger>
+          <TabsTrigger value="documents">Documents</TabsTrigger>
         </TabsList>
 
         <TabsContent value="damages" className="space-y-6 mt-6">
@@ -132,10 +137,15 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="client-info" className="space-y-6 mt-6">
-          <ClientInfoTab
-            formData={formData}
-            onInputChange={handleInputChange}
+        <TabsContent value="documents" className="space-y-6 mt-6">
+          <DocumentsTab
+            vehicleId={vehicle.id}
+            registrationFrontUrl={formData.registrationFrontUrl}
+            registrationBackUrl={formData.registrationBackUrl}
+            insuranceCardUrl={formData.insuranceCardUrl}
+            onRegistrationFrontUpload={handleRegistrationFrontUpload}
+            onRegistrationBackUpload={handleRegistrationBackUpload}
+            onInsuranceCardUpload={handleInsuranceCardUpload}
             onSubmit={handleSubmit}
             onCancel={onCancel}
           />
