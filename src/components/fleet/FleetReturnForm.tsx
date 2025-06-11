@@ -2,32 +2,32 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
-import { useFleetLoanForm } from '@/hooks/use-fleet-loan-form';
+import { useFleetReturnForm } from '@/hooks/use-fleet-return-form';
 import { useFleetLoanFormValidation } from './form/FleetLoanFormValidation';
 import FleetReturnFormNavigation from './form/FleetReturnFormNavigation';
 import DamageAssessmentTab from './form/DamageAssessmentTab';
 import VehicleDetailsTab from './form/VehicleDetailsTab';
 import AttestationTab from './form/AttestationTab';
-import { LoanFormData, DamageItem } from './FleetLoanForm';
+import { FleetReturnFormData } from './FleetReturnForm.types';
 
 interface FleetReturnFormProps {
   vehicle: FleetVehicle;
-  onSubmit: (loanData: LoanFormData) => void;
+  reservationId: string;
+  onSubmit: (returnData: FleetReturnFormData) => void;
   onCancel: () => void;
-  defaultValues?: any;
 }
 
 const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
   vehicle,
+  reservationId,
   onSubmit,
-  onCancel,
-  defaultValues
+  onCancel
 }) => {
   const {
     activeTab,
     setActiveTab,
     formData,
-    createReservation,
+    createReturn,
     handleInputChange,
     handleClientSelect,
     handleMileageChange,
@@ -36,15 +36,19 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
     handleImageRemove,
     handleImageUpdate,
     handleDamageUpdate,
-    handleDriverLicenseFrontUpload,
-    handleDriverLicenseBackUpload,
-    handleInsuranceSwitchChange,
-    handleInsurancePhoneChange,
     handleSignatureChange,
     handleSubmit
-  } = useFleetLoanForm(vehicle, onSubmit, defaultValues);
+  } = useFleetReturnForm(vehicle, onSubmit, reservationId);
 
-  const { isFormValid } = useFleetLoanFormValidation(formData);
+  // Simple validation for return form
+  const isFormValid = () => {
+    return formData.clientId && 
+           formData.returnMileage >= 0 && 
+           formData.fuelLevelReturn >= 0 && 
+           formData.attestationAccepted && 
+           formData.clientSignature && 
+           formData.clientName;
+  };
 
   const tabs = [
     { value: 'damages', label: 'Chocs & rayures' },
@@ -69,11 +73,6 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
       setActiveTab(prevTab.value);
     }
   };
-
-  React.useEffect(() => {
-    // Set initial active tab to damages for return form
-    setActiveTab('damages');
-  }, [setActiveTab]);
 
   return (
     <div className="space-y-6">
@@ -102,8 +101,8 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
         <TabsContent value="vehicle-details" className="space-y-6">
           <VehicleDetailsTab
             vehicleId={vehicle.id}
-            mileage={formData.mileage}
-            fuelLevel={formData.fuelLevel}
+            mileage={formData.returnMileage}
+            fuelLevel={formData.fuelLevelReturn}
             vehicleImages={formData.vehicleImages}
             onMileageChange={handleMileageChange}
             onFuelLevelChange={handleFuelLevelChange}
@@ -115,7 +114,14 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
 
         <TabsContent value="attestation" className="space-y-6">
           <AttestationTab
-            formData={formData}
+            formData={{
+              clientId: formData.clientId,
+              clientName: formData.clientName,
+              startDate: '',
+              expectedReturnDate: formData.returnDate,
+              attestationAccepted: formData.attestationAccepted,
+              clientSignature: formData.clientSignature
+            }}
             vehicle={vehicle}
             onInputChange={handleInputChange}
             onSignatureChange={handleSignatureChange}
@@ -130,7 +136,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
         onNext={handleNext}
         onSubmit={handleSubmit}
         isFormValid={Boolean(isFormValid())}
-        isPending={createReservation.isPending}
+        isPending={createReturn.isPending}
         isFirstTab={isFirstTab}
         isLastTab={isLastTab}
       />

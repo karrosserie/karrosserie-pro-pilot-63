@@ -103,9 +103,9 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
         ) : mode === 'return' && reservation && reservation.fleet_vehicles ? (
           <FleetReturnForm
             vehicle={createCompleteVehicle(reservation.fleet_vehicles)}
+            reservationId={reservation.id}
             onSubmit={handleSubmit}
             onCancel={onClose}
-            defaultValues={reservation}
           />
         ) : (
           <div className="p-4">
