@@ -166,6 +166,7 @@ export const useFleetPage = () => {
     
     // Setters
     setSearchTerm,
+    setIsVehicleSelectionOpen,
     
     // Handlers
     handleAddVehicle,
