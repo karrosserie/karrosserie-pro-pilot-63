@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,14 +13,32 @@ export const useFleetLoanForm = (vehicle: FleetVehicle, onSubmit: (loanData: Loa
   // Determine if we're editing an existing reservation
   const isEditing = Boolean(defaultValues?.id);
   
+  // Helper function to format date for datetime-local input
+  const formatDateTimeLocal = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+  // Helper function to get current date/time for datetime-local input
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    return formatDateTimeLocal(now.toISOString());
+  };
+  
   const [formData, setFormData] = useState<LoanFormData>({
     vehicleId: vehicle.id,
     clientId: defaultValues?.client_id || '',
     clientName: defaultValues?.clients ? `${defaultValues.clients.first_name} ${defaultValues.clients.last_name}` : '',
     clientPhone: defaultValues?.clients?.phone || '',
     clientEmail: defaultValues?.clients?.email || '',
-    startDate: defaultValues?.start_date || new Date().toISOString().split('T')[0],
-    expectedReturnDate: defaultValues?.expected_return_date || '',
+    startDate: defaultValues?.start_date ? formatDateTimeLocal(defaultValues.start_date) : getCurrentDateTime(),
+    expectedReturnDate: defaultValues?.expected_return_date ? formatDateTimeLocal(defaultValues.expected_return_date) : '',
     notes: defaultValues?.notes || '',
     mileage: defaultValues?.start_mileage || vehicle.mileage || 0,
     fuelLevel: defaultValues?.fuel_level_start || 100,

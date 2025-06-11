@@ -62,7 +62,7 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
           <Input
             id="startDate"
             name="startDate"
-            type="date"
+            type="datetime-local"
             value={formData.startDate}
             onChange={onInputChange}
             required
@@ -77,7 +77,7 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
           <Input
             id="expectedReturnDate"
             name="expectedReturnDate"
-            type="date"
+            type="datetime-local"
             value={formData.expectedReturnDate}
             onChange={onInputChange}
             required
