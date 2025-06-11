@@ -4,6 +4,19 @@ import { useAuth } from '@/contexts/AuthContext';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { LoanFormData, DamageItem } from '@/components/fleet/FleetLoanForm';
 
+// Helper function to convert date to datetime-local format
+const formatDateTimeLocal = (dateString: string) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm
+};
+
+// Helper function to get current datetime in local format
+const getCurrentDateTimeLocal = () => {
+  const now = new Date();
+  return now.toISOString().slice(0, 16);
+};
+
 export const useFleetLoanForm = (vehicle: FleetVehicle, onSubmit: (loanData: LoanFormData) => void, defaultValues?: any) => {
   const [activeTab, setActiveTab] = useState('client-info');
   const { createReservation, updateReservation } = useFleetReservations();
@@ -18,8 +31,8 @@ export const useFleetLoanForm = (vehicle: FleetVehicle, onSubmit: (loanData: Loa
     clientName: defaultValues?.clients ? `${defaultValues.clients.first_name} ${defaultValues.clients.last_name}` : '',
     clientPhone: defaultValues?.clients?.phone || '',
     clientEmail: defaultValues?.clients?.email || '',
-    startDate: defaultValues?.start_date || new Date().toISOString().split('T')[0],
-    expectedReturnDate: defaultValues?.expected_return_date || '',
+    startDate: defaultValues?.start_date ? formatDateTimeLocal(defaultValues.start_date) : getCurrentDateTimeLocal(),
+    expectedReturnDate: defaultValues?.expected_return_date ? formatDateTimeLocal(defaultValues.expected_return_date) : '',
     notes: defaultValues?.notes || '',
     mileage: defaultValues?.start_mileage || vehicle.mileage || 0,
     fuelLevel: defaultValues?.fuel_level_start || 100,
@@ -133,12 +146,12 @@ export const useFleetLoanForm = (vehicle: FleetVehicle, onSubmit: (loanData: Loa
     }
 
     try {
-      // Prepare data for database with proper JSON conversion
+      // Convert datetime-local format back to ISO string for database
       const reservationData = {
         fleet_vehicle_id: formData.vehicleId,
         client_id: formData.clientId,
-        start_date: formData.startDate,
-        expected_return_date: formData.expectedReturnDate,
+        start_date: new Date(formData.startDate).toISOString(),
+        expected_return_date: new Date(formData.expectedReturnDate).toISOString(),
         start_mileage: formData.mileage,
         fuel_level_start: formData.fuelLevel,
         notes: formData.notes || '',
