@@ -108,17 +108,17 @@ export const useFleetLoanFormHandlers = (
       const reservationData = prepareReservationData(formData, formData.vehicleId, user.id);
 
       if (isEditing && defaultValues?.id) {
-        // Update existing reservation - toast will be handled by the mutation
+        // Update existing reservation - toast is handled by the mutation
         await updateReservation.mutateAsync({
           id: defaultValues.id,
           data: reservationData
         });
       } else {
-        // Create new reservation - toast will be handled by the mutation
+        // Create new reservation - toast is handled by the mutation
         await createReservation.mutateAsync(reservationData);
       }
       
-      // Call the onSubmit callback without showing additional toast
+      // Call the onSubmit callback without any additional toast
       onSubmit(formData);
     } catch (error) {
       console.error('Error saving reservation:', error);
