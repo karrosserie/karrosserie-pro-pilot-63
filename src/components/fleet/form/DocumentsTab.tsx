@@ -26,7 +26,7 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({
 }) => {
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="space-y-6">
         <div className="space-y-2">
           <Label required>Certificat d'immatriculation (Recto)</Label>
           <DocumentUploader
@@ -49,7 +49,7 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({
           />
         </div>
 
-        <div className="md:col-span-2 space-y-2">
+        <div className="space-y-2">
           <Label required>Carte verte d'assurance</Label>
           <DocumentUploader
             documentType="insurance"
