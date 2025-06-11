@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -74,10 +73,12 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
     try {
       const submissionData = {
         vin: formData.vin,
+        engine_number: formData.engine_number,
         brand: formData.brand,
         model: formData.model,
         year: formData.year,
         license_plate: formData.license_plate,
+        color: formData.color,
         status: formData.status
       };
 
@@ -111,6 +112,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
             <FleetVehicleBasicInfo
               formData={{
                 vin: formData.vin,
+                engine_number: formData.engine_number,
                 brand: formData.brand,
                 model: formData.model,
                 status: formData.status
