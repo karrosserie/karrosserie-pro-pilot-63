@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
@@ -74,8 +75,8 @@ const DamageAssessmentTab: React.FC<DamageAssessmentTabProps> = ({
       <h4 className="font-medium text-gray-700">{title}</h4>
       <div className="space-y-2">
         {items.map((item) => (
-          <div key={item.id} className="grid grid-cols-4 gap-4 items-center py-2 border-b border-gray-100">
-            <div className="text-sm text-gray-600">{item.name}</div>
+          <div key={item.id} className="grid grid-cols-5 gap-4 items-center py-2 border-b border-gray-100">
+            <div className="col-span-2 text-sm text-gray-600">{item.name}</div>
             <div className="flex justify-center">
               <div 
                 className={`w-full h-10 rounded cursor-pointer border transition-colors ${
@@ -121,8 +122,8 @@ const DamageAssessmentTab: React.FC<DamageAssessmentTabProps> = ({
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-4">
-          <div className="grid grid-cols-4 gap-4 mb-4 pb-2 border-b border-gray-200">
-            <div className="font-medium text-gray-700">Partie Avant</div>
+          <div className="grid grid-cols-5 gap-4 mb-4 pb-2 border-b border-gray-200">
+            <div className="col-span-2 font-medium text-gray-700">Partie Avant</div>
             <div className="text-center text-sm text-gray-600">Rayure</div>
             <div className="text-center text-sm text-gray-600">Choc</div>
             <div className="text-center text-sm text-gray-600">HS</div>
@@ -131,8 +132,8 @@ const DamageAssessmentTab: React.FC<DamageAssessmentTabProps> = ({
         </Card>
 
         <Card className="p-4">
-          <div className="grid grid-cols-4 gap-4 mb-4 pb-2 border-b border-gray-200">
-            <div className="font-medium text-gray-700">Partie Arrière</div>
+          <div className="grid grid-cols-5 gap-4 mb-4 pb-2 border-b border-gray-200">
+            <div className="col-span-2 font-medium text-gray-700">Partie Arrière</div>
             <div className="text-center text-sm text-gray-600">Rayure</div>
             <div className="text-center text-sm text-gray-600">Choc</div>
             <div className="text-center text-sm text-gray-600">HS</div>
@@ -141,8 +142,8 @@ const DamageAssessmentTab: React.FC<DamageAssessmentTabProps> = ({
         </Card>
 
         <Card className="p-4">
-          <div className="grid grid-cols-4 gap-4 mb-4 pb-2 border-b border-gray-200">
-            <div className="font-medium text-gray-700">Partie Latérale Gauche</div>
+          <div className="grid grid-cols-5 gap-4 mb-4 pb-2 border-b border-gray-200">
+            <div className="col-span-2 font-medium text-gray-700">Partie Latérale Gauche</div>
             <div className="text-center text-sm text-gray-600">Rayure</div>
             <div className="text-center text-sm text-gray-600">Choc</div>
             <div className="text-center text-sm text-gray-600">HS</div>
@@ -151,8 +152,8 @@ const DamageAssessmentTab: React.FC<DamageAssessmentTabProps> = ({
         </Card>
 
         <Card className="p-4">
-          <div className="grid grid-cols-4 gap-4 mb-4 pb-2 border-b border-gray-200">
-            <div className="font-medium text-gray-700">Partie Latérale Droite</div>
+          <div className="grid grid-cols-5 gap-4 mb-4 pb-2 border-b border-gray-200">
+            <div className="col-span-2 font-medium text-gray-700">Partie Latérale Droite</div>
             <div className="text-center text-sm text-gray-600">Rayure</div>
             <div className="text-center text-sm text-gray-600">Choc</div>
             <div className="text-center text-sm text-gray-600">HS</div>
