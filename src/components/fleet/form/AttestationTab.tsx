@@ -43,6 +43,17 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
     }
   }, [client, formData.clientName, onSignatureChange]);
 
+  // Show loading state if client is being fetched
+  if (formData.clientId && !client) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-8">
+          <p>Chargement des informations du client...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <Card>
@@ -72,7 +83,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
               <div>
                 <Label className="font-semibold">Au Client:</Label>
                 <div className="mt-2 space-y-1">
-                  <div>{client.firstName} {client.lastName}</div>
+                  <div>{client?.firstName} {client?.lastName}</div>
                   <div>{client?.address} {client?.zipCode} {client?.city}</div>
                   <div>{client?.phone}</div>
                   {client?.email && <div>{client.email}</div>}
@@ -136,7 +147,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
                     onCheckedChange={(checked) => onSignatureChange('attestationAccepted', checked)}
                     disabled={isViewMode}
                   />
-                  <Label htmlFor="attestationAccepted" className="text-sm leading-relaxed">
+                  <Label htmlFor="attestationAccepted" className="text-sm leading-relaxed font-normal">
                     Je certifie avoir pris connaissance de l'intégralité du document présent, et reconnais que ma signature apposée électroniquement sur la présente tablette vaut engagement ferme et personnel. Je confirme que cette signature constitue l'expression de mon consentement libre et éclairé, et engage ma pleine responsabilité juridique.
                   </Label>
                 </div>
