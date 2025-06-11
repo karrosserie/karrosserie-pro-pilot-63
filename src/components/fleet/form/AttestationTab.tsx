@@ -72,9 +72,9 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
               <div>
                 <Label className="font-semibold">Au Client:</Label>
                 <div className="mt-2 space-y-1">
-                  <div>{client ? `${client.firstName} ${client.lastName}` : 'Nom du client'}</div>
+                  <div>{{client.firstName} ${client.lastName}}</div>
                   <div>{client?.address} {client?.zipCode} {client?.city}</div>
-                  <div>{client?.phone || 'Téléphone'}</div>
+                  <div>{client?.phone}</div>
                   {client?.email && <div>{client.email}</div>}
                 </div>
               </div>
@@ -99,7 +99,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
                 <Label className="font-semibold">Départ:</Label>
                 <div className="mt-2 space-y-1">
                   <div>Le : {formatDateToFrench(formData.startDate)}</div>
-                  <div>Kilométrage : {formData.mileage}Km</div>
+                  <div>Kilométrage : {formData.mileage} Km</div>
                 </div>
               </div>
               
@@ -136,7 +136,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
                     onCheckedChange={(checked) => onSignatureChange('attestationAccepted', checked)}
                     disabled={isViewMode}
                   />
-                  <Label htmlFor="attestationAccepted" className="text-sm">
+                  <Label htmlFor="attestationAccepted" className="text-sm leading-relaxed">
                     Je certifie avoir pris connaissance de l'intégralité du document présent, et reconnais que ma signature apposée électroniquement sur la présente tablette vaut engagement ferme et personnel. Je confirme que cette signature constitue l'expression de mon consentement libre et éclairé, et engage ma pleine responsabilité juridique.
                   </Label>
                 </div>
@@ -150,7 +150,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
                   disabled={isViewMode}
                 />
 
-                <div className="text-right space-y-2">
+                <div className="space-y-2">
                   <div className="text-sm text-muted-foreground">
                     La signature électronique a la même valeur légale qu'une signature manuscrite.
                     Exigence issue du Règlement eIDAS et du Code civil français, art. 1366-1367).
