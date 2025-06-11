@@ -3,15 +3,17 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Card } from '@/components/ui/card';
-import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import SignaturePad from '@/components/shared/SignaturePad';
 import { FleetReturnFormData } from '@/components/fleet/FleetReturnForm.types';
+import { useCompany } from '@/hooks/use-company';
+import { useClient } from '@/hooks/use-clients';
 
 interface ReturnAttestationTabProps {
   formData: Pick<FleetReturnFormData, 'clientId' | 'clientName' | 'returnDate' | 'attestationAccepted' | 'clientSignature'>;
-  vehicle: FleetVehicle;
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  vehicle: any;
+  clientData?: any;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onSignatureChange: (field: string, value: any) => void;
   isViewMode?: boolean;
 }
@@ -19,105 +21,153 @@ interface ReturnAttestationTabProps {
 const ReturnAttestationTab: React.FC<ReturnAttestationTabProps> = ({
   formData,
   vehicle,
+  clientData,
   onInputChange,
   onSignatureChange,
   isViewMode = false
 }) => {
-  const formatDate = (dateString: string) => {
+  const { companyData } = useCompany();
+  const { client } = useClient(formData.clientId);
+
+  // Format date and time to French format
+  const formatDateTimeToFrench = (dateString: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
+    return date.toLocaleDateString('fr-FR') + ' à ' + date.toLocaleTimeString('fr-FR', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
     });
   };
 
-  const formatTime = (dateString: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('fr-FR', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  // Automatically fill client name when client is selected
+  React.useEffect(() => {
+    if (client && (!formData.clientName || formData.clientName.trim() === '')) {
+      onSignatureChange('clientName', `${client.firstName} ${client.lastName}`);
+    }
+  }, [client, formData.clientName, onSignatureChange]);
+
+  // Show loading state if client is being fetched
+  if (formData.clientId && !client) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-8">
+          <p>Chargement des informations du client...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-8">
-      {/* Client Information */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium text-gray-900">Informations du client</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="clientName">Nom du client *</Label>
-            <Input
-              id="clientName"
-              name="clientName"
-              value={formData.clientName}
-              onChange={onInputChange}
-              placeholder="Nom complet du client"
-              disabled={isViewMode}
-              required
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Return Attestation */}
-      <Card className="p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Attestation de retour de véhicule</h3>
-        <div className="prose max-w-none text-sm text-gray-700 space-y-4">
-          <p>
-            Je soussigné(e), <strong>{formData.clientName || "_______________"}</strong>, 
-            certifie avoir restitué le véhicule <strong>{vehicle.brand} {vehicle.model}</strong> 
-            immatriculé <strong>{vehicle.license_plate}</strong>.
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
-            <div>
-              <p><strong>Date de retour :</strong> {formatDate(formData.returnDate)}</p>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-center text-lg font-bold">
+            Attestation de retour de véhicule
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Company and Client Information */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <div>
+                <Label className="font-semibold">De :</Label>
+                <div className="mt-2 space-y-1">
+                  <div>{companyData?.name}</div>
+                  <div>{companyData?.address}</div>
+                  <div>{companyData?.zipcode} {companyData?.city}</div>
+                  <div>{companyData?.phone}</div>
+                  <div>{companyData?.email}</div>
+                  <div>{companyData?.siren}</div>
+                </div>
+              </div>
             </div>
-            <div>
-              <p><strong>Heure de retour :</strong> {formatTime(formData.returnDate)}</p>
+
+            <div className="space-y-4">
+              <div>
+                <Label className="font-semibold">Du Client:</Label>
+                <div className="mt-2 space-y-1">
+                  <div>{client?.firstName} {client?.lastName}</div>
+                  <div>{client?.address}</div>
+                  <div>{client?.zipCode} {client?.city}</div>
+                  <div>{client?.phone}</div>
+                  {client?.email && <div>{client.email}</div>}
+                </div>
+              </div>
             </div>
           </div>
 
-          <p>
-            Je confirme que le véhicule a été restitué dans l'état décrit dans le présent formulaire 
-            et je déclare avoir pris connaissance des éventuels dommages constatés.
-          </p>
-          
-          <p>
-            Je m'engage à assumer les responsabilités découlant de l'utilisation du véhicule 
-            pendant la période de prêt.
-          </p>
-        </div>
+          {/* Vehicle Information */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <div>
+                <Label className="font-semibold">Désignation du véhicule retourné:</Label>
+                <div className="mt-2 space-y-1">
+                  <div>Marque : {vehicle?.brand}</div>
+                  <div>Model : {vehicle?.model}</div>
+                  <div>N° Immatriculation : {vehicle?.license_plate}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <Label className="font-semibold">Retour:</Label>
+                <div className="mt-2 space-y-1">
+                  <div>Le : {formatDateTimeToFrench(formData.returnDate)}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Signature Section */}
+          <div className="border-t pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="clientName" className="font-semibold">Nom et prénom</Label>
+                  <Input
+                    id="clientName"
+                    name="clientName"
+                    value={formData.clientName || (client ? `${client.firstName} ${client.lastName}` : '')}
+                    onChange={onInputChange}
+                    disabled={isViewMode}
+                    className="mt-2"
+                  />
+                </div>
+                
+                <div className="flex items-start space-x-2">
+                  <Checkbox
+                    id="attestationAccepted"
+                    checked={formData.attestationAccepted || false}
+                    onCheckedChange={(checked) => onSignatureChange('attestationAccepted', checked)}
+                    disabled={isViewMode}
+                  />
+                  <Label htmlFor="attestationAccepted" className="text-sm leading-relaxed font-normal">
+                    Je certifie avoir rendu le véhicule dans l'état décrit dans ce formulaire et reconnais que ma signature apposée électroniquement sur la présente tablette vaut engagement ferme et personnel. Je confirme que cette signature constitue l'expression de mon consentement libre et éclairé, et engage ma pleine responsabilité juridique.
+                  </Label>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {/* Electronic Signature */}
+                <SignaturePad
+                  value={formData.clientSignature || ''}
+                  onSignatureChange={(signature) => onSignatureChange('clientSignature', signature)}
+                  disabled={isViewMode}
+                />
+
+                <div className="space-y-2">
+                  <div className="text-sm text-muted-foreground">
+                    La signature électronique a la même valeur légale qu'une signature manuscrite.
+                    Exigence issue du Règlement eIDAS et du Code civil français, art. 1366-1367).
+                    Toute modification du présent document nécessitera une nouvelle signature du client
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
       </Card>
-
-      {/* Signature Section */}
-      <div className="space-y-6">
-        <h3 className="text-lg font-medium text-gray-900">Signature du client</h3>
-        
-        <div className="space-y-4">
-          <SignaturePad
-            value={formData.clientSignature}
-            onSignatureChange={(signature) => onSignatureChange('clientSignature', signature)}
-            disabled={isViewMode}
-          />
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="attestationAccepted"
-            checked={formData.attestationAccepted}
-            onCheckedChange={(checked) => onSignatureChange('attestationAccepted', checked)}
-            disabled={isViewMode}
-          />
-          <Label htmlFor="attestationAccepted" className="text-sm">
-            J'accepte les termes de cette attestation de retour et confirme l'exactitude des informations fournies *
-          </Label>
-        </div>
-      </div>
     </div>
   );
 };
