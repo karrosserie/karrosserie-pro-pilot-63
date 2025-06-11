@@ -558,7 +558,7 @@ export type Database = {
           driver_license_back_url: string | null
           driver_license_front_url: string | null
           end_mileage: number | null
-          expected_return_date: string
+          expected_return_date: string | null
           fleet_vehicle_id: string
           fuel_level_end: number | null
           fuel_level_start: number
@@ -595,7 +595,7 @@ export type Database = {
           driver_license_back_url?: string | null
           driver_license_front_url?: string | null
           end_mileage?: number | null
-          expected_return_date: string
+          expected_return_date?: string | null
           fleet_vehicle_id: string
           fuel_level_end?: number | null
           fuel_level_start?: number
@@ -632,7 +632,7 @@ export type Database = {
           driver_license_back_url?: string | null
           driver_license_front_url?: string | null
           end_mileage?: number | null
-          expected_return_date?: string
+          expected_return_date?: string | null
           fleet_vehicle_id?: string
           fuel_level_end?: number | null
           fuel_level_start?: number
