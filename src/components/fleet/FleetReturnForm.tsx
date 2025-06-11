@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
@@ -43,6 +44,22 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
     handleSignatureChange,
     handleSubmit
   } = useFleetReturnForm(vehicle, onSubmit, reservationId);
+
+  // Pre-fill return date with current date and time
+  React.useEffect(() => {
+    if (!formData.returnDate && !isViewMode) {
+      const now = new Date();
+      const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16);
+      handleInputChange({
+        target: {
+          name: 'returnDate',
+          value: localDateTime
+        }
+      } as React.ChangeEvent<HTMLInputElement>);
+    }
+  }, [formData.returnDate, isViewMode, handleInputChange]);
 
   // Simple validation for return form
   const isFormValid = () => {

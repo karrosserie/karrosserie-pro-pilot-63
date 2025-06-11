@@ -15,11 +15,11 @@ const SearchBar = ({ onImportClick }: SearchBarProps) => {
         <input 
           type="text" 
           placeholder="Rechercher..." 
-          className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-karrosserie-orange"
+          className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-karrosserie-orange h-10"
         />
       </div>
       <Button 
-        className="bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90"
+        className="bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90 h-10"
         size="sm"
         onClick={onImportClick}
       >

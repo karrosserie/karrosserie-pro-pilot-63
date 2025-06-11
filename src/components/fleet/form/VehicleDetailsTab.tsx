@@ -60,7 +60,9 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
         {/* Left column: Kilométrage et carburant - encore plus compacte */}
         <div className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="mileage">Kilométrage actuel *</Label>
+            <Label htmlFor="mileage">
+              Kilométrage actuel <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="mileage"
               name="mileage"

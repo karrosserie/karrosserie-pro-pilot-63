@@ -118,12 +118,15 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
                 </div>
               </div>
               
-              <div>
-                <Label className="font-semibold">Retour:</Label>
-                <div className="mt-2 space-y-1">
-                  <div>Le : {formatDateTimeToFrench(formData.expectedReturnDate)}</div>
+              {/* Afficher la section "Retour" seulement si une date de fin est spécifiée */}
+              {formData.expectedReturnDate && (
+                <div>
+                  <Label className="font-semibold">Retour:</Label>
+                  <div className="mt-2 space-y-1">
+                    <div>Le : {formatDateTimeToFrench(formData.expectedReturnDate)}</div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
