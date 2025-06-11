@@ -72,7 +72,7 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
 
         <div className="space-y-2">
           <Label htmlFor="expectedReturnDate">
-            Date de fin <span className="text-destructive">*</span>
+            Date de fin
           </Label>
           <Input
             id="expectedReturnDate"
@@ -80,7 +80,6 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
             type="datetime-local"
             value={formData.expectedReturnDate}
             onChange={onInputChange}
-            required
             disabled={isViewMode}
             className={!validateEndDate(formData.expectedReturnDate, formData.startDate) ? 'border-red-500' : ''}
           />
