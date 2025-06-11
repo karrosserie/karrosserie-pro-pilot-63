@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fleetReservationsService, NewFleetReservation, UpdateFleetReservation } from '@/services/supabase/fleet-reservations';
 import { useToast } from '@/hooks/use-toast';
@@ -39,10 +38,7 @@ export function useFleetReservations() {
       fleetReservationsService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fleetReservations'] });
-      toast({
-        title: "Réservation mise à jour",
-        description: "La réservation a été mise à jour avec succès."
-      });
+      // Pas de toast pour la mise à jour
     },
     onError: (error) => {
       toast({
@@ -57,10 +53,7 @@ export function useFleetReservations() {
     mutationFn: (id: string) => fleetReservationsService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fleetReservations'] });
-      toast({
-        title: "Réservation supprimée",
-        description: "La réservation a été supprimée avec succès."
-      });
+      // Pas de toast pour la suppression
     },
     onError: (error) => {
       toast({
