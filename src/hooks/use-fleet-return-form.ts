@@ -1,21 +1,20 @@
 
 import { useState, useEffect } from 'react';
-import { useFleetReturns } from '@/hooks/use-fleet-returns';
+import { useFleetReturns, useFleetReturnByReservation } from '@/hooks/use-fleet-returns';
 import { useFleetReservation } from '@/hooks/use-fleet-reservations';
 import { useAuth } from '@/contexts/AuthContext';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { FleetReturnFormData, ReturnDamageItem } from '@/components/fleet/FleetReturnForm.types';
-import { FleetReturn } from '@/services/supabase/fleet-returns';
 
 export const useFleetReturnForm = (
   vehicle: FleetVehicle, 
   onSubmit: (returnData: FleetReturnFormData) => void, 
-  reservationId: string,
-  existingReturnData?: FleetReturn | null
+  reservationId: string
 ) => {
   const [activeTab, setActiveTab] = useState('damages');
   const { createReturn } = useFleetReturns();
   const { reservation } = useFleetReservation(reservationId);
+  const { fleetReturn } = useFleetReturnByReservation(reservationId);
   const { user } = useAuth();
   
   // Helper function to get current date/time for datetime-local input
@@ -27,27 +26,6 @@ export const useFleetReturnForm = (
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     return `${year}-${month}-${day}T${hours}:${minutes}`;
-  };
-
-  // Helper function to format date for datetime-local input
-  const formatDateTimeForInput = (dateString: string) => {
-    if (!dateString) return getCurrentDateTime();
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  };
-
-  // Helper function to safely convert Json array to string array
-  const convertJsonArrayToStringArray = (jsonArray: any): string[] => {
-    if (!jsonArray) return [];
-    if (Array.isArray(jsonArray)) {
-      return jsonArray.filter(item => typeof item === 'string') as string[];
-    }
-    return [];
   };
   
   const [formData, setFormData] = useState<FleetReturnFormData>({
@@ -65,8 +43,8 @@ export const useFleetReturnForm = (
     clientName: ''
   });
 
-  // Helper function to safely parse damages from reservation or return
-  const parseDamagesFromData = (damages: any): ReturnDamageItem[] => {
+  // Helper function to safely parse damages from reservation
+  const parseDamagesFromReservation = (damages: any): ReturnDamageItem[] => {
     if (!damages) return [];
     
     // If damages is already an array of the correct type
@@ -83,6 +61,15 @@ export const useFleetReturnForm = (
     return [];
   };
 
+  // Helper function to safely convert JSON to string array
+  const jsonToStringArray = (json: any): string[] => {
+    if (!json) return [];
+    if (Array.isArray(json)) {
+      return json.filter(item => typeof item === 'string') as string[];
+    }
+    return [];
+  };
+
   // Update form data when reservation data is loaded
   useEffect(() => {
     if (reservation) {
@@ -90,30 +77,30 @@ export const useFleetReturnForm = (
         ...prev,
         clientId: reservation.client_id || '',
         clientName: reservation.clients ? `${reservation.clients.first_name} ${reservation.clients.last_name}` : '',
-        damages: parseDamagesFromData(reservation.damages),
+        damages: parseDamagesFromReservation(reservation.damages),
         returnMileage: reservation.start_mileage || vehicle.mileage || 0
       }));
     }
   }, [reservation, vehicle.mileage]);
 
-  // Update form data when existing return data is loaded (for view mode)
+  // Update form data when fleet return data is loaded (for viewing existing returns)
   useEffect(() => {
-    if (existingReturnData) {
-      console.log('Loading existing return data:', existingReturnData);
+    if (fleetReturn && reservation) {
       setFormData(prev => ({
         ...prev,
-        returnDate: formatDateTimeForInput(existingReturnData.return_date),
-        returnMileage: existingReturnData.return_mileage || 0,
-        fuelLevelReturn: existingReturnData.fuel_level_return || 100,
-        vehicleImages: convertJsonArrayToStringArray(existingReturnData.vehicle_images),
-        damages: parseDamagesFromData(existingReturnData.damages),
-        notes: existingReturnData.notes || '',
-        attestationAccepted: existingReturnData.attestation_accepted || false,
-        clientSignature: existingReturnData.client_signature || '',
-        clientName: existingReturnData.client_name || ''
+        clientId: reservation.client_id || '',
+        clientName: reservation.clients ? `${reservation.clients.first_name} ${reservation.clients.last_name}` : '',
+        returnDate: fleetReturn.return_date || getCurrentDateTime(),
+        returnMileage: fleetReturn.return_mileage || 0,
+        fuelLevelReturn: fleetReturn.fuel_level_return || 100,
+        vehicleImages: jsonToStringArray(fleetReturn.vehicle_images),
+        damages: parseDamagesFromReservation(fleetReturn.damages),
+        notes: fleetReturn.notes || '',
+        attestationAccepted: fleetReturn.attestation_accepted || false,
+        clientSignature: fleetReturn.client_signature || '',
       }));
     }
-  }, [existingReturnData]);
+  }, [fleetReturn, reservation]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -215,6 +202,7 @@ export const useFleetReturnForm = (
     setActiveTab,
     formData,
     reservation,
+    fleetReturn,
     createReturn,
     handleInputChange,
     handleClientSelect,
