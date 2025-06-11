@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { useFleetPage } from '@/hooks/use-fleet-page';
 import FleetVehicleDialog from './FleetVehicleDialog';
@@ -89,7 +90,7 @@ const FleetPageContent = () => {
         <div className="space-y-6">
           <FleetCurrentLoans
             currentLoans={currentLoans}
-            onViewLoan={handleViewLoanDetails}
+            onViewDetails={handleViewLoanDetails}
             onReturnVehicle={handleReturnVehicle}
             onNewLoan={handleNewLoan}
             onDeleteLoan={handleDeleteLoan}
