@@ -61,26 +61,19 @@ const ReturnAttestationTab: React.FC<ReturnAttestationTabProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Date et heure de retour field */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Date et heure de retour</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div>
-            <Label htmlFor="returnDate">Date et heure de retour</Label>
-            <Input
-              id="returnDate"
-              name="returnDate"
-              type="datetime-local"
-              value={formData.returnDate}
-              onChange={onInputChange}
-              disabled={isViewMode}
-              className="mt-2"
-            />
-          </div>
-        </CardContent>
-      </Card>
+      {/* Date et heure de retour field - without Card wrapper */}
+      <div>
+        <Label htmlFor="returnDate">Date et heure de retour</Label>
+        <Input
+          id="returnDate"
+          name="returnDate"
+          type="datetime-local"
+          value={formData.returnDate}
+          onChange={onInputChange}
+          disabled={isViewMode}
+          className="mt-2"
+        />
+      </div>
 
       <Card>
         <CardHeader>
