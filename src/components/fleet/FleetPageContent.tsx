@@ -30,6 +30,7 @@ const FleetPageContent = () => {
     
     // Setters
     setSearchTerm,
+    setIsVehicleSelectionOpen,
     
     // Handlers
     handleAddVehicle,
