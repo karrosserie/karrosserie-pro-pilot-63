@@ -79,33 +79,33 @@ const DamageAssessmentTab: React.FC<DamageAssessmentTabProps> = ({
             <div className="text-sm text-gray-600">{item.name}</div>
             <div className="flex justify-center">
               <div 
-                className="w-16 h-4 bg-gray-200 rounded cursor-pointer relative"
+                className={`w-full h-10 rounded cursor-pointer border transition-colors ${
+                  item.rayure > 0 
+                    ? 'bg-karrosserie-orange border-karrosserie-orange' 
+                    : 'bg-gray-100 border-gray-200 hover:bg-gray-200'
+                } ${isViewMode ? 'cursor-default' : 'cursor-pointer'}`}
                 onClick={() => !isViewMode && handleDamageChange(item.id, 'rayure', item.rayure > 0 ? 0 : 1)}
-              >
-                {item.rayure > 0 && (
-                  <div className="absolute inset-0 bg-blue-500 rounded"></div>
-                )}
-              </div>
+              />
             </div>
             <div className="flex justify-center">
               <div 
-                className="w-16 h-4 bg-gray-200 rounded cursor-pointer relative"
+                className={`w-full h-10 rounded cursor-pointer border transition-colors ${
+                  item.choc > 0 
+                    ? 'bg-karrosserie-orange border-karrosserie-orange' 
+                    : 'bg-gray-100 border-gray-200 hover:bg-gray-200'
+                } ${isViewMode ? 'cursor-default' : 'cursor-pointer'}`}
                 onClick={() => !isViewMode && handleDamageChange(item.id, 'choc', item.choc > 0 ? 0 : 1)}
-              >
-                {item.choc > 0 && (
-                  <div className="absolute inset-0 bg-blue-500 rounded"></div>
-                )}
-              </div>
+              />
             </div>
             <div className="flex justify-center">
               <div 
-                className="w-16 h-4 bg-gray-200 rounded cursor-pointer relative"
+                className={`w-full h-10 rounded cursor-pointer border transition-colors ${
+                  item.hs > 0 
+                    ? 'bg-karrosserie-orange border-karrosserie-orange' 
+                    : 'bg-gray-100 border-gray-200 hover:bg-gray-200'
+                } ${isViewMode ? 'cursor-default' : 'cursor-pointer'}`}
                 onClick={() => !isViewMode && handleDamageChange(item.id, 'hs', item.hs > 0 ? 0 : 1)}
-              >
-                {item.hs > 0 && (
-                  <div className="absolute inset-0 bg-blue-500 rounded"></div>
-                )}
-              </div>
+              />
             </div>
           </div>
         ))}
