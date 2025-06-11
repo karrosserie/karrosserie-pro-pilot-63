@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
 
 interface FleetReturnFormNavigationProps {
   activeTab: string;
@@ -13,11 +12,9 @@ interface FleetReturnFormNavigationProps {
   isPending: boolean;
   isFirstTab: boolean;
   isLastTab: boolean;
-  isViewMode?: boolean;
 }
 
 const FleetReturnFormNavigation: React.FC<FleetReturnFormNavigationProps> = ({
-  activeTab,
   onCancel,
   onPrevious,
   onNext,
@@ -25,33 +22,23 @@ const FleetReturnFormNavigation: React.FC<FleetReturnFormNavigationProps> = ({
   isFormValid,
   isPending,
   isFirstTab,
-  isLastTab,
-  isViewMode = false
+  isLastTab
 }) => {
-  if (isViewMode) {
-    return (
-      <div className="flex justify-end space-x-3 pt-6 border-t">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Fermer
-        </Button>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex justify-between pt-6 border-t">
-      <div className="flex space-x-3">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Annuler
-        </Button>
+    <div className="flex justify-between items-center pt-6 border-t flex-shrink-0">
+      <div>
         {!isFirstTab && (
           <Button type="button" variant="outline" onClick={onPrevious}>
             Précédent
           </Button>
         )}
       </div>
-
+      
       <div className="flex space-x-3">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Annuler
+        </Button>
+        
         {!isLastTab ? (
           <Button type="button" onClick={onNext}>
             Suivant
@@ -59,11 +46,11 @@ const FleetReturnFormNavigation: React.FC<FleetReturnFormNavigationProps> = ({
         ) : (
           <Button 
             type="submit" 
+            className="btn-primary"
             onClick={onSubmit}
             disabled={!isFormValid || isPending}
           >
-            {isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-            Confirmer le retour
+            {isPending ? 'Enregistrement...' : 'Valider le retour'}
           </Button>
         )}
       </div>
