@@ -12,6 +12,7 @@ interface FleetLoanFormNavigationProps {
   isPending: boolean;
   isFirstTab: boolean;
   isLastTab: boolean;
+  isViewMode?: boolean;
 }
 
 const FleetLoanFormNavigation: React.FC<FleetLoanFormNavigationProps> = ({
@@ -22,12 +23,13 @@ const FleetLoanFormNavigation: React.FC<FleetLoanFormNavigationProps> = ({
   isFormValid,
   isPending,
   isFirstTab,
-  isLastTab
+  isLastTab,
+  isViewMode = false
 }) => {
   return (
     <div className="flex justify-between items-center pt-6 border-t flex-shrink-0">
       <div>
-        {!isFirstTab && (
+        {!isFirstTab && !isViewMode && (
           <Button type="button" variant="outline" onClick={onPrevious}>
             Précédent
           </Button>
@@ -36,22 +38,24 @@ const FleetLoanFormNavigation: React.FC<FleetLoanFormNavigationProps> = ({
       
       <div className="flex space-x-3">
         <Button type="button" variant="outline" onClick={onCancel}>
-          Annuler
+          {isViewMode ? 'Fermer' : 'Annuler'}
         </Button>
         
-        {!isLastTab ? (
-          <Button type="button" onClick={onNext}>
-            Suivant
-          </Button>
-        ) : (
-          <Button 
-            type="submit" 
-            className="btn-primary"
-            onClick={onSubmit}
-            disabled={!isFormValid || isPending}
-          >
-            {isPending ? 'Enregistrement...' : 'Confirmer le prêt'}
-          </Button>
+        {!isViewMode && (
+          !isLastTab ? (
+            <Button type="button" onClick={onNext}>
+              Suivant
+            </Button>
+          ) : (
+            <Button 
+              type="submit" 
+              className="btn-primary"
+              onClick={onSubmit}
+              disabled={!isFormValid || isPending}
+            >
+              {isPending ? 'Enregistrement...' : 'Confirmer le prêt'}
+            </Button>
+          )
         )}
       </div>
     </div>
