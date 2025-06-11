@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fleetReservationsService, NewFleetReservation, UpdateFleetReservation } from '@/services/supabase/fleet-reservations';
 import { useToast } from '@/hooks/use-toast';
@@ -20,14 +21,14 @@ export function useFleetReservations() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fleetReservations'] });
       toast({
-        title: "Réservation créée",
-        description: "La réservation a été créée avec succès."
+        title: "Prêt enregistré",
+        description: "Le prêt a été enregistré avec succès."
       });
     },
     onError: (error) => {
       toast({
         title: "Erreur",
-        description: `Impossible de créer la réservation: ${error.message}`,
+        description: `Impossible de créer le prêt: ${error.message}`,
         variant: "destructive"
       });
     }
