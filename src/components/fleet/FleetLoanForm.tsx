@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
+import { useAuth } from '@/contexts/AuthContext';
 import DamageAssessmentTab from './form/DamageAssessmentTab';
 import VehicleDetailsTab from './form/VehicleDetailsTab';
 import ClientInfoTab from './form/ClientInfoTab';
@@ -64,6 +65,8 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState('client-info');
   const { createReservation } = useFleetReservations();
+  const { user } = useAuth();
+  
   const [formData, setFormData] = useState<LoanFormData>({
     vehicleId: vehicle.id,
     clientId: '',
@@ -224,7 +227,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isFormValid()) {
+    if (!isFormValid() || !user) {
       return;
     }
 

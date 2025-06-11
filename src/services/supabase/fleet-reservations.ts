@@ -12,7 +12,7 @@ export const fleetReservationsService = {
       .from('fleet_reservations')
       .select(`
         *,
-        clients(first_name, last_name, phone, email, address, city, zip_code),
+        clients(first_name, last_name, phone, email, address, city, postal_code),
         fleet_vehicles(brand, model, license_plate)
       `)
       .order('start_date', { ascending: false });
@@ -30,7 +30,7 @@ export const fleetReservationsService = {
       .from('fleet_reservations')
       .select(`
         *,
-        clients(id, first_name, last_name, phone, email, address, city, zip_code),
+        clients(id, first_name, last_name, phone, email, address, city, postal_code),
         fleet_vehicles(id, brand, model, license_plate)
       `)
       .eq('id', id)
