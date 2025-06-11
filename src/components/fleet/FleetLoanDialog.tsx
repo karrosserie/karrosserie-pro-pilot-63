@@ -50,7 +50,7 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
   };
 
   // Si on est en mode return et qu'on a déjà un retour, on affiche les données en lecture seule
-  const isViewOnlyReturn = mode === 'return' && !!fleetReturn;
+  const isViewOnlyReturn = mode === 'return' && fleetReturn;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -62,7 +62,7 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
         {mode === 'return' ? (
           reservation?.fleet_vehicles ? (
             <FleetReturnForm
-              vehicle={reservation.fleet_vehicles as FleetVehicle}
+              vehicle={reservation.fleet_vehicles}
               reservationId={loanId || ''}
               onSubmit={handleReturnSubmit}
               onCancel={onClose}
@@ -77,9 +77,10 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
         ) : (
           <FleetLoanForm
             vehicle={vehicle}
+            reservationId={loanId}
+            mode={mode}
             onSubmit={onSubmit || (() => {})}
             onCancel={onClose}
-            isViewMode={mode === 'view'}
           />
         )}
       </DialogContent>
