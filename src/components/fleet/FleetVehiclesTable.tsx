@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Search, Plus } from 'lucide-react';
@@ -48,7 +47,7 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
             />
           </div>
           
-          <Button className="btn-primary" onClick={onAddVehicle}>
+          <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white" onClick={onAddVehicle}>
             <Plus className="h-4 w-4 mr-2" />
             Ajouter
           </Button>

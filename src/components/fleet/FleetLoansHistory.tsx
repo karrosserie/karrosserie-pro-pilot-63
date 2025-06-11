@@ -7,11 +7,6 @@ interface FleetLoansHistoryProps {
 }
 
 const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ onViewLoan }) => {
-  const handleViewLoan = (loanId: string) => {
-    console.log('Viewing loan:', loanId);
-    onViewLoan?.(loanId);
-  };
-
   return (
     <div className="card-container">
       <h2 className="text-lg font-semibold text-gray-800 mb-4">Historique des prêts</h2>
@@ -37,7 +32,7 @@ const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ onViewLoan }) => 
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => handleViewLoan('loan-1')}
+                  onClick={() => onViewLoan?.('loan-1')}
                 >
                   Voir
                 </Button>
@@ -52,7 +47,7 @@ const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ onViewLoan }) => 
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => handleViewLoan('loan-2')}
+                  onClick={() => onViewLoan?.('loan-2')}
                 >
                   Voir
                 </Button>

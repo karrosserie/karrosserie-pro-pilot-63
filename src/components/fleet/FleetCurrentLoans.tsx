@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Car, Calendar, User } from 'lucide-react';
@@ -23,21 +24,6 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
   onReturnVehicle,
   onNewLoan 
 }) => {
-  const handleViewDetails = (loanId: string) => {
-    console.log('Viewing loan details:', loanId);
-    onViewDetails?.(loanId);
-  };
-
-  const handleReturnVehicle = (loanId: string) => {
-    console.log('Processing vehicle return:', loanId);
-    onReturnVehicle?.(loanId);
-  };
-
-  const handleNewLoan = () => {
-    console.log('Creating new loan');
-    onNewLoan?.();
-  };
-
   return (
     <div className="card-container">
       <h2 className="text-lg font-semibold text-gray-800 mb-4">Prêts en cours</h2>
@@ -69,14 +55,14 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => handleViewDetails(loan.id)}
+                onClick={() => onViewDetails?.(loan.id)}
               >
                 Détails
               </Button>
               <Button 
                 className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
                 size="sm"
-                onClick={() => handleReturnVehicle(loan.id)}
+                onClick={() => onReturnVehicle?.(loan.id)}
               >
                 Retour
               </Button>
@@ -88,7 +74,7 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
       <div className="mt-6">
         <Button 
           className="w-full bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
-          onClick={handleNewLoan}
+          onClick={() => onNewLoan?.()}
         >
           <Calendar className="h-4 w-4 mr-2" />
           Nouveau prêt
