@@ -609,9 +609,12 @@ export type Database = {
           created_at: string | null
           engine_number: string | null
           id: string
+          insurance_card_url: string | null
           license_plate: string
           mileage: number | null
           model: string
+          registration_back_url: string | null
+          registration_front_url: string | null
           status: string | null
           updated_at: string | null
           user_id: string
@@ -624,9 +627,12 @@ export type Database = {
           created_at?: string | null
           engine_number?: string | null
           id?: string
+          insurance_card_url?: string | null
           license_plate: string
           mileage?: number | null
           model: string
+          registration_back_url?: string | null
+          registration_front_url?: string | null
           status?: string | null
           updated_at?: string | null
           user_id: string
@@ -639,9 +645,12 @@ export type Database = {
           created_at?: string | null
           engine_number?: string | null
           id?: string
+          insurance_card_url?: string | null
           license_plate?: string
           mileage?: number | null
           model?: string
+          registration_back_url?: string | null
+          registration_front_url?: string | null
           status?: string | null
           updated_at?: string | null
           user_id?: string
