@@ -64,16 +64,6 @@ const FleetPageContent = () => {
         </button>
       </div>
 
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Rechercher un véhicule..."
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <FleetVehiclesTable
           vehicles={vehicles}
