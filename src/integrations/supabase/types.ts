@@ -594,13 +594,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fleet_reservations_fleet_vehicle_id_fkey"
-            columns: ["fleet_vehicle_id"]
-            isOneToOne: false
-            referencedRelation: "fleet_vehicles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "fleet_reservations_repair_order_id_fkey"
             columns: ["repair_order_id"]
             isOneToOne: false
@@ -612,38 +605,47 @@ export type Database = {
       fleet_vehicles: {
         Row: {
           brand: string
+          color: string | null
           created_at: string | null
+          engine_number: string | null
           id: string
           license_plate: string
+          mileage: number | null
           model: string
-          notes: string | null
           status: string | null
           updated_at: string | null
           user_id: string
+          vin: string | null
           year: number | null
         }
         Insert: {
           brand: string
+          color?: string | null
           created_at?: string | null
+          engine_number?: string | null
           id?: string
           license_plate: string
+          mileage?: number | null
           model: string
-          notes?: string | null
           status?: string | null
           updated_at?: string | null
           user_id: string
+          vin?: string | null
           year?: number | null
         }
         Update: {
           brand?: string
+          color?: string | null
           created_at?: string | null
+          engine_number?: string | null
           id?: string
           license_plate?: string
+          mileage?: number | null
           model?: string
-          notes?: string | null
           status?: string | null
           updated_at?: string | null
           user_id?: string
+          vin?: string | null
           year?: number | null
         }
         Relationships: []
