@@ -3,15 +3,15 @@ import { LoanFormData } from '../FleetLoanForm';
 
 export const useFleetLoanFormValidation = (formData: LoanFormData) => {
   const isFormValid = () => {
-    // Validation des dates
+    // Validation des dates - seulement si une date de fin est fournie
     const isDateValid = () => {
-      if (!formData.startDate || !formData.expectedReturnDate) return false;
+      if (!formData.expectedReturnDate) return true; // Date de fin optionnelle
+      if (!formData.startDate) return false;
       return new Date(formData.expectedReturnDate) > new Date(formData.startDate);
     };
 
     const basicValid = formData.clientId && 
                       formData.startDate && 
-                      formData.expectedReturnDate &&
                       isDateValid() &&
                       formData.driverLicenseFrontUrl &&
                       formData.driverLicenseBackUrl &&
