@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,7 @@ import DamageAssessmentTab from './form/DamageAssessmentTab';
 import VehicleDetailsTab from './form/VehicleDetailsTab';
 import ClientInfoTab from './form/ClientInfoTab';
 import InsuranceTab from './form/InsuranceTab';
+import AttestationTab from './form/AttestationTab';
 
 interface FleetLoanFormProps {
   vehicle: FleetVehicle;
@@ -45,6 +45,8 @@ export interface LoanFormData {
   insuranceAddress?: string;
   insuranceCity?: string;
   insurancePostalCode?: string;
+  // Attestation fields
+  attestationAccepted?: boolean;
 }
 
 interface DamageItem {
@@ -87,7 +89,8 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     insuranceContractNumber: '',
     insuranceAddress: '',
     insuranceCity: '',
-    insurancePostalCode: ''
+    insurancePostalCode: '',
+    attestationAccepted: false
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -148,6 +151,10 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     setFormData(prev => ({ ...prev, insurancePhone: value || '' }));
   };
 
+  const handleSignatureChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
   const isFormValid = () => {
     const basicValid = formData.clientId && 
                       formData.startDate && 
@@ -159,7 +166,8 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
                       formData.prefecture &&
                       formData.holderInfo &&
                       formData.dateOfBirth &&
-                      formData.placeOfBirth;
+                      formData.placeOfBirth &&
+                      formData.attestationAccepted;
 
     const insuranceValid = !formData.clientInsurance || (
       formData.insuranceCompanyName &&
@@ -191,11 +199,12 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
       </div>
 
       <Tabs defaultValue="client-info" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="client-info">Informations sur le client</TabsTrigger>
           <TabsTrigger value="insurance">Assurance</TabsTrigger>
           <TabsTrigger value="damages">Chocs & rayures</TabsTrigger>
           <TabsTrigger value="vehicle-details">Détails du véhicule & photos</TabsTrigger>
+          <TabsTrigger value="attestation">Attestation & Signature</TabsTrigger>
         </TabsList>
 
         <TabsContent value="client-info" className="space-y-6 mt-6">
@@ -235,6 +244,15 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             onImageAdd={handleImageAdd}
             onImageRemove={handleImageRemove}
             onImageUpdate={handleImageUpdate}
+          />
+        </TabsContent>
+
+        <TabsContent value="attestation" className="space-y-6 mt-6">
+          <AttestationTab
+            formData={formData}
+            vehicle={vehicle}
+            onInputChange={handleInputChange}
+            onSignatureChange={handleSignatureChange}
           />
         </TabsContent>
       </Tabs>

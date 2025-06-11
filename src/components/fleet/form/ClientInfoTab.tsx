@@ -109,8 +109,8 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
         </div>
       </div>
 
-      {/* License Details */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* License Details - First row: License Number, Issue Date, Prefecture */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="space-y-2">
           <Label htmlFor="licenseNumber">
             Numéro de permis <span className="text-destructive">*</span>
@@ -154,10 +154,13 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
             required
           />
         </div>
+      </div>
 
+      {/* License Details - Second row: Holder Info, Date of Birth, Place of Birth */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="space-y-2">
           <Label htmlFor="holderInfo">
-            Information Titulaire <span className="text-destructive">*</span>
+            Information titulaire <span className="text-destructive">*</span>
           </Label>
           <Input
             id="holderInfo"

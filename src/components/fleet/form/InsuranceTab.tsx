@@ -94,51 +94,48 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
             </div>
           </div>
 
-          {/* Postal Address */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-medium">Adresse postale</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2 space-y-2">
-                <Label htmlFor="insuranceAddress">
-                  Adresse <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="insuranceAddress"
-                  name="insuranceAddress"
-                  value={formData.insuranceAddress || ''}
-                  onChange={onInputChange}
-                  disabled={isViewMode}
-                  required={formData.clientInsurance}
-                />
-              </div>
+          {/* Address fields without title */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="md:col-span-2 space-y-2">
+              <Label htmlFor="insuranceAddress">
+                Adresse <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="insuranceAddress"
+                name="insuranceAddress"
+                value={formData.insuranceAddress || ''}
+                onChange={onInputChange}
+                disabled={isViewMode}
+                required={formData.clientInsurance}
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="insuranceCity">
-                  Ville <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="insuranceCity"
-                  name="insuranceCity"
-                  value={formData.insuranceCity || ''}
-                  onChange={onInputChange}
-                  disabled={isViewMode}
-                  required={formData.clientInsurance}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="insuranceCity">
+                Ville <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="insuranceCity"
+                name="insuranceCity"
+                value={formData.insuranceCity || ''}
+                onChange={onInputChange}
+                disabled={isViewMode}
+                required={formData.clientInsurance}
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="insurancePostalCode">
-                  Code postal <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="insurancePostalCode"
-                  name="insurancePostalCode"
-                  value={formData.insurancePostalCode || ''}
-                  onChange={onInputChange}
-                  disabled={isViewMode}
-                  required={formData.clientInsurance}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="insurancePostalCode">
+                Code postal <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="insurancePostalCode"
+                name="insurancePostalCode"
+                value={formData.insurancePostalCode || ''}
+                onChange={onInputChange}
+                disabled={isViewMode}
+                required={formData.clientInsurance}
+              />
             </div>
           </div>
         </div>
