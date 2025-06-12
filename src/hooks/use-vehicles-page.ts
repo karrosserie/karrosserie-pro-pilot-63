@@ -2,12 +2,11 @@
 import { useState } from 'react';
 import { useVehicles } from './use-vehicles';
 import { useAuth } from '@/contexts/AuthContext';
-import { VehicleWithRelations } from '@/services/supabase/vehicles';
 
 export function useVehiclesPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
-  const [selectedVehicle, setSelectedVehicle] = useState<VehicleWithRelations | null>(null);
+  const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   const { vehicles, isLoading, error, createVehicle, updateVehicle, deleteVehicle } = useVehicles();
@@ -35,19 +34,19 @@ export function useVehiclesPage() {
     setDialogOpen(true);
   };
 
-  const handleViewVehicle = (vehicle: VehicleWithRelations) => {
+  const handleViewVehicle = (vehicle: any) => {
     setSelectedVehicle(vehicle);
     setDialogMode('view');
     setDialogOpen(true);
   };
 
-  const handleEditVehicle = (vehicle: VehicleWithRelations) => {
+  const handleEditVehicle = (vehicle: any) => {
     setSelectedVehicle(vehicle);
     setDialogMode('edit');
     setDialogOpen(true);
   };
 
-  const handleDeleteVehicle = (vehicle: VehicleWithRelations) => {
+  const handleDeleteVehicle = (vehicle: any) => {
     if (confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?')) {
       deleteVehicle.mutate(vehicle.id);
     }

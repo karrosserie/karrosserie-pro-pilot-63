@@ -1,56 +1,21 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { Database } from '@/integrations/supabase/types';
+import { VehicleStatus } from '@/types/vehicle';
 
-// Updated type definitions to match the new schema
-export interface Vehicle {
-  id: string;
-  client_id: string | null;
-  brand_id: string;
-  model_id: string;
-  year: number | null;
-  license_plate: string | null;
-  color: string | null;
-  vin: string | null;
-  mileage: number | null;
-  fuel_type: string | null;
-  status: string | null;
-  arrival_date: string | null;
-  end_date: string | null;
-  engine_number: string | null;
-  fuel_level: number | null;
-  insurance_company: string | null;
-  created_at: string;
-  updated_at: string;
-  user_id: string | null;
-}
-
-export interface VehicleWithRelations extends Vehicle {
-  clients?: {
-    first_name: string;
-    last_name: string;
-  };
-  car_brands?: {
-    id: string;
-    name: string;
-  };
-  car_models?: {
-    id: string;
-    name: string;
-  };
-}
-
-export type NewVehicle = Omit<Vehicle, 'id' | 'created_at' | 'updated_at'>;
-export type UpdateVehicle = Partial<Omit<Vehicle, 'id' | 'created_at' | 'updated_at'>>;
+export type Vehicle = Database['public']['Tables']['vehicles']['Row'];
+export type NewVehicle = Database['public']['Tables']['vehicles']['Insert'];
+export type UpdateVehicle = Database['public']['Tables']['vehicles']['Update'];
 
 export const vehiclesService = {
-  getAll: async (): Promise<VehicleWithRelations[]> => {
+  getAll: async () => {
     const { data, error } = await supabase
       .from('vehicles')
       .select(`
         *,
         clients(first_name, last_name),
-        car_brands!vehicles_brand_id_fkey(id, name),
-        car_models!vehicles_model_id_fkey(id, name)
+        car_brands(id, name),
+        car_models(id, name)
       `)
       .order('created_at', { ascending: false });
 
@@ -59,16 +24,16 @@ export const vehiclesService = {
       throw new Error(error.message);
     }
     
-    return data || [];
+    return data;
   },
   
-  getByClientId: async (clientId: string): Promise<VehicleWithRelations[]> => {
+  getByClientId: async (clientId: string) => {
     const { data, error } = await supabase
       .from('vehicles')
       .select(`
         *,
-        car_brands!vehicles_brand_id_fkey(id, name),
-        car_models!vehicles_model_id_fkey(id, name)
+        car_brands(id, name),
+        car_models(id, name)
       `)
       .eq('client_id', clientId);
       
@@ -77,17 +42,17 @@ export const vehiclesService = {
       throw new Error(error.message);
     }
     
-    return data || [];
+    return data;
   },
 
-  getById: async (id: string): Promise<VehicleWithRelations> => {
+  getById: async (id: string) => {
     const { data, error } = await supabase
       .from('vehicles')
       .select(`
         *,
         clients(id, first_name, last_name),
-        car_brands!vehicles_brand_id_fkey(id, name),
-        car_models!vehicles_model_id_fkey(id, name)
+        car_brands(id, name),
+        car_models(id, name)
       `)
       .eq('id', id)
       .single();
@@ -100,7 +65,7 @@ export const vehiclesService = {
     return data;
   },
   
-  create: async (vehicle: NewVehicle): Promise<VehicleWithRelations> => {
+  create: async (vehicle: NewVehicle) => {
     // Validate required fields
     if (!vehicle.client_id || !vehicle.vin || !vehicle.brand_id || !vehicle.model_id || !vehicle.license_plate) {
       throw new Error('Les champs Client, Numéro de série (VIN), Marque, Modèle et Plaque d\'immatriculation sont obligatoires.');
@@ -118,8 +83,8 @@ export const vehiclesService = {
       .insert([vehicle])
       .select(`
         *,
-        car_brands!vehicles_brand_id_fkey(id, name),
-        car_models!vehicles_model_id_fkey(id, name)
+        car_brands(id, name),
+        car_models(id, name)
       `)
       .single();
       
@@ -132,7 +97,7 @@ export const vehiclesService = {
     return data;
   },
   
-  update: async (id: string, vehicle: UpdateVehicle): Promise<VehicleWithRelations> => {
+  update: async (id: string, vehicle: UpdateVehicle) => {
     // Ensure status is valid
     if (vehicle.status && !['En attente', 'Réservé', 'En cours', 'Terminé', 'Annulé'].includes(vehicle.status)) {
       vehicle.status = 'En attente';
@@ -146,8 +111,8 @@ export const vehiclesService = {
       .eq('id', id)
       .select(`
         *,
-        car_brands!vehicles_brand_id_fkey(id, name),
-        car_models!vehicles_model_id_fkey(id, name)
+        car_brands(id, name),
+        car_models(id, name)
       `)
       .single();
       
@@ -160,7 +125,7 @@ export const vehiclesService = {
     return data;
   },
   
-  delete: async (id: string): Promise<boolean> => {
+  delete: async (id: string) => {
     const { error } = await supabase
       .from('vehicles')
       .delete()

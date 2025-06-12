@@ -4,13 +4,33 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Car, Eye, Edit, Trash2 } from 'lucide-react';
-import { VehicleWithRelations } from '@/services/supabase/vehicles';
+
+interface Vehicle {
+  id: string;
+  license_plate: string | null;
+  year: number | null;
+  color: string | null;
+  vin: string | null;
+  mileage: number | null;
+  fuel_type: string | null;
+  status: string | null;
+  car_brands?: {
+    name: string;
+  };
+  car_models?: {
+    name: string;
+  };
+  clients?: {
+    first_name: string;
+    last_name: string;
+  };
+}
 
 interface VehiclesGridProps {
-  vehicles: VehicleWithRelations[];
-  onViewVehicle: (vehicle: VehicleWithRelations) => void;
-  onEditVehicle: (vehicle: VehicleWithRelations) => void;
-  onDeleteVehicle: (vehicle: VehicleWithRelations) => void;
+  vehicles: Vehicle[];
+  onViewVehicle: (vehicle: Vehicle) => void;
+  onEditVehicle: (vehicle: Vehicle) => void;
+  onDeleteVehicle: (vehicle: Vehicle) => void;
 }
 
 const VehiclesGrid: React.FC<VehiclesGridProps> = ({

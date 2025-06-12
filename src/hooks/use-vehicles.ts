@@ -1,7 +1,37 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { vehiclesService, NewVehicle, UpdateVehicle, VehicleWithRelations } from '@/services/supabase/vehicles';
+import { vehiclesService, NewVehicle, UpdateVehicle } from '@/services/supabase/vehicles';
 import { useToast } from '@/hooks/use-toast';
+
+// Type pour véhicule avec relations
+interface Vehicle {
+  id: string;
+  client_id: string | null;
+  brand_id: string;
+  model_id: string;
+  year: number | null;
+  license_plate: string | null;
+  color: string | null;
+  vin: string | null;
+  mileage: number | null;
+  fuel_type: string | null;
+  status: string | null;
+  created_at: string;
+  updated_at: string;
+  user_id: string | null;
+  clients?: {
+    first_name: string;
+    last_name: string;
+  };
+  car_brands?: {
+    id: string;
+    name: string;
+  };
+  car_models?: {
+    id: string;
+    name: string;
+  };
+}
 
 export function useClientVehicles(clientId?: string) {
   const {
@@ -39,7 +69,7 @@ export function useVehicles() {
 
   const createVehicle = useMutation({
     mutationFn: async (vehicleData: any) => {
-      // Convert form data to the expected format
+      // Convertir les données du formulaire vers le format attendu
       const newVehicle: NewVehicle = {
         client_id: vehicleData.clientId || vehicleData.client_id,
         brand_id: vehicleData.brandId || vehicleData.brand_id,
@@ -51,11 +81,6 @@ export function useVehicles() {
         mileage: vehicleData.mileage ? parseInt(vehicleData.mileage) : null,
         fuel_type: vehicleData.fuelType || vehicleData.fuel_type,
         status: vehicleData.status || 'En attente',
-        arrival_date: vehicleData.arrival_date,
-        end_date: vehicleData.end_date,
-        engine_number: vehicleData.engine_number,
-        fuel_level: vehicleData.fuel_level,
-        insurance_company: vehicleData.insurance_company,
         user_id: vehicleData.user_id
       };
 
@@ -79,7 +104,7 @@ export function useVehicles() {
 
   const updateVehicle = useMutation({
     mutationFn: async ({ id, data }: { id: string, data: any }) => {
-      // Convert form data to the expected format
+      // Convertir les données du formulaire vers le format attendu
       const updateData: UpdateVehicle = {
         client_id: data.clientId || data.client_id,
         brand_id: data.brandId || data.brand_id,
@@ -90,12 +115,7 @@ export function useVehicles() {
         vin: data.vin,
         mileage: data.mileage ? parseInt(data.mileage) : null,
         fuel_type: data.fuelType || data.fuel_type,
-        status: data.status,
-        arrival_date: data.arrival_date,
-        end_date: data.end_date,
-        engine_number: data.engine_number,
-        fuel_level: data.fuel_level,
-        insurance_company: data.insurance_company
+        status: data.status
       };
 
       return vehiclesService.update(id, updateData);
