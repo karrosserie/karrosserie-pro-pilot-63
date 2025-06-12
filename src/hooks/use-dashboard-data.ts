@@ -476,7 +476,7 @@ export const useDashboardData = () => {
       // Trier par date (plus récent en premier) et prendre les 10 plus récents
       return activities
         .sort((a, b) => b.timestamp - a.timestamp)
-        .slice(0, 10);
+        .slice(0, 20);
     },
     enabled: !quotesLoading && !clientsLoading && !vehiclesLoading && !receiptsLoading && !invoicesLoading && !ordersLoading && !expertiseLoading && !creditsLoading && !expensesLoading
   });
