@@ -5,8 +5,29 @@ import StatsCard from '@/components/dashboard/StatsCard';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { useDashboardData } from '@/hooks/use-dashboard-data';
 
 const Index = () => {
+  const { dashboardStats, recentVehicles, recentDocuments, isLoading } = useDashboardData();
+
+  if (isLoading) {
+    return (
+      <div className="page-container">
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Tableau de bord</h1>
+          <p className="text-gray-600 mt-1">Bienvenue sur Karrosserie Pro, votre outil de gestion automobile.</p>
+        </div>
+        
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+            <p className="text-gray-500">Chargement du tableau de bord...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="page-container">
       <div className="mb-6">
@@ -17,25 +38,25 @@ const Index = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatsCard 
           title="Véhicules en réparation" 
-          value="12" 
+          value={dashboardStats?.vehiclesInRepair || 0} 
           icon={<Car className="h-6 w-6" />}
         />
         <StatsCard 
           title="Clients actifs" 
-          value="48"
+          value={dashboardStats?.activeClients || 0}
           change="+15%" 
           icon={<Users className="h-6 w-6" />}
           iconBg="bg-blue-500"
         />
         <StatsCard 
           title="Devis en attente" 
-          value="8" 
+          value={dashboardStats?.pendingQuotes || 0} 
           icon={<FileText className="h-6 w-6" />}
           iconBg="bg-purple-500"
         />
         <StatsCard 
           title="Chiffre d'affaires" 
-          value="24 500 €" 
+          value={`${(dashboardStats?.revenue || 0).toFixed(0)} €`} 
           change="+22%" 
           icon={<CreditCard className="h-6 w-6" />}
           iconBg="bg-green-500"
@@ -66,39 +87,32 @@ const Index = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium">Peugeot 308</td>
-                    <td className="px-4 py-3 text-gray-600">AB-123-CD</td>
-                    <td className="px-4 py-3">Jean Dupont</td>
-                    <td className="px-4 py-3">
-                      <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                        En réparation
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">Aujourd'hui, 10:23</td>
-                  </tr>
-                  <tr className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium">Renault Clio</td>
-                    <td className="px-4 py-3 text-gray-600">EF-456-GH</td>
-                    <td className="px-4 py-3">Marie Martin</td>
-                    <td className="px-4 py-3">
-                      <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                        Terminé
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">Hier, 15:47</td>
-                  </tr>
-                  <tr className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium">Citroën C3</td>
-                    <td className="px-4 py-3 text-gray-600">IJ-789-KL</td>
-                    <td className="px-4 py-3">Pierre Durand</td>
-                    <td className="px-4 py-3">
-                      <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                        En attente
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">17/05/2023, 09:15</td>
-                  </tr>
+                  {recentVehicles && recentVehicles.length > 0 ? (
+                    recentVehicles.map((vehicle) => (
+                      <tr key={vehicle.id} className="border-b hover:bg-gray-50">
+                        <td className="px-4 py-3 font-medium">{vehicle.model}</td>
+                        <td className="px-4 py-3 text-gray-600">{vehicle.licensePlate}</td>
+                        <td className="px-4 py-3">{vehicle.client}</td>
+                        <td className="px-4 py-3">
+                          <span className={`text-xs font-medium px-2.5 py-0.5 rounded ${
+                            vehicle.status === 'en_reparation' ? 'bg-amber-100 text-amber-800' :
+                            vehicle.status === 'termine' ? 'bg-green-100 text-green-800' :
+                            'bg-blue-100 text-blue-800'
+                          }`}>
+                            {vehicle.status === 'en_reparation' ? 'En réparation' :
+                             vehicle.status === 'termine' ? 'Terminé' : 'En attente'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-gray-600">{vehicle.lastUpdate}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                        Aucun véhicule récent
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -115,49 +129,32 @@ const Index = () => {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="border border-gray-200 rounded-lg p-4 flex items-start">
-                <div className="bg-blue-100 p-3 rounded-lg mr-3">
-                  <FileText className="h-5 w-5 text-blue-600" />
+              {recentDocuments && recentDocuments.length > 0 ? (
+                recentDocuments.map((document) => (
+                  <div key={document.id} className="border border-gray-200 rounded-lg p-4 flex items-start">
+                    <div className={`p-3 rounded-lg mr-3 ${
+                      document.type === 'invoice' ? 'bg-green-100' :
+                      document.type === 'quote' ? 'bg-blue-100' :
+                      'bg-purple-100'
+                    }`}>
+                      <FileText className={`h-5 w-5 ${
+                        document.type === 'invoice' ? 'text-green-600' :
+                        document.type === 'quote' ? 'text-blue-600' :
+                        'text-purple-600'
+                      }`} />
+                    </div>
+                    <div>
+                      <h4 className="font-medium">{document.title}</h4>
+                      <p className="text-sm text-gray-600">{document.client}</p>
+                      <p className="text-xs text-gray-400 mt-1">Créé le {document.date}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-2 text-center py-8 text-gray-500">
+                  Aucun document récent
                 </div>
-                <div>
-                  <h4 className="font-medium">PV d'expertise - Peugeot 308</h4>
-                  <p className="text-sm text-gray-600">Jean Dupont</p>
-                  <p className="text-xs text-gray-400 mt-1">Créé le 17/05/2023</p>
-                </div>
-              </div>
-              
-              <div className="border border-gray-200 rounded-lg p-4 flex items-start">
-                <div className="bg-amber-100 p-3 rounded-lg mr-3">
-                  <FileText className="h-5 w-5 text-amber-600" />
-                </div>
-                <div>
-                  <h4 className="font-medium">Devis - Renault Clio</h4>
-                  <p className="text-sm text-gray-600">Marie Martin</p>
-                  <p className="text-xs text-gray-400 mt-1">Créé le 16/05/2023</p>
-                </div>
-              </div>
-              
-              <div className="border border-gray-200 rounded-lg p-4 flex items-start">
-                <div className="bg-green-100 p-3 rounded-lg mr-3">
-                  <FileText className="h-5 w-5 text-green-600" />
-                </div>
-                <div>
-                  <h4 className="font-medium">OR - Citroën C3</h4>
-                  <p className="text-sm text-gray-600">Pierre Durand</p>
-                  <p className="text-xs text-gray-400 mt-1">Créé le 15/05/2023</p>
-                </div>
-              </div>
-              
-              <div className="border border-gray-200 rounded-lg p-4 flex items-start">
-                <div className="bg-purple-100 p-3 rounded-lg mr-3">
-                  <FileText className="h-5 w-5 text-purple-600" />
-                </div>
-                <div>
-                  <h4 className="font-medium">Facture - Toyota Yaris</h4>
-                  <p className="text-sm text-gray-600">Sophie Bernard</p>
-                  <p className="text-xs text-gray-400 mt-1">Créé le 14/05/2023</p>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -169,25 +166,33 @@ const Index = () => {
             <h3 className="section-title">Raccourcis</h3>
             
             <div className="grid grid-cols-2 gap-3">
-              <Button variant="outline" className="flex-col h-20 p-2">
-                <Car className="h-6 w-6 mb-1" />
-                <span className="text-xs">Nouveau véhicule</span>
-              </Button>
+              <Link to="/vehicles">
+                <Button variant="outline" className="flex-col h-20 p-2 w-full">
+                  <Car className="h-6 w-6 mb-1" />
+                  <span className="text-xs">Nouveau véhicule</span>
+                </Button>
+              </Link>
               
-              <Button variant="outline" className="flex-col h-20 p-2">
-                <FileText className="h-6 w-6 mb-1" />
-                <span className="text-xs">Nouveau devis</span>
-              </Button>
+              <Link to="/documents/devis">
+                <Button variant="outline" className="flex-col h-20 p-2 w-full">
+                  <FileText className="h-6 w-6 mb-1" />
+                  <span className="text-xs">Nouveau devis</span>
+                </Button>
+              </Link>
               
-              <Button variant="outline" className="flex-col h-20 p-2">
-                <Users className="h-6 w-6 mb-1" />
-                <span className="text-xs">Nouveau client</span>
-              </Button>
+              <Link to="/clients">
+                <Button variant="outline" className="flex-col h-20 p-2 w-full">
+                  <Users className="h-6 w-6 mb-1" />
+                  <span className="text-xs">Nouveau client</span>
+                </Button>
+              </Link>
               
-              <Button variant="outline" className="flex-col h-20 p-2">
-                <CreditCard className="h-6 w-6 mb-1" />
-                <span className="text-xs">Encaisser</span>
-              </Button>
+              <Link to="/payments/receipts">
+                <Button variant="outline" className="flex-col h-20 p-2 w-full">
+                  <CreditCard className="h-6 w-6 mb-1" />
+                  <span className="text-xs">Encaisser</span>
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
