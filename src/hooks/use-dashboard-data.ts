@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useClients } from '@/hooks/use-clients';
@@ -9,6 +8,7 @@ import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useCredits } from '@/hooks/use-credits';
 import { useAccountingData } from '@/hooks/use-accounting-data';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
+import { useExpenses } from '@/hooks/use-expenses';
 import { formatCurrency } from '@/lib/utils';
 
 export const useDashboardData = () => {
@@ -20,6 +20,7 @@ export const useDashboardData = () => {
   const { reports: expertiseReports, isLoading: expertiseLoading } = useExpertiseReports();
   const { credits, isLoading: creditsLoading } = useCredits();
   const { receipts, isLoading: receiptsLoading } = useReceiptsData();
+  const { expenses, isLoading: expensesLoading } = useExpenses();
   const { totalReceipts } = useAccountingData();
 
   const { data: dashboardStats, isLoading } = useQuery({
@@ -225,18 +226,116 @@ export const useDashboardData = () => {
     enabled: !!invoices || !!quotes || !!repairOrders || !!expertiseReports || !!credits
   });
 
-  // Activité récente basée sur les vraies données
+  // Activité récente complète avec tous les types d'activités
   const { data: recentActivity } = useQuery({
-    queryKey: ['recent-activity', quotes, clients, vehicles, receipts, invoices],
+    queryKey: ['recent-activity', quotes, clients, vehicles, receipts, invoices, repairOrders, expertiseReports, credits, expenses],
     queryFn: () => {
       const activities = [];
 
-      // Devis récents
-      if (quotes) {
-        quotes.slice(0, 2).forEach(quote => {
+      // Nouveaux clients créés
+      if (clients) {
+        clients.forEach(client => {
+          const createdDate = new Date(client.created_at);
+          activities.push({
+            id: `client-${client.id}`,
+            icon: 'User',
+            iconBackground: 'bg-green-500',
+            title: 'Nouveau client créé',
+            description: `${client.first_name} ${client.last_name}`,
+            time: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+            timestamp: createdDate.getTime()
+          });
+        });
+      }
+
+      // Paiements reçus
+      if (receipts && invoices) {
+        receipts.forEach(receipt => {
+          const receiptDate = new Date(receipt.date);
+          let description = `Encaissement de ${formatCurrency(receipt.amount)}`;
+          
+          // Trouver la facture associée
+          if (receipt.invoice_id) {
+            const invoice = invoices.find(inv => inv.id === receipt.invoice_id);
+            if (invoice && invoice.reference) {
+              const clientName = invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client';
+              description = `Facture n°${invoice.reference} - ${clientName} (${formatCurrency(receipt.amount)})`;
+            }
+          }
+          
+          activities.push({
+            id: `receipt-${receipt.id}`,
+            icon: 'CreditCard',
+            iconBackground: 'bg-amber-500',
+            title: 'Paiement reçu',
+            description,
+            time: `${receiptDate.toLocaleDateString('fr-FR')} à ${receiptDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+            timestamp: receiptDate.getTime()
+          });
+        });
+      }
+
+      // Dépenses enregistrées
+      if (expenses) {
+        expenses.forEach(expense => {
+          const expenseDate = new Date(expense.date);
+          let description = `${expense.description || 'Dépense'} - ${formatCurrency(expense.amount)}`;
+          
+          if (expense.vehicle && vehicles) {
+            const vehicle = vehicles.find(v => v.id === expense.vehicle_id);
+            if (vehicle) {
+              description += ` (${vehicle.brand} ${vehicle.model})`;
+            }
+          }
+          
+          activities.push({
+            id: `expense-${expense.id}`,
+            icon: 'Receipt',
+            iconBackground: 'bg-red-500',
+            title: 'Dépense enregistrée',
+            description,
+            time: `${expenseDate.toLocaleDateString('fr-FR')} à ${expenseDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+            timestamp: expenseDate.getTime()
+          });
+        });
+      }
+
+      // Rapports d'expertise importés
+      if (expertiseReports) {
+        expertiseReports.forEach(report => {
+          const createdDate = new Date(report.created_at);
           let vehicleInfo = 'Véhicule non spécifié';
           
-          // Chercher le véhicule correspondant
+          if (report.vehicle_id && vehicles) {
+            const vehicle = vehicles.find(v => v.id === report.vehicle_id);
+            if (vehicle && vehicle.brand && vehicle.model) {
+              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
+            }
+          }
+          
+          let description = `Rapport d'expertise - ${vehicleInfo}`;
+          if (report.clients) {
+            description += ` - ${report.clients.first_name} ${report.clients.last_name}`;
+          }
+          
+          activities.push({
+            id: `expertise-${report.id}`,
+            icon: 'ClipboardCheck',
+            iconBackground: 'bg-blue-500',
+            title: 'Rapport d\'expertise importé',
+            description,
+            time: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+            timestamp: createdDate.getTime()
+          });
+        });
+      }
+
+      // Devis créés
+      if (quotes) {
+        quotes.forEach(quote => {
+          const createdDate = new Date(quote.created_at);
+          let vehicleInfo = 'Véhicule non spécifié';
+          
           if (quote.vehicle_id && vehicles) {
             const vehicle = vehicles.find(v => v.id === quote.vehicle_id);
             if (vehicle && vehicle.brand && vehicle.model) {
@@ -244,9 +343,9 @@ export const useDashboardData = () => {
             }
           }
           
-          let description = `Devis`;
+          let description = `Devis n°${quote.reference || 'N/A'} - ${vehicleInfo}`;
           if (quote.clients) {
-            description = `${vehicleInfo} - ${quote.clients.first_name} ${quote.clients.last_name}`;
+            description += ` - ${quote.clients.first_name} ${quote.clients.last_name}`;
           }
           
           activities.push({
@@ -255,30 +354,106 @@ export const useDashboardData = () => {
             iconBackground: 'bg-blue-500',
             title: 'Devis créé',
             description,
-            time: new Date(quote.created_at).toLocaleDateString('fr-FR'),
-            timestamp: new Date(quote.created_at).getTime()
+            time: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+            timestamp: createdDate.getTime()
           });
         });
       }
 
-      // Nouveaux clients
-      if (clients) {
-        clients.slice(0, 2).forEach(client => {
+      // Ordres de réparation créés
+      if (repairOrders) {
+        repairOrders.forEach(order => {
+          const createdDate = new Date(order.created_at);
+          let vehicleInfo = 'Véhicule non spécifié';
+          
+          if (order.vehicle_id && vehicles) {
+            const vehicle = vehicles.find(v => v.id === order.vehicle_id);
+            if (vehicle && vehicle.brand && vehicle.model) {
+              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
+            }
+          }
+          
+          let description = `Ordre n°${order.reference || 'N/A'} - ${vehicleInfo}`;
+          if (order.clients) {
+            description += ` - ${order.clients.first_name} ${order.clients.last_name}`;
+          }
+          
           activities.push({
-            id: `client-${client.id}`,
-            icon: 'User',
-            iconBackground: 'bg-green-500',
-            title: 'Nouveau client',
-            description: `${client.first_name} ${client.last_name}`,
-            time: new Date(client.created_at).toLocaleDateString('fr-FR'),
-            timestamp: new Date(client.created_at).getTime()
+            id: `order-${order.id}`,
+            icon: 'Wrench',
+            iconBackground: 'bg-orange-500',
+            title: 'Ordre de réparation créé',
+            description,
+            time: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+            timestamp: createdDate.getTime()
           });
         });
       }
 
-      // Véhicules récemment mis à jour
+      // Factures créées
+      if (invoices) {
+        invoices.forEach(invoice => {
+          const createdDate = new Date(invoice.created_at);
+          let vehicleInfo = 'Véhicule non spécifié';
+          
+          if (invoice.vehicle_id && vehicles) {
+            const vehicle = vehicles.find(v => v.id === invoice.vehicle_id);
+            if (vehicle && vehicle.brand && vehicle.model) {
+              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
+            }
+          }
+          
+          let description = `Facture n°${invoice.reference || 'N/A'} - ${vehicleInfo}`;
+          if (invoice.clients) {
+            description += ` - ${invoice.clients.first_name} ${invoice.clients.last_name}`;
+          }
+          
+          activities.push({
+            id: `invoice-${invoice.id}`,
+            icon: 'Receipt',
+            iconBackground: 'bg-purple-500',
+            title: 'Facture créée',
+            description,
+            time: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+            timestamp: createdDate.getTime()
+          });
+        });
+      }
+
+      // Avoirs créés
+      if (credits) {
+        credits.forEach(credit => {
+          const createdDate = new Date(credit.created_at);
+          let vehicleInfo = 'Véhicule non spécifié';
+          
+          if (credit.vehicle_id && vehicles) {
+            const vehicle = vehicles.find(v => v.id === credit.vehicle_id);
+            if (vehicle && vehicle.brand && vehicle.model) {
+              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
+            }
+          }
+          
+          let description = `Avoir n°${credit.reference || 'N/A'} - ${vehicleInfo}`;
+          if (credit.clients) {
+            description += ` - ${credit.clients.first_name} ${credit.clients.last_name}`;
+          }
+          
+          activities.push({
+            id: `credit-${credit.id}`,
+            icon: 'RotateCcw',
+            iconBackground: 'bg-red-500',
+            title: 'Avoir créé',
+            description,
+            time: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+            timestamp: createdDate.getTime()
+          });
+        });
+      }
+
+      // Véhicules créés
       if (vehicles) {
-        vehicles.slice(0, 1).forEach(vehicle => {
+        vehicles.forEach(vehicle => {
+          const createdDate = new Date(vehicle.created_at);
           let vehicleDescription = 'Véhicule';
           if (vehicle.brand && vehicle.model && vehicle.license_plate) {
             vehicleDescription = `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`;
@@ -290,36 +465,10 @@ export const useDashboardData = () => {
             id: `vehicle-${vehicle.id}`,
             icon: 'Car',
             iconBackground: 'bg-purple-500',
-            title: 'Véhicule mis à jour',
+            title: 'Véhicule créé',
             description: vehicleDescription,
-            time: new Date(vehicle.updated_at || vehicle.created_at).toLocaleDateString('fr-FR'),
-            timestamp: new Date(vehicle.updated_at || vehicle.created_at).getTime()
-          });
-        });
-      }
-
-      // Paiements récents avec informations de facture
-      if (receipts && invoices) {
-        receipts.slice(0, 1).forEach(receipt => {
-          let description = `Encaissement de ${formatCurrency(receipt.amount)}`;
-          
-          // Trouver la facture associée
-          if (receipt.invoice_id) {
-            const invoice = invoices.find(inv => inv.id === receipt.invoice_id);
-            if (invoice && invoice.reference) {
-              const clientName = invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client';
-              description = `Facture n°${invoice.reference} - ${clientName}`;
-            }
-          }
-          
-          activities.push({
-            id: `receipt-${receipt.id}`,
-            icon: 'CreditCard',
-            iconBackground: 'bg-amber-500',
-            title: 'Paiement reçu',
-            description,
-            time: new Date(receipt.date).toLocaleDateString('fr-FR'),
-            timestamp: new Date(receipt.date).getTime()
+            time: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+            timestamp: createdDate.getTime()
           });
         });
       }
@@ -329,7 +478,7 @@ export const useDashboardData = () => {
         .sort((a, b) => b.timestamp - a.timestamp)
         .slice(0, 10);
     },
-    enabled: !quotesLoading && !clientsLoading && !vehiclesLoading && !receiptsLoading && !invoicesLoading
+    enabled: !quotesLoading && !clientsLoading && !vehiclesLoading && !receiptsLoading && !invoicesLoading && !ordersLoading && !expertiseLoading && !creditsLoading && !expensesLoading
   });
 
   return {

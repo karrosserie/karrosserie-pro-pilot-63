@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FileText, User, Car, CreditCard } from 'lucide-react';
+import { FileText, User, Car, CreditCard, Receipt, ClipboardCheck, Wrench, RotateCcw } from 'lucide-react';
 
 interface ActivityItem {
   id: string;
@@ -26,6 +26,14 @@ const RecentActivity = ({ activities = [] }: RecentActivityProps) => {
         return <Car className="h-4 w-4 text-white" />;
       case 'CreditCard':
         return <CreditCard className="h-4 w-4 text-white" />;
+      case 'Receipt':
+        return <Receipt className="h-4 w-4 text-white" />;
+      case 'ClipboardCheck':
+        return <ClipboardCheck className="h-4 w-4 text-white" />;
+      case 'Wrench':
+        return <Wrench className="h-4 w-4 text-white" />;
+      case 'RotateCcw':
+        return <RotateCcw className="h-4 w-4 text-white" />;
       default:
         return <FileText className="h-4 w-4 text-white" />;
     }
