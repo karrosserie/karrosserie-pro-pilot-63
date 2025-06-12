@@ -130,12 +130,13 @@ const Documents = () => {
     // Ajouter les rapports d'expertise
     if (expertiseReports && activeFilters.expertise) {
       expertiseReports.forEach(report => {
+        const createdDate = new Date(report.created_at);
         documents.push({
           id: `expertise-${report.id}`,
           originalId: report.id,
           icon: <FileText className="h-5 w-5 text-blue-600" />,
           title: `Rapport d'expertise`,
-          date: `Créé le ${new Date(report.created_at).toLocaleDateString('fr-FR')}`,
+          date: `Créé le ${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
           customer: report.clients ? `${report.clients.first_name} ${report.clients.last_name}` : 'Client non spécifié',
           vehicle: report.vehicles ? `${report.vehicles.brand} ${report.vehicles.model} - ${report.vehicles.license_plate}` : 'Véhicule non spécifié',
           status: 'Importé',
@@ -149,12 +150,13 @@ const Documents = () => {
     // Ajouter les devis
     if (quotes && activeFilters.quotes) {
       quotes.forEach(quote => {
+        const createdDate = new Date(quote.created_at);
         documents.push({
           id: `quote-${quote.id}`,
           originalId: quote.id,
           icon: <FileText className="h-5 w-5 text-amber-600" />,
           title: `Devis`,
-          date: `Créé le ${new Date(quote.created_at).toLocaleDateString('fr-FR')}`,
+          date: `Créé le ${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
           customer: quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : 'Client non spécifié',
           vehicle: quote.vehicles ? `${quote.vehicles.brand} ${quote.vehicles.model} - ${quote.vehicles.license_plate}` : 'Véhicule non spécifié',
           status: quote.status === 'draft' ? 'En attente' : 'Validé',
@@ -168,12 +170,13 @@ const Documents = () => {
     // Ajouter les ordres de réparation
     if (repairOrders && activeFilters.orders) {
       repairOrders.forEach(order => {
+        const createdDate = new Date(order.created_at);
         documents.push({
           id: `order-${order.id}`,
           originalId: order.id,
           icon: <FileText className="h-5 w-5 text-green-600" />,
           title: `Ordre de réparation`,
-          date: `Créé le ${new Date(order.created_at).toLocaleDateString('fr-FR')}`,
+          date: `Créé le ${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
           customer: order.clients ? `${order.clients.first_name} ${order.clients.last_name}` : 'Client non spécifié',
           vehicle: order.vehicles ? `${order.vehicles.brand} ${order.vehicles.model} - ${order.vehicles.license_plate}` : 'Véhicule non spécifié',
           status: order.status === 'signed' ? 'Signé' : 'En attente',
@@ -187,12 +190,13 @@ const Documents = () => {
     // Ajouter les factures
     if (invoices && activeFilters.invoices) {
       invoices.forEach(invoice => {
+        const createdDate = new Date(invoice.created_at);
         documents.push({
           id: `invoice-${invoice.id}`,
           originalId: invoice.id,
           icon: <FileText className="h-5 w-5 text-purple-600" />,
           title: `Facture`,
-          date: `Créé le ${new Date(invoice.created_at).toLocaleDateString('fr-FR')}`,
+          date: `Créé le ${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
           customer: invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client non spécifié',
           vehicle: invoice.vehicles ? `${invoice.vehicles.brand} ${invoice.vehicles.model} - ${invoice.vehicles.license_plate}` : 'Véhicule non spécifié',
           status: 'Payé',
@@ -206,12 +210,13 @@ const Documents = () => {
     // Ajouter les avoirs
     if (credits && activeFilters.credits) {
       credits.forEach(credit => {
+        const createdDate = new Date(credit.created_at);
         documents.push({
           id: `credit-${credit.id}`,
           originalId: credit.id,
           icon: <FileText className="h-5 w-5 text-red-600" />,
           title: `Avoir`,
-          date: `Créé le ${new Date(credit.created_at).toLocaleDateString('fr-FR')}`,
+          date: `Créé le ${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
           customer: credit.clients ? `${credit.clients.first_name} ${credit.clients.last_name}` : 'Client non spécifié',
           vehicle: credit.vehicles ? `${credit.vehicles.brand} ${credit.vehicles.model} - ${credit.vehicles.license_plate}` : 'Véhicule non spécifié',
           status: 'Émis',
@@ -239,18 +244,21 @@ const Documents = () => {
 
   // Fonction pour gérer le scroll infini
   const handleScroll = useCallback(() => {
-    if (isLoadingMore) return;
+    if (isLoadingMore || displayCount >= allDocuments.length) return;
     
-    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight;
+    const clientHeight = window.innerHeight;
     
-    if (scrollTop + clientHeight >= scrollHeight - 5) {
-      if (displayCount < allDocuments.length) {
-        setIsLoadingMore(true);
-        setTimeout(() => {
-          setDisplayCount(prev => Math.min(prev + 5, allDocuments.length));
-          setIsLoadingMore(false);
-        }, 500);
-      }
+    console.log('Scroll event:', { scrollTop, scrollHeight, clientHeight, threshold: scrollHeight - clientHeight - 100 });
+    
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+      console.log('Loading more documents...');
+      setIsLoadingMore(true);
+      setTimeout(() => {
+        setDisplayCount(prev => Math.min(prev + 5, allDocuments.length));
+        setIsLoadingMore(false);
+      }, 500);
     }
   }, [displayCount, allDocuments.length, isLoadingMore]);
 
@@ -531,7 +539,15 @@ const Documents = () => {
             {displayCount < allDocuments.length && !isLoadingMore && (
               <div className="text-center py-4">
                 <p className="text-gray-500 text-sm">
-                  Faites défiler vers le bas pour charger plus de documents
+                  Faites défiler vers le bas pour charger plus de documents ({displayedDocuments.length}/{allDocuments.length})
+                </p>
+              </div>
+            )}
+            
+            {displayCount >= allDocuments.length && allDocuments.length > 4 && (
+              <div className="text-center py-4">
+                <p className="text-gray-500 text-sm">
+                  Tous les documents ont été chargés ({allDocuments.length} au total)
                 </p>
               </div>
             )}
