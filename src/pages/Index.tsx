@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Car, FileText, Users, CreditCard } from 'lucide-react';
+import { Car, FileText, Users, CreditCard, Eye, Pencil } from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,56 @@ const Index = () => {
   const [isQuoteDialogOpen, setIsQuoteDialogOpen] = useState(false);
   const [isClientDialogOpen, setIsClientDialogOpen] = useState(false);
   const [isReceiptDialogOpen, setIsReceiptDialogOpen] = useState(false);
+  
+  // États pour les dialogues de véhicules
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [vehicleDialogMode, setVehicleDialogMode] = useState('create');
+
+  const handleViewVehicle = (vehicle) => {
+    setSelectedVehicle(vehicle.vehicleData);
+    setVehicleDialogMode('view');
+    setIsVehicleDialogOpen(true);
+  };
+
+  const handleEditVehicle = (vehicle) => {
+    setSelectedVehicle(vehicle.vehicleData);
+    setVehicleDialogMode('edit');
+    setIsVehicleDialogOpen(true);
+  };
+
+  const getStatusDisplayName = (status) => {
+    switch (status) {
+      case 'En cours':
+        return 'En réparation';
+      case 'Terminé':
+        return 'Terminé';
+      case 'En attente':
+        return 'En attente';
+      case 'Réservé':
+        return 'Réservé';
+      case 'Annulé':
+        return 'Annulé';
+      default:
+        return status || 'En attente';
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'En cours':
+        return 'bg-amber-100 text-amber-800';
+      case 'Terminé':
+        return 'bg-green-100 text-green-800';
+      case 'En attente':
+        return 'bg-blue-100 text-blue-800';
+      case 'Réservé':
+        return 'bg-purple-100 text-purple-800';
+      case 'Annulé':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-blue-100 text-blue-800';
+    }
+  };
 
   if (isLoading) {
     return (
@@ -92,7 +143,8 @@ const Index = () => {
                     <th className="px-4 py-3">Immatriculation</th>
                     <th className="px-4 py-3">Client</th>
                     <th className="px-4 py-3">Statut</th>
-                    <th className="px-4 py-3 rounded-tr-lg">Dernière mise à jour</th>
+                    <th className="px-4 py-3">Dernière mise à jour</th>
+                    <th className="px-4 py-3 rounded-tr-lg">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -103,21 +155,26 @@ const Index = () => {
                         <td className="px-4 py-3 text-gray-600">{vehicle.licensePlate}</td>
                         <td className="px-4 py-3">{vehicle.client}</td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs font-medium px-2.5 py-0.5 rounded ${
-                            vehicle.status === 'en_reparation' ? 'bg-amber-100 text-amber-800' :
-                            vehicle.status === 'termine' ? 'bg-green-100 text-green-800' :
-                            'bg-blue-100 text-blue-800'
-                          }`}>
-                            {vehicle.status === 'en_reparation' ? 'En réparation' :
-                             vehicle.status === 'termine' ? 'Terminé' : 'En attente'}
+                          <span className={`text-xs font-medium px-2.5 py-0.5 rounded ${getStatusColor(vehicle.status)}`}>
+                            {getStatusDisplayName(vehicle.status)}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-gray-600">{vehicle.lastUpdate}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex space-x-1">
+                            <Button variant="ghost" size="icon" onClick={() => handleViewVehicle(vehicle)}>
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleEditVehicle(vehicle)}>
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                      <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                         Aucun véhicule récent
                       </td>
                     </tr>
@@ -142,19 +199,25 @@ const Index = () => {
                 recentDocuments.map((document) => (
                   <div key={document.id} className="border border-gray-200 rounded-lg p-4 flex items-start">
                     <div className={`p-3 rounded-lg mr-3 ${
-                      document.type === 'invoice' ? 'bg-green-100' :
-                      document.type === 'quote' ? 'bg-blue-100' :
-                      'bg-purple-100'
+                      document.type === 'invoice' ? 'bg-purple-100' :
+                      document.type === 'quote' ? 'bg-amber-100' :
+                      document.type === 'order' ? 'bg-green-100' :
+                      document.type === 'expertise' ? 'bg-blue-100' :
+                      document.type === 'credit' ? 'bg-red-100' :
+                      'bg-gray-100'
                     }`}>
                       <FileText className={`h-5 w-5 ${
-                        document.type === 'invoice' ? 'text-green-600' :
-                        document.type === 'quote' ? 'text-blue-600' :
-                        'text-purple-600'
+                        document.type === 'invoice' ? 'text-purple-600' :
+                        document.type === 'quote' ? 'text-amber-600' :
+                        document.type === 'order' ? 'text-green-600' :
+                        document.type === 'expertise' ? 'text-blue-600' :
+                        document.type === 'credit' ? 'text-red-600' :
+                        'text-gray-600'
                       }`} />
                     </div>
                     <div>
                       <h4 className="font-medium">{document.title}</h4>
-                      <p className="text-sm text-gray-600">{document.client}</p>
+                      <p className="text-sm text-gray-600">{document.description}</p>
                       <p className="text-xs text-gray-400 mt-1">Créé le {document.date}</p>
                     </div>
                   </div>
@@ -178,7 +241,11 @@ const Index = () => {
               <Button 
                 variant="outline" 
                 className="flex-col h-20 p-2 w-full"
-                onClick={() => setIsVehicleDialogOpen(true)}
+                onClick={() => {
+                  setSelectedVehicle(null);
+                  setVehicleDialogMode('create');
+                  setIsVehicleDialogOpen(true);
+                }}
               >
                 <Car className="h-6 w-6 mb-1" />
                 <span className="text-xs">Nouveau véhicule</span>
@@ -219,10 +286,11 @@ const Index = () => {
       <VehicleDialog
         open={isVehicleDialogOpen}
         onOpenChange={setIsVehicleDialogOpen}
-        title="Nouveau véhicule"
-        description="Ajoutez un nouveau véhicule au système"
+        title={vehicleDialogMode === 'create' ? "Nouveau véhicule" : vehicleDialogMode === 'edit' ? "Modifier le véhicule" : "Détails du véhicule"}
+        description={vehicleDialogMode === 'create' ? "Ajoutez un nouveau véhicule au système" : vehicleDialogMode === 'edit' ? "Modifiez les informations du véhicule" : "Consultez les détails du véhicule"}
         onSubmit={() => setIsVehicleDialogOpen(false)}
-        mode="create"
+        mode={vehicleDialogMode}
+        vehicle={selectedVehicle}
       />
 
       <QuoteDialog

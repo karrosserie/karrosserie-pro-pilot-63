@@ -28,8 +28,8 @@ export const useDashboardData = () => {
       // Véhicules en réparation = statut "En cours"
       const vehiclesInRepair = vehicles?.filter(v => v.status === 'En cours').length || 0;
       const activeClients = clients?.length || 0;
-      // Devis en attente = statut "draft"
-      const pendingQuotes = quotes?.filter(q => q.status === 'draft').length || 0;
+      // Devis en attente = statut "En attente"
+      const pendingQuotes = quotes?.filter(q => q.status === 'En attente').length || 0;
       
       console.log('Dashboard stats calculation:', {
         totalVehicles: vehicles?.length || 0,
@@ -51,27 +51,34 @@ export const useDashboardData = () => {
   });
 
   const { data: recentVehicles } = useQuery({
-    queryKey: ['recent-vehicles', vehicles],
+    queryKey: ['recent-vehicles', vehicles, clients],
     queryFn: () => {
       if (!vehicles) return [];
       
       return vehicles
         .sort((a, b) => new Date(b.updated_at || b.created_at).getTime() - new Date(a.updated_at || a.created_at).getTime())
         .slice(0, 3)
-        .map(vehicle => ({
-          id: vehicle.id,
-          model: `${vehicle.brand} ${vehicle.model}`,
-          licensePlate: vehicle.license_plate,
-          client: 'Client',
-          status: vehicle.status,
-          lastUpdate: new Date(vehicle.updated_at || vehicle.created_at).toLocaleDateString('fr-FR')
-        }));
+        .map(vehicle => {
+          // Trouver le client associé
+          const client = clients?.find(c => c.id === vehicle.client_id);
+          const clientName = client ? `${client.first_name} ${client.last_name}` : 'Client non assigné';
+          
+          return {
+            id: vehicle.id,
+            model: `${vehicle.brand || ''} ${vehicle.model || ''}`.trim() || 'Véhicule',
+            licensePlate: vehicle.license_plate || 'N/A',
+            client: clientName,
+            status: vehicle.status || 'En attente',
+            lastUpdate: new Date(vehicle.updated_at || vehicle.created_at).toLocaleDateString('fr-FR'),
+            vehicleData: vehicle // Garder les données complètes pour les actions
+          };
+        });
     },
-    enabled: !!vehicles
+    enabled: !!vehicles && !!clients
   });
 
   const { data: recentDocuments } = useQuery({
-    queryKey: ['recent-documents', invoices, quotes, repairOrders, expertiseReports, credits],
+    queryKey: ['recent-documents', invoices, quotes, repairOrders, expertiseReports, credits, vehicles, clients],
     queryFn: () => {
       const documents = [];
       
@@ -79,10 +86,22 @@ export const useDashboardData = () => {
       if (invoices) {
         invoices.forEach(invoice => {
           const createdDate = new Date(invoice.created_at);
+          const clientName = invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client non spécifié';
+          
+          // Trouver le véhicule associé
+          let vehicleInfo = 'Véhicule non spécifié';
+          if (invoice.vehicle_id && vehicles) {
+            const vehicle = vehicles.find(v => v.id === invoice.vehicle_id);
+            if (vehicle) {
+              vehicleInfo = `${vehicle.brand || ''} ${vehicle.model || ''} - ${vehicle.license_plate || ''}`.replace(/^\s*-\s*/, '').replace(/\s*-\s*$/, '');
+            }
+          }
+          
           documents.push({
             id: `invoice-${invoice.id}`,
             title: `Facture`,
-            client: invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client',
+            client: clientName,
+            description: `Client: ${clientName} | Véhicule: ${vehicleInfo}`,
             date: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
             type: 'invoice',
             timestamp: createdDate.getTime()
@@ -94,10 +113,22 @@ export const useDashboardData = () => {
       if (quotes) {
         quotes.forEach(quote => {
           const createdDate = new Date(quote.created_at);
+          const clientName = quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : 'Client non spécifié';
+          
+          // Trouver le véhicule associé
+          let vehicleInfo = 'Véhicule non spécifié';
+          if (quote.vehicle_id && vehicles) {
+            const vehicle = vehicles.find(v => v.id === quote.vehicle_id);
+            if (vehicle) {
+              vehicleInfo = `${vehicle.brand || ''} ${vehicle.model || ''} - ${vehicle.license_plate || ''}`.replace(/^\s*-\s*/, '').replace(/\s*-\s*$/, '');
+            }
+          }
+          
           documents.push({
             id: `quote-${quote.id}`,
             title: `Devis`,
-            client: quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : 'Client',
+            client: clientName,
+            description: `Client: ${clientName} | Véhicule: ${vehicleInfo}`,
             date: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
             type: 'quote',
             timestamp: createdDate.getTime()
@@ -109,10 +140,22 @@ export const useDashboardData = () => {
       if (repairOrders) {
         repairOrders.forEach(order => {
           const createdDate = new Date(order.created_at);
+          const clientName = order.clients ? `${order.clients.first_name} ${order.clients.last_name}` : 'Client non spécifié';
+          
+          // Trouver le véhicule associé
+          let vehicleInfo = 'Véhicule non spécifié';
+          if (order.vehicle_id && vehicles) {
+            const vehicle = vehicles.find(v => v.id === order.vehicle_id);
+            if (vehicle) {
+              vehicleInfo = `${vehicle.brand || ''} ${vehicle.model || ''} - ${vehicle.license_plate || ''}`.replace(/^\s*-\s*/, '').replace(/\s*-\s*$/, '');
+            }
+          }
+          
           documents.push({
             id: `order-${order.id}`,
             title: `Ordre de réparation`,
-            client: order.clients ? `${order.clients.first_name} ${order.clients.last_name}` : 'Client',
+            client: clientName,
+            description: `Client: ${clientName} | Véhicule: ${vehicleInfo}`,
             date: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
             type: 'order',
             timestamp: createdDate.getTime()
@@ -124,10 +167,22 @@ export const useDashboardData = () => {
       if (expertiseReports) {
         expertiseReports.forEach(report => {
           const createdDate = new Date(report.created_at);
+          const clientName = report.clients ? `${report.clients.first_name} ${report.clients.last_name}` : 'Client non spécifié';
+          
+          // Trouver le véhicule associé
+          let vehicleInfo = 'Véhicule non spécifié';
+          if (report.vehicle_id && vehicles) {
+            const vehicle = vehicles.find(v => v.id === report.vehicle_id);
+            if (vehicle) {
+              vehicleInfo = `${vehicle.brand || ''} ${vehicle.model || ''} - ${vehicle.license_plate || ''}`.replace(/^\s*-\s*/, '').replace(/\s*-\s*$/, '');
+            }
+          }
+          
           documents.push({
             id: `expertise-${report.id}`,
             title: `Rapport d'expertise`,
-            client: report.clients ? `${report.clients.first_name} ${report.clients.last_name}` : 'Client',
+            client: clientName,
+            description: `Client: ${clientName} | Véhicule: ${vehicleInfo}`,
             date: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
             type: 'expertise',
             timestamp: createdDate.getTime()
@@ -139,10 +194,22 @@ export const useDashboardData = () => {
       if (credits) {
         credits.forEach(credit => {
           const createdDate = new Date(credit.created_at);
+          const clientName = credit.clients ? `${credit.clients.first_name} ${credit.clients.last_name}` : 'Client non spécifié';
+          
+          // Trouver le véhicule associé
+          let vehicleInfo = 'Véhicule non spécifié';
+          if (credit.vehicle_id && vehicles) {
+            const vehicle = vehicles.find(v => v.id === credit.vehicle_id);
+            if (vehicle) {
+              vehicleInfo = `${vehicle.brand || ''} ${vehicle.model || ''} - ${vehicle.license_plate || ''}`.replace(/^\s*-\s*/, '').replace(/\s*-\s*$/, '');
+            }
+          }
+          
           documents.push({
             id: `credit-${credit.id}`,
             title: `Avoir`,
-            client: credit.clients ? `${credit.clients.first_name} ${credit.clients.last_name}` : 'Client',
+            client: clientName,
+            description: `Client: ${clientName} | Véhicule: ${vehicleInfo}`,
             date: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
             type: 'credit',
             timestamp: createdDate.getTime()
@@ -239,7 +306,7 @@ export const useDashboardData = () => {
           // Trouver la facture associée
           if (receipt.invoice_id) {
             const invoice = invoices.find(inv => inv.id === receipt.invoice_id);
-            if (invoice) {
+            if (invoice && invoice.reference) {
               const clientName = invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client';
               description = `Facture n°${invoice.reference} - ${clientName}`;
             }
