@@ -9,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Eye, Download, Pencil, Trash, UserPlus, MoreVertical, FileText, Receipt, CreditCard } from 'lucide-react';
+import { Eye, Pencil, Trash, UserPlus, MoreVertical, FileText, Receipt, CreditCard } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Client } from '@/services/supabase/clients';
@@ -67,9 +67,6 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                     <div className="flex justify-end space-x-1">
                       <Button variant="ghost" size="icon" onClick={() => onViewClient(client)}>
                         <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Download className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => onEditClient(client)}>
                         <Pencil className="h-4 w-4" />
