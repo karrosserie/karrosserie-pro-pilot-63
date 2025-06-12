@@ -39,3 +39,39 @@ export interface Cession {
     } | null;
   } | null;
 }
+
+export interface NewCession {
+  reference?: string;
+  sale_date?: string;
+  sale_price?: number;
+  buyer_name?: string;
+  buyer_contact?: string;
+  expert_name?: string | null;
+  expertise_date?: string | null;
+  expertise_amount?: number | null;
+  salvage_value?: number | null;
+  insurance_company_id?: string | null;
+  bank_account_id?: string | null;
+  repair_order_id?: string | null;
+  document_url?: string | null;
+  status?: 'en_attente' | 'en_cours' | 'terminee' | 'annulee';
+  notes?: string | null;
+}
+
+export interface UpdateCession {
+  reference?: string;
+  sale_date?: string;
+  sale_price?: number;
+  buyer_name?: string;
+  buyer_contact?: string;
+  expert_name?: string | null;
+  expertise_date?: string | null;
+  expertise_amount?: number | null;
+  salvage_value?: number | null;
+  insurance_company_id?: string | null;
+  bank_account_id?: string | null;
+  repair_order_id?: string | null;
+  document_url?: string | null;
+  status?: 'en_attente' | 'en_cours' | 'terminee' | 'annulee';
+  notes?: string | null;
+}

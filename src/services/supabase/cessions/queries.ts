@@ -84,7 +84,11 @@ export const getAllCessions = async (): Promise<Cession[]> => {
         ...cession,
         reference: cession.reference || '',
         status: cession.status || 'en_attente',
-        repair_orders: repairOrderData
+        repair_orders: repairOrderData,
+        sale_date: cession.sale_date || new Date().toISOString().split('T')[0],
+        sale_price: cession.sale_price || 0,
+        buyer_name: cession.buyer_name || '',
+        buyer_contact: cession.buyer_contact || ''
       };
     })
   );
@@ -139,8 +143,12 @@ export const getCessionById = async (id: string): Promise<Cession> => {
   // Transform data to match our interface
   return {
     ...basicCession,
-    reference: (basicCession as any).reference || '',
-    status: (basicCession as any).status || 'en_attente',
-    repair_orders: repairOrderData
+    reference: basicCession.reference || '',
+    status: basicCession.status || 'en_attente',
+    repair_orders: repairOrderData,
+    sale_date: basicCession.sale_date || new Date().toISOString().split('T')[0],
+    sale_price: basicCession.sale_price || 0,
+    buyer_name: basicCession.buyer_name || '',
+    buyer_contact: basicCession.buyer_contact || ''
   } as Cession;
 };

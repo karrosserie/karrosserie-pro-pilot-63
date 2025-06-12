@@ -27,8 +27,8 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
   // Find the specific vehicle for this repair order
   const repairOrderVehicle = vehicles?.find(v => v.id === order?.vehicle_id);
 
-  // Determiner si c'est en lecture seule
-  const isReadOnly = cession?.status === 'payee';
+  // Determiner si c'est en lecture seule (check for terminee status instead of payee)
+  const isReadOnly = cession?.status === 'terminee';
 
   useEffect(() => {
     if (cession) {

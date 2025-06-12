@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -93,7 +91,7 @@ export const CessionsTable = ({
       'Client non assigné';
     
     const vehicleInfo = order.vehicles ? 
-      `${order.vehicles.brand} ${order.vehicles.model} - ${order.vehicles.license_plate}` : 
+      `${order.vehicles.car_brands?.name || 'Marque inconnue'} ${order.vehicles.car_models?.name || 'Modèle inconnu'} - ${order.vehicles.license_plate}` : 
       'Véhicule non assigné';
     
     const orderDate = order.created_at ? 
@@ -208,4 +206,3 @@ export const CessionsTable = ({
     </div>
   );
 };
-

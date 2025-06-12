@@ -68,7 +68,7 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete, isLoading }: Expense
                 <TableCell>
                   {expense.vehicle ? (
                     <span className="text-sm">
-                      {expense.vehicle.license_plate} - {expense.vehicle.brand} {expense.vehicle.model}
+                      {expense.vehicle.license_plate} - {expense.vehicle.car_brands?.name || 'Marque inconnue'} {expense.vehicle.car_models?.name || 'Modèle inconnu'}
                     </span>
                   ) : (
                     <span className="text-gray-400 text-sm">Non assigné</span>

@@ -21,7 +21,14 @@ export const createCession = async (cession: NewCession): Promise<Cession> => {
     user_id: user.id,
     reference,
     status: cession.status || 'en_attente',
-    insurance_company_id: cession.insurance_company_id || null
+    insurance_company_id: cession.insurance_company_id || null,
+    sale_date: cession.sale_date || new Date().toISOString().split('T')[0],
+    sale_price: cession.sale_price || 0,
+    buyer_name: cession.buyer_name || '',
+    buyer_contact: cession.buyer_contact || '',
+    expertise_date: cession.expertise_date || null,
+    expertise_amount: cession.expertise_amount || null,
+    salvage_value: cession.salvage_value || null
   };
   
   console.log('Processed cession data:', processedCession);
@@ -37,11 +44,7 @@ export const createCession = async (cession: NewCession): Promise<Cession> => {
     throw new Error(error.message);
   }
   
-  return {
-    ...data,
-    reference: (data as any).reference || '',
-    status: (data as any).status || 'en_attente'
-  } as Cession;
+  return data as Cession;
 };
 
 export const updateCession = async (id: string, cession: UpdateCession): Promise<Cession> => {
@@ -57,11 +60,7 @@ export const updateCession = async (id: string, cession: UpdateCession): Promise
     throw new Error(error.message);
   }
   
-  return {
-    ...data,
-    reference: (data as any).reference || '',
-    status: (data as any).status || 'en_attente'
-  } as Cession;
+  return data as Cession;
 };
 
 export const deleteCession = async (id: string): Promise<boolean> => {
