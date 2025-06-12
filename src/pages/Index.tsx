@@ -56,7 +56,7 @@ const Index = () => {
         />
         <StatsCard 
           title="Chiffre d'affaires" 
-          value={`${(dashboardStats?.revenue || 0).toFixed(0)} €`} 
+          value={(dashboardStats?.revenue || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} 
           change="+22%" 
           icon={<CreditCard className="h-6 w-6" />}
           iconBg="bg-green-500"

@@ -1,10 +1,10 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useClients } from '@/hooks/use-clients';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useAccountingData } from '@/hooks/use-accounting-data';
+import { formatCurrency } from '@/lib/utils';
 
 export const useDashboardData = () => {
   const { vehicles, isLoading: vehiclesLoading } = useVehicles();
@@ -42,7 +42,7 @@ export const useDashboardData = () => {
           id: vehicle.id,
           model: `${vehicle.brand} ${vehicle.model}`,
           licensePlate: vehicle.license_plate,
-          client: 'Client', // On pourrait enrichir avec les données client
+          client: 'Client',
           status: vehicle.status,
           lastUpdate: new Date(vehicle.updated_at || vehicle.created_at).toLocaleDateString('fr-FR')
         }));

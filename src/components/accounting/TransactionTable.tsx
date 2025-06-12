@@ -9,7 +9,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Button } from '@/components/ui/button';
-import { Eye, Download, Receipt } from 'lucide-react';
+import { Eye, Receipt } from 'lucide-react';
 import { Transaction } from '@/hooks/use-accounting-data';
 
 interface TransactionTableProps {
@@ -22,9 +22,9 @@ const TransactionTable = ({ transactions }: TransactionTableProps) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Référence</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Description</TableHead>
+            <TableHead>Client</TableHead>
             <TableHead>Type</TableHead>
             <TableHead>Méthode</TableHead>
             <TableHead>Montant</TableHead>
@@ -35,9 +35,9 @@ const TransactionTable = ({ transactions }: TransactionTableProps) => {
           {transactions.length > 0 ? (
             transactions.map((transaction) => (
               <TableRow key={transaction.id}>
-                <TableCell className="font-medium">{transaction.reference}</TableCell>
                 <TableCell>{transaction.date}</TableCell>
                 <TableCell>{transaction.description}</TableCell>
+                <TableCell>{transaction.client}</TableCell>
                 <TableCell>
                   <span className={`px-2 py-1 rounded-full text-xs ${transaction.type === 'Encaissement' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                     {transaction.type}
@@ -51,9 +51,6 @@ const TransactionTable = ({ transactions }: TransactionTableProps) => {
                   <div className="flex justify-end space-x-1">
                     <Button variant="ghost" size="icon">
                       <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Download className="h-4 w-4" />
                     </Button>
                   </div>
                 </TableCell>

@@ -7,19 +7,40 @@ import { Search, Filter, Calendar } from 'lucide-react';
 interface TransactionFiltersProps {
   searchTerm: string;
   setSearchTerm: (value: string) => void;
+  selectedFilter: 'all' | 'receipts' | 'expenses';
+  setSelectedFilter: (filter: 'all' | 'receipts' | 'expenses') => void;
 }
 
-const TransactionFilters = ({ searchTerm, setSearchTerm }: TransactionFiltersProps) => {
+const TransactionFilters = ({ 
+  searchTerm, 
+  setSearchTerm, 
+  selectedFilter, 
+  setSelectedFilter 
+}: TransactionFiltersProps) => {
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
       <div className="flex items-center mb-4 md:mb-0">
-        <Button variant="outline" size="sm" className="mr-2">
+        <Button 
+          variant={selectedFilter === 'all' ? 'default' : 'outline'} 
+          size="sm" 
+          className="mr-2"
+          onClick={() => setSelectedFilter('all')}
+        >
           Tous
         </Button>
-        <Button variant="outline" size="sm" className="mr-2">
+        <Button 
+          variant={selectedFilter === 'receipts' ? 'default' : 'outline'} 
+          size="sm" 
+          className="mr-2"
+          onClick={() => setSelectedFilter('receipts')}
+        >
           Encaissements
         </Button>
-        <Button variant="outline" size="sm">
+        <Button 
+          variant={selectedFilter === 'expenses' ? 'default' : 'outline'} 
+          size="sm"
+          onClick={() => setSelectedFilter('expenses')}
+        >
           Dépenses
         </Button>
       </div>

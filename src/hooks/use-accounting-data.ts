@@ -3,15 +3,16 @@ import { useQuery } from '@tanstack/react-query';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { useExpenses } from '@/hooks/use-expenses';
+import { formatCurrency } from '@/lib/utils';
 
 export interface Transaction {
   id: string;
-  reference: string;
   date: string;
   description: string;
   type: 'Encaissement' | 'Dépense';
   method: string;
   amount: string;
+  client: string;
   status?: string;
 }
 
@@ -30,12 +31,12 @@ export const useAccountingData = () => {
         receipts.forEach(receipt => {
           allTransactions.push({
             id: receipt.id,
-            reference: receipt.reference || `ENC-${receipt.id.slice(0, 8)}`,
             date: new Date(receipt.date).toLocaleDateString('fr-FR'),
             description: `Encaissement - ${receipt.invoice || 'Sans facture'}`,
             type: 'Encaissement',
             method: receipt.payment_method || 'Non spécifié',
-            amount: `${receipt.amount.toFixed(2)} €`
+            amount: formatCurrency(receipt.amount),
+            client: receipt.invoices?.clients ? `${receipt.invoices.clients.first_name} ${receipt.invoices.clients.last_name}` : 'Client non spécifié'
           });
         });
       }
@@ -45,12 +46,12 @@ export const useAccountingData = () => {
         expenses.forEach(expense => {
           allTransactions.push({
             id: expense.id,
-            reference: `DEP-${expense.id.slice(0, 8)}`,
             date: new Date(expense.date).toLocaleDateString('fr-FR'),
             description: `${expense.type} - ${expense.supplier}`,
             type: 'Dépense',
             method: 'Fournisseur',
-            amount: `${expense.total_amount.toFixed(2)} €`,
+            amount: formatCurrency(expense.total_amount),
+            client: expense.vehicle?.license_plate ? `Véhicule ${expense.vehicle.license_plate}` : 'Non assigné',
             status: expense.status
           });
         });
@@ -69,21 +70,21 @@ export const useAccountingData = () => {
   const statsCards = [
     {
       title: 'Encaissements du mois',
-      value: `${totalReceipts.toFixed(2)} €`,
+      value: formatCurrency(totalReceipts),
       period: 'Ce mois',
       trend: '+12%',
       trendUp: true
     },
     {
       title: 'Dépenses du mois',
-      value: `${totalExpenses.toFixed(2)} €`,
+      value: formatCurrency(totalExpenses),
       period: 'Ce mois',
       trend: '+8%',
       trendUp: false
     },
     {
       title: 'Bénéfice net',
-      value: `${balance.toFixed(2)} €`,
+      value: formatCurrency(balance),
       period: 'Ce mois',
       trend: balance >= 0 ? '+15%' : '-5%',
       trendUp: balance >= 0

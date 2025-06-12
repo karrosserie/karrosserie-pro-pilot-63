@@ -6,12 +6,19 @@ import { useAccountingData } from '@/hooks/use-accounting-data';
 
 const Accounting = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState<'all' | 'receipts' | 'expenses'>('all');
   const { transactions, statsCards, isLoading } = useAccountingData();
   
-  const filteredTransactions = transactions.filter(transaction => 
-    transaction.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    transaction.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredTransactions = transactions.filter(transaction => {
+    const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         transaction.client.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesFilter = selectedFilter === 'all' || 
+                         (selectedFilter === 'receipts' && transaction.type === 'Encaissement') ||
+                         (selectedFilter === 'expenses' && transaction.type === 'Dépense');
+    
+    return matchesSearch && matchesFilter;
+  });
 
   if (isLoading) {
     return (
@@ -48,6 +55,8 @@ const Accounting = () => {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         filteredTransactions={filteredTransactions}
+        selectedFilter={selectedFilter}
+        setSelectedFilter={setSelectedFilter}
       />
     </div>
   );

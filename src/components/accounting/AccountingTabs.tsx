@@ -10,9 +10,17 @@ interface AccountingTabsProps {
   searchTerm: string;
   setSearchTerm: (value: string) => void;
   filteredTransactions: any[];
+  selectedFilter: 'all' | 'receipts' | 'expenses';
+  setSelectedFilter: (filter: 'all' | 'receipts' | 'expenses') => void;
 }
 
-const AccountingTabs = ({ searchTerm, setSearchTerm, filteredTransactions }: AccountingTabsProps) => {
+const AccountingTabs = ({ 
+  searchTerm, 
+  setSearchTerm, 
+  filteredTransactions, 
+  selectedFilter, 
+  setSelectedFilter 
+}: AccountingTabsProps) => {
   return (
     <Tabs defaultValue="transactions" className="w-full">
       <TabsList className="grid grid-cols-1 md:grid-cols-2 mb-6">
@@ -30,6 +38,8 @@ const AccountingTabs = ({ searchTerm, setSearchTerm, filteredTransactions }: Acc
         <TransactionFilters
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
+          selectedFilter={selectedFilter}
+          setSelectedFilter={setSelectedFilter}
         />
         <TransactionTable transactions={filteredTransactions} />
       </TabsContent>
