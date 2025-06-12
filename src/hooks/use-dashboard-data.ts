@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useClients } from '@/hooks/use-clients';
@@ -101,9 +100,14 @@ export const useDashboardData = () => {
           // Chercher le véhicule correspondant
           if (quote.vehicle_id && vehicles) {
             const vehicle = vehicles.find(v => v.id === quote.vehicle_id);
-            if (vehicle) {
+            if (vehicle && vehicle.brand && vehicle.model) {
               vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
             }
+          }
+          
+          let description = `Devis ${quote.reference}`;
+          if (quote.clients) {
+            description = `${vehicleInfo} - ${quote.clients.first_name} ${quote.clients.last_name}`;
           }
           
           activities.push({
@@ -111,9 +115,7 @@ export const useDashboardData = () => {
             icon: 'FileText',
             iconBackground: 'bg-blue-500',
             title: 'Devis créé',
-            description: quote.clients ? 
-              `${vehicleInfo} - ${quote.clients.first_name} ${quote.clients.last_name}` :
-              `Devis ${quote.reference}`,
+            description,
             time: new Date(quote.created_at).toLocaleDateString('fr-FR'),
             timestamp: new Date(quote.created_at).getTime()
           });
@@ -138,12 +140,19 @@ export const useDashboardData = () => {
       // Véhicules récemment mis à jour
       if (vehicles) {
         vehicles.slice(0, 1).forEach(vehicle => {
+          let vehicleDescription = 'Véhicule';
+          if (vehicle.brand && vehicle.model && vehicle.license_plate) {
+            vehicleDescription = `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`;
+          } else if (vehicle.license_plate) {
+            vehicleDescription = `Véhicule ${vehicle.license_plate}`;
+          }
+          
           activities.push({
             id: `vehicle-${vehicle.id}`,
             icon: 'Car',
             iconBackground: 'bg-purple-500',
             title: 'Véhicule mis à jour',
-            description: `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`,
+            description: vehicleDescription,
             time: new Date(vehicle.updated_at || vehicle.created_at).toLocaleDateString('fr-FR'),
             timestamp: new Date(vehicle.updated_at || vehicle.created_at).getTime()
           });
@@ -153,14 +162,17 @@ export const useDashboardData = () => {
       // Paiements récents
       if (receipts) {
         receipts.slice(0, 1).forEach(receipt => {
+          let description = `Encaissement de ${formatCurrency(receipt.amount)}`;
+          if (receipt.invoices && receipt.invoices.reference) {
+            description = `Facture ${receipt.invoices.reference}`;
+          }
+          
           activities.push({
             id: `receipt-${receipt.id}`,
             icon: 'CreditCard',
             iconBackground: 'bg-amber-500',
             title: 'Paiement reçu',
-            description: receipt.invoices ? 
-              `Facture ${receipt.invoices.reference}` :
-              `Encaissement de ${formatCurrency(receipt.amount)}`,
+            description,
             time: new Date(receipt.date).toLocaleDateString('fr-FR'),
             timestamp: new Date(receipt.date).getTime()
           });
