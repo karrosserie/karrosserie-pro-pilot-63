@@ -1,3 +1,4 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useClients } from '@/hooks/use-clients';
@@ -226,18 +227,29 @@ export const useDashboardData = () => {
     enabled: !!invoices || !!quotes || !!repairOrders || !!expertiseReports || !!credits
   });
 
-  // Activité récente complète avec tous les types d'activités
+  // Activité récente complète avec tous les types d'activités (création et mise à jour)
   const { data: recentActivity } = useQuery({
     queryKey: ['recent-activity', quotes, clients, vehicles, receipts, invoices, repairOrders, expertiseReports, credits, expenses],
     queryFn: () => {
       const activities = [];
 
-      // Nouveaux clients créés
+      // Helper function to check if an item was updated (not just created)
+      const isUpdated = (createdAt: string, updatedAt?: string) => {
+        if (!updatedAt) return false;
+        const created = new Date(createdAt).getTime();
+        const updated = new Date(updatedAt).getTime();
+        return updated > created + 1000; // 1 second tolerance
+      };
+
+      // Clients créés et mis à jour
       if (clients) {
         clients.forEach(client => {
           const createdDate = new Date(client.created_at);
+          const updatedDate = client.updated_at ? new Date(client.updated_at) : null;
+          
+          // Client créé
           activities.push({
-            id: `client-${client.id}`,
+            id: `client-created-${client.id}`,
             icon: 'User',
             iconBackground: 'bg-green-500',
             title: 'Nouveau client créé',
@@ -245,13 +257,27 @@ export const useDashboardData = () => {
             time: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
             timestamp: createdDate.getTime()
           });
+
+          // Client mis à jour (si différent de la création)
+          if (updatedDate && isUpdated(client.created_at, client.updated_at)) {
+            activities.push({
+              id: `client-updated-${client.id}`,
+              icon: 'User',
+              iconBackground: 'bg-blue-500',
+              title: 'Client mis à jour',
+              description: `${client.first_name} ${client.last_name}`,
+              time: `${updatedDate.toLocaleDateString('fr-FR')} à ${updatedDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+              timestamp: updatedDate.getTime()
+            });
+          }
         });
       }
 
-      // Paiements reçus
+      // Paiements reçus et mis à jour
       if (receipts && invoices) {
         receipts.forEach(receipt => {
           const receiptDate = new Date(receipt.date);
+          const updatedDate = receipt.updated_at ? new Date(receipt.updated_at) : null;
           let description = `Encaissement de ${formatCurrency(receipt.amount)}`;
           
           // Trouver la facture associée
@@ -263,8 +289,9 @@ export const useDashboardData = () => {
             }
           }
           
+          // Paiement reçu
           activities.push({
-            id: `receipt-${receipt.id}`,
+            id: `receipt-created-${receipt.id}`,
             icon: 'CreditCard',
             iconBackground: 'bg-amber-500',
             title: 'Paiement reçu',
@@ -272,13 +299,27 @@ export const useDashboardData = () => {
             time: `${receiptDate.toLocaleDateString('fr-FR')} à ${receiptDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
             timestamp: receiptDate.getTime()
           });
+
+          // Paiement mis à jour
+          if (updatedDate && isUpdated(receipt.created_at, receipt.updated_at)) {
+            activities.push({
+              id: `receipt-updated-${receipt.id}`,
+              icon: 'CreditCard',
+              iconBackground: 'bg-orange-500',
+              title: 'Paiement mis à jour',
+              description,
+              time: `${updatedDate.toLocaleDateString('fr-FR')} à ${updatedDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+              timestamp: updatedDate.getTime()
+            });
+          }
         });
       }
 
-      // Dépenses enregistrées
+      // Dépenses enregistrées et mises à jour
       if (expenses) {
         expenses.forEach(expense => {
           const expenseDate = new Date(expense.date);
+          const updatedDate = expense.updated_at ? new Date(expense.updated_at) : null;
           let description = `${expense.supplier || 'Dépense'} - ${formatCurrency(expense.total_amount)}`;
           
           if (expense.vehicle && vehicles) {
@@ -288,8 +329,9 @@ export const useDashboardData = () => {
             }
           }
           
+          // Dépense enregistrée
           activities.push({
-            id: `expense-${expense.id}`,
+            id: `expense-created-${expense.id}`,
             icon: 'Receipt',
             iconBackground: 'bg-red-500',
             title: 'Dépense enregistrée',
@@ -297,13 +339,27 @@ export const useDashboardData = () => {
             time: `${expenseDate.toLocaleDateString('fr-FR')} à ${expenseDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
             timestamp: expenseDate.getTime()
           });
+
+          // Dépense mise à jour
+          if (updatedDate && isUpdated(expense.created_at, expense.updated_at)) {
+            activities.push({
+              id: `expense-updated-${expense.id}`,
+              icon: 'Receipt',
+              iconBackground: 'bg-pink-500',
+              title: 'Dépense mise à jour',
+              description,
+              time: `${updatedDate.toLocaleDateString('fr-FR')} à ${updatedDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+              timestamp: updatedDate.getTime()
+            });
+          }
         });
       }
 
-      // Rapports d'expertise importés
+      // Rapports d'expertise importés et mis à jour
       if (expertiseReports) {
         expertiseReports.forEach(report => {
           const createdDate = new Date(report.created_at);
+          const updatedDate = report.updated_at ? new Date(report.updated_at) : null;
           let vehicleInfo = 'Véhicule non spécifié';
           
           if (report.vehicle_id && vehicles) {
@@ -318,8 +374,9 @@ export const useDashboardData = () => {
             description += ` - ${report.clients.first_name} ${report.clients.last_name}`;
           }
           
+          // Rapport d'expertise importé
           activities.push({
-            id: `expertise-${report.id}`,
+            id: `expertise-created-${report.id}`,
             icon: 'ClipboardCheck',
             iconBackground: 'bg-blue-500',
             title: 'Rapport d\'expertise importé',
@@ -327,13 +384,27 @@ export const useDashboardData = () => {
             time: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
             timestamp: createdDate.getTime()
           });
+
+          // Rapport d'expertise mis à jour
+          if (updatedDate && isUpdated(report.created_at, report.updated_at)) {
+            activities.push({
+              id: `expertise-updated-${report.id}`,
+              icon: 'ClipboardCheck',
+              iconBackground: 'bg-indigo-500',
+              title: 'Rapport d\'expertise mis à jour',
+              description,
+              time: `${updatedDate.toLocaleDateString('fr-FR')} à ${updatedDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+              timestamp: updatedDate.getTime()
+            });
+          }
         });
       }
 
-      // Devis créés
+      // Devis créés et mis à jour
       if (quotes) {
         quotes.forEach(quote => {
           const createdDate = new Date(quote.created_at);
+          const updatedDate = quote.updated_at ? new Date(quote.updated_at) : null;
           let vehicleInfo = 'Véhicule non spécifié';
           
           if (quote.vehicle_id && vehicles) {
@@ -348,8 +419,9 @@ export const useDashboardData = () => {
             description += ` - ${quote.clients.first_name} ${quote.clients.last_name}`;
           }
           
+          // Devis créé
           activities.push({
-            id: `quote-${quote.id}`,
+            id: `quote-created-${quote.id}`,
             icon: 'FileText',
             iconBackground: 'bg-blue-500',
             title: 'Devis créé',
@@ -357,13 +429,27 @@ export const useDashboardData = () => {
             time: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
             timestamp: createdDate.getTime()
           });
+
+          // Devis mis à jour
+          if (updatedDate && isUpdated(quote.created_at, quote.updated_at)) {
+            activities.push({
+              id: `quote-updated-${quote.id}`,
+              icon: 'FileText',
+              iconBackground: 'bg-sky-500',
+              title: 'Devis mis à jour',
+              description,
+              time: `${updatedDate.toLocaleDateString('fr-FR')} à ${updatedDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+              timestamp: updatedDate.getTime()
+            });
+          }
         });
       }
 
-      // Ordres de réparation créés
+      // Ordres de réparation créés et mis à jour
       if (repairOrders) {
         repairOrders.forEach(order => {
           const createdDate = new Date(order.created_at);
+          const updatedDate = order.updated_at ? new Date(order.updated_at) : null;
           let vehicleInfo = 'Véhicule non spécifié';
           
           if (order.vehicle_id && vehicles) {
@@ -378,8 +464,9 @@ export const useDashboardData = () => {
             description += ` - ${order.clients.first_name} ${order.clients.last_name}`;
           }
           
+          // Ordre de réparation créé
           activities.push({
-            id: `order-${order.id}`,
+            id: `order-created-${order.id}`,
             icon: 'Wrench',
             iconBackground: 'bg-orange-500',
             title: 'Ordre de réparation créé',
@@ -387,13 +474,27 @@ export const useDashboardData = () => {
             time: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
             timestamp: createdDate.getTime()
           });
+
+          // Ordre de réparation mis à jour
+          if (updatedDate && isUpdated(order.created_at, order.updated_at)) {
+            activities.push({
+              id: `order-updated-${order.id}`,
+              icon: 'Wrench',
+              iconBackground: 'bg-yellow-500',
+              title: 'Ordre de réparation mis à jour',
+              description,
+              time: `${updatedDate.toLocaleDateString('fr-FR')} à ${updatedDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+              timestamp: updatedDate.getTime()
+            });
+          }
         });
       }
 
-      // Factures créées
+      // Factures créées et mises à jour
       if (invoices) {
         invoices.forEach(invoice => {
           const createdDate = new Date(invoice.created_at);
+          const updatedDate = invoice.updated_at ? new Date(invoice.updated_at) : null;
           let vehicleInfo = 'Véhicule non spécifié';
           
           if (invoice.vehicle_id && vehicles) {
@@ -408,8 +509,9 @@ export const useDashboardData = () => {
             description += ` - ${invoice.clients.first_name} ${invoice.clients.last_name}`;
           }
           
+          // Facture créée
           activities.push({
-            id: `invoice-${invoice.id}`,
+            id: `invoice-created-${invoice.id}`,
             icon: 'Receipt',
             iconBackground: 'bg-purple-500',
             title: 'Facture créée',
@@ -417,13 +519,27 @@ export const useDashboardData = () => {
             time: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
             timestamp: createdDate.getTime()
           });
+
+          // Facture mise à jour
+          if (updatedDate && isUpdated(invoice.created_at, invoice.updated_at)) {
+            activities.push({
+              id: `invoice-updated-${invoice.id}`,
+              icon: 'Receipt',
+              iconBackground: 'bg-violet-500',
+              title: 'Facture mise à jour',
+              description,
+              time: `${updatedDate.toLocaleDateString('fr-FR')} à ${updatedDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+              timestamp: updatedDate.getTime()
+            });
+          }
         });
       }
 
-      // Avoirs créés
+      // Avoirs créés et mis à jour
       if (credits) {
         credits.forEach(credit => {
           const createdDate = new Date(credit.created_at);
+          const updatedDate = credit.updated_at ? new Date(credit.updated_at) : null;
           let vehicleInfo = 'Véhicule non spécifié';
           
           if (credit.vehicle_id && vehicles) {
@@ -438,8 +554,9 @@ export const useDashboardData = () => {
             description += ` - ${credit.clients.first_name} ${credit.clients.last_name}`;
           }
           
+          // Avoir créé
           activities.push({
-            id: `credit-${credit.id}`,
+            id: `credit-created-${credit.id}`,
             icon: 'RotateCcw',
             iconBackground: 'bg-red-500',
             title: 'Avoir créé',
@@ -447,13 +564,27 @@ export const useDashboardData = () => {
             time: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
             timestamp: createdDate.getTime()
           });
+
+          // Avoir mis à jour
+          if (updatedDate && isUpdated(credit.created_at, credit.updated_at)) {
+            activities.push({
+              id: `credit-updated-${credit.id}`,
+              icon: 'RotateCcw',
+              iconBackground: 'bg-rose-500',
+              title: 'Avoir mis à jour',
+              description,
+              time: `${updatedDate.toLocaleDateString('fr-FR')} à ${updatedDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+              timestamp: updatedDate.getTime()
+            });
+          }
         });
       }
 
-      // Véhicules créés
+      // Véhicules créés et mis à jour
       if (vehicles) {
         vehicles.forEach(vehicle => {
           const createdDate = new Date(vehicle.created_at);
+          const updatedDate = vehicle.updated_at ? new Date(vehicle.updated_at) : null;
           let vehicleDescription = 'Véhicule';
           if (vehicle.brand && vehicle.model && vehicle.license_plate) {
             vehicleDescription = `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`;
@@ -461,8 +592,9 @@ export const useDashboardData = () => {
             vehicleDescription = `Véhicule ${vehicle.license_plate}`;
           }
           
+          // Véhicule créé
           activities.push({
-            id: `vehicle-${vehicle.id}`,
+            id: `vehicle-created-${vehicle.id}`,
             icon: 'Car',
             iconBackground: 'bg-purple-500',
             title: 'Véhicule créé',
@@ -470,13 +602,26 @@ export const useDashboardData = () => {
             time: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
             timestamp: createdDate.getTime()
           });
+
+          // Véhicule mis à jour
+          if (updatedDate && isUpdated(vehicle.created_at, vehicle.updated_at)) {
+            activities.push({
+              id: `vehicle-updated-${vehicle.id}`,
+              icon: 'Car',
+              iconBackground: 'bg-slate-500',
+              title: 'Véhicule mis à jour',
+              description: vehicleDescription,
+              time: `${updatedDate.toLocaleDateString('fr-FR')} à ${updatedDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+              timestamp: updatedDate.getTime()
+            });
+          }
         });
       }
 
       // Trier par date (plus récent en premier) et prendre les 10 plus récents
       return activities
         .sort((a, b) => b.timestamp - a.timestamp)
-        .slice(0, 20);
+        .slice(0, 10);
     },
     enabled: !quotesLoading && !clientsLoading && !vehiclesLoading && !receiptsLoading && !invoicesLoading && !ordersLoading && !expertiseLoading && !creditsLoading && !expensesLoading
   });
