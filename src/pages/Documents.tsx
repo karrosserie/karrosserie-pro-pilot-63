@@ -433,8 +433,8 @@ const Documents = () => {
           
           <DropdownMenu open={showFilters} onOpenChange={setShowFilters}>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <Filter className="h-4 w-4 mr-2" />
+              <Button variant="outline" size="icon" className="bg-white border-gray-200">
+                <Filter className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
