@@ -15,7 +15,8 @@ import {
   DollarSign,
   TrendingUp,
   TrendingDown,
-  Wallet
+  Wallet,
+  Bot
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -93,6 +94,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
 
   const navItems = [
     { icon: <Home className="app-icon" />, label: 'Tableau de bord', path: '/' },
+    { icon: <Bot className="app-icon" />, label: 'Assistant IA', path: '/ai-assistant' },
     { icon: <Users className="app-icon" />, label: 'Clients', path: '/clients' },
     { icon: <Car className="app-icon" />, label: 'Véhicules', path: '/vehicles' },
     { 

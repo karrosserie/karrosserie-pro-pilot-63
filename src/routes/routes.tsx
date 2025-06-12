@@ -1,3 +1,4 @@
+
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -14,6 +15,7 @@ import Cessions from "@/pages/Cessions";
 import Auth from "@/pages/Auth";
 import Profile from "@/pages/Profile";
 import Activity from "@/pages/Activity";
+import AIAssistant from "@/pages/AIAssistant";
 
 // Document pages
 import ExpertiseReports from "@/pages/documents/expertise/ExpertiseReports";
@@ -71,6 +73,14 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <Activity />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/ai-assistant",
+    element: (
+      <ProtectedRoute>
+        <AIAssistant />
       </ProtectedRoute>
     )
   },
