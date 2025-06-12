@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useCarBrands } from '@/hooks/use-car-brands';
 import { useCarModels } from '@/hooks/use-car-models';
@@ -8,6 +7,7 @@ export interface VehicleFormData {
   vin: string;
   brand: string;
   model: string;
+  modelId: string;
   licensePlate: string;
   engineNumber: string;
   year: string;
@@ -76,17 +76,13 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
     return brand?.name || '';
   };
 
-  const getModelName = (modelId: string, brandId: string) => {
-    // This will be handled by the parent component that has access to models
-    return defaultValues.car_models?.name || '';
-  };
-
   const [formData, setFormData] = useState<VehicleFormData>({
     // Required fields
     clientId: defaultValues.client_id || '',
     vin: defaultValues.vin || '',
     brand: defaultValues.car_brands?.name || getBrandName(defaultValues.brand_id || ''),
     model: defaultValues.car_models?.name || '',
+    modelId: defaultValues.model_id || '',
     licensePlate: defaultValues.license_plate || '',
     
     // Optional fields
@@ -129,7 +125,7 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
     setFormData(prev => {
       // Reset model if brand changes
       if (name === 'brand') {
-        return { ...prev, [name]: value, model: '' };
+        return { ...prev, [name]: value, model: '', modelId: '' };
       }
       return { ...prev, [name]: value };
     });

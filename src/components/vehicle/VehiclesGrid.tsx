@@ -28,7 +28,7 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
           model={vehicle.car_models?.name || 'Modèle non défini'}
           year={vehicle.year}
           color={vehicle.color}
-          status={vehicle.status}
+          status={vehicle.status as "En attente" | "Réservé" | "En cours" | "Terminé" | "Annulé"}
           clientName={vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Client non défini'}
           onView={() => onViewVehicle(vehicle)}
           onEdit={() => onEditVehicle(vehicle)}

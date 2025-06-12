@@ -45,7 +45,7 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
 
   // Prepare model options for searchable select
   const modelOptions = carModels.map(model => ({
-    value: model.name,
+    value: model.id, // Use model ID as value
     label: model.name
   }));
 
@@ -53,6 +53,16 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
     onSelectChange('brand', brandName);
     // Reset model when brand changes
     onSelectChange('model', '');
+    onSelectChange('modelId', '');
+  };
+
+  const handleModelChange = (modelId: string) => {
+    // Find the model name for display
+    const selectedModel = carModels.find(model => model.id === modelId);
+    if (selectedModel) {
+      onSelectChange('model', selectedModel.name);
+      onSelectChange('modelId', modelId);
+    }
   };
 
   return (
@@ -91,8 +101,8 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
         </Label>
         <SearchableSelect
           options={modelOptions}
-          value={formData.model || ''}
-          onValueChange={(value) => onSelectChange('model', value)}
+          value={formData.modelId || ''}
+          onValueChange={handleModelChange}
           placeholder="Sélectionner un modèle"
           searchPlaceholder="Rechercher un modèle..."
           disabled={isViewMode || !formData.brand}

@@ -56,8 +56,11 @@ export function useVehiclesPage() {
       return;
     }
 
-    // For model, we need to get it from the hook that has access to models for this brand
-    // This will be handled in the component that calls this function
+    // Get model ID from the data (it should be set by the form)
+    if (!data.modelId) {
+      alert('Modèle non trouvé');
+      return;
+    }
 
     // Process work items - ensure it's an array and filter out empty items
     let processedWorkItems = [];
@@ -94,7 +97,7 @@ export function useVehiclesPage() {
       vin: data.vin,
       engine_number: data.engineNumber || null,
       brand_id: selectedBrand.id,
-      model_id: data.modelId || null, // This should be passed from the form
+      model_id: data.modelId,
       license_plate: data.licensePlate,
       year: data.year ? parseInt(data.year) : null,
       color: data.color || null,
