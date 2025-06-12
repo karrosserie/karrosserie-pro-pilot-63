@@ -44,13 +44,13 @@ export const createCession = async (cession: NewCession): Promise<Cession> => {
     throw new Error(error.message);
   }
   
-  // Add default values for missing properties
+  // Map database response to Cession interface with proper defaults
   const completeCession = {
     ...data,
-    sale_price: data.sale_price || 0,
-    expertise_date: data.expertise_date || null,
-    expertise_amount: data.expertise_amount || null,
-    salvage_value: data.salvage_value || null
+    sale_price: (data as any).sale_price ?? 0,
+    expertise_date: (data as any).expertise_date ?? null,
+    expertise_amount: (data as any).expertise_amount ?? null,
+    salvage_value: (data as any).salvage_value ?? null
   };
   
   return completeCession as Cession;
@@ -69,13 +69,13 @@ export const updateCession = async (id: string, cession: UpdateCession): Promise
     throw new Error(error.message);
   }
   
-  // Add default values for missing properties
+  // Map database response to Cession interface with proper defaults
   const completeCession = {
     ...data,
-    sale_price: data.sale_price || 0,
-    expertise_date: data.expertise_date || null,
-    expertise_amount: data.expertise_amount || null,
-    salvage_value: data.salvage_value || null
+    sale_price: (data as any).sale_price ?? 0,
+    expertise_date: (data as any).expertise_date ?? null,
+    expertise_amount: (data as any).expertise_amount ?? null,
+    salvage_value: (data as any).salvage_value ?? null
   };
   
   return completeCession as Cession;

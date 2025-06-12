@@ -80,18 +80,20 @@ export const getAllCessions = async (): Promise<Cession[]> => {
         }
       }
       
+      // Map database response to Cession interface with proper defaults
+      const cessionData = cession as any;
       return {
         ...cession,
         reference: cession.reference || '',
         status: cession.status || 'en_attente',
         repair_orders: repairOrderData,
         sale_date: cession.sale_date || new Date().toISOString().split('T')[0],
-        sale_price: cession.sale_price ?? 0,
+        sale_price: cessionData.sale_price ?? 0,
         buyer_name: cession.buyer_name || '',
         buyer_contact: cession.buyer_contact || '',
-        expertise_date: cession.expertise_date ?? null,
-        expertise_amount: cession.expertise_amount ?? null,
-        salvage_value: cession.salvage_value ?? null
+        expertise_date: cessionData.expertise_date ?? null,
+        expertise_amount: cessionData.expertise_amount ?? null,
+        salvage_value: cessionData.salvage_value ?? null
       };
     })
   );
@@ -143,18 +145,19 @@ export const getCessionById = async (id: string): Promise<Cession> => {
     repairOrderData = repairOrder;
   }
   
-  // Transform data to match our interface
+  // Map database response to Cession interface with proper defaults
+  const cessionData = basicCession as any;
   return {
     ...basicCession,
     reference: basicCession.reference || '',
     status: basicCession.status || 'en_attente',
     repair_orders: repairOrderData,
     sale_date: basicCession.sale_date || new Date().toISOString().split('T')[0],
-    sale_price: basicCession.sale_price ?? 0,
+    sale_price: cessionData.sale_price ?? 0,
     buyer_name: basicCession.buyer_name || '',
     buyer_contact: basicCession.buyer_contact || '',
-    expertise_date: basicCession.expertise_date ?? null,
-    expertise_amount: basicCession.expertise_amount ?? null,
-    salvage_value: basicCession.salvage_value ?? null
+    expertise_date: cessionData.expertise_date ?? null,
+    expertise_amount: cessionData.expertise_amount ?? null,
+    salvage_value: cessionData.salvage_value ?? null
   } as Cession;
 };
