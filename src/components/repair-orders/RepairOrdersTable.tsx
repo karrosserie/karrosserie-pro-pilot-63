@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { EmptyState } from '@/components/ui/empty-state';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { FileText } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { RepairOrderTableRow } from './RepairOrderTableRow';
@@ -20,18 +19,6 @@ interface RepairOrdersTableProps {
 }
 
 export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: RepairOrdersTableProps) => {
-  if (orders.length === 0) {
-    return (
-      <div className="card-container">
-        <EmptyState
-          icon={FileText}
-          title="Aucun ordre de réparation"
-          description="Aucun ordre de réparation n'a été trouvé. Créez-en un nouveau pour commencer."
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="card-container">
       <Table>
@@ -47,14 +34,28 @@ export const RepairOrdersTable = ({ orders, onEditOrder, contextMenuProps }: Rep
           </TableRow>
         </TableHeader>
         <TableBody>
-          {orders.map((order) => (
-            <RepairOrderTableRow
-              key={order.id}
-              order={order}
-              onEditOrder={onEditOrder}
-              contextMenuProps={contextMenuProps}
-            />
-          ))}
+          {orders.length > 0 ? (
+            orders.map((order) => (
+              <RepairOrderTableRow
+                key={order.id}
+                order={order}
+                onEditOrder={onEditOrder}
+                contextMenuProps={contextMenuProps}
+              />
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center py-4">
+                <div className="flex flex-col items-center justify-center py-8">
+                  <FileText className="h-10 w-10 text-gray-400 mb-2" />
+                  <h3 className="font-medium text-gray-900">Aucun résultat</h3>
+                  <p className="text-gray-500 mt-1">
+                    Aucun ordre de réparation correspondant à votre recherche n'a été trouvé.
+                  </p>
+                </div>
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </div>
