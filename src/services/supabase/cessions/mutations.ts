@@ -44,7 +44,16 @@ export const createCession = async (cession: NewCession): Promise<Cession> => {
     throw new Error(error.message);
   }
   
-  return data as Cession;
+  // Add default values for missing properties
+  const completeCession = {
+    ...data,
+    sale_price: data.sale_price || 0,
+    expertise_date: data.expertise_date || null,
+    expertise_amount: data.expertise_amount || null,
+    salvage_value: data.salvage_value || null
+  };
+  
+  return completeCession as Cession;
 };
 
 export const updateCession = async (id: string, cession: UpdateCession): Promise<Cession> => {
@@ -60,7 +69,16 @@ export const updateCession = async (id: string, cession: UpdateCession): Promise
     throw new Error(error.message);
   }
   
-  return data as Cession;
+  // Add default values for missing properties
+  const completeCession = {
+    ...data,
+    sale_price: data.sale_price || 0,
+    expertise_date: data.expertise_date || null,
+    expertise_amount: data.expertise_amount || null,
+    salvage_value: data.salvage_value || null
+  };
+  
+  return completeCession as Cession;
 };
 
 export const deleteCession = async (id: string): Promise<boolean> => {
