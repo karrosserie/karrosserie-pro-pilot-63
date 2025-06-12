@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useClients } from '@/hooks/use-clients';
 import { useInvoices } from '@/hooks/use-invoices';
@@ -11,10 +11,7 @@ import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { useExpenses } from '@/hooks/use-expenses';
 import { formatCurrency } from '@/lib/utils';
 
-const ITEMS_PER_PAGE = 10;
-
 export const useActivityInfinite = () => {
-  const [page, setPage] = useState(1);
   const { vehicles } = useVehicles();
   const { clients } = useClients();
   const { invoices } = useInvoices();
@@ -25,10 +22,11 @@ export const useActivityInfinite = () => {
   const { receipts } = useReceiptsData();
   const { expenses } = useExpenses();
 
-  const { data: allActivities } = useQuery({
-    queryKey: ['all-activities', quotes, clients, vehicles, receipts, invoices, repairOrders, expertiseReports, credits, expenses],
-    queryFn: () => {
+  return useInfiniteQuery({
+    queryKey: ['activity-infinite', quotes, clients, vehicles, receipts, invoices, repairOrders, expertiseReports, credits, expenses],
+    queryFn: ({ pageParam = 0 }) => {
       const activities = [];
+      const pageSize = 20; // Number of activities per page
 
       // Helper function to check if an item was updated (not just created)
       const isUpdated = (createdAt: string, updatedAt?: string) => {
@@ -69,9 +67,6 @@ export const useActivityInfinite = () => {
           }
         });
       }
-
-      // Copy all the activity generation logic from use-recent-activity.ts
-      // This includes: receipts, expenses, expertise reports, quotes, repair orders, invoices, credits, vehicles
 
       // Paiements reçus et mis à jour
       if (receipts && invoices) {
@@ -125,7 +120,7 @@ export const useActivityInfinite = () => {
           if (expense.vehicle && vehicles) {
             const vehicle = vehicles.find(v => v.id === expense.vehicle_id);
             if (vehicle) {
-              description += ` (${vehicle.brand} ${vehicle.model})`;
+              description += ` (${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'})`;
             }
           }
           
@@ -164,8 +159,8 @@ export const useActivityInfinite = () => {
           
           if (report.vehicle_id && vehicles) {
             const vehicle = vehicles.find(v => v.id === report.vehicle_id);
-            if (vehicle && vehicle.brand && vehicle.model) {
-              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
+            if (vehicle && vehicle.car_brands && vehicle.car_models) {
+              vehicleInfo = `${vehicle.car_brands.name} ${vehicle.car_models.name}`;
             }
           }
           
@@ -209,8 +204,8 @@ export const useActivityInfinite = () => {
           
           if (quote.vehicle_id && vehicles) {
             const vehicle = vehicles.find(v => v.id === quote.vehicle_id);
-            if (vehicle && vehicle.brand && vehicle.model) {
-              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
+            if (vehicle && vehicle.car_brands && vehicle.car_models) {
+              vehicleInfo = `${vehicle.car_brands.name} ${vehicle.car_models.name}`;
             }
           }
           
@@ -254,8 +249,8 @@ export const useActivityInfinite = () => {
           
           if (order.vehicle_id && vehicles) {
             const vehicle = vehicles.find(v => v.id === order.vehicle_id);
-            if (vehicle && vehicle.brand && vehicle.model) {
-              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
+            if (vehicle && vehicle.car_brands && vehicle.car_models) {
+              vehicleInfo = `${vehicle.car_brands.name} ${vehicle.car_models.name}`;
             }
           }
           
@@ -298,8 +293,8 @@ export const useActivityInfinite = () => {
           
           if (invoice.vehicle_id && vehicles) {
             const vehicle = vehicles.find(v => v.id === invoice.vehicle_id);
-            if (vehicle && vehicle.brand && vehicle.model) {
-              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
+            if (vehicle && vehicle.car_brands && vehicle.car_models) {
+              vehicleInfo = `${vehicle.car_brands.name} ${vehicle.car_models.name}`;
             }
           }
           
@@ -330,8 +325,8 @@ export const useActivityInfinite = () => {
           
           if (credit.vehicle_id && vehicles) {
             const vehicle = vehicles.find(v => v.id === credit.vehicle_id);
-            if (vehicle && vehicle.brand && vehicle.model) {
-              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
+            if (vehicle && vehicle.car_brands && vehicle.car_models) {
+              vehicleInfo = `${vehicle.car_brands.name} ${vehicle.car_models.name}`;
             }
           }
           
@@ -372,8 +367,8 @@ export const useActivityInfinite = () => {
           const createdDate = new Date(vehicle.created_at);
           const updatedDate = vehicle.updated_at ? new Date(vehicle.updated_at) : null;
           let vehicleDescription = 'Véhicule';
-          if (vehicle.brand && vehicle.model && vehicle.license_plate) {
-            vehicleDescription = `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`;
+          if (vehicle.car_brands && vehicle.car_models && vehicle.license_plate) {
+            vehicleDescription = `${vehicle.car_brands.name} ${vehicle.car_models.name} - ${vehicle.license_plate}`;
           } else if (vehicle.license_plate) {
             vehicleDescription = `Véhicule ${vehicle.license_plate}`;
           }
@@ -405,26 +400,21 @@ export const useActivityInfinite = () => {
       }
 
       // Trier par date (plus récent en premier)
-      return activities.sort((a, b) => b.timestamp - a.timestamp);
+      const sortedActivities = activities.sort((a, b) => b.timestamp - a.timestamp);
+      
+      // Pagination
+      const startIndex = pageParam * pageSize;
+      const endIndex = startIndex + pageSize;
+      const paginatedActivities = sortedActivities.slice(startIndex, endIndex);
+      
+      return {
+        activities: paginatedActivities,
+        nextCursor: endIndex < sortedActivities.length ? pageParam + 1 : undefined,
+        hasNextPage: endIndex < sortedActivities.length
+      };
     },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
     enabled: !!quotes && !!clients && !!vehicles && !!receipts && !!invoices && !!repairOrders && !!expertiseReports && !!credits && !!expenses
   });
-
-  const totalActivities = allActivities || [];
-  const totalPages = Math.ceil(totalActivities.length / ITEMS_PER_PAGE);
-  const displayedActivities = totalActivities.slice(0, page * ITEMS_PER_PAGE);
-  const hasMore = page < totalPages;
-
-  const loadMore = () => {
-    if (hasMore) {
-      setPage(prev => prev + 1);
-    }
-  };
-
-  return {
-    activities: displayedActivities,
-    hasMore,
-    loadMore,
-    isLoading: false
-  };
 };

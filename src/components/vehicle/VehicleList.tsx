@@ -76,12 +76,20 @@ const VehicleList = () => {
     {
       accessorKey: "car_brands.name",
       header: "Marque",
-      cell: ({ row }) => row.original.car_brands?.name || 'Marque inconnue',
+      cell: ({ row }) => {
+        const vehicle = row.original;
+        // Safe access to car_brands with fallback
+        return vehicle.car_brands?.name || 'Marque inconnue';
+      },
     },
     {
       accessorKey: "car_models.name",
       header: "Modèle",
-      cell: ({ row }) => row.original.car_models?.name || 'Modèle inconnu',
+      cell: ({ row }) => {
+        const vehicle = row.original;
+        // Safe access to car_models with fallback
+        return vehicle.car_models?.name || 'Modèle inconnu';
+      },
     },
     {
       accessorKey: "year",
