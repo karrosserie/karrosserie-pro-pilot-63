@@ -81,46 +81,46 @@ export type Database = {
       }
       car_brands: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: string
           name: string
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           name: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           name?: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
       car_models: {
         Row: {
           brand_id: string
-          created_at: string | null
+          created_at: string
           id: string
           name: string
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
           brand_id: string
-          created_at?: string | null
+          created_at?: string
           id?: string
           name: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
           brand_id?: string
-          created_at?: string | null
+          created_at?: string
           id?: string
           name?: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -238,7 +238,7 @@ export type Database = {
           address: string | null
           city: string | null
           country: string | null
-          created_at: string | null
+          created_at: string
           driver_license_back_url: string | null
           driver_license_front_url: string | null
           email: string | null
@@ -247,14 +247,14 @@ export type Database = {
           last_name: string
           phone: string | null
           postal_code: string | null
-          updated_at: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
           address?: string | null
           city?: string | null
           country?: string | null
-          created_at?: string | null
+          created_at?: string
           driver_license_back_url?: string | null
           driver_license_front_url?: string | null
           email?: string | null
@@ -263,14 +263,14 @@ export type Database = {
           last_name: string
           phone?: string | null
           postal_code?: string | null
-          updated_at?: string | null
+          updated_at?: string
           user_id: string
         }
         Update: {
           address?: string | null
           city?: string | null
           country?: string | null
-          created_at?: string | null
+          created_at?: string
           driver_license_back_url?: string | null
           driver_license_front_url?: string | null
           email?: string | null
@@ -279,7 +279,7 @@ export type Database = {
           last_name?: string
           phone?: string | null
           postal_code?: string | null
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -469,7 +469,7 @@ export type Database = {
           amount: number | null
           claim_number: string | null
           client_id: string | null
-          created_at: string | null
+          created_at: string
           document_url: string | null
           expert_name: string | null
           id: string
@@ -482,7 +482,7 @@ export type Database = {
           report_date: string | null
           report_number: string | null
           status: string | null
-          updated_at: string | null
+          updated_at: string
           user_id: string
           vehicle_id: string | null
         }
@@ -490,7 +490,7 @@ export type Database = {
           amount?: number | null
           claim_number?: string | null
           client_id?: string | null
-          created_at?: string | null
+          created_at?: string
           document_url?: string | null
           expert_name?: string | null
           id?: string
@@ -503,7 +503,7 @@ export type Database = {
           report_date?: string | null
           report_number?: string | null
           status?: string | null
-          updated_at?: string | null
+          updated_at?: string
           user_id: string
           vehicle_id?: string | null
         }
@@ -511,7 +511,7 @@ export type Database = {
           amount?: number | null
           claim_number?: string | null
           client_id?: string | null
-          created_at?: string | null
+          created_at?: string
           document_url?: string | null
           expert_name?: string | null
           id?: string
@@ -524,7 +524,7 @@ export type Database = {
           report_date?: string | null
           report_number?: string | null
           status?: string | null
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
           vehicle_id?: string | null
         }
@@ -552,7 +552,7 @@ export type Database = {
           client_id: string
           client_insurance: boolean | null
           client_signature: string | null
-          created_at: string | null
+          created_at: string
           damages: Json | null
           date_of_birth: string | null
           driver_license_back_url: string | null
@@ -579,7 +579,7 @@ export type Database = {
           start_date: string
           start_mileage: number
           status: string
-          updated_at: string | null
+          updated_at: string
           user_id: string
           vehicle_images: Json | null
         }
@@ -589,7 +589,7 @@ export type Database = {
           client_id: string
           client_insurance?: boolean | null
           client_signature?: string | null
-          created_at?: string | null
+          created_at?: string
           damages?: Json | null
           date_of_birth?: string | null
           driver_license_back_url?: string | null
@@ -616,7 +616,7 @@ export type Database = {
           start_date: string
           start_mileage?: number
           status?: string
-          updated_at?: string | null
+          updated_at?: string
           user_id: string
           vehicle_images?: Json | null
         }
@@ -626,7 +626,7 @@ export type Database = {
           client_id?: string
           client_insurance?: boolean | null
           client_signature?: string | null
-          created_at?: string | null
+          created_at?: string
           damages?: Json | null
           date_of_birth?: string | null
           driver_license_back_url?: string | null
@@ -653,7 +653,7 @@ export type Database = {
           start_date?: string
           start_mileage?: number
           status?: string
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
           vehicle_images?: Json | null
         }
@@ -687,7 +687,7 @@ export type Database = {
           client_id: string
           client_name: string | null
           client_signature: string | null
-          created_at: string | null
+          created_at: string
           damages: Json | null
           fleet_reservation_id: string
           fleet_vehicle_id: string
@@ -697,7 +697,7 @@ export type Database = {
           return_date: string
           return_mileage: number
           status: string
-          updated_at: string | null
+          updated_at: string
           user_id: string
           vehicle_images: Json | null
         }
@@ -706,7 +706,7 @@ export type Database = {
           client_id: string
           client_name?: string | null
           client_signature?: string | null
-          created_at?: string | null
+          created_at?: string
           damages?: Json | null
           fleet_reservation_id: string
           fleet_vehicle_id: string
@@ -716,7 +716,7 @@ export type Database = {
           return_date?: string
           return_mileage?: number
           status?: string
-          updated_at?: string | null
+          updated_at?: string
           user_id: string
           vehicle_images?: Json | null
         }
@@ -725,7 +725,7 @@ export type Database = {
           client_id?: string
           client_name?: string | null
           client_signature?: string | null
-          created_at?: string | null
+          created_at?: string
           damages?: Json | null
           fleet_reservation_id?: string
           fleet_vehicle_id?: string
@@ -735,7 +735,7 @@ export type Database = {
           return_date?: string
           return_mileage?: number
           status?: string
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
           vehicle_images?: Json | null
         }
@@ -774,7 +774,7 @@ export type Database = {
         Row: {
           brand: string
           color: string | null
-          created_at: string | null
+          created_at: string
           engine_number: string | null
           id: string
           insurance_card_url: string | null
@@ -784,7 +784,7 @@ export type Database = {
           registration_back_url: string | null
           registration_front_url: string | null
           status: string | null
-          updated_at: string | null
+          updated_at: string
           user_id: string
           vin: string | null
           year: number | null
@@ -792,7 +792,7 @@ export type Database = {
         Insert: {
           brand: string
           color?: string | null
-          created_at?: string | null
+          created_at?: string
           engine_number?: string | null
           id?: string
           insurance_card_url?: string | null
@@ -802,7 +802,7 @@ export type Database = {
           registration_back_url?: string | null
           registration_front_url?: string | null
           status?: string | null
-          updated_at?: string | null
+          updated_at?: string
           user_id: string
           vin?: string | null
           year?: number | null
@@ -810,7 +810,7 @@ export type Database = {
         Update: {
           brand?: string
           color?: string | null
-          created_at?: string | null
+          created_at?: string
           engine_number?: string | null
           id?: string
           insurance_card_url?: string | null
@@ -820,7 +820,7 @@ export type Database = {
           registration_back_url?: string | null
           registration_front_url?: string | null
           status?: string | null
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
           vin?: string | null
           year?: number | null
@@ -829,22 +829,22 @@ export type Database = {
       }
       insurance_companies: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: string
           name: string
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           name: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           name?: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -852,7 +852,7 @@ export type Database = {
         Row: {
           amount: number
           client_id: string | null
-          created_at: string | null
+          created_at: string
           document_url: string | null
           due_date: string | null
           id: string
@@ -863,14 +863,14 @@ export type Database = {
           repair_order_id: string | null
           status: string | null
           tax_rate: number | null
-          updated_at: string | null
+          updated_at: string
           user_id: string
           vehicle_id: string | null
         }
         Insert: {
           amount: number
           client_id?: string | null
-          created_at?: string | null
+          created_at?: string
           document_url?: string | null
           due_date?: string | null
           id?: string
@@ -881,14 +881,14 @@ export type Database = {
           repair_order_id?: string | null
           status?: string | null
           tax_rate?: number | null
-          updated_at?: string | null
+          updated_at?: string
           user_id: string
           vehicle_id?: string | null
         }
         Update: {
           amount?: number
           client_id?: string | null
-          created_at?: string | null
+          created_at?: string
           document_url?: string | null
           due_date?: string | null
           id?: string
@@ -899,16 +899,30 @@ export type Database = {
           repair_order_id?: string | null
           status?: string | null
           tax_rate?: number | null
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
           vehicle_id?: string | null
         }
         Relationships: [
           {
+            foreignKeyName: "invoices_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "invoices_repair_order_id_fkey"
             columns: ["repair_order_id"]
             isOneToOne: false
             referencedRelation: "repair_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -917,38 +931,38 @@ export type Database = {
         Row: {
           avatar_url: string | null
           company_name: string | null
-          created_at: string | null
+          created_at: string
           email: string | null
           first_name: string | null
           id: string
           last_name: string | null
           phone_number: string | null
           role: string | null
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           company_name?: string | null
-          created_at?: string | null
+          created_at?: string
           email?: string | null
           first_name?: string | null
           id: string
           last_name?: string | null
           phone_number?: string | null
           role?: string | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           company_name?: string | null
-          created_at?: string | null
+          created_at?: string
           email?: string | null
           first_name?: string | null
           id?: string
           last_name?: string | null
           phone_number?: string | null
           role?: string | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -956,14 +970,14 @@ export type Database = {
         Row: {
           amount: number
           client_id: string | null
-          created_at: string | null
+          created_at: string
           document_url: string | null
           id: string
           notes: string | null
           reference: string
           status: string | null
           tax_rate: number | null
-          updated_at: string | null
+          updated_at: string
           user_id: string
           valid_until: string | null
           vehicle_id: string | null
@@ -971,14 +985,14 @@ export type Database = {
         Insert: {
           amount: number
           client_id?: string | null
-          created_at?: string | null
+          created_at?: string
           document_url?: string | null
           id?: string
           notes?: string | null
           reference: string
           status?: string | null
           tax_rate?: number | null
-          updated_at?: string | null
+          updated_at?: string
           user_id: string
           valid_until?: string | null
           vehicle_id?: string | null
@@ -986,25 +1000,40 @@ export type Database = {
         Update: {
           amount?: number
           client_id?: string | null
-          created_at?: string | null
+          created_at?: string
           document_url?: string | null
           id?: string
           notes?: string | null
           reference?: string
           status?: string | null
           tax_rate?: number | null
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
           valid_until?: string | null
           vehicle_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "quotes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       receipts: {
         Row: {
           amount: number
           bank_account: string
-          created_at: string | null
+          created_at: string
           date: string
           id: string
           invoice_id: string | null
@@ -1013,13 +1042,13 @@ export type Database = {
           payment_proofs: string[] | null
           reference: string | null
           status: string | null
-          updated_at: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
           amount: number
           bank_account: string
-          created_at?: string | null
+          created_at?: string
           date: string
           id?: string
           invoice_id?: string | null
@@ -1028,13 +1057,13 @@ export type Database = {
           payment_proofs?: string[] | null
           reference?: string | null
           status?: string | null
-          updated_at?: string | null
+          updated_at?: string
           user_id: string
         }
         Update: {
           amount?: number
           bank_account?: string
-          created_at?: string | null
+          created_at?: string
           date?: string
           id?: string
           invoice_id?: string | null
@@ -1043,7 +1072,7 @@ export type Database = {
           payment_proofs?: string[] | null
           reference?: string | null
           status?: string | null
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -1059,7 +1088,7 @@ export type Database = {
       repair_orders: {
         Row: {
           client_id: string | null
-          created_at: string | null
+          created_at: string
           document_url: string | null
           end_date: string | null
           estimated_hours: number | null
@@ -1069,13 +1098,13 @@ export type Database = {
           reference: string
           start_date: string | null
           status: string | null
-          updated_at: string | null
+          updated_at: string
           user_id: string
           vehicle_id: string | null
         }
         Insert: {
           client_id?: string | null
-          created_at?: string | null
+          created_at?: string
           document_url?: string | null
           end_date?: string | null
           estimated_hours?: number | null
@@ -1085,13 +1114,13 @@ export type Database = {
           reference: string
           start_date?: string | null
           status?: string | null
-          updated_at?: string | null
+          updated_at?: string
           user_id: string
           vehicle_id?: string | null
         }
         Update: {
           client_id?: string | null
-          created_at?: string | null
+          created_at?: string
           document_url?: string | null
           end_date?: string | null
           estimated_hours?: number | null
@@ -1101,16 +1130,30 @@ export type Database = {
           reference?: string
           start_date?: string | null
           status?: string | null
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
           vehicle_id?: string | null
         }
         Relationships: [
           {
+            foreignKeyName: "repair_orders_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "repair_orders_quote_id_fkey"
             columns: ["quote_id"]
             isOneToOne: false
             referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repair_orders_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -1119,9 +1162,10 @@ export type Database = {
         Row: {
           arrival_date: string | null
           brand: string
+          brand_id: string | null
           client_id: string | null
           color: string | null
-          created_at: string | null
+          created_at: string
           end_date: string | null
           engine_number: string | null
           fuel_level: number | null
@@ -1139,7 +1183,7 @@ export type Database = {
           road_test_notes: string | null
           start_date: string | null
           status: string | null
-          updated_at: string | null
+          updated_at: string
           user_id: string
           vehicle_image_url: string | null
           vehicle_images: Json | null
@@ -1150,9 +1194,10 @@ export type Database = {
         Insert: {
           arrival_date?: string | null
           brand: string
+          brand_id?: string | null
           client_id?: string | null
           color?: string | null
-          created_at?: string | null
+          created_at?: string
           end_date?: string | null
           engine_number?: string | null
           fuel_level?: number | null
@@ -1170,7 +1215,7 @@ export type Database = {
           road_test_notes?: string | null
           start_date?: string | null
           status?: string | null
-          updated_at?: string | null
+          updated_at?: string
           user_id: string
           vehicle_image_url?: string | null
           vehicle_images?: Json | null
@@ -1181,9 +1226,10 @@ export type Database = {
         Update: {
           arrival_date?: string | null
           brand?: string
+          brand_id?: string | null
           client_id?: string | null
           color?: string | null
-          created_at?: string | null
+          created_at?: string
           end_date?: string | null
           engine_number?: string | null
           fuel_level?: number | null
@@ -1201,7 +1247,7 @@ export type Database = {
           road_test_notes?: string | null
           start_date?: string | null
           status?: string | null
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
           vehicle_image_url?: string | null
           vehicle_images?: Json | null
@@ -1210,6 +1256,13 @@ export type Database = {
           year?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "vehicles_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "car_brands"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "vehicles_client_id_fkey"
             columns: ["client_id"]
