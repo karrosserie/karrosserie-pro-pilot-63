@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Car, FileText, Users, CreditCard, Eye, Pencil } from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
@@ -290,7 +289,7 @@ const Index = () => {
         description={vehicleDialogMode === 'create' ? "Ajoutez un nouveau véhicule au système" : vehicleDialogMode === 'edit' ? "Modifiez les informations du véhicule" : "Consultez les détails du véhicule"}
         onSubmit={() => setIsVehicleDialogOpen(false)}
         mode={vehicleDialogMode}
-        vehicle={selectedVehicle}
+        defaultValues={selectedVehicle}
       />
 
       <QuoteDialog
