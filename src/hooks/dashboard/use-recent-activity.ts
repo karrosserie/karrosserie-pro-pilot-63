@@ -35,6 +35,14 @@ export const useRecentActivity = () => {
         return updated > created + 1000; // 1 second tolerance
       };
 
+      // Helper function to get vehicle info
+      const getVehicleInfo = (vehicleId: string | null) => {
+        if (!vehicleId || !vehicles) return 'Véhicule non spécifié';
+        const vehicle = vehicles.find(v => v.id === vehicleId);
+        if (!vehicle) return 'Véhicule non spécifié';
+        return `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim() || 'Véhicule';
+      };
+
       // Clients créés et mis à jour
       if (clients) {
         clients.forEach(client => {
@@ -116,11 +124,9 @@ export const useRecentActivity = () => {
           const updatedDate = expense.updated_at ? new Date(expense.updated_at) : null;
           let description = `${expense.supplier || 'Dépense'} - ${formatCurrency(expense.total_amount)}`;
           
-          if (expense.vehicle && vehicles) {
-            const vehicle = vehicles.find(v => v.id === expense.vehicle_id);
-            if (vehicle) {
-              description += ` (${vehicle.brand} ${vehicle.model})`;
-            }
+          if (expense.vehicle_id) {
+            const vehicleInfo = getVehicleInfo(expense.vehicle_id);
+            description += ` (${vehicleInfo})`;
           }
           
           // Dépense enregistrée
@@ -154,14 +160,7 @@ export const useRecentActivity = () => {
         expertiseReports.forEach(report => {
           const createdDate = new Date(report.created_at);
           const updatedDate = report.updated_at ? new Date(report.updated_at) : null;
-          let vehicleInfo = 'Véhicule non spécifié';
-          
-          if (report.vehicle_id && vehicles) {
-            const vehicle = vehicles.find(v => v.id === report.vehicle_id);
-            if (vehicle && vehicle.brand && vehicle.model) {
-              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
-            }
-          }
+          const vehicleInfo = getVehicleInfo(report.vehicle_id);
           
           let description = `Rapport d'expertise - ${vehicleInfo}`;
           if (report.clients) {
@@ -199,14 +198,7 @@ export const useRecentActivity = () => {
         quotes.forEach(quote => {
           const createdDate = new Date(quote.created_at);
           const updatedDate = quote.updated_at ? new Date(quote.updated_at) : null;
-          let vehicleInfo = 'Véhicule non spécifié';
-          
-          if (quote.vehicle_id && vehicles) {
-            const vehicle = vehicles.find(v => v.id === quote.vehicle_id);
-            if (vehicle && vehicle.brand && vehicle.model) {
-              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
-            }
-          }
+          const vehicleInfo = getVehicleInfo(quote.vehicle_id);
           
           let description = `Devis n°${quote.reference || 'N/A'} - ${vehicleInfo}`;
           if (quote.clients) {
@@ -244,14 +236,7 @@ export const useRecentActivity = () => {
         repairOrders.forEach(order => {
           const createdDate = new Date(order.created_at);
           const updatedDate = order.updated_at ? new Date(order.updated_at) : null;
-          let vehicleInfo = 'Véhicule non spécifié';
-          
-          if (order.vehicle_id && vehicles) {
-            const vehicle = vehicles.find(v => v.id === order.vehicle_id);
-            if (vehicle && vehicle.brand && vehicle.model) {
-              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
-            }
-          }
+          const vehicleInfo = getVehicleInfo(order.vehicle_id);
           
           let description = `Ordre n°${order.reference || 'N/A'} - ${vehicleInfo}`;
           if (order.clients) {
@@ -284,25 +269,18 @@ export const useRecentActivity = () => {
         });
       }
 
-      // Factures créées et mises à jour (fix for missing updated_at property)
+      // Factures créées et mises à jour
       if (invoices) {
         invoices.forEach(invoice => {
           const createdDate = new Date(invoice.created_at);
-          let vehicleInfo = 'Véhicule non spécifié';
-          
-          if (invoice.vehicle_id && vehicles) {
-            const vehicle = vehicles.find(v => v.id === invoice.vehicle_id);
-            if (vehicle && vehicle.brand && vehicle.model) {
-              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
-            }
-          }
+          const vehicleInfo = getVehicleInfo(invoice.vehicle_id);
           
           let description = `Facture n°${invoice.reference || 'N/A'} - ${vehicleInfo}`;
           if (invoice.clients) {
             description += ` - ${invoice.clients.first_name} ${invoice.clients.last_name}`;
           }
           
-          // Facture créée (only showing creation since updated_at doesn't exist on Invoice type)
+          // Facture créée
           activities.push({
             id: `invoice-created-${invoice.id}`,
             icon: 'Receipt',
@@ -320,14 +298,7 @@ export const useRecentActivity = () => {
         credits.forEach(credit => {
           const createdDate = new Date(credit.created_at);
           const updatedDate = credit.updated_at ? new Date(credit.updated_at) : null;
-          let vehicleInfo = 'Véhicule non spécifié';
-          
-          if (credit.vehicle_id && vehicles) {
-            const vehicle = vehicles.find(v => v.id === credit.vehicle_id);
-            if (vehicle && vehicle.brand && vehicle.model) {
-              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
-            }
-          }
+          const vehicleInfo = getVehicleInfo(credit.vehicle_id);
           
           let description = `Avoir n°${credit.reference || 'N/A'} - ${vehicleInfo}`;
           if (credit.clients) {
@@ -366,8 +337,8 @@ export const useRecentActivity = () => {
           const createdDate = new Date(vehicle.created_at);
           const updatedDate = vehicle.updated_at ? new Date(vehicle.updated_at) : null;
           let vehicleDescription = 'Véhicule';
-          if (vehicle.brand && vehicle.model && vehicle.license_plate) {
-            vehicleDescription = `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`;
+          if (vehicle.car_brands?.name && vehicle.car_models?.name && vehicle.license_plate) {
+            vehicleDescription = `${vehicle.car_brands.name} ${vehicle.car_models.name} - ${vehicle.license_plate}`;
           } else if (vehicle.license_plate) {
             vehicleDescription = `Véhicule ${vehicle.license_plate}`;
           }
