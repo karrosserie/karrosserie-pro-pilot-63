@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Car, Search, Plus } from 'lucide-react';
@@ -78,7 +77,6 @@ const VehicleList = () => {
       header: "Marque",
       cell: ({ row }) => {
         const vehicle = row.original;
-        // Safe access to car_brands with fallback
         return vehicle.car_brands?.name || 'Marque inconnue';
       },
     },
@@ -87,7 +85,6 @@ const VehicleList = () => {
       header: "Modèle",
       cell: ({ row }) => {
         const vehicle = row.original;
-        // Safe access to car_models with fallback
         return vehicle.car_models?.name || 'Modèle inconnu';
       },
     },

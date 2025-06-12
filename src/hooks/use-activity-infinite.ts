@@ -1,4 +1,3 @@
-
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useClients } from '@/hooks/use-clients';
@@ -22,7 +21,7 @@ export const useActivityInfinite = () => {
   const { receipts } = useReceiptsData();
   const { expenses } = useExpenses();
 
-  return useInfiniteQuery({
+  const queryResult = useInfiniteQuery({
     queryKey: ['activity-infinite', quotes, clients, vehicles, receipts, invoices, repairOrders, expertiseReports, credits, expenses],
     queryFn: ({ pageParam = 0 }) => {
       const activities = [];
@@ -417,4 +416,17 @@ export const useActivityInfinite = () => {
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     enabled: !!quotes && !!clients && !!vehicles && !!receipts && !!invoices && !!repairOrders && !!expertiseReports && !!credits && !!expenses
   });
+
+  // Extract and flatten activities from all pages
+  const activities = queryResult.data?.pages.flatMap(page => page.activities) || [];
+  const hasMore = queryResult.hasNextPage;
+  const loadMore = queryResult.fetchNextPage;
+  const isLoading = queryResult.isLoading;
+
+  return {
+    activities,
+    hasMore,
+    loadMore,
+    isLoading
+  };
 };
