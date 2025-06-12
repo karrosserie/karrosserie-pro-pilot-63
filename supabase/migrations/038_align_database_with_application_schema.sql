@@ -1,10 +1,11 @@
 
-
 -- Migration to align database schema with application expectations
 -- This migration adds missing columns and updates existing tables
 
 -- Update vehicles table to match application expectations
 ALTER TABLE public.vehicles 
+ADD COLUMN IF NOT EXISTS brand TEXT,
+ADD COLUMN IF NOT EXISTS model TEXT,
 ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'En attente',
 ADD COLUMN IF NOT EXISTS vehicle_images JSONB DEFAULT '[]'::jsonb,
 ADD COLUMN IF NOT EXISTS registration_document_front_url TEXT,
@@ -85,6 +86,8 @@ WHERE NOT EXISTS (
 );
 
 -- Add indexes for better performance on new columns
+CREATE INDEX IF NOT EXISTS idx_vehicles_brand ON public.vehicles(brand);
+CREATE INDEX IF NOT EXISTS idx_vehicles_model ON public.vehicles(model);
 CREATE INDEX IF NOT EXISTS idx_vehicles_status ON public.vehicles(status);
 CREATE INDEX IF NOT EXISTS idx_vehicles_brand_id ON public.vehicles(brand_id);
 CREATE INDEX IF NOT EXISTS idx_vehicles_model_id ON public.vehicles(model_id);
@@ -92,6 +95,8 @@ CREATE INDEX IF NOT EXISTS idx_expenses_status ON public.expenses(status);
 CREATE INDEX IF NOT EXISTS idx_invoices_claim_number ON public.invoices(claim_number);
 
 -- Add comments for new columns
+COMMENT ON COLUMN public.vehicles.brand IS 'Marque du véhicule (texte libre)';
+COMMENT ON COLUMN public.vehicles.model IS 'Modèle du véhicule (texte libre)';
 COMMENT ON COLUMN public.vehicles.status IS 'Statut du véhicule (En attente, Réservé, En cours, Terminé, Annulé)';
 COMMENT ON COLUMN public.vehicles.vehicle_images IS 'Images du véhicule au format JSON';
 COMMENT ON COLUMN public.vehicles.registration_document_front_url IS 'URL du certificat d''immatriculation recto';
@@ -134,4 +139,3 @@ CREATE TRIGGER update_car_models_updated_at
     BEFORE UPDATE ON public.car_models 
     FOR EACH ROW 
     EXECUTE FUNCTION update_updated_at_column();
-
