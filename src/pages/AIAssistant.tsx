@@ -3,7 +3,6 @@ import React from 'react';
 import IAStatusHeader from '@/components/ai-assistant/IAStatusHeader';
 import IAChannelsBanner from '@/components/ai-assistant/IAChannelsBanner';
 import IAPaymentTracking from '@/components/ai-assistant/IAPaymentTracking';
-import IAAlerts from '@/components/ai-assistant/IAAlerts';
 
 const AIAssistant = () => {
   return (
@@ -17,9 +16,6 @@ const AIAssistant = () => {
         
         {/* Tableau principal de suivi des impayés */}
         <IAPaymentTracking />
-        
-        {/* Alertes IA */}
-        <IAAlerts />
       </div>
     </div>
   );
