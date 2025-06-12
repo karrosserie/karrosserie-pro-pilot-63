@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, Search, Filter } from 'lucide-react';
@@ -18,7 +17,7 @@ import QuoteDialog from '@/components/quotes/QuoteDialog';
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
 import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
-import CreditDialog from '@/components/credits/CreditDialog';
+import { CreditDialog } from '@/components/credits/CreditDialog';
 
 const DocumentItem = ({ 
   icon, 
