@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Search, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -7,6 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import { useQuotes } from '@/hooks/use-quotes';
 import { useInvoices } from '@/hooks/use-invoices';
@@ -49,7 +51,7 @@ const DocumentItem = ({
       <div className="flex-1">
         <div className="flex justify-between items-start">
           <h3 className="font-medium text-gray-800">{title}</h3>
-          <span className={`text-xs font-medium px-2 py-1 rounded inline-block ${statusColor}`}>
+          <span className={`text-xs font-medium px-2 py-1 rounded-full ${statusColor}`}>
             {status}
           </span>
         </div>
@@ -88,9 +90,20 @@ const Documents = () => {
   const [selectedExpertiseReport, setSelectedExpertiseReport] = useState(null);
   const [selectedCredit, setSelectedCredit] = useState(null);
 
-  // États pour les filtres
+  // États pour les filtres et la recherche
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [activeFilters, setActiveFilters] = useState({
+    expertise: true,
+    quotes: true,
+    orders: true,
+    invoices: true,
+    credits: true
+  });
+
+  // États pour la pagination
+  const [displayCount, setDisplayCount] = useState(4);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // Hooks pour récupérer les données
   const { reports: expertiseReports, isLoading: expertiseLoading } = useExpertiseReports();
@@ -110,13 +123,13 @@ const Documents = () => {
     return count <= 1 ? 'document' : 'documents';
   };
 
-  // Créer une liste de tous les documents récents
-  const allRecentDocuments = React.useMemo(() => {
+  // Créer une liste de tous les documents
+  const allDocuments = React.useMemo(() => {
     const documents = [];
 
     // Ajouter les rapports d'expertise
-    if (expertiseReports) {
-      expertiseReports.slice(0, 2).forEach(report => {
+    if (expertiseReports && activeFilters.expertise) {
+      expertiseReports.forEach(report => {
         documents.push({
           id: `expertise-${report.id}`,
           originalId: report.id,
@@ -134,8 +147,8 @@ const Documents = () => {
     }
 
     // Ajouter les devis
-    if (quotes) {
-      quotes.slice(0, 2).forEach(quote => {
+    if (quotes && activeFilters.quotes) {
+      quotes.forEach(quote => {
         documents.push({
           id: `quote-${quote.id}`,
           originalId: quote.id,
@@ -153,8 +166,8 @@ const Documents = () => {
     }
 
     // Ajouter les ordres de réparation
-    if (repairOrders) {
-      repairOrders.slice(0, 2).forEach(order => {
+    if (repairOrders && activeFilters.orders) {
+      repairOrders.forEach(order => {
         documents.push({
           id: `order-${order.id}`,
           originalId: order.id,
@@ -172,8 +185,8 @@ const Documents = () => {
     }
 
     // Ajouter les factures
-    if (invoices) {
-      invoices.slice(0, 2).forEach(invoice => {
+    if (invoices && activeFilters.invoices) {
+      invoices.forEach(invoice => {
         documents.push({
           id: `invoice-${invoice.id}`,
           originalId: invoice.id,
@@ -191,8 +204,8 @@ const Documents = () => {
     }
 
     // Ajouter les avoirs
-    if (credits) {
-      credits.slice(0, 2).forEach(credit => {
+    if (credits && activeFilters.credits) {
+      credits.forEach(credit => {
         documents.push({
           id: `credit-${credit.id}`,
           originalId: credit.id,
@@ -217,11 +230,40 @@ const Documents = () => {
       doc.vehicle.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Trier par date (plus récent en premier) et prendre les 4 plus récents
-    return filtered
-      .sort((a, b) => b.timestamp - a.timestamp)
-      .slice(0, 4);
-  }, [expertiseReports, quotes, repairOrders, invoices, credits, searchTerm]);
+    // Trier par date (plus récent en premier)
+    return filtered.sort((a, b) => b.timestamp - a.timestamp);
+  }, [expertiseReports, quotes, repairOrders, invoices, credits, searchTerm, activeFilters]);
+
+  // Documents à afficher (avec pagination)
+  const displayedDocuments = allDocuments.slice(0, displayCount);
+
+  // Fonction pour gérer le scroll infini
+  const handleScroll = useCallback(() => {
+    if (isLoadingMore) return;
+    
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+    
+    if (scrollTop + clientHeight >= scrollHeight - 5) {
+      if (displayCount < allDocuments.length) {
+        setIsLoadingMore(true);
+        setTimeout(() => {
+          setDisplayCount(prev => Math.min(prev + 5, allDocuments.length));
+          setIsLoadingMore(false);
+        }, 500);
+      }
+    }
+  }, [displayCount, allDocuments.length, isLoadingMore]);
+
+  // Écouter les événements de scroll
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  // Reset pagination when filters or search change
+  useEffect(() => {
+    setDisplayCount(4);
+  }, [searchTerm, activeFilters]);
 
   const handleViewDocument = (document) => {
     switch (document.type) {
@@ -256,6 +298,13 @@ const Documents = () => {
   const handleEditDocument = (document) => {
     // Même logique que pour la visualisation, mais en mode édition
     handleViewDocument(document);
+  };
+
+  const handleFilterChange = (filterType: string, checked: boolean) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      [filterType]: checked
+    }));
   };
 
   const isLoading = expertiseLoading || quotesLoading || ordersLoading || invoicesLoading || creditsLoading;
@@ -382,13 +431,46 @@ const Documents = () => {
             />
           </div>
           
-          <Button 
-            variant="outline"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <Filter className="h-4 w-4 mr-2" />
-            Filtres
-          </Button>
+          <DropdownMenu open={showFilters} onOpenChange={setShowFilters}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <Filter className="h-4 w-4 mr-2" />
+                Filtres
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuCheckboxItem
+                checked={activeFilters.expertise}
+                onCheckedChange={(checked) => handleFilterChange('expertise', checked)}
+              >
+                Rapports d'expertise
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={activeFilters.quotes}
+                onCheckedChange={(checked) => handleFilterChange('quotes', checked)}
+              >
+                Devis
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={activeFilters.orders}
+                onCheckedChange={(checked) => handleFilterChange('orders', checked)}
+              >
+                Ordres de réparation
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={activeFilters.invoices}
+                onCheckedChange={(checked) => handleFilterChange('invoices', checked)}
+              >
+                Factures
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={activeFilters.credits}
+                onCheckedChange={(checked) => handleFilterChange('credits', checked)}
+              >
+                Avoirs
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -424,26 +506,47 @@ const Documents = () => {
       </div>
       
       <div className="space-y-4">
-        {allRecentDocuments.length > 0 ? (
-          allRecentDocuments.map((document) => (
-            <DocumentItem 
-              key={document.id}
-              icon={document.icon}
-              title={document.title}
-              date={document.date}
-              customer={document.customer}
-              vehicle={document.vehicle}
-              status={document.status}
-              statusColor={document.statusColor}
-              onView={() => handleViewDocument(document)}
-              onEdit={() => handleEditDocument(document)}
-            />
-          ))
+        {displayedDocuments.length > 0 ? (
+          <>
+            {displayedDocuments.map((document) => (
+              <DocumentItem 
+                key={document.id}
+                icon={document.icon}
+                title={document.title}
+                date={document.date}
+                customer={document.customer}
+                vehicle={document.vehicle}
+                status={document.status}
+                statusColor={document.statusColor}
+                onView={() => handleViewDocument(document)}
+                onEdit={() => handleEditDocument(document)}
+              />
+            ))}
+            
+            {isLoadingMore && (
+              <div className="flex justify-center py-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
+              </div>
+            )}
+            
+            {displayCount < allDocuments.length && !isLoadingMore && (
+              <div className="text-center py-4">
+                <p className="text-gray-500 text-sm">
+                  Faites défiler vers le bas pour charger plus de documents
+                </p>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-12 text-gray-500">
             <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
             <h3 className="text-lg font-medium mb-2">Aucun document</h3>
-            <p>Commencez par créer votre premier document.</p>
+            <p>
+              {searchTerm || Object.values(activeFilters).some(f => !f) 
+                ? 'Aucun document ne correspond à vos critères de recherche.'
+                : 'Commencez par créer votre premier document.'
+              }
+            </p>
           </div>
         )}
       </div>
