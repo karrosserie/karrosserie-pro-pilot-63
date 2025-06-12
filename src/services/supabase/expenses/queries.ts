@@ -10,8 +10,8 @@ export const getExpenses = async (): Promise<ExpenseWithRelations[]> => {
       vehicle:vehicles(
         id,
         license_plate,
-        brand,
-        model
+        car_brands(name),
+        car_models(name)
       )
     `)
     .order('date', { ascending: false });
@@ -32,8 +32,8 @@ export const getExpenseById = async (id: string): Promise<ExpenseWithRelations |
       vehicle:vehicles(
         id,
         license_plate,
-        brand,
-        model
+        car_brands(name),
+        car_models(name)
       )
     `)
     .eq('id', id)
