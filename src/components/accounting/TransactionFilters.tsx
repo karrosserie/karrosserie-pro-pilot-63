@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Filter, Plus, Calendar } from 'lucide-react';
+import { Search, Filter, Calendar } from 'lucide-react';
 
 interface TransactionFiltersProps {
   searchTerm: string;
@@ -41,11 +41,6 @@ const TransactionFilters = ({ searchTerm, setSearchTerm }: TransactionFiltersPro
         
         <Button variant="outline" size="icon">
           <Filter className="h-4 w-4" />
-        </Button>
-        
-        <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
-          <Plus className="h-4 w-4 mr-2" />
-          Nouvelle transaction
         </Button>
       </div>
     </div>
