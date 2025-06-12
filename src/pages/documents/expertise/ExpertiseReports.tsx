@@ -23,7 +23,7 @@ const ExpertiseReports = () => {
   const filteredReports = reports?.filter(report => 
     report.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (report.clients?.first_name + ' ' + report.clients?.last_name)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (report.vehicles?.brand + ' ' + report.vehicles?.model)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (report.vehicles?.car_brands?.name + ' ' + report.vehicles?.car_models?.name)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     report.expert_name?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
   
