@@ -324,10 +324,10 @@ export const useDashboardData = () => {
         });
       }
 
-      // Trier par date (plus récent en premier) et prendre les 4 plus récents
+      // Trier par date (plus récent en premier) et prendre les 10 plus récents
       return activities
         .sort((a, b) => b.timestamp - a.timestamp)
-        .slice(0, 4);
+        .slice(0, 10);
     },
     enabled: !quotesLoading && !clientsLoading && !vehiclesLoading && !receiptsLoading && !invoicesLoading
   });
