@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Bot, Clock, TrendingUp, Shield } from 'lucide-react';
+import { Bot } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ const IAStatusHeader = () => {
   return (
     <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200 mb-6">
       <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="bg-green-100 p-3 rounded-full mr-4">
               <Bot className="h-6 w-6 text-green-600" />
@@ -36,24 +36,6 @@ const IAStatusHeader = () => {
               <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
               Statut IA : Actif
             </Badge>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white/70 p-4 rounded-lg">
-            <div className="flex items-center mb-2">
-              <Clock className="h-4 w-4 text-blue-600 mr-2" />
-              <span className="text-sm font-medium text-gray-700">Dernière exécution</span>
-            </div>
-            <div className="text-lg font-bold text-gray-900">08h44</div>
-          </div>
-          
-          <div className="bg-white/70 p-4 rounded-lg">
-            <div className="flex items-center mb-2">
-              <TrendingUp className="h-4 w-4 text-green-600 mr-2" />
-              <span className="text-sm font-medium text-gray-700">Relances aujourd'hui</span>
-            </div>
-            <div className="text-lg font-bold text-green-600">5 envoyées</div>
           </div>
         </div>
       </CardContent>
