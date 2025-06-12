@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import IntelligentStatusBadge from '@/components/shared/IntelligentStatusBadge';
 import IATimelineModal from './IATimelineModal';
 
 interface PaymentItem {
@@ -105,15 +106,15 @@ const IAPaymentTracking = () => {
     }
   ];
 
-  const getRelanceBadge = (level: number) => {
-    const configs = {
-      1: { color: 'bg-blue-100 text-blue-800', label: '🔵 Relance 1 🤖' },
-      2: { color: 'bg-yellow-100 text-yellow-800', label: '🟡 Relance 2 🤖' },
-      3: { color: 'bg-orange-100 text-orange-800', label: '🟠 Relance 3 🤖' },
-      4: { color: 'bg-red-100 text-red-800', label: '🔴 Relance 4 🤖' },
-      5: { color: 'bg-purple-100 text-purple-800', label: '⚠️ Contentieux 🤖' }
-    };
-    return configs[level as keyof typeof configs] || configs[1];
+  const getRelanceStatusType = (level: number) => {
+    switch (level) {
+      case 1: return 'relance1';
+      case 2: return 'relance2';
+      case 3: return 'relance3';
+      case 4: return 'contentieux';
+      case 5: return 'judiciaire';
+      default: return 'attente';
+    }
   };
 
   const getDaysRemainingBadge = (days: number) => {
@@ -166,7 +167,6 @@ const IAPaymentTracking = () => {
               </TableHeader>
               <TableBody>
                 {paymentData.map((item, index) => {
-                  const relanceBadge = getRelanceBadge(item.relanceLevel);
                   const daysBadge = getDaysRemainingBadge(item.daysRemaining);
                   const IconComponent = daysBadge.icon;
                   
@@ -178,9 +178,10 @@ const IAPaymentTracking = () => {
                       <TableCell className="font-semibold">{item.amount}</TableCell>
                       <TableCell>{item.dueDate}</TableCell>
                       <TableCell>
-                        <Badge className={relanceBadge.color} title="Action IA générée automatiquement">
-                          {relanceBadge.label}
-                        </Badge>
+                        <IntelligentStatusBadge 
+                          status={getRelanceStatusType(item.relanceLevel) as any}
+                          showAnimation={true}
+                        />
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
@@ -202,6 +203,7 @@ const IAPaymentTracking = () => {
                           variant="outline" 
                           size="sm"
                           onClick={() => handleDetailClick(item)}
+                          className="hover:bg-blue-50 hover:border-blue-300 transition-colors"
                         >
                           <Eye className="h-4 w-4 mr-1" />
                           🔍 Détail IA
@@ -214,14 +216,14 @@ const IAPaymentTracking = () => {
             </Table>
           </div>
           
-          <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+          <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-semibold text-gray-900">L'IA gère. Vous réparez.</p>
+                <p className="font-semibold text-gray-900">L'IA gère. Vous réparez. 🔧</p>
                 <p className="text-sm text-gray-600">+3h gagnées cette semaine – grâce à vos relances automatisées</p>
               </div>
-              <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
-                Activer relance IA en cascade
+              <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 shadow-md hover:shadow-lg transition-all">
+                ⚡ Activer relance IA en cascade
               </Button>
             </div>
           </div>
