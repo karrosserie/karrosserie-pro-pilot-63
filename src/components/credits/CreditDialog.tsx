@@ -35,7 +35,19 @@ export const CreditDialog = ({ credit, open, onOpenChange }: CreditDialogProps) 
           </DialogDescription>
         </DialogHeader>
         {isEditing ? (
-          <EditCreditForm credit={credit} onClose={() => onOpenChange(false)} />
+          <EditCreditForm 
+            creditId={credit.id}
+            initialData={{
+              reference: credit.reference,
+              client_id: credit.client_id,
+              vehicle_id: credit.vehicle_id,
+              invoice_id: credit.invoice_id,
+              status: credit.status as 'En attente' | 'Payé',
+              notes: credit.notes,
+              items: credit.items_data ? JSON.parse(credit.items_data) : []
+            }}
+            onClose={() => onOpenChange(false)} 
+          />
         ) : (
           <CreditForm onClose={() => onOpenChange(false)} />
         )}
