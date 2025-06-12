@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { FileText, User, Car, CreditCard, Receipt, ClipboardCheck, Wrench, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -67,10 +68,7 @@ const RecentActivity = ({ activities = [] }: RecentActivityProps) => {
               <div className="flex-1">
                 <h4 className="font-medium text-gray-800">{activity.title}</h4>
                 <p className="text-sm text-gray-600">{activity.description}</p>
-              </div>
-              
-              <div className="text-xs text-gray-400 whitespace-nowrap">
-                {activity.time}
+                <p className="text-xs text-gray-400 mt-1">{activity.time}</p>
               </div>
             </div>
           ))
