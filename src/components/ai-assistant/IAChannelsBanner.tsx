@@ -91,7 +91,7 @@ const IAChannelsBanner = () => {
                   <span className="text-lg mr-2">{getStatusIcon(channel.status)}</span>
                   <h3 className="font-semibold text-gray-900">{channel.name}</h3>
                 </div>
-                <Badge className={getStatusColor(channel.status)} size="sm">
+                <Badge className={getStatusColor(channel.status)}>
                   {channel.count}
                 </Badge>
               </div>
