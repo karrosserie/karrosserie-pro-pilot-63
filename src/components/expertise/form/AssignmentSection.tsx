@@ -103,7 +103,7 @@ export const AssignmentSection = ({
                     <SelectItem key={vehicle.id} value={vehicle.id}>
                       <div className="flex items-center">
                         <Car className="h-4 w-4 mr-2" />
-                        {vehicle.brand} {vehicle.model} - {vehicle.license_plate}
+                        {vehicle.car_brands?.name || 'Marque inconnue'} {vehicle.car_models?.name || 'Modèle inconnu'} - {vehicle.license_plate}
                       </div>
                     </SelectItem>
                   ))

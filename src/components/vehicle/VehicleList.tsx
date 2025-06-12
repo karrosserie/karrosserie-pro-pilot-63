@@ -39,8 +39,8 @@ const VehicleList = () => {
   const handleVehicleSubmit = (data: any) => {
     if (dialogMode === 'create') {
       createVehicle.mutate({
-        brand: data.brand,
-        model: data.model,
+        brand_id: data.brandId,
+        model_id: data.modelId,
         year: data.year ? parseInt(data.year) : null,
         license_plate: data.licensePlate,
         color: data.color,
@@ -54,8 +54,8 @@ const VehicleList = () => {
       updateVehicle.mutate({
         id: selectedVehicle.id,
         data: {
-          brand: data.brand,
-          model: data.model,
+          brand_id: data.brandId,
+          model_id: data.modelId,
           year: data.year ? parseInt(data.year) : null,
           license_plate: data.licensePlate,
           color: data.color,
@@ -74,12 +74,14 @@ const VehicleList = () => {
       header: "Immatriculation",
     },
     {
-      accessorKey: "brand",
+      accessorKey: "car_brands.name",
       header: "Marque",
+      cell: ({ row }) => row.original.car_brands?.name || 'Marque inconnue',
     },
     {
-      accessorKey: "model",
+      accessorKey: "car_models.name",
       header: "Modèle",
+      cell: ({ row }) => row.original.car_models?.name || 'Modèle inconnu',
     },
     {
       accessorKey: "year",
@@ -159,8 +161,8 @@ const VehicleList = () => {
             : ''
         }
         defaultValues={selectedVehicle ? {
-          brand: selectedVehicle.brand || '',
-          model: selectedVehicle.model || '',
+          brandId: selectedVehicle.brand_id || '',
+          modelId: selectedVehicle.model_id || '',
           year: selectedVehicle.year?.toString() || '',
           licensePlate: selectedVehicle.license_plate || '',
           color: selectedVehicle.color || '',
