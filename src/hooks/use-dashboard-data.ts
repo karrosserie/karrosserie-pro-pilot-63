@@ -1,8 +1,12 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useClients } from '@/hooks/use-clients';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useQuotes } from '@/hooks/use-quotes';
+import { useRepairOrders } from '@/hooks/use-repair-orders';
+import { useExpertiseReports } from '@/hooks/use-expertise-reports';
+import { useCredits } from '@/hooks/use-credits';
 import { useAccountingData } from '@/hooks/use-accounting-data';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { formatCurrency } from '@/lib/utils';
@@ -12,15 +16,29 @@ export const useDashboardData = () => {
   const { clients, isLoading: clientsLoading } = useClients();
   const { invoices, isLoading: invoicesLoading } = useInvoices();
   const { quotes, isLoading: quotesLoading } = useQuotes();
+  const { orders: repairOrders, isLoading: ordersLoading } = useRepairOrders();
+  const { reports: expertiseReports, isLoading: expertiseLoading } = useExpertiseReports();
+  const { credits, isLoading: creditsLoading } = useCredits();
   const { receipts, isLoading: receiptsLoading } = useReceiptsData();
   const { totalReceipts } = useAccountingData();
 
   const { data: dashboardStats, isLoading } = useQuery({
     queryKey: ['dashboard-stats', vehicles, clients, invoices, quotes],
     queryFn: () => {
-      const vehiclesInRepair = vehicles?.filter(v => v.status === 'en_reparation').length || 0;
+      // Véhicules en réparation = statut "En cours"
+      const vehiclesInRepair = vehicles?.filter(v => v.status === 'En cours').length || 0;
       const activeClients = clients?.length || 0;
+      // Devis en attente = statut "draft"
       const pendingQuotes = quotes?.filter(q => q.status === 'draft').length || 0;
+      
+      console.log('Dashboard stats calculation:', {
+        totalVehicles: vehicles?.length || 0,
+        vehiclesInRepair,
+        vehicleStatuses: vehicles?.map(v => ({ id: v.id, status: v.status })) || [],
+        totalQuotes: quotes?.length || 0,
+        pendingQuotes,
+        quoteStatuses: quotes?.map(q => ({ id: q.id, status: q.status })) || []
+      });
       
       return {
         vehiclesInRepair,
@@ -53,42 +71,96 @@ export const useDashboardData = () => {
   });
 
   const { data: recentDocuments } = useQuery({
-    queryKey: ['recent-documents', invoices, quotes],
+    queryKey: ['recent-documents', invoices, quotes, repairOrders, expertiseReports, credits],
     queryFn: () => {
       const documents = [];
       
+      // Factures
       if (invoices) {
-        invoices.slice(0, 2).forEach(invoice => {
+        invoices.forEach(invoice => {
+          const createdDate = new Date(invoice.created_at);
           documents.push({
-            id: invoice.id,
-            title: `Facture - ${invoice.reference}`,
+            id: `invoice-${invoice.id}`,
+            title: `Facture`,
             client: invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client',
-            date: new Date(invoice.created_at).toLocaleDateString('fr-FR'),
-            type: 'invoice'
+            date: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+            type: 'invoice',
+            timestamp: createdDate.getTime()
           });
         });
       }
       
+      // Devis
       if (quotes) {
-        quotes.slice(0, 2).forEach(quote => {
+        quotes.forEach(quote => {
+          const createdDate = new Date(quote.created_at);
           documents.push({
-            id: quote.id,
-            title: `Devis - ${quote.reference}`,
+            id: `quote-${quote.id}`,
+            title: `Devis`,
             client: quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : 'Client',
-            date: new Date(quote.created_at).toLocaleDateString('fr-FR'),
-            type: 'quote'
+            date: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+            type: 'quote',
+            timestamp: createdDate.getTime()
+          });
+        });
+      }
+
+      // Ordres de réparation
+      if (repairOrders) {
+        repairOrders.forEach(order => {
+          const createdDate = new Date(order.created_at);
+          documents.push({
+            id: `order-${order.id}`,
+            title: `Ordre de réparation`,
+            client: order.clients ? `${order.clients.first_name} ${order.clients.last_name}` : 'Client',
+            date: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+            type: 'order',
+            timestamp: createdDate.getTime()
+          });
+        });
+      }
+
+      // Rapports d'expertise
+      if (expertiseReports) {
+        expertiseReports.forEach(report => {
+          const createdDate = new Date(report.created_at);
+          documents.push({
+            id: `expertise-${report.id}`,
+            title: `Rapport d'expertise`,
+            client: report.clients ? `${report.clients.first_name} ${report.clients.last_name}` : 'Client',
+            date: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+            type: 'expertise',
+            timestamp: createdDate.getTime()
+          });
+        });
+      }
+
+      // Avoirs
+      if (credits) {
+        credits.forEach(credit => {
+          const createdDate = new Date(credit.created_at);
+          documents.push({
+            id: `credit-${credit.id}`,
+            title: `Avoir`,
+            client: credit.clients ? `${credit.clients.first_name} ${credit.clients.last_name}` : 'Client',
+            date: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+            type: 'credit',
+            timestamp: createdDate.getTime()
           });
         });
       }
       
-      return documents.slice(0, 4);
+      // Trier par date et prendre les 4 plus récents
+      return documents
+        .sort((a, b) => b.timestamp - a.timestamp)
+        .slice(0, 4);
     },
-    enabled: !!invoices || !!quotes
+    enabled: !!invoices || !!quotes || !!repairOrders || !!expertiseReports || !!credits
   });
 
   // Activité récente basée sur les vraies données
   const { data: recentActivity } = useQuery({
-    queryKey: ['recent-activity', quotes, clients, vehicles, receipts],
+    queryKey: ['recent-activity', quotes, clients, vehicles, receipts, invoices],
     queryFn: () => {
       const activities = [];
 
@@ -105,7 +177,7 @@ export const useDashboardData = () => {
             }
           }
           
-          let description = `Devis ${quote.reference}`;
+          let description = `Devis`;
           if (quote.clients) {
             description = `${vehicleInfo} - ${quote.clients.first_name} ${quote.clients.last_name}`;
           }
@@ -159,12 +231,18 @@ export const useDashboardData = () => {
         });
       }
 
-      // Paiements récents
-      if (receipts) {
+      // Paiements récents avec informations de facture
+      if (receipts && invoices) {
         receipts.slice(0, 1).forEach(receipt => {
           let description = `Encaissement de ${formatCurrency(receipt.amount)}`;
-          if (receipt.invoices && receipt.invoices.reference) {
-            description = `Facture ${receipt.invoices.reference}`;
+          
+          // Trouver la facture associée
+          if (receipt.invoice_id) {
+            const invoice = invoices.find(inv => inv.id === receipt.invoice_id);
+            if (invoice) {
+              const clientName = invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client';
+              description = `Facture n°${invoice.reference} - ${clientName}`;
+            }
           }
           
           activities.push({
@@ -184,7 +262,7 @@ export const useDashboardData = () => {
         .sort((a, b) => b.timestamp - a.timestamp)
         .slice(0, 4);
     },
-    enabled: !quotesLoading && !clientsLoading && !vehiclesLoading && !receiptsLoading
+    enabled: !quotesLoading && !clientsLoading && !vehiclesLoading && !receiptsLoading && !invoicesLoading
   });
 
   return {
