@@ -1118,7 +1118,7 @@ export type Database = {
       vehicles: {
         Row: {
           arrival_date: string | null
-          brand: string
+          brand_id: string
           client_id: string | null
           color: string | null
           created_at: string | null
@@ -1131,7 +1131,7 @@ export type Database = {
           insurance_expiry_date: string | null
           license_plate: string
           mileage: number | null
-          model: string
+          model_id: string
           pre_accident_defects: string | null
           registration_document_back_url: string | null
           registration_document_front_url: string | null
@@ -1149,7 +1149,7 @@ export type Database = {
         }
         Insert: {
           arrival_date?: string | null
-          brand: string
+          brand_id: string
           client_id?: string | null
           color?: string | null
           created_at?: string | null
@@ -1162,7 +1162,7 @@ export type Database = {
           insurance_expiry_date?: string | null
           license_plate: string
           mileage?: number | null
-          model: string
+          model_id: string
           pre_accident_defects?: string | null
           registration_document_back_url?: string | null
           registration_document_front_url?: string | null
@@ -1180,7 +1180,7 @@ export type Database = {
         }
         Update: {
           arrival_date?: string | null
-          brand?: string
+          brand_id?: string
           client_id?: string | null
           color?: string | null
           created_at?: string | null
@@ -1193,7 +1193,7 @@ export type Database = {
           insurance_expiry_date?: string | null
           license_plate?: string
           mileage?: number | null
-          model?: string
+          model_id?: string
           pre_accident_defects?: string | null
           registration_document_back_url?: string | null
           registration_document_front_url?: string | null
@@ -1211,10 +1211,24 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "vehicles_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "car_brands"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "vehicles_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "car_models"
             referencedColumns: ["id"]
           },
         ]
