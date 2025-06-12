@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -7,6 +8,14 @@ import type { Database } from '@/integrations/supabase/types';
 type VehicleRow = Database['public']['Tables']['vehicles']['Row'];
 
 interface Vehicle extends VehicleRow {
+  car_brands?: {
+    id: string;
+    name: string;
+  };
+  car_models?: {
+    id: string;
+    name: string;
+  };
   clients?: {
     first_name: string;
     last_name: string;
@@ -25,7 +34,11 @@ export function useClientVehicles(clientId?: string) {
       
       const { data, error } = await supabase
         .from('vehicles')
-        .select('*')
+        .select(`
+          *,
+          car_brands(id, name),
+          car_models(id, name)
+        `)
         .eq('client_id', clientId);
 
       if (error) {
@@ -60,6 +73,8 @@ export function useVehicles() {
         .from('vehicles')
         .select(`
           *,
+          car_brands(id, name),
+          car_models(id, name),
           clients (
             first_name,
             last_name
@@ -72,13 +87,7 @@ export function useVehicles() {
         throw new Error(error.message);
       }
 
-      // Transform the data to handle the join properly
-      const transformedData = (data || []).map(vehicle => ({
-        ...vehicle,
-        clients: Array.isArray(vehicle.clients) && vehicle.clients.length > 0 ? vehicle.clients[0] : vehicle.clients
-      })) as Vehicle[];
-
-      return transformedData;
+      return data as Vehicle[];
     }
   });
 
@@ -87,7 +96,11 @@ export function useVehicles() {
       const { data, error } = await supabase
         .from('vehicles')
         .insert([vehicleData])
-        .select()
+        .select(`
+          *,
+          car_brands(id, name),
+          car_models(id, name)
+        `)
         .single();
 
       if (error) {
@@ -119,7 +132,11 @@ export function useVehicles() {
         .from('vehicles')
         .update(data)
         .eq('id', id)
-        .select()
+        .select(`
+          *,
+          car_brands(id, name),
+          car_models(id, name)
+        `)
         .single();
 
       if (error) {

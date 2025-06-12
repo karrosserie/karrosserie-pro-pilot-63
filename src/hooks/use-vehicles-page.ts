@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCarBrands } from '@/hooks/use-car-brands';
+import { useCarModels } from '@/hooks/use-car-models';
 
 export function useVehiclesPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -11,6 +13,7 @@ export function useVehiclesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   
   const { vehicles, isLoading, error, createVehicle, updateVehicle, deleteVehicle } = useVehicles();
+  const { carBrands } = useCarBrands();
   const { user } = useAuth();
 
   const handleCreateVehicle = () => {
@@ -46,6 +49,16 @@ export function useVehiclesPage() {
       return;
     }
 
+    // Find brand and model IDs from names
+    const selectedBrand = carBrands.find(brand => brand.name === data.brand);
+    if (!selectedBrand) {
+      alert('Marque non trouvée');
+      return;
+    }
+
+    // For model, we need to get it from the hook that has access to models for this brand
+    // This will be handled in the component that calls this function
+
     // Process work items - ensure it's an array and filter out empty items
     let processedWorkItems = [];
     if (data.workItems) {
@@ -80,8 +93,8 @@ export function useVehiclesPage() {
       client_id: data.clientId,
       vin: data.vin,
       engine_number: data.engineNumber || null,
-      brand: data.brand,
-      model: data.model,
+      brand_id: selectedBrand.id,
+      model_id: data.modelId || null, // This should be passed from the form
       license_plate: data.licensePlate,
       year: data.year ? parseInt(data.year) : null,
       color: data.color || null,
@@ -121,9 +134,12 @@ export function useVehiclesPage() {
 
   // Filter vehicles based on search only (no status filter since status doesn't exist in DB)
   const filteredVehicles = vehicles?.filter(vehicle => {
+    const brandName = vehicle.car_brands?.name || '';
+    const modelName = vehicle.car_models?.name || '';
+    
     const matchesSearch = searchQuery === '' || 
-      vehicle.brand?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vehicle.model?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      brandName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      modelName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       vehicle.license_plate?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   }) || [];

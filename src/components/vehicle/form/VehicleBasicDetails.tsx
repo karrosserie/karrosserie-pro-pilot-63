@@ -49,6 +49,12 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
     label: model.name
   }));
 
+  const handleBrandChange = (brandName: string) => {
+    onSelectChange('brand', brandName);
+    // Reset model when brand changes
+    onSelectChange('model', '');
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div className="space-y-2">
@@ -72,7 +78,7 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
         <SearchableSelect
           options={brandOptions}
           value={formData.brand || ''}
-          onValueChange={(value) => onSelectChange('brand', value)}
+          onValueChange={handleBrandChange}
           placeholder="Sélectionner une marque"
           searchPlaceholder="Rechercher une marque..."
           disabled={isViewMode}

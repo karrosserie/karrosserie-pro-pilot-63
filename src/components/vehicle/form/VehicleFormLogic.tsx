@@ -1,5 +1,7 @@
 
 import { useState } from 'react';
+import { useCarBrands } from '@/hooks/use-car-brands';
+import { useCarModels } from '@/hooks/use-car-models';
 
 export interface VehicleFormData {
   clientId: string;
@@ -36,6 +38,8 @@ interface UseVehicleFormLogicProps {
 }
 
 export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: UseVehicleFormLogicProps) {
+  const { carBrands } = useCarBrands();
+  
   // Parse work items from database
   const parseWorkItems = (workItems: any) => {
     if (!workItems) return [''];
@@ -66,12 +70,23 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
     return [''];
   };
 
+  // Get brand and model names from IDs for display
+  const getBrandName = (brandId: string) => {
+    const brand = carBrands.find(b => b.id === brandId);
+    return brand?.name || '';
+  };
+
+  const getModelName = (modelId: string, brandId: string) => {
+    // This will be handled by the parent component that has access to models
+    return defaultValues.car_models?.name || '';
+  };
+
   const [formData, setFormData] = useState<VehicleFormData>({
     // Required fields
     clientId: defaultValues.client_id || '',
     vin: defaultValues.vin || '',
-    brand: defaultValues.brand || '',
-    model: defaultValues.model || '',
+    brand: defaultValues.car_brands?.name || getBrandName(defaultValues.brand_id || ''),
+    model: defaultValues.car_models?.name || '',
     licensePlate: defaultValues.license_plate || '',
     
     // Optional fields
