@@ -10,21 +10,22 @@ import {
 } from "@/components/ui/table";
 import { Button } from '@/components/ui/button';
 import { Eye, Download, Receipt } from 'lucide-react';
-import { Transaction } from '@/hooks/use-accounting-data';
+
+interface Transaction {
+  id: number;
+  reference: string;
+  date: string;
+  description: string;
+  type: string;
+  method: string;
+  amount: string;
+}
 
 interface TransactionTableProps {
   transactions: Transaction[];
 }
 
 const TransactionTable = ({ transactions }: TransactionTableProps) => {
-  const formatAmount = (amount: number, type: string) => {
-    const formattedAmount = amount.toLocaleString('fr-FR', { 
-      style: 'currency', 
-      currency: 'EUR' 
-    });
-    return type === 'Encaissement' ? `+${formattedAmount}` : `-${formattedAmount}`;
-  };
-
   return (
     <div className="card-container">
       <Table>
@@ -47,21 +48,13 @@ const TransactionTable = ({ transactions }: TransactionTableProps) => {
                 <TableCell>{transaction.date}</TableCell>
                 <TableCell>{transaction.description}</TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    transaction.type === 'Encaissement' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
+                  <span className={`px-2 py-1 rounded-full text-xs ${transaction.type === 'Encaissement' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
                     {transaction.type}
                   </span>
                 </TableCell>
                 <TableCell>{transaction.method}</TableCell>
-                <TableCell className={`font-medium ${
-                  transaction.type === 'Encaissement' 
-                    ? 'text-green-600' 
-                    : 'text-red-600'
-                }`}>
-                  {formatAmount(transaction.amount, transaction.type)}
+                <TableCell className={`font-medium ${transaction.type === 'Encaissement' ? 'text-green-600' : 'text-blue-600'}`}>
+                  {transaction.type === 'Encaissement' ? '+' : '-'} {transaction.amount}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-1">
