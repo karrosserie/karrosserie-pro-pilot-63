@@ -96,13 +96,23 @@ export const useDashboardData = () => {
       // Devis récents
       if (quotes) {
         quotes.slice(0, 2).forEach(quote => {
+          let vehicleInfo = 'Véhicule non spécifié';
+          
+          // Chercher le véhicule correspondant
+          if (quote.vehicle_id && vehicles) {
+            const vehicle = vehicles.find(v => v.id === quote.vehicle_id);
+            if (vehicle) {
+              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
+            }
+          }
+          
           activities.push({
             id: `quote-${quote.id}`,
             icon: 'FileText',
             iconBackground: 'bg-blue-500',
             title: 'Devis créé',
             description: quote.clients ? 
-              `${quote.vehicle?.brand} ${quote.vehicle?.model} - ${quote.clients.first_name} ${quote.clients.last_name}` :
+              `${vehicleInfo} - ${quote.clients.first_name} ${quote.clients.last_name}` :
               `Devis ${quote.reference}`,
             time: new Date(quote.created_at).toLocaleDateString('fr-FR'),
             timestamp: new Date(quote.created_at).getTime()

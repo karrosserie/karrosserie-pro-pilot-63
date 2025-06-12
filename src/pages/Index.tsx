@@ -233,6 +233,10 @@ const Index = () => {
       <ClientDialog
         open={isClientDialogOpen}
         onOpenChange={setIsClientDialogOpen}
+        title="Nouveau client"
+        description="Ajoutez un nouveau client au système"
+        onSubmit={() => setIsClientDialogOpen(false)}
+        mode="create"
       />
 
       <ReceiptDialog
