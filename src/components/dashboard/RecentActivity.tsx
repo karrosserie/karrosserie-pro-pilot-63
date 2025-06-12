@@ -1,6 +1,7 @@
-
 import React from 'react';
 import { FileText, User, Car, CreditCard, Receipt, ClipboardCheck, Wrench, RotateCcw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 interface ActivityItem {
   id: string;
@@ -41,7 +42,14 @@ const RecentActivity = ({ activities = [] }: RecentActivityProps) => {
 
   return (
     <div className="card-container animate-fade-in">
-      <h3 className="section-title">Activité récente</h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="section-title">Activité récente</h3>
+        <Link to="/activity">
+          <Button variant="link" className="text-karrosserie-orange">
+            Voir tous
+          </Button>
+        </Link>
+      </div>
       
       <div className="space-y-4">
         {activities.length > 0 ? (
