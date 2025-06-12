@@ -3,7 +3,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 import { VehicleStatus } from '@/types/vehicle';
 
-export type Vehicle = Database['public']['Tables']['vehicles']['Row'];
+export type Vehicle = Database['public']['Tables']['vehicles']['Row'] & {
+  car_brands?: { id: string; name: string } | null;
+  car_models?: { id: string; name: string } | null;
+  clients?: { first_name: string; last_name: string } | null;
+};
 export type NewVehicle = Database['public']['Tables']['vehicles']['Insert'];
 export type UpdateVehicle = Database['public']['Tables']['vehicles']['Update'];
 

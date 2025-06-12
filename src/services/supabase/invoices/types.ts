@@ -1,62 +1,20 @@
 
-export interface Invoice {
-  id: string;
-  reference: string;
-  repair_order_id?: string | null;
-  client_id?: string | null;
-  vehicle_id?: string | null;
-  status?: string;
-  created_at: string;
-  due_date?: string | null;
-  payment_date?: string | null;
-  payment_due_date?: string | null;
-  payment_details?: string | null;
-  payment_method?: string | null;
-  description?: string | null;
-  notes?: string | null;
-  amount?: number | null;
-  repairs_data?: string | any[] | null;
-  parts_data?: string | any[] | null;
-  discounts_data?: string | any[] | null;
-  claim_number?: string | null;
-  current_mileage?: string | null;
+import { Database } from '@/integrations/supabase/types';
+
+export type Invoice = Database['public']['Tables']['invoices']['Row'] & {
   clients?: {
     id: string;
     first_name: string;
     last_name: string;
-  };
+  } | null;
   vehicles?: {
     id: string;
-    brand: string;
-    model: string;
     license_plate: string;
-  };
-  user_id: string;
-}
-
-export type NewInvoice = Omit<Invoice, 'id' | 'created_at' | 'user_id'>;
-export type UpdateInvoice = Partial<NewInvoice>;
-
-export interface Item {
-  id: string;
-  label: string;
-  description?: string;
-  unitPrice: number;
-  quantity: number;
-  discount: number;
-  vat: number;
-}
-
-export interface Discount {
-  id: string;
-  label: string;
-  type: 'percentage' | 'fixed';
-  value: number;
-}
-
-export interface InvoiceData {
-  invoice: Invoice;
-  repairs?: Item[];
-  parts?: Item[];
-  discounts?: Discount[];
-}
+    car_brands: { id: string; name: string } | null;
+    car_models: { id: string; name: string } | null;
+  } | null;
+  repair_orders?: {
+    id: string;
+    reference: string;
+  } | null;
+};
