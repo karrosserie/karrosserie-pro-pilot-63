@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Search, Filter } from 'lucide-react';
@@ -48,9 +47,9 @@ const DocumentItem = ({
       </div>
       
       <div className="flex-1">
-        <div className="flex justify-between">
+        <div className="flex justify-between items-start">
           <h3 className="font-medium text-gray-800">{title}</h3>
-          <span className={`text-xs font-medium px-2 py-1 rounded ${statusColor}`}>
+          <span className={`text-xs font-medium px-2 py-1 rounded inline-block ${statusColor}`}>
             {status}
           </span>
         </div>
@@ -82,8 +81,16 @@ const Documents = () => {
   const [isExpertiseDialogOpen, setIsExpertiseDialogOpen] = useState(false);
   const [isCreditDialogOpen, setIsCreditDialogOpen] = useState(false);
 
+  // États pour les dialogues de visualisation/édition
+  const [selectedQuote, setSelectedQuote] = useState(null);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [selectedRepairOrder, setSelectedRepairOrder] = useState(null);
+  const [selectedExpertiseReport, setSelectedExpertiseReport] = useState(null);
+  const [selectedCredit, setSelectedCredit] = useState(null);
+
   // États pour les filtres
   const [searchTerm, setSearchTerm] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
 
   // Hooks pour récupérer les données
   const { reports: expertiseReports, isLoading: expertiseLoading } = useExpertiseReports();
@@ -112,6 +119,7 @@ const Documents = () => {
       expertiseReports.slice(0, 2).forEach(report => {
         documents.push({
           id: `expertise-${report.id}`,
+          originalId: report.id,
           icon: <FileText className="h-5 w-5 text-blue-600" />,
           title: `Rapport d'expertise`,
           date: `Créé le ${new Date(report.created_at).toLocaleDateString('fr-FR')}`,
@@ -130,6 +138,7 @@ const Documents = () => {
       quotes.slice(0, 2).forEach(quote => {
         documents.push({
           id: `quote-${quote.id}`,
+          originalId: quote.id,
           icon: <FileText className="h-5 w-5 text-amber-600" />,
           title: `Devis`,
           date: `Créé le ${new Date(quote.created_at).toLocaleDateString('fr-FR')}`,
@@ -148,6 +157,7 @@ const Documents = () => {
       repairOrders.slice(0, 2).forEach(order => {
         documents.push({
           id: `order-${order.id}`,
+          originalId: order.id,
           icon: <FileText className="h-5 w-5 text-green-600" />,
           title: `Ordre de réparation`,
           date: `Créé le ${new Date(order.created_at).toLocaleDateString('fr-FR')}`,
@@ -166,11 +176,12 @@ const Documents = () => {
       invoices.slice(0, 2).forEach(invoice => {
         documents.push({
           id: `invoice-${invoice.id}`,
+          originalId: invoice.id,
           icon: <FileText className="h-5 w-5 text-purple-600" />,
           title: `Facture`,
           date: `Créé le ${new Date(invoice.created_at).toLocaleDateString('fr-FR')}`,
           customer: invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client non spécifié',
-          vehicle: 'Véhicule associé',
+          vehicle: invoice.vehicles ? `${invoice.vehicles.brand} ${invoice.vehicles.model} - ${invoice.vehicles.license_plate}` : 'Véhicule non spécifié',
           status: 'Payé',
           statusColor: 'bg-purple-100 text-purple-800',
           timestamp: new Date(invoice.created_at).getTime(),
@@ -184,11 +195,12 @@ const Documents = () => {
       credits.slice(0, 2).forEach(credit => {
         documents.push({
           id: `credit-${credit.id}`,
+          originalId: credit.id,
           icon: <FileText className="h-5 w-5 text-red-600" />,
           title: `Avoir`,
           date: `Créé le ${new Date(credit.created_at).toLocaleDateString('fr-FR')}`,
           customer: credit.clients ? `${credit.clients.first_name} ${credit.clients.last_name}` : 'Client non spécifié',
-          vehicle: 'Véhicule associé',
+          vehicle: credit.vehicles ? `${credit.vehicles.brand} ${credit.vehicles.model} - ${credit.vehicles.license_plate}` : 'Véhicule non spécifié',
           status: 'Émis',
           statusColor: 'bg-red-100 text-red-800',
           timestamp: new Date(credit.created_at).getTime(),
@@ -211,14 +223,39 @@ const Documents = () => {
       .slice(0, 4);
   }, [expertiseReports, quotes, repairOrders, invoices, credits, searchTerm]);
 
-  const handleViewDocument = (documentId: string) => {
-    console.log('Viewing document:', documentId);
-    // Logique pour voir le document
+  const handleViewDocument = (document) => {
+    switch (document.type) {
+      case 'expertise':
+        const expertiseReport = expertiseReports?.find(r => r.id === document.originalId);
+        setSelectedExpertiseReport(expertiseReport);
+        setIsExpertiseDialogOpen(true);
+        break;
+      case 'quote':
+        const quote = quotes?.find(q => q.id === document.originalId);
+        setSelectedQuote(quote);
+        setIsQuoteDialogOpen(true);
+        break;
+      case 'order':
+        const order = repairOrders?.find(o => o.id === document.originalId);
+        setSelectedRepairOrder(order);
+        setIsRepairOrderDialogOpen(true);
+        break;
+      case 'invoice':
+        const invoice = invoices?.find(i => i.id === document.originalId);
+        setSelectedInvoice(invoice);
+        setIsInvoiceDialogOpen(true);
+        break;
+      case 'credit':
+        const credit = credits?.find(c => c.id === document.originalId);
+        setSelectedCredit(credit);
+        setIsCreditDialogOpen(true);
+        break;
+    }
   };
 
-  const handleEditDocument = (documentId: string) => {
-    console.log('Editing document:', documentId);
-    // Logique pour éditer le document
+  const handleEditDocument = (document) => {
+    // Même logique que pour la visualisation, mais en mode édition
+    handleViewDocument(document);
   };
 
   const isLoading = expertiseLoading || quotesLoading || ordersLoading || invoicesLoading || creditsLoading;
@@ -345,7 +382,10 @@ const Documents = () => {
             />
           </div>
           
-          <Button variant="outline">
+          <Button 
+            variant="outline"
+            onClick={() => setShowFilters(!showFilters)}
+          >
             <Filter className="h-4 w-4 mr-2" />
             Filtres
           </Button>
@@ -358,23 +398,23 @@ const Documents = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem onClick={() => setIsExpertiseDialogOpen(true)}>
+              <DropdownMenuItem onClick={() => { setSelectedExpertiseReport(null); setIsExpertiseDialogOpen(true); }}>
                 <FileText className="mr-2 h-4 w-4" />
                 Rapport d'expertise
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setIsQuoteDialogOpen(true)}>
+              <DropdownMenuItem onClick={() => { setSelectedQuote(null); setIsQuoteDialogOpen(true); }}>
                 <FileText className="mr-2 h-4 w-4" />
                 Devis
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setIsRepairOrderDialogOpen(true)}>
+              <DropdownMenuItem onClick={() => { setSelectedRepairOrder(null); setIsRepairOrderDialogOpen(true); }}>
                 <FileText className="mr-2 h-4 w-4" />
                 Ordre de réparation
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setIsInvoiceDialogOpen(true)}>
+              <DropdownMenuItem onClick={() => { setSelectedInvoice(null); setIsInvoiceDialogOpen(true); }}>
                 <FileText className="mr-2 h-4 w-4" />
                 Facture
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setIsCreditDialogOpen(true)}>
+              <DropdownMenuItem onClick={() => { setSelectedCredit(null); setIsCreditDialogOpen(true); }}>
                 <FileText className="mr-2 h-4 w-4" />
                 Avoir
               </DropdownMenuItem>
@@ -395,8 +435,8 @@ const Documents = () => {
               vehicle={document.vehicle}
               status={document.status}
               statusColor={document.statusColor}
-              onView={() => handleViewDocument(document.id)}
-              onEdit={() => handleEditDocument(document.id)}
+              onView={() => handleViewDocument(document)}
+              onEdit={() => handleEditDocument(document)}
             />
           ))
         ) : (
@@ -410,26 +450,31 @@ const Documents = () => {
 
       {/* Dialogues pour la création de documents */}
       <ExpertiseReportDialog
+        report={selectedExpertiseReport}
         open={isExpertiseDialogOpen}
         onOpenChange={setIsExpertiseDialogOpen}
       />
 
       <QuoteDialog
+        quote={selectedQuote}
         open={isQuoteDialogOpen}
         onOpenChange={setIsQuoteDialogOpen}
       />
 
       <RepairOrderDialog
+        order={selectedRepairOrder}
         open={isRepairOrderDialogOpen}
         onOpenChange={setIsRepairOrderDialogOpen}
       />
 
       <InvoiceDialog
+        invoice={selectedInvoice}
         open={isInvoiceDialogOpen}
         onOpenChange={setIsInvoiceDialogOpen}
       />
 
       <CreditDialog
+        credit={selectedCredit}
         open={isCreditDialogOpen}
         onOpenChange={setIsCreditDialogOpen}
       />
