@@ -1,8 +1,24 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, Search, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useQuotes } from '@/hooks/use-quotes';
+import { useInvoices } from '@/hooks/use-invoices';
+import { useRepairOrders } from '@/hooks/use-repair-orders';
+import { useExpertiseReports } from '@/hooks/use-expertise-reports';
+import { useCredits } from '@/hooks/use-credits';
+import QuoteDialog from '@/components/quotes/QuoteDialog';
+import InvoiceDialog from '@/components/invoices/InvoiceDialog';
+import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
+import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
+import CreditDialog from '@/components/credits/CreditDialog';
 
 const DocumentItem = ({ 
   icon, 
@@ -55,6 +71,125 @@ const DocumentItem = ({
 };
 
 const Documents = () => {
+  // États pour les dialogues
+  const [isQuoteDialogOpen, setIsQuoteDialogOpen] = useState(false);
+  const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
+  const [isRepairOrderDialogOpen, setIsRepairOrderDialogOpen] = useState(false);
+  const [isExpertiseDialogOpen, setIsExpertiseDialogOpen] = useState(false);
+  const [isCreditDialogOpen, setIsCreditDialogOpen] = useState(false);
+
+  // Hooks pour récupérer les données
+  const { reports: expertiseReports, isLoading: expertiseLoading } = useExpertiseReports();
+  const { quotes, isLoading: quotesLoading } = useQuotes();
+  const { orders: repairOrders, isLoading: ordersLoading } = useRepairOrders();
+  const { invoices, isLoading: invoicesLoading } = useInvoices();
+  const { credits, isLoading: creditsLoading } = useCredits();
+
+  // Compter les documents
+  const expertiseCount = expertiseReports?.length || 0;
+  const quotesCount = quotes?.length || 0;
+  const repairOrdersCount = repairOrders?.length || 0;
+  const invoicesCount = invoices?.length || 0;
+  const creditsCount = credits?.length || 0;
+
+  // Créer une liste de tous les documents récents
+  const allRecentDocuments = React.useMemo(() => {
+    const documents = [];
+
+    // Ajouter les rapports d'expertise
+    if (expertiseReports) {
+      expertiseReports.slice(0, 2).forEach(report => {
+        documents.push({
+          id: `expertise-${report.id}`,
+          icon: <FileText className="h-5 w-5 text-blue-600" />,
+          title: `Rapport d'expertise - ${report.reference || 'Sans référence'}`,
+          date: `Créé le ${new Date(report.created_at).toLocaleDateString('fr-FR')}`,
+          customer: report.clients ? `${report.clients.first_name} ${report.clients.last_name}` : 'Client non spécifié',
+          vehicle: report.vehicles ? `${report.vehicles.brand} ${report.vehicles.model} - ${report.vehicles.license_plate}` : 'Véhicule non spécifié',
+          status: 'Importé',
+          statusColor: 'bg-blue-100 text-blue-800',
+          timestamp: new Date(report.created_at).getTime()
+        });
+      });
+    }
+
+    // Ajouter les devis
+    if (quotes) {
+      quotes.slice(0, 2).forEach(quote => {
+        documents.push({
+          id: `quote-${quote.id}`,
+          icon: <FileText className="h-5 w-5 text-amber-600" />,
+          title: `Devis ${quote.reference}`,
+          date: `Créé le ${new Date(quote.created_at).toLocaleDateString('fr-FR')}`,
+          customer: quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : 'Client non spécifié',
+          vehicle: quote.vehicles ? `${quote.vehicles.brand} ${quote.vehicles.model} - ${quote.vehicles.license_plate}` : 'Véhicule non spécifié',
+          status: quote.status === 'draft' ? 'En attente' : 'Validé',
+          statusColor: quote.status === 'draft' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800',
+          timestamp: new Date(quote.created_at).getTime()
+        });
+      });
+    }
+
+    // Ajouter les ordres de réparation
+    if (repairOrders) {
+      repairOrders.slice(0, 2).forEach(order => {
+        documents.push({
+          id: `order-${order.id}`,
+          icon: <FileText className="h-5 w-5 text-green-600" />,
+          title: `Ordre de réparation ${order.reference}`,
+          date: `Créé le ${new Date(order.created_at).toLocaleDateString('fr-FR')}`,
+          customer: order.clients ? `${order.clients.first_name} ${order.clients.last_name}` : 'Client non spécifié',
+          vehicle: order.vehicles ? `${order.vehicles.brand} ${order.vehicles.model} - ${order.vehicles.license_plate}` : 'Véhicule non spécifié',
+          status: order.status === 'signed' ? 'Signé' : 'En attente',
+          statusColor: order.status === 'signed' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800',
+          timestamp: new Date(order.created_at).getTime()
+        });
+      });
+    }
+
+    // Ajouter les factures
+    if (invoices) {
+      invoices.slice(0, 2).forEach(invoice => {
+        documents.push({
+          id: `invoice-${invoice.id}`,
+          icon: <FileText className="h-5 w-5 text-purple-600" />,
+          title: `Facture ${invoice.reference}`,
+          date: `Créé le ${new Date(invoice.created_at).toLocaleDateString('fr-FR')}`,
+          customer: invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client non spécifié',
+          vehicle: 'Véhicule associé',
+          status: 'Payé',
+          statusColor: 'bg-purple-100 text-purple-800',
+          timestamp: new Date(invoice.created_at).getTime()
+        });
+      });
+    }
+
+    // Trier par date (plus récent en premier) et prendre les 4 plus récents
+    return documents
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, 4);
+  }, [expertiseReports, quotes, repairOrders, invoices]);
+
+  const isLoading = expertiseLoading || quotesLoading || ordersLoading || invoicesLoading || creditsLoading;
+
+  if (isLoading) {
+    return (
+      <div className="page-container">
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Gestion des documents</h1>
+          <p className="text-gray-600 mt-1">Consultez et gérez tous vos documents: rapports d'expertise, devis, ordres de réparation, factures et avoirs.</p>
+        </div>
+        
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+            <p className="text-gray-500">Chargement des documents...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="page-container">
       <div className="mb-6">
@@ -63,76 +198,81 @@ const Documents = () => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-        <div className="card-container text-center">
+        <div className="card-container text-center flex flex-col">
           <div className="flex justify-center mb-2">
             <div className="bg-blue-100 p-3 rounded-full">
               <FileText className="h-6 w-6 text-blue-600" />
             </div>
           </div>
           <h3 className="font-bold">Rapports d'expertise</h3>
-          <p className="text-sm text-gray-600 mt-1">12 documents</p>
-          <Link to="/documents/expertise">
-            <Button className="mt-3 w-full" variant="outline">
+          <p className="text-sm text-gray-600 mt-1">{expertiseCount} documents</p>
+          <div className="flex-1"></div>
+          <Link to="/documents/expertise" className="mt-3">
+            <Button className="w-full" variant="outline">
               Voir tout
             </Button>
           </Link>
         </div>
         
-        <div className="card-container text-center">
+        <div className="card-container text-center flex flex-col">
           <div className="flex justify-center mb-2">
             <div className="bg-amber-100 p-3 rounded-full">
               <FileText className="h-6 w-6 text-amber-600" />
             </div>
           </div>
           <h3 className="font-bold">Devis</h3>
-          <p className="text-sm text-gray-600 mt-1">8 documents</p>
-          <Link to="/documents/devis">
-            <Button className="mt-3 w-full" variant="outline">
+          <p className="text-sm text-gray-600 mt-1">{quotesCount} documents</p>
+          <div className="flex-1"></div>
+          <Link to="/documents/devis" className="mt-3">
+            <Button className="w-full" variant="outline">
               Voir tout
             </Button>
           </Link>
         </div>
         
-        <div className="card-container text-center">
+        <div className="card-container text-center flex flex-col">
           <div className="flex justify-center mb-2">
             <div className="bg-green-100 p-3 rounded-full">
               <FileText className="h-6 w-6 text-green-600" />
             </div>
           </div>
           <h3 className="font-bold">Ordres de réparation</h3>
-          <p className="text-sm text-gray-600 mt-1">15 documents</p>
-          <Link to="/documents/ordres">
-            <Button className="mt-3 w-full" variant="outline">
+          <p className="text-sm text-gray-600 mt-1">{repairOrdersCount} documents</p>
+          <div className="flex-1"></div>
+          <Link to="/documents/ordres" className="mt-3">
+            <Button className="w-full" variant="outline">
               Voir tout
             </Button>
           </Link>
         </div>
         
-        <div className="card-container text-center">
+        <div className="card-container text-center flex flex-col">
           <div className="flex justify-center mb-2">
             <div className="bg-purple-100 p-3 rounded-full">
               <FileText className="h-6 w-6 text-purple-600" />
             </div>
           </div>
           <h3 className="font-bold">Factures</h3>
-          <p className="text-sm text-gray-600 mt-1">23 documents</p>
-          <Link to="/documents/factures">
-            <Button className="mt-3 w-full" variant="outline">
+          <p className="text-sm text-gray-600 mt-1">{invoicesCount} documents</p>
+          <div className="flex-1"></div>
+          <Link to="/documents/factures" className="mt-3">
+            <Button className="w-full" variant="outline">
               Voir tout
             </Button>
           </Link>
         </div>
 
-        <div className="card-container text-center">
+        <div className="card-container text-center flex flex-col">
           <div className="flex justify-center mb-2">
             <div className="bg-red-100 p-3 rounded-full">
               <FileText className="h-6 w-6 text-red-600" />
             </div>
           </div>
           <h3 className="font-bold">Avoirs</h3>
-          <p className="text-sm text-gray-600 mt-1">5 documents</p>
-          <Link to="/documents/avoirs">
-            <Button className="mt-3 w-full" variant="outline">
+          <p className="text-sm text-gray-600 mt-1">{creditsCount} documents</p>
+          <div className="flex-1"></div>
+          <Link to="/documents/avoirs" className="mt-3">
+            <Button className="w-full" variant="outline">
               Voir tout
             </Button>
           </Link>
@@ -157,54 +297,87 @@ const Documents = () => {
             Filtres
           </Button>
           
-          <Button className="btn-primary">
-            <Plus className="h-4 w-4 mr-2" />
-            Nouveau
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="btn-primary">
+                <Plus className="h-4 w-4 mr-2" />
+                Nouveau
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem onClick={() => setIsExpertiseDialogOpen(true)}>
+                <FileText className="mr-2 h-4 w-4" />
+                Rapport d'expertise
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsQuoteDialogOpen(true)}>
+                <FileText className="mr-2 h-4 w-4" />
+                Devis
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsRepairOrderDialogOpen(true)}>
+                <FileText className="mr-2 h-4 w-4" />
+                Ordre de réparation
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsInvoiceDialogOpen(true)}>
+                <FileText className="mr-2 h-4 w-4" />
+                Facture
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsCreditDialogOpen(true)}>
+                <FileText className="mr-2 h-4 w-4" />
+                Avoir
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       
       <div className="space-y-4">
-        <DocumentItem 
-          icon={<FileText className="h-5 w-5 text-blue-600" />}
-          title="Rapport d'expertise - Peugeot 308"
-          date="Créé le 17/05/2023"
-          customer="Jean Dupont"
-          vehicle="Peugeot 308 - AB-123-CD"
-          status="Importé"
-          statusColor="bg-blue-100 text-blue-800"
-        />
-        
-        <DocumentItem 
-          icon={<FileText className="h-5 w-5 text-amber-600" />}
-          title="Devis #D2023-045"
-          date="Créé le 16/05/2023"
-          customer="Marie Martin"
-          vehicle="Renault Clio - EF-456-GH"
-          status="En attente"
-          statusColor="bg-amber-100 text-amber-800"
-        />
-        
-        <DocumentItem 
-          icon={<FileText className="h-5 w-5 text-green-600" />}
-          title="Ordre de réparation #OR2023-032"
-          date="Créé le 15/05/2023"
-          customer="Pierre Durand"
-          vehicle="Citroën C3 - IJ-789-KL"
-          status="Signé"
-          statusColor="bg-green-100 text-green-800"
-        />
-        
-        <DocumentItem 
-          icon={<FileText className="h-5 w-5 text-purple-600" />}
-          title="Facture #F2023-056"
-          date="Créé le 14/05/2023"
-          customer="Sophie Bernard"
-          vehicle="Toyota Yaris - MN-012-OP"
-          status="Payé"
-          statusColor="bg-purple-100 text-purple-800"
-        />
+        {allRecentDocuments.length > 0 ? (
+          allRecentDocuments.map((document) => (
+            <DocumentItem 
+              key={document.id}
+              icon={document.icon}
+              title={document.title}
+              date={document.date}
+              customer={document.customer}
+              vehicle={document.vehicle}
+              status={document.status}
+              statusColor={document.statusColor}
+            />
+          ))
+        ) : (
+          <div className="text-center py-12 text-gray-500">
+            <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+            <h3 className="text-lg font-medium mb-2">Aucun document</h3>
+            <p>Commencez par créer votre premier document.</p>
+          </div>
+        )}
       </div>
+
+      {/* Dialogues pour la création de documents */}
+      <ExpertiseReportDialog
+        open={isExpertiseDialogOpen}
+        onOpenChange={setIsExpertiseDialogOpen}
+      />
+
+      <QuoteDialog
+        open={isQuoteDialogOpen}
+        onOpenChange={setIsQuoteDialogOpen}
+      />
+
+      <RepairOrderDialog
+        open={isRepairOrderDialogOpen}
+        onOpenChange={setIsRepairOrderDialogOpen}
+      />
+
+      <InvoiceDialog
+        open={isInvoiceDialogOpen}
+        onOpenChange={setIsInvoiceDialogOpen}
+      />
+
+      <CreditDialog
+        open={isCreditDialogOpen}
+        onOpenChange={setIsCreditDialogOpen}
+      />
     </div>
   );
 };
