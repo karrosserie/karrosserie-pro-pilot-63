@@ -31,7 +31,7 @@ export const useRecentDocuments = () => {
           if (invoice.vehicle_id && vehicles) {
             const vehicle = vehicles.find(v => v.id === invoice.vehicle_id);
             if (vehicle) {
-              vehicleInfo = `${vehicle.brand || ''} ${vehicle.model || ''} - ${vehicle.license_plate || ''}`.replace(/^\s*-\s*/, '').replace(/\s*-\s*$/, '');
+              vehicleInfo = `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''} - ${vehicle.license_plate || ''}`.replace(/^\s*-\s*/, '').replace(/\s*-\s*$/, '');
             }
           }
           
@@ -58,7 +58,7 @@ export const useRecentDocuments = () => {
           if (quote.vehicle_id && vehicles) {
             const vehicle = vehicles.find(v => v.id === quote.vehicle_id);
             if (vehicle) {
-              vehicleInfo = `${vehicle.brand || ''} ${vehicle.model || ''} - ${vehicle.license_plate || ''}`.replace(/^\s*-\s*/, '').replace(/\s*-\s*$/, '');
+              vehicleInfo = `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''} - ${vehicle.license_plate || ''}`.replace(/^\s*-\s*/, '').replace(/\s*-\s*$/, '');
             }
           }
           
@@ -85,7 +85,7 @@ export const useRecentDocuments = () => {
           if (order.vehicle_id && vehicles) {
             const vehicle = vehicles.find(v => v.id === order.vehicle_id);
             if (vehicle) {
-              vehicleInfo = `${vehicle.brand || ''} ${vehicle.model || ''} - ${vehicle.license_plate || ''}`.replace(/^\s*-\s*/, '').replace(/\s*-\s*$/, '');
+              vehicleInfo = `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''} - ${vehicle.license_plate || ''}`.replace(/^\s*-\s*/, '').replace(/\s*-\s*$/, '');
             }
           }
           
@@ -112,7 +112,7 @@ export const useRecentDocuments = () => {
           if (report.vehicle_id && vehicles) {
             const vehicle = vehicles.find(v => v.id === report.vehicle_id);
             if (vehicle) {
-              vehicleInfo = `${vehicle.brand || ''} ${vehicle.model || ''} - ${vehicle.license_plate || ''}`.replace(/^\s*-\s*/, '').replace(/\s*-\s*$/, '');
+              vehicleInfo = `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''} - ${vehicle.license_plate || ''}`.replace(/^\s*-\s*/, '').replace(/\s*-\s*$/, '');
             }
           }
           
@@ -139,7 +139,7 @@ export const useRecentDocuments = () => {
           if (credit.vehicle_id && vehicles) {
             const vehicle = vehicles.find(v => v.id === credit.vehicle_id);
             if (vehicle) {
-              vehicleInfo = `${vehicle.brand || ''} ${vehicle.model || ''} - ${vehicle.license_plate || ''}`.replace(/^\s*-\s*/, '').replace(/\s*-\s*$/, '');
+              vehicleInfo = `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''} - ${vehicle.license_plate || ''}`.replace(/^\s*-\s*/, '').replace(/\s*-\s*$/, '');
             }
           }
           
