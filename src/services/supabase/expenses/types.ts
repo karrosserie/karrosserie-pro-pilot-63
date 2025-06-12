@@ -1,15 +1,23 @@
 
-import { Database } from '@/integrations/supabase/types';
-
-export type Expense = Database['public']['Tables']['expenses']['Row'];
-export type NewExpense = Database['public']['Tables']['expenses']['Insert'];
-export type UpdateExpense = Database['public']['Tables']['expenses']['Update'];
-
-export interface ExpenseWithRelations extends Expense {
-  vehicle?: {
+export interface ExpenseWithRelations {
+  id: string;
+  user_id: string;
+  vehicle_id: string;
+  type: string;
+  category: string;
+  supplier: string;
+  date: string;
+  total_amount: number;
+  vat_amount: number;
+  proof_url: string;
+  status: string;
+  assign_to_vehicle: boolean;
+  created_at: string;
+  updated_at: string;
+  vehicle: {
     id: string;
     license_plate: string;
-    brand: string;
-    model: string;
+    car_brands: { name: string; } | null;
+    car_models: { name: string; } | null;
   } | null;
 }
