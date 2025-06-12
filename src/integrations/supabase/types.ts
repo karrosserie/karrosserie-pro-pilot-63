@@ -851,24 +851,16 @@ export type Database = {
       invoices: {
         Row: {
           amount: number
-          claim_number: string | null
           client_id: string | null
           created_at: string | null
-          current_mileage: string | null
-          description: string | null
-          discounts_data: Json | null
           document_url: string | null
           due_date: string | null
           id: string
           notes: string | null
-          parts_data: Json | null
           payment_date: string | null
-          payment_details: string | null
-          payment_due_date: string | null
           payment_method: string | null
           reference: string
           repair_order_id: string | null
-          repairs_data: Json | null
           status: string | null
           tax_rate: number | null
           updated_at: string | null
@@ -877,24 +869,16 @@ export type Database = {
         }
         Insert: {
           amount: number
-          claim_number?: string | null
           client_id?: string | null
           created_at?: string | null
-          current_mileage?: string | null
-          description?: string | null
-          discounts_data?: Json | null
           document_url?: string | null
           due_date?: string | null
           id?: string
           notes?: string | null
-          parts_data?: Json | null
           payment_date?: string | null
-          payment_details?: string | null
-          payment_due_date?: string | null
           payment_method?: string | null
           reference: string
           repair_order_id?: string | null
-          repairs_data?: Json | null
           status?: string | null
           tax_rate?: number | null
           updated_at?: string | null
@@ -903,24 +887,16 @@ export type Database = {
         }
         Update: {
           amount?: number
-          claim_number?: string | null
           client_id?: string | null
           created_at?: string | null
-          current_mileage?: string | null
-          description?: string | null
-          discounts_data?: Json | null
           document_url?: string | null
           due_date?: string | null
           id?: string
           notes?: string | null
-          parts_data?: Json | null
           payment_date?: string | null
-          payment_details?: string | null
-          payment_due_date?: string | null
           payment_method?: string | null
           reference?: string
           repair_order_id?: string | null
-          repairs_data?: Json | null
           status?: string | null
           tax_rate?: number | null
           updated_at?: string | null
@@ -1142,7 +1118,7 @@ export type Database = {
       vehicles: {
         Row: {
           arrival_date: string | null
-          brand_id: string
+          brand: string
           client_id: string | null
           color: string | null
           created_at: string | null
@@ -1155,7 +1131,7 @@ export type Database = {
           insurance_expiry_date: string | null
           license_plate: string
           mileage: number | null
-          model_id: string
+          model: string
           pre_accident_defects: string | null
           registration_document_back_url: string | null
           registration_document_front_url: string | null
@@ -1173,7 +1149,7 @@ export type Database = {
         }
         Insert: {
           arrival_date?: string | null
-          brand_id: string
+          brand: string
           client_id?: string | null
           color?: string | null
           created_at?: string | null
@@ -1186,7 +1162,7 @@ export type Database = {
           insurance_expiry_date?: string | null
           license_plate: string
           mileage?: number | null
-          model_id: string
+          model: string
           pre_accident_defects?: string | null
           registration_document_back_url?: string | null
           registration_document_front_url?: string | null
@@ -1204,7 +1180,7 @@ export type Database = {
         }
         Update: {
           arrival_date?: string | null
-          brand_id?: string
+          brand?: string
           client_id?: string | null
           color?: string | null
           created_at?: string | null
@@ -1217,7 +1193,7 @@ export type Database = {
           insurance_expiry_date?: string | null
           license_plate?: string
           mileage?: number | null
-          model_id?: string
+          model?: string
           pre_accident_defects?: string | null
           registration_document_back_url?: string | null
           registration_document_front_url?: string | null
@@ -1235,24 +1211,10 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "vehicles_brand_id_fkey"
-            columns: ["brand_id"]
-            isOneToOne: false
-            referencedRelation: "car_brands"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "vehicles_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "vehicles_model_id_fkey"
-            columns: ["model_id"]
-            isOneToOne: false
-            referencedRelation: "car_models"
             referencedColumns: ["id"]
           },
         ]
