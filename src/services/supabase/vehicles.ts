@@ -80,7 +80,7 @@ export const vehiclesService = {
   },
   
   create: async (vehicle: NewVehicle) => {
-    // Validate required fields
+    // Validate required fields - now using brand_id and model_id
     if (!vehicle.client_id || !vehicle.vin || !vehicle.brand_id || !vehicle.model_id || !vehicle.license_plate) {
       throw new Error('Les champs Client, Numéro de série (VIN), Marque, Modèle et Plaque d\'immatriculation sont obligatoires.');
     }
