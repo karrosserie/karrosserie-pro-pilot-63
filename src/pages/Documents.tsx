@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { FileText, Search, Filter } from 'lucide-react';
+import { FileText, Search, Filter, Eye, Pencil } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -62,12 +63,12 @@ const DocumentItem = ({
         <p className="text-xs text-gray-400 mt-2">{date}</p>
       </div>
       
-      <div className="ml-4">
-        <Button variant="outline" size="sm" className="mb-2 w-full" onClick={onView}>
-          Voir
+      <div className="ml-4 flex space-x-2">
+        <Button variant="outline" size="icon" onClick={onView}>
+          <Eye className="h-4 w-4" />
         </Button>
-        <Button size="sm" className="w-full" onClick={onEdit}>
-          Éditer
+        <Button size="icon" onClick={onEdit}>
+          <Pencil className="h-4 w-4" />
         </Button>
       </div>
     </div>
