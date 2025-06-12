@@ -279,7 +279,7 @@ export const useDashboardData = () => {
       if (expenses) {
         expenses.forEach(expense => {
           const expenseDate = new Date(expense.date);
-          let description = `${expense.description || 'Dépense'} - ${formatCurrency(expense.amount)}`;
+          let description = `${expense.supplier || 'Dépense'} - ${formatCurrency(expense.total_amount)}`;
           
           if (expense.vehicle && vehicles) {
             const vehicle = vehicles.find(v => v.id === expense.vehicle_id);
