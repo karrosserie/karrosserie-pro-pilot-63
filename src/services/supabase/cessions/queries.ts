@@ -88,7 +88,10 @@ export const getAllCessions = async (): Promise<Cession[]> => {
         sale_date: cession.sale_date || new Date().toISOString().split('T')[0],
         sale_price: cession.sale_price || 0,
         buyer_name: cession.buyer_name || '',
-        buyer_contact: cession.buyer_contact || ''
+        buyer_contact: cession.buyer_contact || '',
+        expertise_date: cession.expertise_date || null,
+        expertise_amount: cession.expertise_amount || null,
+        salvage_value: cession.salvage_value || null
       };
     })
   );
@@ -149,6 +152,9 @@ export const getCessionById = async (id: string): Promise<Cession> => {
     sale_date: basicCession.sale_date || new Date().toISOString().split('T')[0],
     sale_price: basicCession.sale_price || 0,
     buyer_name: basicCession.buyer_name || '',
-    buyer_contact: basicCession.buyer_contact || ''
+    buyer_contact: basicCession.buyer_contact || '',
+    expertise_date: basicCession.expertise_date || null,
+    expertise_amount: basicCession.expertise_amount || null,
+    salvage_value: basicCession.salvage_value || null
   } as Cession;
 };
