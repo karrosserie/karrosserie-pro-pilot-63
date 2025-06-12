@@ -1,9 +1,8 @@
 
 import React, { useState } from 'react';
 import StatsCards from '@/components/accounting/StatsCards';
-import FinancialOverview from '@/components/accounting/FinancialOverview';
 import AccountingTabs from '@/components/accounting/AccountingTabs';
-import { mockTransactions, chartData, statsCards } from '@/components/accounting/mockData';
+import { mockTransactions, statsCards } from '@/components/accounting/mockData';
 
 const Accounting = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,10 +22,6 @@ const Accounting = () => {
       </div>
       
       <StatsCards cards={statsCards} />
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <FinancialOverview chartData={chartData} className="lg:col-span-3" />
-      </div>
       
       <AccountingTabs 
         searchTerm={searchTerm}
