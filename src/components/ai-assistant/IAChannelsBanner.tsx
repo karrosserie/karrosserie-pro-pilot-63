@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 const IAChannelsBanner = () => {
   const channels = [
     {
-      name: '📞 Appels',
+      name: 'Appels',
       status: 'active',
       description: 'IA en réception + transcription',
       count: '4 appels traités',
@@ -15,7 +15,7 @@ const IAChannelsBanner = () => {
       color: 'green'
     },
     {
-      name: '💬 SMS',
+      name: 'SMS',
       status: 'active',
       description: 'IA auto-réponse + relance',
       count: '7 messages',
@@ -23,7 +23,7 @@ const IAChannelsBanner = () => {
       color: 'blue'
     },
     {
-      name: '🟢 WhatsApp',
+      name: 'WhatsApp',
       status: 'active',
       description: 'Relance client / photo sinistre',
       count: '5 échanges',
@@ -31,7 +31,7 @@ const IAChannelsBanner = () => {
       color: 'green'
     },
     {
-      name: '✉️ Emails',
+      name: 'Emails',
       status: 'active',
       description: 'Analyse + tri automatique',
       count: '12 emails',
@@ -39,7 +39,7 @@ const IAChannelsBanner = () => {
       color: 'purple'
     },
     {
-      name: '📬 Courrier simple',
+      name: 'Courrier simple',
       status: 'warning',
       description: 'Scan IA + génération réponse',
       count: '2 lettres',
@@ -47,7 +47,7 @@ const IAChannelsBanner = () => {
       color: 'orange'
     },
     {
-      name: '📮 Recommandé',
+      name: 'Recommandé',
       status: 'alert',
       description: 'Génération automatique + signature manuelle',
       count: '1 RAR envoyé',
