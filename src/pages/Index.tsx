@@ -22,7 +22,7 @@ const Index = () => {
   
   // États pour les dialogues de véhicules
   const [selectedVehicle, setSelectedVehicle] = useState(null);
-  const [vehicleDialogMode, setVehicleDialogMode] = useState('create');
+  const [vehicleDialogMode, setVehicleDialogMode] = useState<'create' | 'edit' | 'view'>('create');
 
   const handleViewVehicle = (vehicle) => {
     setSelectedVehicle(vehicle.vehicleData);
