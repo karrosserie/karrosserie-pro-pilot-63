@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Search, Filter } from 'lucide-react';
@@ -102,7 +101,7 @@ const Documents = () => {
   });
 
   // États pour la pagination
-  const [displayCount, setDisplayCount] = useState(4);
+  const [displayCount, setDisplayCount] = useState(10);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // Hooks pour récupérer les données
@@ -242,35 +241,62 @@ const Documents = () => {
   // Documents à afficher (avec pagination)
   const displayedDocuments = allDocuments.slice(0, displayCount);
 
-  // Fonction pour gérer le scroll infini
-  const handleScroll = useCallback(() => {
-    if (isLoadingMore || displayCount >= allDocuments.length) return;
+  // Fonction pour charger plus de documents
+  const loadMoreDocuments = useCallback(() => {
+    if (isLoadingMore || displayCount >= allDocuments.length) {
+      console.log('Cannot load more:', { isLoadingMore, displayCount, totalDocuments: allDocuments.length });
+      return;
+    }
     
+    console.log('Loading more documents...', { currentCount: displayCount, totalDocuments: allDocuments.length });
+    setIsLoadingMore(true);
+    
+    setTimeout(() => {
+      setDisplayCount(prev => {
+        const newCount = Math.min(prev + 5, allDocuments.length);
+        console.log('New document count:', newCount);
+        return newCount;
+      });
+      setIsLoadingMore(false);
+    }, 500);
+  }, [displayCount, allDocuments.length, isLoadingMore]);
+
+  // Fonction pour gérer le scroll
+  const handleScroll = useCallback(() => {
+    // Vérifier si on est proche du bas de la page
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const scrollHeight = document.documentElement.scrollHeight;
     const clientHeight = window.innerHeight;
+    const scrolledToBottom = scrollTop + clientHeight >= scrollHeight - 200;
     
-    console.log('Scroll event:', { scrollTop, scrollHeight, clientHeight, threshold: scrollHeight - clientHeight - 100 });
+    console.log('Scroll event:', { 
+      scrollTop: Math.round(scrollTop), 
+      scrollHeight, 
+      clientHeight, 
+      scrolledToBottom,
+      canLoadMore: displayCount < allDocuments.length
+    });
     
-    if (scrollTop + clientHeight >= scrollHeight - 100) {
-      console.log('Loading more documents...');
-      setIsLoadingMore(true);
-      setTimeout(() => {
-        setDisplayCount(prev => Math.min(prev + 5, allDocuments.length));
-        setIsLoadingMore(false);
-      }, 500);
+    if (scrolledToBottom && displayCount < allDocuments.length && !isLoadingMore) {
+      console.log('Triggering load more documents');
+      loadMoreDocuments();
     }
-  }, [displayCount, allDocuments.length, isLoadingMore]);
+  }, [displayCount, allDocuments.length, isLoadingMore, loadMoreDocuments]);
 
   // Écouter les événements de scroll
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    console.log('Setting up scroll listener');
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      console.log('Removing scroll listener');
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, [handleScroll]);
 
   // Reset pagination when filters or search change
   useEffect(() => {
-    setDisplayCount(4);
+    console.log('Resetting pagination due to filter/search change');
+    setDisplayCount(10);
   }, [searchTerm, activeFilters]);
 
   const handleViewDocument = (document) => {
@@ -439,7 +465,7 @@ const Documents = () => {
             />
           </div>
           
-          <DropdownMenu open={showFilters} onOpenChange={setShowFilters}>
+          <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon" className="bg-white border-gray-200">
                 <Filter className="h-4 w-4" />
@@ -448,31 +474,31 @@ const Documents = () => {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuCheckboxItem
                 checked={activeFilters.expertise}
-                onCheckedChange={(checked) => handleFilterChange('expertise', checked)}
+                onCheckedChange={(checked) => setActiveFilters(prev => ({ ...prev, expertise: checked }))}
               >
                 Rapports d'expertise
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 checked={activeFilters.quotes}
-                onCheckedChange={(checked) => handleFilterChange('quotes', checked)}
+                onCheckedChange={(checked) => setActiveFilters(prev => ({ ...prev, quotes: checked }))}
               >
                 Devis
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 checked={activeFilters.orders}
-                onCheckedChange={(checked) => handleFilterChange('orders', checked)}
+                onCheckedChange={(checked) => setActiveFilters(prev => ({ ...prev, orders: checked }))}
               >
                 Ordres de réparation
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 checked={activeFilters.invoices}
-                onCheckedChange={(checked) => handleFilterChange('invoices', checked)}
+                onCheckedChange={(checked) => setActiveFilters(prev => ({ ...prev, invoices: checked }))}
               >
                 Factures
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 checked={activeFilters.credits}
-                onCheckedChange={(checked) => handleFilterChange('credits', checked)}
+                onCheckedChange={(checked) => setActiveFilters(prev => ({ ...prev, credits: checked }))}
               >
                 Avoirs
               </DropdownMenuCheckboxItem>
@@ -541,10 +567,17 @@ const Documents = () => {
                 <p className="text-gray-500 text-sm">
                   Faites défiler vers le bas pour charger plus de documents ({displayedDocuments.length}/{allDocuments.length})
                 </p>
+                <Button 
+                  variant="outline" 
+                  onClick={loadMoreDocuments}
+                  className="mt-2"
+                >
+                  Charger plus
+                </Button>
               </div>
             )}
             
-            {displayCount >= allDocuments.length && allDocuments.length > 4 && (
+            {displayCount >= allDocuments.length && allDocuments.length > 10 && (
               <div className="text-center py-4">
                 <p className="text-gray-500 text-sm">
                   Tous les documents ont été chargés ({allDocuments.length} au total)
