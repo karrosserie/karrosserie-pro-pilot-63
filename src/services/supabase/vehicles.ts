@@ -1,13 +1,8 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 import { VehicleStatus } from '@/types/vehicle';
 
-export type Vehicle = Database['public']['Tables']['vehicles']['Row'] & {
-  car_brands?: { id: string; name: string } | null;
-  car_models?: { id: string; name: string } | null;
-  clients?: { first_name: string; last_name: string } | null;
-};
+export type Vehicle = Database['public']['Tables']['vehicles']['Row'];
 export type NewVehicle = Database['public']['Tables']['vehicles']['Insert'];
 export type UpdateVehicle = Database['public']['Tables']['vehicles']['Update'];
 
@@ -15,13 +10,8 @@ export const vehiclesService = {
   getAll: async () => {
     const { data, error } = await supabase
       .from('vehicles')
-      .select(`
-        *,
-        clients(first_name, last_name),
-        car_brands(id, name),
-        car_models(id, name)
-      `)
-      .order('created_at', { ascending: false });
+      .select('*, clients(first_name, last_name)')
+      .order('brand');
 
     if (error) {
       console.error('Error fetching vehicles:', error);
@@ -34,11 +24,7 @@ export const vehiclesService = {
   getByClientId: async (clientId: string) => {
     const { data, error } = await supabase
       .from('vehicles')
-      .select(`
-        *,
-        car_brands(id, name),
-        car_models(id, name)
-      `)
+      .select('*')
       .eq('client_id', clientId);
       
     if (error) {
@@ -52,12 +38,7 @@ export const vehiclesService = {
   getById: async (id: string) => {
     const { data, error } = await supabase
       .from('vehicles')
-      .select(`
-        *,
-        clients(id, first_name, last_name),
-        car_brands(id, name),
-        car_models(id, name)
-      `)
+      .select('*, clients(id, first_name, last_name)')
       .eq('id', id)
       .single();
       
@@ -71,7 +52,7 @@ export const vehiclesService = {
   
   create: async (vehicle: NewVehicle) => {
     // Validate required fields
-    if (!vehicle.client_id || !vehicle.vin || !vehicle.brand_id || !vehicle.model_id || !vehicle.license_plate) {
+    if (!vehicle.client_id || !vehicle.vin || !vehicle.brand || !vehicle.model || !vehicle.license_plate) {
       throw new Error('Les champs Client, Numéro de série (VIN), Marque, Modèle et Plaque d\'immatriculation sont obligatoires.');
     }
 
@@ -85,11 +66,7 @@ export const vehiclesService = {
     const { data, error } = await supabase
       .from('vehicles')
       .insert([vehicle])
-      .select(`
-        *,
-        car_brands(id, name),
-        car_models(id, name)
-      `)
+      .select()
       .single();
       
     if (error) {
@@ -113,11 +90,7 @@ export const vehiclesService = {
       .from('vehicles')
       .update(vehicle)
       .eq('id', id)
-      .select(`
-        *,
-        car_brands(id, name),
-        car_models(id, name)
-      `)
+      .select()
       .single();
       
     if (error) {

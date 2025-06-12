@@ -119,7 +119,7 @@ export const useRecentActivity = () => {
           if (expense.vehicle && vehicles) {
             const vehicle = vehicles.find(v => v.id === expense.vehicle_id);
             if (vehicle) {
-              description += ` (${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'})`;
+              description += ` (${vehicle.brand} ${vehicle.model})`;
             }
           }
           
@@ -158,8 +158,8 @@ export const useRecentActivity = () => {
           
           if (report.vehicle_id && vehicles) {
             const vehicle = vehicles.find(v => v.id === report.vehicle_id);
-            if (vehicle && vehicle.car_brands && vehicle.car_models) {
-              vehicleInfo = `${vehicle.car_brands.name} ${vehicle.car_models.name}`;
+            if (vehicle && vehicle.brand && vehicle.model) {
+              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
             }
           }
           
@@ -203,8 +203,8 @@ export const useRecentActivity = () => {
           
           if (quote.vehicle_id && vehicles) {
             const vehicle = vehicles.find(v => v.id === quote.vehicle_id);
-            if (vehicle && vehicle.car_brands && vehicle.car_models) {
-              vehicleInfo = `${vehicle.car_brands.name} ${vehicle.car_models.name}`;
+            if (vehicle && vehicle.brand && vehicle.model) {
+              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
             }
           }
           
@@ -248,8 +248,8 @@ export const useRecentActivity = () => {
           
           if (order.vehicle_id && vehicles) {
             const vehicle = vehicles.find(v => v.id === order.vehicle_id);
-            if (vehicle && vehicle.car_brands && vehicle.car_models) {
-              vehicleInfo = `${vehicle.car_brands.name} ${vehicle.car_models.name}`;
+            if (vehicle && vehicle.brand && vehicle.model) {
+              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
             }
           }
           
@@ -292,8 +292,8 @@ export const useRecentActivity = () => {
           
           if (invoice.vehicle_id && vehicles) {
             const vehicle = vehicles.find(v => v.id === invoice.vehicle_id);
-            if (vehicle && vehicle.car_brands && vehicle.car_models) {
-              vehicleInfo = `${vehicle.car_brands.name} ${vehicle.car_models.name}`;
+            if (vehicle && vehicle.brand && vehicle.model) {
+              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
             }
           }
           
@@ -324,8 +324,8 @@ export const useRecentActivity = () => {
           
           if (credit.vehicle_id && vehicles) {
             const vehicle = vehicles.find(v => v.id === credit.vehicle_id);
-            if (vehicle && vehicle.car_brands && vehicle.car_models) {
-              vehicleInfo = `${vehicle.car_brands.name} ${vehicle.car_models.name}`;
+            if (vehicle && vehicle.brand && vehicle.model) {
+              vehicleInfo = `${vehicle.brand} ${vehicle.model}`;
             }
           }
           
@@ -366,8 +366,8 @@ export const useRecentActivity = () => {
           const createdDate = new Date(vehicle.created_at);
           const updatedDate = vehicle.updated_at ? new Date(vehicle.updated_at) : null;
           let vehicleDescription = 'Véhicule';
-          if (vehicle.car_brands && vehicle.car_models && vehicle.license_plate) {
-            vehicleDescription = `${vehicle.car_brands.name} ${vehicle.car_models.name} - ${vehicle.license_plate}`;
+          if (vehicle.brand && vehicle.model && vehicle.license_plate) {
+            vehicleDescription = `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`;
           } else if (vehicle.license_plate) {
             vehicleDescription = `Véhicule ${vehicle.license_plate}`;
           }

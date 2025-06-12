@@ -81,7 +81,7 @@ const Activity = () => {
           {hasMore && (
             <div className="text-center pt-4">
               <Button 
-                onClick={() => loadMore()} 
+                onClick={loadMore} 
                 variant="outline"
                 disabled={isLoading}
               >

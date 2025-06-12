@@ -57,7 +57,7 @@ export const RepairOrderAssignmentSection = ({
 
   const vehicleSelectOptions = clientVehicles.map(vehicle => ({
     value: vehicle.id,
-    label: `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate}`
+    label: `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`
   }));
 
   return (

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Car, Search, Plus } from 'lucide-react';
@@ -38,8 +39,8 @@ const VehicleList = () => {
   const handleVehicleSubmit = (data: any) => {
     if (dialogMode === 'create') {
       createVehicle.mutate({
-        brand_id: data.brandId,
-        model_id: data.modelId,
+        brand: data.brand,
+        model: data.model,
         year: data.year ? parseInt(data.year) : null,
         license_plate: data.licensePlate,
         color: data.color,
@@ -53,8 +54,8 @@ const VehicleList = () => {
       updateVehicle.mutate({
         id: selectedVehicle.id,
         data: {
-          brand_id: data.brandId,
-          model_id: data.modelId,
+          brand: data.brand,
+          model: data.model,
           year: data.year ? parseInt(data.year) : null,
           license_plate: data.licensePlate,
           color: data.color,
@@ -73,20 +74,12 @@ const VehicleList = () => {
       header: "Immatriculation",
     },
     {
-      accessorKey: "car_brands.name",
+      accessorKey: "brand",
       header: "Marque",
-      cell: ({ row }) => {
-        const vehicle = row.original;
-        return vehicle.car_brands?.name || 'Marque inconnue';
-      },
     },
     {
-      accessorKey: "car_models.name",
+      accessorKey: "model",
       header: "Modèle",
-      cell: ({ row }) => {
-        const vehicle = row.original;
-        return vehicle.car_models?.name || 'Modèle inconnu';
-      },
     },
     {
       accessorKey: "year",
@@ -166,8 +159,8 @@ const VehicleList = () => {
             : ''
         }
         defaultValues={selectedVehicle ? {
-          brandId: selectedVehicle.brand_id || '',
-          modelId: selectedVehicle.model_id || '',
+          brand: selectedVehicle.brand || '',
+          model: selectedVehicle.model || '',
           year: selectedVehicle.year?.toString() || '',
           licensePlate: selectedVehicle.license_plate || '',
           color: selectedVehicle.color || '',

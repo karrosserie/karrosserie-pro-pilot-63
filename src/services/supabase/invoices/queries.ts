@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Invoice } from './types';
 
@@ -18,9 +17,9 @@ export const invoiceQueries = {
         ),
         vehicles (
           id,
-          license_plate,
-          car_brands(id, name),
-          car_models(id, name)
+          brand,
+          model,
+          license_plate
         ),
         repair_orders (
           id,
@@ -60,16 +59,11 @@ export const invoiceQueries = {
             clientData = client;
           }
 
-          // Try to get vehicle data with new structure
+          // Try to get vehicle data
           if (invoice.vehicle_id) {
             const { data: vehicle } = await supabase
               .from('vehicles')
-              .select(`
-                id, 
-                license_plate,
-                car_brands(id, name),
-                car_models(id, name)
-              `)
+              .select('id, brand, model, license_plate')
               .eq('id', invoice.vehicle_id)
               .single();
             vehicleData = vehicle;
@@ -120,9 +114,9 @@ export const invoiceQueries = {
         ),
         vehicles (
           id,
-          license_plate,
-          car_brands(id, name),
-          car_models(id, name)
+          brand,
+          model,
+          license_plate
         ),
         repair_orders (
           id,

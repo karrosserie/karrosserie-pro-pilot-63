@@ -2,12 +2,14 @@
 import { Database } from '@/integrations/supabase/types';
 
 export type Expense = Database['public']['Tables']['expenses']['Row'];
+export type NewExpense = Database['public']['Tables']['expenses']['Insert'];
+export type UpdateExpense = Database['public']['Tables']['expenses']['Update'];
 
-export type ExpenseWithRelations = Expense & {
+export interface ExpenseWithRelations extends Expense {
   vehicle?: {
     id: string;
     license_plate: string;
-    car_brands: { id: string; name: string } | null;
-    car_models: { id: string; name: string } | null;
+    brand: string;
+    model: string;
   } | null;
-};
+}
