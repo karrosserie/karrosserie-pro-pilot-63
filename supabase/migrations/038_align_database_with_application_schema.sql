@@ -1,4 +1,5 @@
 
+
 -- Migration to align database schema with application expectations
 -- This migration adds missing columns and updates existing tables
 
@@ -112,21 +113,6 @@ COMMENT ON COLUMN public.invoices.discounts_data IS 'Données des remises au for
 COMMENT ON COLUMN public.invoices.claim_number IS 'Numéro de sinistre';
 COMMENT ON COLUMN public.invoices.current_mileage IS 'Kilométrage actuel';
 
--- Update existing vehicles to have brand_id and model_id based on brand/model text fields
-UPDATE public.vehicles 
-SET brand_id = (
-  SELECT cb.id FROM public.car_brands cb WHERE cb.name = vehicles.brand
-)
-WHERE brand IS NOT NULL AND brand_id IS NULL;
-
-UPDATE public.vehicles 
-SET model_id = (
-  SELECT cm.id FROM public.car_models cm 
-  JOIN public.car_brands cb ON cm.brand_id = cb.id
-  WHERE cm.name = vehicles.model AND cb.name = vehicles.brand
-)
-WHERE model IS NOT NULL AND model_id IS NULL;
-
 -- Create trigger functions for updated_at if they don't exist
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -148,3 +134,4 @@ CREATE TRIGGER update_car_models_updated_at
     BEFORE UPDATE ON public.car_models 
     FOR EACH ROW 
     EXECUTE FUNCTION update_updated_at_column();
+
