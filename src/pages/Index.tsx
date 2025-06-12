@@ -1,14 +1,23 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Car, FileText, Users, CreditCard } from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/use-dashboard-data';
+import VehicleDialog from '@/components/vehicle/VehicleDialog';
+import QuoteDialog from '@/components/quotes/QuoteDialog';
+import ClientDialog from '@/components/client/ClientDialog';
+import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 
 const Index = () => {
-  const { dashboardStats, recentVehicles, recentDocuments, isLoading } = useDashboardData();
+  const { dashboardStats, recentVehicles, recentDocuments, recentActivity, isLoading } = useDashboardData();
+  
+  // États pour les dialogues
+  const [isVehicleDialogOpen, setIsVehicleDialogOpen] = useState(false);
+  const [isQuoteDialogOpen, setIsQuoteDialogOpen] = useState(false);
+  const [isClientDialogOpen, setIsClientDialogOpen] = useState(false);
+  const [isReceiptDialogOpen, setIsReceiptDialogOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -160,43 +169,76 @@ const Index = () => {
         </div>
         
         <div className="space-y-6">
-          <RecentActivity />
+          <RecentActivity activities={recentActivity} />
           
           <div className="card-container animate-fade-in">
             <h3 className="section-title">Raccourcis</h3>
             
             <div className="grid grid-cols-2 gap-3">
-              <Link to="/vehicles">
-                <Button variant="outline" className="flex-col h-20 p-2 w-full">
-                  <Car className="h-6 w-6 mb-1" />
-                  <span className="text-xs">Nouveau véhicule</span>
-                </Button>
-              </Link>
+              <Button 
+                variant="outline" 
+                className="flex-col h-20 p-2 w-full"
+                onClick={() => setIsVehicleDialogOpen(true)}
+              >
+                <Car className="h-6 w-6 mb-1" />
+                <span className="text-xs">Nouveau véhicule</span>
+              </Button>
               
-              <Link to="/documents/devis">
-                <Button variant="outline" className="flex-col h-20 p-2 w-full">
-                  <FileText className="h-6 w-6 mb-1" />
-                  <span className="text-xs">Nouveau devis</span>
-                </Button>
-              </Link>
+              <Button 
+                variant="outline" 
+                className="flex-col h-20 p-2 w-full"
+                onClick={() => setIsQuoteDialogOpen(true)}
+              >
+                <FileText className="h-6 w-6 mb-1" />
+                <span className="text-xs">Nouveau devis</span>
+              </Button>
               
-              <Link to="/clients">
-                <Button variant="outline" className="flex-col h-20 p-2 w-full">
-                  <Users className="h-6 w-6 mb-1" />
-                  <span className="text-xs">Nouveau client</span>
-                </Button>
-              </Link>
+              <Button 
+                variant="outline" 
+                className="flex-col h-20 p-2 w-full"
+                onClick={() => setIsClientDialogOpen(true)}
+              >
+                <Users className="h-6 w-6 mb-1" />
+                <span className="text-xs">Nouveau client</span>
+              </Button>
               
-              <Link to="/payments/receipts">
-                <Button variant="outline" className="flex-col h-20 p-2 w-full">
-                  <CreditCard className="h-6 w-6 mb-1" />
-                  <span className="text-xs">Encaisser</span>
-                </Button>
-              </Link>
+              <Button 
+                variant="outline" 
+                className="flex-col h-20 p-2 w-full"
+                onClick={() => setIsReceiptDialogOpen(true)}
+              >
+                <CreditCard className="h-6 w-6 mb-1" />
+                <span className="text-xs">Encaisser</span>
+              </Button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Dialogues pour les raccourcis */}
+      <VehicleDialog
+        open={isVehicleDialogOpen}
+        onOpenChange={setIsVehicleDialogOpen}
+        title="Nouveau véhicule"
+        description="Ajoutez un nouveau véhicule au système"
+        onSubmit={() => setIsVehicleDialogOpen(false)}
+        mode="create"
+      />
+
+      <QuoteDialog
+        open={isQuoteDialogOpen}
+        onOpenChange={setIsQuoteDialogOpen}
+      />
+
+      <ClientDialog
+        open={isClientDialogOpen}
+        onOpenChange={setIsClientDialogOpen}
+      />
+
+      <ReceiptDialog
+        open={isReceiptDialogOpen}
+        onOpenChange={setIsReceiptDialogOpen}
+      />
     </div>
   );
 };

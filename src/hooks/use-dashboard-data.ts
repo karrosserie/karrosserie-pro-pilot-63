@@ -1,9 +1,11 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useClients } from '@/hooks/use-clients';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useAccountingData } from '@/hooks/use-accounting-data';
+import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { formatCurrency } from '@/lib/utils';
 
 export const useDashboardData = () => {
@@ -11,6 +13,7 @@ export const useDashboardData = () => {
   const { clients, isLoading: clientsLoading } = useClients();
   const { invoices, isLoading: invoicesLoading } = useInvoices();
   const { quotes, isLoading: quotesLoading } = useQuotes();
+  const { receipts, isLoading: receiptsLoading } = useReceiptsData();
   const { totalReceipts } = useAccountingData();
 
   const { data: dashboardStats, isLoading } = useQuery({
@@ -84,10 +87,89 @@ export const useDashboardData = () => {
     enabled: !!invoices || !!quotes
   });
 
+  // Activité récente basée sur les vraies données
+  const { data: recentActivity } = useQuery({
+    queryKey: ['recent-activity', quotes, clients, vehicles, receipts],
+    queryFn: () => {
+      const activities = [];
+
+      // Devis récents
+      if (quotes) {
+        quotes.slice(0, 2).forEach(quote => {
+          activities.push({
+            id: `quote-${quote.id}`,
+            icon: 'FileText',
+            iconBackground: 'bg-blue-500',
+            title: 'Devis créé',
+            description: quote.clients ? 
+              `${quote.vehicle?.brand} ${quote.vehicle?.model} - ${quote.clients.first_name} ${quote.clients.last_name}` :
+              `Devis ${quote.reference}`,
+            time: new Date(quote.created_at).toLocaleDateString('fr-FR'),
+            timestamp: new Date(quote.created_at).getTime()
+          });
+        });
+      }
+
+      // Nouveaux clients
+      if (clients) {
+        clients.slice(0, 2).forEach(client => {
+          activities.push({
+            id: `client-${client.id}`,
+            icon: 'User',
+            iconBackground: 'bg-green-500',
+            title: 'Nouveau client',
+            description: `${client.first_name} ${client.last_name}`,
+            time: new Date(client.created_at).toLocaleDateString('fr-FR'),
+            timestamp: new Date(client.created_at).getTime()
+          });
+        });
+      }
+
+      // Véhicules récemment mis à jour
+      if (vehicles) {
+        vehicles.slice(0, 1).forEach(vehicle => {
+          activities.push({
+            id: `vehicle-${vehicle.id}`,
+            icon: 'Car',
+            iconBackground: 'bg-purple-500',
+            title: 'Véhicule mis à jour',
+            description: `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`,
+            time: new Date(vehicle.updated_at || vehicle.created_at).toLocaleDateString('fr-FR'),
+            timestamp: new Date(vehicle.updated_at || vehicle.created_at).getTime()
+          });
+        });
+      }
+
+      // Paiements récents
+      if (receipts) {
+        receipts.slice(0, 1).forEach(receipt => {
+          activities.push({
+            id: `receipt-${receipt.id}`,
+            icon: 'CreditCard',
+            iconBackground: 'bg-amber-500',
+            title: 'Paiement reçu',
+            description: receipt.invoices ? 
+              `Facture ${receipt.invoices.reference}` :
+              `Encaissement de ${formatCurrency(receipt.amount)}`,
+            time: new Date(receipt.date).toLocaleDateString('fr-FR'),
+            timestamp: new Date(receipt.date).getTime()
+          });
+        });
+      }
+
+      // Trier par date (plus récent en premier) et prendre les 4 plus récents
+      return activities
+        .sort((a, b) => b.timestamp - a.timestamp)
+        .slice(0, 4);
+    },
+    enabled: !quotesLoading && !clientsLoading && !vehiclesLoading && !receiptsLoading
+  });
+
   return {
     dashboardStats,
     recentVehicles,
     recentDocuments,
+    recentActivity,
     isLoading: isLoading || vehiclesLoading || clientsLoading
   };
 };
