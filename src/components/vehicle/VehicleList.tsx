@@ -39,8 +39,8 @@ const VehicleList = () => {
   const handleVehicleSubmit = (data: any) => {
     if (dialogMode === 'create') {
       createVehicle.mutate({
-        brand: data.brand,
-        model: data.model,
+        brand_id: data.brandId,
+        model_id: data.modelId,
         year: data.year ? parseInt(data.year) : null,
         license_plate: data.licensePlate,
         color: data.color,
@@ -48,14 +48,14 @@ const VehicleList = () => {
         mileage: data.mileage ? parseInt(data.mileage) : null,
         fuel_type: data.fuelType,
         client_id: data.clientId,
-        user_id: user ? user.id : null, // Utilisation de l'ID utilisateur actuel
+        user_id: user ? user.id : null,
       });
     } else if (dialogMode === 'edit' && selectedVehicle) {
       updateVehicle.mutate({
         id: selectedVehicle.id,
         data: {
-          brand: data.brand,
-          model: data.model,
+          brand_id: data.brandId,
+          model_id: data.modelId,
           year: data.year ? parseInt(data.year) : null,
           license_plate: data.licensePlate,
           color: data.color,
@@ -74,11 +74,11 @@ const VehicleList = () => {
       header: "Immatriculation",
     },
     {
-      accessorKey: "brand",
+      accessorFn: (row) => row.car_brands?.name || 'Marque inconnue',
       header: "Marque",
     },
     {
-      accessorKey: "model",
+      accessorFn: (row) => row.car_models?.name || 'Modèle inconnu',
       header: "Modèle",
     },
     {
@@ -140,7 +140,6 @@ const VehicleList = () => {
         searchPlaceholder="Rechercher un véhicule..."
       />
 
-      {/* Vehicle Dialog */}
       <VehicleDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
@@ -159,8 +158,8 @@ const VehicleList = () => {
             : ''
         }
         defaultValues={selectedVehicle ? {
-          brand: selectedVehicle.brand || '',
-          model: selectedVehicle.model || '',
+          brand: selectedVehicle.car_brands?.name || '',
+          model: selectedVehicle.car_models?.name || '',
           year: selectedVehicle.year?.toString() || '',
           licensePlate: selectedVehicle.license_plate || '',
           color: selectedVehicle.color || '',

@@ -22,7 +22,7 @@ export const useRecentVehicles = () => {
           
           return {
             id: vehicle.id,
-            model: `${vehicle.brand || ''} ${vehicle.model || ''}`.trim() || 'Véhicule',
+            model: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim() || 'Véhicule',
             licensePlate: vehicle.license_plate || 'N/A',
             client: clientName,
             status: vehicle.status || 'En attente',
