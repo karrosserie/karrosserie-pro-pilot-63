@@ -1,10 +1,15 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Phone, MessageSquare, Mail, FileText, Send } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import IAChannelDetailModal from './IAChannelDetailModal';
 
 const IAChannelsBanner = () => {
+  const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const channels = [
     {
       name: 'Appels',
@@ -74,33 +79,51 @@ const IAChannelsBanner = () => {
     }
   };
 
+  const handleChannelClick = (channelName: string) => {
+    setSelectedChannel(channelName);
+    setIsModalOpen(true);
+  };
+
   return (
-    <Card className="mb-6">
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          Canaux Multicanaux IA
-          <span className="ml-2 text-sm text-gray-500">L'IA analyse, répond ou escalade si besoin – Zéro stress.</span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {channels.map((channel, index) => (
-            <div key={index} className="bg-gray-50 p-4 rounded-lg border hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center">
-                  <span className="text-lg mr-2">{getStatusIcon(channel.status)}</span>
-                  <h3 className="font-semibold text-gray-900">{channel.name}</h3>
+    <>
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            Canaux Multicanaux IA
+            <span className="ml-2 text-sm text-gray-500">L'IA analyse, répond ou escalade si besoin – Zéro stress.</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {channels.map((channel, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                className="bg-gray-50 p-4 rounded-lg border hover:shadow-md transition-shadow h-auto flex flex-col items-start text-left"
+                onClick={() => handleChannelClick(channel.name)}
+              >
+                <div className="flex items-center justify-between mb-2 w-full">
+                  <div className="flex items-center">
+                    <span className="text-lg mr-2">{getStatusIcon(channel.status)}</span>
+                    <h3 className="font-semibold text-gray-900">{channel.name}</h3>
+                  </div>
+                  <Badge className={getStatusColor(channel.status)}>
+                    {channel.count}
+                  </Badge>
                 </div>
-                <Badge className={getStatusColor(channel.status)}>
-                  {channel.count}
-                </Badge>
-              </div>
-              <p className="text-sm text-gray-600 mb-2">{channel.description}</p>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+                <p className="text-sm text-gray-600 mb-2">{channel.description}</p>
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <IAChannelDetailModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        channelName={selectedChannel}
+      />
+    </>
   );
 };
 
