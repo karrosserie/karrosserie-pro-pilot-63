@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { FileText, Plus, Search, Filter } from 'lucide-react';
+import { FileText, Search, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -26,7 +27,9 @@ const DocumentItem = ({
   customer, 
   vehicle, 
   status, 
-  statusColor 
+  statusColor,
+  onView,
+  onEdit
 }: { 
   icon: React.ReactNode; 
   title: string; 
@@ -35,6 +38,8 @@ const DocumentItem = ({
   vehicle: string; 
   status: string; 
   statusColor: string; 
+  onView: () => void;
+  onEdit: () => void;
 }) => {
   return (
     <div className="flex items-start p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
@@ -45,7 +50,7 @@ const DocumentItem = ({
       <div className="flex-1">
         <div className="flex justify-between">
           <h3 className="font-medium text-gray-800">{title}</h3>
-          <span className={`text-xs font-medium px-2.5 py-0.5 rounded ${statusColor}`}>
+          <span className={`text-xs font-medium px-2 py-1 rounded ${statusColor}`}>
             {status}
           </span>
         </div>
@@ -58,10 +63,10 @@ const DocumentItem = ({
       </div>
       
       <div className="ml-4">
-        <Button variant="outline" size="sm" className="mb-2 w-full">
+        <Button variant="outline" size="sm" className="mb-2 w-full" onClick={onView}>
           Voir
         </Button>
-        <Button size="sm" className="w-full">
+        <Button size="sm" className="w-full" onClick={onEdit}>
           Éditer
         </Button>
       </div>
@@ -77,6 +82,9 @@ const Documents = () => {
   const [isExpertiseDialogOpen, setIsExpertiseDialogOpen] = useState(false);
   const [isCreditDialogOpen, setIsCreditDialogOpen] = useState(false);
 
+  // États pour les filtres
+  const [searchTerm, setSearchTerm] = useState('');
+
   // Hooks pour récupérer les données
   const { reports: expertiseReports, isLoading: expertiseLoading } = useExpertiseReports();
   const { quotes, isLoading: quotesLoading } = useQuotes();
@@ -84,12 +92,16 @@ const Documents = () => {
   const { invoices, isLoading: invoicesLoading } = useInvoices();
   const { credits, isLoading: creditsLoading } = useCredits();
 
-  // Compter les documents
+  // Compter les documents et gérer le pluriel
   const expertiseCount = expertiseReports?.length || 0;
   const quotesCount = quotes?.length || 0;
   const repairOrdersCount = repairOrders?.length || 0;
   const invoicesCount = invoices?.length || 0;
   const creditsCount = credits?.length || 0;
+
+  const getDocumentLabel = (count: number) => {
+    return count <= 1 ? 'document' : 'documents';
+  };
 
   // Créer une liste de tous les documents récents
   const allRecentDocuments = React.useMemo(() => {
@@ -101,13 +113,14 @@ const Documents = () => {
         documents.push({
           id: `expertise-${report.id}`,
           icon: <FileText className="h-5 w-5 text-blue-600" />,
-          title: `Rapport d'expertise - ${report.reference || 'Sans référence'}`,
+          title: `Rapport d'expertise`,
           date: `Créé le ${new Date(report.created_at).toLocaleDateString('fr-FR')}`,
           customer: report.clients ? `${report.clients.first_name} ${report.clients.last_name}` : 'Client non spécifié',
           vehicle: report.vehicles ? `${report.vehicles.brand} ${report.vehicles.model} - ${report.vehicles.license_plate}` : 'Véhicule non spécifié',
           status: 'Importé',
           statusColor: 'bg-blue-100 text-blue-800',
-          timestamp: new Date(report.created_at).getTime()
+          timestamp: new Date(report.created_at).getTime(),
+          type: 'expertise'
         });
       });
     }
@@ -118,13 +131,14 @@ const Documents = () => {
         documents.push({
           id: `quote-${quote.id}`,
           icon: <FileText className="h-5 w-5 text-amber-600" />,
-          title: `Devis ${quote.reference}`,
+          title: `Devis`,
           date: `Créé le ${new Date(quote.created_at).toLocaleDateString('fr-FR')}`,
           customer: quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : 'Client non spécifié',
           vehicle: quote.vehicles ? `${quote.vehicles.brand} ${quote.vehicles.model} - ${quote.vehicles.license_plate}` : 'Véhicule non spécifié',
           status: quote.status === 'draft' ? 'En attente' : 'Validé',
           statusColor: quote.status === 'draft' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800',
-          timestamp: new Date(quote.created_at).getTime()
+          timestamp: new Date(quote.created_at).getTime(),
+          type: 'quote'
         });
       });
     }
@@ -135,13 +149,14 @@ const Documents = () => {
         documents.push({
           id: `order-${order.id}`,
           icon: <FileText className="h-5 w-5 text-green-600" />,
-          title: `Ordre de réparation ${order.reference}`,
+          title: `Ordre de réparation`,
           date: `Créé le ${new Date(order.created_at).toLocaleDateString('fr-FR')}`,
           customer: order.clients ? `${order.clients.first_name} ${order.clients.last_name}` : 'Client non spécifié',
           vehicle: order.vehicles ? `${order.vehicles.brand} ${order.vehicles.model} - ${order.vehicles.license_plate}` : 'Véhicule non spécifié',
           status: order.status === 'signed' ? 'Signé' : 'En attente',
           statusColor: order.status === 'signed' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800',
-          timestamp: new Date(order.created_at).getTime()
+          timestamp: new Date(order.created_at).getTime(),
+          type: 'order'
         });
       });
     }
@@ -152,22 +167,59 @@ const Documents = () => {
         documents.push({
           id: `invoice-${invoice.id}`,
           icon: <FileText className="h-5 w-5 text-purple-600" />,
-          title: `Facture ${invoice.reference}`,
+          title: `Facture`,
           date: `Créé le ${new Date(invoice.created_at).toLocaleDateString('fr-FR')}`,
           customer: invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client non spécifié',
           vehicle: 'Véhicule associé',
           status: 'Payé',
           statusColor: 'bg-purple-100 text-purple-800',
-          timestamp: new Date(invoice.created_at).getTime()
+          timestamp: new Date(invoice.created_at).getTime(),
+          type: 'invoice'
         });
       });
     }
 
+    // Ajouter les avoirs
+    if (credits) {
+      credits.slice(0, 2).forEach(credit => {
+        documents.push({
+          id: `credit-${credit.id}`,
+          icon: <FileText className="h-5 w-5 text-red-600" />,
+          title: `Avoir`,
+          date: `Créé le ${new Date(credit.created_at).toLocaleDateString('fr-FR')}`,
+          customer: credit.clients ? `${credit.clients.first_name} ${credit.clients.last_name}` : 'Client non spécifié',
+          vehicle: 'Véhicule associé',
+          status: 'Émis',
+          statusColor: 'bg-red-100 text-red-800',
+          timestamp: new Date(credit.created_at).getTime(),
+          type: 'credit'
+        });
+      });
+    }
+
+    // Filtrer selon le terme de recherche
+    const filtered = documents.filter(doc => 
+      searchTerm === '' || 
+      doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doc.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doc.vehicle.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     // Trier par date (plus récent en premier) et prendre les 4 plus récents
-    return documents
+    return filtered
       .sort((a, b) => b.timestamp - a.timestamp)
       .slice(0, 4);
-  }, [expertiseReports, quotes, repairOrders, invoices]);
+  }, [expertiseReports, quotes, repairOrders, invoices, credits, searchTerm]);
+
+  const handleViewDocument = (documentId: string) => {
+    console.log('Viewing document:', documentId);
+    // Logique pour voir le document
+  };
+
+  const handleEditDocument = (documentId: string) => {
+    console.log('Editing document:', documentId);
+    // Logique pour éditer le document
+  };
 
   const isLoading = expertiseLoading || quotesLoading || ordersLoading || invoicesLoading || creditsLoading;
 
@@ -204,7 +256,7 @@ const Documents = () => {
             </div>
           </div>
           <h3 className="font-bold">Rapports d'expertise</h3>
-          <p className="text-sm text-gray-600 mt-1">{expertiseCount} documents</p>
+          <p className="text-sm text-gray-600 mt-1">{expertiseCount} {getDocumentLabel(expertiseCount)}</p>
           <div className="flex-1"></div>
           <Link to="/documents/expertise" className="mt-3">
             <Button className="w-full" variant="outline">
@@ -220,7 +272,7 @@ const Documents = () => {
             </div>
           </div>
           <h3 className="font-bold">Devis</h3>
-          <p className="text-sm text-gray-600 mt-1">{quotesCount} documents</p>
+          <p className="text-sm text-gray-600 mt-1">{quotesCount} {getDocumentLabel(quotesCount)}</p>
           <div className="flex-1"></div>
           <Link to="/documents/devis" className="mt-3">
             <Button className="w-full" variant="outline">
@@ -236,7 +288,7 @@ const Documents = () => {
             </div>
           </div>
           <h3 className="font-bold">Ordres de réparation</h3>
-          <p className="text-sm text-gray-600 mt-1">{repairOrdersCount} documents</p>
+          <p className="text-sm text-gray-600 mt-1">{repairOrdersCount} {getDocumentLabel(repairOrdersCount)}</p>
           <div className="flex-1"></div>
           <Link to="/documents/ordres" className="mt-3">
             <Button className="w-full" variant="outline">
@@ -252,7 +304,7 @@ const Documents = () => {
             </div>
           </div>
           <h3 className="font-bold">Factures</h3>
-          <p className="text-sm text-gray-600 mt-1">{invoicesCount} documents</p>
+          <p className="text-sm text-gray-600 mt-1">{invoicesCount} {getDocumentLabel(invoicesCount)}</p>
           <div className="flex-1"></div>
           <Link to="/documents/factures" className="mt-3">
             <Button className="w-full" variant="outline">
@@ -268,7 +320,7 @@ const Documents = () => {
             </div>
           </div>
           <h3 className="font-bold">Avoirs</h3>
-          <p className="text-sm text-gray-600 mt-1">{creditsCount} documents</p>
+          <p className="text-sm text-gray-600 mt-1">{creditsCount} {getDocumentLabel(creditsCount)}</p>
           <div className="flex-1"></div>
           <Link to="/documents/avoirs" className="mt-3">
             <Button className="w-full" variant="outline">
@@ -287,6 +339,8 @@ const Documents = () => {
             <input 
               type="text" 
               placeholder="Rechercher un document..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-karrosserie-orange"
             />
           </div>
@@ -299,7 +353,7 @@ const Documents = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button className="btn-primary">
-                <Plus className="h-4 w-4 mr-2" />
+                <FileText className="h-4 w-4 mr-2" />
                 Nouveau
               </Button>
             </DropdownMenuTrigger>
@@ -341,6 +395,8 @@ const Documents = () => {
               vehicle={document.vehicle}
               status={document.status}
               statusColor={document.statusColor}
+              onView={() => handleViewDocument(document.id)}
+              onEdit={() => handleEditDocument(document.id)}
             />
           ))
         ) : (

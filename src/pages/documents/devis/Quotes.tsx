@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,6 +56,14 @@ const Quotes = () => {
         console.error('Error deleting quote:', error);
       }
     }
+  };
+
+  const formatAmount = (amount: number | null | undefined): string => {
+    if (amount === null || amount === undefined) return '-';
+    return amount.toLocaleString('fr-FR', { 
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2 
+    }) + ' €';
   };
 
   const handleDownload = (quote: Quote) => {
@@ -169,7 +176,7 @@ const Quotes = () => {
                       : '-'
                     }
                   </TableCell>
-                  <TableCell>{quote.amount ? `${quote.amount.toFixed(2)} €` : '-'}</TableCell>
+                  <TableCell>{formatAmount(quote.amount)}</TableCell>
                   <TableCell>
                     <StatusBadge status={quote.status || 'En attente'} />
                   </TableCell>
