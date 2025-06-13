@@ -166,15 +166,15 @@ export function ImageCropper({
                 alt="Image à recadrer"
                 onLoad={onImageLoad}
                 style={{
-                  transformOrigin: 'center center',
+                  transformOrigin: 'top left',
                   transition: 'transform 0.3s ease-in-out',
                   width: reactCropDimensions.width,
                   height: 'auto',
                   display: 'block',
-                  position: 'relative',
-                  left: '50%',
-                  top: '50%',
-                  transform: `translate(-50%, -50%) rotate(${rotation}deg)`
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  transform: `rotate(${rotation}deg)`
                 }}
               />
             </ReactCrop>
