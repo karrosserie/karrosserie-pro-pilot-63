@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
@@ -22,9 +21,8 @@ const ExpertiseReports = () => {
   
   const filteredReports = reports?.filter(report => 
     report.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (report.clients?.first_name + ' ' + report.clients?.last_name)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (report.vehicles?.car_brands?.name + ' ' + report.vehicles?.car_models?.name)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    report.expert_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    (report.clients && `${report.clients.first_name} ${report.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (report.vehicles && `${report.vehicles.car_brands?.name || 'Marque inconnue'} ${report.vehicles.car_models?.name || 'Modèle inconnu'} - ${report.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
   ) || [];
   
   const handleViewReport = (report: ExpertiseReport) => {

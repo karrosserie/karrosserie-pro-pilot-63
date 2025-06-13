@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Search, Filter, Eye, Pencil } from 'lucide-react';
@@ -42,6 +41,16 @@ const DocumentItem = ({
   onView: () => void;
   onEdit: () => void;
 }) => {
+  const vehicleDisplay = (vehicle: any) => {
+    if (!vehicle) return 'Aucun véhicule';
+    
+    const brand = vehicle.car_brands?.name || 'Marque inconnue';
+    const model = vehicle.car_models?.name || 'Modèle inconnu';
+    const plate = vehicle.license_plate || 'Plaque inconnue';
+    
+    return `${brand} ${model} - ${plate}`;
+  };
+
   return (
     <div className="flex items-start p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
       <div className="bg-gray-100 p-3 rounded-lg mr-4">
@@ -57,7 +66,7 @@ const DocumentItem = ({
         </div>
         
         <p className="text-sm text-gray-600 mt-1">
-          Client: {customer} | Véhicule: {vehicle}
+          Client: {customer} | Véhicule: {vehicleDisplay(vehicle)}
         </p>
         
         <p className="text-xs text-gray-400 mt-2">{date}</p>

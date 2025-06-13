@@ -33,9 +33,8 @@ const Quotes = () => {
   
   const filteredQuotes = quotes?.filter(quote => 
     quote.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (quote.clients?.first_name + ' ' + quote.clients?.last_name)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (quote.vehicles?.brand + ' ' + quote.vehicles?.model)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    quote.vehicles?.license_plate?.toLowerCase().includes(searchTerm.toLowerCase())
+    (quote.clients && `${quote.clients.first_name} ${quote.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (quote.vehicles && `${quote.vehicles.car_brands?.name || 'Marque inconnue'} ${quote.vehicles.car_models?.name || 'Modèle inconnu'} - ${quote.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
   ) || [];
 
   const handleCreateQuote = () => {
@@ -172,7 +171,7 @@ const Quotes = () => {
                   <TableCell>{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
                   <TableCell>
                     {quote.vehicles 
-                      ? `${quote.vehicles.brand} ${quote.vehicles.model} - ${quote.vehicles.license_plate}` 
+                      ? `${quote.vehicles.car_brands?.name || 'Marque inconnue'} ${quote.vehicles.car_models?.name || 'Modèle inconnu'} - ${quote.vehicles.license_plate}`
                       : '-'
                     }
                   </TableCell>

@@ -10,9 +10,15 @@ export type RepairOrder = Database['public']['Tables']['repair_orders']['Row'] &
   } | null;
   vehicles?: {
     id: string;
-    brand: string;
-    model: string;
     license_plate: string;
+    car_brands?: {
+      id: string;
+      name: string;
+    };
+    car_models?: {
+      id: string;
+      name: string;
+    };
   } | null;
   quotes?: {
     id: string;
@@ -58,11 +64,16 @@ export const repairOrdersService = {
           clientData = client;
         }
 
-        // Try to get vehicle data
+        // Try to get vehicle data with brands and models
         if (order.vehicle_id) {
           const { data: vehicle } = await supabase
             .from('vehicles')
-            .select('id, brand, model, license_plate')
+            .select(`
+              id, 
+              license_plate,
+              car_brands(id, name),
+              car_models(id, name)
+            `)
             .eq('id', order.vehicle_id)
             .single();
           vehicleData = vehicle;
@@ -125,9 +136,9 @@ export const repairOrdersService = {
         .from('vehicles')
         .select(`
           id,
-          brand,
-          model,
           license_plate,
+          car_brands(id, name),
+          car_models(id, name),
           registration_document_front_url,
           registration_document_back_url
         `)
