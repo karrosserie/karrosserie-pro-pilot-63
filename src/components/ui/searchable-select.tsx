@@ -34,9 +34,17 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   console.log('SearchableSelect - value:', value);
   console.log('SearchableSelect - selectedOption:', selectedOption);
 
-  const handleSelect = (selectedValue: string) => {
-    console.log('SearchableSelect - handleSelect called with:', selectedValue);
-    onValueChange(selectedValue);
+  const handleSelect = (currentValue: string) => {
+    console.log('SearchableSelect - handleSelect called with:', currentValue);
+    
+    // Find the option that was selected
+    const selectedOption = options.find(option => option.label.toLowerCase() === currentValue.toLowerCase());
+    
+    if (selectedOption) {
+      console.log('SearchableSelect - Found option:', selectedOption);
+      onValueChange(selectedOption.value);
+    }
+    
     setOpen(false);
   };
 
@@ -64,7 +72,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                 <CommandItem
                   key={option.value}
                   value={option.label}
-                  onSelect={() => handleSelect(option.value)}
+                  onSelect={handleSelect}
                   className="cursor-pointer hover:bg-gray-100"
                 >
                   <Check

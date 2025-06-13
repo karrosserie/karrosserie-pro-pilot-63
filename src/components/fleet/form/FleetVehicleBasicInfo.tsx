@@ -122,7 +122,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
             value={formData.brand_id}
             onValueChange={handleBrandChange}
             placeholder="Sélectionner une marque"
-            disabled={isViewMode}
+            disabled={isViewMode || brandsLoading}
             searchPlaceholder="Rechercher une marque..."
           />
         </div>
