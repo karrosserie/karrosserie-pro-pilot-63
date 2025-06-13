@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -9,6 +10,14 @@ export type FleetVehicle = Database['public']['Tables']['fleet_vehicles']['Row']
   registration_front_url?: string;
   registration_back_url?: string;
   insurance_card_url?: string;
+  car_brands?: {
+    id: string;
+    name: string;
+  };
+  car_models?: {
+    id: string;
+    name: string;
+  };
 };
 
 export type NewFleetVehicle = Database['public']['Tables']['fleet_vehicles']['Insert'] & {
@@ -35,8 +44,12 @@ export const fleetVehiclesService = {
   getAll: async () => {
     const { data, error } = await supabase
       .from('fleet_vehicles')
-      .select('*')
-      .order('brand');
+      .select(`
+        *,
+        car_brands(id, name),
+        car_models(id, name)
+      `)
+      .order('created_at', { ascending: false });
 
     if (error) {
       console.error('Error fetching fleet vehicles:', error);
@@ -49,7 +62,11 @@ export const fleetVehiclesService = {
   getById: async (id: string) => {
     const { data, error } = await supabase
       .from('fleet_vehicles')
-      .select('*')
+      .select(`
+        *,
+        car_brands(id, name),
+        car_models(id, name)
+      `)
       .eq('id', id)
       .single();
       
@@ -65,7 +82,11 @@ export const fleetVehiclesService = {
     const { data, error } = await supabase
       .from('fleet_vehicles')
       .insert([vehicle])
-      .select()
+      .select(`
+        *,
+        car_brands(id, name),
+        car_models(id, name)
+      `)
       .single();
       
     if (error) {
@@ -81,7 +102,11 @@ export const fleetVehiclesService = {
       .from('fleet_vehicles')
       .update(vehicle)
       .eq('id', id)
-      .select()
+      .select(`
+        *,
+        car_brands(id, name),
+        car_models(id, name)
+      `)
       .single();
       
     if (error) {

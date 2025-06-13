@@ -26,8 +26,8 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
   onLendVehicle
 }) => {
   const filteredVehicles = vehicles?.filter(vehicle =>
-    vehicle.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vehicle.car_brands?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vehicle.car_models?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     vehicle.license_plate?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
@@ -76,7 +76,9 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
               {filteredVehicles.length > 0 ? (
                 filteredVehicles.map((vehicle) => (
                   <tr key={vehicle.id} className="bg-white border-b hover:bg-gray-50">
-                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{vehicle.brand} {vehicle.model}</td>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                      {vehicle.car_brands?.name} {vehicle.car_models?.name}
+                    </td>
                     <td className="px-6 py-4">{vehicle.license_plate}</td>
                     <td className="px-6 py-4">{vehicle.year || '-'}</td>
                     <td className="px-6 py-4">

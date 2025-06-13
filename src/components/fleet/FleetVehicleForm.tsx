@@ -62,11 +62,12 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
   const handleBrandSelectChange = (brandId: string) => {
     const updatedFormData = handleBrandChange(brandId, formData);
     setFormData(updatedFormData);
+    // Reset model when brand changes
+    setFormData(prev => ({ ...prev, model_id: '' }));
   };
 
-  const handleModelSelectChange = (modelName: string) => {
-    const updatedFormData = handleModelChange(modelName, formData);
-    setFormData(updatedFormData);
+  const handleModelSelectChange = (modelId: string) => {
+    setFormData(prev => ({ ...prev, model_id: modelId }));
   };
 
   const handleRegistrationFrontUpload = (url: string) => {
@@ -82,7 +83,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
   };
 
   const isFormValid = () => {
-    const basicInfoValid = formData.vin && formData.brand && formData.model && formData.license_plate;
+    const basicInfoValid = formData.vin && formData.brand_id && formData.model_id && formData.license_plate;
     const documentsValid = documentsData.registrationFrontUrl && 
                           documentsData.registrationBackUrl && 
                           documentsData.insuranceCardUrl;
@@ -117,8 +118,8 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
       const submissionData = {
         vin: formData.vin,
         engine_number: formData.engine_number,
-        brand: formData.brand,
-        model: formData.model,
+        brand_id: formData.brand_id,
+        model_id: formData.model_id,
         year: formData.year,
         license_plate: formData.license_plate,
         color: formData.color,
@@ -159,11 +160,10 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
               formData={{
                 vin: formData.vin,
                 engine_number: formData.engine_number,
-                brand: formData.brand,
-                model: formData.model,
+                brand_id: formData.brand_id,
+                model_id: formData.model_id,
                 status: formData.status
               }}
-              selectedBrandId={selectedBrandId}
               isViewMode={isViewMode}
               onInputChange={handleVinInputChange}
               onBrandChange={handleBrandSelectChange}

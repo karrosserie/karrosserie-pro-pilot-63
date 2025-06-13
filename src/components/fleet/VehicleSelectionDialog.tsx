@@ -28,8 +28,8 @@ const VehicleSelectionDialog: React.FC<VehicleSelectionDialogProps> = ({
   // Filter only available vehicles
   const availableVehicles = vehicles.filter(vehicle => 
     vehicle.status === 'Disponible' && 
-    (vehicle.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     vehicle.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (vehicle.car_brands?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     vehicle.car_models?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
      vehicle.license_plate?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
@@ -68,7 +68,7 @@ const VehicleSelectionDialog: React.FC<VehicleSelectionDialogProps> = ({
                     <Car className="h-5 w-5 text-gray-600" />
                     <div>
                       <p className="font-medium text-gray-900">
-                        {vehicle.brand} {vehicle.model}
+                        {vehicle.car_brands?.name} {vehicle.car_models?.name}
                       </p>
                       <p className="text-sm text-gray-600">
                         {vehicle.license_plate} • {vehicle.year || 'N/A'}

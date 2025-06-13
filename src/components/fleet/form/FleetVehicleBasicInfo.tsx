@@ -12,21 +12,19 @@ interface FleetVehicleBasicInfoProps {
   formData: {
     vin: string;
     engine_number: string;
-    brand: string;
-    model: string;
+    brand_id: string;
+    model_id: string;
     status: string;
   };
-  selectedBrandId: string;
   isViewMode: boolean;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBrandChange: (brandId: string) => void;
-  onModelChange: (modelName: string) => void;
+  onModelChange: (modelId: string) => void;
   onSelectChange: (name: string, value: string) => void;
 }
 
 const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
   formData,
-  selectedBrandId,
   isViewMode,
   onInputChange,
   onBrandChange,
@@ -34,7 +32,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
   onSelectChange
 }) => {
   const { carBrands } = useCarBrands();
-  const { carModels } = useCarModels(selectedBrandId);
+  const { carModels } = useCarModels(formData.brand_id);
 
   const brandOptions = carBrands.map(brand => ({
     value: brand.id,
@@ -42,7 +40,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
   }));
 
   const modelOptions = carModels.map(model => ({
-    value: model.name,
+    value: model.id,
     label: model.name
   }));
 
@@ -94,10 +92,10 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
       {/* Brand, Model and Status */}
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <Label htmlFor="brand" required>Marque</Label>
+          <Label htmlFor="brand_id" required>Marque</Label>
           <SearchableSelect
             options={brandOptions}
-            value={selectedBrandId}
+            value={formData.brand_id}
             onValueChange={onBrandChange}
             placeholder="Sélectionner une marque"
             disabled={isViewMode}
@@ -105,13 +103,13 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
           />
         </div>
         <div>
-          <Label htmlFor="model" required>Modèle</Label>
+          <Label htmlFor="model_id" required>Modèle</Label>
           <SearchableSelect
             options={modelOptions}
-            value={formData.model}
+            value={formData.model_id}
             onValueChange={onModelChange}
             placeholder="Sélectionner un modèle"
-            disabled={isViewMode || !selectedBrandId}
+            disabled={isViewMode || !formData.brand_id}
             searchPlaceholder="Rechercher un modèle..."
           />
         </div>

@@ -5,8 +5,8 @@ import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 export interface FleetVehicleFormData {
   vin: string;
   engine_number: string;
-  brand: string;
-  model: string;
+  brand_id: string;
+  model_id: string;
   year: number;
   license_plate: string;
   color: string;
@@ -17,8 +17,8 @@ export function useFleetVehicleForm(vehicle?: FleetVehicle | null) {
   const [formData, setFormData] = useState<FleetVehicleFormData>({
     vin: '',
     engine_number: '',
-    brand: '',
-    model: '',
+    brand_id: '',
+    model_id: '',
     year: new Date().getFullYear(),
     license_plate: '',
     color: '',
@@ -30,8 +30,8 @@ export function useFleetVehicleForm(vehicle?: FleetVehicle | null) {
       setFormData({
         vin: vehicle.vin || '',
         engine_number: vehicle.engine_number || '',
-        brand: vehicle.brand || '',
-        model: vehicle.model || '',
+        brand_id: vehicle.brand_id || '',
+        model_id: vehicle.model_id || '',
         year: vehicle.year || new Date().getFullYear(),
         license_plate: vehicle.license_plate || '',
         color: vehicle.color || '',
