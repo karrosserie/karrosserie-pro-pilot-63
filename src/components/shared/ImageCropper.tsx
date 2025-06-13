@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -59,7 +58,7 @@ export function ImageCropper({
     };
   };
 
-  // Calculer la position pour centrer l'image dans le conteneur ReactCrop
+  // Calculer la position pour aligner l'image pivotée avec les bords du conteneur
   const calculateImagePosition = (naturalWidth: number, naturalHeight: number, rotation: number, scale: number, containerWidth: number, containerHeight: number) => {
     if (rotation === 0) {
       return { left: 0, top: 0 };
@@ -71,13 +70,31 @@ export function ImageCropper({
     const scaledWidth = naturalWidth * scale;
     const scaledHeight = naturalHeight * scale;
     
+    // Les 4 coins de l'image avant rotation (par rapport au centre de l'image)
+    const corners = [
+      { x: -scaledWidth / 2, y: -scaledHeight / 2 }, // coin supérieur gauche
+      { x: scaledWidth / 2, y: -scaledHeight / 2 },  // coin supérieur droit
+      { x: scaledWidth / 2, y: scaledHeight / 2 },   // coin inférieur droit
+      { x: -scaledWidth / 2, y: scaledHeight / 2 }   // coin inférieur gauche
+    ];
+    
+    // Appliquer la rotation aux coins
+    const rotatedCorners = corners.map(corner => ({
+      x: corner.x * Math.cos(rotRad) - corner.y * Math.sin(rotRad),
+      y: corner.x * Math.sin(rotRad) + corner.y * Math.cos(rotRad)
+    }));
+    
+    // Trouver les limites de la bounding box après rotation
+    const minX = Math.min(...rotatedCorners.map(c => c.x));
+    const minY = Math.min(...rotatedCorners.map(c => c.y));
+    
     // Centre du conteneur
     const containerCenterX = containerWidth / 2;
     const containerCenterY = containerHeight / 2;
     
-    // Position pour centrer l'image dans le conteneur
-    const left = containerCenterX - scaledWidth / 2;
-    const top = containerCenterY - scaledHeight / 2;
+    // Position de l'image pour que sa bounding box après rotation soit alignée avec le conteneur
+    const left = containerCenterX - minX;
+    const top = containerCenterY - minY;
     
     return { left, top };
   };
