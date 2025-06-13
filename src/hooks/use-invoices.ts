@@ -1,6 +1,7 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { invoicesService } from '@/services/supabase/invoices';
 
 export function useInvoices() {
   const queryClient = useQueryClient();
@@ -13,52 +14,13 @@ export function useInvoices() {
   } = useQuery({
     queryKey: ['invoices'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('invoices')
-        .select(`
-          *,
-          clients(id, first_name, last_name),
-          vehicles(
-            id,
-            license_plate,
-            car_brands(id, name),
-            car_models(id, name)
-          )
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching invoices:', error);
-        throw new Error(error.message);
-      }
-
-      return data;
+      return await invoicesService.getAll();
     }
   });
 
   const createInvoice = useMutation({
     mutationFn: async (invoiceData: any) => {
-      const { data, error } = await supabase
-        .from('invoices')
-        .insert([invoiceData])
-        .select(`
-          *,
-          clients(first_name, last_name),
-          vehicles(
-            id,
-            license_plate,
-            car_brands(id, name),
-            car_models(id, name)
-          )
-        `)
-        .single();
-
-      if (error) {
-        console.error('Error creating invoice:', error);
-        throw new Error(error.message);
-      }
-
-      return data;
+      return await invoicesService.create(invoiceData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
@@ -78,28 +40,7 @@ export function useInvoices() {
 
   const updateInvoice = useMutation({
     mutationFn: async ({ id, data }: { id: string, data: any }) => {
-      const { data: result, error } = await supabase
-        .from('invoices')
-        .update(data)
-        .eq('id', id)
-        .select(`
-          *,
-          clients(first_name, last_name),
-          vehicles(
-            id,
-            license_plate,
-            car_brands(id, name),
-            car_models(id, name)
-          )
-        `)
-        .single();
-
-      if (error) {
-        console.error('Error updating invoice:', error);
-        throw new Error(error.message);
-      }
-
-      return result;
+      return await invoicesService.update(id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
@@ -119,17 +60,7 @@ export function useInvoices() {
 
   const deleteInvoice = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('invoices')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error('Error deleting invoice:', error);
-        throw new Error(error.message);
-      }
-
-      return true;
+      return await invoicesService.delete(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
