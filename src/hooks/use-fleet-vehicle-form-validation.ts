@@ -18,7 +18,7 @@ interface ValidationData {
 export function useFleetVehicleFormValidation() {
   const { toast } = useToast();
 
-  const isFormValid = (data: ValidationData) => {
+  const isFormValid = (data: ValidationData): boolean => {
     const basicInfoValid = data.formData.vin && 
                           data.formData.brand_id && 
                           data.formData.model_id && 
@@ -27,7 +27,7 @@ export function useFleetVehicleFormValidation() {
                           data.documentsData.registrationBackUrl && 
                           data.documentsData.insuranceCardUrl;
     
-    return basicInfoValid && documentsValid;
+    return !!(basicInfoValid && documentsValid);
   };
 
   const showValidationError = () => {

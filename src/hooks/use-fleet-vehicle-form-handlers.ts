@@ -3,6 +3,20 @@ import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { useAuth } from '@/contexts/AuthContext';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 
+interface ValidationData {
+  formData: {
+    vin: string;
+    brand_id: string;
+    model_id: string;
+    license_plate: string;
+  };
+  documentsData: {
+    registrationFrontUrl: string;
+    registrationBackUrl: string;
+    insuranceCardUrl: string;
+  };
+}
+
 interface FormHandlersProps {
   formData: any;
   setFormData: (data: any) => void;
@@ -10,7 +24,7 @@ interface FormHandlersProps {
   vehicle?: FleetVehicle | null;
   mode: 'create' | 'edit' | 'view';
   onSuccess: () => void;
-  isFormValid: (data: any) => boolean;
+  isFormValid: (data: ValidationData) => boolean;
   showValidationError: () => void;
 }
 
@@ -49,7 +63,7 @@ export function useFleetVehicleFormHandlers({
       return;
     }
 
-    const validationData = { formData, documentsData };
+    const validationData: ValidationData = { formData, documentsData };
     if (!isFormValid(validationData)) {
       showValidationError();
       return;
