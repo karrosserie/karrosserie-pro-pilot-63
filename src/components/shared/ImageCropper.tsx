@@ -166,7 +166,6 @@ export function ImageCropper({
                 alt="Image à recadrer"
                 onLoad={onImageLoad}
                 style={{
-                  transform: `rotate(${rotation}deg)`,
                   transformOrigin: 'center center',
                   transition: 'transform 0.3s ease-in-out',
                   width: reactCropDimensions.width,
