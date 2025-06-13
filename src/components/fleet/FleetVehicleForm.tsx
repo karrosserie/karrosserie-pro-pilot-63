@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -6,11 +5,12 @@ import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFleetVehicleForm } from '@/hooks/use-fleet-vehicle-form';
-import { useVinDecoder } from '@/hooks/use-vin-decoder';
 import FleetVehicleBasicInfo from './form/FleetVehicleBasicInfo';
 import FleetVehicleDetails from './form/FleetVehicleDetails';
 import DocumentsTab from './form/DocumentsTab';
 import { useToast } from '@/hooks/use-toast';
+import { isValidVin, decodeVin } from '@/services/vin-decoder';
+import { useCarBrands } from '@/hooks/use-car-brands';
 
 interface FleetVehicleFormProps {
   vehicle?: FleetVehicle | null;
@@ -28,19 +28,12 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
   const { createVehicle, updateVehicle } = useFleetVehicles();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { carBrands } = useCarBrands();
   const isViewMode = mode === 'view';
   const [activeTab, setActiveTab] = useState('vehicle-info');
 
   const { formData, setFormData, handleInputChange, handleSelectChange } = useFleetVehicleForm(vehicle);
   
-  const {
-    selectedBrandId,
-    carModels,
-    handleVinChange,
-    handleBrandChange,
-    handleModelChange
-  } = useVinDecoder(formData, setFormData);
-
   const [documentsData, setDocumentsData] = useState({
     registrationFrontUrl: vehicle?.registration_front_url || '',
     registrationBackUrl: vehicle?.registration_back_url || '',
@@ -51,22 +44,45 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
     const { name, value } = e.target;
     
     if (name === 'vin') {
-      const updatedFormData = handleVinChange(value, formData);
-      console.log(updatedFormData);
-      setFormData(updatedFormData);
+      const upperValue = value.toUpperCase();
+      setFormData(prev => ({ ...prev, vin: upperValue }));
+      
+      // Auto-decode VIN if valid
+      if (isValidVin(upperValue)) {
+        const vinInfo = decodeVin(upperValue);
+        console.log('VIN décodé:', vinInfo);
+        
+        if (vinInfo.brand && carBrands.length > 0) {
+          const matchingBrand = carBrands.find(brand => 
+            brand.name.toLowerCase() === vinInfo.brand?.toLowerCase()
+          );
+          
+          if (matchingBrand) {
+            console.log('Marque détectée par VIN:', matchingBrand.name);
+            setFormData(prev => ({
+              ...prev,
+              brand_id: matchingBrand.id,
+              year: vinInfo.year || prev.year
+            }));
+          }
+        }
+      }
     } else {
       handleInputChange(e);
     }
   };
 
   const handleBrandSelectChange = (brandId: string) => {
-    const updatedFormData = handleBrandChange(brandId, formData);
-    setFormData(updatedFormData);
-    // Reset model when brand changes
-    setFormData(prev => ({ ...prev, model_id: '' }));
+    console.log('Manual brand selection:', brandId);
+    setFormData(prev => ({ 
+      ...prev, 
+      brand_id: brandId,
+      model_id: '' // Reset model when brand changes
+    }));
   };
 
   const handleModelSelectChange = (modelId: string) => {
+    console.log('Manual model selection:', modelId);
     setFormData(prev => ({ ...prev, model_id: modelId }));
   };
 
@@ -125,11 +141,10 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
         registration_front_url: documentsData.registrationFrontUrl,
         registration_back_url: documentsData.registrationBackUrl,
         insurance_card_url: documentsData.insuranceCardUrl,
-        // Include both new and old fields for compatibility
         brand_id: formData.brand_id,
         model_id: formData.model_id,
-        brand: '', // Will be populated by triggers if using old structure
-        model: '' // Will be populated by triggers if using old structure
+        brand: '',
+        model: ''
       };
 
       if (mode === 'edit' && vehicle) {

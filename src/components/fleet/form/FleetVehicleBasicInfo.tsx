@@ -38,8 +38,6 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
   console.log('  - carBrands count:', carBrands?.length || 0);
   console.log('  - formData.brand_id:', formData.brand_id);
   console.log('  - carModels count:', carModels?.length || 0);
-  console.log('  - onBrandChange type:', typeof onBrandChange);
-  console.log('  - onModelChange type:', typeof onModelChange);
 
   // Prepare brand options
   const brandOptions = carBrands?.map(brand => ({
@@ -58,14 +56,12 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
   console.log('  - modelOptions:', modelOptions);
 
   const handleBrandChange = (brandId: string) => {
-    console.log('FleetVehicleBasicInfo - handleBrandChange called with:', brandId);
-    console.log('FleetVehicleBasicInfo - Calling onBrandChange...');
+    console.log('FleetVehicleBasicInfo - Manual brand selection:', brandId);
     onBrandChange(brandId);
   };
 
   const handleModelChange = (modelId: string) => {
-    console.log('FleetVehicleBasicInfo - handleModelChange called with:', modelId);
-    console.log('FleetVehicleBasicInfo - Calling onModelChange...');
+    console.log('FleetVehicleBasicInfo - Manual model selection:', modelId);
     onModelChange(modelId);
   };
 
