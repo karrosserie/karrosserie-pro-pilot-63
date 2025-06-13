@@ -63,6 +63,7 @@ const Accounting = () => {
         selectedFilter={selectedFilter}
         setSelectedFilter={setSelectedFilter}
         filteredTransactions={filteredTransactions}
+        allTransactions={transactions}
       />
     </div>
   );

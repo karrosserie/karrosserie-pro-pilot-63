@@ -4,25 +4,34 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Filter, Calendar } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Transaction } from '@/hooks/use-accounting-data';
 
 interface TransactionFiltersProps {
   searchTerm: string;
   setSearchTerm: (value: string) => void;
   selectedFilter: 'all' | 'receipts' | 'expenses' | 'unpaid';
   setSelectedFilter: (filter: 'all' | 'receipts' | 'expenses' | 'unpaid') => void;
+  transactions: Transaction[];
 }
 
 export const TransactionFilters = ({ 
   searchTerm, 
   setSearchTerm, 
   selectedFilter, 
-  setSelectedFilter 
+  setSelectedFilter,
+  transactions 
 }: TransactionFiltersProps) => {
+  // Calculer les vrais nombres à partir des données
+  const allCount = transactions.length;
+  const receiptsCount = transactions.filter(t => t.type === 'Encaissement').length;
+  const expensesCount = transactions.filter(t => t.type === 'Dépense').length;
+  const unpaidCount = transactions.filter(t => t.status === 'En attente').length;
+
   const filters = [
-    { value: 'all', label: 'Tous', count: 45 },
-    { value: 'receipts', label: 'Encaissements', count: 28 },
-    { value: 'expenses', label: 'Dépenses', count: 17 },
-    { value: 'unpaid', label: 'Impayés', count: 3 }
+    { value: 'all', label: 'Tous', count: allCount },
+    { value: 'receipts', label: 'Encaissements', count: receiptsCount },
+    { value: 'expenses', label: 'Dépenses', count: expensesCount },
+    { value: 'unpaid', label: 'Impayés', count: unpaidCount }
   ] as const;
 
   return (

@@ -13,6 +13,7 @@ interface AccountingTabsProps {
   selectedFilter: 'all' | 'receipts' | 'expenses' | 'unpaid';
   setSelectedFilter: (filter: 'all' | 'receipts' | 'expenses' | 'unpaid') => void;
   filteredTransactions: Transaction[];
+  allTransactions: Transaction[];
 }
 
 export const AccountingTabs = ({
@@ -20,7 +21,8 @@ export const AccountingTabs = ({
   setSearchTerm,
   selectedFilter,
   setSelectedFilter,
-  filteredTransactions
+  filteredTransactions,
+  allTransactions
 }: AccountingTabsProps) => {
   return (
     <Tabs defaultValue="transactions" className="w-full">
@@ -42,6 +44,7 @@ export const AccountingTabs = ({
           setSearchTerm={setSearchTerm}
           selectedFilter={selectedFilter}
           setSelectedFilter={setSelectedFilter}
+          transactions={allTransactions}
         />
         <TransactionTable transactions={filteredTransactions} />
       </TabsContent>
