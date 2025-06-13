@@ -74,8 +74,18 @@ export const fleetVehiclesService = {
         .select('*')
         .order('created_at', { ascending: false });
       
-      data = result.data;
-      error = result.error;
+      if (result.error) {
+        console.error('Error fetching fleet vehicles:', result.error);
+        throw new Error(result.error.message);
+      }
+      
+      // Add missing relation properties to match FleetVehicle type
+      data = result.data?.map(vehicle => ({
+        ...vehicle,
+        car_brands: null,
+        car_models: null
+      })) || [];
+      error = null;
     }
 
     if (error) {
@@ -107,8 +117,18 @@ export const fleetVehiclesService = {
         .eq('id', id)
         .single();
       
-      data = result.data;
-      error = result.error;
+      if (result.error) {
+        console.error(`Error fetching fleet vehicle with id ${id}:`, result.error);
+        throw new Error(result.error.message);
+      }
+      
+      // Add missing relation properties to match FleetVehicle type
+      data = {
+        ...result.data,
+        car_brands: null,
+        car_models: null
+      };
+      error = null;
     }
       
     if (error) {
@@ -140,8 +160,18 @@ export const fleetVehiclesService = {
         .select('*')
         .single();
       
-      data = result.data;
-      error = result.error;
+      if (result.error) {
+        console.error('Error creating fleet vehicle:', result.error);
+        throw new Error(result.error.message);
+      }
+      
+      // Add missing relation properties to match FleetVehicle type
+      data = {
+        ...result.data,
+        car_brands: null,
+        car_models: null
+      };
+      error = null;
     }
       
     if (error) {
@@ -175,8 +205,18 @@ export const fleetVehiclesService = {
         .select('*')
         .single();
       
-      data = result.data;
-      error = result.error;
+      if (result.error) {
+        console.error(`Error updating fleet vehicle with id ${id}:`, result.error);
+        throw new Error(result.error.message);
+      }
+      
+      // Add missing relation properties to match FleetVehicle type
+      data = {
+        ...result.data,
+        car_brands: null,
+        car_models: null
+      };
+      error = null;
     }
       
     if (error) {
