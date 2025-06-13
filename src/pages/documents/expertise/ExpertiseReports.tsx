@@ -25,12 +25,13 @@ const ExpertiseReports = () => {
     
     // Safe vehicle search with proper null checking
     let vehicleMatch = false;
-    if (report.vehicles && 
-        typeof report.vehicles === 'object' && 
-        'car_brands' in report.vehicles && 
-        'car_models' in report.vehicles && 
-        'license_plate' in report.vehicles) {
-      const vehicleString = `${report.vehicles.car_brands?.name || 'Marque inconnue'} ${report.vehicles.car_models?.name || 'Modèle inconnu'} - ${report.vehicles.license_plate || ''}`;
+    const vehicle = report.vehicles;
+    if (vehicle && 
+        typeof vehicle === 'object' && 
+        'car_brands' in vehicle && 
+        'car_models' in vehicle && 
+        'license_plate' in vehicle) {
+      const vehicleString = `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate || ''}`;
       vehicleMatch = vehicleString.toLowerCase().includes(searchTerm.toLowerCase());
     }
     
