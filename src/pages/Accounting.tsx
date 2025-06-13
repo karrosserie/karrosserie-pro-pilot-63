@@ -1,7 +1,9 @@
 
 import React, { useState } from 'react';
 import StatsCards from '@/components/accounting/StatsCards';
-import AccountingTabs from '@/components/accounting/AccountingTabs';
+import TransactionFilters from '@/components/accounting/TransactionFilters';
+import TransactionTable from '@/components/accounting/TransactionTable';
+import ReportContent from '@/components/accounting/ReportContent';
 import { useAccountingData } from '@/hooks/use-accounting-data';
 
 const Accounting = () => {
@@ -51,13 +53,23 @@ const Accounting = () => {
       
       <StatsCards cards={statsCards} />
       
-      <AccountingTabs 
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        filteredTransactions={filteredTransactions}
-        selectedFilter={selectedFilter}
-        setSelectedFilter={setSelectedFilter}
-      />
+      {/* Section Transactions */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Transactions</h2>
+        <TransactionFilters
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          selectedFilter={selectedFilter}
+          setSelectedFilter={setSelectedFilter}
+        />
+        <TransactionTable transactions={filteredTransactions} />
+      </div>
+      
+      {/* Section Rapports */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Rapports</h2>
+        <ReportContent />
+      </div>
     </div>
   );
 };
