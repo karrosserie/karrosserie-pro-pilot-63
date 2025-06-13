@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
@@ -26,7 +27,8 @@ const ExpertiseReports = () => {
     // Safe vehicle search with proper null checking
     let vehicleMatch = false;
     const vehicle = report.vehicles;
-    if (vehicle && 
+    if (vehicle !== null && 
+        vehicle !== undefined &&
         typeof vehicle === 'object' && 
         'car_brands' in vehicle && 
         'car_models' in vehicle && 
