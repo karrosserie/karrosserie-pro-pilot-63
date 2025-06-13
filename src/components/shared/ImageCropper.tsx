@@ -28,25 +28,33 @@ export function ImageCropper({
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [isLoading, setIsLoading] = useState(false);
-  const [containerHeight, setContainerHeight] = useState(600);
+  const [reactCropDimensions, setReactCropDimensions] = useState({ width: 800, height: 600 });
   const imageRef = useRef<HTMLImageElement>(null);
   const { rotation, rotateImage, resetRotation } = useImageRotation();
 
-  // Largeur fixe du conteneur (largeur maximale de la fenêtre)
-  const containerWidth = 800;
+  // Largeur fixe maximale pour le conteneur ReactCrop
+  const maxContainerWidth = 800;
 
-  // Calculer les dimensions de l'image après rotation
-  const calculateRotatedDimensions = (naturalWidth: number, naturalHeight: number, rotation: number) => {
+  // Calculer les dimensions du conteneur ReactCrop après rotation
+  const calculateReactCropDimensions = (naturalWidth: number, naturalHeight: number, rotation: number) => {
     const rotRad = Math.abs((rotation * Math.PI) / 180);
+    
+    // Dimensions de l'image après rotation
     const rotatedWidth = Math.abs(Math.cos(rotRad) * naturalWidth) + Math.abs(Math.sin(rotRad) * naturalHeight);
     const rotatedHeight = Math.abs(Math.sin(rotRad) * naturalWidth) + Math.abs(Math.cos(rotRad) * naturalHeight);
     
-    // L'image occupe toujours toute la largeur du conteneur
+    // Le conteneur ReactCrop occupe toujours la largeur maximale
+    const containerWidth = maxContainerWidth;
+    
+    // Calculer l'échelle pour que l'image remplisse la largeur du conteneur
     const scale = containerWidth / rotatedWidth;
+    
+    // La hauteur du conteneur s'adapte à la hauteur de l'image redimensionnée
+    const containerHeight = rotatedHeight * scale;
     
     return {
       width: containerWidth,
-      height: rotatedHeight * scale,
+      height: containerHeight,
       scale
     };
   };
@@ -54,10 +62,8 @@ export function ImageCropper({
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { naturalWidth, naturalHeight } = e.currentTarget;
     
-    const dimensions = calculateRotatedDimensions(naturalWidth, naturalHeight, rotation);
-    
-    // Adapter la hauteur du conteneur à l'image
-    setContainerHeight(dimensions.height);
+    const dimensions = calculateReactCropDimensions(naturalWidth, naturalHeight, rotation);
+    setReactCropDimensions({ width: dimensions.width, height: dimensions.height });
     
     // Initialiser avec un recadrage libre couvrant 90% de l'image
     const crop: Crop = {
@@ -101,11 +107,11 @@ export function ImageCropper({
   const handleRotate = (degrees: number) => {
     rotateImage(degrees);
     
-    // Recalculer les dimensions du conteneur après rotation
+    // Recalculer les dimensions du conteneur ReactCrop après rotation
     if (imageRef.current) {
       const { naturalWidth, naturalHeight } = imageRef.current;
-      const dimensions = calculateRotatedDimensions(naturalWidth, naturalHeight, rotation + degrees);
-      setContainerHeight(dimensions.height);
+      const dimensions = calculateReactCropDimensions(naturalWidth, naturalHeight, rotation + degrees);
+      setReactCropDimensions({ width: dimensions.width, height: dimensions.height });
     }
   };
 
@@ -145,36 +151,29 @@ export function ImageCropper({
               width: '100%'
             }}
           >
-            <div 
+            <ReactCrop
+              crop={crop}
+              onChange={(c) => setCrop(c)}
+              onComplete={(c) => setCompletedCrop(c)}
               style={{ 
-                width: containerWidth,
-                height: containerHeight,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
+                width: reactCropDimensions.width,
+                height: reactCropDimensions.height 
               }}
             >
-              <ReactCrop
-                crop={crop}
-                onChange={(c) => setCrop(c)}
-                onComplete={(c) => setCompletedCrop(c)}
-                className="max-w-full max-h-full"
-              >
-                <img
-                  ref={imageRef}
-                  src={imageUrl}
-                  alt="Image à recadrer"
-                  onLoad={onImageLoad}
-                  style={{
-                    transform: `rotate(${rotation}deg)`,
-                    transition: 'transform 0.3s ease-in-out',
-                    width: containerWidth,
-                    height: 'auto',
-                    display: 'block'
-                  }}
-                />
-              </ReactCrop>
-            </div>
+              <img
+                ref={imageRef}
+                src={imageUrl}
+                alt="Image à recadrer"
+                onLoad={onImageLoad}
+                style={{
+                  transform: `rotate(${rotation}deg)`,
+                  transition: 'transform 0.3s ease-in-out',
+                  width: reactCropDimensions.width,
+                  height: 'auto',
+                  display: 'block'
+                }}
+              />
+            </ReactCrop>
           </div>
         </div>
         
