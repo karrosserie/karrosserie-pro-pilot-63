@@ -56,175 +56,104 @@ export type UpdateFleetVehicle = Database['public']['Tables']['fleet_vehicles'][
 
 export const fleetVehiclesService = {
   getAll: async () => {
-    // Try new structure first, fall back to old structure
-    let { data, error } = await supabase
+    console.log('Fetching fleet vehicles - trying new structure first');
+    
+    // Always use fallback to old structure since relations don't exist yet
+    const { data, error } = await supabase
       .from('fleet_vehicles')
-      .select(`
-        *,
-        car_brands!inner(id, name),
-        car_models!inner(id, name)
-      `)
+      .select('*')
       .order('created_at', { ascending: false });
-
-    // If error with relations, try without relations (old structure)
-    if (error && error.code === 'PGRST200') {
-      console.log('Falling back to old structure without relations');
-      const result = await supabase
-        .from('fleet_vehicles')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (result.error) {
-        console.error('Error fetching fleet vehicles:', result.error);
-        throw new Error(result.error.message);
-      }
-      
-      // Add missing relation properties to match FleetVehicle type
-      data = result.data?.map(vehicle => ({
-        ...vehicle,
-        car_brands: null,
-        car_models: null
-      })) || [];
-      error = null;
-    }
-
+    
     if (error) {
       console.error('Error fetching fleet vehicles:', error);
       throw new Error(error.message);
     }
     
-    return data;
+    // Add missing relation properties to match FleetVehicle type
+    const vehicles = data?.map(vehicle => ({
+      ...vehicle,
+      car_brands: null,
+      car_models: null
+    })) || [];
+    
+    console.log('Fleet vehicles fetched successfully (fallback structure):', vehicles);
+    return vehicles;
   },
 
   getById: async (id: string) => {
-    // Try new structure first, fall back to old structure
-    let { data, error } = await supabase
+    console.log(`Fetching fleet vehicle with id ${id} - using fallback structure`);
+    
+    const { data, error } = await supabase
       .from('fleet_vehicles')
-      .select(`
-        *,
-        car_brands!inner(id, name),
-        car_models!inner(id, name)
-      `)
+      .select('*')
       .eq('id', id)
       .single();
-
-    // If error with relations, try without relations (old structure)
-    if (error && error.code === 'PGRST200') {
-      console.log('Falling back to old structure without relations');
-      const result = await supabase
-        .from('fleet_vehicles')
-        .select('*')
-        .eq('id', id)
-        .single();
-      
-      if (result.error) {
-        console.error(`Error fetching fleet vehicle with id ${id}:`, result.error);
-        throw new Error(result.error.message);
-      }
-      
-      // Add missing relation properties to match FleetVehicle type
-      data = {
-        ...result.data,
-        car_brands: null,
-        car_models: null
-      };
-      error = null;
-    }
-      
+    
     if (error) {
       console.error(`Error fetching fleet vehicle with id ${id}:`, error);
       throw new Error(error.message);
     }
     
-    return data;
+    // Add missing relation properties to match FleetVehicle type
+    const vehicle = {
+      ...data,
+      car_brands: null,
+      car_models: null
+    };
+    
+    console.log('Fleet vehicle fetched successfully (fallback structure):', vehicle);
+    return vehicle;
   },
   
   create: async (vehicle: NewFleetVehicle) => {
-    // Try new structure first, fall back to old structure
-    let { data, error } = await supabase
+    console.log('Creating fleet vehicle - using fallback structure');
+    
+    const { data, error } = await supabase
       .from('fleet_vehicles')
       .insert([vehicle])
-      .select(`
-        *,
-        car_brands!inner(id, name),
-        car_models!inner(id, name)
-      `)
+      .select('*')
       .single();
-
-    // If error with relations, try without relations (old structure)
-    if (error && error.code === 'PGRST200') {
-      console.log('Falling back to old structure without relations');
-      const result = await supabase
-        .from('fleet_vehicles')
-        .insert([vehicle])
-        .select('*')
-        .single();
-      
-      if (result.error) {
-        console.error('Error creating fleet vehicle:', result.error);
-        throw new Error(result.error.message);
-      }
-      
-      // Add missing relation properties to match FleetVehicle type
-      data = {
-        ...result.data,
-        car_brands: null,
-        car_models: null
-      };
-      error = null;
-    }
-      
+    
     if (error) {
       console.error('Error creating fleet vehicle:', error);
       throw new Error(error.message);
     }
     
-    return data;
+    // Add missing relation properties to match FleetVehicle type
+    const createdVehicle = {
+      ...data,
+      car_brands: null,
+      car_models: null
+    };
+    
+    console.log('Fleet vehicle created successfully (fallback structure):', createdVehicle);
+    return createdVehicle;
   },
   
   update: async (id: string, vehicle: UpdateFleetVehicle) => {
-    // Try new structure first, fall back to old structure
-    let { data, error } = await supabase
+    console.log(`Updating fleet vehicle with id ${id} - using fallback structure`);
+    
+    const { data, error } = await supabase
       .from('fleet_vehicles')
       .update(vehicle)
       .eq('id', id)
-      .select(`
-        *,
-        car_brands!inner(id, name),
-        car_models!inner(id, name)
-      `)
+      .select('*')
       .single();
-
-    // If error with relations, try without relations (old structure)
-    if (error && error.code === 'PGRST200') {
-      console.log('Falling back to old structure without relations');
-      const result = await supabase
-        .from('fleet_vehicles')
-        .update(vehicle)
-        .eq('id', id)
-        .select('*')
-        .single();
-      
-      if (result.error) {
-        console.error(`Error updating fleet vehicle with id ${id}:`, result.error);
-        throw new Error(result.error.message);
-      }
-      
-      // Add missing relation properties to match FleetVehicle type
-      data = {
-        ...result.data,
-        car_brands: null,
-        car_models: null
-      };
-      error = null;
-    }
-      
+    
     if (error) {
       console.error(`Error updating fleet vehicle with id ${id}:`, error);
       throw new Error(error.message);
     }
     
-    return data;
+    // Add missing relation properties to match FleetVehicle type
+    const updatedVehicle = {
+      ...data,
+      car_brands: null,
+      car_models: null
+    };
+    
+    console.log('Fleet vehicle updated successfully (fallback structure):', updatedVehicle);
+    return updatedVehicle;
   },
   
   delete: async (id: string) => {
