@@ -27,9 +27,15 @@ export interface Invoice {
   };
   vehicles?: {
     id: string;
-    brand: string;
-    model: string;
     license_plate: string;
+    car_brands?: {
+      id: string;
+      name: string;
+    };
+    car_models?: {
+      id: string;
+      name: string;
+    };
   };
   user_id: string;
 }

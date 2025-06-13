@@ -39,7 +39,7 @@ const Invoices = () => {
   const filteredInvoices = invoices?.filter(invoice => 
     invoice.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (invoice.clients && `${invoice.clients.first_name} ${invoice.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (invoice.vehicles && `${invoice.vehicles.brand} ${invoice.vehicles.model} - ${invoice.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
+    (invoice.vehicles && `${invoice.vehicles.car_brands?.name || 'Marque inconnue'} ${invoice.vehicles.car_models?.name || 'Modèle inconnu'} - ${invoice.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
   ) || [];
   
   const getStatusColor = (status: string) => {
@@ -209,11 +209,11 @@ const Invoices = () => {
                   </TableCell>
                   <TableCell>
                     {invoice.vehicles 
-                      ? `${invoice.vehicles.brand} ${invoice.vehicles.model} - ${invoice.vehicles.license_plate}`
+                      ? `${invoice.vehicles.car_brands?.name || 'Marque inconnue'} ${invoice.vehicles.car_models?.name || 'Modèle inconnu'} - ${invoice.vehicles.license_plate}`
                       : '-'
                     }
                   </TableCell>
-                  <TableCell>{formatAmount(invoice.amount)}</TableCell>
+                  <TableCell>{formatAmount(invoice.amount || 0)}</TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente de paiement')}`}>
                       {invoice.status || 'En attente de paiement'}

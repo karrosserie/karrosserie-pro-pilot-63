@@ -20,7 +20,7 @@ const RepairOrders = () => {
   const filteredOrders = orders?.filter(order => 
     order.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (order.clients && `${order.clients.first_name} ${order.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (order.vehicles && `${order.vehicles.brand} ${order.vehicles.model} - ${order.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
+    (order.vehicles && `${order.vehicles.car_brands?.name || 'Marque inconnue'} ${order.vehicles.car_models?.name || 'Modèle inconnu'} - ${order.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
   ) || [];
 
   const handleCreateOrder = () => {
