@@ -132,9 +132,19 @@ const Documents = () => {
     return count <= 1 ? 'document' : 'documents';
   };
 
-  // Créer une liste de tous les documents
+  // Créer une liste de tous les documents avec le vehicleDisplay mis à jour
   const allDocuments = React.useMemo(() => {
     const documents = [];
+
+    const vehicleDisplay = (vehicle: any) => {
+      if (!vehicle) return 'Aucun véhicule';
+      
+      const brand = vehicle.car_brands?.name || 'Marque inconnue';
+      const model = vehicle.car_models?.name || 'Modèle inconnu';
+      const plate = vehicle.license_plate || 'Plaque inconnue';
+      
+      return `${brand} ${model} - ${plate}`;
+    };
 
     // Ajouter les rapports d'expertise
     if (expertiseReports && activeFilters.expertise) {
@@ -147,11 +157,7 @@ const Documents = () => {
           title: `Rapport d'expertise`,
           date: `Créé le ${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
           customer: report.clients ? `${report.clients.first_name} ${report.clients.last_name}` : 'Client non spécifié',
-          vehicle: report.vehicles ? {
-            car_brands: report.vehicles.car_brands,
-            car_models: report.vehicles.car_models,
-            license_plate: report.vehicles.license_plate
-          } : null,
+          vehicle: report.vehicles ? vehicleDisplay(report.vehicles) : 'Aucun véhicule',
           status: 'Importé',
           statusColor: 'bg-blue-100 text-blue-800',
           timestamp: new Date(report.created_at).getTime(),
@@ -171,11 +177,7 @@ const Documents = () => {
           title: `Devis`,
           date: `Créé le ${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
           customer: quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : 'Client non spécifié',
-          vehicle: quote.vehicles ? {
-            car_brands: quote.vehicles.car_brands,
-            car_models: quote.vehicles.car_models,
-            license_plate: quote.vehicles.license_plate
-          } : null,
+          vehicle: quote.vehicles ? vehicleDisplay(quote.vehicles) : 'Aucun véhicule',
           status: quote.status === 'draft' ? 'En attente' : 'Validé',
           statusColor: quote.status === 'draft' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800',
           timestamp: new Date(quote.created_at).getTime(),
@@ -195,11 +197,7 @@ const Documents = () => {
           title: `Ordre de réparation`,
           date: `Créé le ${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
           customer: order.clients ? `${order.clients.first_name} ${order.clients.last_name}` : 'Client non spécifié',
-          vehicle: order.vehicles ? {
-            car_brands: order.vehicles.car_brands,
-            car_models: order.vehicles.car_models,
-            license_plate: order.vehicles.license_plate
-          } : null,
+          vehicle: order.vehicles ? vehicleDisplay(order.vehicles) : 'Aucun véhicule',
           status: order.status === 'signed' ? 'Signé' : 'En attente',
           statusColor: order.status === 'signed' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800',
           timestamp: new Date(order.created_at).getTime(),
@@ -219,11 +217,7 @@ const Documents = () => {
           title: `Facture`,
           date: `Créé le ${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
           customer: invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client non spécifié',
-          vehicle: invoice.vehicles ? {
-            car_brands: invoice.vehicles.car_brands,
-            car_models: invoice.vehicles.car_models,
-            license_plate: invoice.vehicles.license_plate
-          } : null,
+          vehicle: invoice.vehicles ? vehicleDisplay(invoice.vehicles) : 'Aucun véhicule',
           status: 'Payé',
           statusColor: 'bg-purple-100 text-purple-800',
           timestamp: new Date(invoice.created_at).getTime(),
@@ -243,11 +237,7 @@ const Documents = () => {
           title: `Avoir`,
           date: `Créé le ${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
           customer: credit.clients ? `${credit.clients.first_name} ${credit.clients.last_name}` : 'Client non spécifié',
-          vehicle: credit.vehicles ? {
-            car_brands: credit.vehicles.car_brands,
-            car_models: credit.vehicles.car_models,
-            license_plate: credit.vehicles.license_plate
-          } : null,
+          vehicle: credit.vehicles ? vehicleDisplay(credit.vehicles) : 'Aucun véhicule',
           status: 'Émis',
           statusColor: 'bg-red-100 text-red-800',
           timestamp: new Date(credit.created_at).getTime(),
@@ -261,7 +251,7 @@ const Documents = () => {
       searchTerm === '' || 
       doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       doc.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (doc.vehicle && `${doc.vehicle.car_brands?.name || 'Marque inconnue'} ${doc.vehicle.car_models?.name || 'Modèle inconnu'} - ${doc.vehicle.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
+      doc.vehicle.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     // Trier par date (plus récent en premier)

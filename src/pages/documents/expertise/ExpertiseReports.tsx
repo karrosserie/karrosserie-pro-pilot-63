@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
@@ -19,11 +20,16 @@ const ExpertiseReports = () => {
   const [selectedReport, setSelectedReport] = useState<ExpertiseReport | null>(null);
   const { toast } = useToast();
   
-  const filteredReports = reports?.filter(report => 
-    report.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (report.clients && `${report.clients.first_name} ${report.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (report.vehicles && `${report.vehicles.car_brands?.name || 'Marque inconnue'} ${report.vehicles.car_models?.name || 'Modèle inconnu'} - ${report.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
-  ) || [];
+  const filteredReports = reports?.filter(report => {
+    const matchesSearch = report.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (report.clients && `${report.clients.first_name} ${report.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    // Updated vehicle search to use car_brands and car_models properly
+    const vehicleMatch = report.vehicles && 
+      `${report.vehicles.car_brands?.name || 'Marque inconnue'} ${report.vehicles.car_models?.name || 'Modèle inconnu'} - ${report.vehicles.license_plate || ''}`.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesSearch || vehicleMatch;
+  }) || [];
   
   const handleViewReport = (report: ExpertiseReport) => {
     setSelectedReport(report);
