@@ -31,18 +31,43 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
   onModelChange,
   onSelectChange
 }) => {
-  const { carBrands } = useCarBrands();
-  const { carModels } = useCarModels(formData.brand_id);
+  const { carBrands, isLoading: brandsLoading } = useCarBrands();
+  const { carModels, isLoading: modelsLoading } = useCarModels(formData.brand_id);
 
-  const brandOptions = carBrands.map(brand => ({
+  console.log('FleetVehicleBasicInfo - carBrands:', carBrands);
+  console.log('FleetVehicleBasicInfo - brandsLoading:', brandsLoading);
+  console.log('FleetVehicleBasicInfo - formData.brand_id:', formData.brand_id);
+
+  const brandOptions = carBrands?.map(brand => ({
     value: brand.id,
     label: brand.name
-  }));
+  })) || [];
 
-  const modelOptions = carModels.map(model => ({
+  const modelOptions = carModels?.map(model => ({
     value: model.id,
     label: model.name
-  }));
+  })) || [];
+
+  console.log('FleetVehicleBasicInfo - brandOptions:', brandOptions);
+  console.log('FleetVehicleBasicInfo - modelOptions:', modelOptions);
+
+  const handleBrandChange = (brandId: string) => {
+    console.log('FleetVehicleBasicInfo - Brand changed to:', brandId);
+    onBrandChange(brandId);
+  };
+
+  const handleModelChange = (modelId: string) => {
+    console.log('FleetVehicleBasicInfo - Model changed to:', modelId);
+    onModelChange(modelId);
+  };
+
+  if (brandsLoading) {
+    return (
+      <div className="space-y-4">
+        <p className="text-sm text-gray-500">Chargement des marques...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -93,25 +118,47 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
       <div className="grid grid-cols-3 gap-4">
         <div>
           <Label htmlFor="brand_id" required>Marque</Label>
-          <SearchableSelect
-            options={brandOptions}
-            value={formData.brand_id}
-            onValueChange={onBrandChange}
-            placeholder="Sélectionner une marque"
-            disabled={isViewMode}
-            searchPlaceholder="Rechercher une marque..."
-          />
+          {brandOptions.length > 0 ? (
+            <SearchableSelect
+              options={brandOptions}
+              value={formData.brand_id}
+              onValueChange={handleBrandChange}
+              placeholder="Sélectionner une marque"
+              disabled={isViewMode}
+              searchPlaceholder="Rechercher une marque..."
+            />
+          ) : (
+            <div className="w-full p-2 border border-gray-300 rounded text-gray-500 text-sm">
+              Aucune marque disponible
+            </div>
+          )}
         </div>
         <div>
           <Label htmlFor="model_id" required>Modèle</Label>
-          <SearchableSelect
-            options={modelOptions}
-            value={formData.model_id}
-            onValueChange={onModelChange}
-            placeholder="Sélectionner un modèle"
-            disabled={isViewMode || !formData.brand_id}
-            searchPlaceholder="Rechercher un modèle..."
-          />
+          {formData.brand_id ? (
+            modelOptions.length > 0 ? (
+              <SearchableSelect
+                options={modelOptions}
+                value={formData.model_id}
+                onValueChange={handleModelChange}
+                placeholder="Sélectionner un modèle"
+                disabled={isViewMode || modelsLoading}
+                searchPlaceholder="Rechercher un modèle..."
+              />
+            ) : modelsLoading ? (
+              <div className="w-full p-2 border border-gray-300 rounded text-gray-500 text-sm">
+                Chargement des modèles...
+              </div>
+            ) : (
+              <div className="w-full p-2 border border-gray-300 rounded text-gray-500 text-sm">
+                Aucun modèle disponible pour cette marque
+              </div>
+            )
+          ) : (
+            <div className="w-full p-2 border border-gray-300 rounded text-gray-500 text-sm">
+              Sélectionnez d'abord une marque
+            </div>
+          )}
         </div>
         <div>
           <Label htmlFor="status">Statut</Label>

@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Check, ChevronDown } from 'lucide-react';
@@ -30,6 +29,16 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   
   const selectedOption = options.find(option => option.value === value);
 
+  console.log('SearchableSelect - options:', options);
+  console.log('SearchableSelect - value:', value);
+  console.log('SearchableSelect - selectedOption:', selectedOption);
+
+  const handleSelect = (selectedValue: string) => {
+    console.log('SearchableSelect - handleSelect called with:', selectedValue);
+    onValueChange(selectedValue);
+    setOpen(false);
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -44,7 +53,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0" align="start">
+      <PopoverContent className="w-full p-0 z-50 bg-white shadow-lg border" align="start">
         <Command>
           <CommandInput placeholder={searchPlaceholder} />
           <CommandList>
@@ -54,11 +63,8 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                 <CommandItem
                   key={option.value}
                   value={option.label}
-                  onSelect={() => {
-                    onValueChange(option.value);
-                    setOpen(false);
-                  }}
-                  className="cursor-pointer"
+                  onSelect={() => handleSelect(option.value)}
+                  className="cursor-pointer hover:bg-gray-100"
                 >
                   <Check
                     className={cn(
