@@ -98,6 +98,7 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
         vehicle_id: invoice.vehicle_id,
         status: invoice.status || 'En attente de paiement',
         due_date: invoice.due_date,
+        payment_due_date: invoice.payment_due_date,
         payment_method: invoice.payment_method,
         payment_date: invoice.payment_date,
         notes: invoice.notes || ''
@@ -122,13 +123,16 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
     } else {
       // Initialiser avec la date d'aujourd'hui
       const today = new Date().toISOString().split('T')[0];
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 30);
       
       generateNextInvoiceNumber().then(nextNumber => {
         setFormData(prev => ({
           ...prev,
           reference: nextNumber,
           status: 'En attente de paiement',
-          due_date: today // Utiliser la date d'aujourd'hui
+          due_date: today, // Utiliser la date d'aujourd'hui
+          payment_due_date: dueDate.toISOString().split('T')[0] // Date d'échéance à 30 jours
         }));
       });
       setDescription('');
