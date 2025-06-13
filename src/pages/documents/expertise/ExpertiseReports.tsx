@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
@@ -27,14 +28,11 @@ const ExpertiseReports = () => {
     // Safe vehicle search with proper null checking
     let vehicleMatch = false;
     const vehicle = report.vehicles;
-    if (vehicle !== null && 
-        vehicle !== undefined &&
-        typeof vehicle === 'object' && 
-        'car_brands' in vehicle && 
-        'car_models' in vehicle && 
-        'license_plate' in vehicle) {
-      const vehicleString = `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate || ''}`;
-      vehicleMatch = vehicleString.toLowerCase().includes(searchTerm.toLowerCase());
+    if (vehicle !== null && vehicle !== undefined && typeof vehicle === 'object') {
+      if ('car_brands' in vehicle && 'car_models' in vehicle && 'license_plate' in vehicle) {
+        const vehicleString = `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate || ''}`;
+        vehicleMatch = vehicleString.toLowerCase().includes(searchTerm.toLowerCase());
+      }
     }
     
     return matchesSearch || vehicleMatch;
@@ -130,3 +128,4 @@ const ExpertiseReports = () => {
 };
 
 export default ExpertiseReports;
+
