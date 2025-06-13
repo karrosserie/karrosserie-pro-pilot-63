@@ -3,7 +3,7 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TransactionFilters } from './TransactionFilters';
 import { TransactionTable } from './TransactionTable';
-import { ReportContent } from './ReportContent';
+import ReportContent from './ReportContent';
 import { ForecastContent } from './ForecastContent';
 import { Transaction } from '@/hooks/use-accounting-data';
 
