@@ -167,10 +167,15 @@ export function ImageCropper({
                 onLoad={onImageLoad}
                 style={{
                   transform: `rotate(${rotation}deg)`,
+                  transformOrigin: 'center center',
                   transition: 'transform 0.3s ease-in-out',
                   width: reactCropDimensions.width,
                   height: 'auto',
-                  display: 'block'
+                  display: 'block',
+                  position: 'relative',
+                  left: '50%',
+                  top: '50%',
+                  transform: `translate(-50%, -50%) rotate(${rotation}deg)`
                 }}
               />
             </ReactCrop>
