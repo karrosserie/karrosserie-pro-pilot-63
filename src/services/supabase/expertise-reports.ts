@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -38,7 +39,12 @@ export const expertiseReportsService = {
       .select(`
         *,
         clients(first_name, last_name),
-        vehicles(brand, model, license_plate)
+        vehicles(
+          id,
+          license_plate,
+          car_brands(name),
+          car_models(name)
+        )
       `)
       .order('created_at', { ascending: false });
 
@@ -56,7 +62,12 @@ export const expertiseReportsService = {
       .select(`
         *,
         clients(id, first_name, last_name),
-        vehicles(id, brand, model, license_plate)
+        vehicles(
+          id,
+          license_plate,
+          car_brands(name),
+          car_models(name)
+        )
       `)
       .eq('id', id)
       .single();
