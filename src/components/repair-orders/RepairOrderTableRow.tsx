@@ -53,7 +53,7 @@ export const RepairOrderTableRow = ({ order, onEditOrder, contextMenuProps }: Re
       </TableCell>
       <TableCell>
         {order.vehicles 
-          ? `${order.vehicles.brand} ${order.vehicles.model} - ${order.vehicles.license_plate}`
+          ? `${order.vehicles.car_brands?.name || 'Marque inconnue'} ${order.vehicles.car_models?.name || 'Modèle inconnu'} - ${order.vehicles.license_plate}`
           : '-'
         }
       </TableCell>
