@@ -29,7 +29,10 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
   
   // Find brand ID based on brand name for fetching models
   const selectedBrand = carBrands.find(brand => brand.name === formData.brand);
+  console.log('Selected brand:', selectedBrand, 'for brand name:', formData.brand);
+  
   const { carModels } = useCarModels(selectedBrand?.id);
+  console.log('Car models for brand ID', selectedBrand?.id, ':', carModels);
 
   // Prepare client options for searchable select
   const clientOptions = clients?.map(client => ({
@@ -45,23 +48,27 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
 
   // Prepare model options for searchable select
   const modelOptions = carModels.map(model => ({
-    value: model.id, // Use model ID as value
+    value: model.name, // Use model name as value for consistency
     label: model.name
   }));
 
   const handleBrandChange = (brandName: string) => {
+    console.log('Brand changed to:', brandName);
     onSelectChange('brand', brandName);
     // Reset model when brand changes
     onSelectChange('model', '');
     onSelectChange('modelId', '');
   };
 
-  const handleModelChange = (modelId: string) => {
-    // Find the model name for display
-    const selectedModel = carModels.find(model => model.id === modelId);
+  const handleModelChange = (modelName: string) => {
+    console.log('Model changed to:', modelName);
+    // Find the model ID for storage
+    const selectedModel = carModels.find(model => model.name === modelName);
+    console.log('Selected model object:', selectedModel);
+    
     if (selectedModel) {
       onSelectChange('model', selectedModel.name);
-      onSelectChange('modelId', modelId);
+      onSelectChange('modelId', selectedModel.id);
     }
   };
 
@@ -101,12 +108,15 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
         </Label>
         <SearchableSelect
           options={modelOptions}
-          value={formData.modelId || ''}
+          value={formData.model || ''}
           onValueChange={handleModelChange}
-          placeholder="Sélectionner un modèle"
+          placeholder={!formData.brand ? "Sélectionnez d'abord une marque" : "Sélectionner un modèle"}
           searchPlaceholder="Rechercher un modèle..."
-          disabled={isViewMode || !formData.brand}
+          disabled={isViewMode || !formData.brand || carModels.length === 0}
         />
+        {formData.brand && carModels.length === 0 && !isViewMode && (
+          <p className="text-sm text-gray-500">Aucun modèle disponible pour cette marque</p>
+        )}
       </div>
     </div>
   );
