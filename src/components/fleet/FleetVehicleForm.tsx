@@ -1,16 +1,17 @@
+
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFleetVehicleForm } from '@/hooks/use-fleet-vehicle-form';
+import { useFleetVehicleFormValidation } from '@/hooks/use-fleet-vehicle-form-validation';
+import { useFleetVehicleVinHandler } from '@/hooks/use-fleet-vehicle-vin-handler';
+import { useFleetVehicleDocuments } from '@/hooks/use-fleet-vehicle-documents';
 import FleetVehicleBasicInfo from './form/FleetVehicleBasicInfo';
 import FleetVehicleDetails from './form/FleetVehicleDetails';
 import DocumentsTab from './form/DocumentsTab';
-import { useToast } from '@/hooks/use-toast';
-import { isValidVin, decodeVin } from '@/services/vin-decoder';
-import { useCarBrands } from '@/hooks/use-car-brands';
+import FleetVehicleFormNavigation from './form/FleetVehicleFormNavigation';
 
 interface FleetVehicleFormProps {
   vehicle?: FleetVehicle | null;
@@ -27,50 +28,18 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
 }) => {
   const { createVehicle, updateVehicle } = useFleetVehicles();
   const { user } = useAuth();
-  const { toast } = useToast();
-  const { carBrands } = useCarBrands();
   const isViewMode = mode === 'view';
   const [activeTab, setActiveTab] = useState('vehicle-info');
 
   const { formData, setFormData, handleInputChange, handleSelectChange } = useFleetVehicleForm(vehicle);
-  
-  const [documentsData, setDocumentsData] = useState({
-    registrationFrontUrl: vehicle?.registration_front_url || '',
-    registrationBackUrl: vehicle?.registration_back_url || '',
-    insuranceCardUrl: vehicle?.insurance_card_url || ''
-  });
-
-  const handleVinInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    
-    if (name === 'vin') {
-      const upperValue = value.toUpperCase();
-      setFormData(prev => ({ ...prev, vin: upperValue }));
-      
-      // Auto-decode VIN if valid
-      if (isValidVin(upperValue)) {
-        const vinInfo = decodeVin(upperValue);
-        console.log('VIN décodé:', vinInfo);
-        
-        if (vinInfo.brand && carBrands.length > 0) {
-          const matchingBrand = carBrands.find(brand => 
-            brand.name.toLowerCase() === vinInfo.brand?.toLowerCase()
-          );
-          
-          if (matchingBrand) {
-            console.log('Marque détectée par VIN:', matchingBrand.name);
-            setFormData(prev => ({
-              ...prev,
-              brand_id: matchingBrand.id,
-              year: vinInfo.year || prev.year
-            }));
-          }
-        }
-      }
-    } else {
-      handleInputChange(e);
-    }
-  };
+  const { isFormValid, showValidationError } = useFleetVehicleFormValidation();
+  const { handleVinInputChange } = useFleetVehicleVinHandler({ formData, setFormData });
+  const {
+    documentsData,
+    handleRegistrationFrontUpload,
+    handleRegistrationBackUpload,
+    handleInsuranceCardUpload
+  } = useFleetVehicleDocuments(vehicle);
 
   const handleBrandSelectChange = (brandId: string) => {
     console.log('Manual brand selection:', brandId);
@@ -84,27 +53,6 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
   const handleModelSelectChange = (modelId: string) => {
     console.log('Manual model selection:', modelId);
     setFormData(prev => ({ ...prev, model_id: modelId }));
-  };
-
-  const handleRegistrationFrontUpload = (url: string) => {
-    setDocumentsData(prev => ({ ...prev, registrationFrontUrl: url }));
-  };
-
-  const handleRegistrationBackUpload = (url: string) => {
-    setDocumentsData(prev => ({ ...prev, registrationBackUrl: url }));
-  };
-
-  const handleInsuranceCardUpload = (url: string) => {
-    setDocumentsData(prev => ({ ...prev, insuranceCardUrl: url }));
-  };
-
-  const isFormValid = () => {
-    const basicInfoValid = formData.vin && formData.brand_id && formData.model_id && formData.license_plate;
-    const documentsValid = documentsData.registrationFrontUrl && 
-                          documentsData.registrationBackUrl && 
-                          documentsData.insuranceCardUrl;
-    
-    return basicInfoValid && documentsValid;
   };
 
   const handleNext = () => {
@@ -121,12 +69,9 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
       return;
     }
 
-    if (!isFormValid()) {
-      toast({
-        title: "Documents manquants",
-        description: "Veuillez importer tous les documents obligatoires (certificat d'immatriculation recto/verso et carte verte d'assurance).",
-        variant: "destructive"
-      });
+    const validationData = { formData, documentsData };
+    if (!isFormValid(validationData)) {
+      showValidationError();
       return;
     }
     
@@ -163,6 +108,10 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
       console.error('Error saving fleet vehicle:', error);
     }
   };
+
+  const validationData = { formData, documentsData };
+  const formValid = isFormValid(validationData);
+  const isPending = createVehicle.isPending || updateVehicle.isPending;
 
   return (
     <div className="space-y-6">
@@ -214,36 +163,16 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
           </TabsContent>
         </Tabs>
 
-        <div className="flex justify-end space-x-2 pt-4 border-t">
-          <Button type="button" variant="outline" onClick={onCancel}>
-            {isViewMode ? "Fermer" : "Annuler"}
-          </Button>
-          {!isViewMode && (
-            <>
-              {activeTab === 'vehicle-info' && (
-                <Button 
-                  type="button" 
-                  className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-                  onClick={handleNext}
-                >
-                  Suivant
-                </Button>
-              )}
-              {activeTab === 'documents' && (
-                <Button 
-                  type="submit" 
-                  className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-                  disabled={createVehicle.isPending || updateVehicle.isPending || !isFormValid()}
-                >
-                  {createVehicle.isPending || updateVehicle.isPending 
-                    ? "Enregistrement..." 
-                    : (mode === 'edit' ? "Mettre à jour" : "Enregistrer")
-                  }
-                </Button>
-              )}
-            </>
-          )}
-        </div>
+        <FleetVehicleFormNavigation
+          activeTab={activeTab}
+          isViewMode={isViewMode}
+          isFormValid={formValid}
+          isPending={isPending}
+          mode={mode}
+          onCancel={onCancel}
+          onNext={handleNext}
+          onSubmit={handleSubmit}
+        />
       </form>
     </div>
   );
