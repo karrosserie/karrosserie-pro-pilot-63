@@ -32,11 +32,13 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
   onSelectChange
 }) => {
   const { carBrands, isLoading: brandsLoading } = useCarBrands();
-  const { carModels, isLoading: modelsLoading } = useCarModels(formData.brand_id);
+  const { carModels, isLoading: modelsLoading } = useCarModels(formData.brand_id || undefined);
 
-  console.log('FleetVehicleBasicInfo - carBrands:', carBrands);
+  console.log('FleetVehicleBasicInfo - carBrands count:', carBrands?.length || 0);
   console.log('FleetVehicleBasicInfo - brandsLoading:', brandsLoading);
   console.log('FleetVehicleBasicInfo - formData.brand_id:', formData.brand_id);
+  console.log('FleetVehicleBasicInfo - carModels count:', carModels?.length || 0);
+  console.log('FleetVehicleBasicInfo - modelsLoading:', modelsLoading);
 
   const brandOptions = carBrands?.map(brand => ({
     value: brand.id,
@@ -47,9 +49,6 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
     value: model.id,
     label: model.name
   })) || [];
-
-  console.log('FleetVehicleBasicInfo - brandOptions:', brandOptions);
-  console.log('FleetVehicleBasicInfo - modelOptions:', modelOptions);
 
   const handleBrandChange = (brandId: string) => {
     console.log('FleetVehicleBasicInfo - Brand changed to:', brandId);
@@ -118,44 +117,28 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
       <div className="grid grid-cols-3 gap-4">
         <div>
           <Label htmlFor="brand_id" required>Marque</Label>
-          {brandOptions.length > 0 ? (
-            <SearchableSelect
-              options={brandOptions}
-              value={formData.brand_id}
-              onValueChange={handleBrandChange}
-              placeholder="Sélectionner une marque"
-              disabled={isViewMode}
-              searchPlaceholder="Rechercher une marque..."
-            />
-          ) : (
-            <div className="w-full p-2 border border-gray-300 rounded text-gray-500 text-sm">
-              Aucune marque disponible
-            </div>
-          )}
+          <SearchableSelect
+            options={brandOptions}
+            value={formData.brand_id || ''}
+            onValueChange={handleBrandChange}
+            placeholder="Sélectionner une marque"
+            disabled={isViewMode}
+            searchPlaceholder="Rechercher une marque..."
+          />
         </div>
         <div>
           <Label htmlFor="model_id" required>Modèle</Label>
           {formData.brand_id ? (
-            modelOptions.length > 0 ? (
-              <SearchableSelect
-                options={modelOptions}
-                value={formData.model_id}
-                onValueChange={handleModelChange}
-                placeholder="Sélectionner un modèle"
-                disabled={isViewMode || modelsLoading}
-                searchPlaceholder="Rechercher un modèle..."
-              />
-            ) : modelsLoading ? (
-              <div className="w-full p-2 border border-gray-300 rounded text-gray-500 text-sm">
-                Chargement des modèles...
-              </div>
-            ) : (
-              <div className="w-full p-2 border border-gray-300 rounded text-gray-500 text-sm">
-                Aucun modèle disponible pour cette marque
-              </div>
-            )
+            <SearchableSelect
+              options={modelOptions}
+              value={formData.model_id || ''}
+              onValueChange={handleModelChange}
+              placeholder={modelsLoading ? "Chargement..." : "Sélectionner un modèle"}
+              disabled={isViewMode || modelsLoading}
+              searchPlaceholder="Rechercher un modèle..."
+            />
           ) : (
-            <div className="w-full p-2 border border-gray-300 rounded text-gray-500 text-sm">
+            <div className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 flex items-center text-gray-500 text-sm">
               Sélectionnez d'abord une marque
             </div>
           )}
