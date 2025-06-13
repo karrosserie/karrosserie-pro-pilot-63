@@ -24,13 +24,6 @@ const Accounting = () => {
     return matchesSearch && matchesFilter;
   });
 
-  const handleAddTransaction = () => {
-    toast({
-      title: "Fonctionnalité en développement",
-      description: "L'ajout de transactions sera bientôt disponible.",
-    });
-  };
-
   const handleExport = (type: 'fec' | 'excel' | 'pdf') => {
     toast({
       title: `Export ${type.toUpperCase()} en cours`,
@@ -54,7 +47,6 @@ const Accounting = () => {
   return (
     <div className="page-container">
       <AccountingHeader 
-        onAddTransaction={handleAddTransaction}
         onExport={handleExport}
       />
       
