@@ -1,10 +1,12 @@
 
 import React, { useState, useRef } from 'react';
-import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
+import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Loader2, RotateCcw, RotateCw } from 'lucide-react';
+import { useImageRotation } from './hooks/useImageRotation';
+import { calculateDisplayDimensions, getCroppedImageBlob } from './utils/imageCropperUtils';
 
 interface ImageCropperProps {
   open: boolean;
@@ -25,13 +27,28 @@ export function ImageCropper({
 }: ImageCropperProps) {
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
-  const [rotation, setRotation] = useState(0);
-  const imageRef = useRef<HTMLImageElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+  const imageRef = useRef<HTMLImageElement>(null);
+  const { rotation, rotateImage, resetRotation } = useImageRotation();
 
   // Fonction pour initialiser le recadrage au centre lorsque l'image est chargée
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const { width, height } = e.currentTarget;
+    const { naturalWidth, naturalHeight } = e.currentTarget;
+    
+    // Calculer les dimensions d'affichage pour que l'image reste dans le conteneur
+    const containerWidth = 800; // Largeur max du conteneur
+    const containerHeight = 600; // Hauteur max du conteneur
+    
+    const displayDimensions = calculateDisplayDimensions(
+      naturalWidth,
+      naturalHeight,
+      rotation,
+      containerWidth,
+      containerHeight
+    );
+    
+    setImageDimensions(displayDimensions);
     
     // Initialiser avec un recadrage libre couvrant 90% de l'image
     const crop: Crop = {
@@ -45,105 +62,53 @@ export function ImageCropper({
     setCrop(crop);
   };
 
-  // Fonction pour faire pivoter l'image
-  const rotateImage = (degrees: number) => {
-    setRotation(prev => (prev + degrees) % 360);
-  };
-
   // Fonction pour créer une image recadrée à partir du canvas
-  const getCroppedImage = () => {
+  const handleGetCroppedImage = async () => {
     if (!imageRef.current || !completedCrop) return;
 
     setIsLoading(true);
 
-    const image = imageRef.current;
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-
-    if (!ctx) {
+    try {
+      const blob = await getCroppedImageBlob(imageRef.current, completedCrop, rotation);
+      if (blob) {
+        onCropComplete(blob);
+      }
+    } catch (error) {
+      console.error('Error creating cropped image:', error);
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    // Calculer les dimensions en tenant compte de la rotation
-    const rotRad = (rotation * Math.PI) / 180;
-    const { width: bBoxWidth, height: bBoxHeight } = rotateSize(
-      image.width,
-      image.height,
-      rotation
-    );
-
-    // Configurer le canvas
-    canvas.width = completedCrop.width;
-    canvas.height = completedCrop.height;
-
-    // Créer un canvas temporaire pour l'image pivotée
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
-    
-    if (!tempCtx) {
-      setIsLoading(false);
-      return;
-    }
-
-    tempCanvas.width = bBoxWidth;
-    tempCanvas.height = bBoxHeight;
-
-    // Appliquer la rotation sur le canvas temporaire
-    tempCtx.translate(bBoxWidth / 2, bBoxHeight / 2);
-    tempCtx.rotate(rotRad);
-    tempCtx.scale(1, 1);
-    tempCtx.translate(-image.width / 2, -image.height / 2);
-    tempCtx.drawImage(image, 0, 0);
-
-    // Calculer les coordonnées de recadrage avec la rotation
-    const scaleX = image.naturalWidth / bBoxWidth;
-    const scaleY = image.naturalHeight / bBoxHeight;
-
-    // Dessiner la portion recadrée
-    ctx.drawImage(
-      tempCanvas,
-      completedCrop.x * scaleX,
-      completedCrop.y * scaleY,
-      completedCrop.width * scaleX,
-      completedCrop.height * scaleY,
-      0,
-      0,
-      completedCrop.width,
-      completedCrop.height
-    );
-
-    // Convertir le canvas en Blob
-    canvas.toBlob(
-      (blob) => {
-        setIsLoading(false);
-        if (blob) {
-          onCropComplete(blob);
-        }
-      },
-      'image/jpeg',
-      0.95
-    );
-  };
-
-  // Fonction utilitaire pour calculer les dimensions après rotation
-  const rotateSize = (width: number, height: number, rotation: number) => {
-    const rotRad = Math.abs((rotation * Math.PI) / 180);
-    
-    return {
-      width: Math.abs(Math.cos(rotRad) * width) + Math.abs(Math.sin(rotRad) * height),
-      height: Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height),
-    };
   };
 
   const handleComplete = () => {
-    getCroppedImage();
+    handleGetCroppedImage();
     onClose();
   };
 
   const handleClose = () => {
-    setRotation(0);
+    resetRotation();
     onClose();
+  };
+
+  const handleRotate = (degrees: number) => {
+    rotateImage(degrees);
+    
+    // Recalculer les dimensions d'affichage après rotation
+    if (imageRef.current) {
+      const { naturalWidth, naturalHeight } = imageRef.current;
+      const containerWidth = 800;
+      const containerHeight = 600;
+      
+      const newDisplayDimensions = calculateDisplayDimensions(
+        naturalWidth,
+        naturalHeight,
+        rotation + degrees,
+        containerWidth,
+        containerHeight
+      );
+      
+      setImageDimensions(newDisplayDimensions);
+    }
   };
 
   return (
@@ -158,7 +123,7 @@ export function ImageCropper({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => rotateImage(-90)}
+              onClick={() => handleRotate(-90)}
               className="flex items-center gap-2"
             >
               <RotateCcw className="h-4 w-4" />
@@ -167,7 +132,7 @@ export function ImageCropper({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => rotateImage(90)}
+              onClick={() => handleRotate(90)}
               className="flex items-center gap-2"
             >
               <RotateCw className="h-4 w-4" />
@@ -175,24 +140,30 @@ export function ImageCropper({
             </Button>
           </div>
           
-          <ReactCrop
-            crop={crop}
-            onChange={(c) => setCrop(c)}
-            onComplete={(c) => setCompletedCrop(c)}
-            className="max-w-full"
-          >
-            <img
-              ref={imageRef}
-              src={imageUrl}
-              alt="Image à recadrer"
-              onLoad={onImageLoad}
+          <div className="flex justify-center">
+            <ReactCrop
+              crop={crop}
+              onChange={(c) => setCrop(c)}
+              onComplete={(c) => setCompletedCrop(c)}
               className="max-w-full"
-              style={{
-                transform: `rotate(${rotation}deg)`,
-                transition: 'transform 0.3s ease-in-out'
-              }}
-            />
-          </ReactCrop>
+            >
+              <img
+                ref={imageRef}
+                src={imageUrl}
+                alt="Image à recadrer"
+                onLoad={onImageLoad}
+                style={{
+                  transform: `rotate(${rotation}deg)`,
+                  transition: 'transform 0.3s ease-in-out',
+                  maxWidth: '100%',
+                  maxHeight: '60vh',
+                  width: imageDimensions.width || 'auto',
+                  height: imageDimensions.height || 'auto',
+                  objectFit: 'contain'
+                }}
+              />
+            </ReactCrop>
+          </div>
         </div>
         
         <DialogFooter>
