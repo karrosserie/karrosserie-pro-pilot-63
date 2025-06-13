@@ -16,7 +16,6 @@ export const invoiceMutations = {
       status: invoice.status,
       due_date: invoice.due_date,
       payment_date: invoice.payment_date,
-      payment_due_date: invoice.payment_due_date,
       payment_details: invoice.payment_details,
       description: invoice.description,
       amount: invoice.amount || 0,
@@ -53,7 +52,6 @@ export const invoiceMutations = {
     if (invoice.status !== undefined) cleanInvoice.status = invoice.status;
     if (invoice.due_date !== undefined) cleanInvoice.due_date = invoice.due_date;
     if (invoice.payment_date !== undefined) cleanInvoice.payment_date = invoice.payment_date;
-    if (invoice.payment_due_date !== undefined) cleanInvoice.payment_due_date = invoice.payment_due_date;
     if (invoice.payment_details !== undefined) cleanInvoice.payment_details = invoice.payment_details;
     if (invoice.description !== undefined) cleanInvoice.description = invoice.description;
     if (invoice.amount !== undefined) cleanInvoice.amount = invoice.amount;

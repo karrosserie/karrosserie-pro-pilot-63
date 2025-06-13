@@ -120,16 +120,15 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
         setDiscounts([]);
       }
     } else {
+      // Initialiser avec la date d'aujourd'hui
       const today = new Date().toISOString().split('T')[0];
-      const dueDate = new Date();
-      dueDate.setDate(dueDate.getDate() + 30);
       
       generateNextInvoiceNumber().then(nextNumber => {
         setFormData(prev => ({
           ...prev,
           reference: nextNumber,
           status: 'En attente de paiement',
-          due_date: dueDate.toISOString().split('T')[0]
+          due_date: today // Utiliser la date d'aujourd'hui
         }));
       });
       setDescription('');
