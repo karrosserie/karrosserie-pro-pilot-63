@@ -10,8 +10,11 @@ export type FleetVehicle = Database['public']['Tables']['fleet_vehicles']['Row']
   registration_front_url?: string;
   registration_back_url?: string;
   insurance_card_url?: string;
-  brand_id: string;
-  model_id: string;
+  // Support both old and new structure during migration
+  brand?: string;
+  model?: string;
+  brand_id?: string;
+  model_id?: string;
   car_brands?: {
     id: string;
     name: string;
@@ -30,8 +33,11 @@ export type NewFleetVehicle = Database['public']['Tables']['fleet_vehicles']['In
   registration_front_url?: string;
   registration_back_url?: string;
   insurance_card_url?: string;
-  brand_id: string;
-  model_id: string;
+  // Support both old and new structure during migration
+  brand?: string;
+  model?: string;
+  brand_id?: string;
+  model_id?: string;
 };
 
 export type UpdateFleetVehicle = Database['public']['Tables']['fleet_vehicles']['Update'] & {
@@ -42,13 +48,16 @@ export type UpdateFleetVehicle = Database['public']['Tables']['fleet_vehicles'][
   registration_front_url?: string;
   registration_back_url?: string;
   insurance_card_url?: string;
+  brand?: string;
+  model?: string;
   brand_id?: string;
   model_id?: string;
 };
 
 export const fleetVehiclesService = {
   getAll: async () => {
-    const { data, error } = await supabase
+    // Try new structure first, fall back to old structure
+    let { data, error } = await supabase
       .from('fleet_vehicles')
       .select(`
         *,
@@ -56,6 +65,18 @@ export const fleetVehiclesService = {
         car_models!inner(id, name)
       `)
       .order('created_at', { ascending: false });
+
+    // If error with relations, try without relations (old structure)
+    if (error && error.code === 'PGRST200') {
+      console.log('Falling back to old structure without relations');
+      const result = await supabase
+        .from('fleet_vehicles')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      data = result.data;
+      error = result.error;
+    }
 
     if (error) {
       console.error('Error fetching fleet vehicles:', error);
@@ -66,7 +87,8 @@ export const fleetVehiclesService = {
   },
 
   getById: async (id: string) => {
-    const { data, error } = await supabase
+    // Try new structure first, fall back to old structure
+    let { data, error } = await supabase
       .from('fleet_vehicles')
       .select(`
         *,
@@ -75,6 +97,19 @@ export const fleetVehiclesService = {
       `)
       .eq('id', id)
       .single();
+
+    // If error with relations, try without relations (old structure)
+    if (error && error.code === 'PGRST200') {
+      console.log('Falling back to old structure without relations');
+      const result = await supabase
+        .from('fleet_vehicles')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      data = result.data;
+      error = result.error;
+    }
       
     if (error) {
       console.error(`Error fetching fleet vehicle with id ${id}:`, error);
@@ -85,7 +120,8 @@ export const fleetVehiclesService = {
   },
   
   create: async (vehicle: NewFleetVehicle) => {
-    const { data, error } = await supabase
+    // Try new structure first, fall back to old structure
+    let { data, error } = await supabase
       .from('fleet_vehicles')
       .insert([vehicle])
       .select(`
@@ -94,6 +130,19 @@ export const fleetVehiclesService = {
         car_models!inner(id, name)
       `)
       .single();
+
+    // If error with relations, try without relations (old structure)
+    if (error && error.code === 'PGRST200') {
+      console.log('Falling back to old structure without relations');
+      const result = await supabase
+        .from('fleet_vehicles')
+        .insert([vehicle])
+        .select('*')
+        .single();
+      
+      data = result.data;
+      error = result.error;
+    }
       
     if (error) {
       console.error('Error creating fleet vehicle:', error);
@@ -104,7 +153,8 @@ export const fleetVehiclesService = {
   },
   
   update: async (id: string, vehicle: UpdateFleetVehicle) => {
-    const { data, error } = await supabase
+    // Try new structure first, fall back to old structure
+    let { data, error } = await supabase
       .from('fleet_vehicles')
       .update(vehicle)
       .eq('id', id)
@@ -114,6 +164,20 @@ export const fleetVehiclesService = {
         car_models!inner(id, name)
       `)
       .single();
+
+    // If error with relations, try without relations (old structure)
+    if (error && error.code === 'PGRST200') {
+      console.log('Falling back to old structure without relations');
+      const result = await supabase
+        .from('fleet_vehicles')
+        .update(vehicle)
+        .eq('id', id)
+        .select('*')
+        .single();
+      
+      data = result.data;
+      error = result.error;
+    }
       
     if (error) {
       console.error(`Error updating fleet vehicle with id ${id}:`, error);

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
@@ -117,11 +116,21 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     }
   };
 
+  // Get vehicle display name - support both old and new structure
+  const getVehicleDisplayName = () => {
+    if (vehicle.car_brands?.name && vehicle.car_models?.name) {
+      return `${vehicle.car_brands.name} ${vehicle.car_models.name}`;
+    } else if (vehicle.brand && vehicle.model) {
+      return `${vehicle.brand} ${vehicle.model}`;
+    }
+    return 'Véhicule';
+  };
+
   return (
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-medium text-gray-900">
-          {vehicle.car_brands?.name} {vehicle.car_models?.name} ({vehicle.license_plate})
+          {getVehicleDisplayName()} ({vehicle.license_plate})
         </h3>
       </div>
 

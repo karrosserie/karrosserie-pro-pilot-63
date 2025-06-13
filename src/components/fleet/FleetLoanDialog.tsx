@@ -62,8 +62,11 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
   const createCompleteVehicle = (partialVehicle: any): FleetVehicle => {
     return {
       id: partialVehicle.id,
+      // Support both old and new structure
       brand: partialVehicle.brand || '',
       model: partialVehicle.model || '',
+      brand_id: partialVehicle.brand_id || '',
+      model_id: partialVehicle.model_id || '',
       license_plate: partialVehicle.license_plate || '',
       color: partialVehicle.color || '',
       year: partialVehicle.year || new Date().getFullYear(),
@@ -76,7 +79,9 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
       registration_back_url: partialVehicle.registration_back_url || '',
       created_at: partialVehicle.created_at || new Date().toISOString(),
       updated_at: partialVehicle.updated_at || new Date().toISOString(),
-      user_id: partialVehicle.user_id || ''
+      user_id: partialVehicle.user_id || '',
+      car_brands: partialVehicle.car_brands || null,
+      car_models: partialVehicle.car_models || null
     };
   };
 

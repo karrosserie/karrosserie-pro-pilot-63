@@ -118,15 +118,18 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
       const submissionData = {
         vin: formData.vin,
         engine_number: formData.engine_number,
-        brand_id: formData.brand_id,
-        model_id: formData.model_id,
         year: formData.year,
         license_plate: formData.license_plate,
         color: formData.color,
         status: formData.status,
         registration_front_url: documentsData.registrationFrontUrl,
         registration_back_url: documentsData.registrationBackUrl,
-        insurance_card_url: documentsData.insuranceCardUrl
+        insurance_card_url: documentsData.insuranceCardUrl,
+        // Include both new and old fields for compatibility
+        brand_id: formData.brand_id,
+        model_id: formData.model_id,
+        brand: '', // Will be populated by triggers if using old structure
+        model: '' // Will be populated by triggers if using old structure
       };
 
       if (mode === 'edit' && vehicle) {
