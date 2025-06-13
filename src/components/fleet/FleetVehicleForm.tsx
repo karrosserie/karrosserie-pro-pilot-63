@@ -1,13 +1,13 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
-import { useAuth } from '@/contexts/AuthContext';
 import { useFleetVehicleForm } from '@/hooks/use-fleet-vehicle-form';
 import { useFleetVehicleFormValidation } from '@/hooks/use-fleet-vehicle-form-validation';
 import { useFleetVehicleVinHandler } from '@/hooks/use-fleet-vehicle-vin-handler';
 import { useFleetVehicleDocuments } from '@/hooks/use-fleet-vehicle-documents';
+import { useFleetVehicleFormHandlers } from '@/hooks/use-fleet-vehicle-form-handlers';
+import { useFleetVehicleFormNavigation } from '@/hooks/use-fleet-vehicle-form-navigation';
 import FleetVehicleBasicInfo from './form/FleetVehicleBasicInfo';
 import FleetVehicleDetails from './form/FleetVehicleDetails';
 import DocumentsTab from './form/DocumentsTab';
@@ -26,10 +26,8 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
   onSuccess,
   onCancel
 }) => {
-  const { createVehicle, updateVehicle } = useFleetVehicles();
-  const { user } = useAuth();
   const isViewMode = mode === 'view';
-  const [activeTab, setActiveTab] = useState('vehicle-info');
+  const { activeTab, setActiveTab, handleNext } = useFleetVehicleFormNavigation();
 
   const { formData, setFormData, handleInputChange, handleSelectChange } = useFleetVehicleForm(vehicle);
   const { isFormValid, showValidationError } = useFleetVehicleFormValidation();
@@ -41,77 +39,24 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
     handleInsuranceCardUpload
   } = useFleetVehicleDocuments(vehicle);
 
-  const handleBrandSelectChange = (brandId: string) => {
-    console.log('Manual brand selection:', brandId);
-    setFormData(prev => ({ 
-      ...prev, 
-      brand_id: brandId,
-      model_id: '' // Reset model when brand changes
-    }));
-  };
-
-  const handleModelSelectChange = (modelId: string) => {
-    console.log('Manual model selection:', modelId);
-    setFormData(prev => ({ ...prev, model_id: modelId }));
-  };
-
-  const handleNext = () => {
-    if (activeTab === 'vehicle-info') {
-      setActiveTab('documents');
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!user) {
-      console.error('User not authenticated');
-      return;
-    }
-
-    const validationData = { formData, documentsData };
-    if (!isFormValid(validationData)) {
-      showValidationError();
-      return;
-    }
-    
-    try {
-      const submissionData = {
-        vin: formData.vin,
-        engine_number: formData.engine_number,
-        year: formData.year,
-        license_plate: formData.license_plate,
-        color: formData.color,
-        status: formData.status,
-        registration_front_url: documentsData.registrationFrontUrl,
-        registration_back_url: documentsData.registrationBackUrl,
-        insurance_card_url: documentsData.insuranceCardUrl,
-        brand_id: formData.brand_id,
-        model_id: formData.model_id,
-        brand: '',
-        model: ''
-      };
-
-      if (mode === 'edit' && vehicle) {
-        await updateVehicle.mutateAsync({
-          id: vehicle.id,
-          data: submissionData
-        });
-      } else if (mode === 'create') {
-        await createVehicle.mutateAsync({
-          ...submissionData,
-          user_id: user.id
-        });
-      }
-      onSuccess();
-    } catch (error) {
-      console.error('Error saving fleet vehicle:', error);
-    }
-  };
+  const {
+    handleBrandSelectChange,
+    handleModelSelectChange,
+    handleSubmit,
+    isPending
+  } = useFleetVehicleFormHandlers({
+    formData,
+    setFormData,
+    documentsData,
+    vehicle,
+    mode,
+    onSuccess,
+    isFormValid,
+    showValidationError
+  });
 
   const validationData = { formData, documentsData };
   const formValid = isFormValid(validationData);
-  const isPending = createVehicle.isPending || updateVehicle.isPending;
 
   return (
     <div className="space-y-6">
