@@ -45,9 +45,47 @@ export function ImageCropper({
     setCrop(crop);
   };
 
+  // Fonction pour calculer les nouvelles dimensions après rotation
+  const getRotatedDimensions = (width: number, height: number, rotation: number) => {
+    const rotRad = Math.abs((rotation * Math.PI) / 180);
+    
+    return {
+      width: Math.abs(Math.cos(rotRad) * width) + Math.abs(Math.sin(rotRad) * height),
+      height: Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height),
+    };
+  };
+
+  // Fonction pour ajuster la zone de recadrage après rotation
+  const adjustCropAfterRotation = () => {
+    if (!imageRef.current) return;
+
+    const image = imageRef.current;
+    const { width: originalWidth, height: originalHeight } = image;
+    const { width: rotatedWidth, height: rotatedHeight } = getRotatedDimensions(originalWidth, originalHeight, rotation);
+
+    // Calculer le ratio de redimensionnement
+    const scaleX = rotatedWidth / originalWidth;
+    const scaleY = rotatedHeight / originalHeight;
+
+    // Ajuster la zone de recadrage pour qu'elle reste proportionnelle
+    const newCrop: Crop = {
+      unit: '%',
+      x: 5,
+      y: 5,
+      width: 90,
+      height: 90,
+    };
+
+    setCrop(newCrop);
+  };
+
   // Fonction pour faire pivoter l'image
   const rotateImage = (degrees: number) => {
     setRotation(prev => (prev + degrees) % 360);
+    // Ajuster la zone de recadrage après la rotation
+    setTimeout(() => {
+      adjustCropAfterRotation();
+    }, 100); // Petit délai pour laisser le temps à la rotation de s'appliquer
   };
 
   // Fonction pour créer une image recadrée à partir du canvas
@@ -67,7 +105,7 @@ export function ImageCropper({
 
     // Calculer les dimensions en tenant compte de la rotation
     const rotRad = (rotation * Math.PI) / 180;
-    const { width: bBoxWidth, height: bBoxHeight } = rotateSize(
+    const { width: bBoxWidth, height: bBoxHeight } = getRotatedDimensions(
       image.width,
       image.height,
       rotation
@@ -124,16 +162,6 @@ export function ImageCropper({
       'image/jpeg',
       0.95
     );
-  };
-
-  // Fonction utilitaire pour calculer les dimensions après rotation
-  const rotateSize = (width: number, height: number, rotation: number) => {
-    const rotRad = Math.abs((rotation * Math.PI) / 180);
-    
-    return {
-      width: Math.abs(Math.cos(rotRad) * width) + Math.abs(Math.sin(rotRad) * height),
-      height: Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height),
-    };
   };
 
   const handleComplete = () => {
