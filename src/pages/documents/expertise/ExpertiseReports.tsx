@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
@@ -28,11 +26,16 @@ const ExpertiseReports = () => {
     // Safe vehicle search with proper null checking
     let vehicleMatch = false;
     const vehicle = report.vehicles;
-    if (vehicle !== null && vehicle !== undefined && typeof vehicle === 'object') {
-      if ('car_brands' in vehicle && 'car_models' in vehicle && 'license_plate' in vehicle) {
-        const vehicleString = `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate || ''}`;
-        vehicleMatch = vehicleString.toLowerCase().includes(searchTerm.toLowerCase());
-      }
+    
+    // Use a type guard function to properly narrow the type
+    const isValidVehicle = (v: any): v is { car_brands?: { name?: string }; car_models?: { name?: string }; license_plate?: string } => {
+      return v !== null && v !== undefined && typeof v === 'object' && 
+             'car_brands' in v && 'car_models' in v && 'license_plate' in v;
+    };
+    
+    if (isValidVehicle(vehicle)) {
+      const vehicleString = `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate || ''}`;
+      vehicleMatch = vehicleString.toLowerCase().includes(searchTerm.toLowerCase());
     }
     
     return matchesSearch || vehicleMatch;
@@ -128,4 +131,3 @@ const ExpertiseReports = () => {
 };
 
 export default ExpertiseReports;
-
