@@ -27,12 +27,11 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
 }) => {
   const [open, setOpen] = useState(false);
   
-  // Ensure value is always a string, default to empty string if undefined/null
-  const normalizedValue = value || '';
-  const selectedOption = options.find(option => option.value === normalizedValue);
+  // Find the selected option
+  const selectedOption = options.find(option => option.value === value);
 
   console.log('SearchableSelect - options count:', options.length);
-  console.log('SearchableSelect - normalizedValue:', normalizedValue);
+  console.log('SearchableSelect - value:', value);
   console.log('SearchableSelect - selectedOption:', selectedOption);
 
   const handleSelect = (selectedValue: string) => {
@@ -71,7 +70,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      normalizedValue === option.value ? "opacity-100" : "opacity-0"
+                      value === option.value ? "opacity-100" : "opacity-0"
                     )}
                   />
                   {option.label}

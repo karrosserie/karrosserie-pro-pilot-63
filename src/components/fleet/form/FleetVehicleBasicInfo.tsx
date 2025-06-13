@@ -32,19 +32,19 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
   onSelectChange
 }) => {
   const { carBrands, isLoading: brandsLoading } = useCarBrands();
-  const { carModels, isLoading: modelsLoading } = useCarModels(formData.brand_id || undefined);
+  const { carModels, isLoading: modelsLoading } = useCarModels(formData.brand_id);
 
   console.log('FleetVehicleBasicInfo - carBrands count:', carBrands?.length || 0);
-  console.log('FleetVehicleBasicInfo - brandsLoading:', brandsLoading);
   console.log('FleetVehicleBasicInfo - formData.brand_id:', formData.brand_id);
   console.log('FleetVehicleBasicInfo - carModels count:', carModels?.length || 0);
-  console.log('FleetVehicleBasicInfo - modelsLoading:', modelsLoading);
 
+  // Prepare brand options - use brand ID as value like in VehicleBasicDetails
   const brandOptions = carBrands?.map(brand => ({
     value: brand.id,
     label: brand.name
   })) || [];
 
+  // Prepare model options - use model ID as value
   const modelOptions = carModels?.map(model => ({
     value: model.id,
     label: model.name
@@ -119,7 +119,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
           <Label htmlFor="brand_id" required>Marque</Label>
           <SearchableSelect
             options={brandOptions}
-            value={formData.brand_id || ''}
+            value={formData.brand_id}
             onValueChange={handleBrandChange}
             placeholder="Sélectionner une marque"
             disabled={isViewMode}
@@ -128,19 +128,22 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
         </div>
         <div>
           <Label htmlFor="model_id" required>Modèle</Label>
-          {formData.brand_id ? (
-            <SearchableSelect
-              options={modelOptions}
-              value={formData.model_id || ''}
-              onValueChange={handleModelChange}
-              placeholder={modelsLoading ? "Chargement..." : "Sélectionner un modèle"}
-              disabled={isViewMode || modelsLoading}
-              searchPlaceholder="Rechercher un modèle..."
-            />
-          ) : (
-            <div className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 flex items-center text-gray-500 text-sm">
-              Sélectionnez d'abord une marque
-            </div>
+          <SearchableSelect
+            options={modelOptions}
+            value={formData.model_id}
+            onValueChange={handleModelChange}
+            placeholder={
+              !formData.brand_id 
+                ? "Sélectionnez d'abord une marque" 
+                : modelsLoading 
+                ? "Chargement des modèles..."
+                : "Sélectionner un modèle"
+            }
+            searchPlaceholder="Rechercher un modèle..."
+            disabled={isViewMode || !formData.brand_id || modelsLoading}
+          />
+          {modelsLoading && formData.brand_id && (
+            <p className="text-sm text-gray-500 mt-1">Chargement des modèles...</p>
           )}
         </div>
         <div>
