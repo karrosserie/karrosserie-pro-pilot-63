@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -58,47 +59,6 @@ export function ImageCropper({
     };
   };
 
-  // Calculer la position pour aligner l'image pivotée avec les bords du conteneur
-  const calculateImagePosition = (naturalWidth: number, naturalHeight: number, rotation: number, scale: number, containerWidth: number, containerHeight: number) => {
-    if (rotation === 0) {
-      return { left: 0, top: 0 };
-    }
-
-    const rotRad = (rotation * Math.PI) / 180;
-    
-    // Dimensions de l'image mise à l'échelle
-    const scaledWidth = naturalWidth * scale;
-    const scaledHeight = naturalHeight * scale;
-    
-    // Les 4 coins de l'image avant rotation (par rapport au centre de l'image)
-    const corners = [
-      { x: -scaledWidth / 2, y: -scaledHeight / 2 }, // coin supérieur gauche
-      { x: scaledWidth / 2, y: -scaledHeight / 2 },  // coin supérieur droit
-      { x: scaledWidth / 2, y: scaledHeight / 2 },   // coin inférieur droit
-      { x: -scaledWidth / 2, y: scaledHeight / 2 }   // coin inférieur gauche
-    ];
-    
-    // Appliquer la rotation aux coins
-    const rotatedCorners = corners.map(corner => ({
-      x: corner.x * Math.cos(rotRad) - corner.y * Math.sin(rotRad),
-      y: corner.x * Math.sin(rotRad) + corner.y * Math.cos(rotRad)
-    }));
-    
-    // Trouver les limites de la bounding box après rotation
-    const minX = Math.min(...rotatedCorners.map(c => c.x));
-    const minY = Math.min(...rotatedCorners.map(c => c.y));
-    
-    // Centre du conteneur
-    const containerCenterX = containerWidth / 2;
-    const containerCenterY = containerHeight / 2;
-    
-    // Position de l'image pour que sa bounding box après rotation soit alignée avec le conteneur
-    const left = containerCenterX - minX;
-    const top = containerCenterY - minY;
-    
-    return { left, top };
-  };
-
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { naturalWidth, naturalHeight } = e.currentTarget;
     
@@ -155,42 +115,17 @@ export function ImageCropper({
     }
   };
 
-  // Calculer le style de l'image avec rotation et position
+  // Calculer le style de l'image avec rotation - l'image remplit exactement le conteneur
   const getImageStyle = () => {
-    if (!imageRef.current) {
-      return {
-        transformOrigin: 'center center',
-        transition: 'transform 0.3s ease-in-out',
-        width: reactCropDimensions.width,
-        height: 'auto',
-        display: 'block' as const,
-        position: 'absolute' as const,
-        top: 0,
-        left: 0,
-        transform: `rotate(${rotation}deg)`
-      };
-    }
-
-    const { naturalWidth, naturalHeight } = imageRef.current;
-    const dimensions = calculateReactCropDimensions(naturalWidth, naturalHeight, rotation);
-    const { left, top } = calculateImagePosition(
-      naturalWidth, 
-      naturalHeight, 
-      rotation, 
-      dimensions.scale, 
-      reactCropDimensions.width, 
-      reactCropDimensions.height
-    );
-
     return {
       transformOrigin: 'center center',
       transition: 'transform 0.3s ease-in-out',
-      width: naturalWidth * dimensions.scale,
-      height: naturalHeight * dimensions.scale,
+      width: reactCropDimensions.width,
+      height: reactCropDimensions.height,
       display: 'block' as const,
       position: 'absolute' as const,
-      top: top,
-      left: left,
+      top: 0,
+      left: 0,
       transform: `rotate(${rotation}deg)`
     };
   };
