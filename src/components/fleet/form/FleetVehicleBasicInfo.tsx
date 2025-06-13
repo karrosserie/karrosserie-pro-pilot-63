@@ -34,21 +34,40 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
   const { carBrands, isLoading: brandsLoading } = useCarBrands();
   const { carModels, isLoading: modelsLoading } = useCarModels(formData.brand_id);
 
-  console.log('FleetVehicleBasicInfo - carBrands count:', carBrands?.length || 0);
-  console.log('FleetVehicleBasicInfo - formData.brand_id:', formData.brand_id);
-  console.log('FleetVehicleBasicInfo - carModels count:', carModels?.length || 0);
+  console.log('FleetVehicleBasicInfo - Render with:');
+  console.log('  - carBrands count:', carBrands?.length || 0);
+  console.log('  - formData.brand_id:', formData.brand_id);
+  console.log('  - carModels count:', carModels?.length || 0);
+  console.log('  - onBrandChange type:', typeof onBrandChange);
+  console.log('  - onModelChange type:', typeof onModelChange);
 
-  // Prepare brand options - use brand ID as value like in VehicleBasicDetails
+  // Prepare brand options
   const brandOptions = carBrands?.map(brand => ({
     value: brand.id,
     label: brand.name
   })) || [];
 
-  // Prepare model options - use model ID as value
+  // Prepare model options
   const modelOptions = carModels?.map(model => ({
     value: model.id,
     label: model.name
   })) || [];
+
+  console.log('FleetVehicleBasicInfo - Prepared options:');
+  console.log('  - brandOptions:', brandOptions);
+  console.log('  - modelOptions:', modelOptions);
+
+  const handleBrandChange = (brandId: string) => {
+    console.log('FleetVehicleBasicInfo - handleBrandChange called with:', brandId);
+    console.log('FleetVehicleBasicInfo - Calling onBrandChange...');
+    onBrandChange(brandId);
+  };
+
+  const handleModelChange = (modelId: string) => {
+    console.log('FleetVehicleBasicInfo - handleModelChange called with:', modelId);
+    console.log('FleetVehicleBasicInfo - Calling onModelChange...');
+    onModelChange(modelId);
+  };
 
   if (brandsLoading) {
     return (
@@ -110,7 +129,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
           <SearchableSelect
             options={brandOptions}
             value={formData.brand_id}
-            onValueChange={onBrandChange}
+            onValueChange={handleBrandChange}
             placeholder="Sélectionner une marque"
             disabled={isViewMode || brandsLoading}
             searchPlaceholder="Rechercher une marque..."
@@ -121,7 +140,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
           <SearchableSelect
             options={modelOptions}
             value={formData.model_id}
-            onValueChange={onModelChange}
+            onValueChange={handleModelChange}
             placeholder={
               !formData.brand_id 
                 ? "Sélectionnez d'abord une marque" 

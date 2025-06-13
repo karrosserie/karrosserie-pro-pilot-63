@@ -30,20 +30,25 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   // Find the selected option
   const selectedOption = options.find(option => option.value === value);
 
-  console.log('SearchableSelect - options count:', options.length);
-  console.log('SearchableSelect - value:', value);
-  console.log('SearchableSelect - selectedOption:', selectedOption);
+  console.log('SearchableSelect - Render with:');
+  console.log('  - options count:', options.length);
+  console.log('  - value:', value);
+  console.log('  - selectedOption:', selectedOption);
+  console.log('  - disabled:', disabled);
 
-  const handleSelect = (currentValue: string) => {
-    console.log('SearchableSelect - handleSelect called with:', currentValue);
-    
-    // currentValue is now the option value directly
-    if (currentValue !== value) {
-      console.log('SearchableSelect - Changing value to:', currentValue);
-      onValueChange(currentValue);
-    }
+  const handleSelect = (selectedValue: string) => {
+    console.log('SearchableSelect - handleSelect called with selectedValue:', selectedValue);
+    console.log('SearchableSelect - current value:', value);
+    console.log('SearchableSelect - onValueChange function:', typeof onValueChange);
     
     setOpen(false);
+    
+    if (selectedValue !== value) {
+      console.log('SearchableSelect - Calling onValueChange with:', selectedValue);
+      onValueChange(selectedValue);
+    } else {
+      console.log('SearchableSelect - Same value selected, no change needed');
+    }
   };
 
   return (
@@ -66,22 +71,28 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           <CommandList>
             <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
             <CommandGroup>
-              {options.map((option) => (
-                <CommandItem
-                  key={option.value}
-                  value={option.value}
-                  onSelect={handleSelect}
-                  className="cursor-pointer hover:bg-gray-100"
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === option.value ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {option.label}
-                </CommandItem>
-              ))}
+              {options.map((option) => {
+                console.log('SearchableSelect - Rendering option:', option);
+                return (
+                  <CommandItem
+                    key={option.value}
+                    value={option.value}
+                    onSelect={() => {
+                      console.log('SearchableSelect - CommandItem onSelect triggered for:', option);
+                      handleSelect(option.value);
+                    }}
+                    className="cursor-pointer hover:bg-gray-100"
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === option.value ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {option.label}
+                  </CommandItem>
+                );
+              })}
             </CommandGroup>
           </CommandList>
         </Command>
