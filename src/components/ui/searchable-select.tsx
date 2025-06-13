@@ -37,12 +37,15 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const handleSelect = (currentValue: string) => {
     console.log('SearchableSelect - handleSelect called with:', currentValue);
     
-    // Find the option that was selected
-    const selectedOption = options.find(option => option.label.toLowerCase() === currentValue.toLowerCase());
+    // The currentValue is the label, we need to find the corresponding value
+    const selectedOption = options.find(option => option.label === currentValue);
     
     if (selectedOption) {
       console.log('SearchableSelect - Found option:', selectedOption);
-      onValueChange(selectedOption.value);
+      // If the same option is selected, don't change anything
+      if (selectedOption.value !== value) {
+        onValueChange(selectedOption.value);
+      }
     }
     
     setOpen(false);

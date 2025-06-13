@@ -50,16 +50,6 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
     label: model.name
   })) || [];
 
-  const handleBrandChange = (brandId: string) => {
-    console.log('FleetVehicleBasicInfo - Brand changed to:', brandId);
-    onBrandChange(brandId);
-  };
-
-  const handleModelChange = (modelId: string) => {
-    console.log('FleetVehicleBasicInfo - Model changed to:', modelId);
-    onModelChange(modelId);
-  };
-
   if (brandsLoading) {
     return (
       <div className="space-y-4">
@@ -120,7 +110,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
           <SearchableSelect
             options={brandOptions}
             value={formData.brand_id}
-            onValueChange={handleBrandChange}
+            onValueChange={onBrandChange}
             placeholder="Sélectionner une marque"
             disabled={isViewMode || brandsLoading}
             searchPlaceholder="Rechercher une marque..."
@@ -131,7 +121,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
           <SearchableSelect
             options={modelOptions}
             value={formData.model_id}
-            onValueChange={handleModelChange}
+            onValueChange={onModelChange}
             placeholder={
               !formData.brand_id 
                 ? "Sélectionnez d'abord une marque" 
