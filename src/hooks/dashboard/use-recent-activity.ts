@@ -5,7 +5,6 @@ import { useClients } from '@/hooks/use-clients';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
-import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useCredits } from '@/hooks/use-credits';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { useExpenses } from '@/hooks/use-expenses';
@@ -17,13 +16,12 @@ export const useRecentActivity = () => {
   const { invoices } = useInvoices();
   const { quotes } = useQuotes();
   const { orders: repairOrders } = useRepairOrders();
-  const { reports: expertiseReports } = useExpertiseReports();
   const { credits } = useCredits();
   const { receipts } = useReceiptsData();
   const { expenses } = useExpenses();
 
   const { data: recentActivity } = useQuery({
-    queryKey: ['recent-activity', quotes, clients, vehicles, receipts, invoices, repairOrders, expertiseReports, credits, expenses],
+    queryKey: ['recent-activity', quotes, clients, vehicles, receipts, invoices, repairOrders, credits, expenses],
     queryFn: () => {
       const activities = [];
 
@@ -147,44 +145,6 @@ export const useRecentActivity = () => {
               icon: 'Receipt',
               iconBackground: 'bg-pink-500',
               title: 'Dépense mise à jour',
-              description,
-              time: `${updatedDate.toLocaleDateString('fr-FR')} à ${updatedDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
-              timestamp: updatedDate.getTime()
-            });
-          }
-        });
-      }
-
-      // Rapports d'expertise importés et mis à jour
-      if (expertiseReports) {
-        expertiseReports.forEach(report => {
-          const createdDate = new Date(report.created_at);
-          const updatedDate = report.updated_at ? new Date(report.updated_at) : null;
-          const vehicleInfo = getVehicleInfo(report.vehicle_id);
-          
-          let description = `Rapport d'expertise - ${vehicleInfo}`;
-          if (report.clients) {
-            description += ` - ${report.clients.first_name} ${report.clients.last_name}`;
-          }
-          
-          // Rapport d'expertise importé
-          activities.push({
-            id: `expertise-created-${report.id}`,
-            icon: 'ClipboardCheck',
-            iconBackground: 'bg-blue-500',
-            title: 'Rapport d\'expertise importé',
-            description,
-            time: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
-            timestamp: createdDate.getTime()
-          });
-
-          // Rapport d'expertise mis à jour
-          if (updatedDate && isUpdated(report.created_at, report.updated_at)) {
-            activities.push({
-              id: `expertise-updated-${report.id}`,
-              icon: 'ClipboardCheck',
-              iconBackground: 'bg-indigo-500',
-              title: 'Rapport d\'expertise mis à jour',
               description,
               time: `${updatedDate.toLocaleDateString('fr-FR')} à ${updatedDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
               timestamp: updatedDate.getTime()
@@ -374,7 +334,8 @@ export const useRecentActivity = () => {
         .sort((a, b) => b.timestamp - a.timestamp)
         .slice(0, 5);
     },
-    enabled: !!quotes && !!clients && !!vehicles && !!receipts && !!invoices && !!repairOrders && !!expertiseReports && !!credits && !!expenses
+    // Enlever la dépendance stricte aux expertiseReports qui causent l'erreur
+    enabled: !!quotes && !!clients && !!vehicles && !!receipts && !!invoices && !!repairOrders && !!credits && !!expenses
   });
 
   return { recentActivity };

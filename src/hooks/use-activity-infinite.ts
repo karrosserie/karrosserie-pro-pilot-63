@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useVehicles } from '@/hooks/use-vehicles';
@@ -27,7 +26,7 @@ export const useActivityInfinite = () => {
   const { expenses } = useExpenses();
 
   const { data: allActivities } = useQuery({
-    queryKey: ['all-activities', quotes, clients, vehicles, receipts, invoices, repairOrders, expertiseReports, credits, expenses],
+    queryKey: ['all-activities', quotes, clients, vehicles, receipts, invoices, repairOrders, credits, expenses],
     queryFn: () => {
       const activities = [];
 
@@ -376,7 +375,7 @@ export const useActivityInfinite = () => {
       // Trier par date (plus récent en premier)
       return activities.sort((a, b) => b.timestamp - a.timestamp);
     },
-    enabled: !!quotes && !!clients && !!vehicles && !!receipts && !!invoices && !!repairOrders && !!expertiseReports && !!credits && !!expenses
+    enabled: !!quotes && !!clients && !!vehicles && !!receipts && !!invoices && !!repairOrders && !!credits && !!expenses
   });
 
   const totalActivities = allActivities || [];
