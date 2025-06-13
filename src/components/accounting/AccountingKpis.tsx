@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { KpiTile } from './KpiTile';
-import { Euro, TrendingUp, CreditCard, Receipt, AlertTriangle, Calendar } from 'lucide-react';
+import { Euro, TrendingUp, CreditCard, Receipt, Calendar } from 'lucide-react';
 
 interface KpiData {
   title: string;
@@ -78,15 +78,6 @@ export const AccountingKpis = ({
       period: 'Janvier 2025',
       variant: 'default',
       icon: <TrendingUp className="h-6 w-6" />
-    },
-    {
-      title: 'TVA à payer',
-      value: formatCurrency(totalReceipts * 0.2),
-      trend: 'Échéance dans 5j',
-      trendUp: false,
-      period: 'Déclaration Q4',
-      variant: 'warning',
-      icon: <AlertTriangle className="h-6 w-6" />
     }
   ];
 

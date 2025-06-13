@@ -28,10 +28,6 @@ export const TransactionTable = ({ transactions }: TransactionTableProps) => {
             icon={Receipt}
             title="Aucune transaction trouvée"
             description="Commencez par ajouter vos premières transactions pour suivre votre activité comptable."
-            action={{
-              label: "Ajouter une transaction",
-              onClick: () => console.log('Add transaction')
-            }}
           />
         </CardContent>
       </Card>
