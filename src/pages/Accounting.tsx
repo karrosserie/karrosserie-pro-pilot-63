@@ -1,15 +1,16 @@
 
 import React, { useState } from 'react';
-import StatsCards from '@/components/accounting/StatsCards';
-import TransactionFilters from '@/components/accounting/TransactionFilters';
-import TransactionTable from '@/components/accounting/TransactionTable';
-import ReportContent from '@/components/accounting/ReportContent';
+import { AccountingHeader } from '@/components/accounting/AccountingHeader';
+import { AccountingKpis } from '@/components/accounting/AccountingKpis';
+import { AccountingTabs } from '@/components/accounting/AccountingTabs';
 import { useAccountingData } from '@/hooks/use-accounting-data';
+import { useToast } from '@/hooks/use-toast';
 
 const Accounting = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState<'all' | 'receipts' | 'expenses'>('all');
-  const { transactions, statsCards, isLoading } = useAccountingData();
+  const [selectedFilter, setSelectedFilter] = useState<'all' | 'receipts' | 'expenses' | 'unpaid'>('all');
+  const { transactions, isLoading, totalReceipts, totalExpenses, balance } = useAccountingData();
+  const { toast } = useToast();
   
   const filteredTransactions = transactions.filter(transaction => {
     const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -17,24 +18,32 @@ const Accounting = () => {
     
     const matchesFilter = selectedFilter === 'all' || 
                          (selectedFilter === 'receipts' && transaction.type === 'Encaissement') ||
-                         (selectedFilter === 'expenses' && transaction.type === 'Dépense');
+                         (selectedFilter === 'expenses' && transaction.type === 'Dépense') ||
+                         (selectedFilter === 'unpaid' && transaction.status === 'En attente');
     
     return matchesSearch && matchesFilter;
   });
 
+  const handleAddTransaction = () => {
+    toast({
+      title: "Fonctionnalité en développement",
+      description: "L'ajout de transactions sera bientôt disponible.",
+    });
+  };
+
+  const handleExport = (type: 'fec' | 'excel' | 'pdf') => {
+    toast({
+      title: `Export ${type.toUpperCase()} en cours`,
+      description: "Votre fichier sera téléchargé dans quelques instants.",
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="page-container">
-        <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Comptabilité</h1>
-          <p className="text-gray-600 mt-1">
-            Consultez et gérez votre comptabilité.
-          </p>
-        </div>
-        
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className="text-gray-500">Chargement des données comptables...</p>
           </div>
         </div>
@@ -44,32 +53,25 @@ const Accounting = () => {
 
   return (
     <div className="page-container">
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Comptabilité</h1>
-        <p className="text-gray-600 mt-1">
-          Consultez et gérez votre comptabilité.
-        </p>
-      </div>
+      <AccountingHeader 
+        onAddTransaction={handleAddTransaction}
+        onExport={handleExport}
+      />
       
-      <StatsCards cards={statsCards} />
+      <AccountingKpis 
+        totalReceipts={totalReceipts}
+        totalExpenses={totalExpenses}
+        balance={balance}
+        transactionCount={transactions.length}
+      />
       
-      {/* Section Transactions */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Transactions</h2>
-        <TransactionFilters
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          selectedFilter={selectedFilter}
-          setSelectedFilter={setSelectedFilter}
-        />
-        <TransactionTable transactions={filteredTransactions} />
-      </div>
-      
-      {/* Section Rapports */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Rapports</h2>
-        <ReportContent />
-      </div>
+      <AccountingTabs
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        selectedFilter={selectedFilter}
+        setSelectedFilter={setSelectedFilter}
+        filteredTransactions={filteredTransactions}
+      />
     </div>
   );
 };

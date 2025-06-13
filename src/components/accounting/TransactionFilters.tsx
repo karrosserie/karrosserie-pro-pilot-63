@@ -3,69 +3,71 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Filter, Calendar } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface TransactionFiltersProps {
   searchTerm: string;
   setSearchTerm: (value: string) => void;
-  selectedFilter: 'all' | 'receipts' | 'expenses';
-  setSelectedFilter: (filter: 'all' | 'receipts' | 'expenses') => void;
+  selectedFilter: 'all' | 'receipts' | 'expenses' | 'unpaid';
+  setSelectedFilter: (filter: 'all' | 'receipts' | 'expenses' | 'unpaid') => void;
 }
 
-const TransactionFilters = ({ 
+export const TransactionFilters = ({ 
   searchTerm, 
   setSearchTerm, 
   selectedFilter, 
   setSelectedFilter 
 }: TransactionFiltersProps) => {
+  const filters = [
+    { value: 'all', label: 'Tous', count: 45 },
+    { value: 'receipts', label: 'Encaissements', count: 28 },
+    { value: 'expenses', label: 'Dépenses', count: 17 },
+    { value: 'unpaid', label: 'Impayés', count: 3 }
+  ] as const;
+
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
-      <div className="flex items-center mb-4 md:mb-0">
-        <Button 
-          variant={selectedFilter === 'all' ? 'default' : 'outline'} 
-          size="sm" 
-          className="mr-2"
-          onClick={() => setSelectedFilter('all')}
-        >
-          Tous
-        </Button>
-        <Button 
-          variant={selectedFilter === 'receipts' ? 'default' : 'outline'} 
-          size="sm" 
-          className="mr-2"
-          onClick={() => setSelectedFilter('receipts')}
-        >
-          Encaissements
-        </Button>
-        <Button 
-          variant={selectedFilter === 'expenses' ? 'default' : 'outline'} 
-          size="sm"
-          onClick={() => setSelectedFilter('expenses')}
-        >
-          Dépenses
-        </Button>
+    <div className="space-y-4">
+      {/* Filtres principaux */}
+      <div className="flex flex-wrap gap-2">
+        {filters.map((filter) => (
+          <Button
+            key={filter.value}
+            variant={selectedFilter === filter.value ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setSelectedFilter(filter.value)}
+            className="gap-2"
+          >
+            {filter.label}
+            <Badge variant="secondary" className="text-xs">
+              {filter.count}
+            </Badge>
+          </Button>
+        ))}
       </div>
       
-      <div className="flex items-center w-full md:w-auto space-x-2">
-        <div className="relative flex-1 md:w-60">
+      {/* Barre de recherche et filtres avancés */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input 
-            placeholder="Rechercher une transaction..." 
+            placeholder="Rechercher une transaction, client, ou référence..." 
             className="pl-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         
-        <Button variant="outline" size="icon">
-          <Calendar className="h-4 w-4" />
-        </Button>
-        
-        <Button variant="outline" size="icon">
-          <Filter className="h-4 w-4" />
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="gap-2">
+            <Calendar className="h-4 w-4" />
+            Période
+          </Button>
+          <Button variant="outline" size="sm" className="gap-2">
+            <Filter className="h-4 w-4" />
+            Plus de filtres
+          </Button>
+        </div>
       </div>
     </div>
   );
 };
-
-export default TransactionFilters;

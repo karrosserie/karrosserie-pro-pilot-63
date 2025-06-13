@@ -9,70 +9,110 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Button } from '@/components/ui/button';
-import { Eye, Receipt } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Eye, MoreHorizontal, Receipt, TrendingUp } from 'lucide-react';
 import { Transaction } from '@/hooks/use-accounting-data';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface TransactionTableProps {
   transactions: Transaction[];
 }
 
-const TransactionTable = ({ transactions }: TransactionTableProps) => {
+export const TransactionTable = ({ transactions }: TransactionTableProps) => {
+  if (transactions.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-8">
+          <EmptyState
+            icon={Receipt}
+            title="Aucune transaction trouvée"
+            description="Commencez par ajouter vos premières transactions pour suivre votre activité comptable."
+            action={{
+              label: "Ajouter une transaction",
+              onClick: () => console.log('Add transaction')
+            }}
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <div className="card-container">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Client</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Méthode</TableHead>
-            <TableHead>Montant</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {transactions.length > 0 ? (
-            transactions.map((transaction) => (
-              <TableRow key={transaction.id}>
-                <TableCell>{transaction.date}</TableCell>
-                <TableCell>{transaction.description}</TableCell>
-                <TableCell>{transaction.client}</TableCell>
+    <Card>
+      <CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-b border-gray-200">
+              <TableHead className="font-semibold">Date</TableHead>
+              <TableHead className="font-semibold">Description</TableHead>
+              <TableHead className="font-semibold">Client</TableHead>
+              <TableHead className="font-semibold">Type</TableHead>
+              <TableHead className="font-semibold">Méthode</TableHead>
+              <TableHead className="font-semibold text-right">Montant</TableHead>
+              <TableHead className="font-semibold text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {transactions.map((transaction) => (
+              <TableRow 
+                key={transaction.id}
+                className="hover:bg-gray-50 transition-colors duration-200"
+              >
+                <TableCell className="font-medium">
+                  {transaction.date}
+                </TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${transaction.type === 'Encaissement' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  <div className="max-w-xs truncate">
+                    {transaction.description}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="max-w-xs truncate font-medium">
+                    {transaction.client}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge 
+                    variant={transaction.type === 'Encaissement' ? 'default' : 'secondary'}
+                    className={
+                      transaction.type === 'Encaissement' 
+                        ? 'bg-green-100 text-green-800 hover:bg-green-100' 
+                        : 'bg-red-100 text-red-800 hover:bg-red-100'
+                    }
+                  >
                     {transaction.type}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm text-gray-600">
+                    {transaction.method}
                   </span>
                 </TableCell>
-                <TableCell>{transaction.method}</TableCell>
-                <TableCell className={`font-medium ${transaction.type === 'Encaissement' ? 'text-green-600' : 'text-red-600'}`}>
-                  {transaction.type === 'Encaissement' ? '+' : '-'} {transaction.amount}
+                <TableCell className="text-right">
+                  <span className={`font-bold ${
+                    transaction.type === 'Encaissement' 
+                      ? 'text-green-600' 
+                      : 'text-red-600'
+                  }`}>
+                    {transaction.type === 'Encaissement' ? '+' : '-'} {transaction.amount}
+                  </span>
                 </TableCell>
                 <TableCell className="text-right">
-                  <div className="flex justify-end space-x-1">
-                    <Button variant="ghost" size="icon">
+                  <div className="flex justify-end gap-1">
+                    <Button variant="ghost" size="sm">
                       <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm">
+                      <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </div>
                 </TableCell>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={7} className="text-center py-4">
-                <div className="flex flex-col items-center justify-center py-8">
-                  <Receipt className="h-10 w-10 text-gray-400 mb-2" />
-                  <h3 className="font-medium text-gray-900">Aucune transaction</h3>
-                  <p className="text-gray-500 mt-1">
-                    Aucune transaction n'a été trouvée.
-                  </p>
-                </div>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 };
-
-export default TransactionTable;

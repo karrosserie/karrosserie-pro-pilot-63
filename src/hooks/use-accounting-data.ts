@@ -54,7 +54,8 @@ export const useAccountingData = () => {
             type: 'Encaissement',
             method: receipt.payment_method || 'Non spécifié',
             amount: formatCurrency(receipt.amount),
-            client: clientName
+            client: clientName,
+            status: receipt.status
           });
         });
       }
@@ -85,40 +86,8 @@ export const useAccountingData = () => {
   const totalExpenses = expenses?.reduce((sum, expense) => sum + expense.total_amount, 0) || 0;
   const balance = totalReceipts - totalExpenses;
 
-  const statsCards = [
-    {
-      title: 'Encaissements du mois',
-      value: formatCurrency(totalReceipts),
-      period: 'Ce mois',
-      trend: '+12%',
-      trendUp: true
-    },
-    {
-      title: 'Dépenses du mois',
-      value: formatCurrency(totalExpenses),
-      period: 'Ce mois',
-      trend: '+8%',
-      trendUp: false
-    },
-    {
-      title: 'Bénéfice net',
-      value: formatCurrency(balance),
-      period: 'Ce mois',
-      trend: balance >= 0 ? '+15%' : '-5%',
-      trendUp: balance >= 0
-    },
-    {
-      title: 'Nombre de transactions',
-      value: transactions.length.toString(),
-      period: 'Ce mois',
-      trend: '+22%',
-      trendUp: true
-    }
-  ];
-
   return {
     transactions,
-    statsCards,
     isLoading: isLoading || invoicesLoading || receiptsLoading || expensesLoading || clientsLoading,
     totalReceipts,
     totalExpenses,
