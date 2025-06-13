@@ -59,8 +59,8 @@ export function ImageCropper({
     };
   };
 
-  // Calculer la position pour aligner le coin supérieur gauche de l'image pivotée
-  const calculateImagePosition = (naturalWidth: number, naturalHeight: number, rotation: number, scale: number) => {
+  // Calculer la position pour centrer l'image dans le conteneur ReactCrop
+  const calculateImagePosition = (naturalWidth: number, naturalHeight: number, rotation: number, scale: number, containerWidth: number, containerHeight: number) => {
     if (rotation === 0) {
       return { left: 0, top: 0 };
     }
@@ -71,27 +71,13 @@ export function ImageCropper({
     const scaledWidth = naturalWidth * scale;
     const scaledHeight = naturalHeight * scale;
     
-    // Les 4 coins de l'image avant rotation (par rapport au centre de l'image)
-    const corners = [
-      { x: -scaledWidth / 2, y: -scaledHeight / 2 }, // coin supérieur gauche
-      { x: scaledWidth / 2, y: -scaledHeight / 2 },  // coin supérieur droit
-      { x: scaledWidth / 2, y: scaledHeight / 2 },   // coin inférieur droit
-      { x: -scaledWidth / 2, y: scaledHeight / 2 }   // coin inférieur gauche
-    ];
+    // Centre du conteneur
+    const containerCenterX = containerWidth / 2;
+    const containerCenterY = containerHeight / 2;
     
-    // Appliquer la rotation aux coins
-    const rotatedCorners = corners.map(corner => ({
-      x: corner.x * Math.cos(rotRad) - corner.y * Math.sin(rotRad),
-      y: corner.x * Math.sin(rotRad) + corner.y * Math.cos(rotRad)
-    }));
-    
-    // Trouver les limites de la bounding box après rotation
-    const minX = Math.min(...rotatedCorners.map(c => c.x));
-    const minY = Math.min(...rotatedCorners.map(c => c.y));
-    
-    // Position de l'image pour que son coin supérieur gauche après rotation soit à (0,0)
-    const left = -minX;
-    const top = -minY;
+    // Position pour centrer l'image dans le conteneur
+    const left = containerCenterX - scaledWidth / 2;
+    const top = containerCenterY - scaledHeight / 2;
     
     return { left, top };
   };
@@ -170,7 +156,14 @@ export function ImageCropper({
 
     const { naturalWidth, naturalHeight } = imageRef.current;
     const dimensions = calculateReactCropDimensions(naturalWidth, naturalHeight, rotation);
-    const { left, top } = calculateImagePosition(naturalWidth, naturalHeight, rotation, dimensions.scale);
+    const { left, top } = calculateImagePosition(
+      naturalWidth, 
+      naturalHeight, 
+      rotation, 
+      dimensions.scale, 
+      reactCropDimensions.width, 
+      reactCropDimensions.height
+    );
 
     return {
       transformOrigin: 'center center',
