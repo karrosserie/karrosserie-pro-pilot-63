@@ -29,6 +29,7 @@ export function ImageCropper({
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [isLoading, setIsLoading] = useState(false);
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+  const [containerDimensions, setContainerDimensions] = useState({ width: 800, height: 600 });
   const imageRef = useRef<HTMLImageElement>(null);
   const { rotation, rotateImage, resetRotation } = useImageRotation();
 
@@ -49,6 +50,21 @@ export function ImageCropper({
     );
     
     setImageDimensions(displayDimensions);
+    
+    // Calculer les dimensions du conteneur en fonction de la rotation
+    const rotatedContainer = calculateDisplayDimensions(
+      naturalWidth,
+      naturalHeight,
+      rotation,
+      containerWidth,
+      containerHeight
+    );
+    
+    // Ajuster le conteneur pour accueillir l'image pivotée
+    setContainerDimensions({
+      width: Math.max(containerWidth, rotatedContainer.width + 100),
+      height: Math.max(containerHeight, rotatedContainer.height + 100)
+    });
     
     // Initialiser avec un recadrage libre couvrant 90% de l'image
     const crop: Crop = {
@@ -108,17 +124,32 @@ export function ImageCropper({
       );
       
       setImageDimensions(newDisplayDimensions);
+      
+      // Recalculer les dimensions du conteneur pour l'image pivotée
+      const rotatedContainer = calculateDisplayDimensions(
+        naturalWidth,
+        naturalHeight,
+        rotation + degrees,
+        containerWidth,
+        containerHeight
+      );
+      
+      // Ajuster le conteneur avec plus d'espace pour éviter la troncature
+      setContainerDimensions({
+        width: Math.max(containerWidth, rotatedContainer.width + 150),
+        height: Math.max(containerHeight, rotatedContainer.height + 150)
+      });
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-6xl">
         <DialogHeader>
           <DialogTitle>Recadrer l'image</DialogTitle>
         </DialogHeader>
         
-        <div className="my-4 max-h-[70vh] overflow-auto">
+        <div className="my-4 overflow-auto" style={{ maxHeight: '80vh' }}>
           <div className="mb-4 flex justify-center gap-2">
             <Button
               variant="outline"
@@ -140,7 +171,15 @@ export function ImageCropper({
             </Button>
           </div>
           
-          <div className="flex justify-center">
+          <div 
+            className="flex justify-center items-center"
+            style={{
+              minWidth: `${containerDimensions.width}px`,
+              minHeight: `${containerDimensions.height}px`,
+              width: '100%',
+              height: 'auto'
+            }}
+          >
             <ReactCrop
               crop={crop}
               onChange={(c) => setCrop(c)}
@@ -155,8 +194,8 @@ export function ImageCropper({
                 style={{
                   transform: `rotate(${rotation}deg)`,
                   transition: 'transform 0.3s ease-in-out',
-                  maxWidth: '100%',
-                  maxHeight: '60vh',
+                  maxWidth: 'none',
+                  maxHeight: 'none',
                   width: imageDimensions.width || 'auto',
                   height: imageDimensions.height || 'auto',
                   objectFit: 'contain'
