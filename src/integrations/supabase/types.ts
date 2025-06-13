@@ -851,17 +851,23 @@ export type Database = {
       invoices: {
         Row: {
           amount: number
+          claim_number: string | null
           client_id: string | null
           created_at: string
+          current_mileage: string | null
+          discounts_data: Json | null
           document_url: string | null
           due_date: string | null
           id: string
           notes: string | null
+          parts_data: Json | null
           payment_date: string | null
+          payment_details: string | null
           payment_due_date: string | null
           payment_method: string | null
           reference: string
           repair_order_id: string | null
+          repairs_data: Json | null
           status: string | null
           tax_rate: number | null
           updated_at: string
@@ -870,17 +876,23 @@ export type Database = {
         }
         Insert: {
           amount: number
+          claim_number?: string | null
           client_id?: string | null
           created_at?: string
+          current_mileage?: string | null
+          discounts_data?: Json | null
           document_url?: string | null
           due_date?: string | null
           id?: string
           notes?: string | null
+          parts_data?: Json | null
           payment_date?: string | null
+          payment_details?: string | null
           payment_due_date?: string | null
           payment_method?: string | null
           reference: string
           repair_order_id?: string | null
+          repairs_data?: Json | null
           status?: string | null
           tax_rate?: number | null
           updated_at?: string
@@ -889,17 +901,23 @@ export type Database = {
         }
         Update: {
           amount?: number
+          claim_number?: string | null
           client_id?: string | null
           created_at?: string
+          current_mileage?: string | null
+          discounts_data?: Json | null
           document_url?: string | null
           due_date?: string | null
           id?: string
           notes?: string | null
+          parts_data?: Json | null
           payment_date?: string | null
+          payment_details?: string | null
           payment_due_date?: string | null
           payment_method?: string | null
           reference?: string
           repair_order_id?: string | null
+          repairs_data?: Json | null
           status?: string | null
           tax_rate?: number | null
           updated_at?: string
