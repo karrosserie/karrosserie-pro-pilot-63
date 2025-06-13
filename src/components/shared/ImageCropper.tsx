@@ -59,26 +59,41 @@ export function ImageCropper({
     };
   };
 
-  // Calculer l'offset pour aligner le coin supérieur gauche de l'image pivotée
-  const calculateImageOffset = (naturalWidth: number, naturalHeight: number, rotation: number) => {
+  // Calculer la position pour aligner le coin supérieur gauche de l'image pivotée
+  const calculateImagePosition = (naturalWidth: number, naturalHeight: number, rotation: number, scale: number) => {
     const rotRad = (rotation * Math.PI) / 180;
     
-    // Calculer où se trouve le coin supérieur gauche après rotation
-    let offsetX = 0;
-    let offsetY = 0;
+    // Dimensions de l'image mise à l'échelle
+    const scaledWidth = naturalWidth * scale;
+    const scaledHeight = naturalHeight * scale;
     
-    if (rotation === 90 || rotation === -270) {
-      offsetX = naturalHeight;
-      offsetY = 0;
-    } else if (rotation === 180 || rotation === -180) {
-      offsetX = naturalWidth;
-      offsetY = naturalHeight;
-    } else if (rotation === 270 || rotation === -90) {
-      offsetX = 0;
-      offsetY = naturalWidth;
-    }
+    // Centre de l'image mise à l'échelle
+    const centerX = scaledWidth / 2;
+    const centerY = scaledHeight / 2;
     
-    return { offsetX, offsetY };
+    // Calculer les coins de l'image après rotation autour de son centre
+    const corners = [
+      { x: -centerX, y: -centerY }, // coin supérieur gauche
+      { x: centerX, y: -centerY },  // coin supérieur droit
+      { x: centerX, y: centerY },   // coin inférieur droit
+      { x: -centerX, y: centerY }   // coin inférieur gauche
+    ];
+    
+    // Appliquer la rotation aux coins
+    const rotatedCorners = corners.map(corner => ({
+      x: corner.x * Math.cos(rotRad) - corner.y * Math.sin(rotRad),
+      y: corner.x * Math.sin(rotRad) + corner.y * Math.cos(rotRad)
+    }));
+    
+    // Trouver le coin supérieur gauche de la bounding box
+    const minX = Math.min(...rotatedCorners.map(c => c.x));
+    const minY = Math.min(...rotatedCorners.map(c => c.y));
+    
+    // Position pour aligner le coin supérieur gauche avec le conteneur
+    const left = centerX - minX;
+    const top = centerY - minY;
+    
+    return { left, top };
   };
 
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -141,7 +156,7 @@ export function ImageCropper({
   const getImageStyle = () => {
     if (!imageRef.current) {
       return {
-        transformOrigin: 'top left',
+        transformOrigin: 'center center',
         transition: 'transform 0.3s ease-in-out',
         width: reactCropDimensions.width,
         height: 'auto',
@@ -154,22 +169,18 @@ export function ImageCropper({
     }
 
     const { naturalWidth, naturalHeight } = imageRef.current;
-    const { offsetX, offsetY } = calculateImageOffset(naturalWidth, naturalHeight, rotation);
     const dimensions = calculateReactCropDimensions(naturalWidth, naturalHeight, rotation);
-    
-    // Appliquer l'échelle à l'offset
-    const scaledOffsetX = offsetX * dimensions.scale;
-    const scaledOffsetY = offsetY * dimensions.scale;
+    const { left, top } = calculateImagePosition(naturalWidth, naturalHeight, rotation, dimensions.scale);
 
     return {
-      transformOrigin: 'top left',
+      transformOrigin: 'center center',
       transition: 'transform 0.3s ease-in-out',
-      width: reactCropDimensions.width,
-      height: 'auto',
+      width: naturalWidth * dimensions.scale,
+      height: naturalHeight * dimensions.scale,
       display: 'block' as const,
       position: 'absolute' as const,
-      top: -scaledOffsetY,
-      left: -scaledOffsetX,
+      top: top,
+      left: left,
       transform: `rotate(${rotation}deg)`
     };
   };
