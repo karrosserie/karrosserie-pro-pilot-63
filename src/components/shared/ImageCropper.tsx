@@ -59,6 +59,28 @@ export function ImageCropper({
     };
   };
 
+  // Calculer l'offset pour aligner le coin supérieur gauche de l'image pivotée
+  const calculateImageOffset = (naturalWidth: number, naturalHeight: number, rotation: number) => {
+    const rotRad = (rotation * Math.PI) / 180;
+    
+    // Calculer où se trouve le coin supérieur gauche après rotation
+    let offsetX = 0;
+    let offsetY = 0;
+    
+    if (rotation === 90 || rotation === -270) {
+      offsetX = naturalHeight;
+      offsetY = 0;
+    } else if (rotation === 180 || rotation === -180) {
+      offsetX = naturalWidth;
+      offsetY = naturalHeight;
+    } else if (rotation === 270 || rotation === -90) {
+      offsetX = 0;
+      offsetY = naturalWidth;
+    }
+    
+    return { offsetX, offsetY };
+  };
+
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { naturalWidth, naturalHeight } = e.currentTarget;
     
@@ -115,6 +137,43 @@ export function ImageCropper({
     }
   };
 
+  // Calculer la position de l'image avec rotation
+  const getImageStyle = () => {
+    if (!imageRef.current) {
+      return {
+        transformOrigin: 'top left',
+        transition: 'transform 0.3s ease-in-out',
+        width: reactCropDimensions.width,
+        height: 'auto',
+        display: 'block' as const,
+        position: 'absolute' as const,
+        top: 0,
+        left: 0,
+        transform: `rotate(${rotation}deg)`
+      };
+    }
+
+    const { naturalWidth, naturalHeight } = imageRef.current;
+    const { offsetX, offsetY } = calculateImageOffset(naturalWidth, naturalHeight, rotation);
+    const dimensions = calculateReactCropDimensions(naturalWidth, naturalHeight, rotation);
+    
+    // Appliquer l'échelle à l'offset
+    const scaledOffsetX = offsetX * dimensions.scale;
+    const scaledOffsetY = offsetY * dimensions.scale;
+
+    return {
+      transformOrigin: 'top left',
+      transition: 'transform 0.3s ease-in-out',
+      width: reactCropDimensions.width,
+      height: 'auto',
+      display: 'block' as const,
+      position: 'absolute' as const,
+      top: -scaledOffsetY,
+      left: -scaledOffsetX,
+      transform: `rotate(${rotation}deg)`
+    };
+  };
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-6xl max-h-[95vh] overflow-hidden">
@@ -165,17 +224,7 @@ export function ImageCropper({
                 src={imageUrl}
                 alt="Image à recadrer"
                 onLoad={onImageLoad}
-                style={{
-                  transformOrigin: 'top left',
-                  transition: 'transform 0.3s ease-in-out',
-                  width: reactCropDimensions.width,
-                  height: 'auto',
-                  display: 'block',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  transform: `rotate(${rotation}deg)`
-                }}
+                style={getImageStyle()}
               />
             </ReactCrop>
           </div>
