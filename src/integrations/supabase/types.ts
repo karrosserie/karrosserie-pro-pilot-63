@@ -855,6 +855,7 @@ export type Database = {
           client_id: string | null
           created_at: string
           current_mileage: string | null
+          description: string | null
           discounts_data: Json | null
           document_url: string | null
           due_date: string | null
@@ -875,11 +876,12 @@ export type Database = {
           vehicle_id: string | null
         }
         Insert: {
-          amount: number
+          amount?: number
           claim_number?: string | null
           client_id?: string | null
           created_at?: string
           current_mileage?: string | null
+          description?: string | null
           discounts_data?: Json | null
           document_url?: string | null
           due_date?: string | null
@@ -905,6 +907,7 @@ export type Database = {
           client_id?: string | null
           created_at?: string
           current_mileage?: string | null
+          description?: string | null
           discounts_data?: Json | null
           document_url?: string | null
           due_date?: string | null
