@@ -1,23 +1,66 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { invoicesService, NewInvoice, UpdateInvoice } from '@/services/supabase/invoices';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 export function useInvoices() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  
+
   const {
     data: invoices,
     isLoading,
     error
   } = useQuery({
     queryKey: ['invoices'],
-    queryFn: invoicesService.getAll
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('invoices')
+        .select(`
+          *,
+          clients(first_name, last_name),
+          vehicles(
+            id,
+            license_plate,
+            car_brands(id, name),
+            car_models(id, name)
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching invoices:', error);
+        throw new Error(error.message);
+      }
+
+      return data;
+    }
   });
-  
+
   const createInvoice = useMutation({
-    mutationFn: (newInvoice: NewInvoice) => invoicesService.create(newInvoice),
+    mutationFn: async (invoiceData: any) => {
+      const { data, error } = await supabase
+        .from('invoices')
+        .insert([invoiceData])
+        .select(`
+          *,
+          clients(first_name, last_name),
+          vehicles(
+            id,
+            license_plate,
+            car_brands(id, name),
+            car_models(id, name)
+          )
+        `)
+        .single();
+
+      if (error) {
+        console.error('Error creating invoice:', error);
+        throw new Error(error.message);
+      }
+
+      return data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
       toast({
@@ -33,10 +76,32 @@ export function useInvoices() {
       });
     }
   });
-  
+
   const updateInvoice = useMutation({
-    mutationFn: ({ id, data }: { id: string, data: UpdateInvoice }) => 
-      invoicesService.update(id, data),
+    mutationFn: async ({ id, data }: { id: string, data: any }) => {
+      const { data: result, error } = await supabase
+        .from('invoices')
+        .update(data)
+        .eq('id', id)
+        .select(`
+          *,
+          clients(first_name, last_name),
+          vehicles(
+            id,
+            license_plate,
+            car_brands(id, name),
+            car_models(id, name)
+          )
+        `)
+        .single();
+
+      if (error) {
+        console.error('Error updating invoice:', error);
+        throw new Error(error.message);
+      }
+
+      return result;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
       toast({
@@ -52,9 +117,21 @@ export function useInvoices() {
       });
     }
   });
-  
+
   const deleteInvoice = useMutation({
-    mutationFn: (id: string) => invoicesService.delete(id),
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('invoices')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting invoice:', error);
+        throw new Error(error.message);
+      }
+
+      return true;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
       toast({
@@ -70,7 +147,7 @@ export function useInvoices() {
       });
     }
   });
-  
+
   return {
     invoices,
     isLoading,
@@ -78,23 +155,5 @@ export function useInvoices() {
     createInvoice,
     updateInvoice,
     deleteInvoice
-  };
-}
-
-export function useInvoice(id?: string) {
-  const {
-    data: invoice,
-    isLoading,
-    error
-  } = useQuery({
-    queryKey: ['invoices', id],
-    queryFn: () => id ? invoicesService.getById(id) : null,
-    enabled: !!id
-  });
-  
-  return {
-    invoice,
-    isLoading,
-    error
   };
 }

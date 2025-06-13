@@ -1,23 +1,66 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { quotesService, NewQuote, UpdateQuote } from '@/services/supabase/quotes';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 export function useQuotes() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  
+
   const {
     data: quotes,
     isLoading,
     error
   } = useQuery({
     queryKey: ['quotes'],
-    queryFn: quotesService.getAll
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('quotes')
+        .select(`
+          *,
+          clients(first_name, last_name),
+          vehicles(
+            id,
+            license_plate,
+            car_brands(id, name),
+            car_models(id, name)
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching quotes:', error);
+        throw new Error(error.message);
+      }
+
+      return data;
+    }
   });
-  
+
   const createQuote = useMutation({
-    mutationFn: (newQuote: NewQuote) => quotesService.create(newQuote),
+    mutationFn: async (quoteData: any) => {
+      const { data, error } = await supabase
+        .from('quotes')
+        .insert([quoteData])
+        .select(`
+          *,
+          clients(first_name, last_name),
+          vehicles(
+            id,
+            license_plate,
+            car_brands(id, name),
+            car_models(id, name)
+          )
+        `)
+        .single();
+
+      if (error) {
+        console.error('Error creating quote:', error);
+        throw new Error(error.message);
+      }
+
+      return data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
       toast({
@@ -33,10 +76,32 @@ export function useQuotes() {
       });
     }
   });
-  
+
   const updateQuote = useMutation({
-    mutationFn: ({ id, data }: { id: string, data: UpdateQuote }) => 
-      quotesService.update(id, data),
+    mutationFn: async ({ id, data }: { id: string, data: any }) => {
+      const { data: result, error } = await supabase
+        .from('quotes')
+        .update(data)
+        .eq('id', id)
+        .select(`
+          *,
+          clients(first_name, last_name),
+          vehicles(
+            id,
+            license_plate,
+            car_brands(id, name),
+            car_models(id, name)
+          )
+        `)
+        .single();
+
+      if (error) {
+        console.error('Error updating quote:', error);
+        throw new Error(error.message);
+      }
+
+      return result;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
       toast({
@@ -52,9 +117,21 @@ export function useQuotes() {
       });
     }
   });
-  
+
   const deleteQuote = useMutation({
-    mutationFn: (id: string) => quotesService.delete(id),
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('quotes')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting quote:', error);
+        throw new Error(error.message);
+      }
+
+      return true;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
       toast({
@@ -70,7 +147,7 @@ export function useQuotes() {
       });
     }
   });
-  
+
   return {
     quotes,
     isLoading,
@@ -78,23 +155,5 @@ export function useQuotes() {
     createQuote,
     updateQuote,
     deleteQuote
-  };
-}
-
-export function useQuote(id?: string) {
-  const {
-    data: quote,
-    isLoading,
-    error
-  } = useQuery({
-    queryKey: ['quotes', id],
-    queryFn: () => id ? quotesService.getById(id) : null,
-    enabled: !!id
-  });
-  
-  return {
-    quote,
-    isLoading,
-    error
   };
 }

@@ -1,146 +1,159 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { creditsService, Credit } from '@/services/supabase/credits';
 
 export function useCredits() {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+  const { toast } = useToast();
+
   const {
-    data: credits = [],
+    data: credits,
     isLoading,
     error
   } = useQuery({
     queryKey: ['credits'],
-    queryFn: creditsService.getCredits,
-    retry: false,
-    staleTime: 1000 * 60 * 5
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('credits')
+        .select(`
+          *,
+          clients(first_name, last_name),
+          vehicles(
+            id,
+            license_plate,
+            car_brands(id, name),
+            car_models(id, name)
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching credits:', error);
+        throw new Error(error.message);
+      }
+
+      return data;
+    }
   });
-  
+
   const createCredit = useMutation({
-    mutationFn: creditsService.createCredit,
+    mutationFn: async (creditData: any) => {
+      const { data, error } = await supabase
+        .from('credits')
+        .insert([creditData])
+        .select(`
+          *,
+          clients(first_name, last_name),
+          vehicles(
+            id,
+            license_plate,
+            car_brands(id, name),
+            car_models(id, name)
+          )
+        `)
+        .single();
+
+      if (error) {
+        console.error('Error creating credit:', error);
+        throw new Error(error.message);
+      }
+
+      return data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['credits'] });
       toast({
         title: "Avoir créé",
-        description: "L'avoir a été créé avec succès.",
+        description: "L'avoir a été créé avec succès."
       });
     },
-    onError: (error: any) => {
-      console.error('Error creating credit - Full error object:', error);
-      console.error('Error message:', error?.message);
-      
-      if (error?.message?.includes('table des avoirs n\'existe pas')) {
-        toast({
-          title: "Table manquante",
-          description: "La table des avoirs n'existe pas. Veuillez exécuter la migration SQL dans votre dashboard Supabase.",
-          variant: "destructive"
-        });
-      } else if (error?.message) {
-        toast({
-          title: "Erreur",
-          description: error.message,
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Erreur",
-          description: "Impossible de créer l'avoir. Vérifiez la console pour plus de détails.",
-          variant: "destructive"
-        });
-      }
+    onError: (error) => {
+      toast({
+        title: "Erreur",
+        description: `Impossible de créer l'avoir: ${error.message}`,
+        variant: "destructive"
+      });
     }
   });
-  
+
   const updateCredit = useMutation({
-    mutationFn: ({ id, data }: { id: string, data: any }) => 
-      creditsService.updateCredit(id, data),
+    mutationFn: async ({ id, data }: { id: string, data: any }) => {
+      const { data: result, error } = await supabase
+        .from('credits')
+        .update(data)
+        .eq('id', id)
+        .select(`
+          *,
+          clients(first_name, last_name),
+          vehicles(
+            id,
+            license_plate,
+            car_brands(id, name),
+            car_models(id, name)
+          )
+        `)
+        .single();
+
+      if (error) {
+        console.error('Error updating credit:', error);
+        throw new Error(error.message);
+      }
+
+      return result;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['credits'] });
       toast({
-        title: "Avoir modifié",
-        description: "L'avoir a été modifié avec succès.",
+        title: "Avoir mis à jour",
+        description: "L'avoir a été mis à jour avec succès."
       });
     },
-    onError: (error: any) => {
-      console.error('Error updating credit:', error);
-      if (error?.message?.includes('table des avoirs n\'existe pas')) {
-        toast({
-          title: "Table manquante",
-          description: "La table des avoirs n'existe pas. Veuillez exécuter la migration SQL dans votre dashboard Supabase.",
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Erreur",
-          description: "Impossible de modifier l'avoir.",
-          variant: "destructive"
-        });
-      }
+    onError: (error) => {
+      toast({
+        title: "Erreur",
+        description: `Impossible de mettre à jour l'avoir: ${error.message}`,
+        variant: "destructive"
+      });
     }
   });
-  
+
   const deleteCredit = useMutation({
-    mutationFn: creditsService.deleteCredit,
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('credits')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting credit:', error);
+        throw new Error(error.message);
+      }
+
+      return true;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['credits'] });
       toast({
         title: "Avoir supprimé",
-        description: "L'avoir a été supprimé avec succès.",
+        description: "L'avoir a été supprimé avec succès."
       });
     },
-    onError: (error: any) => {
-      console.error('Error deleting credit:', error);
-      if (error?.message?.includes('table des avoirs n\'existe pas')) {
-        toast({
-          title: "Table manquante",
-          description: "La table des avoirs n'existe pas. Veuillez exécuter la migration SQL dans votre dashboard Supabase.",
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Erreur",
-          description: "Impossible de supprimer l'avoir.",
-          variant: "destructive"
-        });
-      }
+    onError: (error) => {
+      toast({
+        title: "Erreur",
+        description: `Impossible de supprimer l'avoir: ${error.message}`,
+        variant: "destructive"
+      });
     }
   });
 
-  const generateReference = useQuery({
-    queryKey: ['credits', 'generate-reference'],
-    queryFn: creditsService.generateReference,
-    enabled: false,
-    retry: false
-  });
-  
   return {
     credits,
     isLoading,
     error,
     createCredit,
     updateCredit,
-    deleteCredit,
-    generateReference
-  };
-}
-
-export function useCredit(id?: string) {
-  const {
-    data: credit,
-    isLoading,
-    error
-  } = useQuery({
-    queryKey: ['credits', id],
-    queryFn: () => creditsService.getCredit(id!),
-    enabled: !!id,
-    retry: false
-  });
-  
-  return {
-    credit,
-    isLoading,
-    error
+    deleteCredit
   };
 }
