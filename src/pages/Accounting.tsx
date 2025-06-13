@@ -1,24 +1,19 @@
 
 import React, { useState } from 'react';
 import StatsCards from '@/components/accounting/StatsCards';
-import AccountingTabs from '@/components/accounting/AccountingTabs';
+import TransactionTable from '@/components/accounting/TransactionTable';
 import { useAccountingData } from '@/hooks/use-accounting-data';
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
 
 const Accounting = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState<'all' | 'receipts' | 'expenses'>('all');
   const { transactions, statsCards, isLoading } = useAccountingData();
   
-  const filteredTransactions = transactions.filter(transaction => {
-    const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         transaction.client.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesFilter = selectedFilter === 'all' || 
-                         (selectedFilter === 'receipts' && transaction.type === 'Encaissement') ||
-                         (selectedFilter === 'expenses' && transaction.type === 'Dépense');
-    
-    return matchesSearch && matchesFilter;
-  });
+  const filteredTransactions = transactions.filter(transaction => 
+    transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    transaction.client.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (isLoading) {
     return (
@@ -51,13 +46,21 @@ const Accounting = () => {
       
       <StatsCards cards={statsCards} />
       
-      <AccountingTabs 
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        filteredTransactions={filteredTransactions}
-        selectedFilter={selectedFilter}
-        setSelectedFilter={setSelectedFilter}
-      />
+      <div className="space-y-6">
+        <div className="flex items-center space-x-4">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input 
+              placeholder="Rechercher une transaction..." 
+              className="pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+        
+        <TransactionTable transactions={filteredTransactions} />
+      </div>
     </div>
   );
 };
