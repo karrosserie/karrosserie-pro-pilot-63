@@ -10,14 +10,16 @@ export type FleetVehicle = Database['public']['Tables']['fleet_vehicles']['Row']
   registration_front_url?: string;
   registration_back_url?: string;
   insurance_card_url?: string;
+  brand_id: string;
+  model_id: string;
   car_brands?: {
     id: string;
     name: string;
-  };
+  } | null;
   car_models?: {
     id: string;
     name: string;
-  };
+  } | null;
 };
 
 export type NewFleetVehicle = Database['public']['Tables']['fleet_vehicles']['Insert'] & {
@@ -28,6 +30,8 @@ export type NewFleetVehicle = Database['public']['Tables']['fleet_vehicles']['In
   registration_front_url?: string;
   registration_back_url?: string;
   insurance_card_url?: string;
+  brand_id: string;
+  model_id: string;
 };
 
 export type UpdateFleetVehicle = Database['public']['Tables']['fleet_vehicles']['Update'] & {
@@ -38,6 +42,8 @@ export type UpdateFleetVehicle = Database['public']['Tables']['fleet_vehicles'][
   registration_front_url?: string;
   registration_back_url?: string;
   insurance_card_url?: string;
+  brand_id?: string;
+  model_id?: string;
 };
 
 export const fleetVehiclesService = {
@@ -46,8 +52,8 @@ export const fleetVehiclesService = {
       .from('fleet_vehicles')
       .select(`
         *,
-        car_brands(id, name),
-        car_models(id, name)
+        car_brands!inner(id, name),
+        car_models!inner(id, name)
       `)
       .order('created_at', { ascending: false });
 
@@ -64,8 +70,8 @@ export const fleetVehiclesService = {
       .from('fleet_vehicles')
       .select(`
         *,
-        car_brands(id, name),
-        car_models(id, name)
+        car_brands!inner(id, name),
+        car_models!inner(id, name)
       `)
       .eq('id', id)
       .single();
@@ -84,8 +90,8 @@ export const fleetVehiclesService = {
       .insert([vehicle])
       .select(`
         *,
-        car_brands(id, name),
-        car_models(id, name)
+        car_brands!inner(id, name),
+        car_models!inner(id, name)
       `)
       .single();
       
@@ -104,8 +110,8 @@ export const fleetVehiclesService = {
       .eq('id', id)
       .select(`
         *,
-        car_brands(id, name),
-        car_models(id, name)
+        car_brands!inner(id, name),
+        car_models!inner(id, name)
       `)
       .single();
       

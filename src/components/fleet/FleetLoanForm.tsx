@@ -121,7 +121,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-medium text-gray-900">
-          {vehicle.brand} {vehicle.model} ({vehicle.license_plate})
+          {vehicle.car_brands?.name} {vehicle.car_models?.name} ({vehicle.license_plate})
         </h3>
       </div>
 
