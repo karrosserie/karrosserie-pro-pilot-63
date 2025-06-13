@@ -858,6 +858,7 @@ export type Database = {
           id: string
           notes: string | null
           payment_date: string | null
+          payment_due_date: string | null
           payment_method: string | null
           reference: string
           repair_order_id: string | null
@@ -876,6 +877,7 @@ export type Database = {
           id?: string
           notes?: string | null
           payment_date?: string | null
+          payment_due_date?: string | null
           payment_method?: string | null
           reference: string
           repair_order_id?: string | null
@@ -894,6 +896,7 @@ export type Database = {
           id?: string
           notes?: string | null
           payment_date?: string | null
+          payment_due_date?: string | null
           payment_method?: string | null
           reference?: string
           repair_order_id?: string | null
