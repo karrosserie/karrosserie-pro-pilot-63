@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Loader2, RotateCcw, RotateCw } from 'lucide-react';
 import { useImageRotation } from './hooks/useImageRotation';
-import { calculateDisplayDimensions, getCroppedImageBlob } from './utils/imageCropperUtils';
+import { getCroppedImageBlob } from './utils/imageCropperUtils';
 
 interface ImageCropperProps {
   open: boolean;
@@ -28,27 +28,36 @@ export function ImageCropper({
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [isLoading, setIsLoading] = useState(false);
-  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+  const [containerHeight, setContainerHeight] = useState(600);
   const imageRef = useRef<HTMLImageElement>(null);
   const { rotation, rotateImage, resetRotation } = useImageRotation();
 
-  // Fonction pour initialiser le recadrage au centre lorsque l'image est chargée
+  // Largeur fixe du conteneur (largeur maximale de la fenêtre)
+  const containerWidth = 800;
+
+  // Calculer les dimensions de l'image après rotation
+  const calculateRotatedDimensions = (naturalWidth: number, naturalHeight: number, rotation: number) => {
+    const rotRad = Math.abs((rotation * Math.PI) / 180);
+    const rotatedWidth = Math.abs(Math.cos(rotRad) * naturalWidth) + Math.abs(Math.sin(rotRad) * naturalHeight);
+    const rotatedHeight = Math.abs(Math.sin(rotRad) * naturalWidth) + Math.abs(Math.cos(rotRad) * naturalHeight);
+    
+    // L'image occupe toujours toute la largeur du conteneur
+    const scale = containerWidth / rotatedWidth;
+    
+    return {
+      width: containerWidth,
+      height: rotatedHeight * scale,
+      scale
+    };
+  };
+
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { naturalWidth, naturalHeight } = e.currentTarget;
     
-    // Calculer les dimensions d'affichage pour que l'image reste dans le conteneur
-    const containerWidth = 800; // Largeur max du conteneur
-    const containerHeight = 600; // Hauteur max du conteneur
+    const dimensions = calculateRotatedDimensions(naturalWidth, naturalHeight, rotation);
     
-    const displayDimensions = calculateDisplayDimensions(
-      naturalWidth,
-      naturalHeight,
-      rotation,
-      containerWidth,
-      containerHeight
-    );
-    
-    setImageDimensions(displayDimensions);
+    // Adapter la hauteur du conteneur à l'image
+    setContainerHeight(dimensions.height);
     
     // Initialiser avec un recadrage libre couvrant 90% de l'image
     const crop: Crop = {
@@ -62,7 +71,6 @@ export function ImageCropper({
     setCrop(crop);
   };
 
-  // Fonction pour créer une image recadrée à partir du canvas
   const handleGetCroppedImage = async () => {
     if (!imageRef.current || !completedCrop) return;
 
@@ -93,32 +101,22 @@ export function ImageCropper({
   const handleRotate = (degrees: number) => {
     rotateImage(degrees);
     
-    // Recalculer les dimensions d'affichage après rotation
+    // Recalculer les dimensions du conteneur après rotation
     if (imageRef.current) {
       const { naturalWidth, naturalHeight } = imageRef.current;
-      const containerWidth = 800;
-      const containerHeight = 600;
-      
-      const newDisplayDimensions = calculateDisplayDimensions(
-        naturalWidth,
-        naturalHeight,
-        rotation + degrees,
-        containerWidth,
-        containerHeight
-      );
-      
-      setImageDimensions(newDisplayDimensions);
+      const dimensions = calculateRotatedDimensions(naturalWidth, naturalHeight, rotation + degrees);
+      setContainerHeight(dimensions.height);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-6xl max-h-[95vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle>Recadrer l'image</DialogTitle>
         </DialogHeader>
         
-        <div className="my-4 max-h-[70vh] overflow-auto">
+        <div className="flex flex-col">
           <div className="mb-4 flex justify-center gap-2">
             <Button
               variant="outline"
@@ -140,29 +138,43 @@ export function ImageCropper({
             </Button>
           </div>
           
-          <div className="flex justify-center">
-            <ReactCrop
-              crop={crop}
-              onChange={(c) => setCrop(c)}
-              onComplete={(c) => setCompletedCrop(c)}
-              className="max-w-full"
+          <div 
+            className="flex justify-center overflow-auto"
+            style={{ 
+              maxHeight: '70vh',
+              width: '100%'
+            }}
+          >
+            <div 
+              style={{ 
+                width: containerWidth,
+                height: containerHeight,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
             >
-              <img
-                ref={imageRef}
-                src={imageUrl}
-                alt="Image à recadrer"
-                onLoad={onImageLoad}
-                style={{
-                  transform: `rotate(${rotation}deg)`,
-                  transition: 'transform 0.3s ease-in-out',
-                  maxWidth: '100%',
-                  maxHeight: '60vh',
-                  width: imageDimensions.width || 'auto',
-                  height: imageDimensions.height || 'auto',
-                  objectFit: 'contain'
-                }}
-              />
-            </ReactCrop>
+              <ReactCrop
+                crop={crop}
+                onChange={(c) => setCrop(c)}
+                onComplete={(c) => setCompletedCrop(c)}
+                className="max-w-full max-h-full"
+              >
+                <img
+                  ref={imageRef}
+                  src={imageUrl}
+                  alt="Image à recadrer"
+                  onLoad={onImageLoad}
+                  style={{
+                    transform: `rotate(${rotation}deg)`,
+                    transition: 'transform 0.3s ease-in-out',
+                    width: containerWidth,
+                    height: 'auto',
+                    display: 'block'
+                  }}
+                />
+              </ReactCrop>
+            </div>
           </div>
         </div>
         
