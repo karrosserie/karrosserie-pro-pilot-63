@@ -1,10 +1,20 @@
 
 export const getRotatedDimensions = (width: number, height: number, rotation: number) => {
-  const rotRad = Math.abs((rotation * Math.PI) / 180);
+  // Normaliser la rotation (0, 90, 180, 270)
+  const normalizedRotation = ((rotation % 360) + 360) % 360;
   
+  // Pour les rotations de 90° et 270°, inverser width et height
+  if (normalizedRotation === 90 || normalizedRotation === 270) {
+    return {
+      width: height,
+      height: width,
+    };
+  }
+  
+  // Pour 0° et 180°, garder les dimensions originales
   return {
-    width: Math.abs(Math.cos(rotRad) * width) + Math.abs(Math.sin(rotRad) * height),
-    height: Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height),
+    width: width,
+    height: height,
   };
 };
 
