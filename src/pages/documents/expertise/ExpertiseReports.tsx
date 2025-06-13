@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
@@ -24,13 +23,16 @@ const ExpertiseReports = () => {
     const matchesSearch = report.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (report.clients && `${report.clients.first_name} ${report.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    // Safe vehicle search with proper type checking
-    const vehicleMatch = report.vehicles && 
-      typeof report.vehicles === 'object' && 
-      'car_brands' in report.vehicles && 
-      'car_models' in report.vehicles && 
-      'license_plate' in report.vehicles &&
-      `${report.vehicles.car_brands?.name || 'Marque inconnue'} ${report.vehicles.car_models?.name || 'Modèle inconnu'} - ${report.vehicles.license_plate || ''}`.toLowerCase().includes(searchTerm.toLowerCase());
+    // Safe vehicle search with proper null checking
+    let vehicleMatch = false;
+    if (report.vehicles && 
+        typeof report.vehicles === 'object' && 
+        'car_brands' in report.vehicles && 
+        'car_models' in report.vehicles && 
+        'license_plate' in report.vehicles) {
+      const vehicleString = `${report.vehicles.car_brands?.name || 'Marque inconnue'} ${report.vehicles.car_models?.name || 'Modèle inconnu'} - ${report.vehicles.license_plate || ''}`;
+      vehicleMatch = vehicleString.toLowerCase().includes(searchTerm.toLowerCase());
+    }
     
     return matchesSearch || vehicleMatch;
   }) || [];
