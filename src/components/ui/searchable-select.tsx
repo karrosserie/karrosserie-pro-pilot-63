@@ -37,15 +37,10 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const handleSelect = (currentValue: string) => {
     console.log('SearchableSelect - handleSelect called with:', currentValue);
     
-    // The currentValue is the label, we need to find the corresponding value
-    const selectedOption = options.find(option => option.label === currentValue);
-    
-    if (selectedOption) {
-      console.log('SearchableSelect - Found option:', selectedOption);
-      // If the same option is selected, don't change anything
-      if (selectedOption.value !== value) {
-        onValueChange(selectedOption.value);
-      }
+    // currentValue is now the option value directly
+    if (currentValue !== value) {
+      console.log('SearchableSelect - Changing value to:', currentValue);
+      onValueChange(currentValue);
     }
     
     setOpen(false);
@@ -74,7 +69,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
               {options.map((option) => (
                 <CommandItem
                   key={option.value}
-                  value={option.label}
+                  value={option.value}
                   onSelect={handleSelect}
                   className="cursor-pointer hover:bg-gray-100"
                 >
