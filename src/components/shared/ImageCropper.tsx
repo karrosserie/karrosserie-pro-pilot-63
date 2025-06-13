@@ -170,6 +170,23 @@ export function ImageCropper({
 
     const { naturalWidth, naturalHeight } = imageRef.current;
     const dimensions = calculateReactCropDimensions(naturalWidth, naturalHeight, rotation);
+    
+    // Pour rotation = 0, positionner simplement l'image en haut à gauche
+    if (rotation === 0) {
+      return {
+        transformOrigin: 'center center',
+        transition: 'transform 0.3s ease-in-out',
+        width: naturalWidth * dimensions.scale,
+        height: naturalHeight * dimensions.scale,
+        display: 'block' as const,
+        position: 'absolute' as const,
+        top: 0,
+        left: 0,
+        transform: `rotate(${rotation}deg)`
+      };
+    }
+    
+    // Pour les autres rotations, calculer la position
     const { left, top } = calculateImagePosition(naturalWidth, naturalHeight, rotation, dimensions.scale);
 
     return {
