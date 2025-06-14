@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -27,7 +26,7 @@ export function ImageCropper({
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
-  const [key, setKey] = useState(0); // Clé pour forcer le remontage du composant ReactCrop
+  const [key, setKey] = useState(0);
   const imageRef = useRef<HTMLImageElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -70,7 +69,7 @@ export function ImageCropper({
     setKey(prev => prev + 1);
   };
 
-  // Fonction pour créer une image recadrée à partir du canvas
+  // Fonction pour créer une image recadrée à partir du canvas avec rotation appliquée
   const getCroppedImage = () => {
     if (!imageRef.current || !completedCrop) return;
 
@@ -87,20 +86,47 @@ export function ImageCropper({
       return;
     }
 
-    canvas.width = completedCrop.width;
-    canvas.height = completedCrop.height;
+    // Calculer les dimensions finales en tenant compte de la rotation
+    const rotationInRadians = (rotation * Math.PI) / 180;
+    const isRotated90or270 = rotation === 90 || rotation === 270;
+    
+    // Dimensions du crop dans l'image originale
+    const cropWidth = completedCrop.width * scaleX;
+    const cropHeight = completedCrop.height * scaleY;
+    
+    // Définir la taille du canvas en fonction de la rotation
+    if (isRotated90or270) {
+      canvas.width = cropHeight;
+      canvas.height = cropWidth;
+    } else {
+      canvas.width = cropWidth;
+      canvas.height = cropHeight;
+    }
 
+    // Sauvegarder l'état du contexte
+    ctx.save();
+
+    // Déplacer l'origine au centre du canvas
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    
+    // Appliquer la rotation
+    ctx.rotate(rotationInRadians);
+
+    // Dessiner l'image avec la rotation appliquée
     ctx.drawImage(
       image,
       completedCrop.x * scaleX,
       completedCrop.y * scaleY,
-      completedCrop.width * scaleX,
-      completedCrop.height * scaleY,
-      0,
-      0,
-      completedCrop.width,
-      completedCrop.height
+      cropWidth,
+      cropHeight,
+      -cropWidth / 2,
+      -cropHeight / 2,
+      cropWidth,
+      cropHeight
     );
+
+    // Restaurer l'état du contexte
+    ctx.restore();
 
     // Convertir le canvas en Blob
     canvas.toBlob(
