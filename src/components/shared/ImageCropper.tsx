@@ -26,12 +26,26 @@ export function ImageCropper({
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [rotation, setRotation] = useState(0);
+  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const imageRef = useRef<HTMLImageElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Calculer les dimensions après rotation
+  const getRotatedDimensions = (width: number, height: number, rotation: number) => {
+    const rotRad = Math.abs((rotation * Math.PI) / 180);
+    const cos = Math.abs(Math.cos(rotRad));
+    const sin = Math.abs(Math.sin(rotRad));
+    
+    return {
+      width: width * cos + height * sin,
+      height: width * sin + height * cos,
+    };
+  };
 
   // Fonction pour initialiser le recadrage au centre lorsque l'image est chargée
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = e.currentTarget;
+    setImageDimensions({ width, height });
     
     // Initialiser avec un recadrage libre couvrant 90% de l'image
     const crop: Crop = {
@@ -146,6 +160,9 @@ export function ImageCropper({
     onClose();
   };
 
+  // Calculer les dimensions de la zone ReactCrop en fonction de la rotation
+  const rotatedDimensions = getRotatedDimensions(imageDimensions.width, imageDimensions.height, rotation);
+  
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-4xl">
@@ -175,24 +192,44 @@ export function ImageCropper({
             </Button>
           </div>
           
-          <ReactCrop
-            crop={crop}
-            onChange={(c) => setCrop(c)}
-            onComplete={(c) => setCompletedCrop(c)}
-            className="max-w-full"
-          >
-            <img
-              ref={imageRef}
-              src={imageUrl}
-              alt="Image à recadrer"
-              onLoad={onImageLoad}
-              className="max-w-full"
+          <div className="flex justify-center">
+            <div 
               style={{
-                transform: `rotate(${rotation}deg)`,
-                transition: 'transform 0.3s ease-in-out'
+                width: `${rotatedDimensions.width}px`,
+                height: `${rotatedDimensions.height}px`,
+                overflow: 'hidden'
               }}
-            />
-          </ReactCrop>
+            >
+              <ReactCrop
+                crop={crop}
+                onChange={(c) => setCrop(c)}
+                onComplete={(c) => setCompletedCrop(c)}
+                className="max-w-full"
+                style={{
+                  width: `${rotatedDimensions.width}px`,
+                  height: `${rotatedDimensions.height}px`
+                }}
+              >
+                <img
+                  ref={imageRef}
+                  src={imageUrl}
+                  alt="Image à recadrer"
+                  onLoad={onImageLoad}
+                  className="max-w-none"
+                  style={{
+                    width: `${imageDimensions.width}px`,
+                    height: `${imageDimensions.height}px`,
+                    transform: `rotate(${rotation}deg)`,
+                    transformOrigin: 'center center',
+                    transition: 'transform 0.3s ease-in-out',
+                    position: 'relative',
+                    left: `${(rotatedDimensions.width - imageDimensions.width) / 2}px`,
+                    top: `${(rotatedDimensions.height - imageDimensions.height) / 2}px`
+                  }}
+                />
+              </ReactCrop>
+            </div>
+          </div>
         </div>
         
         <DialogFooter>
