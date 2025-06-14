@@ -69,7 +69,7 @@ export function ImageCropper({
     setKey(prev => prev + 1);
   };
 
-  // Fonction pour créer une image recadrée à partir du canvas avec rotation appliquée
+  // Fonction pour créer une image recadrée à partir du canvas avec rotation et zoom appliqués
   const getCroppedImage = () => {
     if (!imageRef.current || !completedCrop) return;
 
@@ -77,8 +77,11 @@ export function ImageCropper({
 
     const image = imageRef.current;
     const canvas = document.createElement('canvas');
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
+    
+    // Calculer les échelles en tenant compte du zoom
+    const scaleX = (image.naturalWidth / image.width) / zoom;
+    const scaleY = (image.naturalHeight / image.height) / zoom;
+    
     const ctx = canvas.getContext('2d');
 
     if (!ctx) {
@@ -90,7 +93,7 @@ export function ImageCropper({
     const rotationInRadians = (rotation * Math.PI) / 180;
     const isRotated90or270 = rotation === 90 || rotation === 270;
     
-    // Dimensions du crop dans l'image originale
+    // Dimensions du crop dans l'image originale avec zoom
     const cropWidth = completedCrop.width * scaleX;
     const cropHeight = completedCrop.height * scaleY;
     
@@ -112,7 +115,7 @@ export function ImageCropper({
     // Appliquer la rotation
     ctx.rotate(rotationInRadians);
 
-    // Dessiner l'image avec la rotation appliquée
+    // Dessiner l'image avec la rotation et le zoom appliqués
     ctx.drawImage(
       image,
       completedCrop.x * scaleX,
