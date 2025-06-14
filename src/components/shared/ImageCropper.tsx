@@ -42,8 +42,8 @@ export function ImageCropper({
 
     let width = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? imageHeight : imageWidth;
     let height = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? imageWidth : imageHeight;    
-    let rotatedWidth = imageWidth > cropAreaWidth ? rotatedWidth = cropAreaWidth : cropAreaHeight;
-    let rotatedHeight = imageWidth > cropAreaWidth ? imageHeight * rotatedWidth / imageWidth : imageWidth * rotatedHeight / imageHeight;
+    let rotatedWidth = imageWidth > cropAreaWidth ? cropAreaWidth : imageWidth * rotatedHeight / imageHeight;
+    let rotatedHeight = imageWidth > cropAreaWidth ? imageHeight * rotatedWidth / imageWidth : cropAreaHeight;
     
     console.log('rotatedWidth: '+rotatedWidth+ ' - rotatedHeight: '+rotatedHeight);
 
