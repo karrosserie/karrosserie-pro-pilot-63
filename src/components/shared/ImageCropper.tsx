@@ -227,7 +227,6 @@ export function ImageCropper({
           
           <div className="flex-1 flex justify-center items-center min-h-0">
             <div 
-              className="my-4"
               style={{
                 width: `${cropAreaWidth}px`,
                 height: `${cropAreaHeight}px`,
@@ -236,6 +235,7 @@ export function ImageCropper({
               }}
             >
               <ReactCrop
+                className="my-4"
                 crop={crop}
                 onChange={(c) => setCrop(c)}
                 onComplete={(c) => setCompletedCrop(c)}
