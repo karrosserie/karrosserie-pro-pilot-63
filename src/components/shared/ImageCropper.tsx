@@ -1,9 +1,10 @@
+
 import React, { useState, useRef } from 'react';
-import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
+import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ZoomIn, ZoomOut, RotateCw, RotateCcw } from 'lucide-react';
 
 interface ImageCropperProps {
   open: boolean;
@@ -24,6 +25,9 @@ export function ImageCropper({
 }: ImageCropperProps) {
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
+  const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [key, setKey] = useState(0); // Clé pour forcer le remontage du composant ReactCrop
   const imageRef = useRef<HTMLImageElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -31,16 +35,39 @@ export function ImageCropper({
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = e.currentTarget;
     
-    // Initialiser avec un recadrage libre couvrant 90% de l'image
+    // Initialiser avec un recadrage libre couvrant 80% de l'image, centré
     const crop: Crop = {
       unit: '%',
-      x: 5,
-      y: 5,
-      width: 90,
-      height: 90,
+      x: 10,
+      y: 10,
+      width: 80,
+      height: 80,
     };
     
     setCrop(crop);
+  };
+
+  // Fonction pour gérer le zoom
+  const handleZoom = (direction: 'in' | 'out') => {
+    setZoom(prev => {
+      const newZoom = direction === 'in' ? prev * 1.1 : prev / 1.1;
+      return Math.max(0.5, Math.min(3, newZoom));
+    });
+  };
+
+  // Fonction pour gérer la rotation
+  const handleRotation = (direction: 'cw' | 'ccw') => {
+    const rotationStep = 90;
+    const newRotation = direction === 'cw' 
+      ? (rotation + rotationStep) % 360 
+      : (rotation - rotationStep + 360) % 360;
+    
+    setRotation(newRotation);
+    
+    // Réinitialiser le crop et forcer le remontage du composant ReactCrop
+    setCrop(undefined);
+    setCompletedCrop(undefined);
+    setKey(prev => prev + 1);
   };
 
   // Fonction pour créer une image recadrée à partir du canvas
@@ -95,26 +122,80 @@ export function ImageCropper({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-5xl">
         <DialogHeader>
           <DialogTitle>Recadrer l'image</DialogTitle>
         </DialogHeader>
         
-        <div className="my-4 max-h-[70vh] overflow-auto">
-          <ReactCrop
-            crop={crop}
-            onChange={(c) => setCrop(c)}
-            onComplete={(c) => setCompletedCrop(c)}
-            className="max-w-full"
+        {/* Contrôles */}
+        <div className="flex justify-center gap-2 mb-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleZoom('out')}
+            disabled={zoom <= 0.5}
           >
-            <img
-              ref={imageRef}
-              src={imageUrl}
-              alt="Image à recadrer"
-              onLoad={onImageLoad}
+            <ZoomOut className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleZoom('in')}
+            disabled={zoom >= 3}
+          >
+            <ZoomIn className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleRotation('ccw')}
+          >
+            <RotateCcw className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleRotation('cw')}
+          >
+            <RotateCw className="h-4 w-4" />
+          </Button>
+        </div>
+        
+        <div className="my-4 max-h-[70vh] overflow-auto">
+          <div 
+            className="flex justify-center items-center"
+            style={{ 
+              width: '100%', 
+              height: '100%'
+            }}
+          >
+            <ReactCrop
+              key={key} // Force le remontage du composant lors de la rotation
+              crop={crop}
+              onChange={(c) => setCrop(c)}
+              onComplete={(c) => setCompletedCrop(c)}
               className="max-w-full"
-            />
-          </ReactCrop>
+              style={{
+                width: '100%',
+                height: '100%'
+              }}
+            >
+              <img
+                ref={imageRef}
+                src={imageUrl}
+                alt="Image à recadrer"
+                onLoad={onImageLoad}
+                className="max-w-full max-h-full object-contain"
+                style={{
+                  transform: `scale(${zoom}) rotate(${rotation}deg)`,
+                  transformOrigin: 'center center',
+                  transition: 'transform 0.2s ease-in-out',
+                  display: 'block',
+                  margin: '0 auto'
+                }}
+              />
+            </ReactCrop>
+          </div>
         </div>
         
         <DialogFooter>
