@@ -33,10 +33,11 @@ export function ImageCropper({
 
   // Largeur et hauteur fixes pour la zone ReactCrop
   const cropAreaWidth = 800;
-  const cropAreaHeight = 600;
+  const cropAreaHeight = 500;
 
   // Calculer les dimensions d'affichage optimales pour l'image
   const calculateOptimalImageSize = (imageWidth: number, imageHeight: number, rotation: number) => {
+    console.log('imageWidth: '+imageWidth+ ' - imageHeight: '+imageHeight+ ' - rotation: '+rotation);
     // Calculer les dimensions de l'image après rotation
     const rotRad = Math.abs((rotation * Math.PI) / 180);
     const cos = Math.abs(Math.cos(rotRad));
