@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -48,7 +49,7 @@ export function ImageCropper({
     // Calculer le ratio de redimensionnement pour que l'image occupe le maximum d'espace
     const scaleX = cropAreaWidth / rotatedWidth;
     const scaleY = cropAreaHeight / rotatedHeight;
-    const scale = Math.min(scaleX, scaleY) * 1; // 0.95 pour laisser un peu de marge
+    const scale = Math.min(scaleX, scaleY) * 0.95; // 0.95 pour laisser un peu de marge
 
     return {
       width: imageWidth * scale,
@@ -67,13 +68,13 @@ export function ImageCropper({
     
     setImageLoaded(true);
     
-    // Initialiser avec un recadrage libre couvrant 90% de l'image
+    // Initialiser avec un recadrage libre couvrant 80% de l'image, centré
     const crop: Crop = {
       unit: '%',
-      x: 5,
-      y: 5,
-      width: 90,
-      height: 90,
+      x: 10,
+      y: 10,
+      width: 80,
+      height: 80,
     };
     
     setCrop(crop);
@@ -142,8 +143,8 @@ export function ImageCropper({
     tempCtx.drawImage(image, 0, 0);
 
     // Calculer les coordonnées de recadrage avec la rotation
-    const scaleX = originalImageDimensions.width / bBoxWidth;
-    const scaleY = originalImageDimensions.height / bBoxHeight;
+    const scaleX = bBoxWidth / displayImageDimensions.width;
+    const scaleY = bBoxHeight / displayImageDimensions.height;
 
     // Dessiner la portion recadrée
     ctx.drawImage(
@@ -244,6 +245,10 @@ export function ImageCropper({
                   height: `${cropAreaHeight}px`,
                   overflow: 'hidden'
                 }}
+                minWidth={50}
+                minHeight={50}
+                keepSelection={true}
+                ruleOfThirds={true}
               >
                 <img
                   ref={imageRef}
@@ -261,7 +266,8 @@ export function ImageCropper({
                     marginTop: imageLoaded ? `-${displayImageDimensions.height / 2}px` : '0',
                     width: imageLoaded ? `${displayImageDimensions.width}px` : 'auto',
                     height: imageLoaded ? `${displayImageDimensions.height}px` : 'auto',
-                    maxWidth: 'none'
+                    maxWidth: 'none',
+                    maxHeight: 'none'
                   }}
                 />
               </ReactCrop>
