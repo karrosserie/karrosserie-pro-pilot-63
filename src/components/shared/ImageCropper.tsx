@@ -39,21 +39,21 @@ export function ImageCropper({
   const calculateOptimalImageSize = (imageWidth: number, imageHeight: number, rotation: number) => {
     console.log('imageWidth: '+imageWidth+ ' - imageHeight: '+imageHeight+ ' - rotation: '+rotation);
     // Calculer les dimensions de l'image après rotation
-    const rotRad = Math.abs((rotation * Math.PI) / 180);
-    const cos = Math.abs(Math.cos(rotRad));
-    const sin = Math.abs(Math.sin(rotRad));
     
-    const rotatedWidth = imageWidth * cos + imageHeight * sin;
-    const rotatedHeight = imageWidth * sin + imageHeight * cos;
-
-    // Calculer le ratio de redimensionnement pour que l'image occupe le maximum d'espace
-    const scaleX = cropAreaWidth / rotatedWidth;
-    const scaleY = cropAreaHeight / rotatedHeight;
-    const scale = Math.min(scaleX, scaleY) * 1; // 0.95 pour laisser un peu de marge
+    const rotatedWidth = 0;
+    const rotatedHeight = 0;
+    
+    if(imageWidth > cropAreaWidth) {
+      rotatedWidth = cropAreaWidth;
+      rotatedHeight = imageHeight * rotatedWidth / imageWidth;
+    } else if(imageHeight > cropAreaHeight) {
+      rotatedHeight = cropAreaHeight;
+      rotatedWidth = imageWidth * rotatedHeight / imageHeight;
+    }
 
     return {
-      width: imageWidth * scale,
-      height: imageHeight * scale
+      width: rotatedWidth,
+      height: rotatedHeight
     };
   };
 
