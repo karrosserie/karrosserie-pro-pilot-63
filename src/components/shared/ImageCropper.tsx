@@ -39,6 +39,12 @@ export function ImageCropper({
   const calculateOptimalImageSize = (imageWidth: number, imageHeight: number, rotation: number) => {
     console.log('imageWidth: '+imageWidth+ ' - imageHeight: '+imageHeight+ ' - rotation: '+rotation);
     // Calculer les dimensions de l'image après rotation
+
+    if(rotation == -90) {
+      let tmp = imageWidth;
+      imageWidth = imageHeight;
+      imageHeight = tmp;
+    }
     
     let rotatedWidth = 0;
     let rotatedHeight = 0;
