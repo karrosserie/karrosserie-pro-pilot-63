@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -196,12 +197,12 @@ export function ImageCropper({
   
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col">
+      <DialogContent className="max-w-5xl">
         <DialogHeader>
           <DialogTitle>Recadrer l'image</DialogTitle>
         </DialogHeader>
         
-        <div className="flex flex-col flex-1 min-h-0">
+        <div className="my-4 max-h-[70vh] overflow-auto">
           <div className="mb-4 flex justify-center gap-2">
             <Button
               variant="outline"
@@ -225,22 +226,23 @@ export function ImageCropper({
             </Button>
           </div>
           
-          <div className="flex justify-center flex-1 min-h-0">
+          <div className="flex justify-center">
             <div 
               style={{
                 width: `${cropAreaWidth}px`,
                 height: `${cropAreaHeight}px`,
-                position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                position: 'relative'
               }}
             >
               <ReactCrop
                 crop={crop}
                 onChange={(c) => setCrop(c)}
                 onComplete={(c) => setCompletedCrop(c)}
+                className="w-full h-full"
                 style={{
-                  width: '100%',
-                  height: '100%'
+                  width: `${cropAreaWidth}px`,
+                  height: `${cropAreaHeight}px`
                 }}
               >
                 <img
