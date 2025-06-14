@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -240,15 +239,15 @@ export function ImageCropper({
                 crop={crop}
                 onChange={(c) => setCrop(c)}
                 onComplete={(c) => setCompletedCrop(c)}
+                minWidth={50}
+                minHeight={50}
+                keepSelection={true}
+                ruleOfThirds={true}
                 style={{
                   width: `${cropAreaWidth}px`,
                   height: `${cropAreaHeight}px`,
                   overflow: 'hidden'
                 }}
-                minWidth={50}
-                minHeight={50}
-                keepSelection={true}
-                ruleOfThirds={true}
               >
                 <img
                   ref={imageRef}
