@@ -33,37 +33,26 @@ export function ImageCropper({
 
   // Largeur et hauteur fixes pour la zone ReactCrop
   const cropAreaWidth = 800;
-  const cropAreaHeight = 500;
+  const cropAreaHeight = 600;
 
   // Calculer les dimensions d'affichage optimales pour l'image
   const calculateOptimalImageSize = (imageWidth: number, imageHeight: number, rotation: number) => {
-    console.log('imageWidth: '+imageWidth+ ' - imageHeight: '+imageHeight+ ' - rotation: '+rotation);
     // Calculer les dimensions de l'image après rotation
-    let imgWidth = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? imageHeight : imageWidth;
-    let imgHeight = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? imageWidth : imageHeight;
-    console.log('imgWidth: '+imgWidth+ ' - imgHeight: '+imgHeight+ ' - rotation: '+Math.abs(rotation));
+    const rotRad = Math.abs((rotation * Math.PI) / 180);
+    const cos = Math.abs(Math.cos(rotRad));
+    const sin = Math.abs(Math.sin(rotRad));
     
-    let rotatedWidth = 0;
-    let rotatedHeight = 0;
-    
-    if (imgWidth > cropAreaWidth) {
-      rotatedWidth = cropAreaWidth;
-      rotatedHeight = imgHeight * rotatedWidth / imgWidth;
-    } else if(imgHeight > cropAreaHeight) {
-      rotatedHeight = cropAreaHeight;
-      rotatedWidth = imgWidth * rotatedHeight / imgHeight;
-    }
-    
-    console.log('rotatedWidth: '+rotatedWidth+ ' - rotatedHeight: '+rotatedHeight);
+    const rotatedWidth = imageWidth * cos + imageHeight * sin;
+    const rotatedHeight = imageWidth * sin + imageHeight * cos;
 
-    imageWidth = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? rotatedHeight : rotatedWidth;
-    imageHeight = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? rotatedWidth : rotatedHeight;
-    
-    console.log('imageWidth: '+imageWidth+ ' - imageHeight: '+imageHeight);
-    
+    // Calculer le ratio de redimensionnement pour que l'image occupe le maximum d'espace
+    const scaleX = cropAreaWidth / rotatedWidth;
+    const scaleY = cropAreaHeight / rotatedHeight;
+    const scale = Math.min(scaleX, scaleY) * 0.95; // 0.95 pour laisser un peu de marge
+
     return {
-      width: rotatedWidth,
-      height: imageHeight
+      width: imageWidth * scale,
+      height: imageHeight * scale
     };
   };
 
@@ -212,7 +201,7 @@ export function ImageCropper({
           <DialogTitle>Recadrer l'image</DialogTitle>
         </DialogHeader>
         
-        <div className="my-4 max-h-[70vh] overflow-auto">
+        <div className="flex-1 flex flex-col min-h-0">
           <div className="mb-4 flex justify-center gap-2">
             <Button
               variant="outline"
@@ -238,6 +227,7 @@ export function ImageCropper({
           
           <div className="flex-1 flex justify-center items-center min-h-0">
             <div 
+              className="my-4"
               style={{
                 width: `${cropAreaWidth}px`,
                 height: `${cropAreaHeight}px`,
@@ -246,7 +236,6 @@ export function ImageCropper({
               }}
             >
               <ReactCrop
-                className="my-4"
                 crop={crop}
                 onChange={(c) => setCrop(c)}
                 onComplete={(c) => setCompletedCrop(c)}
