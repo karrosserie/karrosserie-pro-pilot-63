@@ -41,9 +41,18 @@ export function ImageCropper({
     // Calculer les dimensions de l'image après rotation
 
     let width = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? imageHeight : imageWidth;
-    let height = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? imageWidth : imageHeight;    
-    let rotatedWidth = imageWidth > cropAreaWidth ? cropAreaWidth : imageWidth * rotatedHeight / imageHeight;
-    let rotatedHeight = imageWidth > cropAreaWidth ? imageHeight * rotatedWidth / imageWidth : cropAreaHeight;
+    let height = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? imageWidth : imageHeight;
+    
+    let rotatedWidth = 0;
+    let rotatedHeight = 0;
+    
+    if (imageWidth > cropAreaWidth) {
+      rotatedWidth = cropAreaWidth;
+      rotatedHeight = imageHeight * rotatedWidth / imageWidth;
+    } else if(imageHeight > cropAreaHeight) {
+      rotatedHeight = cropAreaHeight;
+      rotatedWidth = imageWidth * rotatedHeight / imageHeight;
+    }
     
     console.log('rotatedWidth: '+rotatedWidth+ ' - rotatedHeight: '+rotatedHeight);
 
