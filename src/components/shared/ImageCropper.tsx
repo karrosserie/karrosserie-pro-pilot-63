@@ -46,12 +46,12 @@ export function ImageCropper({
     let rotatedWidth = 0;
     let rotatedHeight = 0;
     
-    if (imageWidth > cropAreaWidth) {
+    if (width > cropAreaWidth) {
       rotatedWidth = cropAreaWidth;
-      rotatedHeight = imageHeight * rotatedWidth / imageWidth;
-    } else if(imageHeight > cropAreaHeight) {
+      rotatedHeight = height * rotatedWidth / width;
+    } else if(height > cropAreaHeight) {
       rotatedHeight = cropAreaHeight;
-      rotatedWidth = imageWidth * rotatedHeight / imageHeight;
+      rotatedWidth = width * rotatedHeight / height;
     }
     
     console.log('rotatedWidth: '+rotatedWidth+ ' - rotatedHeight: '+rotatedHeight);
