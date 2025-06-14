@@ -201,7 +201,7 @@ export function ImageCropper({
           <DialogTitle>Recadrer l'image</DialogTitle>
         </DialogHeader>
         
-        <div className="flex-1 flex flex-col min-h-0">
+        <div className="my-4 max-h-[70vh] overflow-auto">
           <div className="mb-4 flex justify-center gap-2">
             <Button
               variant="outline"
