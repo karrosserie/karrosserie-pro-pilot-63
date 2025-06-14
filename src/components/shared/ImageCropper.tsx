@@ -1,9 +1,10 @@
+
 import React, { useState, useRef } from 'react';
 import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Loader2, RotateCcw, RotateCw } from 'lucide-react';
+import { Loader2, RotateCcw, RotateCw, ZoomIn, ZoomOut } from 'lucide-react';
 
 interface ImageCropperProps {
   open: boolean;
@@ -25,6 +26,7 @@ export function ImageCropper({
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [rotation, setRotation] = useState(0);
+  const [zoom, setZoom] = useState(1);
   const [imageLoaded, setImageLoaded] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +51,15 @@ export function ImageCropper({
   const rotateImage = (degrees: number) => {
     const newRotation = (rotation + degrees) % 360;
     setRotation(newRotation);
+  };
+
+  // Fonctions de zoom
+  const handleZoomIn = () => {
+    setZoom(prev => Math.min(prev + 0.1, 3));
+  };
+
+  const handleZoomOut = () => {
+    setZoom(prev => Math.max(prev - 0.1, 0.5));
   };
 
   // Fonction pour créer une image recadrée à partir du canvas
@@ -137,6 +148,7 @@ export function ImageCropper({
 
   const handleClose = () => {
     setRotation(0);
+    setZoom(1);
     setImageLoaded(false);
     onClose();
   };
@@ -170,10 +182,30 @@ export function ImageCropper({
               <RotateCw className="h-4 w-4" />
               Pivoter à droite
             </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleZoomOut}
+              className="flex items-center gap-2"
+              disabled={!imageLoaded || zoom <= 0.5}
+            >
+              <ZoomOut className="h-4 w-4" />
+              Zoom -
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleZoomIn}
+              className="flex items-center gap-2"
+              disabled={!imageLoaded || zoom >= 3}
+            >
+              <ZoomIn className="h-4 w-4" />
+              Zoom +
+            </Button>
           </div>
           
-          <div className="flex-1 flex justify-center items-center min-h-0 my-4">
-            <div style={{ width: '100%', height: '100%' }}>
+          <div className="flex-1 flex justify-center items-center min-h-0 my-4 overflow-hidden">
+            <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <ReactCrop
                 crop={crop}
                 onChange={(c) => setCrop(c)}
@@ -182,7 +214,13 @@ export function ImageCropper({
                 minHeight={50}
                 keepSelection={true}
                 ruleOfThirds={true}
-                style={{ width: '100%', height: '100%' }}
+                style={{ 
+                  width: '100%', 
+                  height: '100%',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
               >
                 <img
                   ref={imageRef}
@@ -190,7 +228,7 @@ export function ImageCropper({
                   alt="Image à recadrer"
                   onLoad={onImageLoad}
                   style={{
-                    transform: `rotate(${rotation}deg)`,
+                    transform: `rotate(${rotation}deg) scale(${zoom})`,
                     maxWidth: '100%',
                     maxHeight: '100%',
                     width: 'auto',
