@@ -41,7 +41,7 @@ export function ImageCropper({
     // Calculer les dimensions de l'image après rotation
     let imgWidth = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? imageHeight : imageWidth;
     let imgHeight = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? imageWidth : imageHeight;
-    console.log('width: '+width+ ' - height: '+height+ ' - rotation: '+Math.abs(rotation));
+    console.log('imgWidth: '+imgWidth+ ' - imgHeight: '+imgHeight+ ' - rotation: '+Math.abs(rotation));
     
     let rotatedWidth = 0;
     let rotatedHeight = 0;
