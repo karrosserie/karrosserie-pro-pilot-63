@@ -67,13 +67,13 @@ export function ImageCropper({
     
     setImageLoaded(true);
     
-    // Initialiser avec un recadrage libre couvrant 80% de l'image, centré
+    // Initialiser avec un recadrage libre couvrant 90% de l'image
     const crop: Crop = {
       unit: '%',
-      x: 10,
-      y: 10,
-      width: 80,
-      height: 80,
+      x: 5,
+      y: 5,
+      width: 90,
+      height: 90,
     };
     
     setCrop(crop);
@@ -142,8 +142,8 @@ export function ImageCropper({
     tempCtx.drawImage(image, 0, 0);
 
     // Calculer les coordonnées de recadrage avec la rotation
-    const scaleX = bBoxWidth / displayImageDimensions.width;
-    const scaleY = bBoxHeight / displayImageDimensions.height;
+    const scaleX = originalImageDimensions.width / bBoxWidth;
+    const scaleY = originalImageDimensions.height / bBoxHeight;
 
     // Dessiner la portion recadrée
     ctx.drawImage(
@@ -239,10 +239,6 @@ export function ImageCropper({
                 crop={crop}
                 onChange={(c) => setCrop(c)}
                 onComplete={(c) => setCompletedCrop(c)}
-                minWidth={50}
-                minHeight={50}
-                keepSelection={true}
-                ruleOfThirds={true}
                 style={{
                   width: `${cropAreaWidth}px`,
                   height: `${cropAreaHeight}px`,
@@ -265,8 +261,7 @@ export function ImageCropper({
                     marginTop: imageLoaded ? `-${displayImageDimensions.height / 2}px` : '0',
                     width: imageLoaded ? `${displayImageDimensions.width}px` : 'auto',
                     height: imageLoaded ? `${displayImageDimensions.height}px` : 'auto',
-                    maxWidth: 'none',
-                    maxHeight: 'none'
+                    maxWidth: 'none'
                   }}
                 />
               </ReactCrop>
