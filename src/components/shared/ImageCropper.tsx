@@ -34,13 +34,19 @@ export function ImageCropper({
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     setImageLoaded(true);
     
-    // Initialiser avec un recadrage libre couvrant 80% de l'image, centré
+    const image = e.currentTarget;
+    const { width, height } = image;
+    
+    // Créer un crop centré avec des dimensions fixes en pixels
+    const cropWidth = Math.min(width * 0.8, 300);
+    const cropHeight = Math.min(height * 0.8, 300);
+    
     const crop: Crop = {
-      unit: '%',
-      x: 10,
-      y: 10,
-      width: 80,
-      height: 80,
+      unit: 'px',
+      x: (width - cropWidth) / 2,
+      y: (height - cropHeight) / 2,
+      width: cropWidth,
+      height: cropHeight,
     };
     
     setCrop(crop);
