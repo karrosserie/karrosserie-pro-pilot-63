@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -35,7 +34,7 @@ export function ImageCropper({
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     setImageLoaded(true);
     
-    // Initialiser avec un recadrage libre couvrant 80% de l'image, centré
+    // Initialiser avec un recadrage en pourcentage couvrant 80% de l'image, centré
     const crop: Crop = {
       unit: '%',
       x: 10,
