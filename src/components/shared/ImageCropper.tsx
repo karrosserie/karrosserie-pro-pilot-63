@@ -56,9 +56,14 @@ export function ImageCropper({
     
     console.log('rotatedWidth: '+rotatedWidth+ ' - rotatedHeight: '+rotatedHeight);
 
+    imageWidth = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? rotatedHeight : rotatedWidth;
+    imageHeight = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? rotatedWidth : rotatedHeight;
+    
+    console.log('imageWidth: '+imageWidth+ ' - imageHeight: '+imageHeight);
+    
     return {
-      width: (Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? rotatedHeight : rotatedWidth),
-      height: (Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? rotatedWidth : rotatedHeight)
+      width: rotatedWidth,
+      height: imageHeight
     };
   };
 
