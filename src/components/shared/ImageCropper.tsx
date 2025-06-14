@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -67,11 +66,9 @@ export function ImageCropper({
       return;
     }
 
-    // Configurer le canvas
     canvas.width = completedCrop.width;
     canvas.height = completedCrop.height;
 
-    // Créer un canvas temporaire pour l'image pivotée
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
     
@@ -80,7 +77,6 @@ export function ImageCropper({
       return;
     }
 
-    // Calculer les dimensions après rotation
     const rotRad = (rotation * Math.PI) / 180;
     const { width: bBoxWidth, height: bBoxHeight } = rotateSize(
       image.naturalWidth,
@@ -91,18 +87,15 @@ export function ImageCropper({
     tempCanvas.width = bBoxWidth;
     tempCanvas.height = bBoxHeight;
 
-    // Appliquer la rotation sur le canvas temporaire
     tempCtx.translate(bBoxWidth / 2, bBoxHeight / 2);
     tempCtx.rotate(rotRad);
     tempCtx.scale(1, 1);
     tempCtx.translate(-image.naturalWidth / 2, -image.naturalHeight / 2);
     tempCtx.drawImage(image, 0, 0);
 
-    // Calculer les coordonnées de recadrage avec la rotation
     const scaleX = bBoxWidth / image.width;
     const scaleY = bBoxHeight / image.height;
 
-    // Dessiner la portion recadrée
     ctx.drawImage(
       tempCanvas,
       completedCrop.x * scaleX,
@@ -115,7 +108,6 @@ export function ImageCropper({
       completedCrop.height
     );
 
-    // Convertir le canvas en Blob
     canvas.toBlob(
       (blob) => {
         setIsLoading(false);
@@ -181,29 +173,33 @@ export function ImageCropper({
           </div>
           
           <div className="flex-1 flex justify-center items-center min-h-0 my-4">
-            <ReactCrop
-              crop={crop}
-              onChange={(c) => setCrop(c)}
-              onComplete={(c) => setCompletedCrop(c)}
-              minWidth={50}
-              minHeight={50}
-              keepSelection={true}
-              ruleOfThirds={true}
-            >
-              <img
-                ref={imageRef}
-                src={imageUrl}
-                alt="Image à recadrer"
-                onLoad={onImageLoad}
-                style={{
-                  transform: `rotate(${rotation}deg)`,
-                  maxWidth: '800px',
-                  maxHeight: '600px',
-                  width: 'auto',
-                  height: 'auto'
-                }}
-              />
-            </ReactCrop>
+            <div style={{ width: '100%', height: '100%' }}>
+              <ReactCrop
+                crop={crop}
+                onChange={(c) => setCrop(c)}
+                onComplete={(c) => setCompletedCrop(c)}
+                minWidth={50}
+                minHeight={50}
+                keepSelection={true}
+                ruleOfThirds={true}
+                style={{ width: '100%', height: '100%' }}
+              >
+                <img
+                  ref={imageRef}
+                  src={imageUrl}
+                  alt="Image à recadrer"
+                  onLoad={onImageLoad}
+                  style={{
+                    transform: `rotate(${rotation}deg)`,
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    width: 'auto',
+                    height: 'auto',
+                    display: 'block'
+                  }}
+                />
+              </ReactCrop>
+            </div>
           </div>
         </div>
         
