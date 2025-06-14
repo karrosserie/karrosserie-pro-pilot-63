@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -49,7 +48,7 @@ export function ImageCropper({
     // Calculer le ratio de redimensionnement pour que l'image occupe le maximum d'espace
     const scaleX = cropAreaWidth / rotatedWidth;
     const scaleY = cropAreaHeight / rotatedHeight;
-    const scale = Math.min(scaleX, scaleY) * 0.9; // 0.9 pour laisser un peu de marge
+    const scale = Math.min(scaleX, scaleY) * 0.95; // 0.95 pour laisser un peu de marge
 
     return {
       width: imageWidth * scale,
@@ -197,12 +196,12 @@ export function ImageCropper({
   
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-5xl">
+      <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Recadrer l'image</DialogTitle>
         </DialogHeader>
         
-        <div className="my-4 max-h-[70vh] overflow-auto">
+        <div className="flex-1 flex flex-col min-h-0">
           <div className="mb-4 flex justify-center gap-2">
             <Button
               variant="outline"
@@ -226,23 +225,23 @@ export function ImageCropper({
             </Button>
           </div>
           
-          <div className="flex justify-center">
+          <div className="flex-1 flex justify-center items-center min-h-0">
             <div 
               style={{
                 width: `${cropAreaWidth}px`,
                 height: `${cropAreaHeight}px`,
-                overflow: 'hidden',
-                position: 'relative'
+                position: 'relative',
+                overflow: 'hidden'
               }}
             >
               <ReactCrop
                 crop={crop}
                 onChange={(c) => setCrop(c)}
                 onComplete={(c) => setCompletedCrop(c)}
-                className="w-full h-full"
                 style={{
                   width: `${cropAreaWidth}px`,
-                  height: `${cropAreaHeight}px`
+                  height: `${cropAreaHeight}px`,
+                  overflow: 'hidden'
                 }}
               >
                 <img
@@ -250,7 +249,6 @@ export function ImageCropper({
                   src={imageUrl}
                   alt="Image à recadrer"
                   onLoad={onImageLoad}
-                  className="max-w-none"
                   style={{
                     transform: `rotate(${rotation}deg)`,
                     transformOrigin: 'center center',
@@ -261,7 +259,8 @@ export function ImageCropper({
                     marginLeft: imageLoaded ? `-${displayImageDimensions.width / 2}px` : '0',
                     marginTop: imageLoaded ? `-${displayImageDimensions.height / 2}px` : '0',
                     width: imageLoaded ? `${displayImageDimensions.width}px` : 'auto',
-                    height: imageLoaded ? `${displayImageDimensions.height}px` : 'auto'
+                    height: imageLoaded ? `${displayImageDimensions.height}px` : 'auto',
+                    maxWidth: 'none'
                   }}
                 />
               </ReactCrop>
