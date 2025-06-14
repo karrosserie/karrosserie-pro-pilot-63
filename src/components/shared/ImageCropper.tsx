@@ -40,8 +40,8 @@ export function ImageCropper({
     console.log('imageWidth: '+imageWidth+ ' - imageHeight: '+imageHeight+ ' - rotation: '+rotation);
     // Calculer les dimensions de l'image après rotation
     
-    const rotatedWidth = 0;
-    const rotatedHeight = 0;
+    let rotatedWidth = 0;
+    let rotatedHeight = 0;
     
     if(imageWidth > cropAreaWidth) {
       rotatedWidth = cropAreaWidth;
