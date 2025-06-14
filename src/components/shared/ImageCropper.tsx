@@ -227,6 +227,7 @@ export function ImageCropper({
           
           <div className="flex-1 flex justify-center items-center min-h-0">
             <div 
+              className="my-4"
               style={{
                 width: `${cropAreaWidth}px`,
                 height: `${cropAreaHeight}px`,
