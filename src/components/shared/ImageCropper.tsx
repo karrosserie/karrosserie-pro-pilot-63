@@ -57,8 +57,8 @@ export function ImageCropper({
     console.log('rotatedWidth: '+rotatedWidth+ ' - rotatedHeight: '+rotatedHeight);
 
     return {
-      width: rotatedWidth,
-      height: rotatedHeight
+      width: Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? rotatedHeight : rotatedWidth,
+      height: Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? rotatedWidth : rotatedHeight
     };
   };
 
