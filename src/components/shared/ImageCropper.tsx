@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -78,9 +79,14 @@ export function ImageCropper({
     const image = imageRef.current;
     const canvas = document.createElement('canvas');
     
-    // Calculer les échelles en tenant compte du zoom
-    const scaleX = (image.naturalWidth / image.width) / zoom;
-    const scaleY = (image.naturalHeight / image.height) / zoom;
+    // Les coordonnées du crop sont relatives à l'image affichée (avec zoom)
+    // Il faut les convertir vers les coordonnées de l'image naturelle
+    const displayedWidth = image.width * zoom;
+    const displayedHeight = image.height * zoom;
+    
+    // Facteur de conversion de l'image affichée vers l'image naturelle
+    const scaleX = image.naturalWidth / displayedWidth;
+    const scaleY = image.naturalHeight / displayedHeight;
     
     const ctx = canvas.getContext('2d');
 
@@ -93,7 +99,7 @@ export function ImageCropper({
     const rotationInRadians = (rotation * Math.PI) / 180;
     const isRotated90or270 = rotation === 90 || rotation === 270;
     
-    // Dimensions du crop dans l'image originale avec zoom
+    // Dimensions du crop dans l'image naturelle
     const cropWidth = completedCrop.width * scaleX;
     const cropHeight = completedCrop.height * scaleY;
     
