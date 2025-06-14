@@ -50,6 +50,8 @@ export function ImageCropper({
       rotatedHeight = cropAreaHeight;
       rotatedWidth = imageWidth * rotatedHeight / imageHeight;
     }
+    
+    console.log('rotatedWidth: '+rotatedWidth+ ' - rotatedHeight: '+rotatedHeight);
 
     return {
       width: rotatedWidth,
