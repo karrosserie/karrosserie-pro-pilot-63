@@ -164,14 +164,13 @@ export function ImageCropper({
     onClose();
   };
 
-  // Calculer les dimensions de la zone ReactCrop en fonction de la rotation
-  const rotatedDimensions = imageLoaded 
-    ? getRotatedDimensions(imageDimensions.width, imageDimensions.height, rotation)
-    : { width: 400, height: 300 }; // Dimensions par défaut en attendant le chargement
+  // Largeur fixe pour la zone ReactCrop
+  const cropAreaWidth = 800; // Largeur fixe
+  const cropAreaHeight = 600; // Hauteur fixe
   
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-5xl">
         <DialogHeader>
           <DialogTitle>Recadrer l'image</DialogTitle>
         </DialogHeader>
@@ -203,19 +202,20 @@ export function ImageCropper({
           <div className="flex justify-center">
             <div 
               style={{
-                width: `${rotatedDimensions.width}px`,
-                height: `${rotatedDimensions.height}px`,
-                overflow: 'hidden'
+                width: `${cropAreaWidth}px`,
+                height: `${cropAreaHeight}px`,
+                overflow: 'hidden',
+                position: 'relative'
               }}
             >
               <ReactCrop
                 crop={crop}
                 onChange={(c) => setCrop(c)}
                 onComplete={(c) => setCompletedCrop(c)}
-                className="max-w-full"
+                className="w-full h-full"
                 style={{
-                  width: `${rotatedDimensions.width}px`,
-                  height: `${rotatedDimensions.height}px`
+                  width: `${cropAreaWidth}px`,
+                  height: `${cropAreaHeight}px`
                 }}
               >
                 <img
@@ -225,14 +225,16 @@ export function ImageCropper({
                   onLoad={onImageLoad}
                   className="max-w-none"
                   style={{
-                    width: imageLoaded ? `${imageDimensions.width}px` : '100%',
-                    height: imageLoaded ? `${imageDimensions.height}px` : 'auto',
                     transform: `rotate(${rotation}deg)`,
                     transformOrigin: 'center center',
                     transition: 'transform 0.3s ease-in-out',
-                    position: 'relative',
-                    left: imageLoaded ? `${(rotatedDimensions.width - imageDimensions.width) / 2}px` : '0',
-                    top: imageLoaded ? `${(rotatedDimensions.height - imageDimensions.height) / 2}px` : '0'
+                    position: 'absolute',
+                    left: '50%',
+                    top: '50%',
+                    marginLeft: imageLoaded ? `-${imageDimensions.width / 2}px` : '0',
+                    marginTop: imageLoaded ? `-${imageDimensions.height / 2}px` : '0',
+                    width: imageLoaded ? `${imageDimensions.width}px` : 'auto',
+                    height: imageLoaded ? `${imageDimensions.height}px` : 'auto'
                   }}
                 />
               </ReactCrop>
