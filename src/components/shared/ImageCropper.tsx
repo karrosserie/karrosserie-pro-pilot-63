@@ -48,7 +48,7 @@ export function ImageCropper({
     // Calculer le ratio de redimensionnement pour que l'image occupe le maximum d'espace
     const scaleX = cropAreaWidth / rotatedWidth;
     const scaleY = cropAreaHeight / rotatedHeight;
-    const scale = Math.min(scaleX, scaleY) * 0.95; // 0.95 pour laisser un peu de marge
+    const scale = Math.min(scaleX, scaleY) * 1; // 0.95 pour laisser un peu de marge
 
     return {
       width: imageWidth * scale,
