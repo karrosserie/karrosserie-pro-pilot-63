@@ -43,7 +43,8 @@ export function ImageCropper({
     //let width = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? imageHeight : imageWidth;
     //let height = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? imageWidth : imageHeight;
     //console.log('width: '+width+ ' - height: '+height+ ' - rotation: '+Math.abs(rotation));
-    
+    let width = imageWidth;
+    let height = imageHeight;
     
     let rotatedWidth = 0;
     let rotatedHeight = 0;
