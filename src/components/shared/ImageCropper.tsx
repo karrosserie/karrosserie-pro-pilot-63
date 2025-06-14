@@ -27,6 +27,7 @@ export function ImageCropper({
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [rotation, setRotation] = useState(0);
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+  const [imageLoaded, setImageLoaded] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -46,6 +47,7 @@ export function ImageCropper({
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = e.currentTarget;
     setImageDimensions({ width, height });
+    setImageLoaded(true);
     
     // Initialiser avec un recadrage libre couvrant 90% de l'image
     const crop: Crop = {
@@ -157,11 +159,15 @@ export function ImageCropper({
 
   const handleClose = () => {
     setRotation(0);
+    setImageLoaded(false);
+    setImageDimensions({ width: 0, height: 0 });
     onClose();
   };
 
   // Calculer les dimensions de la zone ReactCrop en fonction de la rotation
-  const rotatedDimensions = getRotatedDimensions(imageDimensions.width, imageDimensions.height, rotation);
+  const rotatedDimensions = imageLoaded 
+    ? getRotatedDimensions(imageDimensions.width, imageDimensions.height, rotation)
+    : { width: 400, height: 300 }; // Dimensions par défaut en attendant le chargement
   
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -177,6 +183,7 @@ export function ImageCropper({
               size="sm"
               onClick={() => rotateImage(-90)}
               className="flex items-center gap-2"
+              disabled={!imageLoaded}
             >
               <RotateCcw className="h-4 w-4" />
               Pivoter à gauche
@@ -186,6 +193,7 @@ export function ImageCropper({
               size="sm"
               onClick={() => rotateImage(90)}
               className="flex items-center gap-2"
+              disabled={!imageLoaded}
             >
               <RotateCw className="h-4 w-4" />
               Pivoter à droite
@@ -217,14 +225,14 @@ export function ImageCropper({
                   onLoad={onImageLoad}
                   className="max-w-none"
                   style={{
-                    width: `${imageDimensions.width}px`,
-                    height: `${imageDimensions.height}px`,
+                    width: imageLoaded ? `${imageDimensions.width}px` : '100%',
+                    height: imageLoaded ? `${imageDimensions.height}px` : 'auto',
                     transform: `rotate(${rotation}deg)`,
                     transformOrigin: 'center center',
                     transition: 'transform 0.3s ease-in-out',
                     position: 'relative',
-                    left: `${(rotatedDimensions.width - imageDimensions.width) / 2}px`,
-                    top: `${(rotatedDimensions.height - imageDimensions.height) / 2}px`
+                    left: imageLoaded ? `${(rotatedDimensions.width - imageDimensions.width) / 2}px` : '0',
+                    top: imageLoaded ? `${(rotatedDimensions.height - imageDimensions.height) / 2}px` : '0'
                   }}
                 />
               </ReactCrop>
@@ -236,7 +244,7 @@ export function ImageCropper({
           <Button variant="outline" onClick={handleClose}>
             Annuler
           </Button>
-          <Button onClick={handleComplete} disabled={isLoading}>
+          <Button onClick={handleComplete} disabled={isLoading || !imageLoaded}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
