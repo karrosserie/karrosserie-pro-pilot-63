@@ -39,20 +39,21 @@ export function ImageCropper({
   const calculateOptimalImageSize = (imageWidth: number, imageHeight: number, rotation: number) => {
     console.log('imageWidth: '+imageWidth+ ' - imageHeight: '+imageHeight+ ' - rotation: '+rotation);
     // Calculer les dimensions de l'image après rotation
-
-    let width = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? imageHeight : imageWidth;
-    let height = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? imageWidth : imageHeight;
+    let imgWidth = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? imageHeight : imageWidth;
+    let imgHeight = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? imageWidth : imageHeight;
+    let cropWidth = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? cropAreaHeight : cropAreaWidth;
+    let cropHeight = Math.abs(rotation) == 90 || Math.abs(rotation) == 270 ? cropAreaWidth : cropAreaHeight;
     console.log('width: '+width+ ' - height: '+height+ ' - rotation: '+Math.abs(rotation));
     
     let rotatedWidth = 0;
     let rotatedHeight = 0;
     
-    if (width > cropAreaWidth) {
-      rotatedWidth = cropAreaWidth;
-      rotatedHeight = height * rotatedWidth / width;
-    } else if(height > cropAreaHeight) {
-      rotatedHeight = cropAreaHeight;
-      rotatedWidth = width * rotatedHeight / height;
+    if (imgWidth > cropWidth) {
+      rotatedWidth = cropWidth;
+      rotatedHeight = imgHeight * rotatedWidth / imgWidth;
+    } else if(imgHeight > cropHeight) {
+      rotatedHeight = cropHeight;
+      rotatedWidth = imgWidth * rotatedHeight / imgHeight;
     }
     
     console.log('rotatedWidth: '+rotatedWidth+ ' - rotatedHeight: '+rotatedHeight);
