@@ -58,7 +58,7 @@ const AIAssistant = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50 relative">
-      <div className="page-container space-y-6">
+      <div className="page-container space-y-3 sm:space-y-4 lg:space-y-6 p-3 sm:p-4 lg:p-6">
         {/* Header contextuel avec statut IA */}
         <IAStatusHeader />
         
@@ -68,16 +68,16 @@ const AIAssistant = () => {
         {/* Tableau principal de suivi des impayés */}
         <IAPaymentTracking />
 
-        {/* Indicateur de raccourcis en bas à gauche */}
-        <div className="fixed bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg border">
+        {/* Indicateur de raccourcis en bas à droite pour mobile, bas à gauche pour desktop */}
+        <div className="fixed bottom-3 right-3 sm:bottom-4 sm:left-4 bg-white/90 backdrop-blur-sm rounded-lg p-2 sm:p-3 shadow-lg border z-40">
           <div className="text-xs text-gray-600 space-y-1">
             <div className="flex items-center">
-              <kbd className="px-2 py-1 bg-gray-100 rounded text-xs mr-2">⌘K</kbd>
-              <span>Recherche globale</span>
+              <kbd className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-gray-100 rounded text-xs mr-1 sm:mr-2">⌘K</kbd>
+              <span className="text-xs sm:text-sm">Recherche</span>
             </div>
             <div className="flex items-center">
-              <kbd className="px-2 py-1 bg-gray-100 rounded text-xs mr-2">⌘1-6</kbd>
-              <span>Actions rapides</span>
+              <kbd className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-gray-100 rounded text-xs mr-1 sm:mr-2">⌘1-6</kbd>
+              <span className="text-xs sm:text-sm">Actions</span>
             </div>
           </div>
         </div>
