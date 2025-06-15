@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useIsMobile } from "@/hooks/use-mobile";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
+import QuickActions from "@/components/shared/QuickActions";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -32,6 +33,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           </div>
         </main>
       </div>
+
+      {/* Quick Actions présentes sur toutes les pages */}
+      <QuickActions />
     </div>
   );
 };

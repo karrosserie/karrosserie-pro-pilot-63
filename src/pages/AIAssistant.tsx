@@ -5,7 +5,6 @@ import IAChannelsBanner from '@/components/ai-assistant/IAChannelsBanner';
 import IAPaymentTracking from '@/components/ai-assistant/IAPaymentTracking';
 import GlobalSearch from '@/components/shared/GlobalSearch';
 import AIContextualPanel from '@/components/shared/AIContextualPanel';
-import QuickActions from '@/components/shared/QuickActions';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 
 const AIAssistant = () => {
@@ -98,9 +97,6 @@ const AIAssistant = () => {
           onClose={() => setShowAIPanel(false)}
         />
       )}
-
-      {/* Quick Actions flottantes */}
-      <QuickActions />
     </div>
   );
 };
