@@ -28,6 +28,7 @@ export function ImageCropper({
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
   const imageRef = useRef<HTMLImageElement>(null);
+  const hiddenImageRef = useRef<HTMLImageElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Fonction pour initialiser le recadrage au centre lorsque l'image est chargée
@@ -51,6 +52,10 @@ export function ImageCropper({
     const newZoom = direction === 'in' ? zoom * 1.2 : zoom / 1.2;
     const clampedZoom = Math.max(0.5, Math.min(3, newZoom));
     setZoom(clampedZoom);
+    
+    // Réinitialiser le crop lors du zoom pour éviter les décalages
+    setCrop(undefined);
+    setCompletedCrop(undefined);
   };
 
   // Fonction pour gérer la rotation
@@ -61,15 +66,19 @@ export function ImageCropper({
       : (rotation - rotationStep + 360) % 360;
     
     setRotation(newRotation);
+    
+    // Réinitialiser le crop lors de la rotation pour éviter les décalages
+    setCrop(undefined);
+    setCompletedCrop(undefined);
   };
 
   // Fonction pour créer une image recadrée à partir du canvas
   const getCroppedImage = () => {
-    if (!imageRef.current || !completedCrop) return;
+    if (!hiddenImageRef.current || !completedCrop) return;
 
     setIsLoading(true);
 
-    const image = imageRef.current;
+    const image = hiddenImageRef.current;
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
 
@@ -81,23 +90,16 @@ export function ImageCropper({
     console.log('=== CROP DEBUG INFO ===');
     console.log('Completed crop:', completedCrop);
     console.log('Image natural size:', image.naturalWidth, 'x', image.naturalHeight);
-    console.log('Image displayed size:', image.width, 'x', image.height);
     console.log('Current zoom:', zoom);
     console.log('Current rotation:', rotation);
 
-    // Calculer le ratio entre l'image naturelle et l'image affichée
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
-    
-    console.log('Scale ratios:', { scaleX, scaleY });
+    // Utiliser directement les coordonnées du crop sur l'image non transformée
+    const naturalCropX = completedCrop.x;
+    const naturalCropY = completedCrop.y;
+    const naturalCropWidth = completedCrop.width;
+    const naturalCropHeight = completedCrop.height;
 
-    // Convertir les coordonnées de crop vers l'espace de l'image naturelle
-    const naturalCropX = completedCrop.x * scaleX;
-    const naturalCropY = completedCrop.y * scaleY;
-    const naturalCropWidth = completedCrop.width * scaleX;
-    const naturalCropHeight = completedCrop.height * scaleY;
-
-    console.log('Natural crop coordinates:', {
+    console.log('Crop coordinates:', {
       x: naturalCropX,
       y: naturalCropY,
       width: naturalCropWidth,
@@ -171,6 +173,14 @@ export function ImageCropper({
           <DialogTitle>Recadrer l'image</DialogTitle>
         </DialogHeader>
         
+        {/* Image cachée pour les calculs sans transformation */}
+        <img
+          ref={hiddenImageRef}
+          src={imageUrl}
+          alt="Image de référence"
+          style={{ display: 'none' }}
+        />
+        
         {/* Contrôles */}
         <div className="flex justify-center gap-2 mb-2">
           <Button
@@ -215,25 +225,41 @@ export function ImageCropper({
               maxHeight: '600px'
             }}
           >
-            <ReactCrop
-              crop={crop}
-              onChange={(c) => setCrop(c)}
-              onComplete={(c) => setCompletedCrop(c)}
-              className="flex justify-center items-center w-full h-full"
-            >
-              <img
-                ref={imageRef}
-                src={imageUrl}
-                alt="Image à recadrer"
-                onLoad={onImageLoad}
-                className="max-w-full max-h-full object-contain"
-                style={{
-                  transform: `scale(${zoom}) rotate(${rotation}deg)`,
-                  transformOrigin: 'center center',
-                  transition: 'transform 0.2s ease-in-out',
-                }}
-              />
-            </ReactCrop>
+            {/* Image avec transformations visuelles mais sans crop si zoom ou rotation */}
+            {(zoom !== 1 || rotation !== 0) ? (
+              <div className="w-full h-full flex justify-center items-center">
+                <img
+                  src={imageUrl}
+                  alt="Image à recadrer"
+                  className="max-w-full max-h-full object-contain"
+                  style={{
+                    transform: `scale(${zoom}) rotate(${rotation}deg)`,
+                    transformOrigin: 'center center',
+                    transition: 'transform 0.2s ease-in-out',
+                  }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="bg-black bg-opacity-50 text-white px-4 py-2 rounded">
+                    Réinitialisez le zoom et la rotation pour pouvoir sélectionner une zone
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <ReactCrop
+                crop={crop}
+                onChange={(c) => setCrop(c)}
+                onComplete={(c) => setCompletedCrop(c)}
+                className="flex justify-center items-center w-full h-full"
+              >
+                <img
+                  ref={imageRef}
+                  src={imageUrl}
+                  alt="Image à recadrer"
+                  onLoad={onImageLoad}
+                  className="max-w-full max-h-full object-contain"
+                />
+              </ReactCrop>
+            )}
           </div>
         </div>
         
@@ -241,7 +267,20 @@ export function ImageCropper({
           <Button variant="outline" onClick={onClose}>
             Annuler
           </Button>
-          <Button onClick={handleComplete} disabled={isLoading}>
+          {zoom !== 1 || rotation !== 0 ? (
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setZoom(1);
+                setRotation(0);
+                setCrop(undefined);
+                setCompletedCrop(undefined);
+              }}
+            >
+              Réinitialiser
+            </Button>
+          ) : null}
+          <Button onClick={handleComplete} disabled={isLoading || !completedCrop}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
