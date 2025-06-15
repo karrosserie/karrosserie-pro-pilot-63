@@ -246,7 +246,7 @@ export function ImageCropper({
           </Button>
         </div>
         
-        <div className="my-4 max-h-[70vh]">
+        <div className="my-2 max-h-[70vh]">
           <div 
             className="flex justify-center items-center"
             style={{ 
