@@ -8,15 +8,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Download, Mail, MoreHorizontal } from 'lucide-react';
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { GeneratedReport } from '@/hooks/use-generated-reports';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -34,14 +26,11 @@ export const GeneratedReportsTable = ({ reports, onSendEmail }: GeneratedReports
         return <Badge variant="secondary" className="bg-blue-100 text-blue-800">En cours</Badge>;
       case 'ready':
         return <Badge variant="default" className="bg-green-100 text-green-800">Prêt</Badge>;
+      case 'sent':
+        return <Badge variant="default" className="bg-purple-100 text-purple-800">Envoyé</Badge>;
       case 'error':
         return <Badge variant="destructive">Erreur</Badge>;
     }
-  };
-
-  const handleDownload = (report: GeneratedReport) => {
-    // Simuler le téléchargement
-    console.log(`Téléchargement de ${report.name}`);
   };
 
   if (reports.length === 0) {
@@ -70,7 +59,6 @@ export const GeneratedReportsTable = ({ reports, onSendEmail }: GeneratedReports
               <TableHead className="font-semibold">Période</TableHead>
               <TableHead className="font-semibold">Date de génération</TableHead>
               <TableHead className="font-semibold">Statut</TableHead>
-              <TableHead className="font-semibold text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -94,43 +82,6 @@ export const GeneratedReportsTable = ({ reports, onSendEmail }: GeneratedReports
                 </TableCell>
                 <TableCell>
                   {getStatusBadge(report.status)}
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-1">
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => handleDownload(report)}
-                      disabled={report.status !== 'ready'}
-                    >
-                      <Download className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => onSendEmail(report.id)}
-                      disabled={report.status !== 'ready'}
-                    >
-                      <Mail className="h-4 w-4" />
-                    </Button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleDownload(report)}>
-                          <Download className="mr-2 h-4 w-4" />
-                          Télécharger
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onSendEmail(report.id)}>
-                          <Mail className="mr-2 h-4 w-4" />
-                          Envoyer par email
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
                 </TableCell>
               </TableRow>
             ))}

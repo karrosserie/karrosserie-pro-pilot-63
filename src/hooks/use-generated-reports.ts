@@ -11,7 +11,7 @@ export interface GeneratedReport {
   fromDate: Date;
   toDate: Date;
   generatedAt: Date;
-  status: 'generating' | 'ready' | 'error';
+  status: 'generating' | 'ready' | 'sent' | 'error';
   fileUrl?: string;
 }
 
@@ -61,6 +61,15 @@ export const useGeneratedReports = () => {
 
     const fromDateStr = format(report.fromDate, 'dd/MM/yyyy', { locale: fr });
     const toDateStr = format(report.toDate, 'dd/MM/yyyy', { locale: fr });
+
+    // Marquer le rapport comme envoyé
+    setReports(prev => 
+      prev.map(r => 
+        r.id === reportId 
+          ? { ...r, status: 'sent' }
+          : r
+      )
+    );
 
     toast({
       title: "Email envoyé",
