@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -84,26 +83,35 @@ export function ImageCropper({
     console.log('Image displayed size:', image.width, 'x', image.height);
     console.log('Current zoom:', zoom);
     
-    // NOUVELLE APPROCHE : Calculer les dimensions réelles de l'image zoomée
-    // L'image s'affiche dans un conteneur avec une certaine taille (image.width x image.height)
-    // Mais avec le zoom, sa taille visuelle réelle change
+    // CORRECTION : Prendre en compte le centrage de l'image zoomée
     const displayedImageWidth = image.width * zoom;
     const displayedImageHeight = image.height * zoom;
     
     console.log('Real displayed image size with zoom:', displayedImageWidth, 'x', displayedImageHeight);
     
-    // Les coordonnées du crop sont par rapport à cette image zoomée
-    // On doit maintenant les convertir vers l'image naturelle
-    const scaleXFromDisplayedToNatural = image.naturalWidth / displayedImageWidth;
-    const scaleYFromDisplayedToNatural = image.naturalHeight / displayedImageHeight;
+    // Calculer l'offset dû au centrage de l'image zoomée
+    const offsetX = (displayedImageWidth - image.width) / 2;
+    const offsetY = (displayedImageHeight - image.height) / 2;
     
-    console.log('Scale from displayed to natural:', scaleXFromDisplayedToNatural, scaleYFromDisplayedToNatural);
+    console.log('Centering offset:', offsetX, offsetY);
     
-    // Appliquer directement cette conversion
-    const cropX = completedCrop.x * scaleXFromDisplayedToNatural;
-    const cropY = completedCrop.y * scaleYFromDisplayedToNatural;
-    const cropWidth = completedCrop.width * scaleXFromDisplayedToNatural;
-    const cropHeight = completedCrop.height * scaleYFromDisplayedToNatural;
+    // Ajuster les coordonnées du crop en tenant compte de l'offset de centrage
+    const adjustedCropX = completedCrop.x + offsetX;
+    const adjustedCropY = completedCrop.y + offsetY;
+    
+    console.log('Adjusted crop coordinates:', adjustedCropX, adjustedCropY);
+    
+    // Maintenant convertir vers l'image naturelle
+    const scaleXToNatural = image.naturalWidth / displayedImageWidth;
+    const scaleYToNatural = image.naturalHeight / displayedImageHeight;
+    
+    console.log('Scale to natural:', scaleXToNatural, scaleYToNatural);
+    
+    // Appliquer la conversion finale
+    const cropX = adjustedCropX * scaleXToNatural;
+    const cropY = adjustedCropY * scaleYToNatural;
+    const cropWidth = completedCrop.width * scaleXToNatural;
+    const cropHeight = completedCrop.height * scaleYToNatural;
     
     console.log('Final crop in natural image:', {
       x: cropX,
