@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Car, FileText, Users, CreditCard, Eye, Pencil, Wrench, PaintBucket } from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
@@ -10,8 +9,17 @@ import VehicleDialog from '@/components/vehicle/VehicleDialog';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import ClientDialog from '@/components/client/ClientDialog';
 import ReceiptDialog from '@/components/receipts/ReceiptDialog';
+import MobileHomePage from '@/components/mobile/MobileHomePage';
+import { useMobileDetection } from '@/hooks/use-mobile-detection';
 
 const Index = () => {
+  const isMobile = useMobileDetection();
+  
+  // Si on est sur mobile, on affiche la version mobile
+  if (isMobile) {
+    return <MobileHomePage />;
+  }
+
   const { dashboardStats, recentVehicles, recentDocuments, recentActivity, isLoading } = useDashboardData();
   
   // États pour les dialogues

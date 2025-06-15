@@ -1,0 +1,147 @@
+
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Bot, Car, Users, FileText, ArrowRight, Zap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+
+const MobileHomePage = () => {
+  const quickActions = [
+    {
+      icon: <Bot className="h-6 w-6" />,
+      title: "Assistant IA",
+      description: "Gestion automatique",
+      color: "bg-gradient-to-br from-blue-500 to-purple-600",
+      path: "/ai-assistant"
+    },
+    {
+      icon: <Car className="h-6 w-6" />,
+      title: "Véhicules",
+      description: "Suivi réparations",
+      color: "bg-gradient-to-br from-orange-500 to-red-600",
+      path: "/vehicles"
+    },
+    {
+      icon: <Users className="h-6 w-6" />,
+      title: "Clients",
+      description: "Gestion clientèle",
+      color: "bg-gradient-to-br from-green-500 to-emerald-600",
+      path: "/clients"
+    },
+    {
+      icon: <FileText className="h-6 w-6" />,
+      title: "Documents",
+      description: "Devis & Factures",
+      color: "bg-gradient-to-br from-purple-500 to-pink-600",
+      path: "/documents"
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-blue-50 flex flex-col">
+      {/* Header */}
+      <div className="pt-12 pb-8 px-6">
+        <div className="text-center">
+          <div className="mb-4">
+            <span className="text-3xl font-bold text-karrosserie-orange">
+              Karrosserie
+            </span>
+            <span className="text-3xl font-bold text-gray-800 ml-2">
+              Pro
+            </span>
+          </div>
+          <p className="text-lg text-gray-600 mb-2">
+            Votre atelier, digitalisé
+          </p>
+          <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
+            <Zap className="h-4 w-4 text-yellow-500" />
+            <span>Rapide • Simple • Efficace</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats rapides */}
+      <div className="px-6 mb-8">
+        <div className="grid grid-cols-3 gap-4">
+          <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-karrosserie-orange mb-1">12</div>
+              <div className="text-xs text-gray-600">Véhicules</div>
+            </CardContent>
+          </Card>
+          <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-green-600 mb-1">8</div>
+              <div className="text-xs text-gray-600">En cours</div>
+            </CardContent>
+          </Card>
+          <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-blue-600 mb-1">4</div>
+              <div className="text-xs text-gray-600">Terminés</div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Actions rapides */}
+      <div className="flex-1 px-6">
+        <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center">
+          Accès rapide
+        </h2>
+        
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          {quickActions.map((action, index) => (
+            <Link key={index} to={action.path}>
+              <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 h-32">
+                <CardContent className="p-0 h-full">
+                  <div className={`${action.color} h-full rounded-lg flex flex-col items-center justify-center text-white relative overflow-hidden`}>
+                    <div className="absolute inset-0 bg-black/10"></div>
+                    <div className="relative z-10 text-center">
+                      <div className="mb-2">
+                        {action.icon}
+                      </div>
+                      <div className="font-semibold text-sm mb-1">
+                        {action.title}
+                      </div>
+                      <div className="text-xs opacity-90">
+                        {action.description}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+
+        {/* Bouton principal */}
+        <div className="space-y-4">
+          <Link to="/ai-assistant">
+            <Button className="w-full h-14 bg-gradient-to-r from-karrosserie-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95">
+              <Bot className="h-6 w-6 mr-3" />
+              Lancer l'Assistant IA
+              <ArrowRight className="h-5 w-5 ml-3" />
+            </Button>
+          </Link>
+
+          <Link to="/vehicles">
+            <Button variant="outline" className="w-full h-12 border-2 border-gray-200 hover:border-karrosserie-orange hover:bg-orange-50 font-medium text-gray-700 hover:text-karrosserie-orange transition-all duration-300">
+              Accéder à l'application complète
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="p-6 text-center">
+        <p className="text-xs text-gray-500">
+          © 2024 Karrosserie Pro • Version Mobile
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default MobileHomePage;
