@@ -61,24 +61,6 @@ export const AccountingKpis = ({
       period: 'Décembre 2024',
       variant: balance >= 0 ? 'success' : 'danger',
       icon: <Euro className="h-6 w-6" />
-    },
-    {
-      title: 'Transactions',
-      value: transactionCount.toString(),
-      trend: '+22%',
-      trendUp: true,
-      period: 'Décembre 2024',
-      variant: 'default',
-      icon: <Receipt className="h-6 w-6" />
-    },
-    {
-      title: 'Trésorerie prévisionnelle',
-      value: formatCurrency(balance * 1.1),
-      trend: '+5%',
-      trendUp: true,
-      period: 'Janvier 2025',
-      variant: 'default',
-      icon: <TrendingUp className="h-6 w-6" />
     }
   ];
 
