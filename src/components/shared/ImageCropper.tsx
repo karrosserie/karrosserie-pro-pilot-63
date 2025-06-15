@@ -28,12 +28,44 @@ export function ImageCropper({
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [key, setKey] = useState(0);
+  const [maxZoom, setMaxZoom] = useState(3);
   const imageRef = useRef<HTMLImageElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Calculer les dimensions maximales selon la rotation
+  const calculateMaxDimensions = (imageWidth: number, imageHeight: number, containerWidth: number, containerHeight: number, currentRotation: number) => {
+    const normalizedRotation = Math.abs(currentRotation % 180);
+    const isRotated90 = normalizedRotation === 90;
+    
+    if (isRotated90) {
+      // Quand l'image est pivotée de 90°, sa largeur devient sa hauteur et vice versa
+      const maxScaleByWidth = containerWidth / imageHeight;
+      const maxScaleByHeight = containerHeight / imageWidth;
+      return Math.min(maxScaleByWidth, maxScaleByHeight);
+    } else {
+      // Rotation normale (0°, 180°)
+      const maxScaleByWidth = containerWidth / imageWidth;
+      const maxScaleByHeight = containerHeight / imageHeight;
+      return Math.min(maxScaleByWidth, maxScaleByHeight);
+    }
+  };
 
   // Fonction pour initialiser le recadrage au centre lorsque l'image est chargée
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = e.currentTarget;
+    
+    // Récupérer les dimensions du conteneur ReactCrop
+    const reactCropContainer = e.currentTarget.closest('.ReactCrop') as HTMLElement;
+    if (reactCropContainer) {
+      const containerRect = reactCropContainer.getBoundingClientRect();
+      const maxScale = calculateMaxDimensions(width, height, containerRect.width, containerRect.height, rotation);
+      setMaxZoom(maxScale);
+      
+      // Ajuster le zoom si nécessaire
+      if (zoom > maxScale) {
+        setZoom(maxScale);
+      }
+    }
     
     // Initialiser avec un recadrage libre couvrant 80% de l'image, centré
     const crop: Crop = {
@@ -47,15 +79,33 @@ export function ImageCropper({
     setCrop(crop);
   };
 
-  // Fonction pour gérer le zoom
+  // Fonction pour gérer le zoom avec vérification des limites
   const handleZoom = (direction: 'in' | 'out') => {
-    setZoom(prev => {
-      const newZoom = direction === 'in' ? prev * 1.1 : prev / 1.1;
-      return Math.max(0.5, Math.min(3, newZoom));
-    });
+    if (!imageRef.current) return;
+    
+    const image = imageRef.current;
+    const reactCropContainer = image.closest('.ReactCrop') as HTMLElement;
+    
+    if (reactCropContainer) {
+      const containerRect = reactCropContainer.getBoundingClientRect();
+      const imageRect = image.getBoundingClientRect();
+      
+      const currentMaxZoom = calculateMaxDimensions(
+        imageRect.width / zoom, 
+        imageRect.height / zoom, 
+        containerRect.width, 
+        containerRect.height, 
+        rotation
+      );
+      
+      setZoom(prev => {
+        const newZoom = direction === 'in' ? prev * 1.1 : prev / 1.1;
+        return Math.max(0.1, Math.min(currentMaxZoom, newZoom));
+      });
+    }
   };
 
-  // Fonction pour gérer la rotation
+  // Fonction pour gérer la rotation avec recalcul des dimensions
   const handleRotation = (direction: 'cw' | 'ccw') => {
     const rotationStep = 90;
     const newRotation = direction === 'cw' 
@@ -63,6 +113,32 @@ export function ImageCropper({
       : (rotation - rotationStep + 360) % 360;
     
     setRotation(newRotation);
+    
+    // Recalculer le zoom maximum avec la nouvelle rotation
+    if (imageRef.current) {
+      const image = imageRef.current;
+      const reactCropContainer = image.closest('.ReactCrop') as HTMLElement;
+      
+      if (reactCropContainer) {
+        const containerRect = reactCropContainer.getBoundingClientRect();
+        const imageRect = image.getBoundingClientRect();
+        
+        const newMaxZoom = calculateMaxDimensions(
+          imageRect.width / zoom, 
+          imageRect.height / zoom, 
+          containerRect.width, 
+          containerRect.height, 
+          newRotation
+        );
+        
+        setMaxZoom(newMaxZoom);
+        
+        // Ajuster le zoom si nécessaire
+        if (zoom > newMaxZoom) {
+          setZoom(newMaxZoom);
+        }
+      }
+    }
     
     // Réinitialiser le crop et forcer le remontage du composant ReactCrop
     setCrop(undefined);
@@ -217,7 +293,7 @@ export function ImageCropper({
             variant="outline"
             size="sm"
             onClick={() => handleZoom('out')}
-            disabled={zoom <= 0.5}
+            disabled={zoom <= 0.1}
           >
             <ZoomOut className="h-4 w-4" />
           </Button>
@@ -225,7 +301,7 @@ export function ImageCropper({
             variant="outline"
             size="sm"
             onClick={() => handleZoom('in')}
-            disabled={zoom >= 3}
+            disabled={zoom >= maxZoom}
           >
             <ZoomIn className="h-4 w-4" />
           </Button>
@@ -298,4 +374,133 @@ export function ImageCropper({
       </DialogContent>
     </Dialog>
   );
+
+  // Fonction pour créer une image recadrée à partir du canvas avec rotation et zoom appliqués
+  function getCroppedImage() {
+    if (!imageRef.current || !completedCrop) return;
+
+    setIsLoading(true);
+
+    const image = imageRef.current;
+    const canvas = document.createElement('canvas');
+    
+    console.log('Crop coordinates:', completedCrop);
+    console.log('Image natural size:', image.naturalWidth, 'x', image.naturalHeight);
+    console.log('Current zoom:', zoom);
+    
+    // Récupérer les dimensions réelles de l'image affichée dans le DOM
+    const imageRect = image.getBoundingClientRect();
+    const displayedImageWidth = imageRect.width;
+    const displayedImageHeight = imageRect.height;
+    
+    console.log('Real displayed image dimensions:', displayedImageWidth, 'x', displayedImageHeight);
+    
+    // Calculer les dimensions de l'image avec le zoom appliqué
+    const zoomedImageWidth = displayedImageWidth * zoom;
+    const zoomedImageHeight = displayedImageHeight * zoom;
+    
+    console.log('Zoomed image dimensions:', zoomedImageWidth, 'x', zoomedImageHeight);
+    
+    // Récupérer le conteneur ReactCrop
+    const reactCropContainer = image.closest('.ReactCrop') as HTMLElement;
+    if (!reactCropContainer) {
+      console.error('ReactCrop container not found');
+      setIsLoading(false);
+      return;
+    }
+    
+    const containerRect = reactCropContainer.getBoundingClientRect();
+    const containerWidth = containerRect.width;
+    const containerHeight = containerRect.height;
+    
+    console.log('ReactCrop container dimensions:', containerWidth, 'x', containerHeight);
+    
+    // Calculer l'offset de l'image zoomée dans le conteneur (image centrée)
+    const imageOffsetX = (containerWidth - zoomedImageWidth) / 2;
+    const imageOffsetY = (containerHeight - zoomedImageHeight) / 2;
+    
+    console.log('Image offset in container:', imageOffsetX, imageOffsetY);
+    
+    // Convertir les coordonnées du crop (relatives au conteneur) vers l'image zoomée
+    const cropXInZoomedImage = completedCrop.x - imageOffsetX;
+    const cropYInZoomedImage = completedCrop.y - imageOffsetY;
+    
+    console.log('Crop position in zoomed image:', cropXInZoomedImage, cropYInZoomedImage);
+    
+    // Calculer le ratio pour convertir vers l'image naturelle
+    const scaleToNaturalX = image.naturalWidth / zoomedImageWidth;
+    const scaleToNaturalY = image.naturalHeight / zoomedImageHeight;
+    
+    console.log('Scale to natural:', scaleToNaturalX, scaleToNaturalY);
+    
+    // Calculer les coordonnées finales dans l'image naturelle
+    const finalCropX = cropXInZoomedImage * scaleToNaturalX;
+    const finalCropY = cropYInZoomedImage * scaleToNaturalY;
+    const finalCropWidth = completedCrop.width * scaleToNaturalX;
+    const finalCropHeight = completedCrop.height * scaleToNaturalY;
+    
+    console.log('Final crop in natural image:', {
+      x: finalCropX,
+      y: finalCropY,
+      width: finalCropWidth,
+      height: finalCropHeight
+    });
+    
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+      setIsLoading(false);
+      return;
+    }
+
+    // Calculer les dimensions finales en tenant compte de la rotation
+    const rotationInRadians = (rotation * Math.PI) / 180;
+    const isRotated90or270 = rotation === 90 || rotation === 270;
+    
+    // Définir la taille du canvas en fonction de la rotation
+    if (isRotated90or270) {
+      canvas.width = finalCropHeight;
+      canvas.height = finalCropWidth;
+    } else {
+      canvas.width = finalCropWidth;
+      canvas.height = finalCropHeight;
+    }
+
+    // Sauvegarder l'état du contexte
+    ctx.save();
+
+    // Déplacer l'origine au centre du canvas
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    
+    // Appliquer la rotation
+    ctx.rotate(rotationInRadians);
+
+    // Dessiner l'image avec la rotation appliquée
+    ctx.drawImage(
+      image,
+      finalCropX,
+      finalCropY,
+      finalCropWidth,
+      finalCropHeight,
+      -finalCropWidth / 2,
+      -finalCropHeight / 2,
+      finalCropWidth,
+      finalCropHeight
+    );
+
+    // Restaurer l'état du contexte
+    ctx.restore();
+
+    // Convertir le canvas en Blob
+    canvas.toBlob(
+      (blob) => {
+        setIsLoading(false);
+        if (blob) {
+          onCropComplete(blob);
+        }
+      },
+      'image/jpeg',
+      0.95
+    );
+  }
 }
