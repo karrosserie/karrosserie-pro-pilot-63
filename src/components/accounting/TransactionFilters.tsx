@@ -36,18 +36,29 @@ export const TransactionFilters = ({
 
   return (
     <div className="space-y-4">
-      {/* Filtres principaux */}
-      <div className="flex flex-wrap gap-2">
+      {/* Sous-onglets principaux */}
+      <div className="flex flex-wrap gap-2 p-1 bg-gray-50 rounded-lg">
         {filters.map((filter) => (
           <Button
             key={filter.value}
-            variant={selectedFilter === filter.value ? 'default' : 'outline'}
+            variant={selectedFilter === filter.value ? 'default' : 'ghost'}
             size="sm"
             onClick={() => setSelectedFilter(filter.value)}
-            className="gap-2"
+            className={`gap-2 flex-1 sm:flex-none ${
+              selectedFilter === filter.value 
+                ? 'bg-white shadow-sm text-gray-900' 
+                : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
+            }`}
           >
             {filter.label}
-            <Badge variant="secondary" className="text-xs">
+            <Badge 
+              variant="secondary" 
+              className={`text-xs ${
+                selectedFilter === filter.value 
+                  ? 'bg-gray-100 text-gray-700' 
+                  : 'bg-gray-200 text-gray-600'
+              }`}
+            >
               {filter.count}
             </Badge>
           </Button>
