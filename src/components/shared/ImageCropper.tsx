@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -83,27 +84,37 @@ export function ImageCropper({
     console.log('Image displayed size:', image.width, 'x', image.height);
     console.log('Current zoom:', zoom);
     
-    // CORRECTION : Prendre en compte le centrage de l'image zoomée
-    const displayedImageWidth = image.width * zoom;
-    const displayedImageHeight = image.height * zoom;
+    // CORRECTION FINALE : Le problème vient du fait que les coordonnées du crop
+    // sont données par rapport à l'image affichée (sans zoom), mais nous devons
+    // les convertir par rapport à l'image zoomée puis vers l'image naturelle
     
-    console.log('Real displayed image size with zoom:', displayedImageWidth, 'x', displayedImageHeight);
+    // 1. Les coordonnées du crop sont relatives à l'image de base (image.width x image.height)
+    // 2. Mais l'image réellement affichée est zoomée et centrée
+    // 3. Il faut d'abord convertir les coordonnées vers l'image zoomée, puis vers l'image naturelle
     
-    // Calculer l'offset dû au centrage de l'image zoomée
-    const offsetX = (displayedImageWidth - image.width) / 2;
-    const offsetY = (displayedImageHeight - image.height) / 2;
+    // Calculer les dimensions de l'image zoomée
+    const zoomedWidth = image.width * zoom;
+    const zoomedHeight = image.height * zoom;
+    
+    console.log('Zoomed image dimensions:', zoomedWidth, 'x', zoomedHeight);
+    
+    // Calculer l'offset de centrage (combien l'image zoomée dépasse du conteneur)
+    const offsetX = (zoomedWidth - image.width) / 2;
+    const offsetY = (zoomedHeight - image.height) / 2;
     
     console.log('Centering offset:', offsetX, offsetY);
     
-    // Ajuster les coordonnées du crop en tenant compte de l'offset de centrage
-    const adjustedCropX = completedCrop.x + offsetX;
-    const adjustedCropY = completedCrop.y + offsetY;
+    // Les coordonnées du crop sont données par rapport à l'image de base
+    // Il faut les ajuster pour tenir compte du zoom et du centrage
+    // CORRECTION : Soustraire l'offset au lieu de l'ajouter
+    const adjustedCropX = completedCrop.x - offsetX;
+    const adjustedCropY = completedCrop.y - offsetY;
     
     console.log('Adjusted crop coordinates:', adjustedCropX, adjustedCropY);
     
     // Maintenant convertir vers l'image naturelle
-    const scaleXToNatural = image.naturalWidth / displayedImageWidth;
-    const scaleYToNatural = image.naturalHeight / displayedImageHeight;
+    const scaleXToNatural = image.naturalWidth / zoomedWidth;
+    const scaleYToNatural = image.naturalHeight / zoomedHeight;
     
     console.log('Scale to natural:', scaleXToNatural, scaleYToNatural);
     
