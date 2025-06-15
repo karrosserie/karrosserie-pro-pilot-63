@@ -25,16 +25,16 @@ export const AccountingTabs = ({
 }: AccountingTabsProps) => {
   return (
     <Tabs defaultValue="transactions" className="w-full">
-      <TabsList className="grid w-full grid-cols-2 mb-6">
-        <TabsTrigger value="transactions" className="text-sm font-medium">
+      <TabsList className="grid w-full grid-cols-2 mb-4 sm:mb-6 h-9 sm:h-10">
+        <TabsTrigger value="transactions" className="text-xs sm:text-sm font-medium">
           Transactions
         </TabsTrigger>
-        <TabsTrigger value="reports" className="text-sm font-medium">
+        <TabsTrigger value="reports" className="text-xs sm:text-sm font-medium">
           Rapports
         </TabsTrigger>
       </TabsList>
       
-      <TabsContent value="transactions" className="space-y-6">
+      <TabsContent value="transactions" className="space-y-4 sm:space-y-6">
         <TransactionFilters
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -46,7 +46,7 @@ export const AccountingTabs = ({
         <TransactionTable transactions={filteredTransactions} />
       </TabsContent>
       
-      <TabsContent value="reports" className="space-y-6">
+      <TabsContent value="reports" className="space-y-4 sm:space-y-6">
         <ReportContent />
       </TabsContent>
     </Tabs>

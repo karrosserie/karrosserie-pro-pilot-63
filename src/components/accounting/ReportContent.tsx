@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Download } from 'lucide-react';
@@ -71,62 +72,65 @@ const ReportContent = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="card-container p-6">
-        <h3 className="text-lg font-semibold mb-4">Rapports financiers</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="card-container p-3 sm:p-4 md:p-6">
+        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Rapports financiers</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
           <Button 
             variant="outline" 
-            className="flex flex-col p-6 h-auto items-center justify-center"
+            className="flex flex-col p-4 sm:p-6 h-auto items-center justify-center min-h-[100px] sm:min-h-[120px]"
             onClick={() => setOpenDialog('monthly')}
           >
-            <FileText className="h-8 w-8 mb-2" />
-            <span className="font-medium">Bilan mensuel</span>
-            <span className="text-sm text-gray-500 mt-1">Générer un PDF</span>
+            <FileText className="h-6 w-6 sm:h-8 sm:w-8 mb-2" />
+            <span className="font-medium text-sm sm:text-base">Bilan mensuel</span>
+            <span className="text-xs sm:text-sm text-gray-500 mt-1">Générer un PDF</span>
           </Button>
           <Button 
             variant="outline" 
-            className="flex flex-col p-6 h-auto items-center justify-center"
+            className="flex flex-col p-4 sm:p-6 h-auto items-center justify-center min-h-[100px] sm:min-h-[120px]"
             onClick={() => setOpenDialog('quarterly')}
           >
-            <FileText className="h-8 w-8 mb-2" />
-            <span className="font-medium">Bilan trimestriel</span>
-            <span className="text-sm text-gray-500 mt-1">Générer un PDF</span>
+            <FileText className="h-6 w-6 sm:h-8 sm:w-8 mb-2" />
+            <span className="font-medium text-sm sm:text-base">Bilan trimestriel</span>
+            <span className="text-xs sm:text-sm text-gray-500 mt-1">Générer un PDF</span>
           </Button>
           <Button 
             variant="outline" 
-            className="flex flex-col p-6 h-auto items-center justify-center"
+            className="flex flex-col p-4 sm:p-6 h-auto items-center justify-center min-h-[100px] sm:min-h-[120px]"
             onClick={() => setOpenDialog('yearly')}
           >
-            <FileText className="h-8 w-8 mb-2" />
-            <span className="font-medium">Bilan annuel</span>
-            <span className="text-sm text-gray-500 mt-1">Générer un PDF</span>
+            <FileText className="h-6 w-6 sm:h-8 sm:w-8 mb-2" />
+            <span className="font-medium text-sm sm:text-base">Bilan annuel</span>
+            <span className="text-xs sm:text-sm text-gray-500 mt-1">Générer un PDF</span>
           </Button>
         </div>
         
-        <div className="mb-6">
-          <h4 className="font-medium mb-4">Export pour cabinet comptable</h4>
-          <div className="flex items-center space-x-4">
+        <div className="mb-4 sm:mb-6">
+          <h4 className="font-medium mb-3 sm:mb-4 text-sm sm:text-base">Export pour cabinet comptable</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
             <Button 
               variant="outline"
               onClick={() => setOpenDialog('fec')}
+              className="w-full justify-center h-10 sm:h-11"
             >
               <Download className="h-4 w-4 mr-2" />
-              Exporter au format FEC
+              <span className="text-sm sm:text-base">Format FEC</span>
             </Button>
             <Button 
               variant="outline"
               onClick={() => setOpenDialog('csv')}
+              className="w-full justify-center h-10 sm:h-11"
             >
               <Download className="h-4 w-4 mr-2" />
-              Exporter au format CSV
+              <span className="text-sm sm:text-base">Format CSV</span>
             </Button>
             <Button 
               variant="outline"
               onClick={() => setOpenDialog('excel')}
+              className="w-full justify-center h-10 sm:h-11"
             >
               <Download className="h-4 w-4 mr-2" />
-              Exporter au format Excel
+              <span className="text-sm sm:text-base">Format Excel</span>
             </Button>
           </div>
         </div>

@@ -44,10 +44,10 @@ export const GeneratedReportsTable = ({ reports, onSendEmail }: GeneratedReports
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Rapports générés</CardTitle>
+          <CardTitle className="text-base sm:text-lg">Rapports générés</CardTitle>
         </CardHeader>
-        <CardContent className="text-center py-8">
-          <p className="text-gray-500">Aucun rapport généré pour le moment</p>
+        <CardContent className="text-center py-6 sm:py-8">
+          <p className="text-gray-500 text-sm sm:text-base">Aucun rapport généré pour le moment</p>
         </CardContent>
       </Card>
     );
@@ -56,65 +56,76 @@ export const GeneratedReportsTable = ({ reports, onSendEmail }: GeneratedReports
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Rapports générés</CardTitle>
+        <CardTitle className="text-base sm:text-lg">Rapports générés</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-b border-gray-200">
-              <TableHead className="font-semibold">Nom du rapport</TableHead>
-              <TableHead className="font-semibold">Période</TableHead>
-              <TableHead className="font-semibold">Date de génération</TableHead>
-              <TableHead className="font-semibold">Statut</TableHead>
-              <TableHead className="font-semibold text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {reports.map((report) => (
-              <TableRow 
-                key={report.id}
-                className="hover:bg-gray-50 transition-colors duration-200"
-              >
-                <TableCell className="font-medium">
-                  {report.name}
-                </TableCell>
-                <TableCell>
-                  <div className="text-sm">
-                    Du {format(report.fromDate, 'dd/MM/yyyy', { locale: fr })} au {format(report.toDate, 'dd/MM/yyyy', { locale: fr })}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="text-sm text-gray-600">
-                    {format(report.generatedAt, 'dd/MM/yyyy à HH:mm', { locale: fr })}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {getStatusBadge(report.status)}
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-1">
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => handleDownload(report)}
-                      disabled={report.status !== 'ready'}
-                    >
-                      <Download className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => onSendEmail(report.id)}
-                      disabled={report.status !== 'ready'}
-                    >
-                      <Mail className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-b border-gray-200">
+                <TableHead className="font-semibold text-xs sm:text-sm min-w-[120px]">Nom du rapport</TableHead>
+                <TableHead className="font-semibold text-xs sm:text-sm min-w-[140px]">Période</TableHead>
+                <TableHead className="font-semibold text-xs sm:text-sm min-w-[120px] hidden sm:table-cell">Date de génération</TableHead>
+                <TableHead className="font-semibold text-xs sm:text-sm min-w-[80px]">Statut</TableHead>
+                <TableHead className="font-semibold text-xs sm:text-sm text-right min-w-[100px]">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {reports.map((report) => (
+                <TableRow 
+                  key={report.id}
+                  className="hover:bg-gray-50 transition-colors duration-200"
+                >
+                  <TableCell className="font-medium text-xs sm:text-sm">
+                    <div className="max-w-[100px] sm:max-w-none truncate">
+                      {report.name}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-xs sm:text-sm">
+                      <div className="sm:hidden">
+                        {format(report.fromDate, 'dd/MM/yy', { locale: fr })} - {format(report.toDate, 'dd/MM/yy', { locale: fr })}
+                      </div>
+                      <div className="hidden sm:block">
+                        Du {format(report.fromDate, 'dd/MM/yyyy', { locale: fr })} au {format(report.toDate, 'dd/MM/yyyy', { locale: fr })}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell">
+                    <div className="text-xs sm:text-sm text-gray-600">
+                      {format(report.generatedAt, 'dd/MM/yyyy à HH:mm', { locale: fr })}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {getStatusBadge(report.status)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleDownload(report)}
+                        disabled={report.status !== 'ready'}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Download className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => onSendEmail(report.id)}
+                        disabled={report.status !== 'ready'}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Mail className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );
