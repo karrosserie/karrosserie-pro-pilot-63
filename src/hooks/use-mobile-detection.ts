@@ -10,13 +10,32 @@ export const useMobileDetection = () => {
       const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
       const isSmallScreen = window.innerWidth <= 768;
       
-      setIsMobile(isMobileDevice || isSmallScreen);
+      const mobileResult = isMobileDevice || isSmallScreen;
+      setIsMobile(prevIsMobile => {
+        // Only update if the value actually changed to prevent unnecessary re-renders
+        if (prevIsMobile !== mobileResult) {
+          return mobileResult;
+        }
+        return prevIsMobile;
+      });
     };
 
+    // Check immediately
     checkIfMobile();
-    window.addEventListener('resize', checkIfMobile);
+    
+    // Debounce resize events to prevent excessive re-renders
+    let timeoutId: NodeJS.Timeout;
+    const debouncedCheckIfMobile = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(checkIfMobile, 100);
+    };
 
-    return () => window.removeEventListener('resize', checkIfMobile);
+    window.addEventListener('resize', debouncedCheckIfMobile);
+
+    return () => {
+      window.removeEventListener('resize', debouncedCheckIfMobile);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   return isMobile;

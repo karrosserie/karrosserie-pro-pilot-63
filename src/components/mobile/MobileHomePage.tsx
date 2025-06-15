@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 const MobileHomePage = () => {
+  console.log('MobileHomePage: Component rendering');
+
   const quickActions = [
     {
       icon: <Bot className="h-6 w-6" />,
@@ -120,14 +122,14 @@ const MobileHomePage = () => {
           <Link to="/ai-assistant">
             <Button className="w-full h-14 bg-gradient-to-r from-karrosserie-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95">
               <Bot className="h-6 w-6 mr-3" />
-              Lancer l'Assistant IA
+              Lancer l&apos;Assistant IA
               <ArrowRight className="h-5 w-5 ml-3" />
             </Button>
           </Link>
 
           <Link to="/vehicles">
             <Button variant="outline" className="w-full h-12 border-2 border-gray-200 hover:border-karrosserie-orange hover:bg-orange-50 font-medium text-gray-700 hover:text-karrosserie-orange transition-all duration-300">
-              Accéder à l'application complète
+              Accéder à l&apos;application complète
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </Link>

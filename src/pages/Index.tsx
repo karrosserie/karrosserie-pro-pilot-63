@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Car, FileText, Users, CreditCard, Eye, Pencil, Wrench, PaintBucket } from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
@@ -14,12 +15,6 @@ import { useMobileDetection } from '@/hooks/use-mobile-detection';
 
 const Index = () => {
   const isMobile = useMobileDetection();
-  
-  // Si on est sur mobile, on affiche la version mobile
-  if (isMobile) {
-    return <MobileHomePage />;
-  }
-
   const { dashboardStats, recentVehicles, recentDocuments, recentActivity, isLoading } = useDashboardData();
   
   // États pour les dialogues
@@ -31,6 +26,11 @@ const Index = () => {
   // États pour les dialogues de véhicules
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [vehicleDialogMode, setVehicleDialogMode] = useState<'create' | 'edit' | 'view'>('create');
+
+  // Early return for mobile to prevent any potential conflicts
+  if (isMobile) {
+    return <MobileHomePage />;
+  }
 
   const handleViewVehicle = (vehicle) => {
     setSelectedVehicle(vehicle.vehicleData);
