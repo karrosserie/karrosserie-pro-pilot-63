@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -83,32 +84,29 @@ export function ImageCropper({
     console.log('Image displayed size:', image.width, 'x', image.height);
     console.log('Current zoom:', zoom);
     
-    // CORRECTION FINALE : Les coordonnées du crop sont données par ReactCrop
-    // par rapport à l'image affichée dans le conteneur (image.width x image.height)
-    // Mais l'image réelle affichée est zoomée et centrée dans ce conteneur
+    // CORRECTION : Les coordonnées du crop viennent de ReactCrop par rapport au conteneur
+    // Mais l'image affichée peut être plus petite que le conteneur et centrée
     
-    // 1. Calculer les dimensions réelles de l'image zoomée
+    // 1. Calculer les dimensions réelles de l'image zoomée dans le conteneur
     const actualDisplayedWidth = image.width * zoom;
     const actualDisplayedHeight = image.height * zoom;
     
     console.log('Actual displayed dimensions with zoom:', actualDisplayedWidth, 'x', actualDisplayedHeight);
     
-    // 2. Calculer l'offset de centrage de l'image zoomée dans le conteneur
-    // L'image zoomée est centrée dans le conteneur de taille image.width x image.height
-    const centerOffsetX = (actualDisplayedWidth - image.width) / 2;
-    const centerOffsetY = (actualDisplayedHeight - image.height) / 2;
+    // 2. Calculer l'offset de centrage : si l'image est plus petite que le conteneur, elle est centrée
+    const centerOffsetX = Math.max(0, (image.width - actualDisplayedWidth) / 2);
+    const centerOffsetY = Math.max(0, (image.height - actualDisplayedHeight) / 2);
     
     console.log('Center offset:', centerOffsetX, centerOffsetY);
     
-    // 3. Les coordonnées du crop sont relatives au conteneur (image.width x image.height)
-    // Il faut les convertir pour qu'elles soient relatives à l'image zoomée réelle
-    // Pour cela, on ajoute l'offset de centrage pour obtenir la position dans l'image zoomée
-    const cropXInZoomedImage = completedCrop.x + centerOffsetX;
-    const cropYInZoomedImage = completedCrop.y + centerOffsetY;
+    // 3. Les coordonnées du crop sont relatives au conteneur
+    // Il faut les ajuster pour qu'elles soient relatives à l'image zoomée centrée
+    const cropXInZoomedImage = completedCrop.x - centerOffsetX;
+    const cropYInZoomedImage = completedCrop.y - centerOffsetY;
     
     console.log('Crop position in zoomed image:', cropXInZoomedImage, cropYInZoomedImage);
     
-    // 4. Maintenant convertir vers l'image naturelle
+    // 4. Convertir vers l'image naturelle
     const scaleToNaturalX = image.naturalWidth / actualDisplayedWidth;
     const scaleToNaturalY = image.naturalHeight / actualDisplayedHeight;
     
