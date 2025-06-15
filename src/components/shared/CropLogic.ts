@@ -4,6 +4,7 @@ export class CropLogic {
     image: HTMLImageElement,
     completedCrop: any,
     rotation: number,
+    zoom: number,
     onComplete: (blob: Blob) => void
   ) {
     if (!image || !completedCrop) return;
@@ -17,31 +18,45 @@ export class CropLogic {
     console.log('Completed crop:', completedCrop);
     console.log('Image natural size:', image.naturalWidth, 'x', image.naturalHeight);
     console.log('Current rotation:', rotation);
+    console.log('Current zoom:', zoom);
 
-    // Utiliser directement les coordonnées du crop sur l'image non transformée
-    const naturalCropX = completedCrop.x;
-    const naturalCropY = completedCrop.y;
-    const naturalCropWidth = completedCrop.width;
-    const naturalCropHeight = completedCrop.height;
+    // Calculer les dimensions de l'image affichée
+    const displayedImageRect = image.getBoundingClientRect();
+    const naturalWidth = image.naturalWidth;
+    const naturalHeight = image.naturalHeight;
+    
+    // Calculer le ratio entre l'image naturelle et l'image affichée
+    const scaleX = naturalWidth / image.offsetWidth;
+    const scaleY = naturalHeight / image.offsetHeight;
+    
+    console.log('Scale ratios:', { scaleX, scaleY });
+    console.log('Image offset size:', image.offsetWidth, 'x', image.offsetHeight);
 
-    console.log('Crop coordinates:', {
-      x: naturalCropX,
-      y: naturalCropY,
-      width: naturalCropWidth,
-      height: naturalCropHeight
+    // Convertir les coordonnées du crop en tenant compte du zoom
+    // Les coordonnées de crop sont relatives à l'image transformée
+    const cropX = (completedCrop.x * scaleX) / zoom;
+    const cropY = (completedCrop.y * scaleY) / zoom;
+    const cropWidth = (completedCrop.width * scaleX) / zoom;
+    const cropHeight = (completedCrop.height * scaleY) / zoom;
+
+    console.log('Adjusted crop coordinates:', {
+      x: cropX,
+      y: cropY,
+      width: cropWidth,
+      height: cropHeight
     });
 
-    // Calculer les dimensions finales en tenant compte de la rotation
+    // Calculer les dimensions du canvas final en tenant compte de la rotation
     const rotationInRadians = (rotation * Math.PI) / 180;
     const isRotated90or270 = rotation === 90 || rotation === 270;
     
-    // Définir la taille du canvas en fonction de la rotation
+    // Définir la taille du canvas
     if (isRotated90or270) {
-      canvas.width = naturalCropHeight;
-      canvas.height = naturalCropWidth;
+      canvas.width = cropHeight;
+      canvas.height = cropWidth;
     } else {
-      canvas.width = naturalCropWidth;
-      canvas.height = naturalCropHeight;
+      canvas.width = cropWidth;
+      canvas.height = cropHeight;
     }
 
     console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
@@ -55,17 +70,48 @@ export class CropLogic {
     // Appliquer la rotation
     ctx.rotate(rotationInRadians);
 
-    // Dessiner l'image avec la rotation appliquée
+    // Calculer les coordonnées de dessin en tenant compte de la rotation
+    let drawX, drawY, drawWidth, drawHeight;
+    
+    if (rotation === 0) {
+      drawX = -cropWidth / 2;
+      drawY = -cropHeight / 2;
+      drawWidth = cropWidth;
+      drawHeight = cropHeight;
+    } else if (rotation === 90) {
+      drawX = -cropHeight / 2;
+      drawY = -cropWidth / 2;
+      drawWidth = cropHeight;
+      drawHeight = cropWidth;
+    } else if (rotation === 180) {
+      drawX = -cropWidth / 2;
+      drawY = -cropHeight / 2;
+      drawWidth = cropWidth;
+      drawHeight = cropHeight;
+    } else if (rotation === 270) {
+      drawX = -cropHeight / 2;
+      drawY = -cropWidth / 2;
+      drawWidth = cropHeight;
+      drawHeight = cropWidth;
+    } else {
+      // Pour les rotations non-orthogonales, utiliser les valeurs de base
+      drawX = -cropWidth / 2;
+      drawY = -cropHeight / 2;
+      drawWidth = cropWidth;
+      drawHeight = cropHeight;
+    }
+
+    // Dessiner l'image croppée avec la rotation appliquée
     ctx.drawImage(
       image,
-      naturalCropX,
-      naturalCropY,
-      naturalCropWidth,
-      naturalCropHeight,
-      -naturalCropWidth / 2,
-      -naturalCropHeight / 2,
-      naturalCropWidth,
-      naturalCropHeight
+      cropX,
+      cropY,
+      cropWidth,
+      cropHeight,
+      drawX,
+      drawY,
+      drawWidth,
+      drawHeight
     );
 
     // Restaurer l'état du contexte

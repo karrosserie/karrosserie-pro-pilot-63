@@ -34,40 +34,25 @@ export function ImageDisplay({
           maxHeight: '600px'
         }}
       >
-        {(zoom !== 1 || rotation !== 0) ? (
-          <div className="w-full h-full flex justify-center items-center">
-            <img
-              src={imageUrl}
-              alt="Image à recadrer"
-              className="max-w-full max-h-full object-contain"
-              style={{
-                transform: `scale(${zoom}) rotate(${rotation}deg)`,
-                transformOrigin: 'center center',
-                transition: 'transform 0.2s ease-in-out',
-              }}
-            />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="bg-black bg-opacity-50 text-white px-4 py-2 rounded">
-                Réinitialisez le zoom et la rotation pour pouvoir sélectionner une zone
-              </div>
-            </div>
-          </div>
-        ) : (
-          <ReactCrop
-            crop={crop}
-            onChange={onCropChange}
-            onComplete={onCropComplete}
-            className="flex justify-center items-center w-full h-full"
-          >
-            <img
-              ref={imageRef}
-              src={imageUrl}
-              alt="Image à recadrer"
-              onLoad={onImageLoad}
-              className="max-w-full max-h-full object-contain"
-            />
-          </ReactCrop>
-        )}
+        <ReactCrop
+          crop={crop}
+          onChange={onCropChange}
+          onComplete={onCropComplete}
+          className="flex justify-center items-center w-full h-full"
+        >
+          <img
+            ref={imageRef}
+            src={imageUrl}
+            alt="Image à recadrer"
+            onLoad={onImageLoad}
+            className="max-w-full max-h-full object-contain"
+            style={{
+              transform: `scale(${zoom}) rotate(${rotation}deg)`,
+              transformOrigin: 'center center',
+              transition: 'transform 0.2s ease-in-out',
+            }}
+          />
+        </ReactCrop>
       </div>
     </div>
   );
