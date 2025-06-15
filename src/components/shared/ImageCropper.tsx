@@ -84,32 +84,26 @@ export function ImageCropper({
     console.log('Image displayed size:', image.width, 'x', image.height);
     console.log('Current zoom:', zoom);
     
-    // CORRECTION DU CALCUL :
-    // 1. Les coordonnées du crop sont données par ReactCrop par rapport à l'image TELLE QU'ELLE APPARAIT avec le zoom
-    // 2. Nous devons d'abord convertir ces coordonnées vers l'image de base (sans zoom)
-    // 3. Puis les convertir vers l'image naturelle
+    // NOUVELLE APPROCHE : Calculer les dimensions réelles de l'image zoomée
+    // L'image s'affiche dans un conteneur avec une certaine taille (image.width x image.height)
+    // Mais avec le zoom, sa taille visuelle réelle change
+    const displayedImageWidth = image.width * zoom;
+    const displayedImageHeight = image.height * zoom;
     
-    // Étape 1 : Convertir du crop zoomé vers l'image de base (élément img)
-    const cropXOnBaseImage = completedCrop.x / zoom;
-    const cropYOnBaseImage = completedCrop.y / zoom;
-    const cropWidthOnBaseImage = completedCrop.width / zoom;
-    const cropHeightOnBaseImage = completedCrop.height / zoom;
+    console.log('Real displayed image size with zoom:', displayedImageWidth, 'x', displayedImageHeight);
     
-    console.log('Crop on base image (no zoom):', {
-      x: cropXOnBaseImage,
-      y: cropYOnBaseImage,
-      width: cropWidthOnBaseImage,
-      height: cropHeightOnBaseImage
-    });
+    // Les coordonnées du crop sont par rapport à cette image zoomée
+    // On doit maintenant les convertir vers l'image naturelle
+    const scaleXFromDisplayedToNatural = image.naturalWidth / displayedImageWidth;
+    const scaleYFromDisplayedToNatural = image.naturalHeight / displayedImageHeight;
     
-    // Étape 2 : Convertir de l'image de base vers l'image naturelle
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
+    console.log('Scale from displayed to natural:', scaleXFromDisplayedToNatural, scaleYFromDisplayedToNatural);
     
-    const cropX = cropXOnBaseImage * scaleX;
-    const cropY = cropYOnBaseImage * scaleY;
-    const cropWidth = cropWidthOnBaseImage * scaleX;
-    const cropHeight = cropHeightOnBaseImage * scaleY;
+    // Appliquer directement cette conversion
+    const cropX = completedCrop.x * scaleXFromDisplayedToNatural;
+    const cropY = completedCrop.y * scaleYFromDisplayedToNatural;
+    const cropWidth = completedCrop.width * scaleXFromDisplayedToNatural;
+    const cropHeight = completedCrop.height * scaleYFromDisplayedToNatural;
     
     console.log('Final crop in natural image:', {
       x: cropX,
