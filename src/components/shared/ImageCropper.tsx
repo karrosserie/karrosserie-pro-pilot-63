@@ -154,69 +154,6 @@ export function ImageCropper({
 
     const image = imageRef.current;
     const canvas = document.createElement('canvas');
-    
-    console.log('Crop coordinates:', completedCrop);
-    console.log('Image natural size:', image.naturalWidth, 'x', image.naturalHeight);
-    console.log('Current zoom:', zoom);
-    
-    // Récupérer les dimensions réelles de l'image affichée dans le DOM
-    const imageRect = image.getBoundingClientRect();
-    const displayedImageWidth = imageRect.width;
-    const displayedImageHeight = imageRect.height;
-    
-    console.log('Real displayed image dimensions:', displayedImageWidth, 'x', displayedImageHeight);
-    
-    // Calculer les dimensions de l'image avec le zoom appliqué
-    const zoomedImageWidth = displayedImageWidth * zoom;
-    const zoomedImageHeight = displayedImageHeight * zoom;
-    
-    console.log('Zoomed image dimensions:', zoomedImageWidth, 'x', zoomedImageHeight);
-    
-    // Récupérer le conteneur ReactCrop
-    const reactCropContainer = image.closest('.ReactCrop') as HTMLElement;
-    if (!reactCropContainer) {
-      console.error('ReactCrop container not found');
-      setIsLoading(false);
-      return;
-    }
-    
-    const containerRect = reactCropContainer.getBoundingClientRect();
-    const containerWidth = containerRect.width;
-    const containerHeight = containerRect.height;
-    
-    console.log('ReactCrop container dimensions:', containerWidth, 'x', containerHeight);
-    
-    // Calculer l'offset de l'image zoomée dans le conteneur (image centrée)
-    const imageOffsetX = (containerWidth - zoomedImageWidth) / 2;
-    const imageOffsetY = (containerHeight - zoomedImageHeight) / 2;
-    
-    console.log('Image offset in container:', imageOffsetX, imageOffsetY);
-    
-    // Convertir les coordonnées du crop (relatives au conteneur) vers l'image zoomée
-    const cropXInZoomedImage = completedCrop.x - imageOffsetX;
-    const cropYInZoomedImage = completedCrop.y - imageOffsetY;
-    
-    console.log('Crop position in zoomed image:', cropXInZoomedImage, cropYInZoomedImage);
-    
-    // Calculer le ratio pour convertir vers l'image naturelle
-    const scaleToNaturalX = image.naturalWidth / zoomedImageWidth;
-    const scaleToNaturalY = image.naturalHeight / zoomedImageHeight;
-    
-    console.log('Scale to natural:', scaleToNaturalX, scaleToNaturalY);
-    
-    // Calculer les coordonnées finales dans l'image naturelle
-    const finalCropX = cropXInZoomedImage * scaleToNaturalX;
-    const finalCropY = cropYInZoomedImage * scaleToNaturalY;
-    const finalCropWidth = completedCrop.width * scaleToNaturalX;
-    const finalCropHeight = completedCrop.height * scaleToNaturalY;
-    
-    console.log('Final crop in natural image:', {
-      x: finalCropX,
-      y: finalCropY,
-      width: finalCropWidth,
-      height: finalCropHeight
-    });
-    
     const ctx = canvas.getContext('2d');
 
     if (!ctx) {
@@ -224,18 +161,53 @@ export function ImageCropper({
       return;
     }
 
+    console.log('=== CROP DEBUG INFO ===');
+    console.log('Completed crop:', completedCrop);
+    console.log('Image natural size:', image.naturalWidth, 'x', image.naturalHeight);
+    console.log('Current zoom:', zoom);
+    console.log('Current rotation:', rotation);
+
+    // Obtenir les dimensions de l'image sans transformation
+    const imageRect = image.getBoundingClientRect();
+    const baseImageWidth = imageRect.width / zoom;
+    const baseImageHeight = imageRect.height / zoom;
+    
+    console.log('Base image dimensions (without zoom):', baseImageWidth, 'x', baseImageHeight);
+
+    // Calculer le ratio entre l'image naturelle et l'image affichée (sans zoom)
+    const scaleToNaturalX = image.naturalWidth / baseImageWidth;
+    const scaleToNaturalY = image.naturalHeight / baseImageHeight;
+    
+    console.log('Scale to natural:', scaleToNaturalX, scaleToNaturalY);
+
+    // Convertir les coordonnées de crop vers l'image naturelle
+    // Les coordonnées de crop sont relatives à l'image zoomée affichée
+    const naturalCropX = (completedCrop.x / zoom) * scaleToNaturalX;
+    const naturalCropY = (completedCrop.y / zoom) * scaleToNaturalY;
+    const naturalCropWidth = (completedCrop.width / zoom) * scaleToNaturalX;
+    const naturalCropHeight = (completedCrop.height / zoom) * scaleToNaturalY;
+
+    console.log('Natural crop coordinates:', {
+      x: naturalCropX,
+      y: naturalCropY,
+      width: naturalCropWidth,
+      height: naturalCropHeight
+    });
+
     // Calculer les dimensions finales en tenant compte de la rotation
     const rotationInRadians = (rotation * Math.PI) / 180;
     const isRotated90or270 = rotation === 90 || rotation === 270;
     
     // Définir la taille du canvas en fonction de la rotation
     if (isRotated90or270) {
-      canvas.width = finalCropHeight;
-      canvas.height = finalCropWidth;
+      canvas.width = naturalCropHeight;
+      canvas.height = naturalCropWidth;
     } else {
-      canvas.width = finalCropWidth;
-      canvas.height = finalCropHeight;
+      canvas.width = naturalCropWidth;
+      canvas.height = naturalCropHeight;
     }
+
+    console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
 
     // Sauvegarder l'état du contexte
     ctx.save();
@@ -249,18 +221,20 @@ export function ImageCropper({
     // Dessiner l'image avec la rotation appliquée
     ctx.drawImage(
       image,
-      finalCropX,
-      finalCropY,
-      finalCropWidth,
-      finalCropHeight,
-      -finalCropWidth / 2,
-      -finalCropHeight / 2,
-      finalCropWidth,
-      finalCropHeight
+      naturalCropX,
+      naturalCropY,
+      naturalCropWidth,
+      naturalCropHeight,
+      -naturalCropWidth / 2,
+      -naturalCropHeight / 2,
+      naturalCropWidth,
+      naturalCropHeight
     );
 
     // Restaurer l'état du contexte
     ctx.restore();
+
+    console.log('=== END CROP DEBUG ===');
 
     // Convertir le canvas en Blob
     canvas.toBlob(
@@ -334,7 +308,7 @@ export function ImageCropper({
               crop={crop}
               onChange={(c) => setCrop(c)}
               onComplete={(c) => setCompletedCrop(c)}
-              className="w-full h-full flex justify-center items-center"
+              className="w-full h-full flex justify-center items-center overflow-hidden"
             >
               <img
                 ref={imageRef}
