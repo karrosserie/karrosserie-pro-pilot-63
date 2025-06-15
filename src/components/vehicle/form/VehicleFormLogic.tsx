@@ -40,6 +40,9 @@ interface UseVehicleFormLogicProps {
 export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: UseVehicleFormLogicProps) {
   const { carBrands } = useCarBrands();
   
+  // Ensure defaultValues is an object to prevent null access errors
+  const safeDefaultValues = defaultValues || {};
+  
   // Parse work items from database
   const parseWorkItems = (workItems: any) => {
     if (!workItems) return [''];
@@ -78,42 +81,42 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
 
   const [formData, setFormData] = useState<VehicleFormData>({
     // Required fields
-    clientId: defaultValues.client_id || '',
-    vin: defaultValues.vin || '',
-    brand: defaultValues.car_brands?.name || getBrandName(defaultValues.brand_id || ''),
-    model: defaultValues.car_models?.name || '',
-    modelId: defaultValues.model_id || '',
-    licensePlate: defaultValues.license_plate || '',
+    clientId: safeDefaultValues.client_id || '',
+    vin: safeDefaultValues.vin || '',
+    brand: safeDefaultValues.car_brands?.name || getBrandName(safeDefaultValues.brand_id || ''),
+    model: safeDefaultValues.car_models?.name || '',
+    modelId: safeDefaultValues.model_id || '',
+    licensePlate: safeDefaultValues.license_plate || '',
     
     // Optional fields
-    engineNumber: defaultValues.engine_number || '',
-    year: defaultValues.year?.toString() || '',
-    color: defaultValues.color || '',
-    mileage: defaultValues.mileage?.toString() || '',
-    insuranceCompany: defaultValues.insurance_company || '',
-    insuranceExpiryDate: defaultValues.insurance_expiry_date || '',
-    startDate: defaultValues.start_date || '',
-    arrivalDate: defaultValues.arrival_date || '',
-    endDate: defaultValues.end_date || '',
-    status: defaultValues.status || 'En attente',
-    roadTest: defaultValues.road_test || '',
-    roadTestNotes: defaultValues.road_test_notes || '',
-    fuelLevel: defaultValues.fuel_level || 50,
-    preAccidentDefects: defaultValues.pre_accident_defects || '',
-    workItems: parseWorkItems(defaultValues.work_items),
-    registrationDocumentFrontUrl: defaultValues.registration_document_front_url || '',
-    registrationDocumentBackUrl: defaultValues.registration_document_back_url || '',
-    vehicleImageUrl: defaultValues.vehicle_image_url || '',
-    vehicleImages: parseVehicleImages(defaultValues.vehicle_images),
-    fuelType: defaultValues.fuel_type || ''
+    engineNumber: safeDefaultValues.engine_number || '',
+    year: safeDefaultValues.year?.toString() || '',
+    color: safeDefaultValues.color || '',
+    mileage: safeDefaultValues.mileage?.toString() || '',
+    insuranceCompany: safeDefaultValues.insurance_company || '',
+    insuranceExpiryDate: safeDefaultValues.insurance_expiry_date || '',
+    startDate: safeDefaultValues.start_date || '',
+    arrivalDate: safeDefaultValues.arrival_date || '',
+    endDate: safeDefaultValues.end_date || '',
+    status: safeDefaultValues.status || 'En attente',
+    roadTest: safeDefaultValues.road_test || '',
+    roadTestNotes: safeDefaultValues.road_test_notes || '',
+    fuelLevel: safeDefaultValues.fuel_level || 50,
+    preAccidentDefects: safeDefaultValues.pre_accident_defects || '',
+    workItems: parseWorkItems(safeDefaultValues.work_items),
+    registrationDocumentFrontUrl: safeDefaultValues.registration_document_front_url || '',
+    registrationDocumentBackUrl: safeDefaultValues.registration_document_back_url || '',
+    vehicleImageUrl: safeDefaultValues.vehicle_image_url || '',
+    vehicleImages: parseVehicleImages(safeDefaultValues.vehicle_images),
+    fuelType: safeDefaultValues.fuel_type || ''
   });
 
   const [regDocPreview, setRegDocPreview] = useState<string | null>(
-    defaultValues.registrationDocument || null
+    safeDefaultValues.registrationDocument || null
   );
   
   const [vehicleImagePreview, setVehicleImagePreview] = useState<string | null>(
-    defaultValues.vehicleImage || null
+    safeDefaultValues.vehicleImage || null
   );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
