@@ -27,22 +27,20 @@ export function ImageCropper({
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
-  const [key, setKey] = useState(0);
   const imageRef = useRef<HTMLImageElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Fonction pour initialiser le recadrage au centre lorsque l'image est chargée
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = e.currentTarget;
     
-    // Initialiser avec un recadrage libre couvrant 80% de l'image, centré
+    // Initialiser avec un recadrage libre couvrant 60% de l'image, centré
     const crop: Crop = {
       unit: '%',
-      x: 10,
-      y: 10,
-      width: 80,
-      height: 80,
+      x: 20,
+      y: 20,
+      width: 60,
+      height: 60,
     };
     
     setCrop(crop);
@@ -50,7 +48,7 @@ export function ImageCropper({
 
   // Fonction pour gérer le zoom
   const handleZoom = (direction: 'in' | 'out') => {
-    const newZoom = direction === 'in' ? zoom * 1.1 : zoom / 1.1;
+    const newZoom = direction === 'in' ? zoom * 1.2 : zoom / 1.2;
     const clampedZoom = Math.max(0.5, Math.min(3, newZoom));
     setZoom(clampedZoom);
   };
@@ -63,11 +61,6 @@ export function ImageCropper({
       : (rotation - rotationStep + 360) % 360;
     
     setRotation(newRotation);
-    
-    // Réinitialiser le crop et forcer le remontage du composant ReactCrop
-    setCrop(undefined);
-    setCompletedCrop(undefined);
-    setKey(prev => prev + 1);
   };
 
   // Fonction pour créer une image recadrée à partir du canvas
@@ -98,8 +91,7 @@ export function ImageCropper({
     
     console.log('Scale ratios:', { scaleX, scaleY });
 
-    // Les coordonnées de crop sont dans l'espace de l'image affichée
-    // Il faut les convertir vers l'espace de l'image naturelle
+    // Convertir les coordonnées de crop vers l'espace de l'image naturelle
     const naturalCropX = completedCrop.x * scaleX;
     const naturalCropY = completedCrop.y * scaleY;
     const naturalCropWidth = completedCrop.width * scaleX;
@@ -215,7 +207,6 @@ export function ImageCropper({
         
         <div className="my-4 flex justify-center items-center" style={{ height: '70vh' }}>
           <div 
-            ref={containerRef}
             className="relative overflow-hidden border border-gray-200 rounded-lg"
             style={{ 
               width: '100%',
@@ -224,37 +215,25 @@ export function ImageCropper({
               maxHeight: '600px'
             }}
           >
-            {/* Conteneur avec transformation pour le zoom et la rotation */}
-            <div
-              className="w-full h-full flex justify-center items-center"
-              style={{
-                transform: `scale(${zoom}) rotate(${rotation}deg)`,
-                transformOrigin: 'center center',
-                transition: 'transform 0.2s ease-in-out',
-              }}
+            <ReactCrop
+              crop={crop}
+              onChange={(c) => setCrop(c)}
+              onComplete={(c) => setCompletedCrop(c)}
+              className="flex justify-center items-center w-full h-full"
             >
-              <ReactCrop
-                key={key}
-                crop={crop}
-                onChange={(c) => setCrop(c)}
-                onComplete={(c) => setCompletedCrop(c)}
-                className="flex justify-center items-center"
-              >
-                <img
-                  ref={imageRef}
-                  src={imageUrl}
-                  alt="Image à recadrer"
-                  onLoad={onImageLoad}
-                  className="max-w-full max-h-full object-contain"
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '100%',
-                    width: 'auto',
-                    height: 'auto'
-                  }}
-                />
-              </ReactCrop>
-            </div>
+              <img
+                ref={imageRef}
+                src={imageUrl}
+                alt="Image à recadrer"
+                onLoad={onImageLoad}
+                className="max-w-full max-h-full object-contain"
+                style={{
+                  transform: `scale(${zoom}) rotate(${rotation}deg)`,
+                  transformOrigin: 'center center',
+                  transition: 'transform 0.2s ease-in-out',
+                }}
+              />
+            </ReactCrop>
           </div>
         </div>
         
