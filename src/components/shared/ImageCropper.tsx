@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -84,51 +83,48 @@ export function ImageCropper({
     console.log('Image displayed size:', image.width, 'x', image.height);
     console.log('Current zoom:', zoom);
     
-    // CORRECTION FINALE : Le problème vient du fait que les coordonnées du crop
-    // sont données par rapport à l'image affichée (sans zoom), mais nous devons
-    // les convertir par rapport à l'image zoomée puis vers l'image naturelle
+    // CORRECTION FINALE : Les coordonnées du crop sont données par ReactCrop
+    // par rapport à l'image affichée dans le conteneur (image.width x image.height)
+    // Mais l'image réelle affichée est zoomée et centrée dans ce conteneur
     
-    // 1. Les coordonnées du crop sont relatives à l'image de base (image.width x image.height)
-    // 2. Mais l'image réellement affichée est zoomée et centrée
-    // 3. Il faut d'abord convertir les coordonnées vers l'image zoomée, puis vers l'image naturelle
+    // 1. Calculer les dimensions réelles de l'image zoomée
+    const actualDisplayedWidth = image.width * zoom;
+    const actualDisplayedHeight = image.height * zoom;
     
-    // Calculer les dimensions de l'image zoomée
-    const zoomedWidth = image.width * zoom;
-    const zoomedHeight = image.height * zoom;
+    console.log('Actual displayed dimensions with zoom:', actualDisplayedWidth, 'x', actualDisplayedHeight);
     
-    console.log('Zoomed image dimensions:', zoomedWidth, 'x', zoomedHeight);
+    // 2. Calculer l'offset de centrage de l'image zoomée dans le conteneur
+    // L'image zoomée est centrée dans le conteneur de taille image.width x image.height
+    const centerOffsetX = (actualDisplayedWidth - image.width) / 2;
+    const centerOffsetY = (actualDisplayedHeight - image.height) / 2;
     
-    // Calculer l'offset de centrage (combien l'image zoomée dépasse du conteneur)
-    const offsetX = (zoomedWidth - image.width) / 2;
-    const offsetY = (zoomedHeight - image.height) / 2;
+    console.log('Center offset:', centerOffsetX, centerOffsetY);
     
-    console.log('Centering offset:', offsetX, offsetY);
+    // 3. Les coordonnées du crop sont relatives au conteneur (image.width x image.height)
+    // Il faut les convertir pour qu'elles soient relatives à l'image zoomée réelle
+    // Pour cela, on ajoute l'offset de centrage pour obtenir la position dans l'image zoomée
+    const cropXInZoomedImage = completedCrop.x + centerOffsetX;
+    const cropYInZoomedImage = completedCrop.y + centerOffsetY;
     
-    // Les coordonnées du crop sont données par rapport à l'image de base
-    // Il faut les ajuster pour tenir compte du zoom et du centrage
-    // CORRECTION : Soustraire l'offset au lieu de l'ajouter
-    const adjustedCropX = completedCrop.x - offsetX;
-    const adjustedCropY = completedCrop.y - offsetY;
+    console.log('Crop position in zoomed image:', cropXInZoomedImage, cropYInZoomedImage);
     
-    console.log('Adjusted crop coordinates:', adjustedCropX, adjustedCropY);
+    // 4. Maintenant convertir vers l'image naturelle
+    const scaleToNaturalX = image.naturalWidth / actualDisplayedWidth;
+    const scaleToNaturalY = image.naturalHeight / actualDisplayedHeight;
     
-    // Maintenant convertir vers l'image naturelle
-    const scaleXToNatural = image.naturalWidth / zoomedWidth;
-    const scaleYToNatural = image.naturalHeight / zoomedHeight;
+    console.log('Scale to natural:', scaleToNaturalX, scaleToNaturalY);
     
-    console.log('Scale to natural:', scaleXToNatural, scaleYToNatural);
-    
-    // Appliquer la conversion finale
-    const cropX = adjustedCropX * scaleXToNatural;
-    const cropY = adjustedCropY * scaleYToNatural;
-    const cropWidth = completedCrop.width * scaleXToNatural;
-    const cropHeight = completedCrop.height * scaleYToNatural;
+    // 5. Calculer les coordonnées finales dans l'image naturelle
+    const finalCropX = cropXInZoomedImage * scaleToNaturalX;
+    const finalCropY = cropYInZoomedImage * scaleToNaturalY;
+    const finalCropWidth = completedCrop.width * scaleToNaturalX;
+    const finalCropHeight = completedCrop.height * scaleToNaturalY;
     
     console.log('Final crop in natural image:', {
-      x: cropX,
-      y: cropY,
-      width: cropWidth,
-      height: cropHeight
+      x: finalCropX,
+      y: finalCropY,
+      width: finalCropWidth,
+      height: finalCropHeight
     });
     
     const ctx = canvas.getContext('2d');
@@ -144,11 +140,11 @@ export function ImageCropper({
     
     // Définir la taille du canvas en fonction de la rotation
     if (isRotated90or270) {
-      canvas.width = cropHeight;
-      canvas.height = cropWidth;
+      canvas.width = finalCropHeight;
+      canvas.height = finalCropWidth;
     } else {
-      canvas.width = cropWidth;
-      canvas.height = cropHeight;
+      canvas.width = finalCropWidth;
+      canvas.height = finalCropHeight;
     }
 
     // Sauvegarder l'état du contexte
@@ -163,14 +159,14 @@ export function ImageCropper({
     // Dessiner l'image avec la rotation appliquée
     ctx.drawImage(
       image,
-      cropX,
-      cropY,
-      cropWidth,
-      cropHeight,
-      -cropWidth / 2,
-      -cropHeight / 2,
-      cropWidth,
-      cropHeight
+      finalCropX,
+      finalCropY,
+      finalCropWidth,
+      finalCropHeight,
+      -finalCropWidth / 2,
+      -finalCropHeight / 2,
+      finalCropWidth,
+      finalCropHeight
     );
 
     // Restaurer l'état du contexte
