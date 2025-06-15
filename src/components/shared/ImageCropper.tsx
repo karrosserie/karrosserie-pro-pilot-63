@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { Button } from '@/components/ui/button';
@@ -31,6 +31,7 @@ export function ImageCropper({
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const cropContainerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Calculer les dimensions effectives de l'image après rotation
@@ -77,6 +78,23 @@ export function ImageCropper({
     setCrop(crop);
   };
 
+  // Reset crop when zoom or rotation changes to avoid offset issues
+  useEffect(() => {
+    if (imageDimensions.width > 0) {
+      // Réinitialiser le crop avec des valeurs par défaut
+      const defaultCrop: Crop = {
+        unit: '%',
+        x: 10,
+        y: 10,
+        width: 80,
+        height: 80,
+      };
+      setCrop(defaultCrop);
+      setCompletedCrop(undefined);
+      setKey(prev => prev + 1);
+    }
+  }, [zoom, rotation, imageDimensions]);
+
   // Fonction pour gérer le zoom avec contraintes
   const handleZoom = (direction: 'in' | 'out') => {
     const newZoom = direction === 'in' ? zoom * 1.1 : zoom / 1.1;
@@ -99,11 +117,6 @@ export function ImageCropper({
     if (zoom > maxZoom) {
       setZoom(maxZoom);
     }
-    
-    // Réinitialiser le crop et forcer le remontage du composant ReactCrop
-    setCrop(undefined);
-    setCompletedCrop(undefined);
-    setKey(prev => prev + 1);
   };
 
   // Fonction pour créer une image recadrée à partir du canvas
@@ -263,14 +276,10 @@ export function ImageCropper({
               maxHeight: '600px'
             }}
           >
-            {/* Conteneur avec transformation pour le zoom et la rotation */}
+            {/* Conteneur sans transformation pour ReactCrop */}
             <div
+              ref={cropContainerRef}
               className="w-full h-full flex justify-center items-center"
-              style={{
-                transform: `scale(${zoom}) rotate(${rotation}deg)`,
-                transformOrigin: 'center center',
-                transition: 'transform 0.2s ease-in-out',
-              }}
             >
               <ReactCrop
                 key={key}
@@ -286,6 +295,9 @@ export function ImageCropper({
                   onLoad={onImageLoad}
                   className="max-w-full max-h-full object-contain"
                   style={{
+                    transform: `scale(${zoom}) rotate(${rotation}deg)`,
+                    transformOrigin: 'center center',
+                    transition: 'transform 0.2s ease-in-out',
                     maxWidth: '100%',
                     maxHeight: '100%',
                     width: 'auto',
