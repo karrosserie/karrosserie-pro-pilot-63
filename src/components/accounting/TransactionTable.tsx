@@ -95,9 +95,11 @@ export const TransactionTable = ({ transactions }: TransactionTableProps) => {
                 </TableCell>
                 <TableCell className="text-right">
                   <span className={`font-bold ${
-                    transaction.type === 'Encaissement' 
-                      ? 'text-green-600' 
-                      : 'text-orange-600'
+                    transaction.status === 'En attente' 
+                      ? 'text-red-600' 
+                      : transaction.type === 'Encaissement' 
+                        ? 'text-green-600' 
+                        : 'text-orange-600'
                   }`}>
                     {transaction.type === 'Encaissement' ? '+' : '-'} {transaction.amount}
                   </span>
