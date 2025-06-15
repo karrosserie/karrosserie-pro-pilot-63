@@ -27,21 +27,22 @@ export function ImageCropper({
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
+  const [key, setKey] = useState(0);
   const imageRef = useRef<HTMLImageElement>(null);
-  const hiddenImageRef = useRef<HTMLImageElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Fonction pour initialiser le recadrage au centre lorsque l'image est chargée
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = e.currentTarget;
     
-    // Initialiser avec un recadrage libre couvrant 60% de l'image, centré
+    // Initialiser avec un recadrage libre couvrant 80% de l'image, centré
     const crop: Crop = {
       unit: '%',
-      x: 20,
-      y: 20,
-      width: 60,
-      height: 60,
+      x: 10,
+      y: 10,
+      width: 80,
+      height: 80,
     };
     
     setCrop(crop);
@@ -49,13 +50,9 @@ export function ImageCropper({
 
   // Fonction pour gérer le zoom
   const handleZoom = (direction: 'in' | 'out') => {
-    const newZoom = direction === 'in' ? zoom * 1.2 : zoom / 1.2;
+    const newZoom = direction === 'in' ? zoom * 1.1 : zoom / 1.1;
     const clampedZoom = Math.max(0.5, Math.min(3, newZoom));
     setZoom(clampedZoom);
-    
-    // Réinitialiser le crop lors du zoom pour éviter les décalages
-    setCrop(undefined);
-    setCompletedCrop(undefined);
   };
 
   // Fonction pour gérer la rotation
@@ -67,18 +64,19 @@ export function ImageCropper({
     
     setRotation(newRotation);
     
-    // Réinitialiser le crop lors de la rotation pour éviter les décalages
+    // Réinitialiser le crop et forcer le remontage du composant ReactCrop
     setCrop(undefined);
     setCompletedCrop(undefined);
+    setKey(prev => prev + 1);
   };
 
   // Fonction pour créer une image recadrée à partir du canvas
   const getCroppedImage = () => {
-    if (!hiddenImageRef.current || !completedCrop) return;
+    if (!imageRef.current || !completedCrop) return;
 
     setIsLoading(true);
 
-    const image = hiddenImageRef.current;
+    const image = imageRef.current;
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
 
@@ -90,16 +88,24 @@ export function ImageCropper({
     console.log('=== CROP DEBUG INFO ===');
     console.log('Completed crop:', completedCrop);
     console.log('Image natural size:', image.naturalWidth, 'x', image.naturalHeight);
+    console.log('Image displayed size:', image.width, 'x', image.height);
     console.log('Current zoom:', zoom);
     console.log('Current rotation:', rotation);
 
-    // Utiliser directement les coordonnées du crop sur l'image non transformée
-    const naturalCropX = completedCrop.x;
-    const naturalCropY = completedCrop.y;
-    const naturalCropWidth = completedCrop.width;
-    const naturalCropHeight = completedCrop.height;
+    // Calculer le ratio entre l'image naturelle et l'image affichée
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+    
+    console.log('Scale ratios:', { scaleX, scaleY });
 
-    console.log('Crop coordinates:', {
+    // Les coordonnées de crop sont dans l'espace de l'image affichée
+    // Il faut les convertir vers l'espace de l'image naturelle
+    const naturalCropX = completedCrop.x * scaleX;
+    const naturalCropY = completedCrop.y * scaleY;
+    const naturalCropWidth = completedCrop.width * scaleX;
+    const naturalCropHeight = completedCrop.height * scaleY;
+
+    console.log('Natural crop coordinates:', {
       x: naturalCropX,
       y: naturalCropY,
       width: naturalCropWidth,
@@ -173,14 +179,6 @@ export function ImageCropper({
           <DialogTitle>Recadrer l'image</DialogTitle>
         </DialogHeader>
         
-        {/* Image cachée pour les calculs sans transformation */}
-        <img
-          ref={hiddenImageRef}
-          src={imageUrl}
-          alt="Image de référence"
-          style={{ display: 'none' }}
-        />
-        
         {/* Contrôles */}
         <div className="flex justify-center gap-2 mb-2">
           <Button
@@ -217,6 +215,7 @@ export function ImageCropper({
         
         <div className="my-4 flex justify-center items-center" style={{ height: '70vh' }}>
           <div 
+            ref={containerRef}
             className="relative overflow-hidden border border-gray-200 rounded-lg"
             style={{ 
               width: '100%',
@@ -225,31 +224,21 @@ export function ImageCropper({
               maxHeight: '600px'
             }}
           >
-            {/* Image avec transformations visuelles mais sans crop si zoom ou rotation */}
-            {(zoom !== 1 || rotation !== 0) ? (
-              <div className="w-full h-full flex justify-center items-center">
-                <img
-                  src={imageUrl}
-                  alt="Image à recadrer"
-                  className="max-w-full max-h-full object-contain"
-                  style={{
-                    transform: `scale(${zoom}) rotate(${rotation}deg)`,
-                    transformOrigin: 'center center',
-                    transition: 'transform 0.2s ease-in-out',
-                  }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="bg-black bg-opacity-50 text-white px-4 py-2 rounded">
-                    Réinitialisez le zoom et la rotation pour pouvoir sélectionner une zone
-                  </div>
-                </div>
-              </div>
-            ) : (
+            {/* Conteneur avec transformation pour le zoom et la rotation */}
+            <div
+              className="w-full h-full flex justify-center items-center"
+              style={{
+                transform: `scale(${zoom}) rotate(${rotation}deg)`,
+                transformOrigin: 'center center',
+                transition: 'transform 0.2s ease-in-out',
+              }}
+            >
               <ReactCrop
+                key={key}
                 crop={crop}
                 onChange={(c) => setCrop(c)}
                 onComplete={(c) => setCompletedCrop(c)}
-                className="flex justify-center items-center w-full h-full"
+                className="flex justify-center items-center"
               >
                 <img
                   ref={imageRef}
@@ -257,9 +246,15 @@ export function ImageCropper({
                   alt="Image à recadrer"
                   onLoad={onImageLoad}
                   className="max-w-full max-h-full object-contain"
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    width: 'auto',
+                    height: 'auto'
+                  }}
                 />
               </ReactCrop>
-            )}
+            </div>
           </div>
         </div>
         
@@ -267,20 +262,7 @@ export function ImageCropper({
           <Button variant="outline" onClick={onClose}>
             Annuler
           </Button>
-          {zoom !== 1 || rotation !== 0 ? (
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                setZoom(1);
-                setRotation(0);
-                setCrop(undefined);
-                setCompletedCrop(undefined);
-              }}
-            >
-              Réinitialiser
-            </Button>
-          ) : null}
-          <Button onClick={handleComplete} disabled={isLoading || !completedCrop}>
+          <Button onClick={handleComplete} disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
