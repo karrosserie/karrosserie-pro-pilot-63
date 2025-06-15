@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Bot, Mic, Send, Lightbulb, Clock, TrendingUp, X, Minimize2 } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -111,7 +110,7 @@ const AIContextualPanel: React.FC<AIContextualPanelProps> = ({
 
   if (isMinimized) {
     return (
-      <Card className="fixed bottom-4 right-4 w-16 h-16 shadow-lg border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50">
+      <Card className="fixed bottom-4 left-4 w-16 h-16 shadow-lg border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50">
         <CardContent className="p-0 flex items-center justify-center h-full">
           <Button
             variant="ghost"
@@ -127,7 +126,7 @@ const AIContextualPanel: React.FC<AIContextualPanelProps> = ({
   }
 
   return (
-    <Card className="fixed bottom-4 right-4 w-96 h-[600px] shadow-xl border-2 border-blue-200 bg-white flex flex-col">
+    <Card className="fixed bottom-4 left-4 w-96 h-[600px] shadow-xl border-2 border-blue-200 bg-white flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-purple-50">
         <div className="flex items-center">
           <div className="bg-blue-100 p-2 rounded-full mr-3">
