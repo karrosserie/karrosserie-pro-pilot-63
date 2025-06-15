@@ -27,11 +27,9 @@ export function ImageCropper({
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
-  const [key, setKey] = useState(0);
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const cropContainerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Calculer les dimensions effectives de l'image après rotation
@@ -77,23 +75,6 @@ export function ImageCropper({
     
     setCrop(crop);
   };
-
-  // Reset crop when zoom or rotation changes to avoid offset issues
-  useEffect(() => {
-    if (imageDimensions.width > 0) {
-      // Réinitialiser le crop avec des valeurs par défaut
-      const defaultCrop: Crop = {
-        unit: '%',
-        x: 10,
-        y: 10,
-        width: 80,
-        height: 80,
-      };
-      setCrop(defaultCrop);
-      setCompletedCrop(undefined);
-      setKey(prev => prev + 1);
-    }
-  }, [zoom, rotation, imageDimensions]);
 
   // Fonction pour gérer le zoom avec contraintes
   const handleZoom = (direction: 'in' | 'out') => {
@@ -141,18 +122,27 @@ export function ImageCropper({
     console.log('Current zoom:', zoom);
     console.log('Current rotation:', rotation);
 
-    // Calculer le ratio entre l'image naturelle et l'image affichée
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
+    // Calculer le ratio entre l'image naturelle et l'image affichée SANS les transformations
+    const baseScaleX = image.naturalWidth / image.width;
+    const baseScaleY = image.naturalHeight / image.height;
     
-    console.log('Scale ratios:', { scaleX, scaleY });
+    console.log('Base scale ratios:', { baseScaleX, baseScaleY });
 
-    // Les coordonnées de crop sont dans l'espace de l'image affichée
-    // Il faut les convertir vers l'espace de l'image naturelle
-    const naturalCropX = completedCrop.x * scaleX;
-    const naturalCropY = completedCrop.y * scaleY;
-    const naturalCropWidth = completedCrop.width * scaleX;
-    const naturalCropHeight = completedCrop.height * scaleY;
+    // Ajuster les coordonnées en fonction du zoom
+    const zoomAdjustedCrop = {
+      x: completedCrop.x / zoom,
+      y: completedCrop.y / zoom,
+      width: completedCrop.width / zoom,
+      height: completedCrop.height / zoom
+    };
+
+    console.log('Zoom adjusted crop:', zoomAdjustedCrop);
+
+    // Convertir vers l'espace de l'image naturelle
+    const naturalCropX = zoomAdjustedCrop.x * baseScaleX;
+    const naturalCropY = zoomAdjustedCrop.y * baseScaleY;
+    const naturalCropWidth = zoomAdjustedCrop.width * baseScaleX;
+    const naturalCropHeight = zoomAdjustedCrop.height * baseScaleY;
 
     console.log('Natural crop coordinates:', {
       x: naturalCropX,
@@ -276,13 +266,16 @@ export function ImageCropper({
               maxHeight: '600px'
             }}
           >
-            {/* Conteneur sans transformation pour ReactCrop */}
+            {/* Conteneur avec transformation pour le zoom et la rotation */}
             <div
-              ref={cropContainerRef}
               className="w-full h-full flex justify-center items-center"
+              style={{
+                transform: `scale(${zoom}) rotate(${rotation}deg)`,
+                transformOrigin: 'center center',
+                transition: 'transform 0.2s ease-in-out',
+              }}
             >
               <ReactCrop
-                key={key}
                 crop={crop}
                 onChange={(c) => setCrop(c)}
                 onComplete={(c) => setCompletedCrop(c)}
@@ -295,9 +288,6 @@ export function ImageCropper({
                   onLoad={onImageLoad}
                   className="max-w-full max-h-full object-contain"
                   style={{
-                    transform: `scale(${zoom}) rotate(${rotation}deg)`,
-                    transformOrigin: 'center center',
-                    transition: 'transform 0.2s ease-in-out',
                     maxWidth: '100%',
                     maxHeight: '100%',
                     width: 'auto',
