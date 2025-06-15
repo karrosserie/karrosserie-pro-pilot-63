@@ -122,27 +122,17 @@ export function ImageCropper({
     console.log('Current zoom:', zoom);
     console.log('Current rotation:', rotation);
 
-    // Calculer le ratio entre l'image naturelle et l'image affichée SANS les transformations
-    const baseScaleX = image.naturalWidth / image.width;
-    const baseScaleY = image.naturalHeight / image.height;
+    // Calculer le ratio entre l'image naturelle et l'image affichée
+    const scaleX = image.naturalWidth / (image.width * zoom);
+    const scaleY = image.naturalHeight / (image.height * zoom);
     
-    console.log('Base scale ratios:', { baseScaleX, baseScaleY });
+    console.log('Scale ratios with zoom:', { scaleX, scaleY });
 
-    // Ajuster les coordonnées en fonction du zoom
-    const zoomAdjustedCrop = {
-      x: completedCrop.x / zoom,
-      y: completedCrop.y / zoom,
-      width: completedCrop.width / zoom,
-      height: completedCrop.height / zoom
-    };
-
-    console.log('Zoom adjusted crop:', zoomAdjustedCrop);
-
-    // Convertir vers l'espace de l'image naturelle
-    const naturalCropX = zoomAdjustedCrop.x * baseScaleX;
-    const naturalCropY = zoomAdjustedCrop.y * baseScaleY;
-    const naturalCropWidth = zoomAdjustedCrop.width * baseScaleX;
-    const naturalCropHeight = zoomAdjustedCrop.height * baseScaleY;
+    // Convertir les coordonnées du crop vers l'espace de l'image naturelle
+    const naturalCropX = completedCrop.x * scaleX;
+    const naturalCropY = completedCrop.y * scaleY;
+    const naturalCropWidth = completedCrop.width * scaleX;
+    const naturalCropHeight = completedCrop.height * scaleY;
 
     console.log('Natural crop coordinates:', {
       x: naturalCropX,
@@ -266,15 +256,8 @@ export function ImageCropper({
               maxHeight: '600px'
             }}
           >
-            {/* Conteneur avec transformation pour le zoom et la rotation */}
-            <div
-              className="w-full h-full flex justify-center items-center"
-              style={{
-                transform: `scale(${zoom}) rotate(${rotation}deg)`,
-                transformOrigin: 'center center',
-                transition: 'transform 0.2s ease-in-out',
-              }}
-            >
+            {/* ReactCrop sans transformation - les transformations sont appliquées uniquement à l'image */}
+            <div className="w-full h-full flex justify-center items-center">
               <ReactCrop
                 crop={crop}
                 onChange={(c) => setCrop(c)}
@@ -288,6 +271,9 @@ export function ImageCropper({
                   onLoad={onImageLoad}
                   className="max-w-full max-h-full object-contain"
                   style={{
+                    transform: `scale(${zoom}) rotate(${rotation}deg)`,
+                    transformOrigin: 'center center',
+                    transition: 'transform 0.2s ease-in-out',
                     maxWidth: '100%',
                     maxHeight: '100%',
                     width: 'auto',
