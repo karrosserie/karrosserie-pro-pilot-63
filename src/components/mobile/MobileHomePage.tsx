@@ -119,10 +119,10 @@ const MobileHomePage = () => {
 
         {/* Bouton principal */}
         <div className="space-y-4">
-          <Link to="/ai-assistant">
+          <Link to="/documents/expertise">
             <Button className="w-full h-14 bg-gradient-to-r from-karrosserie-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95">
-              <Bot className="h-6 w-6 mr-3" />
-              Lancer l&apos;Assistant IA
+              <FileText className="h-6 w-6 mr-3" />
+              Charger un rapport d&apos;expertise
               <ArrowRight className="h-5 w-5 ml-3" />
             </Button>
           </Link>
