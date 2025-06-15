@@ -20,7 +20,7 @@ const VehicleFormActions: React.FC<VehicleFormActionsProps> = ({
       </Button>
       {!isViewMode && (
         <Button type="submit" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
-          {defaultValues.id ? "Mettre à jour" : "Enregistrer"}
+          {defaultValues?.id ? "Mettre à jour" : "Enregistrer"}
         </Button>
       )}
     </div>
