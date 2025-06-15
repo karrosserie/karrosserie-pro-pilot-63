@@ -80,43 +80,56 @@ export function ImageCropper({
     
     console.log('Crop coordinates:', completedCrop);
     console.log('Image natural size:', image.naturalWidth, 'x', image.naturalHeight);
-    console.log('Image displayed size:', image.width, 'x', image.height);
     console.log('Current zoom:', zoom);
     
-    // CORRECTION FINALE : Calculer la position et la taille réelle de l'image dans le conteneur
+    // NOUVELLE APPROCHE : Récupérer les vraies dimensions depuis le DOM
     
-    // 1. L'image est affichée avec zoom et peut dépasser ou être plus petite que le conteneur
-    const zoomedImageWidth = image.width * zoom;
-    const zoomedImageHeight = image.height * zoom;
+    // 1. Récupérer les dimensions réelles de l'image affichée dans le DOM
+    const imageRect = image.getBoundingClientRect();
+    const displayedImageWidth = imageRect.width;
+    const displayedImageHeight = imageRect.height;
+    
+    console.log('Real displayed image dimensions:', displayedImageWidth, 'x', displayedImageHeight);
+    
+    // 2. Calculer les dimensions de l'image avec le zoom appliqué
+    const zoomedImageWidth = displayedImageWidth * zoom;
+    const zoomedImageHeight = displayedImageHeight * zoom;
     
     console.log('Zoomed image dimensions:', zoomedImageWidth, 'x', zoomedImageHeight);
     
-    // 2. Le conteneur ReactCrop a la taille de l'élément image HTML
-    const containerWidth = image.width;
-    const containerHeight = image.height;
+    // 3. Récupérer le conteneur ReactCrop
+    const reactCropContainer = image.closest('.ReactCrop') as HTMLElement;
+    if (!reactCropContainer) {
+      console.error('ReactCrop container not found');
+      setIsLoading(false);
+      return;
+    }
     
-    // 3. L'image zoomée est centrée dans ce conteneur
-    // Si l'image zoomée est plus petite, elle est centrée avec des marges
-    // Si l'image zoomée est plus grande, elle déborde mais reste centrée
+    const containerRect = reactCropContainer.getBoundingClientRect();
+    const containerWidth = containerRect.width;
+    const containerHeight = containerRect.height;
+    
+    console.log('ReactCrop container dimensions:', containerWidth, 'x', containerHeight);
+    
+    // 4. Calculer l'offset de l'image zoomée dans le conteneur (image centrée)
     const imageOffsetX = (containerWidth - zoomedImageWidth) / 2;
     const imageOffsetY = (containerHeight - zoomedImageHeight) / 2;
     
     console.log('Image offset in container:', imageOffsetX, imageOffsetY);
     
-    // 4. Les coordonnées du crop sont données par rapport au conteneur
-    // Il faut les convertir en coordonnées relatives à l'image zoomée réelle
+    // 5. Convertir les coordonnées du crop (relatives au conteneur) vers l'image zoomée
     const cropXInZoomedImage = completedCrop.x - imageOffsetX;
     const cropYInZoomedImage = completedCrop.y - imageOffsetY;
     
     console.log('Crop position in zoomed image:', cropXInZoomedImage, cropYInZoomedImage);
     
-    // 5. Convertir vers l'image naturelle
+    // 6. Calculer le ratio pour convertir vers l'image naturelle
     const scaleToNaturalX = image.naturalWidth / zoomedImageWidth;
     const scaleToNaturalY = image.naturalHeight / zoomedImageHeight;
     
     console.log('Scale to natural:', scaleToNaturalX, scaleToNaturalY);
     
-    // 6. Calculer les coordonnées finales dans l'image naturelle
+    // 7. Calculer les coordonnées finales dans l'image naturelle
     const finalCropX = cropXInZoomedImage * scaleToNaturalX;
     const finalCropY = cropYInZoomedImage * scaleToNaturalY;
     const finalCropWidth = completedCrop.width * scaleToNaturalX;
