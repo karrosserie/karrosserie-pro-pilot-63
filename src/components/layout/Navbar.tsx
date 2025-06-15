@@ -28,22 +28,22 @@ const Navbar = ({ onToggleSidebar, isSidebarOpen = false }: NavbarProps) => {
 
   return (
     <div className="sticky top-0 z-30 w-full bg-white border-b border-gray-200 shadow-sm">
-      <div className="px-4 h-16 flex items-center justify-between">
+      <div className="px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between">
         <div className="flex items-center">
           <MobileMenuButton onClick={onToggleSidebar} />
-          
-          {/* Removed BrandLogo component from navbar */}
         </div>
 
-        <SearchBar onImportClick={() => setImportDialogOpen(true)} />
+        <div className="hidden sm:block flex-1 max-w-md mx-4">
+          <SearchBar onImportClick={() => setImportDialogOpen(true)} />
+        </div>
 
-        <div className="flex items-center space-x-1 md:space-x-2">
+        <div className="flex items-center space-x-1 sm:space-x-2">
           <Button 
             variant="ghost" 
             size="icon"
-            className="text-gray-600 md:hidden"
+            className="text-gray-600 sm:hidden h-9 w-9"
           >
-            <Search className="h-5 w-5" />
+            <Search className="h-4 w-4" />
           </Button>
           
           <NotificationsPanel 

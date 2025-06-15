@@ -16,7 +16,8 @@ import {
   TrendingUp,
   TrendingDown,
   Wallet,
-  Bot
+  Bot,
+  X
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -32,15 +33,18 @@ interface NavItemProps {
   isActive: boolean;
   hasSubMenu?: boolean;
   subMenuItems?: { label: string; path: string }[];
+  onClose?: () => void;
 }
 
-const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems = [] }: NavItemProps) => {
+const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems = [], onClose }: NavItemProps) => {
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
   
   const toggleSubMenu = (e: React.MouseEvent) => {
     if (hasSubMenu) {
       e.preventDefault();
       setIsSubMenuOpen(!isSubMenuOpen);
+    } else if (onClose) {
+      onClose();
     }
   };
 
@@ -49,18 +53,21 @@ const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems
       <Link
         to={path}
         onClick={toggleSubMenu}
-        className={`flex items-center py-2 px-3 rounded-lg ${
+        className={`flex items-center py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
           isActive 
             ? 'bg-karrosserie-orange bg-opacity-10 text-karrosserie-orange' 
-            : 'text-gray-600 hover:bg-gray-100'
+            : 'text-gray-600 hover:bg-gray-100 active:bg-gray-200'
         }`}
       >
-        <span className="mr-2">{icon}</span>
-        <span className="flex-1">{label}</span>
+        <span className="mr-3 flex-shrink-0">{icon}</span>
+        <span className="flex-1 truncate">{label}</span>
         {hasSubMenu && (
-          isSubMenuOpen 
-            ? <ChevronDown className="h-4 w-4" /> 
-            : <ChevronRight className="h-4 w-4" />
+          <span className="ml-2 flex-shrink-0">
+            {isSubMenuOpen 
+              ? <ChevronDown className="h-4 w-4" /> 
+              : <ChevronRight className="h-4 w-4" />
+            }
+          </span>
         )}
       </Link>
       
@@ -70,7 +77,8 @@ const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems
             <Link
               key={index}
               to={item.path}
-              className="flex items-center py-1 px-3 rounded-md text-gray-600 hover:bg-gray-100 text-sm"
+              onClick={onClose}
+              className="flex items-center py-2 px-3 rounded-md text-gray-600 hover:bg-gray-100 active:bg-gray-200 text-sm transition-colors"
             >
               {item.label}
             </Link>
@@ -84,7 +92,6 @@ const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems
 const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
   const location = useLocation();
   
-  // Determine if a path is active - includes check for sub-paths as well
   const isActivePath = (path: string): boolean => {
     if (path === '/') {
       return location.pathname === '/';
@@ -127,7 +134,6 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     { icon: <Settings className="app-icon" />, label: 'Paramètres', path: '/settings' },
   ];
 
-  // Handle overlay click
   const handleOverlayClick = () => {
     if (isMobile) {
       onClose();
@@ -146,21 +152,29 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
       
       {/* Sidebar */}
       <div 
-        className={`fixed lg:sticky top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 lg:z-10 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed lg:sticky top-0 left-0 h-full w-80 sm:w-72 lg:w-64 bg-white border-r border-gray-200 z-50 lg:z-10 transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        {/* Always show logo in sidebar, regardless of its collapsed or open state */}
-        <div className="h-16 flex items-center px-4 border-b border-gray-200">
-          <Link to="/" className="flex items-center">
+        {/* Header with close button on mobile */}
+        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
+          <Link to="/" className="flex items-center" onClick={isMobile ? onClose : undefined}>
             <span className="text-xl font-bold text-karrosserie-orange">
               Karrosserie<span className="text-karrosserie-gray ml-1">Pro</span>
             </span>
           </Link>
+          {isMobile && (
+            <button 
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <X className="h-5 w-5 text-gray-600" />
+            </button>
+          )}
         </div>
         
-        <div className="p-4 overflow-y-auto h-[calc(100vh-4rem)]">
-          <nav>
+        <div className="p-4 overflow-y-auto h-[calc(100vh-4rem)] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+          <nav className="space-y-1">
             {navItems.map((item, index) => (
               <NavItem
                 key={index}
@@ -170,6 +184,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
                 isActive={isActivePath(item.path)}
                 hasSubMenu={item.hasSubMenu}
                 subMenuItems={item.subMenuItems}
+                onClose={isMobile ? onClose : undefined}
               />
             ))}
           </nav>
