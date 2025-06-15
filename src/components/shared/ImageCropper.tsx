@@ -28,105 +28,34 @@ export function ImageCropper({
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [key, setKey] = useState(0);
-  const [maxZoom, setMaxZoom] = useState(3);
   const imageRef = useRef<HTMLImageElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  // Calculer les dimensions maximales selon la rotation
-  const calculateMaxDimensions = (imageWidth: number, imageHeight: number, containerWidth: number, containerHeight: number, currentRotation: number) => {
-    const normalizedRotation = Math.abs(currentRotation % 180);
-    const isRotated90 = normalizedRotation === 90;
-    
-    if (isRotated90) {
-      // Quand l'image est pivotée de 90°, sa largeur devient sa hauteur et vice versa
-      const maxScaleByWidth = containerWidth / imageHeight;
-      const maxScaleByHeight = containerHeight / imageWidth;
-      return Math.min(maxScaleByWidth, maxScaleByHeight);
-    } else {
-      // Rotation normale (0°, 180°)
-      const maxScaleByWidth = containerWidth / imageWidth;
-      const maxScaleByHeight = containerHeight / imageHeight;
-      return Math.min(maxScaleByWidth, maxScaleByHeight);
-    }
-  };
 
   // Fonction pour initialiser le recadrage au centre lorsque l'image est chargée
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = e.currentTarget;
     
-    // Récupérer les dimensions du conteneur ReactCrop
-    const reactCropContainer = e.currentTarget.closest('.ReactCrop') as HTMLElement;
-    if (reactCropContainer) {
-      const containerRect = reactCropContainer.getBoundingClientRect();
-      const maxScale = calculateMaxDimensions(width, height, containerRect.width, containerRect.height, rotation);
-      setMaxZoom(maxScale);
-      
-      // Ajuster le zoom si nécessaire
-      if (zoom > maxScale) {
-        setZoom(maxScale);
-      }
-    }
-    
     // Initialiser avec un recadrage libre couvrant 80% de l'image, centré
-    // Utiliser les dimensions réelles de l'image affichée pour éviter les décalages
-    const displayedWidth = width * zoom;
-    const displayedHeight = height * zoom;
-    
     const crop: Crop = {
-      unit: 'px',
-      x: displayedWidth * 0.1,
-      y: displayedHeight * 0.1,
-      width: displayedWidth * 0.8,
-      height: displayedHeight * 0.8,
+      unit: '%',
+      x: 10,
+      y: 10,
+      width: 80,
+      height: 80,
     };
     
     setCrop(crop);
   };
 
-  // Fonction pour gérer le zoom avec vérification des limites
+  // Fonction pour gérer le zoom
   const handleZoom = (direction: 'in' | 'out') => {
-    if (!imageRef.current) return;
-    
-    const image = imageRef.current;
-    const reactCropContainer = image.closest('.ReactCrop') as HTMLElement;
-    
-    if (reactCropContainer) {
-      const containerRect = reactCropContainer.getBoundingClientRect();
-      const imageRect = image.getBoundingClientRect();
-      
-      const currentMaxZoom = calculateMaxDimensions(
-        imageRect.width / zoom, 
-        imageRect.height / zoom, 
-        containerRect.width, 
-        containerRect.height, 
-        rotation
-      );
-      
-      setZoom(prev => {
-        const newZoom = direction === 'in' ? prev * 1.1 : prev / 1.1;
-        const clampedZoom = Math.max(0.1, Math.min(currentMaxZoom, newZoom));
-        
-        // Réinitialiser le crop après changement de zoom pour éviter les décalages
-        if (imageRef.current) {
-          const { width, height } = imageRef.current;
-          const displayedWidth = width * clampedZoom;
-          const displayedHeight = height * clampedZoom;
-          
-          setCrop({
-            unit: 'px',
-            x: displayedWidth * 0.1,
-            y: displayedHeight * 0.1,
-            width: displayedWidth * 0.8,
-            height: displayedHeight * 0.8,
-          });
-        }
-        
-        return clampedZoom;
-      });
-    }
+    const newZoom = direction === 'in' ? zoom * 1.1 : zoom / 1.1;
+    const clampedZoom = Math.max(0.5, Math.min(3, newZoom));
+    setZoom(clampedZoom);
   };
 
-  // Fonction pour gérer la rotation avec recalcul des dimensions
+  // Fonction pour gérer la rotation
   const handleRotation = (direction: 'cw' | 'ccw') => {
     const rotationStep = 90;
     const newRotation = direction === 'cw' 
@@ -134,32 +63,6 @@ export function ImageCropper({
       : (rotation - rotationStep + 360) % 360;
     
     setRotation(newRotation);
-    
-    // Recalculer le zoom maximum avec la nouvelle rotation
-    if (imageRef.current) {
-      const image = imageRef.current;
-      const reactCropContainer = image.closest('.ReactCrop') as HTMLElement;
-      
-      if (reactCropContainer) {
-        const containerRect = reactCropContainer.getBoundingClientRect();
-        const imageRect = image.getBoundingClientRect();
-        
-        const newMaxZoom = calculateMaxDimensions(
-          imageRect.width / zoom, 
-          imageRect.height / zoom, 
-          containerRect.width, 
-          containerRect.height, 
-          newRotation
-        );
-        
-        setMaxZoom(newMaxZoom);
-        
-        // Ajuster le zoom si nécessaire
-        if (zoom > newMaxZoom) {
-          setZoom(newMaxZoom);
-        }
-      }
-    }
     
     // Réinitialiser le crop et forcer le remontage du composant ReactCrop
     setCrop(undefined);
@@ -282,7 +185,7 @@ export function ImageCropper({
             variant="outline"
             size="sm"
             onClick={() => handleZoom('out')}
-            disabled={zoom <= 0.1}
+            disabled={zoom <= 0.5}
           >
             <ZoomOut className="h-4 w-4" />
           </Button>
@@ -290,7 +193,7 @@ export function ImageCropper({
             variant="outline"
             size="sm"
             onClick={() => handleZoom('in')}
-            disabled={zoom >= maxZoom}
+            disabled={zoom >= 3}
           >
             <ZoomIn className="h-4 w-4" />
           </Button>
@@ -312,36 +215,46 @@ export function ImageCropper({
         
         <div className="my-4 flex justify-center items-center" style={{ height: '70vh' }}>
           <div 
-            className="relative w-full h-full flex justify-center items-center overflow-hidden"
+            ref={containerRef}
+            className="relative overflow-hidden border border-gray-200 rounded-lg"
             style={{ 
-              maxWidth: '100%',
-              maxHeight: '100%'
+              width: '100%',
+              height: '100%',
+              maxWidth: '800px',
+              maxHeight: '600px'
             }}
           >
-            <ReactCrop
-              key={key}
-              crop={crop}
-              onChange={(c) => setCrop(c)}
-              onComplete={(c) => setCompletedCrop(c)}
-              className="w-full h-full flex justify-center items-center overflow-hidden"
+            {/* Conteneur avec transformation pour le zoom et la rotation */}
+            <div
+              className="w-full h-full flex justify-center items-center"
+              style={{
+                transform: `scale(${zoom}) rotate(${rotation}deg)`,
+                transformOrigin: 'center center',
+                transition: 'transform 0.2s ease-in-out',
+              }}
             >
-              <img
-                ref={imageRef}
-                src={imageUrl}
-                alt="Image à recadrer"
-                onLoad={onImageLoad}
-                className="max-w-full max-h-full object-contain"
-                style={{
-                  transform: `scale(${zoom}) rotate(${rotation}deg)`,
-                  transformOrigin: 'center center',
-                  transition: 'transform 0.2s ease-in-out',
-                  maxWidth: '100%',
-                  maxHeight: '100%',
-                  width: 'auto',
-                  height: 'auto'
-                }}
-              />
-            </ReactCrop>
+              <ReactCrop
+                key={key}
+                crop={crop}
+                onChange={(c) => setCrop(c)}
+                onComplete={(c) => setCompletedCrop(c)}
+                className="flex justify-center items-center"
+              >
+                <img
+                  ref={imageRef}
+                  src={imageUrl}
+                  alt="Image à recadrer"
+                  onLoad={onImageLoad}
+                  className="max-w-full max-h-full object-contain"
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    width: 'auto',
+                    height: 'auto'
+                  }}
+                />
+              </ReactCrop>
+            </div>
           </div>
         </div>
         
