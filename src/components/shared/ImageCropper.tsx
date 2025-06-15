@@ -68,12 +68,16 @@ export function ImageCropper({
     }
     
     // Initialiser avec un recadrage libre couvrant 80% de l'image, centré
+    // Utiliser les dimensions réelles de l'image affichée pour éviter les décalages
+    const displayedWidth = width * zoom;
+    const displayedHeight = height * zoom;
+    
     const crop: Crop = {
-      unit: '%',
-      x: 10,
-      y: 10,
-      width: 80,
-      height: 80,
+      unit: 'px',
+      x: displayedWidth * 0.1,
+      y: displayedHeight * 0.1,
+      width: displayedWidth * 0.8,
+      height: displayedHeight * 0.8,
     };
     
     setCrop(crop);
@@ -100,7 +104,24 @@ export function ImageCropper({
       
       setZoom(prev => {
         const newZoom = direction === 'in' ? prev * 1.1 : prev / 1.1;
-        return Math.max(0.1, Math.min(currentMaxZoom, newZoom));
+        const clampedZoom = Math.max(0.1, Math.min(currentMaxZoom, newZoom));
+        
+        // Réinitialiser le crop après changement de zoom pour éviter les décalages
+        if (imageRef.current) {
+          const { width, height } = imageRef.current;
+          const displayedWidth = width * clampedZoom;
+          const displayedHeight = height * clampedZoom;
+          
+          setCrop({
+            unit: 'px',
+            x: displayedWidth * 0.1,
+            y: displayedHeight * 0.1,
+            width: displayedWidth * 0.8,
+            height: displayedHeight * 0.8,
+          });
+        }
+        
+        return clampedZoom;
       });
     }
   };
@@ -146,7 +167,7 @@ export function ImageCropper({
     setKey(prev => prev + 1);
   };
 
-  // Fonction pour créer une image recadrée à partir du canvas avec rotation et zoom appliqués
+  // Fonction pour créer une image recadrée à partir du canvas
   const getCroppedImage = () => {
     if (!imageRef.current || !completedCrop) return;
 
@@ -164,28 +185,22 @@ export function ImageCropper({
     console.log('=== CROP DEBUG INFO ===');
     console.log('Completed crop:', completedCrop);
     console.log('Image natural size:', image.naturalWidth, 'x', image.naturalHeight);
+    console.log('Image displayed size:', image.width, 'x', image.height);
     console.log('Current zoom:', zoom);
     console.log('Current rotation:', rotation);
 
-    // Obtenir les dimensions de l'image sans transformation
-    const imageRect = image.getBoundingClientRect();
-    const baseImageWidth = imageRect.width / zoom;
-    const baseImageHeight = imageRect.height / zoom;
+    // Calculer le ratio entre l'image naturelle et l'image affichée
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
     
-    console.log('Base image dimensions (without zoom):', baseImageWidth, 'x', baseImageHeight);
+    console.log('Scale ratios:', { scaleX, scaleY });
 
-    // Calculer le ratio entre l'image naturelle et l'image affichée (sans zoom)
-    const scaleToNaturalX = image.naturalWidth / baseImageWidth;
-    const scaleToNaturalY = image.naturalHeight / baseImageHeight;
-    
-    console.log('Scale to natural:', scaleToNaturalX, scaleToNaturalY);
-
-    // Convertir les coordonnées de crop vers l'image naturelle
-    // Les coordonnées de crop sont relatives à l'image zoomée affichée
-    const naturalCropX = (completedCrop.x / zoom) * scaleToNaturalX;
-    const naturalCropY = (completedCrop.y / zoom) * scaleToNaturalY;
-    const naturalCropWidth = (completedCrop.width / zoom) * scaleToNaturalX;
-    const naturalCropHeight = (completedCrop.height / zoom) * scaleToNaturalY;
+    // Les coordonnées de crop sont dans l'espace de l'image affichée
+    // Il faut les convertir vers l'espace de l'image naturelle
+    const naturalCropX = completedCrop.x * scaleX;
+    const naturalCropY = completedCrop.y * scaleY;
+    const naturalCropWidth = completedCrop.width * scaleX;
+    const naturalCropHeight = completedCrop.height * scaleY;
 
     console.log('Natural crop coordinates:', {
       x: naturalCropX,
