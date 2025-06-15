@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { Button } from '@/components/ui/button';
@@ -28,13 +28,42 @@ export function ImageCropper({
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [key, setKey] = useState(0);
+  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Calculer les dimensions effectives de l'image après rotation
+  const getEffectiveDimensions = useCallback((width: number, height: number, rotation: number) => {
+    const normalizedRotation = Math.abs(rotation) % 360;
+    const isRotated90or270 = normalizedRotation === 90 || normalizedRotation === 270;
+    
+    return {
+      width: isRotated90or270 ? height : width,
+      height: isRotated90or270 ? width : height
+    };
+  }, []);
+
+  // Calculer le zoom maximum pour que l'image reste dans le conteneur
+  const getMaxZoom = useCallback((imageWidth: number, imageHeight: number, rotation: number) => {
+    if (!containerRef.current) return 3;
+    
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const containerWidth = containerRect.width;
+    const containerHeight = containerRect.height;
+    
+    const effectiveDims = getEffectiveDimensions(imageWidth, imageHeight, rotation);
+    
+    const maxZoomX = containerWidth / effectiveDims.width;
+    const maxZoomY = containerHeight / effectiveDims.height;
+    
+    return Math.min(maxZoomX, maxZoomY, 3); // Limiter à 3x maximum
+  }, [getEffectiveDimensions]);
+
   // Fonction pour initialiser le recadrage au centre lorsque l'image est chargée
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = e.currentTarget;
+    setImageDimensions({ width, height });
     
     // Initialiser avec un recadrage libre couvrant 80% de l'image, centré
     const crop: Crop = {
@@ -48,14 +77,15 @@ export function ImageCropper({
     setCrop(crop);
   };
 
-  // Fonction pour gérer le zoom
+  // Fonction pour gérer le zoom avec contraintes
   const handleZoom = (direction: 'in' | 'out') => {
     const newZoom = direction === 'in' ? zoom * 1.1 : zoom / 1.1;
-    const clampedZoom = Math.max(0.5, Math.min(3, newZoom));
+    const maxZoom = getMaxZoom(imageDimensions.width, imageDimensions.height, rotation);
+    const clampedZoom = Math.max(0.5, Math.min(maxZoom, newZoom));
     setZoom(clampedZoom);
   };
 
-  // Fonction pour gérer la rotation
+  // Fonction pour gérer la rotation avec ajustement du zoom
   const handleRotation = (direction: 'cw' | 'ccw') => {
     const rotationStep = 90;
     const newRotation = direction === 'cw' 
@@ -63,6 +93,12 @@ export function ImageCropper({
       : (rotation - rotationStep + 360) % 360;
     
     setRotation(newRotation);
+    
+    // Ajuster le zoom pour que l'image reste dans le conteneur après rotation
+    const maxZoom = getMaxZoom(imageDimensions.width, imageDimensions.height, newRotation);
+    if (zoom > maxZoom) {
+      setZoom(maxZoom);
+    }
     
     // Réinitialiser le crop et forcer le remontage du composant ReactCrop
     setCrop(undefined);
@@ -172,6 +208,9 @@ export function ImageCropper({
     onClose();
   };
 
+  // Calculer le zoom maximum actuel
+  const maxZoom = getMaxZoom(imageDimensions.width, imageDimensions.height, rotation);
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-5xl">
@@ -193,7 +232,7 @@ export function ImageCropper({
             variant="outline"
             size="sm"
             onClick={() => handleZoom('in')}
-            disabled={zoom >= 3}
+            disabled={zoom >= maxZoom}
           >
             <ZoomIn className="h-4 w-4" />
           </Button>
@@ -216,7 +255,7 @@ export function ImageCropper({
         <div className="my-4 flex justify-center items-center" style={{ height: '70vh' }}>
           <div 
             ref={containerRef}
-            className="relative overflow-hidden border border-gray-200 rounded-lg"
+            className="relative overflow-hidden border border-gray-200 rounded-lg bg-gray-50"
             style={{ 
               width: '100%',
               height: '100%',
