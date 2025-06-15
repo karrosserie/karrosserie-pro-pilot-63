@@ -8,7 +8,9 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Download, Mail } from 'lucide-react';
 import { GeneratedReport } from '@/hooks/use-generated-reports';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -31,6 +33,11 @@ export const GeneratedReportsTable = ({ reports, onSendEmail }: GeneratedReports
       case 'error':
         return <Badge variant="destructive">Erreur</Badge>;
     }
+  };
+
+  const handleDownload = (report: GeneratedReport) => {
+    // Simuler le téléchargement
+    console.log(`Téléchargement de ${report.name}`);
   };
 
   if (reports.length === 0) {
@@ -59,6 +66,7 @@ export const GeneratedReportsTable = ({ reports, onSendEmail }: GeneratedReports
               <TableHead className="font-semibold">Période</TableHead>
               <TableHead className="font-semibold">Date de génération</TableHead>
               <TableHead className="font-semibold">Statut</TableHead>
+              <TableHead className="font-semibold text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -82,6 +90,26 @@ export const GeneratedReportsTable = ({ reports, onSendEmail }: GeneratedReports
                 </TableCell>
                 <TableCell>
                   {getStatusBadge(report.status)}
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-1">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleDownload(report)}
+                      disabled={report.status !== 'ready'}
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => onSendEmail(report.id)}
+                      disabled={report.status !== 'ready'}
+                    >
+                      <Mail className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
