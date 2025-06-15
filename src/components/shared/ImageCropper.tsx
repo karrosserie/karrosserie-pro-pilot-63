@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -82,22 +83,20 @@ export function ImageCropper({
     console.log('Image natural size:', image.naturalWidth, 'x', image.naturalHeight);
     console.log('Current zoom:', zoom);
     
-    // NOUVELLE APPROCHE : Récupérer les vraies dimensions depuis le DOM
-    
-    // 1. Récupérer les dimensions réelles de l'image affichée dans le DOM
+    // Récupérer les dimensions réelles de l'image affichée dans le DOM
     const imageRect = image.getBoundingClientRect();
     const displayedImageWidth = imageRect.width;
     const displayedImageHeight = imageRect.height;
     
     console.log('Real displayed image dimensions:', displayedImageWidth, 'x', displayedImageHeight);
     
-    // 2. Calculer les dimensions de l'image avec le zoom appliqué
+    // Calculer les dimensions de l'image avec le zoom appliqué
     const zoomedImageWidth = displayedImageWidth * zoom;
     const zoomedImageHeight = displayedImageHeight * zoom;
     
     console.log('Zoomed image dimensions:', zoomedImageWidth, 'x', zoomedImageHeight);
     
-    // 3. Récupérer le conteneur ReactCrop
+    // Récupérer le conteneur ReactCrop
     const reactCropContainer = image.closest('.ReactCrop') as HTMLElement;
     if (!reactCropContainer) {
       console.error('ReactCrop container not found');
@@ -111,25 +110,25 @@ export function ImageCropper({
     
     console.log('ReactCrop container dimensions:', containerWidth, 'x', containerHeight);
     
-    // 4. Calculer l'offset de l'image zoomée dans le conteneur (image centrée)
+    // Calculer l'offset de l'image zoomée dans le conteneur (image centrée)
     const imageOffsetX = (containerWidth - zoomedImageWidth) / 2;
     const imageOffsetY = (containerHeight - zoomedImageHeight) / 2;
     
     console.log('Image offset in container:', imageOffsetX, imageOffsetY);
     
-    // 5. Convertir les coordonnées du crop (relatives au conteneur) vers l'image zoomée
+    // Convertir les coordonnées du crop (relatives au conteneur) vers l'image zoomée
     const cropXInZoomedImage = completedCrop.x - imageOffsetX;
     const cropYInZoomedImage = completedCrop.y - imageOffsetY;
     
     console.log('Crop position in zoomed image:', cropXInZoomedImage, cropYInZoomedImage);
     
-    // 6. Calculer le ratio pour convertir vers l'image naturelle
+    // Calculer le ratio pour convertir vers l'image naturelle
     const scaleToNaturalX = image.naturalWidth / zoomedImageWidth;
     const scaleToNaturalY = image.naturalHeight / zoomedImageHeight;
     
     console.log('Scale to natural:', scaleToNaturalX, scaleToNaturalY);
     
-    // 7. Calculer les coordonnées finales dans l'image naturelle
+    // Calculer les coordonnées finales dans l'image naturelle
     const finalCropX = cropXInZoomedImage * scaleToNaturalX;
     const finalCropY = cropYInZoomedImage * scaleToNaturalY;
     const finalCropWidth = completedCrop.width * scaleToNaturalX;
@@ -246,24 +245,20 @@ export function ImageCropper({
           </Button>
         </div>
         
-        <div className="my-4 max-h-[70vh]">
+        <div className="my-4 flex justify-center items-center" style={{ height: '70vh' }}>
           <div 
-            className="flex justify-center items-center"
+            className="relative w-full h-full flex justify-center items-center overflow-hidden"
             style={{ 
-              width: '100%', 
-              height: '100%'
+              maxWidth: '100%',
+              maxHeight: '100%'
             }}
           >
             <ReactCrop
-              key={key} // Force le remontage du composant lors de la rotation
+              key={key}
               crop={crop}
               onChange={(c) => setCrop(c)}
               onComplete={(c) => setCompletedCrop(c)}
-              className="max-w-full"
-              style={{
-                width: '100%',
-                height: '100%'
-              }}
+              className="w-full h-full flex justify-center items-center"
             >
               <img
                 ref={imageRef}
@@ -275,8 +270,10 @@ export function ImageCropper({
                   transform: `scale(${zoom}) rotate(${rotation}deg)`,
                   transformOrigin: 'center center',
                   transition: 'transform 0.2s ease-in-out',
-                  display: 'block',
-                  margin: '0 auto'
+                  maxWidth: '100%',
+                  maxHeight: '100%',
+                  width: 'auto',
+                  height: 'auto'
                 }}
               />
             </ReactCrop>
