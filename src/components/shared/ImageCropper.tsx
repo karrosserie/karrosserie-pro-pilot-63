@@ -1,4 +1,5 @@
 
+
 import React, { useState, useRef } from 'react';
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -79,14 +80,22 @@ export function ImageCropper({
     const image = imageRef.current;
     const canvas = document.createElement('canvas');
     
-    // Les coordonnées du crop sont relatives à l'image affichée (avec zoom)
-    // Il faut les convertir vers les coordonnées de l'image naturelle
-    const displayedWidth = image.width * zoom;
-    const displayedHeight = image.height * zoom;
+    console.log('Crop coordinates:', completedCrop);
+    console.log('Image natural size:', image.naturalWidth, 'x', image.naturalHeight);
+    console.log('Image displayed size:', image.width, 'x', image.height);
+    console.log('Current zoom:', zoom);
     
-    // Facteur de conversion de l'image affichée vers l'image naturelle
-    const scaleX = image.naturalWidth / displayedWidth;
-    const scaleY = image.naturalHeight / displayedHeight;
+    // L'image affichée a une taille qui dépend du zoom
+    // Si zoom = 1, taille affichée = taille de l'élément img
+    // Si zoom = 0.5, l'image est affichée à 50% de sa taille de l'élément img
+    // Si zoom = 2, l'image est affichée à 200% de sa taille de l'élément img
+    
+    // Les coordonnées du crop sont en pixels par rapport à l'image AFFICHÉE avec le zoom
+    // Nous devons les convertir vers les coordonnées de l'image naturelle
+    
+    // Facteur de conversion : de l'image affichée vers l'image naturelle
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
     
     const ctx = canvas.getContext('2d');
 
@@ -100,8 +109,20 @@ export function ImageCropper({
     const isRotated90or270 = rotation === 90 || rotation === 270;
     
     // Dimensions du crop dans l'image naturelle
-    const cropWidth = completedCrop.width * scaleX;
-    const cropHeight = completedCrop.height * scaleY;
+    // Les coordonnées du crop sont par rapport à l'image affichée avec zoom
+    // donc on divise par zoom pour avoir les coordonnées réelles sur l'élément img
+    // puis on multiplie par scale pour avoir les coordonnées sur l'image naturelle
+    const cropX = (completedCrop.x / zoom) * scaleX;
+    const cropY = (completedCrop.y / zoom) * scaleY;
+    const cropWidth = (completedCrop.width / zoom) * scaleX;
+    const cropHeight = (completedCrop.height / zoom) * scaleY;
+    
+    console.log('Calculated crop in natural image:', {
+      x: cropX,
+      y: cropY,
+      width: cropWidth,
+      height: cropHeight
+    });
     
     // Définir la taille du canvas en fonction de la rotation
     if (isRotated90or270) {
@@ -121,11 +142,11 @@ export function ImageCropper({
     // Appliquer la rotation
     ctx.rotate(rotationInRadians);
 
-    // Dessiner l'image avec la rotation et le zoom appliqués
+    // Dessiner l'image avec la rotation appliquée
     ctx.drawImage(
       image,
-      completedCrop.x * scaleX,
-      completedCrop.y * scaleY,
+      cropX,
+      cropY,
       cropWidth,
       cropHeight,
       -cropWidth / 2,
@@ -252,3 +273,4 @@ export function ImageCropper({
     </Dialog>
   );
 }
+
