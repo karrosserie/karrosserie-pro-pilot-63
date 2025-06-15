@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Car, FileText, Users, CreditCard, Eye, Pencil } from 'lucide-react';
+import { Car, FileText, Users, CreditCard, Eye, Pencil, Wrench, PaintBucket } from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import { Button } from '@/components/ui/button';
@@ -119,6 +120,23 @@ const Index = () => {
           change="+22%" 
           icon={<CreditCard className="h-6 w-6" />}
           iconBg="bg-green-500"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <StatsCard 
+          title="CA carrosserie" 
+          value={(0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} 
+          change="+18%" 
+          icon={<PaintBucket className="h-6 w-6" />}
+          iconBg="bg-orange-500"
+        />
+        <StatsCard 
+          title="CA mécanique" 
+          value={(0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} 
+          change="+26%" 
+          icon={<Wrench className="h-6 w-6" />}
+          iconBg="bg-gray-600"
         />
       </div>
       
