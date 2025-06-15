@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -54,6 +53,10 @@ export function ImageCropper({
     const newZoom = direction === 'in' ? zoom * 1.2 : zoom / 1.2;
     const clampedZoom = Math.max(0.5, Math.min(3, newZoom));
     setZoom(clampedZoom);
+    
+    // Réinitialiser le crop lors du zoom pour éviter les décalages
+    setCrop(undefined);
+    setCompletedCrop(undefined);
   };
 
   // Fonction pour gérer la rotation
@@ -64,6 +67,10 @@ export function ImageCropper({
       : (rotation - rotationStep + 360) % 360;
     
     setRotation(newRotation);
+    
+    // Réinitialiser le crop lors de la rotation pour éviter les décalages
+    setCrop(undefined);
+    setCompletedCrop(undefined);
   };
 
   const getCroppedImage = () => {
@@ -75,7 +82,6 @@ export function ImageCropper({
       hiddenImageRef.current,
       completedCrop,
       rotation,
-      zoom,
       (blob) => {
         setIsLoading(false);
         onCropComplete(blob);
