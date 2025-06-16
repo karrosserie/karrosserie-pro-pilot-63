@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Search, Filter, Eye, Pencil } from 'lucide-react';
@@ -76,7 +77,11 @@ const DocumentItem = ({
         <Button variant="outline" size="icon" onClick={onView}>
           <Eye className="h-4 w-4" />
         </Button>
-        <Button size="icon" onClick={onEdit}>
+        <Button 
+          size="icon" 
+          onClick={onEdit}
+          className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
+        >
           <Pencil className="h-4 w-4" />
         </Button>
       </div>
