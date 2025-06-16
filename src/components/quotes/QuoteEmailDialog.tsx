@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useClients } from "@/hooks/use-clients";
 import { Mail } from "lucide-react";
 
 interface Quote {
@@ -53,16 +54,20 @@ const QuoteEmailDialog: React.FC<QuoteEmailDialogProps> = ({
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { clients } = useClients();
 
   useEffect(() => {
     if (quote && open) {
       console.log('Quote data for email dialog:', quote);
-      console.log('Client data:', quote.clients);
-      console.log('Client email:', quote.clients?.email);
+      console.log('Client data from quote:', quote.clients);
+      console.log('All clients data:', clients);
       
-      // Pré-remplir le destinataire avec l'email du client
-      const clientEmail = quote.clients?.email || '';
-      console.log('Setting recipient email to:', clientEmail);
+      // Récupérer les données complètes du client depuis la liste des clients
+      const fullClientData = clients?.find(client => client.id === quote.clients?.id);
+      console.log('Full client data found:', fullClientData);
+      
+      const clientEmail = fullClientData?.email || quote.clients?.email || '';
+      console.log('Final client email to use:', clientEmail);
       setRecipient(clientEmail);
       
       // Pré-remplir le sujet
@@ -77,7 +82,7 @@ const QuoteEmailDialog: React.FC<QuoteEmailDialogProps> = ({
         `Veuillez trouver ci-joint le devis pour le véhicule immatriculé ${licensePlate} appartenant à ${clientName}.`
       );
     }
-  }, [quote, open]);
+  }, [quote, open, clients]);
 
   const handleSend = async () => {
     if (!recipient.trim()) {
