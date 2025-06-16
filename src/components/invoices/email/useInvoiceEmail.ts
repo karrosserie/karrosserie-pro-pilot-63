@@ -11,27 +11,45 @@ export const useInvoiceEmail = (invoice: Invoice | null) => {
 
   const getDefaultEmailData = async (): Promise<InvoiceEmailFormData> => {
     let clientEmail = '';
+    let clientName = '';
+    let vehicleInfo = '';
     
     if (invoice?.client_id) {
       try {
         const client = await clientsService.getById(invoice.client_id);
         clientEmail = client.email || '';
+        clientName = `${client.first_name} ${client.last_name}`;
       } catch (error) {
         console.error('Error fetching client:', error);
       }
     }
 
-    return {
-      to: clientEmail,
-      subject: `Facture ${invoice?.reference || ''}`,
-      message: `Bonjour,
+    // Si on n'a pas pu récupérer le nom du client depuis l'API, on utilise les données de l'invoice
+    if (!clientName && invoice?.clients) {
+      clientName = `${invoice.clients.first_name} ${invoice.clients.last_name}`;
+    }
 
-Veuillez trouver ci-joint votre facture ${invoice?.reference || ''}.
+    // Construction des informations du véhicule
+    if (invoice?.vehicles) {
+      const brand = invoice.vehicles.car_brands?.name || 'Véhicule';
+      const model = invoice.vehicles.car_models?.name || '';
+      const licensePlate = invoice.vehicles.license_plate || '';
+      vehicleInfo = `${brand}${model ? ` ${model}` : ''} - ${licensePlate}`;
+    }
 
-Nous vous remercions pour votre confiance.
+    const subject = `Facture n°${invoice?.reference || ''} - ${clientName}`;
+    
+    const message = `Bonjour ${clientName},
+
+Veuillez trouver en pièce jointe la facture n°${invoice?.reference || ''} pour votre véhicule ${vehicleInfo}.
 
 Cordialement,
-L'équipe`
+AUTO PAINT`;
+
+    return {
+      to: clientEmail,
+      subject: subject,
+      message: message
     };
   };
 
