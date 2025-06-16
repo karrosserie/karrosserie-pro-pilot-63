@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Invoice } from '@/services/supabase/invoices';
 import { InvoiceRepairItem, InvoicePartItem, InvoiceDiscountItem } from './types';
@@ -117,14 +118,14 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
         } catch (error) {
           console.error('Erreur lors de la génération du numéro de facture:', error);
           setFormData({
-            reference: 'F-001',
+            reference: '1',
             client_id: invoice?.client_id || '',
             vehicle_id: invoice?.vehicle_id || '',
             status: 'En attente de paiement',
             due_date: today,
             payment_details: ''
           });
-          console.log('Set fallback form data with F-001');
+          console.log('Set fallback form data with 1');
         }
         
         setDescription('');
