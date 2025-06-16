@@ -8,7 +8,7 @@ export interface Credit {
   invoice_id: string | null;
   status: string;
   amount: number;
-  items_data: string | null;
+  items_data: any | null; // Changed from string to any to accept Json from Supabase
   notes: string | null;
   created_at: string;
   updated_at: string;

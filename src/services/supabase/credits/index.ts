@@ -1,6 +1,6 @@
 
 import { getCredits, getCreditById, getLastCreditByUser } from './queries';
-import { createCredit, updateCredit, deleteCredit } from './mutations';
+import { createCredit, updateCredit, deleteCredit, generateReference } from './mutations';
 
 export const creditsService = {
   getAll: getCredits,
@@ -8,7 +8,8 @@ export const creditsService = {
   getLastCreditByUser,
   create: createCredit,
   update: updateCredit,
-  delete: deleteCredit
+  delete: deleteCredit,
+  generateReference
 };
 
 export * from './types';
