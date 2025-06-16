@@ -139,7 +139,7 @@ export const CessionsTable = ({
                     : '-'
                   }
                 </TableCell>
-                <TableCell className="font-medium">
+                <TableCell>
                   {formatRepairOrderDisplay(cession)}
                 </TableCell>
                 <TableCell>
