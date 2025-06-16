@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { RepairOrdersHeader } from '@/components/repair-orders/RepairOrdersHeader';
 import { RepairOrdersTable } from '@/components/repair-orders/RepairOrdersTable';
@@ -73,7 +74,9 @@ const RepairOrders = () => {
   };
 
   const handleConvertToInvoice = (order: RepairOrder) => {
-    // Parser les données de l'ordre de réparation depuis le champ notes
+    console.log('Converting repair order to invoice:', order);
+    
+    // Parser les données de l'ordre de réparation
     let orderData = {
       description: '',
       claimNumber: '',
@@ -83,7 +86,7 @@ const RepairOrders = () => {
       discounts: []
     };
 
-    // Essayer de parser les notes de l'ordre de réparation
+    // Essayer de parser les notes JSON de l'ordre de réparation
     try {
       if (order.notes) {
         const parsedNotes = JSON.parse(order.notes);
@@ -98,31 +101,87 @@ const RepairOrders = () => {
       }
     } catch (e) {
       console.error('Error parsing repair order notes:', e);
-      // Fallback: utiliser les champs directs s'ils existent
-      orderData = {
-        description: order.description || '',
-        claimNumber: order.claim_number || '',
-        currentMileage: order.current_mileage || '',
-        repairs: [],
-        parts: [],
-        discounts: []
-      };
     }
-    
-    // Créer un objet facture avec les données de l'ordre de réparation
+
+    // Essayer aussi de parser les champs séparés s'ils existent
+    try {
+      if (order.repairs_data) {
+        const repairs = typeof order.repairs_data === 'string' 
+          ? JSON.parse(order.repairs_data) 
+          : order.repairs_data;
+        if (Array.isArray(repairs) && repairs.length > 0) {
+          orderData.repairs = repairs;
+        }
+      }
+    } catch (e) {
+      console.error('Error parsing repairs_data:', e);
+    }
+
+    try {
+      if (order.parts_data) {
+        const parts = typeof order.parts_data === 'string' 
+          ? JSON.parse(order.parts_data) 
+          : order.parts_data;
+        if (Array.isArray(parts) && parts.length > 0) {
+          orderData.parts = parts;
+        }
+      }
+    } catch (e) {
+      console.error('Error parsing parts_data:', e);
+    }
+
+    try {
+      if (order.discounts_data) {
+        const discounts = typeof order.discounts_data === 'string' 
+          ? JSON.parse(order.discounts_data) 
+          : order.discounts_data;
+        if (Array.isArray(discounts) && discounts.length > 0) {
+          orderData.discounts = discounts;
+        }
+      }
+    } catch (e) {
+      console.error('Error parsing discounts_data:', e);
+    }
+
+    // Utiliser les champs directs comme fallback
+    if (!orderData.description && order.description) {
+      orderData.description = order.description;
+    }
+    if (!orderData.claimNumber && order.claim_number) {
+      orderData.claimNumber = order.claim_number;
+    }
+    if (!orderData.currentMileage && order.current_mileage) {
+      orderData.currentMileage = order.current_mileage;
+    }
+
+    // Créer un objet facture formaté selon ce que useInvoiceFormLogic attend
     const invoiceData = {
+      // Champs de base de la facture
       client_id: order.client_id,
       vehicle_id: order.vehicle_id,
       repair_order_id: order.id,
+      status: 'En attente de paiement',
+      
+      // Relations pour l'affichage
       clients: order.clients,
       vehicles: order.vehicles,
-      notes: JSON.stringify(orderData)
+      
+      // Données métier dans notes (format attendu par useInvoiceFormLogic)
+      notes: JSON.stringify(orderData),
+      
+      // Champs individuels pour compatibilité
+      description: orderData.description,
+      claim_number: orderData.claimNumber,
+      current_mileage: orderData.currentMileage,
+      repairs_data: orderData.repairs,
+      parts_data: orderData.parts,
+      discounts_data: orderData.discounts
     };
     
-    console.log('Converting repair order to invoice:', {
+    console.log('Invoice data being passed to form:', {
       originalOrder: order,
-      parsedData: orderData,
-      invoiceData: invoiceData
+      parsedOrderData: orderData,
+      finalInvoiceData: invoiceData
     });
     
     setSelectedOrderForInvoice(invoiceData);
