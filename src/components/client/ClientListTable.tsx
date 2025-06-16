@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Client } from '@/services/supabase/clients';
@@ -12,13 +13,19 @@ interface ClientListTableProps {
   onViewClient: (client: Client) => void;
   onEditClient: (client: Client) => void;
   onDeleteClient: (client: Client) => void;
+  onCreateQuote?: (client: Client) => void;
+  onCreateInvoice?: (client: Client) => void;
+  onCreateCredit?: (client: Client) => void;
 }
 
 const ClientListTable: React.FC<ClientListTableProps> = ({
   clients,
   onViewClient,
   onEditClient,
-  onDeleteClient
+  onDeleteClient,
+  onCreateQuote,
+  onCreateInvoice,
+  onCreateCredit
 }) => {
   const columns: ColumnDef<Client>[] = [
     {
@@ -79,15 +86,15 @@ const ClientListTable: React.FC<ClientListTableProps> = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onCreateQuote?.(row.original)}>
                 <FileText className="h-4 w-4 mr-2" />
                 Créer un devis
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onCreateInvoice?.(row.original)}>
                 <Receipt className="h-4 w-4 mr-2" />
                 Créer une facture
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onCreateCredit?.(row.original)}>
                 <CreditCard className="h-4 w-4 mr-2" />
                 Créer un avoir
               </DropdownMenuItem>

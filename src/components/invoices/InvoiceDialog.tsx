@@ -9,10 +9,10 @@ import {
 } from "@/components/ui/dialog";
 import { InvoiceForm } from '@/components/invoices/InvoiceForm';
 import { useInvoices } from '@/hooks/use-invoices';
-import { Invoice } from '@/services/supabase/invoices';
+import { useToast } from '@/hooks/use-toast';
 
 interface InvoiceDialogProps {
-  invoice?: Invoice | null;
+  invoice?: any;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -22,10 +22,11 @@ const InvoiceDialog = ({
   open,
   onOpenChange
 }: InvoiceDialogProps) => {
+  const { toast } = useToast();
   const { updateInvoice, createInvoice } = useInvoices();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (formData: Partial<Invoice>) => {
+  const handleSubmit = async (formData: any) => {
     if (isSubmitting) return;
     
     setIsSubmitting(true);
@@ -34,7 +35,7 @@ const InvoiceDialog = ({
       if (invoice && invoice.id) {
         await updateInvoice.mutateAsync({ id: invoice.id, data: formData });
       } else {
-        await createInvoice.mutateAsync(formData as any);
+        await createInvoice.mutateAsync(formData);
       }
       onOpenChange(false);
     } catch (error: any) {
@@ -46,13 +47,13 @@ const InvoiceDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={!isSubmitting ? onOpenChange : undefined}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {invoice ? `Modifier la facture - ${invoice.reference}` : "Créer une nouvelle facture"}
+            {invoice && invoice.id ? `Modifier la facture - ${invoice.reference}` : "Créer une nouvelle facture"}
           </DialogTitle>
           <DialogDescription>
-            {invoice
+            {invoice && invoice.id
               ? "Modifiez les détails de la facture."
               : "Créez une nouvelle facture en remplissant les informations ci-dessous."
             }

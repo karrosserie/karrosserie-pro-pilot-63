@@ -3,6 +3,9 @@ import React, { useState, useMemo } from 'react';
 import ClientListHeader from './ClientListHeader';
 import ClientListTable from './ClientListTable';
 import ClientDialog from './ClientDialog';
+import QuoteDialog from '@/components/quotes/QuoteDialog';
+import InvoiceDialog from '@/components/invoices/InvoiceDialog';
+import { CreditDialog } from '@/components/credits/CreditDialog';
 import { useClients } from '@/hooks/use-clients';
 import { Client } from '@/services/supabase/clients';
 import { TableLoading } from '@/components/ui/loading';
@@ -14,6 +17,13 @@ const ClientList = () => {
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // États pour les nouveaux dialogues
+  const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
+  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
+  const [creditDialogOpen, setCreditDialogOpen] = useState(false);
+  const [selectedClientForDocument, setSelectedClientForDocument] = useState<Client | null>(null);
+  
   const { clients, isLoading, error, createClient, updateClient, deleteClient } = useClients();
   const { user } = useAuth();
 
@@ -55,6 +65,22 @@ const ClientList = () => {
 
   const handleDeleteClient = (client: Client) => {
     deleteClient.mutate(client.id);
+  };
+
+  // Nouveaux handlers pour les documents
+  const handleCreateQuote = (client: Client) => {
+    setSelectedClientForDocument(client);
+    setQuoteDialogOpen(true);
+  };
+
+  const handleCreateInvoice = (client: Client) => {
+    setSelectedClientForDocument(client);
+    setInvoiceDialogOpen(true);
+  };
+
+  const handleCreateCredit = (client: Client) => {
+    setSelectedClientForDocument(client);
+    setCreditDialogOpen(true);
   };
 
   const handleClientSubmit = (data: any) => {
@@ -110,6 +136,9 @@ const ClientList = () => {
         onViewClient={handleViewClient}
         onEditClient={handleEditClient}
         onDeleteClient={handleDeleteClient}
+        onCreateQuote={handleCreateQuote}
+        onCreateInvoice={handleCreateInvoice}
+        onCreateCredit={handleCreateCredit}
       />
 
       <ClientDialog
@@ -144,6 +173,40 @@ const ClientList = () => {
         } : {}}
         onSubmit={handleClientSubmit}
         mode={dialogMode}
+      />
+
+      {/* Dialogue de création de devis */}
+      <QuoteDialog
+        open={quoteDialogOpen}
+        onOpenChange={setQuoteDialogOpen}
+        quote={{
+          client_id: selectedClientForDocument?.id || '',
+          clients: selectedClientForDocument ? {
+            id: selectedClientForDocument.id,
+            first_name: selectedClientForDocument.first_name,
+            last_name: selectedClientForDocument.last_name
+          } : null
+        } as any}
+      />
+
+      {/* Dialogue de création de facture */}
+      <InvoiceDialog
+        open={invoiceDialogOpen}
+        onOpenChange={setInvoiceDialogOpen}
+        invoice={{
+          client_id: selectedClientForDocument?.id || '',
+          clients: selectedClientForDocument ? {
+            id: selectedClientForDocument.id,
+            first_name: selectedClientForDocument.first_name,
+            last_name: selectedClientForDocument.last_name
+          } : null
+        } as any}
+      />
+
+      {/* Dialogue de création d'avoir */}
+      <CreditDialog
+        open={creditDialogOpen}
+        onOpenChange={setCreditDialogOpen}
       />
     </div>
   );
