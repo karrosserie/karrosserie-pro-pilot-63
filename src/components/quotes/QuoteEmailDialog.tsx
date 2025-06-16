@@ -48,11 +48,6 @@ const QuoteEmailDialog: React.FC<QuoteEmailDialogProps> = ({
             <Mail className="h-5 w-5" />
             Envoyer le devis par e-mail
           </DialogTitle>
-          <DialogDescription>
-            {quote && (
-              <>Envoi du devis {quote.reference} par e-mail</>
-            )}
-          </DialogDescription>
         </DialogHeader>
         
         <EmailFormFields
