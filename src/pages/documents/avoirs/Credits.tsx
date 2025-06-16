@@ -85,44 +85,61 @@ const Credits = () => {
   const { invoices } = useInvoices();
   
   const formatVehicleDisplay = (credit: any) => {
-    console.log('Formatting vehicle display for credit:', credit.id, 'vehicle data:', credit.vehicles);
+    console.log('Formatting vehicle display for credit:', credit.id, 'credit data:', credit);
     
+    // First, try to get vehicle data from the credit itself
     if (credit.vehicles) {
-      // Try multiple ways to get brand and model
       let brand = '';
       let model = '';
       
-      // First try from car_brands relation
       if (credit.vehicles.car_brands?.name) {
         brand = credit.vehicles.car_brands.name;
-      } 
-      // Then try direct brand field
-      else if (credit.vehicles.brand) {
+      } else if (credit.vehicles.brand) {
         brand = credit.vehicles.brand;
-      } 
-      // Default
-      else {
-        brand = 'Marque inconnue';
       }
       
-      // First try from car_models relation
       if (credit.vehicles.car_models?.name) {
         model = credit.vehicles.car_models.name;
-      } 
-      // Then try direct model field
-      else if (credit.vehicles.model) {
+      } else if (credit.vehicles.model) {
         model = credit.vehicles.model;
-      } 
-      // Default
-      else {
-        model = 'Modèle inconnu';
       }
       
       const licensePlate = credit.vehicles.license_plate || '';
-      const result = `${brand} ${model}${licensePlate ? ` - ${licensePlate}` : ''}`;
       
-      console.log('Vehicle display result for credit:', result);
-      return result;
+      if (brand || model || licensePlate) {
+        const result = `${brand} ${model}${licensePlate ? ` - ${licensePlate}` : ''}`.trim();
+        console.log('Vehicle display result from credit vehicle:', result);
+        return result || '-';
+      }
+    }
+    
+    // If no vehicle data in credit, try to get it from the linked invoice
+    if (credit.invoice_id && invoices) {
+      console.log('Looking for invoice with id:', credit.invoice_id, 'in invoices:', invoices);
+      const linkedInvoice = invoices.find(invoice => invoice.id === credit.invoice_id);
+      
+      if (linkedInvoice?.vehicles) {
+        console.log('Found linked invoice with vehicle:', linkedInvoice.vehicles);
+        
+        let brand = '';
+        let model = '';
+        
+        if (linkedInvoice.vehicles.car_brands?.name) {
+          brand = linkedInvoice.vehicles.car_brands.name;
+        }
+        
+        if (linkedInvoice.vehicles.car_models?.name) {
+          model = linkedInvoice.vehicles.car_models.name;
+        }
+        
+        const licensePlate = linkedInvoice.vehicles.license_plate || '';
+        
+        if (brand || model || licensePlate) {
+          const result = `${brand} ${model}${licensePlate ? ` - ${licensePlate}` : ''}`.trim();
+          console.log('Vehicle display result from invoice vehicle:', result);
+          return result || '-';
+        }
+      }
     }
     
     console.log('No vehicle data found for credit:', credit.id);
