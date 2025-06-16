@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +14,9 @@ import { useQuotes } from '@/hooks/use-quotes';
 import { useToast } from '@/hooks/use-toast';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import QuoteEmailDialog from '@/components/quotes/QuoteEmailDialog';
+import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
 import { Quote } from '@/services/supabase/quotes';
+import { RepairOrder } from '@/services/supabase/repair-orders';
 import { StatusBadge } from '@/components/ui/status-badge';
 import {
   DropdownMenu,
@@ -31,8 +32,10 @@ const Quotes = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [repairOrderDialogOpen, setRepairOrderDialogOpen] = useState(false);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [selectedQuoteForEmail, setSelectedQuoteForEmail] = useState<Quote | null>(null);
+  const [prefilledRepairOrder, setPrefilledRepairOrder] = useState<Partial<RepairOrder> | null>(null);
   const { toast } = useToast();
   
   const filteredQuotes = quotes?.filter(quote => 
@@ -96,10 +99,24 @@ const Quotes = () => {
   };
 
   const handleConvertToRepairOrder = (quote: Quote) => {
-    toast({
-      title: "Conversion en ordre de réparation",
-      description: `Le devis ${quote.reference} a été converti en ordre de réparation`
-    });
+    // Préparer les données de l'ordre de réparation à partir du devis
+    const today = new Date().toISOString().split('T')[0];
+    
+    const prefilledData: Partial<RepairOrder> = {
+      client_id: quote.client_id,
+      vehicle_id: quote.vehicle_id,
+      status: 'En cours',
+      start_date: today,
+      notes: quote.notes || '',
+      // Les données spécifiques comme repairs, parts, discounts seront gérées dans le formulaire
+      // à partir des données du devis si elles sont stockées dans notes ou une structure JSON
+    };
+
+    console.log('Converting quote to repair order with data:', prefilledData);
+    console.log('Original quote data:', quote);
+
+    setPrefilledRepairOrder(prefilledData);
+    setRepairOrderDialogOpen(true);
   };
   
   return (
@@ -258,6 +275,17 @@ const Quotes = () => {
         quote={selectedQuoteForEmail}
         open={emailDialogOpen}
         onOpenChange={setEmailDialogOpen}
+      />
+
+      <RepairOrderDialog
+        order={prefilledRepairOrder as RepairOrder}
+        open={repairOrderDialogOpen}
+        onOpenChange={(open) => {
+          setRepairOrderDialogOpen(open);
+          if (!open) {
+            setPrefilledRepairOrder(null);
+          }
+        }}
       />
     </div>
   );
