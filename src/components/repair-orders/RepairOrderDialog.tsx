@@ -25,13 +25,16 @@ const RepairOrderDialog = ({
   const { updateOrder, createOrder } = useRepairOrders();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Déterminer s'il s'agit d'un ordre existant (avec ID) ou d'une création
+  const isExistingOrder = order && order.id;
+
   const handleSubmit = async (formData: Partial<RepairOrder>) => {
     if (isSubmitting) return;
     
     setIsSubmitting(true);
     
     try {
-      if (order && order.id) {
+      if (isExistingOrder) {
         await updateOrder.mutateAsync({ id: order.id, data: formData });
       } else {
         await createOrder.mutateAsync(formData as any);
@@ -49,10 +52,10 @@ const RepairOrderDialog = ({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle>
-            {order ? `Modifier l'ordre de réparation - ${order.reference}` : "Créer un nouvel ordre de réparation"}
+            {isExistingOrder ? `Modifier l'ordre de réparation - ${order.reference}` : "Créer un nouvel ordre de réparation"}
           </DialogTitle>
           <DialogDescription>
-            {order
+            {isExistingOrder
               ? "Modifiez les détails de l'ordre de réparation."
               : "Créez un nouvel ordre de réparation en remplissant les informations ci-dessous."
             }
