@@ -39,30 +39,40 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
   console.log('  - formData.brand_id:', formData.brand_id);
   console.log('  - carModels count:', carModels?.length || 0);
 
-  // Prepare brand options
+  // Prepare brand options - use brand names instead of IDs
   const brandOptions = carBrands?.map(brand => ({
-    value: brand.id,
+    value: brand.name, // Use name instead of ID
     label: brand.name
   })) || [];
 
-  // Prepare model options
-  const modelOptions = carModels?.map(model => ({
-    value: model.id,
+  // Find brand ID for fetching models based on selected brand name
+  const selectedBrand = carBrands?.find(brand => brand.name === formData.brand_id);
+  const actualBrandId = selectedBrand?.id || '';
+
+  // Use the actual brand ID for fetching models
+  const { carModels: actualCarModels, isLoading: actualModelsLoading } = useCarModels(actualBrandId);
+
+  // Prepare model options - use model names instead of IDs
+  const modelOptions = actualCarModels?.map(model => ({
+    value: model.name, // Use name instead of ID
     label: model.name
   })) || [];
 
   console.log('FleetVehicleBasicInfo - Prepared options:');
   console.log('  - brandOptions:', brandOptions);
   console.log('  - modelOptions:', modelOptions);
+  console.log('  - selectedBrand:', selectedBrand);
+  console.log('  - actualBrandId:', actualBrandId);
 
-  const handleBrandChange = (brandId: string) => {
-    console.log('FleetVehicleBasicInfo - Manual brand selection:', brandId);
-    onBrandChange(brandId);
+  const handleBrandChange = (brandName: string) => {
+    console.log('FleetVehicleBasicInfo - Manual brand selection:', brandName);
+    onBrandChange(brandName); // Pass brand name instead of ID
+    onModelChange(''); // Reset model when brand changes
   };
 
-  const handleModelChange = (modelId: string) => {
-    console.log('FleetVehicleBasicInfo - Manual model selection:', modelId);
-    onModelChange(modelId);
+  const handleModelChange = (modelName: string) => {
+    console.log('FleetVehicleBasicInfo - Manual model selection:', modelName);
+    onModelChange(modelName); // Pass model name instead of ID
   };
 
   if (brandsLoading) {
@@ -141,14 +151,14 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
             placeholder={
               !formData.brand_id 
                 ? "Sélectionnez d'abord une marque" 
-                : modelsLoading 
+                : actualModelsLoading 
                 ? "Chargement des modèles..."
                 : "Sélectionner un modèle"
             }
             searchPlaceholder="Rechercher un modèle..."
-            disabled={isViewMode || !formData.brand_id || modelsLoading}
+            disabled={isViewMode || !formData.brand_id || actualModelsLoading}
           />
-          {modelsLoading && formData.brand_id && (
+          {actualModelsLoading && formData.brand_id && (
             <p className="text-sm text-gray-500 mt-1">Chargement des modèles...</p>
           )}
         </div>
