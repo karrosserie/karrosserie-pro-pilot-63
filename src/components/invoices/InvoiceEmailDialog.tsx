@@ -44,7 +44,7 @@ export const InvoiceEmailDialog = ({ invoice, open, onOpenChange }: InvoiceEmail
     }
   };
 
-  const isFormValid = emailData.to && emailData.subject && emailData.message;
+  const isFormValid = Boolean(emailData.to && emailData.subject && emailData.message);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
