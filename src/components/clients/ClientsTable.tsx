@@ -19,13 +19,19 @@ interface ClientsTableProps {
   onViewClient: (client: Client) => void;
   onEditClient: (client: Client) => void;
   onDeleteClient: (client: Client) => void;
+  onCreateQuote?: (client: Client) => void;
+  onCreateInvoice?: (client: Client) => void;
+  onCreateCredit?: (client: Client) => void;
 }
 
 const ClientsTable: React.FC<ClientsTableProps> = ({
   clients,
   onViewClient,
   onEditClient,
-  onDeleteClient
+  onDeleteClient,
+  onCreateQuote,
+  onCreateInvoice,
+  onCreateCredit
 }) => {
   
   return (
@@ -48,6 +54,27 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
               const hasFrontLicense = clientData.driver_license_front_url;
               const hasBackLicense = clientData.driver_license_back_url;
               const hasCompleteLicense = hasFrontLicense && hasBackLicense;
+
+              const handleCreateQuote = (e: React.MouseEvent) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Creating quote for client:', client);
+                onCreateQuote?.(client);
+              };
+
+              const handleCreateInvoice = (e: React.MouseEvent) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Creating invoice for client:', client);
+                onCreateInvoice?.(client);
+              };
+
+              const handleCreateCredit = (e: React.MouseEvent) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Creating credit for client:', client);
+                onCreateCredit?.(client);
+              };
               
               return (
                 <TableRow key={client.id}>
@@ -86,15 +113,15 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-56">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={handleCreateQuote} className="cursor-pointer">
                             <FileText className="h-4 w-4 mr-2" />
                             Créer un devis
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={handleCreateInvoice} className="cursor-pointer">
                             <Receipt className="h-4 w-4 mr-2" />
                             Créer une facture
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={handleCreateCredit} className="cursor-pointer">
                             <CreditCard className="h-4 w-4 mr-2" />
                             Créer un avoir
                           </DropdownMenuItem>

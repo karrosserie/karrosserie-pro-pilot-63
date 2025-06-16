@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Client } from '@/services/supabase/clients';
@@ -66,39 +65,41 @@ const ClientListTable: React.FC<ClientListTableProps> = ({
       id: "actions",
       header: "Actions",
       cell: ({ row }) => {
+        const client = row.original;
+
         const handleCreateQuote = (e: React.MouseEvent) => {
           e.preventDefault();
           e.stopPropagation();
-          console.log('Creating quote for client:', row.original);
-          onCreateQuote?.(row.original);
+          console.log('Creating quote for client:', client);
+          onCreateQuote?.(client);
         };
 
         const handleCreateInvoice = (e: React.MouseEvent) => {
           e.preventDefault();
           e.stopPropagation();
-          console.log('Creating invoice for client:', row.original);
-          onCreateInvoice?.(row.original);
+          console.log('Creating invoice for client:', client);
+          onCreateInvoice?.(client);
         };
 
         const handleCreateCredit = (e: React.MouseEvent) => {
           e.preventDefault();
           e.stopPropagation();
-          console.log('Creating credit for client:', row.original);
-          onCreateCredit?.(row.original);
+          console.log('Creating credit for client:', client);
+          onCreateCredit?.(client);
         };
 
         return (
           <div className="text-right space-x-1 flex items-center justify-end">
-            <Button variant="ghost" size="icon" onClick={() => onViewClient(row.original)}>
+            <Button variant="ghost" size="icon" onClick={() => onViewClient(client)}>
               <Eye className="h-4 w-4" />
             </Button>
             <Button variant="ghost" size="icon">
               <Download className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => onEditClient(row.original)}>
+            <Button variant="ghost" size="icon" onClick={() => onEditClient(client)}>
               <Pencil className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => onDeleteClient(row.original)}>
+            <Button variant="ghost" size="icon" onClick={() => onDeleteClient(client)}>
               <Trash2 className="h-4 w-4" />
             </Button>
             <DropdownMenu>
