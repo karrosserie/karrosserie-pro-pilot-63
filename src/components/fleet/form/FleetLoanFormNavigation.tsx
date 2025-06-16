@@ -43,15 +43,19 @@ const FleetLoanFormNavigation: React.FC<FleetLoanFormNavigationProps> = ({
         
         {!isViewMode && (
           !isLastTab ? (
-            <Button type="button" onClick={onNext}>
+            <Button 
+              type="button" 
+              onClick={onNext}
+              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
+            >
               Suivant
             </Button>
           ) : (
             <Button 
               type="submit" 
-              className="btn-primary"
               onClick={onSubmit}
               disabled={!isFormValid || isPending}
+              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
             >
               {isPending ? 'Enregistrement...' : 'Confirmer le prêt'}
             </Button>
