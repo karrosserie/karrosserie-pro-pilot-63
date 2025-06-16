@@ -28,6 +28,13 @@ const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ onViewLoan, onVie
     );
   }
 
+  const getVehicleDisplayName = (fleetVehicle: any) => {
+    if (fleetVehicle?.car_brands?.name && fleetVehicle?.car_models?.name) {
+      return `${fleetVehicle.car_brands.name} ${fleetVehicle.car_models.name}`;
+    }
+    return 'Véhicule non spécifié';
+  };
+
   return (
     <div className="card-container">
       <h2 className="text-lg font-semibold text-gray-800 mb-4">Historique des prêts</h2>
@@ -48,7 +55,7 @@ const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ onViewLoan, onVie
               completedReservations.map((reservation) => (
                 <tr key={reservation.id} className="border-b hover:bg-gray-50">
                   <td className="px-4 py-3 font-medium">
-                    {reservation.fleet_vehicles?.brand} {reservation.fleet_vehicles?.model}
+                    {getVehicleDisplayName(reservation.fleet_vehicles)}
                   </td>
                   <td className="px-4 py-3">
                     {reservation.clients?.first_name} {reservation.clients?.last_name}

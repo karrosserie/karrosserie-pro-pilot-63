@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from 'react';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
@@ -37,13 +38,19 @@ export const useFleetPage = () => {
   // Convert reservations to current loans format
   const currentLoans = (reservations || [])
     .filter(reservation => reservation.status === 'active')
-    .map(reservation => ({
-      id: reservation.id,
-      vehicle: `${reservation.fleet_vehicles?.brand || 'N/A'} ${reservation.fleet_vehicles?.model || 'N/A'} - ${reservation.fleet_vehicles?.license_plate || 'N/A'}`,
-      client: `${reservation.clients?.first_name || ''} ${reservation.clients?.last_name || ''}`,
-      startDate: new Date(reservation.start_date).toLocaleDateString('fr-FR'),
-      expectedReturnDate: new Date(reservation.expected_return_date).toLocaleDateString('fr-FR')
-    }));
+    .map(reservation => {
+      const vehicleDisplay = reservation.fleet_vehicles?.car_brands?.name && reservation.fleet_vehicles?.car_models?.name
+        ? `${reservation.fleet_vehicles.car_brands.name} ${reservation.fleet_vehicles.car_models.name}`
+        : 'Véhicule non spécifié';
+      
+      return {
+        id: reservation.id,
+        vehicle: `${vehicleDisplay} - ${reservation.fleet_vehicles?.license_plate || 'N/A'}`,
+        client: `${reservation.clients?.first_name || ''} ${reservation.clients?.last_name || ''}`,
+        startDate: new Date(reservation.start_date).toLocaleDateString('fr-FR'),
+        expectedReturnDate: new Date(reservation.expected_return_date).toLocaleDateString('fr-FR')
+      };
+    });
 
   const handleAddVehicle = () => {
     setSelectedVehicle(null);
@@ -78,9 +85,12 @@ export const useFleetPage = () => {
 
   const handleLoanSubmit = (loanData: LoanFormData) => {
     console.log('Loan data:', loanData);
+    const vehicleDisplay = vehicleToLend?.car_brands?.name && vehicleToLend?.car_models?.name
+      ? `${vehicleToLend.car_brands.name} ${vehicleToLend.car_models.name}`
+      : 'le véhicule';
     toast({
       title: "Prêt enregistré",
-      description: `Le véhicule ${vehicleToLend?.brand} ${vehicleToLend?.model} a été prêté avec succès.`
+      description: `Le véhicule ${vehicleDisplay} a été prêté avec succès.`
     });
   };
 
