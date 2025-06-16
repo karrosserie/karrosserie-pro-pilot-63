@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -31,6 +32,9 @@ export type RepairOrder = Database['public']['Tables']['repair_orders']['Row'] &
   client_signature?: string | null;
   client_name_signature?: string | null;
   signature_date?: string | null;
+  description?: string | null;
+  current_mileage?: string | null;
+  claim_number?: string | null;
 };
 
 export type NewRepairOrder = Database['public']['Tables']['repair_orders']['Insert'];
