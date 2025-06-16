@@ -128,6 +128,8 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
               ? "Sélectionnez d'abord une marque" 
               : modelsLoading 
               ? "Chargement des modèles..."
+              : modelOptions.length === 0
+              ? "Aucun modèle disponible"
               : "Sélectionner un modèle"
           }
           searchPlaceholder="Rechercher un modèle..."
@@ -135,6 +137,9 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
         />
         {modelsLoading && formData.brand && (
           <p className="text-sm text-gray-500">Chargement des modèles...</p>
+        )}
+        {!modelsLoading && formData.brand && modelOptions.length === 0 && (
+          <p className="text-sm text-amber-600">Aucun modèle trouvé pour cette marque</p>
         )}
       </div>
     </div>
