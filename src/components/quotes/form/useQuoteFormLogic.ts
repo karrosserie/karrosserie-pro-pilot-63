@@ -9,9 +9,10 @@ import { generateNextQuoteNumber } from './utils/quoteNumber';
 
 interface UseQuoteFormLogicProps {
   quote?: Quote | null;
+  prefillData?: any;
 }
 
-export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
+export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps) => {
   const [formData, setFormData] = useState<Partial<Quote>>({
     reference: '',
     client_id: '',
@@ -105,14 +106,19 @@ export const useQuoteFormLogic = ({ quote }: UseQuoteFormLogicProps) => {
         setFormData(prev => ({
           ...prev,
           reference: nextNumber,
-          valid_until: today
+          valid_until: today,
+          // Appliquer les données de pré-remplissage si disponibles
+          ...(prefillData && {
+            client_id: prefillData.client_id || '',
+            vehicle_id: prefillData.vehicle_id || ''
+          })
         }));
       });
       setNotes('');
       setClaimNumber('');
       setCurrentMileage('');
     }
-  }, [quote]);
+  }, [quote, prefillData]);
 
   return {
     formData,
