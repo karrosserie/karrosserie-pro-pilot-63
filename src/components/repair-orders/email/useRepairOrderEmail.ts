@@ -1,10 +1,11 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { useCompany } from '@/hooks/use-company';
 import { RepairOrder, EmailFormData } from './types';
 
 export const useRepairOrderEmail = (repairOrder: RepairOrder | null, open: boolean) => {
   const { toast } = useToast();
+  const { companyData } = useCompany();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<EmailFormData>({
     recipient: '',
@@ -22,6 +23,8 @@ export const useRepairOrderEmail = (repairOrder: RepairOrder | null, open: boole
         ? `${repairOrder.vehicles.car_brands?.name || 'Marque inconnue'} ${repairOrder.vehicles.car_models?.name || 'Modèle inconnu'} - ${repairOrder.vehicles.license_plate}`
         : '';
 
+      const companyName = companyData?.name || 'L\'équipe';
+
       setFormData({
         recipient: repairOrder.clients?.email || '',
         subject: `Ordre de réparation ${repairOrder.reference || ''} - ${clientName}`,
@@ -34,10 +37,10 @@ Cet ordre de réparation détaille les travaux à effectuer sur votre véhicule.
 Si vous avez des questions concernant cet ordre de réparation, n'hésitez pas à nous contacter.
 
 Cordialement,
-L'équipe`
+${companyName}`
       });
     }
-  }, [open, repairOrder]);
+  }, [open, repairOrder, companyData?.name]);
 
   const updateFormData = (field: keyof EmailFormData, value: string) => {
     setFormData(prev => ({
