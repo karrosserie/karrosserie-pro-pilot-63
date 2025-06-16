@@ -92,6 +92,15 @@ const QuoteEmailDialog: React.FC<QuoteEmailDialogProps> = ({
       return;
     }
 
+    if (!message.trim()) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez saisir un message",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
     
     try {
@@ -142,7 +151,9 @@ const QuoteEmailDialog: React.FC<QuoteEmailDialogProps> = ({
         
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="recipient">Destinataire *</Label>
+            <Label htmlFor="recipient" required>
+              Destinataire
+            </Label>
             <Input
               id="recipient"
               type="email"
@@ -154,7 +165,9 @@ const QuoteEmailDialog: React.FC<QuoteEmailDialogProps> = ({
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="subject">Sujet *</Label>
+            <Label htmlFor="subject" required>
+              Sujet
+            </Label>
             <Input
               id="subject"
               placeholder="Sujet de l'e-mail"
@@ -165,7 +178,9 @@ const QuoteEmailDialog: React.FC<QuoteEmailDialogProps> = ({
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="message">Message</Label>
+            <Label htmlFor="message" required>
+              Message
+            </Label>
             <Textarea
               id="message"
               placeholder="Votre message..."
