@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,6 +10,11 @@ export function useVehiclesPage() {
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [statusFilter, setStatusFilter] = useState<string>('Tous');
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // États pour les nouveaux dialogues de documents
+  const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
+  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
+  const [selectedVehicleForDocument, setSelectedVehicleForDocument] = useState<any>(null);
   
   const { vehicles, isLoading, error, createVehicle, updateVehicle, deleteVehicle } = useVehicles();
   const { carBrands } = useCarBrands();
@@ -38,6 +42,19 @@ export function useVehiclesPage() {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?')) {
       deleteVehicle.mutate(vehicleId);
     }
+  };
+
+  // Nouveaux handlers pour les documents
+  const handleCreateQuote = (vehicle: any) => {
+    console.log('Opening quote dialog for vehicle:', vehicle);
+    setSelectedVehicleForDocument(vehicle);
+    setQuoteDialogOpen(true);
+  };
+
+  const handleCreateInvoice = (vehicle: any) => {
+    console.log('Opening invoice dialog for vehicle:', vehicle);
+    setSelectedVehicleForDocument(vehicle);
+    setInvoiceDialogOpen(true);
   };
 
   const handleVehicleSubmit = (data: any) => {
@@ -158,6 +175,14 @@ export function useVehiclesPage() {
     isLoading,
     error,
     
+    // Document dialog state
+    quoteDialogOpen,
+    setQuoteDialogOpen,
+    invoiceDialogOpen,
+    setInvoiceDialogOpen,
+    selectedVehicleForDocument,
+    setSelectedVehicleForDocument,
+    
     // Setters
     setDialogOpen,
     setStatusFilter,
@@ -169,5 +194,7 @@ export function useVehiclesPage() {
     handleEditVehicle,
     handleDeleteVehicle,
     handleVehicleSubmit,
+    handleCreateQuote,
+    handleCreateInvoice,
   };
 }

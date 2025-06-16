@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 import { VehicleStatus } from '@/types/vehicle';
@@ -13,6 +12,7 @@ export type Vehicle = Database['public']['Tables']['vehicles']['Row'] & {
     name: string;
   };
   clients?: {
+    id: string;
     first_name: string;
     last_name: string;
   };
@@ -29,7 +29,7 @@ export const vehiclesService = {
         *,
         car_brands(id, name),
         car_models(id, name),
-        clients(first_name, last_name)
+        clients(id, first_name, last_name)
       `)
       .order('created_at', { ascending: false });
 
