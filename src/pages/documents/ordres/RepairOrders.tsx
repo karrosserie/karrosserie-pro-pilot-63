@@ -41,8 +41,8 @@ const RepairOrders = () => {
     
     // Search by vehicle info
     if (order.vehicles) {
-      const brand = order.vehicles.brand || order.vehicles.car_brands?.name || '';
-      const model = order.vehicles.model || order.vehicles.car_models?.name || '';
+      const brand = order.vehicles.car_brands?.name || '';
+      const model = order.vehicles.car_models?.name || '';
       const licensePlate = order.vehicles.license_plate || '';
       const vehicleInfo = `${brand} ${model} - ${licensePlate}`.toLowerCase();
       
