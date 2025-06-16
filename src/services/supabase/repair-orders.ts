@@ -12,6 +12,8 @@ export type RepairOrder = Database['public']['Tables']['repair_orders']['Row'] &
   vehicles?: {
     id: string;
     license_plate: string;
+    brand: string;
+    model: string;
     car_brands?: {
       id: string;
       name: string;
@@ -71,13 +73,15 @@ export const repairOrdersService = {
           clientData = client;
         }
 
-        // Try to get vehicle data with brands and models
+        // Try to get vehicle data with brands and models, including the brand and model fields
         if (order.vehicle_id) {
           const { data: vehicle } = await supabase
             .from('vehicles')
             .select(`
               id, 
               license_plate,
+              brand,
+              model,
               car_brands(id, name),
               car_models(id, name)
             `)

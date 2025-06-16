@@ -22,7 +22,16 @@ export const RepairOrderSelector = ({
 
   const formatRepairOrderDisplay = (order: any) => {
     const clientName = order.clients ? `${order.clients.first_name} ${order.clients.last_name}` : 'Client non assigné';
-    const vehicleInfo = order.vehicles ? `${order.vehicles.brand} ${order.vehicles.model} - ${order.vehicles.license_plate}` : 'Véhicule non assigné';
+    
+    // Utiliser d'abord les champs brand et model directs, puis fallback sur les relations
+    let vehicleInfo = 'Véhicule non assigné';
+    if (order.vehicles) {
+      const brand = order.vehicles.brand || order.vehicles.car_brands?.name || 'Marque inconnue';
+      const model = order.vehicles.model || order.vehicles.car_models?.name || 'Modèle inconnu';
+      const licensePlate = order.vehicles.license_plate || '';
+      vehicleInfo = `${brand} ${model} - ${licensePlate}`;
+    }
+    
     const orderDate = order.created_at ? format(new Date(order.created_at), 'dd/MM/yyyy', { locale: fr }) : '';
     
     return `Ordre n°${order.reference} du ${orderDate} - ${clientName} - ${vehicleInfo}`;
