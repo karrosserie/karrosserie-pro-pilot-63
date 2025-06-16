@@ -102,7 +102,12 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
           >
             Annuler
           </Button>
-          <Button type="submit">Enregistrer</Button>
+          <Button 
+            type="submit"
+            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
+          >
+            Enregistrer
+          </Button>
         </div>
       </form>
     </Form>

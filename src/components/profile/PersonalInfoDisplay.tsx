@@ -50,7 +50,10 @@ export const PersonalInfoDisplay: React.FC<PersonalInfoDisplayProps> = ({
       </div>
       
       <div className="flex justify-end">
-        <Button onClick={onEdit}>
+        <Button 
+          onClick={onEdit}
+          className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
+        >
           Modifier
         </Button>
       </div>

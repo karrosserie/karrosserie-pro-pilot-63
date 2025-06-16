@@ -535,7 +535,7 @@ const Documents = () => {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button className="btn-primary">
+              <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white">
                 <FileText className="h-4 w-4 mr-2" />
                 Nouveau
               </Button>

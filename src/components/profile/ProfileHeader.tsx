@@ -14,7 +14,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile, user }) =
     <div className="flex items-center gap-6 mb-6">
       <Avatar className="h-20 w-20">
         <AvatarImage src={profile?.avatar_url || ''} />
-        <AvatarFallback className="bg-primary text-xl">
+        <AvatarFallback className="bg-karrosserie-orange text-white text-xl">
           {profile?.first_name?.[0]}{profile?.last_name?.[0]}
         </AvatarFallback>
       </Avatar>
