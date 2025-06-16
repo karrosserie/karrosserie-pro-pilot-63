@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
+import { useCompany } from '@/hooks/use-company';
 import { useClients } from "@/hooks/use-clients";
 import { Quote, EmailFormData } from './types';
 
@@ -12,6 +13,7 @@ export const useQuoteEmail = (quote: Quote | null, open: boolean) => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { companyData } = useCompany();
   const { clients } = useClients();
 
   useEffect(() => {
@@ -27,21 +29,32 @@ export const useQuoteEmail = (quote: Quote | null, open: boolean) => {
       const clientEmail = fullClientData?.email || quote.clients?.email || '';
       console.log('Final client email to use:', clientEmail);
       
-      // Pré-remplir le sujet
-      const licensePlate = quote.vehicles?.license_plate || 'véhicule';
-      
-      // Pré-remplir le message
       const clientName = quote.clients 
         ? `${quote.clients.first_name} ${quote.clients.last_name}`
-        : 'client';
+        : '';
+      
+      const vehicleInfo = quote.vehicles 
+        ? `${quote.vehicles.car_brands?.name || 'Marque inconnue'} ${quote.vehicles.car_models?.name || 'Modèle inconnu'} - ${quote.vehicles.license_plate}`
+        : '';
+
+      const companyName = companyData?.name || 'L\'équipe';
 
       setFormData({
         recipient: clientEmail,
-        subject: `Devis pour le véhicule ${licensePlate}`,
-        message: `Veuillez trouver ci-joint le devis pour le véhicule immatriculé ${licensePlate} appartenant à ${clientName}.`
+        subject: `Devis ${quote.reference || ''} - ${clientName}`,
+        message: `Bonjour ${clientName},
+
+Veuillez trouver en pièce jointe le devis ${quote.reference || ''} pour votre véhicule ${vehicleInfo}.
+
+Ce devis détaille les travaux proposés pour votre véhicule.
+
+Si vous avez des questions concernant ce devis, n'hésitez pas à nous contacter.
+
+Cordialement,
+${companyName}`
       });
     }
-  }, [quote, open, clients]);
+  }, [quote, open, clients, companyData?.name]);
 
   const updateFormData = (field: keyof EmailFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
