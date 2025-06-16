@@ -130,13 +130,9 @@ const RepairOrderSignatureDialog: React.FC<RepairOrderSignatureDialogProps> = ({
           {/* Legal notice */}
           <div className="space-y-4 text-sm text-muted-foreground">
             <p>
-              La signature électronique a la même valeur légale qu'une signature manuscrite.
-            </p>
-            <p>
-              Exigence issue du Règlement eIDAS et du Code civil français, art. 1366-1367).
-            </p>
-            <p>
-              Toute modification du présent document nécessitera une nouvelle signature du client
+              La signature électronique a la même valeur légale qu'une signature manuscrite.<br/>
+              Exigence issue du Règlement eIDAS et du Code civil français, art. 1366-1367).<br/>
+              Toute modification du présent document nécessitera une nouvelle signature du client.
             </p>
           </div>
 
