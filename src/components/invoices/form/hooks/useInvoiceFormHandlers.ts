@@ -31,7 +31,7 @@ export const useInvoiceFormHandlers = ({
 }: UseInvoiceFormHandlersProps) => {
   const validateForm = () => {
     const validationResult = validateInvoiceForm(formData, claimNumber, currentMileage);
-    setErrors(validationResult.errors);
+    setErrors(() => validationResult.errors);
     return validationResult.isValid;
   };
 
