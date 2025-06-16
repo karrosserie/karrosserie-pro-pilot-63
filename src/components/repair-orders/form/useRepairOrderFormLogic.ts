@@ -47,8 +47,11 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
   };
 
   useEffect(() => {
-    if (order) {
-      console.log('Loading order data:', order);
+    // Vérifier si c'est un ordre existant (avec un ID) ou une création avec pré-remplissage
+    const isExistingOrder = order && order.id;
+    
+    if (isExistingOrder) {
+      console.log('Loading existing order data:', order);
       
       // Charger toutes les données de l'ordre en une seule fois
       const initialData = {
@@ -93,18 +96,41 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
         status: order.status || 'En cours'
       });
     } else {
+      // Nouvel ordre ou ordre avec pré-remplissage (sans ID)
       const today = new Date().toISOString().split('T')[0];
       
       generateNextOrderNumber().then(nextNumber => {
         setFormData(prev => ({
           ...prev,
           reference: nextNumber,
-          start_date: today
+          start_date: today,
+          // Appliquer les données de pré-remplissage si disponibles
+          ...(order && {
+            client_id: order.client_id || null,
+            vehicle_id: order.vehicle_id || null,
+            status: order.status || 'En cours',
+            notes: order.notes || ''
+          })
         }));
       });
-      setDescription('');
-      setClaimNumber('');
-      setCurrentMileage('');
+      
+      // Si on a des données de pré-remplissage avec des notes (comme d'un devis converti)
+      if (order && order.notes) {
+        const noteData = parseOrderNotes(order.notes);
+        setDescription(noteData.description || noteData.notes || '');
+        setClaimNumber(noteData.claimNumber || '');
+        setCurrentMileage(noteData.currentMileage || '');
+        if (noteData.repairs) setRepairs(noteData.repairs);
+        if (noteData.parts) setParts(noteData.parts);
+        if (noteData.discounts) setDiscounts(noteData.discounts);
+      } else {
+        setDescription('');
+        setClaimNumber('');
+        setCurrentMileage('');
+        setRepairs([]);
+        setParts([]);
+        setDiscounts([]);
+      }
     }
   }, [order]);
 

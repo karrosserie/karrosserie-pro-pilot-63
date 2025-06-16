@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -108,15 +109,14 @@ const Quotes = () => {
       status: 'En cours',
       start_date: today,
       notes: quote.notes || '',
-      // Les données spécifiques comme repairs, parts, discounts seront gérées dans le formulaire
-      // à partir des données du devis si elles sont stockées dans notes ou une structure JSON
+      // Ne pas inclure l'ID pour forcer la création d'un nouvel ordre
     };
 
     console.log('Converting quote to repair order with data:', prefilledData);
     console.log('Original quote data:', quote);
 
-    // Passer null au lieu de prefilledData pour forcer la création d'un nouvel ordre
-    setPrefilledRepairOrder(null);
+    // Passer les données de pré-remplissage pour la création d'un nouvel ordre
+    setPrefilledRepairOrder(prefilledData);
     setRepairOrderDialogOpen(true);
   };
   
