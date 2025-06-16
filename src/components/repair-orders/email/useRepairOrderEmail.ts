@@ -27,10 +27,10 @@ export const useRepairOrderEmail = (repairOrder: RepairOrder | null, open: boole
 
       setFormData({
         recipient: repairOrder.clients?.email || '',
-        subject: `Ordre de réparation ${repairOrder.reference || ''} - ${clientName}`,
+        subject: `Ordre de réparation n°${repairOrder.reference || ''} - ${clientName}`,
         message: `Bonjour ${clientName},
 
-Veuillez trouver en pièce jointe l'ordre de réparation ${repairOrder.reference || ''} pour votre véhicule ${vehicleInfo}.
+Veuillez trouver en pièce jointe l'ordre de réparation n°${repairOrder.reference || ''} pour votre véhicule ${vehicleInfo}.
 
 Cet ordre de réparation détaille les travaux à effectuer sur votre véhicule.
 

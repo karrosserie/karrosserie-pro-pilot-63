@@ -41,10 +41,10 @@ export const useQuoteEmail = (quote: Quote | null, open: boolean) => {
 
       setFormData({
         recipient: clientEmail,
-        subject: `Devis ${quote.reference || ''} - ${clientName}`,
+        subject: `Devis n°${quote.reference || ''} - ${clientName}`,
         message: `Bonjour ${clientName},
 
-Veuillez trouver en pièce jointe le devis ${quote.reference || ''} pour votre véhicule ${vehicleInfo}.
+Veuillez trouver en pièce jointe le devis n°${quote.reference || ''} pour votre véhicule ${vehicleInfo}.
 
 Ce devis détaille les travaux proposés pour votre véhicule.
 
