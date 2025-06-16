@@ -10,6 +10,8 @@ export type FleetVehicle = Database['public']['Tables']['fleet_vehicles']['Row']
   registration_front_url?: string;
   registration_back_url?: string;
   insurance_card_url?: string;
+  brand_id?: string;
+  model_id?: string;
   car_brands?: {
     id: string;
     name: string;
@@ -28,6 +30,8 @@ export type NewFleetVehicle = Database['public']['Tables']['fleet_vehicles']['In
   registration_front_url?: string;
   registration_back_url?: string;
   insurance_card_url?: string;
+  brand_id?: string;
+  model_id?: string;
 };
 
 export type UpdateFleetVehicle = Database['public']['Tables']['fleet_vehicles']['Update'] & {
@@ -38,6 +42,8 @@ export type UpdateFleetVehicle = Database['public']['Tables']['fleet_vehicles'][
   registration_front_url?: string;
   registration_back_url?: string;
   insurance_card_url?: string;
+  brand_id?: string;
+  model_id?: string;
 };
 
 export const fleetVehiclesService = {
