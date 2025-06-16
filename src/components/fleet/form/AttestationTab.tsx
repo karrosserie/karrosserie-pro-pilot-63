@@ -2,7 +2,7 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { SignaturePad } from '@/components/shared/SignaturePad';
+import SignaturePad from '@/components/shared/SignaturePad';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 
 interface AttestationTabProps {
@@ -42,7 +42,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
         type: 'checkbox',
         checked: checked
       }
-    } as React.ChangeEvent<HTMLInputElement>;
+    } as unknown as React.ChangeEvent<HTMLInputElement>;
     
     onInputChange(syntheticEvent);
   };
@@ -102,10 +102,8 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
           <div className="border rounded-lg p-4 bg-white">
             <SignaturePad
               value={formData.clientSignature || ''}
-              onChange={onSignatureChange}
+              onSignatureChange={onSignatureChange}
               disabled={isViewMode}
-              width="100%"
-              height="200px"
             />
           </div>
           {!isViewMode && (
