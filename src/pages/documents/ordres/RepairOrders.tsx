@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { RepairOrdersHeader } from '@/components/repair-orders/RepairOrdersHeader';
 import { RepairOrdersTable } from '@/components/repair-orders/RepairOrdersTable';
@@ -20,7 +21,7 @@ const RepairOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState<RepairOrder | null>(null);
   const [selectedOrderForEmail, setSelectedOrderForEmail] = useState<RepairOrder | null>(null);
   const [selectedOrderForSignature, setSelectedOrderForSignature] = useState<RepairOrder | null>(null);
-  const [selectedOrderForInvoice, setSelectedOrderForInvoice] = useState<RepairOrder | null>(null);
+  const [selectedOrderForInvoice, setSelectedOrderForInvoice] = useState<any>(null);
   const { toast } = useToast();
   
   const { orders, isLoading, error } = useRepairOrders();
