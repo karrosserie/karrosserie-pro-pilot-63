@@ -20,9 +20,15 @@ export interface Credit {
   } | null;
   vehicles?: {
     id: string;
-    brand: string;
-    model: string;
     license_plate: string;
+    car_brands: {
+      id: string;
+      name: string;
+    };
+    car_models: {
+      id: string;
+      name: string;
+    };
   } | null;
   invoices?: {
     id: string;
