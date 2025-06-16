@@ -71,6 +71,29 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
     }
   };
 
+  // Fonction pour préparer les données de soumission
+  const prepareInvoiceSubmitData = () => {
+    console.log('Preparing submit data with:', {
+      formData,
+      description,
+      claimNumber,
+      currentMileage,
+      repairs,
+      parts,
+      discounts
+    });
+
+    return {
+      ...formData,
+      description,
+      claim_number: claimNumber,
+      current_mileage: currentMileage,
+      repairs_data: repairs,
+      parts_data: parts,
+      discounts_data: discounts
+    };
+  };
+
   useEffect(() => {
     const initializeForm = async () => {
       console.log('Invoice form initializing with invoice:', invoice);
@@ -177,6 +200,6 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
     handleCurrentMileageChange,
     validateForm,
     calculateGlobalTotals: () => calculateGlobalTotals(repairs, parts, discounts),
-    prepareSubmitData: () => prepareSubmitData(formData, description, claimNumber, currentMileage, repairs, parts, discounts)
+    prepareSubmitData: prepareInvoiceSubmitData
   };
 };
