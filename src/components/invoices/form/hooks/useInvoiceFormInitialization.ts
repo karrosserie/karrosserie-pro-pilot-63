@@ -43,13 +43,72 @@ export const useInvoiceFormInitialization = ({
           payment_details: invoice.payment_details || ''
         }));
         
-        const parsedData = parseInvoiceNotes(invoice.notes || '');
-        setDescription(parsedData.description);
-        setClaimNumber(parsedData.claimNumber);
-        setCurrentMileage(parsedData.currentMileage);
-        setRepairs(parsedData.repairs);
-        setParts(parsedData.parts);
-        setDiscounts(parsedData.discounts);
+        // Pour une facture existante, récupérer les données directement depuis les champs de la facture
+        console.log('Loading existing invoice data:', {
+          description: invoice.description,
+          claim_number: invoice.claim_number,
+          current_mileage: invoice.current_mileage,
+          repairs_data: invoice.repairs_data,
+          parts_data: invoice.parts_data,
+          discounts_data: invoice.discounts_data
+        });
+
+        setDescription(invoice.description || '');
+        setClaimNumber(invoice.claim_number || '');
+        setCurrentMileage(invoice.current_mileage || '');
+        
+        // Traiter les données de réparations, pièces et remises
+        let repairsData: InvoiceRepairItem[] = [];
+        let partsData: InvoicePartItem[] = [];
+        let discountsData: InvoiceDiscountItem[] = [];
+
+        try {
+          // Gérer les repairs_data (peut être string ou array)
+          if (invoice.repairs_data) {
+            if (typeof invoice.repairs_data === 'string') {
+              repairsData = JSON.parse(invoice.repairs_data);
+            } else if (Array.isArray(invoice.repairs_data)) {
+              repairsData = invoice.repairs_data;
+            }
+          }
+
+          // Gérer les parts_data (peut être string ou array)
+          if (invoice.parts_data) {
+            if (typeof invoice.parts_data === 'string') {
+              partsData = JSON.parse(invoice.parts_data);
+            } else if (Array.isArray(invoice.parts_data)) {
+              partsData = invoice.parts_data;
+            }
+          }
+
+          // Gérer les discounts_data (peut être string ou array)
+          if (invoice.discounts_data) {
+            if (typeof invoice.discounts_data === 'string') {
+              discountsData = JSON.parse(invoice.discounts_data);
+            } else if (Array.isArray(invoice.discounts_data)) {
+              discountsData = invoice.discounts_data;
+            }
+          }
+        } catch (error) {
+          console.error('Error parsing invoice data:', error);
+          // En cas d'erreur, essayer de parser depuis les notes comme fallback
+          if (invoice.notes) {
+            const parsedData = parseInvoiceNotes(invoice.notes);
+            repairsData = parsedData.repairs || [];
+            partsData = parsedData.parts || [];
+            discountsData = parsedData.discounts || [];
+          }
+        }
+
+        console.log('Setting parsed data:', {
+          repairs: repairsData,
+          parts: partsData,
+          discounts: discountsData
+        });
+
+        setRepairs(repairsData);
+        setParts(partsData);
+        setDiscounts(discountsData);
       } else {
         console.log('New invoice or prefilled data, generating number...');
         // Pour une nouvelle facture, générer automatiquement le numéro
