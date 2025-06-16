@@ -3,8 +3,9 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Pencil, Trash2, MoreVertical, FileText, Receipt } from 'lucide-react';
+import { Eye, Pencil, Trash2, MoreVertical, FileText, Receipt, Car, User } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { StatusBadge } from '@/components/ui/status-badge';
 
 interface Vehicle {
   id: string;
@@ -14,6 +15,10 @@ interface Vehicle {
   color?: string;
   mileage?: number;
   client_id?: string;
+  vehicle_image_url?: string;
+  vehicle_images?: string;
+  registration_document_front_url?: string;
+  registration_document_back_url?: string;
   car_brands?: {
     id: string;
     name: string;
@@ -60,22 +65,103 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
     onCreateInvoice?.(vehicle);
   };
 
+  const getFirstImage = (vehicle: Vehicle) => {
+    if (vehicle.vehicle_image_url) return vehicle.vehicle_image_url;
+    
+    if (vehicle.vehicle_images) {
+      try {
+        const parsed = JSON.parse(vehicle.vehicle_images);
+        return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
+      } catch {
+        return null;
+      }
+    }
+    
+    return null;
+  };
+
+  const hasCompleteRegistration = (vehicle: Vehicle) => {
+    return vehicle.registration_document_front_url && 
+           vehicle.registration_document_front_url.trim() !== '' && 
+           vehicle.registration_document_back_url && 
+           vehicle.registration_document_back_url.trim() !== '';
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {vehicles.map((vehicle) => (
-        <Card key={vehicle.id} className="hover:shadow-lg transition-shadow">
-          <CardHeader className="pb-3">
-            <div className="flex justify-between items-start">
-              <CardTitle className="text-lg font-semibold">
+      {vehicles.map((vehicle) => {
+        const firstImage = getFirstImage(vehicle);
+        const hasRegistration = hasCompleteRegistration(vehicle);
+        
+        return (
+          <div key={vehicle.id} className="card-container flex flex-col h-full animate-fade-in">
+            <div className="relative h-40 bg-gray-100 rounded-lg mb-4 overflow-hidden">
+              {firstImage ? (
+                <img 
+                  src={firstImage} 
+                  alt={`${vehicle.car_brands?.name} ${vehicle.car_models?.name}`} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-400">
+                  <Car className="h-12 w-12" />
+                </div>
+              )}
+              <div className="absolute top-2 right-2">
+                <span className="text-xs font-medium px-2.5 py-0.5 rounded bg-blue-100 text-blue-800">
+                  En attente
+                </span>
+              </div>
+            </div>
+            
+            <div className="flex-1">
+              <h3 className="font-bold text-gray-800 text-lg">
                 {vehicle.car_brands?.name} {vehicle.car_models?.name}
-              </CardTitle>
+              </h3>
+              
+              <div className="flex items-center mt-2 text-sm text-gray-600">
+                <Car className="h-4 w-4 mr-1" />
+                <span>{vehicle.license_plate}</span>
+              </div>
+              
+              <div className="flex items-center mt-2 text-sm text-gray-600">
+                <User className="h-4 w-4 mr-1" />
+                <span>Client: {vehicle.clients?.first_name} {vehicle.clients?.last_name}</span>
+              </div>
+              
+              <div className="mt-2">
+                <StatusBadge 
+                  status={hasRegistration ? "Certificat d'immatriculation importé" : "Pas de certificat d'immatriculation"}
+                  className={hasRegistration ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-amber-100 text-amber-800 hover:bg-amber-100"}
+                />
+              </div>
+            </div>
+            
+            <div className="border-t border-gray-100 mt-4 pt-4 flex justify-between items-center">
+              <div className="flex space-x-1">
+                <Button variant="ghost" size="icon" onClick={() => onViewVehicle(vehicle)}>
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => onEditVehicle(vehicle)}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="text-red-500 hover:text-red-700" 
+                  onClick={() => onDeleteVehicle(vehicle.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+              
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon">
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 bg-white border shadow-lg z-50">
+                <DropdownMenuContent className="w-56 bg-white border shadow-lg z-50" align="end">
                   <DropdownMenuItem onClick={(e) => handleCreateQuote(e, vehicle)} className="cursor-pointer">
                     <FileText className="h-4 w-4 mr-2" />
                     Créer un devis
@@ -87,63 +173,9 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <div className="text-sm text-gray-600">
-              {vehicle.clients?.first_name} {vehicle.clients?.last_name}
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Plaque:</span>
-                <Badge variant="outline">{vehicle.license_plate}</Badge>
-              </div>
-              {vehicle.year && (
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Année:</span>
-                  <span className="text-sm">{vehicle.year}</span>
-                </div>
-              )}
-              {vehicle.color && (
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Couleur:</span>
-                  <div className="flex items-center">
-                    <div 
-                      className="w-4 h-4 rounded-full mr-2 border" 
-                      style={{ backgroundColor: vehicle.color }} 
-                    />
-                    <span className="text-sm">{vehicle.color}</span>
-                  </div>
-                </div>
-              )}
-              {vehicle.mileage && (
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Kilométrage:</span>
-                  <span className="text-sm">{vehicle.mileage.toLocaleString()} km</span>
-                </div>
-              )}
-            </div>
-            <div className="flex space-x-2 mt-4">
-              <Button variant="outline" size="sm" onClick={() => onViewVehicle(vehicle)}>
-                <Eye className="h-4 w-4 mr-1" />
-                Voir
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => onEditVehicle(vehicle)}>
-                <Pencil className="h-4 w-4 mr-1" />
-                Modifier
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="text-red-600 hover:text-red-700" 
-                onClick={() => onDeleteVehicle(vehicle.id)}
-              >
-                <Trash2 className="h-4 w-4 mr-1" />
-                Supprimer
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+          </div>
+        );
+      })}
     </div>
   );
 };
