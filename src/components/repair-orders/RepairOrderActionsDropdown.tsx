@@ -24,6 +24,8 @@ interface RepairOrderActionsDropdownProps {
 }
 
 export const RepairOrderActionsDropdown = ({ order, contextMenuProps }: RepairOrderActionsDropdownProps) => {
+  const isAlreadySigned = order.status === 'Signé';
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -45,10 +47,12 @@ export const RepairOrderActionsDropdown = ({ order, contextMenuProps }: RepairOr
           Envoyer par e-mail
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => contextMenuProps?.onSignOrder?.(order)}>
-          <Signature className="mr-2 h-4 w-4" />
-          Signature du client
-        </DropdownMenuItem>
+        {!isAlreadySigned && (
+          <DropdownMenuItem onClick={() => contextMenuProps?.onSignOrder?.(order)}>
+            <Signature className="mr-2 h-4 w-4" />
+            Signature du client
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onClick={() => contextMenuProps?.onRequestDocuments?.(order)}>
           <FileCheck className="mr-2 h-4 w-4" />
           Demander les justificatifs
