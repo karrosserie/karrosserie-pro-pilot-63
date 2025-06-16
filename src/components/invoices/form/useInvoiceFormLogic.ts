@@ -97,7 +97,7 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
         setParts(parsedData.parts);
         setDiscounts(parsedData.discounts);
       } else {
-        console.log('New invoice, generating number...');
+        console.log('New invoice or prefilled data, generating number...');
         // Pour une nouvelle facture, générer automatiquement le numéro
         const today = new Date().toISOString().split('T')[0];
         
@@ -109,10 +109,30 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
             reference: nextNumber,
             client_id: invoice?.client_id || '',
             vehicle_id: invoice?.vehicle_id || '',
+            repair_order_id: invoice?.repair_order_id || null,
             status: 'En attente de paiement',
             due_date: today,
             payment_details: ''
           });
+          
+          // Si des notes sont fournies (depuis un ordre de réparation), les parser
+          if (invoice?.notes) {
+            console.log('Parsing notes from repair order:', invoice.notes);
+            const parsedData = parseInvoiceNotes(invoice.notes);
+            setDescription(parsedData.description || '');
+            setClaimNumber(parsedData.claimNumber || '');
+            setCurrentMileage(parsedData.currentMileage || '');
+            setRepairs(parsedData.repairs || []);
+            setParts(parsedData.parts || []);
+            setDiscounts(parsedData.discounts || []);
+          } else {
+            setDescription('');
+            setClaimNumber('');
+            setCurrentMileage('');
+            setRepairs([]);
+            setParts([]);
+            setDiscounts([]);
+          }
           
           console.log('Form data set with generated number:', nextNumber);
         } catch (error) {
@@ -121,19 +141,13 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
             reference: '1',
             client_id: invoice?.client_id || '',
             vehicle_id: invoice?.vehicle_id || '',
+            repair_order_id: invoice?.repair_order_id || null,
             status: 'En attente de paiement',
             due_date: today,
             payment_details: ''
           });
           console.log('Set fallback form data with 1');
         }
-        
-        setDescription('');
-        setClaimNumber('');
-        setCurrentMileage('');
-        setRepairs([]);
-        setParts([]);
-        setDiscounts([]);
       }
     };
 
