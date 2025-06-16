@@ -90,6 +90,42 @@ const transformLegacyVehicle = (vehicle: any): FleetVehicle => {
   };
 };
 
+// Helper function to transform new data to legacy format for database operations
+const transformToLegacyFormat = async (data: NewFleetVehicle | UpdateFleetVehicle) => {
+  const legacyData = { ...data };
+  
+  // Get brand and model names from IDs if they exist
+  if ('brand_id' in data && data.brand_id) {
+    const brandResult = await supabase
+      .from('car_brands')
+      .select('name')
+      .eq('id', data.brand_id)
+      .single();
+    
+    if (brandResult.data) {
+      legacyData.brand = brandResult.data.name;
+    }
+  }
+  
+  if ('model_id' in data && data.model_id) {
+    const modelResult = await supabase
+      .from('car_models')
+      .select('name')
+      .eq('id', data.model_id)
+      .single();
+    
+    if (modelResult.data) {
+      legacyData.model = modelResult.data.name;
+    }
+  }
+  
+  // Remove the new fields that don't exist in legacy schema
+  delete legacyData.brand_id;
+  delete legacyData.model_id;
+  
+  return legacyData;
+};
+
 export const fleetVehiclesService = {
   getAll: async () => {
     console.log('Fetching fleet vehicles with relations');
@@ -170,48 +206,14 @@ export const fleetVehiclesService = {
   create: async (vehicle: NewFleetVehicle) => {
     console.log('Creating fleet vehicle:', vehicle);
     
-    // Try creating with new structure first
-    let { data, error } = await supabase
-      .from('fleet_vehicles')
-      .insert(vehicle)
-      .select(`
-        *,
-        car_brands(id, name),
-        car_models(id, name)
-      `)
-      .single();
+    // Transform to legacy format for database insertion
+    const legacyVehicle = await transformToLegacyFormat(vehicle);
     
-    // If that fails due to missing columns, try legacy structure
-    if (error && error.message.includes('column')) {
-      console.log('Trying legacy fleet_vehicles structure for creation');
-      
-      // For legacy structure, we'll need to get brand/model names
-      const [brandResult, modelResult] = await Promise.all([
-        supabase.from('car_brands').select('name').eq('id', vehicle.brand_id).single(),
-        supabase.from('car_models').select('name').eq('id', vehicle.model_id).single()
-      ]);
-      
-      const legacyVehicle = {
-        ...vehicle,
-        brand: brandResult.data?.name || '',
-        model: modelResult.data?.name || ''
-      };
-      
-      const legacyResult = await supabase
-        .from('fleet_vehicles')
-        .insert(legacyVehicle)
-        .select('*')
-        .single();
-      
-      if (legacyResult.error) {
-        console.error('Error creating fleet vehicle (legacy):', legacyResult.error);
-        throw new Error(legacyResult.error.message);
-      }
-      
-      const transformedData = transformLegacyVehicle(legacyResult.data);
-      console.log('Fleet vehicle created successfully (legacy):', transformedData);
-      return transformedData;
-    }
+    const { data, error } = await supabase
+      .from('fleet_vehicles')
+      .insert(legacyVehicle)
+      .select('*')
+      .single();
     
     if (error) {
       console.error('Error creating fleet vehicle:', error);
@@ -226,59 +228,15 @@ export const fleetVehiclesService = {
   update: async (id: string, vehicle: UpdateFleetVehicle) => {
     console.log(`Updating fleet vehicle with id ${id}:`, vehicle);
     
-    // Try updating with new structure first
-    let { data, error } = await supabase
-      .from('fleet_vehicles')
-      .update(vehicle)
-      .eq('id', id)
-      .select(`
-        *,
-        car_brands(id, name),
-        car_models(id, name)
-      `)
-      .single();
+    // Transform to legacy format for database update
+    const legacyVehicle = await transformToLegacyFormat(vehicle);
     
-    // If that fails due to missing columns, try legacy structure
-    if (error && error.message.includes('column')) {
-      console.log('Trying legacy fleet_vehicles structure for update');
-      
-      let legacyVehicle = { ...vehicle };
-      
-      // Convert brand_id/model_id to brand/model names if needed
-      if (vehicle.brand_id || vehicle.model_id) {
-        const promises = [];
-        if (vehicle.brand_id) {
-          promises.push(supabase.from('car_brands').select('name').eq('id', vehicle.brand_id).single());
-        }
-        if (vehicle.model_id) {
-          promises.push(supabase.from('car_models').select('name').eq('id', vehicle.model_id).single());
-        }
-        
-        const results = await Promise.all(promises);
-        if (vehicle.brand_id && results[0]?.data) {
-          legacyVehicle.brand = results[0].data.name;
-        }
-        if (vehicle.model_id && results[results.length - 1]?.data) {
-          legacyVehicle.model = results[results.length - 1].data.name;
-        }
-      }
-      
-      const legacyResult = await supabase
-        .from('fleet_vehicles')
-        .update(legacyVehicle)
-        .eq('id', id)
-        .select('*')
-        .single();
-      
-      if (legacyResult.error) {
-        console.error(`Error updating fleet vehicle with id ${id} (legacy):`, legacyResult.error);
-        throw new Error(legacyResult.error.message);
-      }
-      
-      const transformedData = transformLegacyVehicle(legacyResult.data);
-      console.log('Fleet vehicle updated successfully (legacy):', transformedData);
-      return transformedData;
-    }
+    const { data, error } = await supabase
+      .from('fleet_vehicles')
+      .update(legacyVehicle)
+      .eq('id', id)
+      .select('*')
+      .single();
     
     if (error) {
       console.error(`Error updating fleet vehicle with id ${id}:`, error);
