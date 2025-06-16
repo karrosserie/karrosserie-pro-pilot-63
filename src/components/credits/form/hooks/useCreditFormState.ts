@@ -85,6 +85,7 @@ export const useCreditFormState = () => {
     updateItem,
     removeItem,
     calculateTotal,
-    setErrors
+    setErrors,
+    setFormData
   };
 };
