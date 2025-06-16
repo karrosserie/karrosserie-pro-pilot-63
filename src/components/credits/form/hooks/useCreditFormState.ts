@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { CreditFormData, CreditItem } from '../types';
-import { generateNextCreditNumber } from '../utils/creditFormUtils';
+import { creditsService } from '@/services/supabase/credits';
 
 export const useCreditFormState = () => {
   const [formData, setFormData] = useState<CreditFormData>({
@@ -19,11 +20,12 @@ export const useCreditFormState = () => {
   useEffect(() => {
     const generateReference = async () => {
       try {
-        const reference = await generateNextCreditNumber();
+        const reference = await creditsService.generateReference();
         setFormData(prev => ({ ...prev, reference }));
       } catch (error) {
         console.error('Error generating reference:', error);
-        setFormData(prev => ({ ...prev, reference: '1' }));
+        const currentYear = new Date().getFullYear();
+        setFormData(prev => ({ ...prev, reference: `AV${currentYear}-001` }));
       }
     };
 

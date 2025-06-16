@@ -1,108 +1,139 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { CreditCreateData, CreditUpdateData } from './types';
+import { Credit, CreditCreateData, CreditUpdateData } from './types';
 
-export const createCredit = async (creditData: CreditCreateData) => {
-  const { data: { user } } = await supabase.auth.getUser();
+export const createCredit = async (creditData: CreditCreateData): Promise<Credit> => {
+  console.log('Creating credit with data:', creditData);
   
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
+    console.error('User not authenticated');
     throw new Error('User not authenticated');
   }
 
-  const { data, error } = await supabase
-    .from('credits')
-    .insert([{
-      ...creditData,
-      user_id: user.id
-    }])
-    .select(`
-      *,
-      clients(first_name, last_name),
-      vehicles(
-        id,
-        license_plate,
-        car_brands(id, name),
-        car_models(id, name)
-      )
-    `)
-    .single();
+  console.log('User authenticated:', user.id);
 
-  if (error) {
-    console.error('Error creating credit:', error);
-    throw new Error(error.message);
-  }
+  const insertData = {
+    user_id: user.id,
+    reference: creditData.reference,
+    invoice_id: creditData.invoice_id,
+    status: creditData.status,
+    amount: creditData.amount,
+    items_data: creditData.items_data,
+    notes: creditData.notes
+  };
 
-  return data;
-};
+  console.log('Inserting data:', insertData);
 
-export const updateCredit = async (id: string, creditData: CreditUpdateData) => {
-  const { data, error } = await supabase
-    .from('credits')
-    .update(creditData)
-    .eq('id', id)
-    .select(`
-      *,
-      clients(first_name, last_name),
-      vehicles(
-        id,
-        license_plate,
-        car_brands(id, name),
-        car_models(id, name)
-      )
-    `)
-    .single();
-
-  if (error) {
-    console.error('Error updating credit:', error);
-    throw new Error(error.message);
-  }
-
-  return data;
-};
-
-export const deleteCredit = async (id: string) => {
-  const { error } = await supabase
-    .from('credits')
-    .delete()
-    .eq('id', id);
-
-  if (error) {
-    console.error('Error deleting credit:', error);
-    throw new Error(error.message);
-  }
-
-  return true;
-};
-
-export const generateReference = async (): Promise<string> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
-
-    const { data, error } = await supabase
+    // Test if table exists first
+    const { error: testError } = await (supabase as any)
       .from('credits')
-      .select('reference')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
+      .select('id')
       .limit(1);
 
+    if (testError && testError.code === '42P01') {
+      throw new Error('TABLE_MISSING');
+    }
+
+    // Use any to bypass TypeScript errors for missing table type
+    const { data, error } = await (supabase as any)
+      .from('credits')
+      .insert([insertData])
+      .select()
+      .single();
+
     if (error) {
-      console.warn('Error fetching last reference, generating default:', error);
-      return '1';
-    }
-
-    if (data && data.length > 0) {
-      const lastReference = data[0].reference;
-      const lastNumber = parseInt(lastReference);
+      console.error('Supabase insert error:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      console.error('Error details:', error.details);
+      console.error('Error hint:', error.hint);
       
-      if (!isNaN(lastNumber)) {
-        return (lastNumber + 1).toString();
+      if (error.code === '42P01') {
+        throw new Error('TABLE_MISSING');
       }
+      
+      throw new Error(`Failed to create credit: ${error.message || 'Unknown error'}`);
     }
 
-    return '1';
-  } catch (error) {
-    console.error('Error generating reference:', error);
-    return '1';
+    console.log('Credit created successfully:', data);
+    return data;
+  } catch (error: any) {
+    console.error('Error in createCredit:', error);
+    
+    if (error.message === 'TABLE_MISSING') {
+      throw new Error('La table des avoirs n\'existe pas. Veuillez exécuter la migration SQL dans votre dashboard Supabase.');
+    }
+    
+    throw error;
+  }
+};
+
+export const updateCredit = async (id: string, creditData: CreditUpdateData): Promise<Credit> => {
+  try {
+    // Test if table exists first
+    const { error: testError } = await (supabase as any)
+      .from('credits')
+      .select('id')
+      .limit(1);
+
+    if (testError && testError.code === '42P01') {
+      throw new Error('TABLE_MISSING');
+    }
+
+    const { data, error } = await (supabase as any)
+      .from('credits')
+      .update(creditData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Update credit error:', error);
+      if (error.code === '42P01') {
+        throw new Error('TABLE_MISSING');
+      }
+      throw new Error(`Failed to update credit: ${error.message || 'Unknown error'}`);
+    }
+    return data;
+  } catch (error: any) {
+    if (error.message === 'TABLE_MISSING') {
+      throw new Error('La table des avoirs n\'existe pas. Veuillez exécuter la migration SQL dans votre dashboard Supabase.');
+    }
+    throw error;
+  }
+};
+
+export const deleteCredit = async (id: string): Promise<boolean> => {
+  try {
+    // Test if table exists first
+    const { error: testError } = await (supabase as any)
+      .from('credits')
+      .select('id')
+      .limit(1);
+
+    if (testError && testError.code === '42P01') {
+      throw new Error('TABLE_MISSING');
+    }
+
+    const { error } = await (supabase as any)
+      .from('credits')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Delete credit error:', error);
+      if (error.code === '42P01') {
+        throw new Error('TABLE_MISSING');
+      }
+      throw new Error(`Failed to delete credit: ${error.message || 'Unknown error'}`);
+    }
+    return true;
+  } catch (error: any) {
+    if (error.message === 'TABLE_MISSING') {
+      throw new Error('La table des avoirs n\'existe pas. Veuillez exécuter la migration SQL dans votre dashboard Supabase.');
+    }
+    throw error;
   }
 };

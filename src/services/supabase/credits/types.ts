@@ -8,7 +8,7 @@ export interface Credit {
   invoice_id: string | null;
   status: string;
   amount: number;
-  items_data: any | null; // Changed from string to any to accept Json from Supabase
+  items_data: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
@@ -20,15 +20,9 @@ export interface Credit {
   } | null;
   vehicles?: {
     id: string;
+    brand: string;
+    model: string;
     license_plate: string;
-    car_brands: {
-      id: string;
-      name: string;
-    };
-    car_models: {
-      id: string;
-      name: string;
-    };
   } | null;
   invoices?: {
     id: string;
