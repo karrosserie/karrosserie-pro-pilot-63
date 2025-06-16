@@ -83,15 +83,19 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
       discounts
     });
 
-    return {
+    // Préparer les données selon le format attendu par la base de données
+    const submitData = {
       ...formData,
-      description,
-      claim_number: claimNumber,
-      current_mileage: currentMileage,
-      repairs_data: repairs,
-      parts_data: parts,
-      discounts_data: discounts
+      description: description || '',
+      claim_number: claimNumber || '',
+      current_mileage: currentMileage || '',
+      repairs_data: repairs || [],
+      parts_data: parts || [],
+      discounts_data: discounts || []
     };
+
+    console.log('Final submit data:', submitData);
+    return submitData;
   };
 
   useEffect(() => {
