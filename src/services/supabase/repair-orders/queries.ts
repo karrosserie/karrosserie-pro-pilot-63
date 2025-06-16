@@ -17,10 +17,16 @@ export const getRepairOrders = async (): Promise<RepairOrder[]> => {
       vehicles(
         id,
         license_plate,
-        brand,
-        model,
         brand_id,
-        model_id
+        model_id,
+        car_brands(
+          id,
+          name
+        ),
+        car_models(
+          id,
+          name
+        )
       )
     `)
     .order('created_at', { ascending: false });
@@ -56,10 +62,16 @@ export const getRepairOrderById = async (id: string): Promise<RepairOrder> => {
       vehicles(
         id,
         license_plate,
-        brand,
-        model,
         brand_id,
         model_id,
+        car_brands(
+          id,
+          name
+        ),
+        car_models(
+          id,
+          name
+        ),
         registration_document_front_url,
         registration_document_back_url
       )

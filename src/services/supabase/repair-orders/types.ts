@@ -11,16 +11,16 @@ export type RepairOrder = Database['public']['Tables']['repair_orders']['Row'] &
   vehicles?: {
     id: string;
     license_plate: string;
-    brand: string;
-    model: string;
+    brand_id: string;
+    model_id: string;
     car_brands?: {
       id: string;
       name: string;
-    };
+    } | null;
     car_models?: {
       id: string;
       name: string;
-    };
+    } | null;
   } | null;
   quotes?: {
     id: string;
