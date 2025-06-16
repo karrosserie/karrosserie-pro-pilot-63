@@ -58,6 +58,17 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
   const validationData = { formData, documentsData };
   const formValid = isFormValid(validationData);
 
+  // Combined input handler that handles both VIN processing and regular input changes
+  const handleCombinedInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('FleetVehicleForm - Combined input change:', e.target.name, e.target.value);
+    
+    if (e.target.name === 'vin') {
+      handleVinInputChange(e);
+    } else {
+      handleInputChange(e);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -77,7 +88,7 @@ const FleetVehicleForm: React.FC<FleetVehicleFormProps> = ({
                 status: formData.status
               }}
               isViewMode={isViewMode}
-              onInputChange={handleVinInputChange}
+              onInputChange={handleCombinedInputChange}
               onBrandChange={handleBrandSelectChange}
               onModelChange={handleModelSelectChange}
               onSelectChange={handleSelectChange}
