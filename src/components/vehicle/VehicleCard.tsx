@@ -120,27 +120,30 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
         </div>
       </div>
       
-      <div className="border-t border-gray-100 mt-4 pt-4 flex justify-end space-x-1">
-        {onView && (
-          <Button variant="ghost" size="icon" onClick={onView}>
-            <Eye className="h-4 w-4" />
-          </Button>
-        )}
-        {onEdit && (
-          <Button variant="ghost" size="icon" onClick={onEdit}>
-            <Pencil className="h-4 w-4" />
-          </Button>
-        )}
-        {onDelete && (
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="text-red-500 hover:text-red-700" 
-            onClick={onDelete}
-            >
-            <Trash className="h-4 w-4" />
-          </Button>
-        )}
+      <div className="border-t border-gray-100 mt-4 pt-4 flex justify-between items-center">
+        <div className="flex items-center space-x-1">
+          {onView && (
+            <Button variant="ghost" size="icon" onClick={onView}>
+              <Eye className="h-4 w-4" />
+            </Button>
+          )}
+          {onEdit && (
+            <Button variant="ghost" size="icon" onClick={onEdit}>
+              <Pencil className="h-4 w-4" />
+            </Button>
+          )}
+          {onDelete && (
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="text-red-500 hover:text-red-700" 
+              onClick={onDelete}
+              >
+              <Trash className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+        
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">

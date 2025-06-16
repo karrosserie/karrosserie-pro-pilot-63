@@ -115,7 +115,8 @@ const Quotes = () => {
     console.log('Converting quote to repair order with data:', prefilledData);
     console.log('Original quote data:', quote);
 
-    setPrefilledRepairOrder(prefilledData);
+    // Passer null au lieu de prefilledData pour forcer la création d'un nouvel ordre
+    setPrefilledRepairOrder(null);
     setRepairOrderDialogOpen(true);
   };
   
