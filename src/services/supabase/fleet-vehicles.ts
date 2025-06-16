@@ -2,16 +2,23 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
-export type FleetVehicle = Database['public']['Tables']['fleet_vehicles']['Row'] & {
+export type FleetVehicle = {
+  id: string;
+  brand_id: string;
+  model_id: string;
+  license_plate: string;
+  color?: string;
+  year?: number;
   vin?: string;
   engine_number?: string;
-  color?: string;
   mileage?: number;
+  status: string;
+  insurance_card_url?: string;
   registration_front_url?: string;
   registration_back_url?: string;
-  insurance_card_url?: string;
-  brand_id?: string;
-  model_id?: string;
+  created_at: string;
+  updated_at: string;
+  user_id: string;
   car_brands?: {
     id: string;
     name: string;
@@ -22,28 +29,35 @@ export type FleetVehicle = Database['public']['Tables']['fleet_vehicles']['Row']
   } | null;
 };
 
-export type NewFleetVehicle = Database['public']['Tables']['fleet_vehicles']['Insert'] & {
+export type NewFleetVehicle = {
+  brand_id: string;
+  model_id: string;
+  license_plate: string;
+  user_id: string;
   vin?: string;
   engine_number?: string;
   color?: string;
+  year?: number;
   mileage?: number;
+  status?: string;
   registration_front_url?: string;
   registration_back_url?: string;
   insurance_card_url?: string;
-  brand_id?: string;
-  model_id?: string;
 };
 
-export type UpdateFleetVehicle = Database['public']['Tables']['fleet_vehicles']['Update'] & {
+export type UpdateFleetVehicle = {
+  brand_id?: string;
+  model_id?: string;
+  license_plate?: string;
   vin?: string;
   engine_number?: string;
   color?: string;
+  year?: number;
   mileage?: number;
+  status?: string;
   registration_front_url?: string;
   registration_back_url?: string;
   insurance_card_url?: string;
-  brand_id?: string;
-  model_id?: string;
 };
 
 export const fleetVehiclesService = {
