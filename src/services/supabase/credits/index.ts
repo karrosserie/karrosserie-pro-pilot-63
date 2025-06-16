@@ -1,15 +1,16 @@
 
-import { getCredits, getCredit } from './queries';
+import { getCredits, getCreditById, getLastCreditByUser } from './queries';
 import { createCredit, updateCredit, deleteCredit } from './mutations';
-import { generateReference } from './table-utils';
 
 export const creditsService = {
-  getCredits,
-  getCredit,
-  createCredit,
-  updateCredit,
-  deleteCredit,
-  generateReference
+  getAll: getCredits,
+  getById: getCreditById,
+  getLastCreditByUser,
+  create: createCredit,
+  update: updateCredit,
+  delete: deleteCredit
 };
 
 export * from './types';
+export * from './queries';
+export * from './mutations';
