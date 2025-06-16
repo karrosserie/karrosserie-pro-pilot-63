@@ -72,42 +72,54 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
   };
 
   useEffect(() => {
-    if (invoice) {
-      setFormData({
-        reference: invoice.reference,
-        client_id: invoice.client_id,
-        vehicle_id: invoice.vehicle_id,
-        status: invoice.status || 'En attente de paiement',
-        due_date: invoice.due_date,
-        payment_details: invoice.payment_details || ''
-      });
-      
-      const parsedData = parseInvoiceNotes(invoice.notes || '');
-      setDescription(parsedData.description);
-      setClaimNumber(parsedData.claimNumber);
-      setCurrentMileage(parsedData.currentMileage);
-      setRepairs(parsedData.repairs);
-      setParts(parsedData.parts);
-      setDiscounts(parsedData.discounts);
-    } else {
-      // Pour une nouvelle facture, générer automatiquement le numéro
-      const today = new Date().toISOString().split('T')[0];
-      
-      generateNextInvoiceNumber().then(nextNumber => {
-        setFormData(prev => ({
-          ...prev,
-          reference: nextNumber,
-          due_date: today
-        }));
-      });
-      
-      setDescription('');
-      setClaimNumber('');
-      setCurrentMileage('');
-      setRepairs([]);
-      setParts([]);
-      setDiscounts([]);
-    }
+    const initializeForm = async () => {
+      if (invoice) {
+        setFormData({
+          reference: invoice.reference,
+          client_id: invoice.client_id,
+          vehicle_id: invoice.vehicle_id,
+          status: invoice.status || 'En attente de paiement',
+          due_date: invoice.due_date,
+          payment_details: invoice.payment_details || ''
+        });
+        
+        const parsedData = parseInvoiceNotes(invoice.notes || '');
+        setDescription(parsedData.description);
+        setClaimNumber(parsedData.claimNumber);
+        setCurrentMileage(parsedData.currentMileage);
+        setRepairs(parsedData.repairs);
+        setParts(parsedData.parts);
+        setDiscounts(parsedData.discounts);
+      } else {
+        // Pour une nouvelle facture, générer automatiquement le numéro
+        const today = new Date().toISOString().split('T')[0];
+        
+        try {
+          const nextNumber = await generateNextInvoiceNumber();
+          setFormData(prev => ({
+            ...prev,
+            reference: nextNumber,
+            due_date: today
+          }));
+        } catch (error) {
+          console.error('Erreur lors de la génération du numéro de facture:', error);
+          setFormData(prev => ({
+            ...prev,
+            reference: '1',
+            due_date: today
+          }));
+        }
+        
+        setDescription('');
+        setClaimNumber('');
+        setCurrentMileage('');
+        setRepairs([]);
+        setParts([]);
+        setDiscounts([]);
+      }
+    };
+
+    initializeForm();
   }, [invoice]);
 
   return {
