@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useCessions } from '@/hooks/use-cessions';
 import { CessionDialog } from '@/components/cessions/CessionDialog';
@@ -21,9 +20,9 @@ const Cessions = () => {
     const matchesSearch = 
       cession.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       cession.buyer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cession.vehicles?.car_brands?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cession.vehicles?.car_models?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cession.vehicles?.license_plate?.toLowerCase().includes(searchTerm.toLowerCase());
+      cession.repair_orders?.vehicles?.car_brands?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cession.repair_orders?.vehicles?.car_models?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cession.repair_orders?.vehicles?.license_plate?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus = selectedStatus === 'all' || cession.status === selectedStatus;
 
