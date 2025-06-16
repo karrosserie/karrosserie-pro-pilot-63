@@ -84,10 +84,20 @@ const Credits = () => {
   const { credits = [], isLoading, deleteCredit, error } = useCredits();
   const { invoices } = useInvoices();
   
+  const formatVehicleDisplay = (credit: any) => {
+    if (credit.vehicles) {
+      const brand = credit.vehicles.car_brands?.name || 'Marque inconnue';
+      const model = credit.vehicles.car_models?.name || 'Modèle inconnu';
+      const licensePlate = credit.vehicles.license_plate || '';
+      return `${brand} ${model} - ${licensePlate}`;
+    }
+    return '-';
+  };
+  
   const filteredCredits = credits?.filter(credit => 
     credit.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (credit.clients && `${credit.clients.first_name} ${credit.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (credit.vehicles && `${credit.vehicles.car_brands?.name || 'Marque inconnue'} ${credit.vehicles.car_models?.name || 'Modèle inconnu'} - ${credit.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
+    formatVehicleDisplay(credit).toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
   const getStatusColor = (status: string) => {
@@ -305,10 +315,7 @@ const Credits = () => {
                   <TableCell className="font-medium">{credit.reference}</TableCell>
                   <TableCell>{formatDate(credit.created_at)}</TableCell>
                   <TableCell>
-                    {credit.vehicles 
-                      ? `${credit.vehicles.car_brands?.name || 'Marque inconnue'} ${credit.vehicles.car_models?.name || 'Modèle inconnu'} - ${credit.vehicles.license_plate}`
-                      : '-'
-                    }
+                    {formatVehicleDisplay(credit)}
                   </TableCell>
                   <TableCell>
                     {getInvoiceDisplay(credit.invoice_id)}

@@ -41,6 +41,16 @@ export const RepairOrderTableRow = ({ order, onEditOrder, contextMenuProps }: Re
     return new Date(dateString).toLocaleDateString('fr-FR');
   };
 
+  const formatVehicleDisplay = (order: RepairOrder) => {
+    if (order.vehicles) {
+      const brand = order.vehicles.brand || order.vehicles.car_brands?.name || 'Marque inconnue';
+      const model = order.vehicles.model || order.vehicles.car_models?.name || 'Modèle inconnu';
+      const licensePlate = order.vehicles.license_plate || '';
+      return `${brand} ${model} - ${licensePlate}`;
+    }
+    return '-';
+  };
+
   return (
     <TableRow>
       <TableCell className="font-medium">{order.reference}</TableCell>
@@ -52,10 +62,7 @@ export const RepairOrderTableRow = ({ order, onEditOrder, contextMenuProps }: Re
         }
       </TableCell>
       <TableCell>
-        {order.vehicles 
-          ? `${order.vehicles.car_brands?.name || 'Marque inconnue'} ${order.vehicles.car_models?.name || 'Modèle inconnu'} - ${order.vehicles.license_plate}`
-          : '-'
-        }
+        {formatVehicleDisplay(order)}
       </TableCell>
       <TableCell>{formatAmount(calculateOrderAmount(order))}</TableCell>
       <TableCell>

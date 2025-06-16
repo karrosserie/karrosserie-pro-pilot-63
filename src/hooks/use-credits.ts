@@ -1,6 +1,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { creditsService } from '@/services/supabase/credits';
 import { useToast } from '@/hooks/use-toast';
 
 export function useCredits() {
@@ -13,69 +13,11 @@ export function useCredits() {
     error
   } = useQuery({
     queryKey: ['credits'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('credits')
-        .select(`
-          *,
-          clients(id, first_name, last_name),
-          vehicles(
-            id,
-            license_plate,
-            car_brands(id, name),
-            car_models(id, name)
-          )
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching credits:', error);
-        throw new Error(error.message);
-      }
-
-      return data;
-    }
+    queryFn: creditsService.getCredits
   });
 
   const createCredit = useMutation({
-    mutationFn: async (creditData: any) => {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error('Utilisateur non authentifié');
-      }
-
-      // Add user_id to credit data
-      const dataWithUserId = {
-        ...creditData,
-        user_id: user.id
-      };
-
-      console.log('Creating credit with user_id:', dataWithUserId);
-
-      const { data, error } = await supabase
-        .from('credits')
-        .insert([dataWithUserId])
-        .select(`
-          *,
-          clients(first_name, last_name),
-          vehicles(
-            id,
-            license_plate,
-            car_brands(id, name),
-            car_models(id, name)
-          )
-        `)
-        .single();
-
-      if (error) {
-        console.error('Error creating credit:', error);
-        throw new Error(error.message);
-      }
-
-      return data;
-    },
+    mutationFn: creditsService.createCredit,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['credits'] });
       toast({
@@ -93,30 +35,8 @@ export function useCredits() {
   });
 
   const updateCredit = useMutation({
-    mutationFn: async ({ id, data }: { id: string, data: any }) => {
-      const { data: result, error } = await supabase
-        .from('credits')
-        .update(data)
-        .eq('id', id)
-        .select(`
-          *,
-          clients(first_name, last_name),
-          vehicles(
-            id,
-            license_plate,
-            car_brands(id, name),
-            car_models(id, name)
-          )
-        `)
-        .single();
-
-      if (error) {
-        console.error('Error updating credit:', error);
-        throw new Error(error.message);
-      }
-
-      return result;
-    },
+    mutationFn: ({ id, data }: { id: string, data: any }) => 
+      creditsService.updateCredit(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['credits'] });
       toast({
@@ -134,19 +54,7 @@ export function useCredits() {
   });
 
   const deleteCredit = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('credits')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error('Error deleting credit:', error);
-        throw new Error(error.message);
-      }
-
-      return true;
-    },
+    mutationFn: creditsService.deleteCredit,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['credits'] });
       toast({
