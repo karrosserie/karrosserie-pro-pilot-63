@@ -45,18 +45,17 @@ export const RepairOrderTableRow = ({ order, onEditOrder, contextMenuProps }: Re
     console.log('Formatting vehicle display for order:', order.id, 'vehicle data:', order.vehicles);
     
     if (order.vehicles) {
-      // Try to get brand name from car_brands relation first, then fallback to direct brand field
-      const brand = order.vehicles.car_brands?.name || order.vehicles.brand || 'Marque inconnue';
-      // Try to get model name from car_models relation first, then fallback to direct model field
-      const model = order.vehicles.car_models?.name || order.vehicles.model || 'Modèle inconnu';
+      const brand = order.vehicles.car_brands?.name || order.vehicles.brand || '';
+      const model = order.vehicles.car_models?.name || order.vehicles.model || '';
       const licensePlate = order.vehicles.license_plate || '';
       
-      const result = `${brand} ${model}${licensePlate ? ` - ${licensePlate}` : ''}`;
-      console.log('Vehicle display result:', result);
-      return result;
+      if (brand && model) {
+        return `${brand} ${model}${licensePlate ? ` - ${licensePlate}` : ''}`;
+      } else if (licensePlate) {
+        return licensePlate;
+      }
     }
     
-    console.log('No vehicle data found for order:', order.id);
     return '-';
   };
 

@@ -1,108 +1,53 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { RepairOrder } from './types';
 
 export const getRepairOrders = async (): Promise<RepairOrder[]> => {
   console.log('Fetching repair orders...');
   
-  // Get basic repair orders data
-  const { data: basicOrders, error: basicError } = await supabase
+  const { data: orders, error } = await supabase
     .from('repair_orders')
-    .select('*')
+    .select(`
+      *,
+      clients(
+        id,
+        first_name,
+        last_name,
+        email
+      ),
+      vehicles(
+        id,
+        license_plate,
+        brand,
+        model,
+        car_brands(
+          id,
+          name
+        ),
+        car_models(
+          id,
+          name
+        )
+      )
+    `)
     .order('created_at', { ascending: false });
 
-  if (basicError) {
-    console.error('Error fetching repair orders:', basicError);
-    throw new Error(basicError.message);
+  if (error) {
+    console.error('Error fetching repair orders:', error);
+    throw new Error(error.message);
   }
 
-  // Enrich with client and vehicle data separately
-  const enrichedOrders = await Promise.all(
-    (basicOrders || []).map(async (order) => {
-      let clientData = null;
-      let vehicleData = null;
-
-      // Try to get client data
-      if (order.client_id) {
-        try {
-          const { data: client } = await supabase
-            .from('clients')
-            .select('id, first_name, last_name, email')
-            .eq('id', order.client_id)
-            .single();
-          clientData = client;
-        } catch (error) {
-          console.warn('Could not fetch client:', error);
-        }
-      }
-
-      // Try to get vehicle data with all necessary information
-      if (order.vehicle_id) {
-        try {
-          console.log('Fetching vehicle for order:', order.id, 'vehicle_id:', order.vehicle_id);
-          
-          // First try to get vehicle with brand/model names from lookup tables
-          const { data: vehicle } = await supabase
-            .from('vehicles')
-            .select(`
-              id, 
-              license_plate,
-              brand,
-              model,
-              car_brands(id, name),
-              car_models(id, name)
-            `)
-            .eq('id', order.vehicle_id)
-            .single();
-          
-          if (vehicle) {
-            console.log('Found vehicle with data:', vehicle);
-            vehicleData = vehicle;
-          }
-        } catch (error) {
-          console.warn('Could not fetch vehicle for order:', order.id, error);
-        }
-      }
-
-      const enrichedOrder = {
-        ...order,
-        clients: clientData,
-        vehicles: vehicleData,
-        quotes: null
-      };
-
-      console.log('Final enriched order:', enrichedOrder);
-      return enrichedOrder;
-    })
-  );
-
-  console.log('All enriched orders:', enrichedOrders);
-  return enrichedOrders;
+  console.log('Fetched repair orders with vehicle data:', orders);
+  return orders || [];
 };
 
 export const getRepairOrderById = async (id: string): Promise<RepairOrder> => {
   console.log(`Fetching repair order with id ${id}...`);
   
-  // Get basic order data
-  const { data: basicOrder, error: basicError } = await supabase
+  const { data: order, error } = await supabase
     .from('repair_orders')
-    .select('*')
-    .eq('id', id)
-    .single();
-    
-  if (basicError) {
-    console.error(`Error fetching repair order with id ${id}:`, basicError);
-    throw new Error(basicError.message);
-  }
-  
-  // Enrich with client and vehicle data
-  let clientData = null;
-  let vehicleData = null;
-  
-  if (basicOrder.client_id) {
-    const { data: client } = await supabase
-      .from('clients')
-      .select(`
+    .select(`
+      *,
+      clients(
         id,
         first_name,
         last_name,
@@ -113,41 +58,34 @@ export const getRepairOrderById = async (id: string): Promise<RepairOrder> => {
         postal_code,
         driver_license_front_url,
         driver_license_back_url
-      `)
-      .eq('id', basicOrder.client_id)
-      .single();
-    clientData = client;
-    console.log('Fetched client data separately:', clientData);
-  }
-  
-  if (basicOrder.vehicle_id) {
-    const { data: vehicle } = await supabase
-      .from('vehicles')
-      .select(`
+      ),
+      vehicles(
         id,
         license_plate,
         brand,
         model,
-        car_brands(id, name),
-        car_models(id, name),
+        car_brands(
+          id,
+          name
+        ),
+        car_models(
+          id,
+          name
+        ),
         registration_document_front_url,
         registration_document_back_url
-      `)
-      .eq('id', basicOrder.vehicle_id)
-      .single();
-    vehicleData = vehicle;
-    console.log('Fetched vehicle data separately:', vehicleData);
+      )
+    `)
+    .eq('id', id)
+    .single();
+    
+  if (error) {
+    console.error(`Error fetching repair order with id ${id}:`, error);
+    throw new Error(error.message);
   }
   
-  const enrichedOrder = {
-    ...basicOrder,
-    clients: clientData,
-    vehicles: vehicleData,
-    quotes: null
-  };
-  
-  console.log('Final enriched order:', enrichedOrder);
-  return enrichedOrder;
+  console.log('Fetched repair order with complete data:', order);
+  return order;
 };
 
 export const getLastOrderByUser = async () => {
