@@ -20,7 +20,11 @@ export const ImageCropperFooter: React.FC<ImageCropperFooterProps> = ({
       <Button variant="outline" onClick={onCancel}>
         Annuler
       </Button>
-      <Button onClick={onApply} disabled={isLoading}>
+      <Button 
+        onClick={onApply} 
+        disabled={isLoading}
+        className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
+      >
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

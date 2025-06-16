@@ -111,9 +111,10 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
           <Input
             id="engine_number"
             name="engine_number"
-            value={formData.engine_number}
+            value={formData.engine_number || ''}
             onChange={onInputChange}
             disabled={isViewMode}
+            placeholder="Entrez le numéro de moteur"
           />
         </div>
       </div>
