@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useInvoices } from '@/hooks/use-invoices';
+import { InvoiceSelect } from './form/InvoiceSelect';
 import { Receipt } from './form/types';
 
 interface ReceiptFormProps {
@@ -16,7 +16,6 @@ interface ReceiptFormProps {
 }
 
 export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: ReceiptFormProps) => {
-  const { invoices } = useInvoices();
   const [formData, setFormData] = useState<Receipt>({
     reference: '',
     date: new Date().toISOString().split('T')[0],
@@ -82,21 +81,10 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
         </div>
       </div>
 
-      <div>
-        <Label htmlFor="invoice">Facture</Label>
-        <Select value={formData.invoice} onValueChange={(value) => handleFieldChange('invoice', value)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Sélectionner une facture" />
-          </SelectTrigger>
-          <SelectContent>
-            {invoices?.map((invoice) => (
-              <SelectItem key={invoice.id} value={invoice.id}>
-                {invoice.reference} - {invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client non spécifié'}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <InvoiceSelect
+        value={formData.invoice}
+        onChange={(value) => handleFieldChange('invoice', value)}
+      />
 
       <div className="grid grid-cols-2 gap-4">
         <div>
