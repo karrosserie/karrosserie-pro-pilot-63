@@ -56,8 +56,14 @@ const QuoteEmailDialog: React.FC<QuoteEmailDialogProps> = ({
 
   useEffect(() => {
     if (quote && open) {
+      console.log('Quote data for email dialog:', quote);
+      console.log('Client data:', quote.clients);
+      console.log('Client email:', quote.clients?.email);
+      
       // Pré-remplir le destinataire avec l'email du client
-      setRecipient(quote.clients?.email || '');
+      const clientEmail = quote.clients?.email || '';
+      console.log('Setting recipient email to:', clientEmail);
+      setRecipient(clientEmail);
       
       // Pré-remplir le sujet
       const licensePlate = quote.vehicles?.license_plate || 'véhicule';
@@ -151,8 +157,8 @@ const QuoteEmailDialog: React.FC<QuoteEmailDialogProps> = ({
         
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="recipient" required>
-              Destinataire
+            <Label htmlFor="recipient" className="text-sm font-medium">
+              Destinataire <span className="text-red-500">*</span>
             </Label>
             <Input
               id="recipient"
@@ -165,8 +171,8 @@ const QuoteEmailDialog: React.FC<QuoteEmailDialogProps> = ({
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="subject" required>
-              Sujet
+            <Label htmlFor="subject" className="text-sm font-medium">
+              Sujet <span className="text-red-500">*</span>
             </Label>
             <Input
               id="subject"
@@ -178,8 +184,8 @@ const QuoteEmailDialog: React.FC<QuoteEmailDialogProps> = ({
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="message" required>
-              Message
+            <Label htmlFor="message" className="text-sm font-medium">
+              Message <span className="text-red-500">*</span>
             </Label>
             <Textarea
               id="message"
