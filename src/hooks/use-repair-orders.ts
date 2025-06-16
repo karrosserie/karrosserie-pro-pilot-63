@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -21,6 +22,8 @@ export function useRepairOrders() {
           vehicles(
             id,
             license_plate,
+            brand,
+            model,
             car_brands(id, name),
             car_models(id, name)
           )
@@ -61,6 +64,8 @@ export function useRepairOrders() {
           vehicles(
             id,
             license_plate,
+            brand,
+            model,
             car_brands(id, name),
             car_models(id, name)
           )
@@ -102,6 +107,8 @@ export function useRepairOrders() {
           vehicles(
             id,
             license_plate,
+            brand,
+            model,
             car_brands(id, name),
             car_models(id, name)
           )

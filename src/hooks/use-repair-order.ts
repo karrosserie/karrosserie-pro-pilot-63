@@ -20,6 +20,8 @@ export function useRepairOrder(id?: string) {
           vehicles(
             id,
             license_plate,
+            brand,
+            model,
             car_brands(id, name),
             car_models(id, name)
           )
