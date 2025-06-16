@@ -324,9 +324,6 @@ const Credits = () => {
                       <Button variant="ghost" size="icon">
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon">
-                        <Download className="h-4 w-4" />
-                      </Button>
                       <Button variant="ghost" size="icon" onClick={() => handleEditCredit(credit)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
