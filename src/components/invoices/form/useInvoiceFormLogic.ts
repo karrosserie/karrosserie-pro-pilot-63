@@ -73,7 +73,10 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
 
   useEffect(() => {
     const initializeForm = async () => {
+      console.log('Invoice form initializing with invoice:', invoice);
+      
       if (invoice) {
+        console.log('Existing invoice, setting form data with reference:', invoice.reference);
         setFormData({
           reference: invoice.reference,
           client_id: invoice.client_id,
@@ -91,24 +94,37 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
         setParts(parsedData.parts);
         setDiscounts(parsedData.discounts);
       } else {
+        console.log('New invoice, generating number...');
         // Pour une nouvelle facture, générer automatiquement le numéro
         const today = new Date().toISOString().split('T')[0];
         
         try {
           const nextNumber = await generateNextInvoiceNumber();
           console.log('Generated invoice number:', nextNumber);
-          setFormData(prev => ({
-            ...prev,
+          
+          const newFormData = {
             reference: nextNumber,
-            due_date: today
-          }));
+            client_id: '',
+            vehicle_id: '',
+            status: 'En attente de paiement',
+            due_date: today,
+            payment_details: ''
+          };
+          
+          console.log('Setting form data with generated number:', newFormData);
+          setFormData(newFormData);
         } catch (error) {
           console.error('Erreur lors de la génération du numéro de facture:', error);
-          setFormData(prev => ({
-            ...prev,
+          const fallbackFormData = {
             reference: 'F-001',
-            due_date: today
-          }));
+            client_id: '',
+            vehicle_id: '',
+            status: 'En attente de paiement',
+            due_date: today,
+            payment_details: ''
+          };
+          console.log('Setting fallback form data:', fallbackFormData);
+          setFormData(fallbackFormData);
         }
         
         setDescription('');
@@ -122,6 +138,11 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
 
     initializeForm();
   }, [invoice]);
+
+  // Log formData changes
+  useEffect(() => {
+    console.log('FormData updated:', formData);
+  }, [formData]);
 
   return {
     formData,
