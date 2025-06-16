@@ -15,27 +15,33 @@ export const createCession = async (cession: NewCession): Promise<Cession> => {
   // Generate a reference if not provided
   const reference = cession.reference || `CC-${new Date().getFullYear()}-${Date.now()}`;
   
-  // Ensure insurance_company_id is properly formatted as UUID or null
+  // Only include fields that exist in the new cessions table structure
   const processedCession = {
-    ...cession,
     user_id: user.id,
     reference,
     status: cession.status || 'en_attente',
+    repair_order_id: cession.repair_order_id || null,
+    bank_account_id: cession.bank_account_id || null,
+    incident_number: cession.incident_number || null,
+    incident_date: cession.incident_date || null,
+    policy_number: cession.policy_number || null,
+    report_number: cession.report_number || null,
+    expert_name: cession.expert_name || null,
     insurance_company_id: cession.insurance_company_id || null,
-    sale_date: cession.sale_date || new Date().toISOString().split('T')[0],
-    sale_price: cession.sale_price || 0,
+    // Legacy fields for backward compatibility
     buyer_name: cession.buyer_name || '',
-    buyer_contact: cession.buyer_contact || '',
-    expertise_date: cession.expertise_date || null,
-    expertise_amount: cession.expertise_amount || null,
-    salvage_value: cession.salvage_value || null
+    buyer_contact: cession.buyer_contact || null,
+    sale_price: cession.sale_price || 0,
+    sale_date: cession.sale_date || new Date().toISOString().split('T')[0],
+    notes: cession.notes || null,
+    document_url: cession.document_url || null
   };
   
   console.log('Processed cession data:', processedCession);
   
   const { data, error } = await supabase
     .from('cessions')
-    .insert([processedCession as any])
+    .insert([processedCession])
     .select()
     .single();
     
@@ -44,22 +50,34 @@ export const createCession = async (cession: NewCession): Promise<Cession> => {
     throw new Error(error.message);
   }
   
-  // Map database response to Cession interface with proper defaults
-  const completeCession = {
-    ...data,
-    sale_price: (data as any).sale_price ?? 0,
-    expertise_date: (data as any).expertise_date ?? null,
-    expertise_amount: (data as any).expertise_amount ?? null,
-    salvage_value: (data as any).salvage_value ?? null
-  };
-  
-  return completeCession as Cession;
+  return data as Cession;
 };
 
 export const updateCession = async (id: string, cession: UpdateCession): Promise<Cession> => {
+  // Only include fields that exist in the new cessions table structure
+  const processedCession = {
+    reference: cession.reference,
+    status: cession.status,
+    repair_order_id: cession.repair_order_id,
+    bank_account_id: cession.bank_account_id,
+    incident_number: cession.incident_number,
+    incident_date: cession.incident_date,
+    policy_number: cession.policy_number,
+    report_number: cession.report_number,
+    expert_name: cession.expert_name,
+    insurance_company_id: cession.insurance_company_id,
+    // Legacy fields for backward compatibility
+    buyer_name: cession.buyer_name,
+    buyer_contact: cession.buyer_contact,
+    sale_price: cession.sale_price,
+    sale_date: cession.sale_date,
+    notes: cession.notes,
+    document_url: cession.document_url
+  };
+
   const { data, error } = await supabase
     .from('cessions')
-    .update(cession as any)
+    .update(processedCession)
     .eq('id', id)
     .select()
     .single();
@@ -69,16 +87,7 @@ export const updateCession = async (id: string, cession: UpdateCession): Promise
     throw new Error(error.message);
   }
   
-  // Map database response to Cession interface with proper defaults
-  const completeCession = {
-    ...data,
-    sale_price: (data as any).sale_price ?? 0,
-    expertise_date: (data as any).expertise_date ?? null,
-    expertise_amount: (data as any).expertise_amount ?? null,
-    salvage_value: (data as any).salvage_value ?? null
-  };
-  
-  return completeCession as Cession;
+  return data as Cession;
 };
 
 export const deleteCession = async (id: string): Promise<boolean> => {
