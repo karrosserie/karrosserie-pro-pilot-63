@@ -45,8 +45,8 @@ export const RepairOrderTableRow = ({ order, onEditOrder, contextMenuProps }: Re
     console.log('Formatting vehicle display for order:', order.id, 'vehicle data:', order.vehicles);
     
     if (order.vehicles) {
-      const brand = order.vehicles.car_brands?.name || order.vehicles.brand || '';
-      const model = order.vehicles.car_models?.name || order.vehicles.model || '';
+      const brand = order.vehicles.brand || '';
+      const model = order.vehicles.model || '';
       const licensePlate = order.vehicles.license_plate || '';
       
       if (brand && model) {
