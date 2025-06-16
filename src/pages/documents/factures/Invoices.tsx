@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +11,8 @@ import {
 } from "@/components/ui/table";
 import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
+import InvoiceEmailDialog from '@/components/invoices/InvoiceEmailDialog';
+import InvoiceSignatureDialog from '@/components/invoices/InvoiceSignatureDialog';
 import { useInvoices } from '@/hooks/use-invoices';
 import { Invoice } from '@/services/supabase/invoices';
 import LoadingSpinner from '@/components/ui/loading-spinner';
@@ -31,6 +32,8 @@ import { Printer, Mail, Signature, CreditCard, FileX, Download } from 'lucide-re
 const Invoices = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [signatureDialogOpen, setSignatureDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const { toast } = useToast();
   
@@ -102,17 +105,13 @@ const Invoices = () => {
   };
 
   const handleSendEmail = (invoice: Invoice) => {
-    toast({
-      title: "Envoi par e-mail",
-      description: `Envoi de la facture ${invoice.reference} par e-mail...`
-    });
+    setSelectedInvoice(invoice);
+    setEmailDialogOpen(true);
   };
 
   const handleClientSignature = (invoice: Invoice) => {
-    toast({
-      title: "Signature du client",
-      description: `Demande de signature du client pour la facture ${invoice.reference}`
-    });
+    setSelectedInvoice(invoice);
+    setSignatureDialogOpen(true);
   };
 
   const handleAddPayment = (invoice: Invoice) => {
@@ -294,6 +293,18 @@ const Invoices = () => {
         invoice={selectedInvoice}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
+      />
+
+      <InvoiceEmailDialog
+        invoice={selectedInvoice}
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+      />
+
+      <InvoiceSignatureDialog
+        invoice={selectedInvoice}
+        open={signatureDialogOpen}
+        onOpenChange={setSignatureDialogOpen}
       />
     </div>
   );
