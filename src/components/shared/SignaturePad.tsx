@@ -7,16 +7,12 @@ interface SignaturePadProps {
   onSignatureChange: (signature: string) => void;
   value?: string;
   disabled?: boolean;
-  width?: string;
-  height?: string;
 }
 
 const SignaturePad: React.FC<SignaturePadProps> = ({
   onSignatureChange,
   value,
-  disabled = false,
-  width = '100%',
-  height = '200px'
+  disabled = false
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -125,12 +121,8 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
       <div className="relative">
         <canvas
           ref={canvasRef}
-          className="border-2 border-dashed border-gray-300 w-full bg-gray-50 cursor-crosshair"
-          style={{ 
-            touchAction: 'none',
-            width: width,
-            height: height
-          }}
+          className="border-2 border-dashed border-gray-300 w-full h-32 bg-gray-50 cursor-crosshair"
+          style={{ touchAction: 'none' }}
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}

@@ -125,11 +125,6 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     return 'Véhicule';
   };
 
-  // Create a wrapper for signature change to match the expected signature
-  const handleSignatureChangeWrapper = (signature: string) => {
-    handleSignatureChange('clientSignature', signature);
-  };
-
   return (
     <div className="space-y-6">
       <div>
@@ -196,7 +191,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             formData={formData}
             vehicle={vehicle}
             onInputChange={handleInputChange}
-            onSignatureChange={handleSignatureChangeWrapper}
+            onSignatureChange={handleSignatureChange}
             isViewMode={isViewMode}
           />
         </TabsContent>

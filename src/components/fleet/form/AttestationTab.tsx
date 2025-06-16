@@ -1,118 +1,184 @@
 
 import React from 'react';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import SignaturePad from '@/components/shared/SignaturePad';
-import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
+import { LoanFormData } from '../FleetLoanForm';
+import { useCompany } from '@/hooks/use-company';
+import { useClient } from '@/hooks/use-clients';
 
 interface AttestationTabProps {
-  formData: {
-    clientId: string;
-    clientName: string;
-    startDate: string;
-    expectedReturnDate: string;
-    attestationAccepted?: boolean;
-    clientSignature?: string;
-  };
-  vehicle: FleetVehicle;
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSignatureChange: (signature: string) => void;
+  formData: LoanFormData;
+  vehicle: any;
+  clientData?: any;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onSignatureChange: (field: string, value: any) => void;
   isViewMode?: boolean;
 }
 
 const AttestationTab: React.FC<AttestationTabProps> = ({
   formData,
   vehicle,
+  clientData,
   onInputChange,
   onSignatureChange,
   isViewMode = false
 }) => {
-  const getVehicleDisplayName = () => {
-    if (vehicle.car_brands?.name && vehicle.car_models?.name) {
-      return `${vehicle.car_brands.name} ${vehicle.car_models.name}`;
-    }
-    return 'Véhicule';
+  const { companyData } = useCompany();
+  const { client } = useClient(formData.clientId);
+
+  // Format date and time to French format
+  const formatDateTimeToFrench = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR') + ' à ' + date.toLocaleTimeString('fr-FR', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
   };
 
-  const handleAttestationChange = (checked: boolean) => {
-    const syntheticEvent = {
-      target: {
-        name: 'attestationAccepted',
-        value: checked,
-        type: 'checkbox',
-        checked: checked
-      }
-    } as unknown as React.ChangeEvent<HTMLInputElement>;
-    
-    onInputChange(syntheticEvent);
-  };
+  // Automatically fill client name when client is selected
+  React.useEffect(() => {
+    if (client && (!formData.clientName || formData.clientName.trim() === '')) {
+      onSignatureChange('clientName', `${client.firstName} ${client.lastName}`);
+    }
+  }, [client, formData.clientName, onSignatureChange]);
+
+  // Show loading state if client is being fetched
+  if (formData.clientId && !client) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-8">
+          <p>Chargement des informations du client...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <div className="bg-gray-50 p-6 rounded-lg">
-        <h3 className="text-lg font-semibold mb-4">Attestation de prêt de véhicule</h3>
-        
-        <div className="space-y-4 text-sm">
-          <p>
-            Je soussigné(e) <strong>{formData.clientName}</strong>, 
-            reconnais avoir reçu en prêt le véhicule <strong>{getVehicleDisplayName()}</strong> 
-            immatriculé <strong>{vehicle.license_plate}</strong>.
-          </p>
-          
-          <p>
-            <strong>Période de prêt :</strong><br />
-            Du {new Date(formData.startDate).toLocaleDateString('fr-FR')} 
-            au {new Date(formData.expectedReturnDate).toLocaleDateString('fr-FR')}
-          </p>
-          
-          <div className="space-y-2">
-            <p><strong>Je m'engage à :</strong></p>
-            <ul className="list-disc pl-6 space-y-1">
-              <li>Utiliser le véhicule de manière responsable et conforme au code de la route</li>
-              <li>Restituer le véhicule dans l'état où je l'ai reçu</li>
-              <li>Signaler immédiatement tout sinistre ou problème technique</li>
-              <li>Prendre en charge les éventuels dommages causés pendant la période de prêt</li>
-              <li>Restituer le véhicule à la date convenue avec le plein de carburant</li>
-            </ul>
-          </div>
-          
-          <p className="text-xs text-gray-600 mt-4">
-            Cette attestation fait foi entre les parties et engage ma responsabilité 
-            pendant toute la durée du prêt.
-          </p>
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-center text-lg font-bold">
+            Attestation de prêt de véhicule
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Company and Client Information */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <div>
+                <Label className="font-semibold">De :</Label>
+                <div className="mt-2 space-y-1">
+                  <div>{companyData?.name}</div>
+                  <div>{companyData?.address}</div>
+                  <div>{companyData?.zipcode} {companyData?.city}</div>
+                  <div>{companyData?.phone}</div>
+                  <div>{companyData?.email}</div>
+                  <div>{companyData?.siren}</div>
+                </div>
+              </div>
+            </div>
 
-      <div className="space-y-4">
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="attestationAccepted"
-            checked={formData.attestationAccepted || false}
-            onCheckedChange={handleAttestationChange}
-            disabled={isViewMode}
-            className="data-[state=checked]:bg-karrosserie-orange data-[state=checked]:border-karrosserie-orange"
-          />
-          <Label htmlFor="attestationAccepted" className="text-sm font-medium">
-            J'ai lu et j'accepte les conditions de prêt ci-dessus
-          </Label>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Signature du client</Label>
-          <div className="border rounded-lg p-4 bg-white">
-            <SignaturePad
-              value={formData.clientSignature || ''}
-              onSignatureChange={onSignatureChange}
-              disabled={isViewMode}
-            />
+            <div className="space-y-4">
+              <div>
+                <Label className="font-semibold">Au Client:</Label>
+                <div className="mt-2 space-y-1">
+                  <div>{client?.firstName} {client?.lastName}</div>
+                  <div>{client?.address}</div>
+                  <div>{client?.zipCode} {client?.city}</div>
+                  <div>{client?.phone}</div>
+                  {client?.email && <div>{client.email}</div>}
+                </div>
+              </div>
+            </div>
           </div>
-          {!isViewMode && (
-            <p className="text-xs text-gray-500">
-              Signez dans la zone ci-dessus avec votre souris ou votre doigt
-            </p>
-          )}
-        </div>
-      </div>
+
+          {/* Vehicle Information */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <div>
+                <Label className="font-semibold">Désignation du véhicule d'emprunt:</Label>
+                <div className="mt-2 space-y-1">
+                  <div>Marque : {vehicle?.brand}</div>
+                  <div>Model : {vehicle?.model}</div>
+                  <div>N° Immatriculation : {vehicle?.license_plate}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <Label className="font-semibold">Départ:</Label>
+                <div className="mt-2 space-y-1">
+                  <div>Le : {formatDateTimeToFrench(formData.startDate)}</div>
+                  <div>Kilométrage : {formData.mileage} Km</div>
+                </div>
+              </div>
+              
+              {/* Afficher la section "Retour" seulement si une date de fin est spécifiée */}
+              {formData.expectedReturnDate && (
+                <div>
+                  <Label className="font-semibold">Retour:</Label>
+                  <div className="mt-2 space-y-1">
+                    <div>Le : {formatDateTimeToFrench(formData.expectedReturnDate)}</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Signature Section */}
+          <div className="border-t pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="clientName" className="font-semibold">Nom et prénom</Label>
+                  <Input
+                    id="clientName"
+                    name="clientName"
+                    value={formData.clientName || (client ? `${client.firstName} ${client.lastName}` : '')}
+                    onChange={onInputChange}
+                    disabled={isViewMode}
+                    className="mt-2"
+                  />
+                </div>
+                
+                <div className="flex items-start space-x-2">
+                  <Checkbox
+                    id="attestationAccepted"
+                    checked={formData.attestationAccepted || false}
+                    onCheckedChange={(checked) => onSignatureChange('attestationAccepted', checked)}
+                    disabled={isViewMode}
+                  />
+                  <Label htmlFor="attestationAccepted" className="text-sm leading-relaxed font-normal">
+                    Je certifie avoir pris connaissance de l'intégralité du document présent, et reconnais que ma signature apposée électroniquement sur la présente tablette vaut engagement ferme et personnel. Je confirme que cette signature constitue l'expression de mon consentement libre et éclairé, et engage ma pleine responsabilité juridique.
+                  </Label>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {/* Electronic Signature */}
+                <SignaturePad
+                  value={formData.clientSignature || ''}
+                  onSignatureChange={(signature) => onSignatureChange('clientSignature', signature)}
+                  disabled={isViewMode}
+                />
+
+                <div className="space-y-2">
+                  <div className="text-sm text-muted-foreground">
+                    La signature électronique a la même valeur légale qu'une signature manuscrite.
+                    Exigence issue du Règlement eIDAS et du Code civil français, art. 1366-1367).
+                    Toute modification du présent document nécessitera une nouvelle signature du client
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

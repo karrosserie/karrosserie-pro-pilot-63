@@ -66,12 +66,6 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
     onModelChange(modelId);
   };
 
-  // Handle input changes for VIN and engine number
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('FleetVehicleBasicInfo - Input change:', e.target.name, e.target.value);
-    onInputChange(e);
-  };
-
   if (brandsLoading) {
     return (
       <div className="space-y-4">
@@ -92,7 +86,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
             id="vin"
             name="vin"
             value={formData.vin}
-            onChange={handleInputChange}
+            onChange={onInputChange}
             disabled={isViewMode}
             required
             placeholder="17 caractères"
@@ -119,7 +113,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
             id="engine_number"
             name="engine_number"
             value={formData.engine_number}
-            onChange={handleInputChange}
+            onChange={onInputChange}
             disabled={isViewMode}
             placeholder="Entrez le numéro de moteur"
           />
