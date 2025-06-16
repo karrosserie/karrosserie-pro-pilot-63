@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, Download, Printer, Mail, Signature, FileCheck, Receipt } from 'lucide-react';
+import { MoreVertical, Download, Printer, Mail, Signature, FileCheck, FileText } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 
 interface RepairOrderActionsDropdownProps {
@@ -58,7 +58,7 @@ export const RepairOrderActionsDropdown = ({ order, contextMenuProps }: RepairOr
           Demander les justificatifs
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => contextMenuProps?.onConvertToInvoice?.(order)}>
-          <Receipt className="mr-2 h-4 w-4" />
+          <FileText className="mr-2 h-4 w-4" />
           Convertir en facture
         </DropdownMenuItem>
       </DropdownMenuContent>

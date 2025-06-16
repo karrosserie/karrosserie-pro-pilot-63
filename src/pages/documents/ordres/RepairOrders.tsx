@@ -4,6 +4,7 @@ import { RepairOrdersTable } from '@/components/repair-orders/RepairOrdersTable'
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
 import RepairOrderEmailDialog from '@/components/repair-orders/RepairOrderEmailDialog';
 import RepairOrderSignatureDialog from '@/components/repair-orders/RepairOrderSignatureDialog';
+import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import LoadingSpinner from '@/components/ui/loading-spinner';
@@ -15,9 +16,11 @@ const RepairOrders = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [signatureDialogOpen, setSignatureDialogOpen] = useState(false);
+  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<RepairOrder | null>(null);
   const [selectedOrderForEmail, setSelectedOrderForEmail] = useState<RepairOrder | null>(null);
   const [selectedOrderForSignature, setSelectedOrderForSignature] = useState<RepairOrder | null>(null);
+  const [selectedOrderForInvoice, setSelectedOrderForInvoice] = useState<RepairOrder | null>(null);
   const { toast } = useToast();
   
   const { orders, isLoading, error } = useRepairOrders();
@@ -70,10 +73,8 @@ const RepairOrders = () => {
   };
 
   const handleConvertToInvoice = (order: RepairOrder) => {
-    toast({
-      title: "Conversion en facture",
-      description: `L'ordre de réparation ${order.reference} a été converti en facture`
-    });
+    setSelectedOrderForInvoice(order);
+    setInvoiceDialogOpen(true);
   };
 
   if (isLoading) {
@@ -129,6 +130,29 @@ const RepairOrders = () => {
         repairOrder={selectedOrderForSignature}
         open={signatureDialogOpen}
         onOpenChange={setSignatureDialogOpen}
+      />
+
+      <InvoiceDialog
+        open={invoiceDialogOpen}
+        onOpenChange={(open) => {
+          setInvoiceDialogOpen(open);
+          if (!open) {
+            setSelectedOrderForInvoice(null);
+          }
+        }}
+        invoice={selectedOrderForInvoice ? {
+          repair_order_id: selectedOrderForInvoice.id,
+          client_id: selectedOrderForInvoice.client_id,
+          vehicle_id: selectedOrderForInvoice.vehicle_id,
+          repairs_data: selectedOrderForInvoice.repairs_data,
+          parts_data: selectedOrderForInvoice.parts_data,
+          discounts_data: selectedOrderForInvoice.discounts_data,
+          description: selectedOrderForInvoice.description,
+          current_mileage: selectedOrderForInvoice.current_mileage,
+          claim_number: selectedOrderForInvoice.claim_number,
+          clients: selectedOrderForInvoice.clients,
+          vehicles: selectedOrderForInvoice.vehicles
+        } : null}
       />
     </div>
   );
