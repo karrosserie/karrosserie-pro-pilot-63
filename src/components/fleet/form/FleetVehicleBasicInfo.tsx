@@ -66,6 +66,12 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
     onModelChange(modelId);
   };
 
+  // Handle engine number input changes specifically
+  const handleEngineNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('FleetVehicleBasicInfo - Engine number change:', e.target.value);
+    onInputChange(e);
+  };
+
   if (brandsLoading) {
     return (
       <div className="space-y-4">
@@ -113,7 +119,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
             id="engine_number"
             name="engine_number"
             value={formData.engine_number}
-            onChange={onInputChange}
+            onChange={handleEngineNumberChange}
             disabled={isViewMode}
             placeholder="Entrez le numéro de moteur"
           />
