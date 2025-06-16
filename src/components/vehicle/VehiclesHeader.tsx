@@ -54,7 +54,10 @@ const VehiclesHeader: React.FC<VehiclesHeaderProps> = ({
           </DropdownMenuContent>
         </DropdownMenu>
         
-        <Button className="btn-primary" onClick={onCreateVehicle}>
+        <Button 
+          className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white" 
+          onClick={onCreateVehicle}
+        >
           <Car className="h-4 w-4 mr-2" />
           Nouveau véhicule
         </Button>
