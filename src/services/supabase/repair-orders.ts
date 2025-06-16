@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -7,6 +6,7 @@ export type RepairOrder = Database['public']['Tables']['repair_orders']['Row'] &
     id: string;
     first_name: string;
     last_name: string;
+    email?: string;
   } | null;
   vehicles?: {
     id: string;
@@ -28,6 +28,9 @@ export type RepairOrder = Database['public']['Tables']['repair_orders']['Row'] &
   repairs_data?: string | null;
   parts_data?: string | null;
   discounts_data?: string | null;
+  client_signature?: string | null;
+  client_name_signature?: string | null;
+  signature_date?: string | null;
 };
 
 export type NewRepairOrder = Database['public']['Tables']['repair_orders']['Insert'];
@@ -58,7 +61,7 @@ export const repairOrdersService = {
         if (order.client_id) {
           const { data: client } = await supabase
             .from('clients')
-            .select('id, first_name, last_name')
+            .select('id, first_name, last_name, email')
             .eq('id', order.client_id)
             .single();
           clientData = client;
