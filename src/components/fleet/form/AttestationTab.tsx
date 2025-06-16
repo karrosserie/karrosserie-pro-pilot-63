@@ -149,6 +149,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
                 <div className="flex items-start space-x-2">
                   <Checkbox
                     id="attestationAccepted"
+                    className="data-[state=checked]:bg-karrosserie-orange data-[state=checked]:border-karrosserie-orange"
                     checked={formData.attestationAccepted || false}
                     onCheckedChange={(checked) => onSignatureChange('attestationAccepted', checked)}
                     disabled={isViewMode}
