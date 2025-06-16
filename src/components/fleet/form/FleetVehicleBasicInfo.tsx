@@ -38,6 +38,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
   console.log('  - carBrands count:', carBrands?.length || 0);
   console.log('  - formData.brand_id:', formData.brand_id);
   console.log('  - carModels count:', carModels?.length || 0);
+  console.log('  - formData.engine_number:', formData.engine_number);
 
   // Prepare brand options - use brand IDs like in vehicles
   const brandOptions = carBrands?.map(brand => ({
@@ -64,12 +65,6 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
   const handleModelChange = (modelId: string) => {
     console.log('FleetVehicleBasicInfo - Manual model selection:', modelId);
     onModelChange(modelId);
-  };
-
-  // Handle engine number input changes specifically
-  const handleEngineNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('FleetVehicleBasicInfo - Engine number change:', e.target.value);
-    onInputChange(e);
   };
 
   if (brandsLoading) {
@@ -119,7 +114,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
             id="engine_number"
             name="engine_number"
             value={formData.engine_number}
-            onChange={handleEngineNumberChange}
+            onChange={onInputChange}
             disabled={isViewMode}
             placeholder="Entrez le numéro de moteur"
           />
