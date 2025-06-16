@@ -79,12 +79,20 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
     }
   };
 
+  // Get vehicle display name using the new structure
+  const getVehicleDisplayName = () => {
+    if (vehicle.car_brands?.name && vehicle.car_models?.name) {
+      return `${vehicle.car_brands.name} ${vehicle.car_models.name}`;
+    }
+    return 'Véhicule';
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         <div className="col-span-4 space-y-2">
           <h3 className="text-lg font-medium text-gray-900">
-            {vehicle.brand} {vehicle.model} ({vehicle.license_plate})
+            {getVehicleDisplayName()} ({vehicle.license_plate})
           </h3>
           <div>Client : {formData.clientName}</div>
           {fleetReturn && (

@@ -109,7 +109,7 @@ export const fleetVehiclesService = {
     
     const { data, error } = await supabase
       .from('fleet_vehicles')
-      .insert([vehicle])
+      .insert(vehicle)
       .select(`
         *,
         car_brands(id, name),
