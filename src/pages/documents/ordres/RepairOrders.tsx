@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { RepairOrdersHeader } from '@/components/repair-orders/RepairOrdersHeader';
 import { RepairOrdersTable } from '@/components/repair-orders/RepairOrdersTable';
@@ -8,6 +7,7 @@ import RepairOrderSignatureDialog from '@/components/repair-orders/RepairOrderSi
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { RepairOrder } from '@/services/supabase/repair-orders';
+import { Invoice } from '@/services/supabase/invoices';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
 import { useToast } from '@/hooks/use-toast';
@@ -21,7 +21,7 @@ const RepairOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState<RepairOrder | null>(null);
   const [selectedOrderForEmail, setSelectedOrderForEmail] = useState<RepairOrder | null>(null);
   const [selectedOrderForSignature, setSelectedOrderForSignature] = useState<RepairOrder | null>(null);
-  const [selectedOrderForInvoice, setSelectedOrderForInvoice] = useState<any>(null);
+  const [prefilledInvoice, setPrefilledInvoice] = useState<Partial<Invoice> | null>(null);
   const { toast } = useToast();
   
   const { orders, isLoading, error } = useRepairOrders();
@@ -74,117 +74,24 @@ const RepairOrders = () => {
   };
 
   const handleConvertToInvoice = (order: RepairOrder) => {
-    console.log('Converting repair order to invoice:', order);
+    // Préparer les données de la facture à partir de l'ordre de réparation
+    const today = new Date().toISOString().split('T')[0];
     
-    // Parser les données de l'ordre de réparation
-    let orderData = {
-      description: '',
-      claimNumber: '',
-      currentMileage: '',
-      repairs: [],
-      parts: [],
-      discounts: []
-    };
-
-    // Essayer de parser les notes JSON de l'ordre de réparation
-    try {
-      if (order.notes) {
-        const parsedNotes = JSON.parse(order.notes);
-        orderData = {
-          description: parsedNotes.description || '',
-          claimNumber: parsedNotes.claimNumber || '',
-          currentMileage: parsedNotes.currentMileage || '',
-          repairs: parsedNotes.repairs || [],
-          parts: parsedNotes.parts || [],
-          discounts: parsedNotes.discounts || []
-        };
-      }
-    } catch (e) {
-      console.error('Error parsing repair order notes:', e);
-    }
-
-    // Essayer aussi de parser les champs séparés s'ils existent
-    try {
-      if (order.repairs_data) {
-        const repairs = typeof order.repairs_data === 'string' 
-          ? JSON.parse(order.repairs_data) 
-          : order.repairs_data;
-        if (Array.isArray(repairs) && repairs.length > 0) {
-          orderData.repairs = repairs;
-        }
-      }
-    } catch (e) {
-      console.error('Error parsing repairs_data:', e);
-    }
-
-    try {
-      if (order.parts_data) {
-        const parts = typeof order.parts_data === 'string' 
-          ? JSON.parse(order.parts_data) 
-          : order.parts_data;
-        if (Array.isArray(parts) && parts.length > 0) {
-          orderData.parts = parts;
-        }
-      }
-    } catch (e) {
-      console.error('Error parsing parts_data:', e);
-    }
-
-    try {
-      if (order.discounts_data) {
-        const discounts = typeof order.discounts_data === 'string' 
-          ? JSON.parse(order.discounts_data) 
-          : order.discounts_data;
-        if (Array.isArray(discounts) && discounts.length > 0) {
-          orderData.discounts = discounts;
-        }
-      }
-    } catch (e) {
-      console.error('Error parsing discounts_data:', e);
-    }
-
-    // Utiliser les champs directs comme fallback
-    if (!orderData.description && order.description) {
-      orderData.description = order.description;
-    }
-    if (!orderData.claimNumber && order.claim_number) {
-      orderData.claimNumber = order.claim_number;
-    }
-    if (!orderData.currentMileage && order.current_mileage) {
-      orderData.currentMileage = order.current_mileage;
-    }
-
-    // Créer un objet facture formaté selon ce que useInvoiceFormLogic attend
-    const invoiceData = {
-      // Champs de base de la facture
+    const prefilledData: Partial<Invoice> = {
       client_id: order.client_id,
       vehicle_id: order.vehicle_id,
       repair_order_id: order.id,
       status: 'En attente de paiement',
-      
-      // Relations pour l'affichage
-      clients: order.clients,
-      vehicles: order.vehicles,
-      
-      // Données métier dans notes (format attendu par useInvoiceFormLogic)
-      notes: JSON.stringify(orderData),
-      
-      // Champs individuels pour compatibilité
-      description: orderData.description,
-      claim_number: orderData.claimNumber,
-      current_mileage: orderData.currentMileage,
-      repairs_data: orderData.repairs,
-      parts_data: orderData.parts,
-      discounts_data: orderData.discounts
+      due_date: today,
+      notes: order.notes || '',
+      // Ne pas inclure l'ID pour forcer la création d'une nouvelle facture
     };
-    
-    console.log('Invoice data being passed to form:', {
-      originalOrder: order,
-      parsedOrderData: orderData,
-      finalInvoiceData: invoiceData
-    });
-    
-    setSelectedOrderForInvoice(invoiceData);
+
+    console.log('Converting repair order to invoice with data:', prefilledData);
+    console.log('Original repair order data:', order);
+
+    // Passer les données de pré-remplissage pour la création d'une nouvelle facture
+    setPrefilledInvoice(prefilledData);
     setInvoiceDialogOpen(true);
   };
 
@@ -248,10 +155,10 @@ const RepairOrders = () => {
         onOpenChange={(open) => {
           setInvoiceDialogOpen(open);
           if (!open) {
-            setSelectedOrderForInvoice(null);
+            setPrefilledInvoice(null);
           }
         }}
-        invoice={selectedOrderForInvoice}
+        invoice={prefilledInvoice as Invoice}
       />
     </div>
   );
