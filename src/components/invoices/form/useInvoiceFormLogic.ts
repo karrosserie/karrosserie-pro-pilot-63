@@ -1,56 +1,51 @@
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Invoice } from '@/services/supabase/invoices';
-import { useInvoiceFormState } from './hooks/useInvoiceFormState';
-import { useInvoiceCalculations } from './hooks/useInvoiceCalculations';
-import { useInvoiceValidation } from './hooks/useInvoiceValidation';
-import { generateNextInvoiceNumber, prepareSubmitData, parseInvoiceNotes } from './utils/invoiceFormUtils';
+import { InvoiceRepairItem, InvoicePartItem, InvoiceDiscountItem } from './types';
+import { validateInvoiceForm } from './utils/validation';
+import { calculateGlobalTotals } from './hooks/useInvoiceCalculations';
+import { prepareSubmitData, parseInvoiceNotes, generateNextInvoiceNumber } from './utils/invoiceFormUtils';
 
 interface UseInvoiceFormLogicProps {
   invoice?: Invoice | null;
 }
 
 export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
-  const {
-    formData,
-    setFormData,
-    description,
-    setDescription,
-    claimNumber,
-    setClaimNumber,
-    currentMileage,
-    setCurrentMileage,
-    repairs,
-    setRepairs,
-    parts,
-    setParts,
-    discounts,
-    setDiscounts,
-    errors,
-    setErrors,
-    isReadOnly
-  } = useInvoiceFormState({ invoice });
+  const [formData, setFormData] = useState<Partial<Invoice>>({
+    reference: '',
+    client_id: '',
+    vehicle_id: '',
+    status: 'En attente de paiement',
+    due_date: '',
+    payment_details: ''
+  });
 
-  const { calculateGlobalTotals } = useInvoiceCalculations();
-  const { validateForm } = useInvoiceValidation();
+  const [description, setDescription] = useState('');
+  const [claimNumber, setClaimNumber] = useState('');
+  const [currentMileage, setCurrentMileage] = useState('');
+  const [repairs, setRepairs] = useState<InvoiceRepairItem[]>([]);
+  const [parts, setParts] = useState<InvoicePartItem[]>([]);
+  const [discounts, setDiscounts] = useState<InvoiceDiscountItem[]>([]);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Déterminer si le formulaire est en lecture seule
+  const isReadOnly = formData.status === 'Payée';
+
+  const validateForm = () => {
+    const validationResult = validateInvoiceForm(formData, claimNumber, currentMileage);
+    setErrors(validationResult.errors);
+    return validationResult.isValid;
+  };
 
   const handleChange = (field: string, value: any) => {
-    console.log('handleChange called with:', { field, value, isReadOnly });
-    
-    if (isReadOnly && field !== 'payment_method' && field !== 'payment_date') {
-      console.log('Blocked change due to readonly mode');
+    if (isReadOnly && field !== 'status') {
       return;
     }
     
     if (field === 'description') {
       setDescription(value);
     } else {
-      console.log('Updating formData:', field, value);
-      setFormData(prev => {
-        const newData = { ...prev, [field]: value };
-        console.log('New formData after update:', newData);
-        return newData;
-      });
+      setFormData(prev => ({ ...prev, [field]: value }));
     }
     
     if (errors[field]) {
@@ -61,7 +56,6 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
   const handleClaimNumberChange = (value: string) => {
     if (!isReadOnly) {
       setClaimNumber(value);
-      console.log('Claim number changed to:', value);
       if (errors.claim_number) {
         setErrors(prev => ({ ...prev, claim_number: '' }));
       }
@@ -71,23 +65,10 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
   const handleCurrentMileageChange = (value: string) => {
     if (!isReadOnly) {
       setCurrentMileage(value);
-      console.log('Current mileage changed to:', value);
       if (errors.current_mileage) {
         setErrors(prev => ({ ...prev, current_mileage: '' }));
       }
     }
-  };
-
-  const validateFormData = () => {
-    return validateForm(formData, claimNumber, currentMileage, setErrors);
-  };
-
-  const calculateTotals = () => {
-    return calculateGlobalTotals(repairs, parts, discounts);
-  };
-
-  const prepareFormSubmitData = () => {
-    return prepareSubmitData(formData, description, claimNumber, currentMileage, repairs, parts, discounts);
   };
 
   useEffect(() => {
@@ -98,46 +79,34 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
         vehicle_id: invoice.vehicle_id,
         status: invoice.status || 'En attente de paiement',
         due_date: invoice.due_date,
-        payment_due_date: invoice.payment_due_date,
-        payment_method: invoice.payment_method,
-        payment_date: invoice.payment_date,
-        notes: invoice.notes || ''
+        payment_details: invoice.payment_details || ''
       });
       
-      if (invoice.notes) {
-        const parsedData = parseInvoiceNotes(invoice.notes);
-        setDescription(parsedData.description);
-        setClaimNumber(parsedData.claimNumber);
-        setCurrentMileage(parsedData.currentMileage);
-        setRepairs(parsedData.repairs);
-        setParts(parsedData.parts);
-        setDiscounts(parsedData.discounts);
-      } else {
-        setDescription('');
-        setClaimNumber('');
-        setCurrentMileage('');
-        setRepairs([]);
-        setParts([]);
-        setDiscounts([]);
-      }
+      const parsedData = parseInvoiceNotes(invoice.notes || '');
+      setDescription(parsedData.description);
+      setClaimNumber(parsedData.claimNumber);
+      setCurrentMileage(parsedData.currentMileage);
+      setRepairs(parsedData.repairs);
+      setParts(parsedData.parts);
+      setDiscounts(parsedData.discounts);
     } else {
-      // Initialiser avec la date d'aujourd'hui
+      // Pour une nouvelle facture, générer automatiquement le numéro
       const today = new Date().toISOString().split('T')[0];
-      const dueDate = new Date();
-      dueDate.setDate(dueDate.getDate() + 30);
       
       generateNextInvoiceNumber().then(nextNumber => {
         setFormData(prev => ({
           ...prev,
           reference: nextNumber,
-          status: 'En attente de paiement',
-          due_date: today, // Utiliser la date d'aujourd'hui
-          payment_due_date: dueDate.toISOString().split('T')[0] // Date d'échéance à 30 jours
+          due_date: today
         }));
       });
+      
       setDescription('');
       setClaimNumber('');
       setCurrentMileage('');
+      setRepairs([]);
+      setParts([]);
+      setDiscounts([]);
     }
   }, [invoice]);
 
@@ -157,8 +126,8 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
     handleChange,
     handleClaimNumberChange,
     handleCurrentMileageChange,
-    validateForm: validateFormData,
-    calculateGlobalTotals: calculateTotals,
-    prepareSubmitData: prepareFormSubmitData
+    validateForm,
+    calculateGlobalTotals: () => calculateGlobalTotals(repairs, parts, discounts),
+    prepareSubmitData: () => prepareSubmitData(formData, description, claimNumber, currentMileage, repairs, parts, discounts)
   };
 };
