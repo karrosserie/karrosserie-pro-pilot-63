@@ -1,9 +1,9 @@
-
 import React, { useState } from 'react';
 import { RepairOrdersHeader } from '@/components/repair-orders/RepairOrdersHeader';
 import { RepairOrdersTable } from '@/components/repair-orders/RepairOrdersTable';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
 import RepairOrderEmailDialog from '@/components/repair-orders/RepairOrderEmailDialog';
+import RepairOrderSignatureDialog from '@/components/repair-orders/RepairOrderSignatureDialog';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import LoadingSpinner from '@/components/ui/loading-spinner';
@@ -14,8 +14,10 @@ const RepairOrders = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [signatureDialogOpen, setSignatureDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<RepairOrder | null>(null);
   const [selectedOrderForEmail, setSelectedOrderForEmail] = useState<RepairOrder | null>(null);
+  const [selectedOrderForSignature, setSelectedOrderForSignature] = useState<RepairOrder | null>(null);
   const { toast } = useToast();
   
   const { orders, isLoading, error } = useRepairOrders();
@@ -56,10 +58,8 @@ const RepairOrders = () => {
   };
 
   const handleSignOrder = (order: RepairOrder) => {
-    toast({
-      title: "Signature de l'ordre de réparation",
-      description: `L'ordre de réparation ${order.reference} a été signé`
-    });
+    setSelectedOrderForSignature(order);
+    setSignatureDialogOpen(true);
   };
 
   const handleRequestDocuments = (order: RepairOrder) => {
@@ -123,6 +123,12 @@ const RepairOrders = () => {
         repairOrder={selectedOrderForEmail}
         open={emailDialogOpen}
         onOpenChange={setEmailDialogOpen}
+      />
+
+      <RepairOrderSignatureDialog
+        repairOrder={selectedOrderForSignature}
+        open={signatureDialogOpen}
+        onOpenChange={setSignatureDialogOpen}
       />
     </div>
   );
