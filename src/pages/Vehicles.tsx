@@ -1,7 +1,6 @@
 
 import React from 'react';
 import VehicleDialog from '@/components/vehicle/VehicleDialog';
-import VehicleDocumentDialogs from '@/components/vehicle/VehicleDocumentDialogs';
 import VehiclesHeader from '@/components/vehicle/VehiclesHeader';
 import VehiclesGrid from '@/components/vehicle/VehiclesGrid';
 import VehiclesEmptyState from '@/components/vehicle/VehiclesEmptyState';
@@ -18,12 +17,6 @@ const Vehicles = () => {
     vehicles,
     isLoading,
     error,
-    quoteDialogOpen,
-    setQuoteDialogOpen,
-    invoiceDialogOpen,
-    setInvoiceDialogOpen,
-    selectedVehicleForDocument,
-    setSelectedVehicleForDocument,
     setDialogOpen,
     setSearchQuery,
     handleCreateVehicle,
@@ -31,8 +24,6 @@ const Vehicles = () => {
     handleEditVehicle,
     handleDeleteVehicle,
     handleVehicleSubmit,
-    handleCreateQuote,
-    handleCreateInvoice,
   } = useVehiclesPage();
 
   if (isLoading) return <TableLoading />;
@@ -58,8 +49,6 @@ const Vehicles = () => {
           onViewVehicle={handleViewVehicle}
           onEditVehicle={handleEditVehicle}
           onDeleteVehicle={handleDeleteVehicle}
-          onCreateQuote={handleCreateQuote}
-          onCreateInvoice={handleCreateInvoice}
         />
       )}
 
@@ -83,15 +72,6 @@ const Vehicles = () => {
         defaultValues={selectedVehicle || {}}
         onSubmit={handleVehicleSubmit}
         mode={dialogMode}
-      />
-
-      <VehicleDocumentDialogs
-        quoteDialogOpen={quoteDialogOpen}
-        setQuoteDialogOpen={setQuoteDialogOpen}
-        invoiceDialogOpen={invoiceDialogOpen}
-        setInvoiceDialogOpen={setInvoiceDialogOpen}
-        selectedVehicleForDocument={selectedVehicleForDocument}
-        setSelectedVehicleForDocument={setSelectedVehicleForDocument}
       />
     </div>
   );

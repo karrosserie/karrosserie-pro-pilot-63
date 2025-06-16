@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -16,7 +17,6 @@ interface Vehicle extends VehicleRow {
     name: string;
   };
   clients?: {
-    id: string;
     first_name: string;
     last_name: string;
   };
@@ -76,7 +76,6 @@ export function useVehicles() {
           car_brands(id, name),
           car_models(id, name),
           clients (
-            id,
             first_name,
             last_name
           )
