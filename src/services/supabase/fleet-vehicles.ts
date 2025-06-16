@@ -47,7 +47,22 @@ export const fleetVehiclesService = {
     const { data, error } = await supabase
       .from('fleet_vehicles')
       .select(`
-        *,
+        id,
+        brand_id,
+        model_id,
+        license_plate,
+        color,
+        year,
+        vin,
+        engine_number,
+        mileage,
+        status,
+        insurance_card_url,
+        registration_front_url,
+        registration_back_url,
+        created_at,
+        updated_at,
+        user_id,
         car_brands(id, name),
         car_models(id, name)
       `)
@@ -68,7 +83,22 @@ export const fleetVehiclesService = {
     const { data, error } = await supabase
       .from('fleet_vehicles')
       .select(`
-        *,
+        id,
+        brand_id,
+        model_id,
+        license_plate,
+        color,
+        year,
+        vin,
+        engine_number,
+        mileage,
+        status,
+        insurance_card_url,
+        registration_front_url,
+        registration_back_url,
+        created_at,
+        updated_at,
+        user_id,
         car_brands(id, name),
         car_models(id, name)
       `)
@@ -91,7 +121,22 @@ export const fleetVehiclesService = {
       .from('fleet_vehicles')
       .insert([vehicle])
       .select(`
-        *,
+        id,
+        brand_id,
+        model_id,
+        license_plate,
+        color,
+        year,
+        vin,
+        engine_number,
+        mileage,
+        status,
+        insurance_card_url,
+        registration_front_url,
+        registration_back_url,
+        created_at,
+        updated_at,
+        user_id,
         car_brands(id, name),
         car_models(id, name)
       `)
@@ -114,7 +159,22 @@ export const fleetVehiclesService = {
       .update(vehicle)
       .eq('id', id)
       .select(`
-        *,
+        id,
+        brand_id,
+        model_id,
+        license_plate,
+        color,
+        year,
+        vin,
+        engine_number,
+        mileage,
+        status,
+        insurance_card_url,
+        registration_front_url,
+        registration_back_url,
+        created_at,
+        updated_at,
+        user_id,
         car_brands(id, name),
         car_models(id, name)
       `)
