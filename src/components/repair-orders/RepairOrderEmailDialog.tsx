@@ -48,9 +48,6 @@ const RepairOrderEmailDialog: React.FC<RepairOrderEmailDialogProps> = ({
             <Mail className="h-5 w-5" />
             Envoyer l'ordre de réparation par e-mail
           </DialogTitle>
-          <DialogDescription>
-            Envoyer l'ordre de réparation {repairOrder?.reference || ''} par e-mail au client.
-          </DialogDescription>
         </DialogHeader>
         
         <EmailFormFields
