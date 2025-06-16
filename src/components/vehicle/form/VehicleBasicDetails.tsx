@@ -133,6 +133,9 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
           searchPlaceholder="Rechercher un modèle..."
           disabled={isViewMode || !formData.brand || modelsLoading}
         />
+        {modelsLoading && formData.brand && (
+          <p className="text-sm text-gray-500">Chargement des modèles...</p>
+        )}
       </div>
     </div>
   );
