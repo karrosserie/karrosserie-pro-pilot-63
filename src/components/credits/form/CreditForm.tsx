@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
 import { CreditBasicInfoSection } from './CreditBasicInfoSection';
@@ -10,9 +9,10 @@ import { useCredits } from '@/hooks/use-credits';
 
 interface CreditFormProps {
   onClose: () => void;
+  preselectedInvoice?: { invoice_id: string; reference: string; status: string; amount: number; notes: string } | null;
 }
 
-export const CreditForm = ({ onClose }: CreditFormProps) => {
+export const CreditForm = ({ onClose, preselectedInvoice }: CreditFormProps) => {
   const { createCredit } = useCredits();
   const {
     formData,
@@ -23,8 +23,21 @@ export const CreditForm = ({ onClose }: CreditFormProps) => {
     updateItem,
     removeItem,
     calculateTotal,
-    setErrors
+    setErrors,
+    setFormData
   } = useCreditFormState();
+
+  useEffect(() => {
+    if (preselectedInvoice) {
+      setFormData(prev => ({
+        ...prev,
+        invoice_id: preselectedInvoice.invoice_id,
+        reference: preselectedInvoice.reference,
+        status: preselectedInvoice.status,
+        notes: preselectedInvoice.notes
+      }));
+    }
+  }, [preselectedInvoice, setFormData]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};

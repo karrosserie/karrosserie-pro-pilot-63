@@ -12,6 +12,8 @@ import {
 import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import InvoiceEmailDialog from '@/components/invoices/InvoiceEmailDialog';
+import ReceiptDialog from '@/components/receipts/ReceiptDialog';
+import { CreditDialog } from '@/components/credits/CreditDialog';
 import { useInvoices } from '@/hooks/use-invoices';
 import { Invoice } from '@/services/supabase/invoices';
 import LoadingSpinner from '@/components/ui/loading-spinner';
@@ -32,6 +34,8 @@ const Invoices = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
+  const [creditDialogOpen, setCreditDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const { toast } = useToast();
   
@@ -108,17 +112,13 @@ const Invoices = () => {
   };
 
   const handleAddPayment = (invoice: Invoice) => {
-    toast({
-      title: "Ajouter un paiement",
-      description: `Ajout d'un paiement pour la facture ${invoice.reference}`
-    });
+    setSelectedInvoice(invoice);
+    setReceiptDialogOpen(true);
   };
 
   const handleAddCredit = (invoice: Invoice) => {
-    toast({
-      title: "Ajouter un avoir",
-      description: `Ajout d'un avoir pour la facture ${invoice.reference}`
-    });
+    setSelectedInvoice(invoice);
+    setCreditDialogOpen(true);
   };
 
   if (isLoading) {
@@ -288,6 +288,34 @@ const Invoices = () => {
         invoice={selectedInvoice}
         open={emailDialogOpen}
         onOpenChange={setEmailDialogOpen}
+      />
+
+      <ReceiptDialog
+        receipt={selectedInvoice ? {
+          invoice: selectedInvoice.id,
+          reference: '',
+          date: new Date().toISOString().split('T')[0],
+          amount: selectedInvoice.amount || 0,
+          status: 'Encaissé',
+          payment_method: 'Virement',
+          bank_account: '',
+          notes: '',
+          payment_proofs: []
+        } : null}
+        open={receiptDialogOpen}
+        onOpenChange={setReceiptDialogOpen}
+      />
+
+      <CreditDialog
+        credit={selectedInvoice ? {
+          invoice_id: selectedInvoice.id,
+          reference: '',
+          status: 'Émis',
+          amount: 0,
+          notes: ''
+        } : null}
+        open={creditDialogOpen}
+        onOpenChange={setCreditDialogOpen}
       />
     </div>
   );
