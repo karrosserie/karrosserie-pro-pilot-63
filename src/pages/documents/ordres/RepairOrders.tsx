@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { RepairOrdersHeader } from '@/components/repair-orders/RepairOrdersHeader';
 import { RepairOrdersTable } from '@/components/repair-orders/RepairOrdersTable';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
+import RepairOrderEmailDialog from '@/components/repair-orders/RepairOrderEmailDialog';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import LoadingSpinner from '@/components/ui/loading-spinner';
@@ -12,7 +13,9 @@ import { useToast } from '@/hooks/use-toast';
 const RepairOrders = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<RepairOrder | null>(null);
+  const [selectedOrderForEmail, setSelectedOrderForEmail] = useState<RepairOrder | null>(null);
   const { toast } = useToast();
   
   const { orders, isLoading, error } = useRepairOrders();
@@ -48,10 +51,8 @@ const RepairOrders = () => {
   };
 
   const handleSendEmail = (order: RepairOrder) => {
-    toast({
-      title: "Envoi par e-mail",
-      description: `Envoi de l'ordre de réparation ${order.reference} par e-mail...`
-    });
+    setSelectedOrderForEmail(order);
+    setEmailDialogOpen(true);
   };
 
   const handleSignOrder = (order: RepairOrder) => {
@@ -116,6 +117,12 @@ const RepairOrders = () => {
         order={selectedOrder}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
+      />
+
+      <RepairOrderEmailDialog
+        repairOrder={selectedOrderForEmail}
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
       />
     </div>
   );
