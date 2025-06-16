@@ -86,7 +86,16 @@ BEGIN
   ELSE
     -- Update existing reference column to ensure it's not null
     ALTER TABLE public.cessions ALTER COLUMN reference SET DEFAULT '';
-    UPDATE public.cessions SET reference = 'CC-' || EXTRACT(YEAR FROM created_at) || '-' || LPAD(ROW_NUMBER() OVER (ORDER BY created_at)::TEXT, 3, '0') WHERE reference IS NULL OR reference = '';
+    
+    -- Update records with empty references using a simpler approach
+    UPDATE public.cessions 
+    SET reference = 'CC-' || EXTRACT(YEAR FROM created_at) || '-' || LPAD((
+      SELECT COUNT(*) + 1 
+      FROM public.cessions c2 
+      WHERE c2.created_at <= public.cessions.created_at 
+      AND EXTRACT(YEAR FROM c2.created_at) = EXTRACT(YEAR FROM public.cessions.created_at)
+    )::TEXT, 3, '0')
+    WHERE reference IS NULL OR reference = '';
   END IF;
   
   -- Ensure status column exists with proper default and constraint
@@ -194,4 +203,3 @@ COMMENT ON COLUMN public.cessions.policy_number IS 'Insurance policy number';
 COMMENT ON COLUMN public.cessions.report_number IS 'Expert report number';
 COMMENT ON COLUMN public.cessions.expert_name IS 'Name of the insurance expert';
 COMMENT ON COLUMN public.cessions.insurance_company_id IS 'Reference to the insurance company';
-
