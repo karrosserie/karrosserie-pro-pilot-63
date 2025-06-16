@@ -62,6 +62,9 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
   const createCompleteVehicle = (partialVehicle: any): FleetVehicle => {
     return {
       id: partialVehicle.id,
+      // Support both old and new structure
+      brand: partialVehicle.brand || '',
+      model: partialVehicle.model || '',
       brand_id: partialVehicle.brand_id || '',
       model_id: partialVehicle.model_id || '',
       license_plate: partialVehicle.license_plate || '',

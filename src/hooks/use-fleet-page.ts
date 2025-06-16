@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from 'react';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
@@ -35,22 +34,12 @@ export const useFleetPage = () => {
     });
   }, [vehicles, reservations]);
 
-  // Helper function to get vehicle display name
-  const getVehicleDisplayName = (vehicle: any) => {
-    if (vehicle.car_brands?.name && vehicle.car_models?.name) {
-      return `${vehicle.car_brands.name} ${vehicle.car_models.name}`;
-    } else if (vehicle.fleet_vehicles?.car_brands?.name && vehicle.fleet_vehicles?.car_models?.name) {
-      return `${vehicle.fleet_vehicles.car_brands.name} ${vehicle.fleet_vehicles.car_models.name}`;
-    }
-    return 'N/A N/A';
-  };
-
   // Convert reservations to current loans format
   const currentLoans = (reservations || [])
     .filter(reservation => reservation.status === 'active')
     .map(reservation => ({
       id: reservation.id,
-      vehicle: `${getVehicleDisplayName(reservation)} - ${reservation.fleet_vehicles?.license_plate || 'N/A'}`,
+      vehicle: `${reservation.fleet_vehicles?.brand || 'N/A'} ${reservation.fleet_vehicles?.model || 'N/A'} - ${reservation.fleet_vehicles?.license_plate || 'N/A'}`,
       client: `${reservation.clients?.first_name || ''} ${reservation.clients?.last_name || ''}`,
       startDate: new Date(reservation.start_date).toLocaleDateString('fr-FR'),
       expectedReturnDate: new Date(reservation.expected_return_date).toLocaleDateString('fr-FR')
@@ -91,7 +80,7 @@ export const useFleetPage = () => {
     console.log('Loan data:', loanData);
     toast({
       title: "Prêt enregistré",
-      description: `Le véhicule ${vehicleToLend?.car_brands?.name} ${vehicleToLend?.car_models?.name} a été prêté avec succès.`
+      description: `Le véhicule ${vehicleToLend?.brand} ${vehicleToLend?.model} a été prêté avec succès.`
     });
   };
 
