@@ -1,6 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { repairOrdersService } from '@/services/supabase/repair-orders';
 
 export function useRepairOrder(id?: string) {
   const {
@@ -11,30 +11,7 @@ export function useRepairOrder(id?: string) {
     queryKey: ['repair-order', id],
     queryFn: async () => {
       if (!id) return null;
-      
-      const { data, error } = await supabase
-        .from('repair_orders')
-        .select(`
-          *,
-          clients(id, first_name, last_name),
-          vehicles(
-            id,
-            license_plate,
-            brand,
-            model,
-            car_brands(id, name),
-            car_models(id, name)
-          )
-        `)
-        .eq('id', id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching repair order:', error);
-        throw new Error(error.message);
-      }
-
-      return data;
+      return await repairOrdersService.getById(id);
     },
     enabled: !!id
   });

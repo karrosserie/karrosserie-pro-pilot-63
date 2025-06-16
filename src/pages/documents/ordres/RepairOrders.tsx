@@ -26,11 +26,33 @@ const RepairOrders = () => {
   
   const { orders, isLoading, error } = useRepairOrders();
   
-  const filteredOrders = orders?.filter(order => 
-    order.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (order.clients && `${order.clients.first_name} ${order.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (order.vehicles && `${order.vehicles.car_brands?.name || 'Marque inconnue'} ${order.vehicles.car_models?.name || 'Modèle inconnu'} - ${order.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
-  ) || [];
+  const filteredOrders = orders?.filter(order => {
+    const searchLower = searchTerm.toLowerCase();
+    
+    // Search by reference
+    if (order.reference?.toLowerCase().includes(searchLower)) {
+      return true;
+    }
+    
+    // Search by client name
+    if (order.clients && `${order.clients.first_name} ${order.clients.last_name}`.toLowerCase().includes(searchLower)) {
+      return true;
+    }
+    
+    // Search by vehicle info
+    if (order.vehicles) {
+      const brand = order.vehicles.brand || order.vehicles.car_brands?.name || '';
+      const model = order.vehicles.model || order.vehicles.car_models?.name || '';
+      const licensePlate = order.vehicles.license_plate || '';
+      const vehicleInfo = `${brand} ${model} - ${licensePlate}`.toLowerCase();
+      
+      if (vehicleInfo.includes(searchLower)) {
+        return true;
+      }
+    }
+    
+    return false;
+  }) || [];
 
   const handleCreateOrder = () => {
     setSelectedOrder(null);

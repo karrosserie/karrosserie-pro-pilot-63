@@ -1,7 +1,8 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { repairOrdersService } from '@/services/supabase/repair-orders';
+import { NewRepairOrder, UpdateRepairOrder } from '@/services/supabase/repair-orders/types';
 
 export function useRepairOrders() {
   const queryClient = useQueryClient();
@@ -13,71 +14,12 @@ export function useRepairOrders() {
     error
   } = useQuery({
     queryKey: ['repair-orders'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('repair_orders')
-        .select(`
-          *,
-          clients(id, first_name, last_name),
-          vehicles(
-            id,
-            license_plate,
-            brand,
-            model,
-            car_brands(id, name),
-            car_models(id, name)
-          )
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching repair orders:', error);
-        throw new Error(error.message);
-      }
-
-      return data;
-    }
+    queryFn: repairOrdersService.getAll
   });
 
   const createOrder = useMutation({
-    mutationFn: async (orderData: any) => {
-      // Récupérer l'utilisateur actuel
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
-      if (userError || !user) {
-        console.error('Error getting current user:', userError);
-        throw new Error('User not authenticated');
-      }
-
-      // Ajouter l'ID utilisateur aux données de l'ordre
-      const orderWithUser = {
-        ...orderData,
-        user_id: user.id
-      };
-
-      const { data, error } = await supabase
-        .from('repair_orders')
-        .insert([orderWithUser])
-        .select(`
-          *,
-          clients(first_name, last_name),
-          vehicles(
-            id,
-            license_plate,
-            brand,
-            model,
-            car_brands(id, name),
-            car_models(id, name)
-          )
-        `)
-        .single();
-
-      if (error) {
-        console.error('Error creating repair order:', error);
-        throw new Error(error.message);
-      }
-
-      return data;
+    mutationFn: async (orderData: NewRepairOrder) => {
+      return await repairOrdersService.create(orderData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['repair-orders'] });
@@ -96,31 +38,8 @@ export function useRepairOrders() {
   });
 
   const updateOrder = useMutation({
-    mutationFn: async ({ id, data }: { id: string, data: any }) => {
-      const { data: result, error } = await supabase
-        .from('repair_orders')
-        .update(data)
-        .eq('id', id)
-        .select(`
-          *,
-          clients(first_name, last_name),
-          vehicles(
-            id,
-            license_plate,
-            brand,
-            model,
-            car_brands(id, name),
-            car_models(id, name)
-          )
-        `)
-        .single();
-
-      if (error) {
-        console.error('Error updating repair order:', error);
-        throw new Error(error.message);
-      }
-
-      return result;
+    mutationFn: async ({ id, data }: { id: string, data: UpdateRepairOrder }) => {
+      return await repairOrdersService.update(id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['repair-orders'] });
@@ -140,17 +59,7 @@ export function useRepairOrders() {
 
   const deleteOrder = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('repair_orders')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error('Error deleting repair order:', error);
-        throw new Error(error.message);
-      }
-
-      return true;
+      return await repairOrdersService.delete(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['repair-orders'] });
