@@ -151,6 +151,7 @@ export type Database = {
           report_number: string | null
           sale_amount: number | null
           sale_date: string | null
+          sale_price: number | null
           status: string | null
           updated_at: string
           user_id: string
@@ -174,6 +175,7 @@ export type Database = {
           report_number?: string | null
           sale_amount?: number | null
           sale_date?: string | null
+          sale_price?: number | null
           status?: string | null
           updated_at?: string
           user_id: string
@@ -197,6 +199,7 @@ export type Database = {
           report_number?: string | null
           sale_amount?: number | null
           sale_date?: string | null
+          sale_price?: number | null
           status?: string | null
           updated_at?: string
           user_id?: string
