@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useFleetReturns, useFleetReturnByReservation } from '@/hooks/use-fleet-returns';
 import { useFleetReservation } from '@/hooks/use-fleet-reservations';
@@ -20,6 +19,7 @@ export const useFleetReturnForm = (
   // Helper function to get current date/time for datetime-local input
   const getCurrentDateTime = () => {
     const now = new Date();
+    // Format for datetime-local input: YYYY-MM-DDTHH:MM
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
