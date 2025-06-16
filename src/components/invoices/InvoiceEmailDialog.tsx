@@ -51,9 +51,6 @@ export const InvoiceEmailDialog = ({ invoice, open, onOpenChange }: InvoiceEmail
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Envoyer la facture par e-mail</DialogTitle>
-          <DialogDescription>
-            Envoi de la facture {invoice?.reference} par e-mail
-          </DialogDescription>
         </DialogHeader>
 
         <EmailFormFields
