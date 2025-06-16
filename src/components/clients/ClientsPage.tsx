@@ -4,6 +4,9 @@ import ClientsHeader from './ClientsHeader';
 import ClientsTable from './ClientsTable';
 import ClientsFilters from './ClientsFilters';
 import ClientDialog from '@/components/client/ClientDialog';
+import QuoteDialog from '@/components/quotes/QuoteDialog';
+import InvoiceDialog from '@/components/invoices/InvoiceDialog';
+import { CreditDialog } from '@/components/credits/CreditDialog';
 import { useClients } from '@/hooks/use-clients';
 import { Client } from '@/services/supabase/clients';
 import { TableLoading } from '@/components/ui/loading';
@@ -14,6 +17,13 @@ const ClientsPage = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  
+  // États pour les nouveaux dialogues
+  const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
+  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
+  const [creditDialogOpen, setCreditDialogOpen] = useState(false);
+  const [selectedClientForDocument, setSelectedClientForDocument] = useState<Client | null>(null);
+  
   const { clients, isLoading, error, createClient, updateClient, deleteClient } = useClients();
   const [searchTerm, setSearchTerm] = useState('');
   const { user } = useAuth();
@@ -51,6 +61,25 @@ const ClientsPage = () => {
 
   const handleDeleteClient = (client: Client) => {
     deleteClient.mutate(client.id);
+  };
+
+  // Nouveaux handlers pour les documents
+  const handleCreateQuote = (client: Client) => {
+    console.log('Opening quote dialog for client:', client);
+    setSelectedClientForDocument(client);
+    setQuoteDialogOpen(true);
+  };
+
+  const handleCreateInvoice = (client: Client) => {
+    console.log('Opening invoice dialog for client:', client);
+    setSelectedClientForDocument(client);
+    setInvoiceDialogOpen(true);
+  };
+
+  const handleCreateCredit = (client: Client) => {
+    console.log('Opening credit dialog for client:', client);
+    setSelectedClientForDocument(client);
+    setCreditDialogOpen(true);
   };
 
   const handleClientSubmit = (data: any) => {
@@ -106,6 +135,9 @@ const ClientsPage = () => {
         onViewClient={handleViewClient}
         onEditClient={handleEditClient}
         onDeleteClient={handleDeleteClient}
+        onCreateQuote={handleCreateQuote}
+        onCreateInvoice={handleCreateInvoice}
+        onCreateCredit={handleCreateCredit}
       />
 
       <ClientDialog
@@ -140,6 +172,59 @@ const ClientsPage = () => {
         } : {}}
         onSubmit={handleClientSubmit}
         mode={dialogMode}
+      />
+
+      {/* Dialogue de création de devis */}
+      <QuoteDialog
+        open={quoteDialogOpen}
+        onOpenChange={(open) => {
+          console.log('Quote dialog open state changing to:', open);
+          setQuoteDialogOpen(open);
+          if (!open) {
+            setSelectedClientForDocument(null);
+          }
+        }}
+        quote={selectedClientForDocument ? {
+          client_id: selectedClientForDocument.id,
+          clients: {
+            id: selectedClientForDocument.id,
+            first_name: selectedClientForDocument.first_name,
+            last_name: selectedClientForDocument.last_name
+          }
+        } as any : null}
+      />
+
+      {/* Dialogue de création de facture */}
+      <InvoiceDialog
+        open={invoiceDialogOpen}
+        onOpenChange={(open) => {
+          console.log('Invoice dialog open state changing to:', open);
+          setInvoiceDialogOpen(open);
+          if (!open) {
+            setSelectedClientForDocument(null);
+          }
+        }}
+        invoice={selectedClientForDocument ? {
+          client_id: selectedClientForDocument.id,
+          clients: {
+            id: selectedClientForDocument.id,
+            first_name: selectedClientForDocument.first_name,
+            last_name: selectedClientForDocument.last_name
+          }
+        } as any : null}
+      />
+
+      {/* Dialogue de création d'avoir */}
+      <CreditDialog
+        open={creditDialogOpen}
+        onOpenChange={(open) => {
+          console.log('Credit dialog open state changing to:', open);
+          setCreditDialogOpen(open);
+          if (!open) {
+            setSelectedClientForDocument(null);
+          }
+        }}
+        credit={null}
       />
     </div>
   );
