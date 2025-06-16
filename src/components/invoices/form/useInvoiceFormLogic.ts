@@ -96,6 +96,7 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
         
         try {
           const nextNumber = await generateNextInvoiceNumber();
+          console.log('Generated invoice number:', nextNumber);
           setFormData(prev => ({
             ...prev,
             reference: nextNumber,
@@ -105,7 +106,7 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
           console.error('Erreur lors de la génération du numéro de facture:', error);
           setFormData(prev => ({
             ...prev,
-            reference: '1',
+            reference: 'F-001',
             due_date: today
           }));
         }
