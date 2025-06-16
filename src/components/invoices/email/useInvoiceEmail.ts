@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Invoice } from '@/services/supabase/invoices';
+import { clientsService } from '@/services/supabase/clients';
 import { EmailFormData } from './types';
 
 export const useInvoiceEmail = (invoice: Invoice | null, open: boolean) => {
@@ -14,22 +15,38 @@ export const useInvoiceEmail = (invoice: Invoice | null, open: boolean) => {
   });
 
   useEffect(() => {
-    if (open && invoice) {
-      const clientEmail = invoice.clients?.email || '';
-      const subject = `Facture ${invoice.reference || ''} - Karrosserie`;
-      const message = `Bonjour,
+    const initializeFormData = async () => {
+      if (open && invoice) {
+        let clientEmail = '';
+        
+        // Try to get client email if we have a client_id
+        if (invoice.client_id) {
+          try {
+            const client = await clientsService.getById(invoice.client_id);
+            clientEmail = client.email || '';
+          } catch (error) {
+            console.error('Error fetching client email:', error);
+            clientEmail = '';
+          }
+        }
+
+        const subject = `Facture ${invoice.reference || ''} - Karrosserie`;
+        const message = `Bonjour,
 
 Veuillez trouver ci-joint votre facture ${invoice.reference || ''}.
 
 Cordialement,
 L'équipe Karrosserie`;
 
-      setFormData({
-        recipient: clientEmail,
-        subject,
-        message
-      });
-    }
+        setFormData({
+          recipient: clientEmail,
+          subject,
+          message
+        });
+      }
+    };
+
+    initializeFormData();
   }, [open, invoice]);
 
   const updateFormData = (field: keyof EmailFormData, value: string) => {
