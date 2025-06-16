@@ -33,7 +33,7 @@ export const CreditForm = ({ onClose, preselectedInvoice }: CreditFormProps) => 
         ...prev,
         invoice_id: preselectedInvoice.invoice_id,
         reference: preselectedInvoice.reference,
-        status: preselectedInvoice.status,
+        status: 'En attente' as const, // Use default status instead of preselectedInvoice.status
         notes: preselectedInvoice.notes
       }));
     }
