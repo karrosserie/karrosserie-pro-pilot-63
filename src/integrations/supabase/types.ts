@@ -775,7 +775,7 @@ export type Database = {
       }
       fleet_vehicles: {
         Row: {
-          brand: string
+          brand_id: string
           color: string | null
           created_at: string
           engine_number: string | null
@@ -783,7 +783,7 @@ export type Database = {
           insurance_card_url: string | null
           license_plate: string
           mileage: number | null
-          model: string
+          model_id: string
           registration_back_url: string | null
           registration_front_url: string | null
           status: string | null
@@ -793,7 +793,7 @@ export type Database = {
           year: number | null
         }
         Insert: {
-          brand: string
+          brand_id: string
           color?: string | null
           created_at?: string
           engine_number?: string | null
@@ -801,7 +801,7 @@ export type Database = {
           insurance_card_url?: string | null
           license_plate: string
           mileage?: number | null
-          model: string
+          model_id: string
           registration_back_url?: string | null
           registration_front_url?: string | null
           status?: string | null
@@ -811,7 +811,7 @@ export type Database = {
           year?: number | null
         }
         Update: {
-          brand?: string
+          brand_id?: string
           color?: string | null
           created_at?: string
           engine_number?: string | null
@@ -819,7 +819,7 @@ export type Database = {
           insurance_card_url?: string | null
           license_plate?: string
           mileage?: number | null
-          model?: string
+          model_id?: string
           registration_back_url?: string | null
           registration_front_url?: string | null
           status?: string | null
@@ -828,7 +828,22 @@ export type Database = {
           vin?: string | null
           year?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_fleet_vehicles_brand"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "car_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_fleet_vehicles_model"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "car_models"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       insurance_companies: {
         Row: {
