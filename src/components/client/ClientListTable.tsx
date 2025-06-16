@@ -65,43 +65,66 @@ const ClientListTable: React.FC<ClientListTableProps> = ({
     {
       id: "actions",
       header: "Actions",
-      cell: ({ row }) => (
-        <div className="text-right space-x-1 flex items-center justify-end">
-          <Button variant="ghost" size="icon" onClick={() => onViewClient(row.original)}>
-            <Eye className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon">
-            <Download className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => onEditClient(row.original)}>
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => onDeleteClient(row.original)}>
-            <Trash2 className="h-4 w-4" />
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuItem onClick={() => onCreateQuote?.(row.original)}>
-                <FileText className="h-4 w-4 mr-2" />
-                Créer un devis
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onCreateInvoice?.(row.original)}>
-                <Receipt className="h-4 w-4 mr-2" />
-                Créer une facture
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onCreateCredit?.(row.original)}>
-                <CreditCard className="h-4 w-4 mr-2" />
-                Créer un avoir
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const handleCreateQuote = (e: React.MouseEvent) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Creating quote for client:', row.original);
+          onCreateQuote?.(row.original);
+        };
+
+        const handleCreateInvoice = (e: React.MouseEvent) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Creating invoice for client:', row.original);
+          onCreateInvoice?.(row.original);
+        };
+
+        const handleCreateCredit = (e: React.MouseEvent) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Creating credit for client:', row.original);
+          onCreateCredit?.(row.original);
+        };
+
+        return (
+          <div className="text-right space-x-1 flex items-center justify-end">
+            <Button variant="ghost" size="icon" onClick={() => onViewClient(row.original)}>
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon">
+              <Download className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => onEditClient(row.original)}>
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => onDeleteClient(row.original)}>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 bg-white border shadow-lg z-50">
+                <DropdownMenuItem onClick={handleCreateQuote} className="cursor-pointer">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Créer un devis
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleCreateInvoice} className="cursor-pointer">
+                  <Receipt className="h-4 w-4 mr-2" />
+                  Créer une facture
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleCreateCredit} className="cursor-pointer">
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  Créer un avoir
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        );
+      },
     },
   ];
 

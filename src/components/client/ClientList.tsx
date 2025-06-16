@@ -69,16 +69,19 @@ const ClientList = () => {
 
   // Nouveaux handlers pour les documents
   const handleCreateQuote = (client: Client) => {
+    console.log('Opening quote dialog for client:', client);
     setSelectedClientForDocument(client);
     setQuoteDialogOpen(true);
   };
 
   const handleCreateInvoice = (client: Client) => {
+    console.log('Opening invoice dialog for client:', client);
     setSelectedClientForDocument(client);
     setInvoiceDialogOpen(true);
   };
 
   const handleCreateCredit = (client: Client) => {
+    console.log('Opening credit dialog for client:', client);
     setSelectedClientForDocument(client);
     setCreditDialogOpen(true);
   };
@@ -178,35 +181,54 @@ const ClientList = () => {
       {/* Dialogue de création de devis */}
       <QuoteDialog
         open={quoteDialogOpen}
-        onOpenChange={setQuoteDialogOpen}
-        quote={{
-          client_id: selectedClientForDocument?.id || '',
-          clients: selectedClientForDocument ? {
+        onOpenChange={(open) => {
+          console.log('Quote dialog open state changing to:', open);
+          setQuoteDialogOpen(open);
+          if (!open) {
+            setSelectedClientForDocument(null);
+          }
+        }}
+        quote={selectedClientForDocument ? {
+          client_id: selectedClientForDocument.id,
+          clients: {
             id: selectedClientForDocument.id,
             first_name: selectedClientForDocument.first_name,
             last_name: selectedClientForDocument.last_name
-          } : null
-        } as any}
+          }
+        } as any : null}
       />
 
       {/* Dialogue de création de facture */}
       <InvoiceDialog
         open={invoiceDialogOpen}
-        onOpenChange={setInvoiceDialogOpen}
-        invoice={{
-          client_id: selectedClientForDocument?.id || '',
-          clients: selectedClientForDocument ? {
+        onOpenChange={(open) => {
+          console.log('Invoice dialog open state changing to:', open);
+          setInvoiceDialogOpen(open);
+          if (!open) {
+            setSelectedClientForDocument(null);
+          }
+        }}
+        invoice={selectedClientForDocument ? {
+          client_id: selectedClientForDocument.id,
+          clients: {
             id: selectedClientForDocument.id,
             first_name: selectedClientForDocument.first_name,
             last_name: selectedClientForDocument.last_name
-          } : null
-        } as any}
+          }
+        } as any : null}
       />
 
       {/* Dialogue de création d'avoir */}
       <CreditDialog
         open={creditDialogOpen}
-        onOpenChange={setCreditDialogOpen}
+        onOpenChange={(open) => {
+          console.log('Credit dialog open state changing to:', open);
+          setCreditDialogOpen(open);
+          if (!open) {
+            setSelectedClientForDocument(null);
+          }
+        }}
+        credit={null}
       />
     </div>
   );
