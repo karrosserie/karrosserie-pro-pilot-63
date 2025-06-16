@@ -38,9 +38,23 @@ export function useRepairOrders() {
 
   const createOrder = useMutation({
     mutationFn: async (orderData: any) => {
+      // Récupérer l'utilisateur actuel
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        console.error('Error getting current user:', userError);
+        throw new Error('User not authenticated');
+      }
+
+      // Ajouter l'ID utilisateur aux données de l'ordre
+      const orderWithUser = {
+        ...orderData,
+        user_id: user.id
+      };
+
       const { data, error } = await supabase
         .from('repair_orders')
-        .insert([orderData])
+        .insert([orderWithUser])
         .select(`
           *,
           clients(first_name, last_name),
