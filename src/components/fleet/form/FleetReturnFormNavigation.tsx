@@ -40,13 +40,16 @@ const FleetReturnFormNavigation: React.FC<FleetReturnFormNavigationProps> = ({
         </Button>
         
         {!isLastTab ? (
-          <Button type="button" onClick={onNext}>
+          <Button 
+            type="button" 
+            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+            onClick={onNext}>
             Suivant
           </Button>
         ) : (
           <Button 
             type="submit" 
-            className="btn-primary"
+            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
             onClick={onSubmit}
             disabled={!isFormValid || isPending}
           >
