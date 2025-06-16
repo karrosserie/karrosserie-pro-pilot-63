@@ -16,7 +16,7 @@ interface Vehicle {
   mileage?: number;
   client_id?: string;
   vehicle_image_url?: string;
-  vehicle_images?: string;
+  vehicle_images?: any; // Changed from string to any to match Json type
   registration_document_front_url?: string;
   registration_document_back_url?: string;
   car_brands?: {
@@ -70,7 +70,9 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
     
     if (vehicle.vehicle_images) {
       try {
-        const parsed = JSON.parse(vehicle.vehicle_images);
+        const parsed = Array.isArray(vehicle.vehicle_images) 
+          ? vehicle.vehicle_images 
+          : JSON.parse(vehicle.vehicle_images);
         return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
       } catch {
         return null;
