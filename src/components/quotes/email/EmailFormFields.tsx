@@ -19,8 +19,8 @@ const EmailFormFields: React.FC<EmailFormFieldsProps> = ({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="recipient" className="text-sm font-medium">
-          Destinataire <span className="text-red-500">*</span>
+        <Label htmlFor="recipient" className="text-sm font-medium" required>
+          Destinataire
         </Label>
         <Input
           id="recipient"
@@ -33,8 +33,8 @@ const EmailFormFields: React.FC<EmailFormFieldsProps> = ({
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="subject" className="text-sm font-medium">
-          Sujet <span className="text-red-500">*</span>
+        <Label htmlFor="subject" className="text-sm font-medium" required>
+          Sujet
         </Label>
         <Input
           id="subject"
@@ -46,8 +46,8 @@ const EmailFormFields: React.FC<EmailFormFieldsProps> = ({
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="message" className="text-sm font-medium">
-          Message <span className="text-red-500">*</span>
+        <Label htmlFor="message" className="text-sm font-medium" required>
+          Message
         </Label>
         <Textarea
           id="message"
