@@ -43,6 +43,8 @@ export function useFleetVehicleForm(vehicle?: FleetVehicle | null) {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     
+    console.log('handleInputChange called with:', { name, value });
+    
     setFormData(prev => ({
       ...prev,
       [name]: name === 'year' ? parseInt(value) || 0 : value
@@ -50,6 +52,8 @@ export function useFleetVehicleForm(vehicle?: FleetVehicle | null) {
   };
 
   const handleSelectChange = (name: string, value: string) => {
+    console.log('handleSelectChange called with:', { name, value });
+    
     setFormData(prev => ({
       ...prev,
       [name]: value

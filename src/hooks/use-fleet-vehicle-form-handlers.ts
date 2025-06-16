@@ -41,18 +41,18 @@ export function useFleetVehicleFormHandlers({
   const { createVehicle, updateVehicle } = useFleetVehicles();
   const { user } = useAuth();
 
-  const handleBrandSelectChange = (brandName: string) => {
-    console.log('Manual brand selection:', brandName);
+  const handleBrandSelectChange = (brandId: string) => {
+    console.log('Manual brand selection:', brandId);
     setFormData(prev => ({ 
       ...prev, 
-      brand_id: brandName, // Store brand name instead of ID
+      brand_id: brandId,
       model_id: '' // Reset model when brand changes
     }));
   };
 
-  const handleModelSelectChange = (modelName: string) => {
-    console.log('Manual model selection:', modelName);
-    setFormData(prev => ({ ...prev, model_id: modelName })); // Store model name instead of ID
+  const handleModelSelectChange = (modelId: string) => {
+    console.log('Manual model selection:', modelId);
+    setFormData(prev => ({ ...prev, model_id: modelId }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -80,9 +80,8 @@ export function useFleetVehicleFormHandlers({
         registration_front_url: documentsData.registrationFrontUrl,
         registration_back_url: documentsData.registrationBackUrl,
         insurance_card_url: documentsData.insuranceCardUrl,
-        // Use brand and model names instead of IDs for now
-        brand: formData.brand_id,
-        model: formData.model_id
+        brand_id: formData.brand_id,
+        model_id: formData.model_id
       };
 
       if (mode === 'edit' && vehicle) {
