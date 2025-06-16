@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Invoice } from '@/services/supabase/invoices';
 import { InvoiceRepairItem, InvoicePartItem, InvoiceDiscountItem } from './types';
@@ -75,7 +74,10 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
     const initializeForm = async () => {
       console.log('Invoice form initializing with invoice:', invoice);
       
-      if (invoice) {
+      // Vérifier si c'est une facture existante (avec un ID) ou une nouvelle facture
+      const isExistingInvoice = invoice && invoice.id;
+      
+      if (isExistingInvoice) {
         console.log('Existing invoice, setting form data with reference:', invoice.reference);
         setFormData({
           reference: invoice.reference,
@@ -104,8 +106,8 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
           
           setFormData({
             reference: nextNumber,
-            client_id: '',
-            vehicle_id: '',
+            client_id: invoice?.client_id || '',
+            vehicle_id: invoice?.vehicle_id || '',
             status: 'En attente de paiement',
             due_date: today,
             payment_details: ''
@@ -116,8 +118,8 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
           console.error('Erreur lors de la génération du numéro de facture:', error);
           setFormData({
             reference: 'F-001',
-            client_id: '',
-            vehicle_id: '',
+            client_id: invoice?.client_id || '',
+            vehicle_id: invoice?.vehicle_id || '',
             status: 'En attente de paiement',
             due_date: today,
             payment_details: ''
