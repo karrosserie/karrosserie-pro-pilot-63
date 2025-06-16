@@ -1112,6 +1112,8 @@ export type Database = {
       repair_orders: {
         Row: {
           client_id: string | null
+          client_name_signature: string | null
+          client_signature: string | null
           created_at: string
           document_url: string | null
           end_date: string | null
@@ -1120,6 +1122,7 @@ export type Database = {
           notes: string | null
           quote_id: string | null
           reference: string
+          signature_date: string | null
           start_date: string | null
           status: string | null
           updated_at: string
@@ -1128,6 +1131,8 @@ export type Database = {
         }
         Insert: {
           client_id?: string | null
+          client_name_signature?: string | null
+          client_signature?: string | null
           created_at?: string
           document_url?: string | null
           end_date?: string | null
@@ -1136,6 +1141,7 @@ export type Database = {
           notes?: string | null
           quote_id?: string | null
           reference: string
+          signature_date?: string | null
           start_date?: string | null
           status?: string | null
           updated_at?: string
@@ -1144,6 +1150,8 @@ export type Database = {
         }
         Update: {
           client_id?: string | null
+          client_name_signature?: string | null
+          client_signature?: string | null
           created_at?: string
           document_url?: string | null
           end_date?: string | null
@@ -1152,6 +1160,7 @@ export type Database = {
           notes?: string | null
           quote_id?: string | null
           reference?: string
+          signature_date?: string | null
           start_date?: string | null
           status?: string | null
           updated_at?: string
