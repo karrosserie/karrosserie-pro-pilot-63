@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +14,7 @@ import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, MoreVertical } from
 import { useQuotes } from '@/hooks/use-quotes';
 import { useToast } from '@/hooks/use-toast';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
+import QuoteEmailDialog from '@/components/quotes/QuoteEmailDialog';
 import { Quote } from '@/services/supabase/quotes';
 import { StatusBadge } from '@/components/ui/status-badge';
 import {
@@ -28,7 +30,9 @@ const Quotes = () => {
   const { quotes, isLoading, error, deleteQuote } = useQuotes();
   const [searchTerm, setSearchTerm] = useState('');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
+  const [selectedQuoteForEmail, setSelectedQuoteForEmail] = useState<Quote | null>(null);
   const { toast } = useToast();
   
   const filteredQuotes = quotes?.filter(quote => 
@@ -80,10 +84,8 @@ const Quotes = () => {
   };
 
   const handleSendEmail = (quote: Quote) => {
-    toast({
-      title: "Envoi par e-mail",
-      description: `Envoi du devis ${quote.reference} par e-mail...`
-    });
+    setSelectedQuoteForEmail(quote);
+    setEmailDialogOpen(true);
   };
 
   const handleRequestDocuments = (quote: Quote) => {
@@ -202,24 +204,24 @@ const Quotes = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-56">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDownload(quote)}>
                             <Download className="mr-2 h-4 w-4" />
                             Télécharger
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handlePrint(quote)}>
                             <Printer className="mr-2 h-4 w-4" />
                             Imprimer
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleSendEmail(quote)}>
                             <Mail className="mr-2 h-4 w-4" />
                             Envoyer par e-mail
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleRequestDocuments(quote)}>
                             <FileCheck className="mr-2 h-4 w-4" />
                             Demander les justificatifs
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleConvertToRepairOrder(quote)}>
                             <ArrowRight className="mr-2 h-4 w-4" />
                             Convertir en ordre de réparation
                           </DropdownMenuItem>
@@ -250,6 +252,12 @@ const Quotes = () => {
         quote={selectedQuote}
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
+      />
+
+      <QuoteEmailDialog
+        quote={selectedQuoteForEmail}
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
       />
     </div>
   );
