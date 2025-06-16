@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -38,9 +39,24 @@ export function useCredits() {
 
   const createCredit = useMutation({
     mutationFn: async (creditData: any) => {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('Utilisateur non authentifié');
+      }
+
+      // Add user_id to credit data
+      const dataWithUserId = {
+        ...creditData,
+        user_id: user.id
+      };
+
+      console.log('Creating credit with user_id:', dataWithUserId);
+
       const { data, error } = await supabase
         .from('credits')
-        .insert([creditData])
+        .insert([dataWithUserId])
         .select(`
           *,
           clients(first_name, last_name),
