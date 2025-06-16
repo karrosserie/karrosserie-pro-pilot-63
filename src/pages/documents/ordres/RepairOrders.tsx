@@ -73,7 +73,30 @@ const RepairOrders = () => {
   };
 
   const handleConvertToInvoice = (order: RepairOrder) => {
-    setSelectedOrderForInvoice(order);
+    // Créer un objet facture avec les données de l'ordre de réparation
+    const invoiceData = {
+      client_id: order.client_id,
+      vehicle_id: order.vehicle_id,
+      repair_order_id: order.id,
+      repairs_data: order.repairs_data,
+      parts_data: order.parts_data,
+      discounts_data: order.discounts_data,
+      description: order.description,
+      current_mileage: order.current_mileage,
+      claim_number: order.claim_number,
+      clients: order.clients,
+      vehicles: order.vehicles,
+      notes: JSON.stringify({
+        description: order.description || '',
+        claimNumber: order.claim_number || '',
+        currentMileage: order.current_mileage || '',
+        repairs: order.repairs_data ? (typeof order.repairs_data === 'string' ? JSON.parse(order.repairs_data) : order.repairs_data) : [],
+        parts: order.parts_data ? (typeof order.parts_data === 'string' ? JSON.parse(order.parts_data) : order.parts_data) : [],
+        discounts: order.discounts_data ? (typeof order.discounts_data === 'string' ? JSON.parse(order.discounts_data) : order.discounts_data) : []
+      })
+    };
+    
+    setSelectedOrderForInvoice(invoiceData);
     setInvoiceDialogOpen(true);
   };
 
@@ -140,19 +163,7 @@ const RepairOrders = () => {
             setSelectedOrderForInvoice(null);
           }
         }}
-        invoice={selectedOrderForInvoice ? {
-          repair_order_id: selectedOrderForInvoice.id,
-          client_id: selectedOrderForInvoice.client_id,
-          vehicle_id: selectedOrderForInvoice.vehicle_id,
-          repairs_data: selectedOrderForInvoice.repairs_data,
-          parts_data: selectedOrderForInvoice.parts_data,
-          discounts_data: selectedOrderForInvoice.discounts_data,
-          description: selectedOrderForInvoice.description,
-          current_mileage: selectedOrderForInvoice.current_mileage,
-          claim_number: selectedOrderForInvoice.claim_number,
-          clients: selectedOrderForInvoice.clients,
-          vehicles: selectedOrderForInvoice.vehicles
-        } : null}
+        invoice={selectedOrderForInvoice}
       />
     </div>
   );
