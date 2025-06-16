@@ -11,6 +11,10 @@ interface RepairOrderFormActionsProps {
 }
 
 export const RepairOrderFormActions = ({ order, isSubmitting, onCancel }: RepairOrderFormActionsProps) => {
+  // Déterminer s'il s'agit d'une modification d'un ordre existant ou d'une création
+  // Si l'ordre a un ID, c'est une modification, sinon c'est une création
+  const isExistingOrder = order && order.id;
+  
   return (
     <>
       <Separator />
@@ -28,7 +32,7 @@ export const RepairOrderFormActions = ({ order, isSubmitting, onCancel }: Repair
           disabled={isSubmitting}
           className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
         >
-          {isSubmitting ? 'Enregistrement...' : order ? 'Mettre à jour' : "Créer l'ordre de réparation"}
+          {isSubmitting ? 'Enregistrement...' : isExistingOrder ? 'Mettre à jour' : "Créer l'ordre de réparation"}
         </Button>
       </div>
     </>
