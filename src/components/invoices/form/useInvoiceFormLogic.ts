@@ -102,29 +102,27 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
           const nextNumber = await generateNextInvoiceNumber();
           console.log('Generated invoice number:', nextNumber);
           
-          const newFormData = {
+          setFormData({
             reference: nextNumber,
             client_id: '',
             vehicle_id: '',
             status: 'En attente de paiement',
             due_date: today,
             payment_details: ''
-          };
+          });
           
-          console.log('Setting form data with generated number:', newFormData);
-          setFormData(newFormData);
+          console.log('Form data set with generated number:', nextNumber);
         } catch (error) {
           console.error('Erreur lors de la génération du numéro de facture:', error);
-          const fallbackFormData = {
+          setFormData({
             reference: 'F-001',
             client_id: '',
             vehicle_id: '',
             status: 'En attente de paiement',
             due_date: today,
             payment_details: ''
-          };
-          console.log('Setting fallback form data:', fallbackFormData);
-          setFormData(fallbackFormData);
+          });
+          console.log('Set fallback form data with F-001');
         }
         
         setDescription('');

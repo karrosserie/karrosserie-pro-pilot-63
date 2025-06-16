@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -33,9 +32,6 @@ export const InvoiceBasicInfoSection = ({
     { value: 'Payée', label: 'Payée' }
   ];
 
-  // Debug log pour vérifier la valeur
-  console.log('InvoiceBasicInfoSection - formData.reference:', formData.reference);
-
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -59,7 +55,7 @@ export const InvoiceBasicInfoSection = ({
                 "bg-gray-50 cursor-not-allowed",
                 errors.reference && "border-red-500 focus-visible:ring-red-500"
               )}
-              placeholder={formData.reference ? undefined : "Généré automatiquement"}
+              placeholder={!formData.reference ? "Généré automatiquement" : undefined}
             />
             {errors.reference && (
               <p className="text-sm text-red-500 mt-1 flex items-center">
