@@ -16,12 +16,14 @@ interface QuoteDialogProps {
   quote?: Quote | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  prefillData?: any;
 }
 
 const QuoteDialog = ({
   quote,
   open,
-  onOpenChange
+  onOpenChange,
+  prefillData
 }: QuoteDialogProps) => {
   const { toast } = useToast();
   const { updateQuote, createQuote } = useQuotes();
@@ -68,6 +70,7 @@ const QuoteDialog = ({
           onSubmit={handleSubmit}
           onCancel={() => onOpenChange(false)}
           isSubmitting={isSubmitting}
+          prefillData={prefillData}
         />
       </DialogContent>
     </Dialog>

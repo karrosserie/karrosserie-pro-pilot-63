@@ -37,7 +37,8 @@ const VehicleDocumentDialogs: React.FC<VehicleDocumentDialogsProps> = ({
             setSelectedVehicleForDocument(null);
           }
         }}
-        quote={selectedVehicleForDocument ? {
+        quote={null}
+        prefillData={selectedVehicleForDocument ? {
           client_id: selectedVehicleForDocument.client_id,
           vehicle_id: selectedVehicleForDocument.id,
           clients: selectedVehicleForDocument.clients ? {
@@ -51,7 +52,7 @@ const VehicleDocumentDialogs: React.FC<VehicleDocumentDialogsProps> = ({
             car_brands: selectedVehicleForDocument.car_brands,
             car_models: selectedVehicleForDocument.car_models
           }
-        } as any : null}
+        } : null}
       />
 
       {/* Dialogue de création de facture */}

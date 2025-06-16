@@ -17,13 +17,15 @@ interface QuoteFormProps {
   onSubmit: (formData: Partial<Quote>) => Promise<void>;
   onCancel: () => void;
   isSubmitting: boolean;
+  prefillData?: any;
 }
 
 export const QuoteForm = ({
   quote,
   onSubmit,
   onCancel,
-  isSubmitting
+  isSubmitting,
+  prefillData
 }: QuoteFormProps) => {
   const { toast } = useToast();
   const { clients, isLoading: isLoadingClients } = useClients();
@@ -47,7 +49,7 @@ export const QuoteForm = ({
     validateForm,
     calculateGlobalTotals,
     prepareSubmitData
-  } = useQuoteFormLogic({ quote });
+  } = useQuoteFormLogic({ quote, prefillData });
 
   const globalTotals = calculateGlobalTotals();
 
