@@ -74,28 +74,63 @@ const RepairOrders = () => {
   };
 
   const handleConvertToInvoice = (order: RepairOrder) => {
-    // Créer un objet facture avec les données de l'ordre de réparation
+    // Parser les données JSON de l'ordre de réparation
+    let parsedRepairs = [];
+    let parsedParts = [];
+    let parsedDiscounts = [];
+    
+    try {
+      if (order.repairs_data) {
+        parsedRepairs = typeof order.repairs_data === 'string' 
+          ? JSON.parse(order.repairs_data) 
+          : order.repairs_data;
+      }
+    } catch (e) {
+      console.error('Error parsing repairs_data:', e);
+    }
+    
+    try {
+      if (order.parts_data) {
+        parsedParts = typeof order.parts_data === 'string' 
+          ? JSON.parse(order.parts_data) 
+          : order.parts_data;
+      }
+    } catch (e) {
+      console.error('Error parsing parts_data:', e);
+    }
+    
+    try {
+      if (order.discounts_data) {
+        parsedDiscounts = typeof order.discounts_data === 'string' 
+          ? JSON.parse(order.discounts_data) 
+          : order.discounts_data;
+      }
+    } catch (e) {
+      console.error('Error parsing discounts_data:', e);
+    }
+
+    // Créer l'objet notes que useInvoiceFormLogic sait parser
+    const notesData = {
+      description: order.description || '',
+      claimNumber: order.claim_number || '',
+      currentMileage: order.current_mileage || '',
+      repairs: parsedRepairs,
+      parts: parsedParts,
+      discounts: parsedDiscounts
+    };
+    
+    // Créer un objet facture avec les données formatées correctement
     const invoiceData = {
       client_id: order.client_id,
       vehicle_id: order.vehicle_id,
       repair_order_id: order.id,
-      repairs_data: order.repairs_data,
-      parts_data: order.parts_data,
-      discounts_data: order.discounts_data,
-      description: order.description,
-      current_mileage: order.current_mileage,
-      claim_number: order.claim_number,
       clients: order.clients,
       vehicles: order.vehicles,
-      notes: JSON.stringify({
-        description: order.description || '',
-        claimNumber: order.claim_number || '',
-        currentMileage: order.current_mileage || '',
-        repairs: order.repairs_data ? (typeof order.repairs_data === 'string' ? JSON.parse(order.repairs_data) : order.repairs_data) : [],
-        parts: order.parts_data ? (typeof order.parts_data === 'string' ? JSON.parse(order.parts_data) : order.parts_data) : [],
-        discounts: order.discounts_data ? (typeof order.discounts_data === 'string' ? JSON.parse(order.discounts_data) : order.discounts_data) : []
-      })
+      notes: JSON.stringify(notesData)
     };
+    
+    console.log('Invoice data being passed:', invoiceData);
+    console.log('Notes data:', notesData);
     
     setSelectedOrderForInvoice(invoiceData);
     setInvoiceDialogOpen(true);
