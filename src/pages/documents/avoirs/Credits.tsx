@@ -85,12 +85,47 @@ const Credits = () => {
   const { invoices } = useInvoices();
   
   const formatVehicleDisplay = (credit: any) => {
+    console.log('Formatting vehicle display for credit:', credit.id, 'vehicle data:', credit.vehicles);
+    
     if (credit.vehicles) {
-      const brand = credit.vehicles.car_brands?.name || 'Marque inconnue';
-      const model = credit.vehicles.car_models?.name || 'Modèle inconnu';
+      // Try multiple ways to get brand and model
+      let brand = '';
+      let model = '';
+      
+      // First try from car_brands relation
+      if (credit.vehicles.car_brands?.name) {
+        brand = credit.vehicles.car_brands.name;
+      } 
+      // Then try direct brand field
+      else if (credit.vehicles.brand) {
+        brand = credit.vehicles.brand;
+      } 
+      // Default
+      else {
+        brand = 'Marque inconnue';
+      }
+      
+      // First try from car_models relation
+      if (credit.vehicles.car_models?.name) {
+        model = credit.vehicles.car_models.name;
+      } 
+      // Then try direct model field
+      else if (credit.vehicles.model) {
+        model = credit.vehicles.model;
+      } 
+      // Default
+      else {
+        model = 'Modèle inconnu';
+      }
+      
       const licensePlate = credit.vehicles.license_plate || '';
-      return `${brand} ${model} - ${licensePlate}`;
+      const result = `${brand} ${model}${licensePlate ? ` - ${licensePlate}` : ''}`;
+      
+      console.log('Vehicle display result for credit:', result);
+      return result;
     }
+    
+    console.log('No vehicle data found for credit:', credit.id);
     return '-';
   };
   

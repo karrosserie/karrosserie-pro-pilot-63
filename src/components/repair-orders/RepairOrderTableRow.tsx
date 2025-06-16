@@ -42,12 +42,21 @@ export const RepairOrderTableRow = ({ order, onEditOrder, contextMenuProps }: Re
   };
 
   const formatVehicleDisplay = (order: RepairOrder) => {
+    console.log('Formatting vehicle display for order:', order.id, 'vehicle data:', order.vehicles);
+    
     if (order.vehicles) {
-      const brand = order.vehicles.brand || order.vehicles.car_brands?.name || 'Marque inconnue';
-      const model = order.vehicles.model || order.vehicles.car_models?.name || 'Modèle inconnu';
+      // Try to get brand name from car_brands relation first, then fallback to direct brand field
+      const brand = order.vehicles.car_brands?.name || order.vehicles.brand || 'Marque inconnue';
+      // Try to get model name from car_models relation first, then fallback to direct model field
+      const model = order.vehicles.car_models?.name || order.vehicles.model || 'Modèle inconnu';
       const licensePlate = order.vehicles.license_plate || '';
-      return `${brand} ${model} - ${licensePlate}`;
+      
+      const result = `${brand} ${model}${licensePlate ? ` - ${licensePlate}` : ''}`;
+      console.log('Vehicle display result:', result);
+      return result;
     }
+    
+    console.log('No vehicle data found for order:', order.id);
     return '-';
   };
 

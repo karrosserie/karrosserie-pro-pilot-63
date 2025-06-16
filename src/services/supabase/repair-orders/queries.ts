@@ -24,40 +24,59 @@ export const getRepairOrders = async (): Promise<RepairOrder[]> => {
 
       // Try to get client data
       if (order.client_id) {
-        const { data: client } = await supabase
-          .from('clients')
-          .select('id, first_name, last_name, email')
-          .eq('id', order.client_id)
-          .single();
-        clientData = client;
+        try {
+          const { data: client } = await supabase
+            .from('clients')
+            .select('id, first_name, last_name, email')
+            .eq('id', order.client_id)
+            .single();
+          clientData = client;
+        } catch (error) {
+          console.warn('Could not fetch client:', error);
+        }
       }
 
-      // Try to get vehicle data with brands and models, including the brand and model fields
+      // Try to get vehicle data with all necessary information
       if (order.vehicle_id) {
-        const { data: vehicle } = await supabase
-          .from('vehicles')
-          .select(`
-            id, 
-            license_plate,
-            brand,
-            model,
-            car_brands(id, name),
-            car_models(id, name)
-          `)
-          .eq('id', order.vehicle_id)
-          .single();
-        vehicleData = vehicle;
+        try {
+          console.log('Fetching vehicle for order:', order.id, 'vehicle_id:', order.vehicle_id);
+          
+          // First try to get vehicle with brand/model names from lookup tables
+          const { data: vehicle } = await supabase
+            .from('vehicles')
+            .select(`
+              id, 
+              license_plate,
+              brand,
+              model,
+              car_brands(id, name),
+              car_models(id, name)
+            `)
+            .eq('id', order.vehicle_id)
+            .single();
+          
+          if (vehicle) {
+            console.log('Found vehicle with data:', vehicle);
+            vehicleData = vehicle;
+          }
+        } catch (error) {
+          console.warn('Could not fetch vehicle for order:', order.id, error);
+        }
       }
 
-      return {
+      const enrichedOrder = {
         ...order,
         clients: clientData,
         vehicles: vehicleData,
         quotes: null
       };
+
+      console.log('Final enriched order:', enrichedOrder);
+      return enrichedOrder;
     })
   );
 
+  console.log('All enriched orders:', enrichedOrders);
   return enrichedOrders;
 };
 
