@@ -98,7 +98,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
     } else {
       updatedImages[index] = { ...updatedImages[index], phase };
     }
-    // Update the form data with the new images array
+    // This will be handled by the hook's handleImageUpdate method
   };
 
   return (

@@ -4,6 +4,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useFleetReturns } from '@/hooks/use-fleet-returns';
 import { FleetReturnFormData, ReturnDamageItem } from '@/components/fleet/FleetReturnForm.types';
 
+interface VehicleImage {
+  url: string;
+  phase: 'Avant' | 'Pendant' | 'Après';
+}
+
 export const useFleetReturnFormHandlers = (
   formData: FleetReturnFormData,
   setFormData: React.Dispatch<React.SetStateAction<FleetReturnFormData>>,
@@ -33,7 +38,7 @@ export const useFleetReturnFormHandlers = (
     console.log('useFleetReturnForm - Adding image:', url);
     setFormData(prev => ({
       ...prev,
-      vehicleImages: [...prev.vehicleImages, url]
+      vehicleImages: [...prev.vehicleImages, { url, phase: 'Avant' }]
     }));
   };
 
@@ -49,7 +54,11 @@ export const useFleetReturnFormHandlers = (
     console.log('useFleetReturnForm - Updating image at index:', index, 'with url:', url);
     setFormData(prev => {
       const newImages = [...prev.vehicleImages];
-      newImages[index] = url;
+      if (!newImages[index]) {
+        newImages[index] = { url, phase: 'Avant' };
+      } else {
+        newImages[index] = { ...newImages[index], url };
+      }
       return {
         ...prev,
         vehicleImages: newImages

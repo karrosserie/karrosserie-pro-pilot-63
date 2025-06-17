@@ -5,6 +5,11 @@ import { DamageItem, LoanFormData } from '@/components/fleet/FleetLoanForm';
 import { prepareReservationData } from './utils';
 import { FleetLoanFormState } from './types';
 
+interface VehicleImage {
+  url: string;
+  phase: 'Avant' | 'Pendant' | 'Après';
+}
+
 export const useFleetLoanFormHandlers = (
   state: FleetLoanFormState,
   onSubmit: (loanData: LoanFormData) => void,
@@ -39,7 +44,7 @@ export const useFleetLoanFormHandlers = (
     console.log('Current vehicleImages:', formData.vehicleImages);
     
     setFormData(prev => {
-      const newImages = [...prev.vehicleImages, url];
+      const newImages: VehicleImage[] = [...prev.vehicleImages, { url, phase: 'Avant' }];
       console.log('New vehicleImages after add:', newImages);
       return {
         ...prev,
@@ -64,7 +69,11 @@ export const useFleetLoanFormHandlers = (
     console.log('useFleetLoanForm - Updating image at index:', index, 'with url:', url);
     setFormData(prev => {
       const newImages = [...prev.vehicleImages];
-      newImages[index] = url;
+      if (!newImages[index]) {
+        newImages[index] = { url, phase: 'Avant' };
+      } else {
+        newImages[index] = { ...newImages[index], url };
+      }
       console.log('New vehicleImages after update:', newImages);
       return {
         ...prev,
