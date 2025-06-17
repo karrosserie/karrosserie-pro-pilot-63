@@ -6,6 +6,13 @@ import { Wrench, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import { RepairOrderActionsDropdown } from '@/components/repair-orders/RepairOrderActionsDropdown';
 
 interface ClientRepairOrdersTabProps {
   clientId: string;
@@ -36,6 +43,15 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'ordre de réparation ${order.reference} ?`)) {
       deleteOrder.mutate(order.id);
     }
+  };
+
+  const contextMenuProps = {
+    onDownload: (order: any) => console.log('Download order:', order),
+    onPrint: (order: any) => console.log('Print order:', order),
+    onSendEmail: (order: any) => console.log('Send email order:', order),
+    onSignOrder: (order: any) => console.log('Sign order:', order),
+    onRequestDocuments: (order: any) => console.log('Request documents:', order),
+    onConvertToInvoice: (order: any) => console.log('Convert to invoice:', order)
   };
 
   const formatAmount = (amount: number | null | undefined): string => {
@@ -86,10 +102,10 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
       }
     },
     {
-      accessorKey: "total_amount",
+      accessorKey: "amount",
       header: "Montant",
       cell: ({ row }) => {
-        const amount = row.getValue("total_amount");
+        const amount = row.getValue("amount");
         return formatAmount(amount as number);
       }
     },
@@ -130,6 +146,7 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
             >
               <Trash className="h-4 w-4" />
             </Button>
+            <RepairOrderActionsDropdown order={order} contextMenuProps={contextMenuProps} />
           </div>
         );
       }
@@ -147,10 +164,40 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
   }
 
   return (
-    <SimpleTable
-      columns={columns}
-      data={clientOrders}
-    />
+    <div className="space-y-4">
+      {clientOrders.map((order) => (
+        <ContextMenu key={order.id}>
+          <ContextMenuTrigger asChild>
+            <div>
+              <SimpleTable
+                columns={columns}
+                data={[order]}
+              />
+            </div>
+          </ContextMenuTrigger>
+          <ContextMenuContent>
+            <ContextMenuItem onClick={() => contextMenuProps.onDownload(order)}>
+              Télécharger
+            </ContextMenuItem>
+            <ContextMenuItem onClick={() => contextMenuProps.onPrint(order)}>
+              Imprimer
+            </ContextMenuItem>
+            <ContextMenuItem onClick={() => contextMenuProps.onSendEmail(order)}>
+              Envoyer par e-mail
+            </ContextMenuItem>
+            <ContextMenuItem onClick={() => contextMenuProps.onSignOrder(order)}>
+              Signature du client
+            </ContextMenuItem>
+            <ContextMenuItem onClick={() => contextMenuProps.onRequestDocuments(order)}>
+              Demander les justificatifs
+            </ContextMenuItem>
+            <ContextMenuItem onClick={() => contextMenuProps.onConvertToInvoice(order)}>
+              Convertir en facture
+            </ContextMenuItem>
+          </ContextMenuContent>
+        </ContextMenu>
+      ))}
+    </div>
   );
 };
 

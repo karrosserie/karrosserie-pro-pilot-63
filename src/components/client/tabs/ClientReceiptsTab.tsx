@@ -72,7 +72,7 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
       header: "Facture",
       cell: ({ row }) => {
         const invoice = row.getValue("invoices") as any;
-        return invoice ? invoice.reference : "-";
+        return invoice?.reference || "-";
       }
     },
     {

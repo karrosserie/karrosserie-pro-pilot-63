@@ -13,17 +13,17 @@ import ClientForm from './ClientForm';
 import ClientVehiclesTab from './tabs/ClientVehiclesTab';
 import ClientExpertiseReportsTab from './tabs/ClientExpertiseReportsTab';
 import ClientQuotesTab from './tabs/ClientQuotesTab';
+import ClientRepairOrdersTab from './tabs/ClientRepairOrdersTab';
 import ClientInvoicesTab from './tabs/ClientInvoicesTab';
 import ClientCreditsTab from './tabs/ClientCreditsTab';
 import ClientReceiptsTab from './tabs/ClientReceiptsTab';
-import ClientRepairOrdersTab from './tabs/ClientRepairOrdersTab';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useQuotes } from '@/hooks/use-quotes';
+import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useCredits } from '@/hooks/use-credits';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
-import { useRepairOrders } from '@/hooks/use-repair-orders';
 
 interface ClientDialogProps {
   open: boolean;
@@ -47,10 +47,10 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
   const { vehicles } = useVehicles();
   const { reports } = useExpertiseReports();
   const { quotes } = useQuotes();
+  const { orders } = useRepairOrders();
   const { invoices } = useInvoices();
   const { credits } = useCredits();
   const { receipts } = useReceiptsData();
-  const { orders } = useRepairOrders();
 
   const handleCancel = () => {
     onOpenChange(false);
@@ -65,15 +65,27 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
   const clientVehicles = vehicles?.filter(vehicle => vehicle.client_id === defaultValues?.id) || [];
   const clientReports = reports?.filter(report => report.client_id === defaultValues?.id) || [];
   const clientQuotes = quotes?.filter(quote => quote.client_id === defaultValues?.id) || [];
+  const clientOrders = orders?.filter(order => order.client_id === defaultValues?.id) || [];
   const clientInvoices = invoices?.filter(invoice => invoice.client_id === defaultValues?.id) || [];
-  const clientCredits = credits?.filter(credit => credit.client_id === defaultValues?.id) || [];
+  
+  // For credits, include both direct client credits and credits via invoices
+  const clientCredits = credits?.filter(credit => {
+    if (credit.client_id === defaultValues?.id) {
+      return true;
+    }
+    if (credit.invoice_id && invoices) {
+      const relatedInvoice = invoices.find(invoice => invoice.id === credit.invoice_id);
+      return relatedInvoice?.client_id === defaultValues?.id;
+    }
+    return false;
+  }) || [];
+  
   const clientReceipts = receipts?.filter(receipt => {
     if (receipt.invoices && receipt.invoices.client_id === defaultValues?.id) {
       return true;
     }
     return false;
   }) || [];
-  const clientOrders = orders?.filter(order => order.client_id === defaultValues?.id) || [];
 
   // Si c'est en mode visualisation, on affiche les onglets
   if (mode === 'view') {
@@ -94,12 +106,6 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
                   {clientVehicles.length}
                 </Badge>
               </TabsTrigger>
-              <TabsTrigger value="repair-orders" className="flex items-center gap-2">
-                Ordres
-                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
-                  {clientOrders.length}
-                </Badge>
-              </TabsTrigger>
               <TabsTrigger value="expertise" className="flex items-center gap-2">
                 Expertises
                 <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
@@ -110,6 +116,12 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
                 Devis
                 <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
                   {clientQuotes.length}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="repair-orders" className="flex items-center gap-2">
+                Ordres
+                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
+                  {clientOrders.length}
                 </Badge>
               </TabsTrigger>
               <TabsTrigger value="invoices" className="flex items-center gap-2">
@@ -146,16 +158,16 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
                 <ClientVehiclesTab clientId={defaultValues?.id} />
               </TabsContent>
               
-              <TabsContent value="repair-orders">
-                <ClientRepairOrdersTab clientId={defaultValues?.id} />
-              </TabsContent>
-              
               <TabsContent value="expertise">
                 <ClientExpertiseReportsTab clientId={defaultValues?.id} />
               </TabsContent>
               
               <TabsContent value="quotes">
                 <ClientQuotesTab clientId={defaultValues?.id} />
+              </TabsContent>
+              
+              <TabsContent value="repair-orders">
+                <ClientRepairOrdersTab clientId={defaultValues?.id} />
               </TabsContent>
               
               <TabsContent value="invoices">

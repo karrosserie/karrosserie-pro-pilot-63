@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useCredits } from '@/hooks/use-credits';
+import { useInvoices } from '@/hooks/use-invoices';
 import { SimpleTable } from '@/components/ui/simple-table';
 import { CreditCard, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
@@ -12,6 +13,7 @@ interface ClientCreditsTabProps {
 
 const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   const { credits, isLoading, deleteCredit } = useCredits();
+  const { invoices } = useInvoices();
 
   if (isLoading) {
     return (
@@ -21,8 +23,19 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
     );
   }
 
-  // Filtrer les avoirs par client_id directement
-  const clientCredits = credits?.filter(credit => credit.client_id === clientId) || [];
+  // Filter credits by client_id directly OR by invoice belonging to client
+  const clientCredits = credits?.filter(credit => {
+    // Direct client assignment
+    if (credit.client_id === clientId) {
+      return true;
+    }
+    // Credit linked to an invoice belonging to the client
+    if (credit.invoice_id && invoices) {
+      const relatedInvoice = invoices.find(invoice => invoice.id === credit.invoice_id);
+      return relatedInvoice?.client_id === clientId;
+    }
+    return false;
+  }) || [];
 
   const handleView = (credit: any) => {
     console.log('View credit:', credit);
