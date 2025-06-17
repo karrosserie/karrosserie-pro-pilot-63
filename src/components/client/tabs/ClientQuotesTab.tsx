@@ -2,7 +2,7 @@
 import React from 'react';
 import { useQuotes } from '@/hooks/use-quotes';
 import { SimpleTable } from '@/components/ui/simple-table';
-import { FileText, Eye, Pencil, Trash } from 'lucide-react';
+import { FileText, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,14 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Download, Printer, Mail, FileCheck, ArrowRight } from 'lucide-react';
 
 interface ClientQuotesTabProps {
   clientId: string;
@@ -43,6 +51,26 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer le devis ${quote.reference} ?`)) {
       deleteQuote.mutate(quote.id);
     }
+  };
+
+  const handleDownload = (quote: any) => {
+    console.log('Download quote:', quote);
+  };
+
+  const handlePrint = (quote: any) => {
+    console.log('Print quote:', quote);
+  };
+
+  const handleSendEmail = (quote: any) => {
+    console.log('Send email quote:', quote);
+  };
+
+  const handleRequestDocuments = (quote: any) => {
+    console.log('Request documents:', quote);
+  };
+
+  const handleConvertToRepairOrder = (quote: any) => {
+    console.log('Convert to repair order:', quote);
   };
 
   const contextMenuProps = {
@@ -135,6 +163,36 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
             >
               <Trash className="h-4 w-4" />
             </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56">
+                <DropdownMenuItem onClick={() => handleDownload(quote)}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Télécharger
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handlePrint(quote)}>
+                  <Printer className="mr-2 h-4 w-4" />
+                  Imprimer
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSendEmail(quote)}>
+                  <Mail className="mr-2 h-4 w-4" />
+                  Envoyer par e-mail
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => handleRequestDocuments(quote)}>
+                  <FileCheck className="mr-2 h-4 w-4" />
+                  Demander les justificatifs
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleConvertToRepairOrder(quote)}>
+                  <ArrowRight className="mr-2 h-4 w-4" />
+                  Convertir en ordre de réparation
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         );
       }

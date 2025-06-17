@@ -13,6 +13,7 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { RepairOrderActionsDropdown } from '@/components/repair-orders/RepairOrderActionsDropdown';
+import { calculateOrderAmount } from '@/components/repair-orders/utils/orderCalculations';
 
 interface ClientRepairOrdersTabProps {
   clientId: string;
@@ -105,8 +106,9 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
       accessorKey: "amount",
       header: "Montant",
       cell: ({ row }) => {
-        const amount = row.getValue("amount");
-        return formatAmount(amount as number);
+        const order = row.original;
+        const amount = calculateOrderAmount(order);
+        return formatAmount(amount);
       }
     },
     {

@@ -2,7 +2,7 @@
 import React from 'react';
 import { useInvoices } from '@/hooks/use-invoices';
 import { SimpleTable } from '@/components/ui/simple-table';
-import { Receipt, Eye, Pencil, Trash } from 'lucide-react';
+import { Receipt, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
@@ -13,6 +13,14 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Download, Printer, Mail, CreditCard, FileX } from 'lucide-react';
 
 interface ClientInvoicesTabProps {
   clientId: string;
@@ -43,6 +51,26 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer la facture ${invoice.reference} ?`)) {
       deleteInvoice.mutate(invoice.id);
     }
+  };
+
+  const handleDownload = (invoice: any) => {
+    console.log('Download invoice:', invoice);
+  };
+
+  const handlePrint = (invoice: any) => {
+    console.log('Print invoice:', invoice);
+  };
+
+  const handleSendEmail = (invoice: any) => {
+    console.log('Send email invoice:', invoice);
+  };
+
+  const handleAddPayment = (invoice: any) => {
+    console.log('Add payment:', invoice);
+  };
+
+  const handleAddCredit = (invoice: any) => {
+    console.log('Add credit:', invoice);
   };
 
   const contextMenuProps = {
@@ -157,6 +185,36 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
             >
               <Trash className="h-4 w-4" />
             </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56">
+                <DropdownMenuItem onClick={() => handleDownload(invoice)}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Télécharger
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handlePrint(invoice)}>
+                  <Printer className="mr-2 h-4 w-4" />
+                  Imprimer
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSendEmail(invoice)}>
+                  <Mail className="mr-2 h-4 w-4" />
+                  Envoyer par e-mail
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => handleAddPayment(invoice)}>
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Ajouter un paiement
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleAddCredit(invoice)}>
+                  <FileX className="mr-2 h-4 w-4" />
+                  Ajouter un avoir
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         );
       }
