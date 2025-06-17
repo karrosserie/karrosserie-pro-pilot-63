@@ -16,12 +16,14 @@ import ClientQuotesTab from './tabs/ClientQuotesTab';
 import ClientInvoicesTab from './tabs/ClientInvoicesTab';
 import ClientCreditsTab from './tabs/ClientCreditsTab';
 import ClientReceiptsTab from './tabs/ClientReceiptsTab';
+import ClientRepairOrdersTab from './tabs/ClientRepairOrdersTab';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useCredits } from '@/hooks/use-credits';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
+import { useRepairOrders } from '@/hooks/use-repair-orders';
 
 interface ClientDialogProps {
   open: boolean;
@@ -48,6 +50,7 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
   const { invoices } = useInvoices();
   const { credits } = useCredits();
   const { receipts } = useReceiptsData();
+  const { orders } = useRepairOrders();
 
   const handleCancel = () => {
     onOpenChange(false);
@@ -70,6 +73,7 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
     }
     return false;
   }) || [];
+  const clientOrders = orders?.filter(order => order.client_id === defaultValues?.id) || [];
 
   // Si c'est en mode visualisation, on affiche les onglets
   if (mode === 'view') {
@@ -82,41 +86,47 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
           </DialogHeader>
           
           <Tabs defaultValue="details" className="w-full h-full">
-            <TabsList className="grid w-full grid-cols-7">
+            <TabsList className="grid w-full grid-cols-8">
               <TabsTrigger value="details">Détails</TabsTrigger>
               <TabsTrigger value="vehicles" className="flex items-center gap-2">
                 Véhicules
-                <Badge variant="destructive" className="text-xs bg-red-500 hover:bg-red-600">
+                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
                   {clientVehicles.length}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="repair-orders" className="flex items-center gap-2">
+                Ordres
+                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
+                  {clientOrders.length}
                 </Badge>
               </TabsTrigger>
               <TabsTrigger value="expertise" className="flex items-center gap-2">
                 Expertises
-                <Badge variant="destructive" className="text-xs bg-red-500 hover:bg-red-600">
+                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
                   {clientReports.length}
                 </Badge>
               </TabsTrigger>
               <TabsTrigger value="quotes" className="flex items-center gap-2">
                 Devis
-                <Badge variant="destructive" className="text-xs bg-red-500 hover:bg-red-600">
+                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
                   {clientQuotes.length}
                 </Badge>
               </TabsTrigger>
               <TabsTrigger value="invoices" className="flex items-center gap-2">
                 Factures
-                <Badge variant="destructive" className="text-xs bg-red-500 hover:bg-red-600">
+                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
                   {clientInvoices.length}
                 </Badge>
               </TabsTrigger>
               <TabsTrigger value="credits" className="flex items-center gap-2">
                 Avoirs
-                <Badge variant="destructive" className="text-xs bg-red-500 hover:bg-red-600">
+                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
                   {clientCredits.length}
                 </Badge>
               </TabsTrigger>
               <TabsTrigger value="receipts" className="flex items-center gap-2">
                 Encaissements
-                <Badge variant="destructive" className="text-xs bg-red-500 hover:bg-red-600">
+                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
                   {clientReceipts.length}
                 </Badge>
               </TabsTrigger>
@@ -134,6 +144,10 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
               
               <TabsContent value="vehicles">
                 <ClientVehiclesTab clientId={defaultValues?.id} />
+              </TabsContent>
+              
+              <TabsContent value="repair-orders">
+                <ClientRepairOrdersTab clientId={defaultValues?.id} />
               </TabsContent>
               
               <TabsContent value="expertise">

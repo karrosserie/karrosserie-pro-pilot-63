@@ -1,18 +1,18 @@
 
 import React from 'react';
-import { useReceiptsData } from '@/hooks/use-receipts-data';
+import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { SimpleTable } from '@/components/ui/simple-table';
-import { Banknote, Eye, Pencil, Trash } from 'lucide-react';
+import { Wrench, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 
-interface ClientReceiptsTabProps {
+interface ClientRepairOrdersTabProps {
   clientId: string;
 }
 
-const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
-  const { receipts, isLoading, deleteReceipt } = useReceiptsData();
+const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId }) => {
+  const { orders, isLoading, deleteOrder } = useRepairOrders();
 
   if (isLoading) {
     return (
@@ -22,25 +22,19 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
     );
   }
 
-  // Filtrer les encaissements par client via les factures associées
-  const clientReceipts = receipts?.filter(receipt => {
-    if (receipt.invoices && receipt.invoices.client_id === clientId) {
-      return true;
-    }
-    return false;
-  }) || [];
+  const clientOrders = orders?.filter(order => order.client_id === clientId) || [];
 
-  const handleView = (receipt: any) => {
-    console.log('View receipt:', receipt);
+  const handleView = (order: any) => {
+    console.log('View repair order:', order);
   };
 
-  const handleEdit = (receipt: any) => {
-    console.log('Edit receipt:', receipt);
+  const handleEdit = (order: any) => {
+    console.log('Edit repair order:', order);
   };
 
-  const handleDelete = (receipt: any) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'encaissement ${receipt.reference} ?`)) {
-      deleteReceipt.mutate(receipt.id);
+  const handleDelete = (order: any) => {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'ordre de réparation ${order.reference} ?`)) {
+      deleteOrder.mutate(order.id);
     }
   };
 
@@ -70,32 +64,33 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
       )
     },
     {
-      accessorKey: "date",
+      accessorKey: "created_at",
       header: "Date",
-      cell: ({ row }) => formatDate(row.getValue("date") as string)
+      cell: ({ row }) => formatDate(row.getValue("created_at") as string)
     },
     {
-      accessorKey: "invoices",
-      header: "Facture",
+      accessorKey: "clients",
+      header: "Client",
       cell: ({ row }) => {
-        const invoice = row.getValue("invoices") as any;
-        return invoice ? invoice.reference : "-";
+        const client = row.getValue("clients") as any;
+        return client ? `${client.first_name} ${client.last_name}` : '-';
       }
     },
     {
-      accessorKey: "amount",
-      header: "Montant",
+      accessorKey: "vehicles",
+      header: "Véhicule",
       cell: ({ row }) => {
-        const amount = row.getValue("amount");
+        const vehicle = row.getValue("vehicles") as any;
+        if (!vehicle) return '-';
+        return `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate}`;
+      }
+    },
+    {
+      accessorKey: "total_amount",
+      header: "Montant total",
+      cell: ({ row }) => {
+        const amount = row.getValue("total_amount");
         return formatAmount(amount as number);
-      }
-    },
-    {
-      accessorKey: "payment_method",
-      header: "Mode de paiement",
-      cell: ({ row }) => {
-        const paymentMethod = row.getValue("payment_method") as string;
-        return paymentMethod || "-";
       }
     },
     {
@@ -103,27 +98,27 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
       header: "Statut",
       cell: ({ row }) => {
         const status = row.getValue("status") as string;
-        return <StatusBadge status={status || 'En attente'} />;
+        return <StatusBadge status={status || 'En cours'} />;
       }
     },
     {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => {
-        const receipt = row.original;
+        const order = row.original;
         return (
           <div className="flex items-center space-x-2">
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleView(receipt)}
+              onClick={() => handleView(order)}
             >
               <Eye className="h-4 w-4" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleEdit(receipt)}
+              onClick={() => handleEdit(order)}
             >
               <Pencil className="h-4 w-4" />
             </Button>
@@ -131,7 +126,7 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
               variant="ghost"
               size="icon"
               className="text-red-500 hover:text-red-700"
-              onClick={() => handleDelete(receipt)}
+              onClick={() => handleDelete(order)}
             >
               <Trash className="h-4 w-4" />
             </Button>
@@ -141,12 +136,12 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
     }
   ];
 
-  if (clientReceipts.length === 0) {
+  if (clientOrders.length === 0) {
     return (
       <div className="text-center py-8">
-        <Banknote className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucun encaissement</h3>
-        <p className="mt-1 text-sm text-gray-500">Ce client n'a pas encore d'encaissement.</p>
+        <Wrench className="mx-auto h-12 w-12 text-gray-400" />
+        <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucun ordre de réparation</h3>
+        <p className="mt-1 text-sm text-gray-500">Ce client n'a pas encore d'ordre de réparation.</p>
       </div>
     );
   }
@@ -154,9 +149,9 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
   return (
     <SimpleTable
       columns={columns}
-      data={clientReceipts}
+      data={clientOrders}
     />
   );
 };
 
-export default ClientReceiptsTab;
+export default ClientRepairOrdersTab;
