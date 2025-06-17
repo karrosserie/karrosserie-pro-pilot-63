@@ -164,40 +164,36 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
   }
 
   return (
-    <div className="space-y-4">
-      {clientOrders.map((order) => (
-        <ContextMenu key={order.id}>
-          <ContextMenuTrigger asChild>
-            <div>
-              <SimpleTable
-                columns={columns}
-                data={[order]}
-              />
-            </div>
-          </ContextMenuTrigger>
-          <ContextMenuContent>
-            <ContextMenuItem onClick={() => contextMenuProps.onDownload(order)}>
-              Télécharger
-            </ContextMenuItem>
-            <ContextMenuItem onClick={() => contextMenuProps.onPrint(order)}>
-              Imprimer
-            </ContextMenuItem>
-            <ContextMenuItem onClick={() => contextMenuProps.onSendEmail(order)}>
-              Envoyer par e-mail
-            </ContextMenuItem>
-            <ContextMenuItem onClick={() => contextMenuProps.onSignOrder(order)}>
-              Signature du client
-            </ContextMenuItem>
-            <ContextMenuItem onClick={() => contextMenuProps.onRequestDocuments(order)}>
-              Demander les justificatifs
-            </ContextMenuItem>
-            <ContextMenuItem onClick={() => contextMenuProps.onConvertToInvoice(order)}>
-              Convertir en facture
-            </ContextMenuItem>
-          </ContextMenuContent>
-        </ContextMenu>
-      ))}
-    </div>
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
+        <div>
+          <SimpleTable
+            columns={columns}
+            data={clientOrders}
+          />
+        </div>
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem onClick={() => contextMenuProps.onDownload(clientOrders[0])}>
+          Télécharger
+        </ContextMenuItem>
+        <ContextMenuItem onClick={() => contextMenuProps.onPrint(clientOrders[0])}>
+          Imprimer
+        </ContextMenuItem>
+        <ContextMenuItem onClick={() => contextMenuProps.onSendEmail(clientOrders[0])}>
+          Envoyer par e-mail
+        </ContextMenuItem>
+        <ContextMenuItem onClick={() => contextMenuProps.onSignOrder(clientOrders[0])}>
+          Signature du client
+        </ContextMenuItem>
+        <ContextMenuItem onClick={() => contextMenuProps.onRequestDocuments(clientOrders[0])}>
+          Demander les justificatifs
+        </ContextMenuItem>
+        <ContextMenuItem onClick={() => contextMenuProps.onConvertToInvoice(clientOrders[0])}>
+          Convertir en facture
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 };
 

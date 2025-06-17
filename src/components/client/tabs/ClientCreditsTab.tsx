@@ -23,7 +23,7 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
     );
   }
 
-  // Filter credits by client_id directly OR by invoice belonging to client
+  // Filter credits: direct client assignment OR via invoice belonging to client
   const clientCredits = credits?.filter(credit => {
     // Direct client assignment
     if (credit.client_id === clientId) {

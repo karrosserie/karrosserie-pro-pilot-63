@@ -22,7 +22,7 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
     );
   }
 
-  // Filtrer les encaissements par client via les factures associées
+  // Filter receipts by client via invoices
   const clientReceipts = receipts?.filter(receipt => {
     if (receipt.invoices && receipt.invoices.client_id === clientId) {
       return true;

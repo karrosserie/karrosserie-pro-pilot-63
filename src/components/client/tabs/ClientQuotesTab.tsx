@@ -7,6 +7,12 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 
 interface ClientQuotesTabProps {
   clientId: string;
@@ -37,6 +43,13 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer le devis ${quote.reference} ?`)) {
       deleteQuote.mutate(quote.id);
     }
+  };
+
+  const contextMenuProps = {
+    onDownload: (quote: any) => console.log('Download quote:', quote),
+    onPrint: (quote: any) => console.log('Print quote:', quote),
+    onSendEmail: (quote: any) => console.log('Send email quote:', quote),
+    onConvertToRepairOrder: (quote: any) => console.log('Convert to repair order:', quote)
   };
 
   const formatAmount = (amount: number | null | undefined): string => {
@@ -139,10 +152,30 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
   }
 
   return (
-    <SimpleTable
-      columns={columns}
-      data={clientQuotes}
-    />
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
+        <div>
+          <SimpleTable
+            columns={columns}
+            data={clientQuotes}
+          />
+        </div>
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem onClick={() => contextMenuProps.onDownload(clientQuotes[0])}>
+          Télécharger
+        </ContextMenuItem>
+        <ContextMenuItem onClick={() => contextMenuProps.onPrint(clientQuotes[0])}>
+          Imprimer
+        </ContextMenuItem>
+        <ContextMenuItem onClick={() => contextMenuProps.onSendEmail(clientQuotes[0])}>
+          Envoyer par e-mail
+        </ContextMenuItem>
+        <ContextMenuItem onClick={() => contextMenuProps.onConvertToRepairOrder(clientQuotes[0])}>
+          Convertir en ordre de réparation
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 };
 

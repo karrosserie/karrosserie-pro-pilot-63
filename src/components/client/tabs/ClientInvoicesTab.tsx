@@ -7,6 +7,12 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 
 interface ClientInvoicesTabProps {
   clientId: string;
@@ -37,6 +43,13 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer la facture ${invoice.reference} ?`)) {
       deleteInvoice.mutate(invoice.id);
     }
+  };
+
+  const contextMenuProps = {
+    onDownload: (invoice: any) => console.log('Download invoice:', invoice),
+    onPrint: (invoice: any) => console.log('Print invoice:', invoice),
+    onSendEmail: (invoice: any) => console.log('Send email invoice:', invoice),
+    onCreateCredit: (invoice: any) => console.log('Create credit:', invoice)
   };
 
   const formatDate = (dateString: string | null) => {
@@ -161,10 +174,30 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
   }
 
   return (
-    <SimpleTable
-      columns={columns}
-      data={clientInvoices}
-    />
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
+        <div>
+          <SimpleTable
+            columns={columns}
+            data={clientInvoices}
+          />
+        </div>
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem onClick={() => contextMenuProps.onDownload(clientInvoices[0])}>
+          Télécharger
+        </ContextMenuItem>
+        <ContextMenuItem onClick={() => contextMenuProps.onPrint(clientInvoices[0])}>
+          Imprimer
+        </ContextMenuItem>
+        <ContextMenuItem onClick={() => contextMenuProps.onSendEmail(clientInvoices[0])}>
+          Envoyer par e-mail
+        </ContextMenuItem>
+        <ContextMenuItem onClick={() => contextMenuProps.onCreateCredit(clientInvoices[0])}>
+          Créer un avoir
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 };
 
