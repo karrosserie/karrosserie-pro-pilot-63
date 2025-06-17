@@ -5,16 +5,22 @@ import { Input } from '@/components/ui/input';
 import FuelGauge from '@/components/vehicle/form/FuelGauge';
 import MultipleVehicleImages from '@/components/vehicle/form/MultipleVehicleImages';
 
+interface VehicleImage {
+  url: string;
+  phase: 'Avant' | 'Pendant' | 'Après';
+}
+
 interface VehicleDetailsTabProps {
   vehicleId: string;
   mileage: number;
   fuelLevel: number;
-  vehicleImages: string[];
+  vehicleImages: VehicleImage[];
   onMileageChange: (mileage: number) => void;
   onFuelLevelChange: (level: number) => void;
   onImageAdd: (url: string) => void;
   onImageRemove: (index: number) => void;
   onImageUpdate: (index: number, url: string) => void;
+  onImagePhaseUpdate: (index: number, phase: 'Avant' | 'Pendant' | 'Après') => void;
   isViewMode?: boolean;
 }
 
@@ -28,6 +34,7 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
   onImageAdd,
   onImageRemove,
   onImageUpdate,
+  onImagePhaseUpdate,
   isViewMode = false
 }) => {
   const handleMileageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,8 +58,13 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
     onImageUpdate(index, url);
   };
 
+  const handleImagePhaseUpdate = (index: number, phase: 'Avant' | 'Pendant' | 'Après') => {
+    console.log('VehicleDetailsTab - Updating image phase at index:', index, 'with phase:', phase);
+    onImagePhaseUpdate(index, phase);
+  };
+
   // S'assurer qu'il y a au moins un slot vide pour ajouter une image
-  const displayImages = vehicleImages.length === 0 ? [''] : vehicleImages;
+  const displayImages = vehicleImages.length === 0 ? [{ url: '', phase: 'Avant' as const }] : vehicleImages;
 
   return (
     <div className="space-y-6">
@@ -96,6 +108,7 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
             onImageAdd={handleImageAdd}
             onImageRemove={handleImageRemove}
             onImageUpdate={handleImageUpdate}
+            onImagePhaseUpdate={handleImagePhaseUpdate}
           />
         </div>
       </div>
