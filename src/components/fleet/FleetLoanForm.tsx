@@ -11,11 +11,6 @@ import ClientInfoTab from './form/ClientInfoTab';
 import InsuranceTab from './form/InsuranceTab';
 import AttestationTab from './form/AttestationTab';
 
-interface VehicleImage {
-  url: string;
-  phase: 'Avant' | 'Pendant' | 'Après';
-}
-
 interface FleetLoanFormProps {
   vehicle: FleetVehicle;
   onSubmit: (loanData: LoanFormData) => void;
@@ -35,7 +30,7 @@ export interface LoanFormData {
   notes?: string;
   mileage: number;
   fuelLevel: number;
-  vehicleImages: VehicleImage[];
+  vehicleImages: string[];
   damages: DamageItem[];
   driverLicenseFrontUrl: string;
   driverLicenseBackUrl: string;
@@ -130,17 +125,6 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     return 'Véhicule';
   };
 
-  const handleImagePhaseUpdate = (index: number, phase: 'Avant' | 'Pendant' | 'Après') => {
-    const updatedImages = [...formData.vehicleImages];
-    if (!updatedImages[index]) {
-      updatedImages[index] = { url: '', phase };
-    } else {
-      updatedImages[index] = { ...updatedImages[index], phase };
-    }
-    // We need to call the existing handler with the updated images
-    // This assumes the handler will be updated to accept VehicleImage[]
-  };
-
   return (
     <div className="space-y-6">
       <div>
@@ -198,7 +182,6 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             onImageAdd={handleImageAdd}
             onImageRemove={handleImageRemove}
             onImageUpdate={handleImageUpdate}
-            onImagePhaseUpdate={handleImagePhaseUpdate}
             isViewMode={isViewMode}
           />
         </TabsContent>

@@ -4,11 +4,6 @@ import { Label } from '@/components/ui/label';
 import { DocumentUploader } from '@/components/shared/DocumentUploader';
 import MultipleVehicleImages from './MultipleVehicleImages';
 
-interface VehicleImage {
-  url: string;
-  phase: 'Avant' | 'Pendant' | 'Après';
-}
-
 interface VehicleDocumentsFormProps {
   formData: any;
   isViewMode: boolean;
@@ -19,7 +14,7 @@ interface VehicleDocumentsFormProps {
   onRegistrationFrontUpload: (url: string) => void;
   onRegistrationBackUpload: (url: string) => void;
   onVehicleImageUpload: (url: string) => void;
-  onVehicleImagesUpdate: (images: VehicleImage[]) => void;
+  onVehicleImagesUpdate: (images: string[]) => void;
 }
 
 const VehicleDocumentsForm: React.FC<VehicleDocumentsFormProps> = ({
@@ -30,17 +25,17 @@ const VehicleDocumentsForm: React.FC<VehicleDocumentsFormProps> = ({
   onVehicleImagesUpdate
 }) => {
   const vehicleId = formData.id || 'new-vehicle';
-  const vehicleImages: VehicleImage[] = formData.vehicleImages || [{ url: '', phase: 'Avant' }];
+  const vehicleImages = formData.vehicleImages || [''];
 
   const handleImageAdd = (url: string) => {
-    if (vehicleImages[vehicleImages.length - 1]?.url === '') {
+    if (vehicleImages[vehicleImages.length - 1] === '') {
       // Remplacer le dernier slot vide
       const updatedImages = [...vehicleImages];
-      updatedImages[updatedImages.length - 1] = { url, phase: 'Avant' };
+      updatedImages[updatedImages.length - 1] = url;
       onVehicleImagesUpdate(updatedImages);
     } else {
       // Ajouter une nouvelle image
-      onVehicleImagesUpdate([...vehicleImages, { url, phase: 'Avant' }]);
+      onVehicleImagesUpdate([...vehicleImages, url]);
     }
   };
 
@@ -48,7 +43,7 @@ const VehicleDocumentsForm: React.FC<VehicleDocumentsFormProps> = ({
     const updatedImages = vehicleImages.filter((_, i) => i !== index);
     // S'assurer qu'il y a au moins un slot vide si toutes les images sont supprimées
     if (updatedImages.length === 0) {
-      onVehicleImagesUpdate([{ url: '', phase: 'Avant' }]);
+      onVehicleImagesUpdate(['']);
     } else {
       onVehicleImagesUpdate(updatedImages);
     }
@@ -56,21 +51,7 @@ const VehicleDocumentsForm: React.FC<VehicleDocumentsFormProps> = ({
 
   const handleImageUpdate = (index: number, url: string) => {
     const updatedImages = [...vehicleImages];
-    if (!updatedImages[index]) {
-      updatedImages[index] = { url, phase: 'Avant' };
-    } else {
-      updatedImages[index] = { ...updatedImages[index], url };
-    }
-    onVehicleImagesUpdate(updatedImages);
-  };
-
-  const handleImagePhaseUpdate = (index: number, phase: 'Avant' | 'Pendant' | 'Après') => {
-    const updatedImages = [...vehicleImages];
-    if (!updatedImages[index]) {
-      updatedImages[index] = { url: '', phase };
-    } else {
-      updatedImages[index] = { ...updatedImages[index], phase };
-    }
+    updatedImages[index] = url;
     onVehicleImagesUpdate(updatedImages);
   };
 
@@ -105,7 +86,6 @@ const VehicleDocumentsForm: React.FC<VehicleDocumentsFormProps> = ({
         onImageAdd={handleImageAdd}
         onImageRemove={handleImageRemove}
         onImageUpdate={handleImageUpdate}
-        onImagePhaseUpdate={handleImagePhaseUpdate}
       />
     </div>
   );

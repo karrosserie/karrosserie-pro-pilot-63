@@ -1,29 +1,23 @@
 
 import { useState, useEffect } from 'react';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
-import { FleetReservation } from '@/services/supabase/fleet-reservations';
-import { FleetReturn } from '@/services/supabase/fleet-returns';
 import { FleetReturnFormData } from '@/components/fleet/FleetReturnForm.types';
-
-interface VehicleImage {
-  url: string;
-  phase: 'Avant' | 'Pendant' | 'Après';
-}
+import { getCurrentDateTime, parseDamagesFromReservation, jsonToStringArray } from './utils';
 
 export const useFleetReturnFormData = (
   vehicle: FleetVehicle,
   reservationId: string,
-  reservation?: FleetReservation | null,
-  fleetReturn?: FleetReturn | null
+  reservation: any,
+  fleetReturn: any
 ) => {
   const [formData, setFormData] = useState<FleetReturnFormData>({
     reservationId,
     vehicleId: vehicle.id,
     clientId: '',
-    returnDate: new Date().toISOString().slice(0, 16),
-    returnMileage: 0,
-    fuelLevelReturn: 0,
-    vehicleImages: [] as VehicleImage[],
+    returnDate: getCurrentDateTime(),
+    returnMileage: vehicle.mileage || 0,
+    fuelLevelReturn: 100,
+    vehicleImages: [],
     damages: [],
     notes: '',
     attestationAccepted: false,
@@ -31,33 +25,37 @@ export const useFleetReturnFormData = (
     clientName: ''
   });
 
-  // Update form data when reservation or return data is loaded
+  // Update form data when reservation data is loaded
   useEffect(() => {
     if (reservation) {
       setFormData(prev => ({
         ...prev,
         clientId: reservation.client_id || '',
-        clientName: reservation.client_name || ''
+        clientName: reservation.clients ? `${reservation.clients.first_name} ${reservation.clients.last_name}` : '',
+        damages: parseDamagesFromReservation(reservation.damages),
+        returnMileage: reservation.start_mileage || vehicle.mileage || 0
       }));
     }
-  }, [reservation]);
+  }, [reservation, vehicle.mileage]);
 
+  // Update form data when fleet return data is loaded (for viewing existing returns)
   useEffect(() => {
-    if (fleetReturn) {
+    if (fleetReturn && reservation) {
       setFormData(prev => ({
         ...prev,
-        returnDate: fleetReturn.return_date || prev.returnDate,
+        clientId: reservation.client_id || '',
+        clientName: reservation.clients ? `${reservation.clients.first_name} ${reservation.clients.last_name}` : '',
+        returnDate: fleetReturn.return_date || getCurrentDateTime(),
         returnMileage: fleetReturn.return_mileage || 0,
-        fuelLevelReturn: fleetReturn.fuel_level_return || 0,
-        vehicleImages: (fleetReturn.vehicle_images as VehicleImage[]) || [],
-        damages: fleetReturn.damages || [],
+        fuelLevelReturn: fleetReturn.fuel_level_return || 100,
+        vehicleImages: jsonToStringArray(fleetReturn.vehicle_images),
+        damages: parseDamagesFromReservation(fleetReturn.damages),
         notes: fleetReturn.notes || '',
         attestationAccepted: fleetReturn.attestation_accepted || false,
         clientSignature: fleetReturn.client_signature || '',
-        clientName: fleetReturn.client_name || prev.clientName
       }));
     }
-  }, [fleetReturn]);
+  }, [fleetReturn, reservation]);
 
   return { formData, setFormData };
 };
