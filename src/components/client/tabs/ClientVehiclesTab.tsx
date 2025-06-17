@@ -1,9 +1,8 @@
 
 import React from 'react';
 import { useVehicles } from '@/hooks/use-vehicles';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Car, Calendar } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import VehicleCard from '@/components/vehicle/VehicleCard';
+import { Car } from 'lucide-react';
 
 interface ClientVehiclesTabProps {
   clientId: string;
@@ -33,43 +32,22 @@ const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="grid gap-4">
-        {clientVehicles.map((vehicle) => (
-          <Card key={vehicle.id}>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Car className="h-5 w-5" />
-                  <span>
-                    {vehicle.car_brands?.name} {vehicle.car_models?.name}
-                  </span>
-                </div>
-                <Badge variant={vehicle.status === 'En cours' ? 'default' : 'secondary'}>
-                  {vehicle.status}
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="font-medium">Plaque:</span> {vehicle.license_plate}
-                </div>
-                <div>
-                  <span className="font-medium">VIN:</span> {vehicle.vin}
-                </div>
-                <div>
-                  <span className="font-medium">Année:</span> {vehicle.year}
-                </div>
-                <div className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  <span className="font-medium">Créé:</span> {new Date(vehicle.created_at).toLocaleDateString()}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {clientVehicles.map((vehicle) => (
+        <VehicleCard
+          key={vehicle.id}
+          brand={vehicle.car_brands?.name || 'Marque inconnue'}
+          model={vehicle.car_models?.name || 'Modèle inconnu'}
+          year={vehicle.year || 0}
+          licensePlate={vehicle.license_plate}
+          status={vehicle.status as any}
+          owner={vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Client inconnu'}
+          imageUrl={vehicle.image_url}
+          vehicleImages={vehicle.vehicle_images}
+          registrationDocumentFrontUrl={vehicle.registration_document_front_url}
+          registrationDocumentBackUrl={vehicle.registration_document_back_url}
+        />
+      ))}
     </div>
   );
 };

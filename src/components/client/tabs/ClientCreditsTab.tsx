@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { useCredits } from '@/hooks/use-credits';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CreditCard, Calendar, Euro } from 'lucide-react';
+import { DataTable } from '@/components/ui/data-table';
+import { CreditCard } from 'lucide-react';
+import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 
 interface ClientCreditsTabProps {
@@ -22,6 +23,38 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
 
   const clientCredits = credits?.filter(credit => credit.client_id === clientId) || [];
 
+  const columns: ColumnDef<any>[] = [
+    {
+      accessorKey: "reference",
+      header: "Référence",
+      cell: ({ row }) => `#${row.getValue("reference")}`
+    },
+    {
+      accessorKey: "created_at",
+      header: "Date création",
+      cell: ({ row }) => new Date(row.getValue("created_at") as string).toLocaleDateString()
+    },
+    {
+      accessorKey: "amount",
+      header: "Montant",
+      cell: ({ row }) => `${row.getValue("amount")}€`
+    },
+    {
+      accessorKey: "notes",
+      header: "Notes",
+      cell: ({ row }) => row.getValue("notes") || "-"
+    },
+    {
+      accessorKey: "status",
+      header: "Statut",
+      cell: ({ row }) => (
+        <Badge variant={row.getValue("status") === 'Payé' ? 'default' : 'secondary'}>
+          {row.getValue("status")}
+        </Badge>
+      )
+    }
+  ];
+
   if (clientCredits.length === 0) {
     return (
       <div className="text-center py-8">
@@ -33,42 +66,12 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="grid gap-4">
-        {clientCredits.map((credit) => (
-          <Card key={credit.id}>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <CreditCard className="h-5 w-5" />
-                  <span>Avoir #{credit.reference}</span>
-                </div>
-                <Badge variant={credit.status === 'Payé' ? 'default' : 'secondary'}>
-                  {credit.status}
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  <span className="font-medium">Créé:</span> {new Date(credit.created_at).toLocaleDateString()}
-                </div>
-                <div className="flex items-center">
-                  <Euro className="h-4 w-4 mr-1" />
-                  <span className="font-medium">Montant:</span> {credit.amount}€
-                </div>
-                {credit.notes && (
-                  <div className="col-span-2">
-                    <span className="font-medium">Notes:</span> {credit.notes}
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
+    <DataTable
+      columns={columns}
+      data={clientCredits}
+      searchKey="reference"
+      searchPlaceholder="Rechercher par référence..."
+    />
   );
 };
 

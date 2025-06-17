@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Banknote, Calendar, Euro, CreditCard } from 'lucide-react';
+import { DataTable } from '@/components/ui/data-table';
+import { Banknote } from 'lucide-react';
+import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 
 interface ClientReceiptsTabProps {
@@ -28,6 +29,46 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
     return false;
   }) || [];
 
+  const columns: ColumnDef<any>[] = [
+    {
+      accessorKey: "reference",
+      header: "Référence",
+      cell: ({ row }) => `#${row.getValue("reference")}`
+    },
+    {
+      accessorKey: "date",
+      header: "Date",
+      cell: ({ row }) => new Date(row.getValue("date") as string).toLocaleDateString()
+    },
+    {
+      accessorKey: "amount",
+      header: "Montant",
+      cell: ({ row }) => `${row.getValue("amount")}€`
+    },
+    {
+      accessorKey: "payment_method",
+      header: "Méthode",
+      cell: ({ row }) => row.getValue("payment_method")
+    },
+    {
+      accessorKey: "invoices",
+      header: "Facture",
+      cell: ({ row }) => {
+        const invoice = row.getValue("invoices") as any;
+        return invoice ? `#${invoice.reference}` : "-";
+      }
+    },
+    {
+      accessorKey: "status",
+      header: "Statut",
+      cell: ({ row }) => (
+        <Badge variant={row.getValue("status") === 'Encaissé' ? 'default' : 'secondary'}>
+          {row.getValue("status")}
+        </Badge>
+      )
+    }
+  ];
+
   if (clientReceipts.length === 0) {
     return (
       <div className="text-center py-8">
@@ -39,46 +80,12 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="grid gap-4">
-        {clientReceipts.map((receipt) => (
-          <Card key={receipt.id}>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Banknote className="h-5 w-5" />
-                  <span>Encaissement #{receipt.reference}</span>
-                </div>
-                <Badge variant={receipt.status === 'Encaissé' ? 'default' : 'secondary'}>
-                  {receipt.status}
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  <span className="font-medium">Date:</span> {new Date(receipt.date).toLocaleDateString()}
-                </div>
-                <div className="flex items-center">
-                  <Euro className="h-4 w-4 mr-1" />
-                  <span className="font-medium">Montant:</span> {receipt.amount}€
-                </div>
-                <div className="flex items-center">
-                  <CreditCard className="h-4 w-4 mr-1" />
-                  <span className="font-medium">Méthode:</span> {receipt.payment_method}
-                </div>
-                {receipt.invoices && (
-                  <div>
-                    <span className="font-medium">Facture:</span> #{receipt.invoices.reference}
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
+    <DataTable
+      columns={columns}
+      data={clientReceipts}
+      searchKey="reference"
+      searchPlaceholder="Rechercher par référence..."
+    />
   );
 };
 

@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { useQuotes } from '@/hooks/use-quotes';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Calendar, Euro } from 'lucide-react';
+import { DataTable } from '@/components/ui/data-table';
+import { FileText } from 'lucide-react';
+import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 
 interface ClientQuotesTabProps {
@@ -22,6 +23,49 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
 
   const clientQuotes = quotes?.filter(quote => quote.client_id === clientId) || [];
 
+  const columns: ColumnDef<any>[] = [
+    {
+      accessorKey: "reference",
+      header: "Référence",
+      cell: ({ row }) => `#${row.getValue("reference")}`
+    },
+    {
+      accessorKey: "created_at",
+      header: "Date création",
+      cell: ({ row }) => new Date(row.getValue("created_at") as string).toLocaleDateString()
+    },
+    {
+      accessorKey: "amount",
+      header: "Montant",
+      cell: ({ row }) => `${row.getValue("amount")}€`
+    },
+    {
+      accessorKey: "valid_until",
+      header: "Valide jusqu'au",
+      cell: ({ row }) => {
+        const validUntil = row.getValue("valid_until");
+        return validUntil ? new Date(validUntil as string).toLocaleDateString() : "-";
+      }
+    },
+    {
+      accessorKey: "vehicles",
+      header: "Véhicule",
+      cell: ({ row }) => {
+        const vehicle = row.getValue("vehicles") as any;
+        return vehicle?.license_plate || "-";
+      }
+    },
+    {
+      accessorKey: "status",
+      header: "Statut",
+      cell: ({ row }) => (
+        <Badge variant={row.getValue("status") === 'Accepté' ? 'default' : 'secondary'}>
+          {row.getValue("status")}
+        </Badge>
+      )
+    }
+  ];
+
   if (clientQuotes.length === 0) {
     return (
       <div className="text-center py-8">
@@ -33,48 +77,12 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="grid gap-4">
-        {clientQuotes.map((quote) => (
-          <Card key={quote.id}>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <FileText className="h-5 w-5" />
-                  <span>Devis #{quote.reference}</span>
-                </div>
-                <Badge variant={quote.status === 'Accepté' ? 'default' : 'secondary'}>
-                  {quote.status}
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  <span className="font-medium">Créé:</span> {new Date(quote.created_at).toLocaleDateString()}
-                </div>
-                <div className="flex items-center">
-                  <Euro className="h-4 w-4 mr-1" />
-                  <span className="font-medium">Montant:</span> {quote.amount}€
-                </div>
-                {quote.vehicles && (
-                  <div>
-                    <span className="font-medium">Véhicule:</span> {quote.vehicles.license_plate}
-                  </div>
-                )}
-                {quote.valid_until && (
-                  <div className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    <span className="font-medium">Valide jusqu'au:</span> {new Date(quote.valid_until).toLocaleDateString()}
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
+    <DataTable
+      columns={columns}
+      data={clientQuotes}
+      searchKey="reference"
+      searchPlaceholder="Rechercher par référence..."
+    />
   );
 };
 

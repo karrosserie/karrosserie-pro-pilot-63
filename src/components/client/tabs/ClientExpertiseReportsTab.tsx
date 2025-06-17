@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Calendar, Euro } from 'lucide-react';
+import { DataTable } from '@/components/ui/data-table';
+import { FileText } from 'lucide-react';
+import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 
 interface ClientExpertiseReportsTabProps {
@@ -22,6 +23,49 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
 
   const clientReports = reports?.filter(report => report.client_id === clientId) || [];
 
+  const columns: ColumnDef<any>[] = [
+    {
+      accessorKey: "report_number",
+      header: "N° Rapport",
+      cell: ({ row }) => row.getValue("report_number") || "Non défini"
+    },
+    {
+      accessorKey: "report_date",
+      header: "Date",
+      cell: ({ row }) => {
+        const date = row.getValue("report_date");
+        return date ? new Date(date as string).toLocaleDateString() : "Non définie";
+      }
+    },
+    {
+      accessorKey: "amount",
+      header: "Montant",
+      cell: ({ row }) => {
+        const amount = row.getValue("amount");
+        return amount ? `${amount}€` : "Non défini";
+      }
+    },
+    {
+      accessorKey: "claim_number",
+      header: "N° Sinistre",
+      cell: ({ row }) => row.getValue("claim_number") || "-"
+    },
+    {
+      accessorKey: "vehicles",
+      header: "Véhicule",
+      cell: ({ row }) => {
+        const vehicle = row.getValue("vehicles") as any;
+        return vehicle?.license_plate || "-";
+      }
+    },
+    {
+      header: "Statut",
+      cell: () => (
+        <Badge variant="outline">Expertise</Badge>
+      )
+    }
+  ];
+
   if (clientReports.length === 0) {
     return (
       <div className="text-center py-8">
@@ -33,47 +77,12 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
   }
 
   return (
-    <div className="space-y-4">
-      <div className="grid gap-4">
-        {clientReports.map((report) => (
-          <Card key={report.id}>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <FileText className="h-5 w-5" />
-                  <span>Rapport #{report.report_number || 'Non défini'}</span>
-                </div>
-                <Badge variant="outline">
-                  Expertise
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  <span className="font-medium">Date:</span> {report.report_date ? new Date(report.report_date).toLocaleDateString() : 'Non définie'}
-                </div>
-                <div className="flex items-center">
-                  <Euro className="h-4 w-4 mr-1" />
-                  <span className="font-medium">Montant:</span> {report.amount ? `${report.amount}€` : 'Non défini'}
-                </div>
-                {report.claim_number && (
-                  <div>
-                    <span className="font-medium">N° Sinistre:</span> {report.claim_number}
-                  </div>
-                )}
-                {report.vehicles && (
-                  <div>
-                    <span className="font-medium">Véhicule:</span> {report.vehicles.license_plate}
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
+    <DataTable
+      columns={columns}
+      data={clientReports}
+      searchKey="report_number"
+      searchPlaceholder="Rechercher par numéro de rapport..."
+    />
   );
 };
 
