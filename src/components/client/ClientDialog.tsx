@@ -86,37 +86,37 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
               <TabsTrigger value="details">Détails</TabsTrigger>
               <TabsTrigger value="vehicles" className="flex items-center gap-2">
                 Véhicules
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="destructive" className="text-xs bg-red-500 hover:bg-red-600">
                   {clientVehicles.length}
                 </Badge>
               </TabsTrigger>
               <TabsTrigger value="expertise" className="flex items-center gap-2">
                 Expertises
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="destructive" className="text-xs bg-red-500 hover:bg-red-600">
                   {clientReports.length}
                 </Badge>
               </TabsTrigger>
               <TabsTrigger value="quotes" className="flex items-center gap-2">
                 Devis
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="destructive" className="text-xs bg-red-500 hover:bg-red-600">
                   {clientQuotes.length}
                 </Badge>
               </TabsTrigger>
               <TabsTrigger value="invoices" className="flex items-center gap-2">
                 Factures
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="destructive" className="text-xs bg-red-500 hover:bg-red-600">
                   {clientInvoices.length}
                 </Badge>
               </TabsTrigger>
               <TabsTrigger value="credits" className="flex items-center gap-2">
                 Avoirs
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="destructive" className="text-xs bg-red-500 hover:bg-red-600">
                   {clientCredits.length}
                 </Badge>
               </TabsTrigger>
               <TabsTrigger value="receipts" className="flex items-center gap-2">
                 Encaissements
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="destructive" className="text-xs bg-red-500 hover:bg-red-600">
                   {clientReceipts.length}
                 </Badge>
               </TabsTrigger>
