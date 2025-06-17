@@ -120,7 +120,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
         </div>
       </div>
       
-      <div className="border-t border-gray-100 mt-4 pt-4 flex justify-between items-center">
+      <div className="border-t border-gray-100 mt-4 pt-4 flex text-right">
         <div className="flex items-center space-x-1">
           {onView && (
             <Button variant="ghost" size="icon" onClick={onView}>
