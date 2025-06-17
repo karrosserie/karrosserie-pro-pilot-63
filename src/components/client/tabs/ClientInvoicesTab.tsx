@@ -43,7 +43,7 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
       accessorKey: "reference",
       header: "Référence",
       cell: ({ row }) => (
-        <span className="font-medium">#{row.getValue("reference")}</span>
+        <span className="font-medium">#{row.getValue("reference") as string}</span>
       )
     },
     {
@@ -55,15 +55,15 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
       accessorKey: "amount",
       header: "Montant",
       cell: ({ row }) => (
-        <span className="font-medium">{row.getValue("amount")}€</span>
+        <span className="font-medium">{row.getValue("amount") as number}€</span>
       )
     },
     {
       accessorKey: "due_date",
       header: "Échéance",
       cell: ({ row }) => {
-        const dueDate = row.getValue("due_date");
-        return dueDate ? new Date(dueDate as string).toLocaleDateString() : "-";
+        const dueDate = row.getValue("due_date") as string;
+        return dueDate ? new Date(dueDate).toLocaleDateString() : "-";
       }
     },
     {
@@ -78,7 +78,7 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
       accessorKey: "status",
       header: "Statut",
       cell: ({ row }) => {
-        const status = row.getValue("status");
+        const status = row.getValue("status") as string;
         return (
           <Badge variant={status === 'Payée' ? 'default' : 'secondary'}>
             {status}

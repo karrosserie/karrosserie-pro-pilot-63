@@ -43,7 +43,7 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
       accessorKey: "reference",
       header: "Référence",
       cell: ({ row }) => (
-        <span className="font-medium">#{row.getValue("reference")}</span>
+        <span className="font-medium">#{row.getValue("reference") as string}</span>
       )
     },
     {
@@ -55,19 +55,19 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
       accessorKey: "amount",
       header: "Montant",
       cell: ({ row }) => (
-        <span className="font-medium">{row.getValue("amount")}€</span>
+        <span className="font-medium">{row.getValue("amount") as number}€</span>
       )
     },
     {
       accessorKey: "notes",
       header: "Notes",
-      cell: ({ row }) => row.getValue("notes") || "-"
+      cell: ({ row }) => (row.getValue("notes") as string) || "-"
     },
     {
       accessorKey: "status",
       header: "Statut",
       cell: ({ row }) => {
-        const status = row.getValue("status");
+        const status = row.getValue("status") as string;
         return (
           <Badge variant={status === 'Payé' ? 'default' : 'secondary'}>
             {status}

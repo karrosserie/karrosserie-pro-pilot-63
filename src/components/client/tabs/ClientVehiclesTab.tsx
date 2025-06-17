@@ -59,7 +59,7 @@ const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
           status={vehicle.status as any}
           owner={vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Client inconnu'}
           imageUrl={vehicle.vehicle_images?.[0] || undefined}
-          vehicleImages={Array.isArray(vehicle.vehicle_images) ? vehicle.vehicle_images : []}
+          vehicleImages={Array.isArray(vehicle.vehicle_images) ? vehicle.vehicle_images.map(img => String(img)) : []}
           registrationDocumentFrontUrl={vehicle.registration_document_front_url}
           registrationDocumentBackUrl={vehicle.registration_document_back_url}
           onView={() => handleViewVehicle(vehicle)}

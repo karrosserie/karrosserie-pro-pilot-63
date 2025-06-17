@@ -49,7 +49,7 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
       accessorKey: "reference",
       header: "Référence",
       cell: ({ row }) => (
-        <span className="font-medium">#{row.getValue("reference")}</span>
+        <span className="font-medium">#{row.getValue("reference") as string}</span>
       )
     },
     {
@@ -61,13 +61,13 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
       accessorKey: "amount",
       header: "Montant",
       cell: ({ row }) => (
-        <span className="font-medium">{row.getValue("amount")}€</span>
+        <span className="font-medium">{row.getValue("amount") as number}€</span>
       )
     },
     {
       accessorKey: "payment_method",
       header: "Méthode",
-      cell: ({ row }) => row.getValue("payment_method")
+      cell: ({ row }) => row.getValue("payment_method") as string
     },
     {
       accessorKey: "invoices",
@@ -81,7 +81,7 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
       accessorKey: "status",
       header: "Statut",
       cell: ({ row }) => {
-        const status = row.getValue("status");
+        const status = row.getValue("status") as string;
         return (
           <Badge variant={status === 'Encaissé' ? 'default' : 'secondary'}>
             {status}

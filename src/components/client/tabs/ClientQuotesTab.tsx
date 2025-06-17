@@ -43,7 +43,7 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
       accessorKey: "reference",
       header: "Référence",
       cell: ({ row }) => (
-        <span className="font-medium">#{row.getValue("reference")}</span>
+        <span className="font-medium">#{row.getValue("reference") as string}</span>
       )
     },
     {
@@ -55,15 +55,15 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
       accessorKey: "amount",
       header: "Montant",
       cell: ({ row }) => (
-        <span className="font-medium">{row.getValue("amount")}€</span>
+        <span className="font-medium">{row.getValue("amount") as number}€</span>
       )
     },
     {
       accessorKey: "valid_until",
       header: "Valide jusqu'au",
       cell: ({ row }) => {
-        const validUntil = row.getValue("valid_until");
-        return validUntil ? new Date(validUntil as string).toLocaleDateString() : "-";
+        const validUntil = row.getValue("valid_until") as string;
+        return validUntil ? new Date(validUntil).toLocaleDateString() : "-";
       }
     },
     {
@@ -78,7 +78,7 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
       accessorKey: "status",
       header: "Statut",
       cell: ({ row }) => {
-        const status = row.getValue("status");
+        const status = row.getValue("status") as string;
         return (
           <Badge variant={status === 'Accepté' ? 'default' : 'secondary'}>
             {status}
