@@ -39,17 +39,17 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
   };
 
   const handleDelete = (receipt: any) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'encaissement ${receipt.reference} ?`)) {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'encaissement ?`)) {
       deleteReceipt.mutate(receipt.id);
     }
   };
 
   const formatAmount = (amount: number | null | undefined): string => {
     if (amount === null || amount === undefined) return '-';
-    return amount.toLocaleString('fr-FR', { 
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2 
-    }) + ' €';
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(amount);
   };
 
   const formatDate = (dateString: string | null) => {
@@ -62,13 +62,6 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
   };
 
   const columns: ColumnDef<any>[] = [
-    {
-      accessorKey: "reference",
-      header: "Référence",
-      cell: ({ row }) => (
-        <span className="font-medium">{row.getValue("reference") as string}</span>
-      )
-    },
     {
       accessorKey: "date",
       header: "Date",
@@ -96,6 +89,14 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
       cell: ({ row }) => {
         const paymentMethod = row.getValue("payment_method") as string;
         return paymentMethod || "-";
+      }
+    },
+    {
+      accessorKey: "bank_account",
+      header: "Compte bancaire",
+      cell: ({ row }) => {
+        const bankAccount = row.getValue("bank_account") as string;
+        return bankAccount || "-";
       }
     },
     {

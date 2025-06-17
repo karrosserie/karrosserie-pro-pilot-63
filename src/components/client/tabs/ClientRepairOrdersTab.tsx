@@ -40,10 +40,10 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
 
   const formatAmount = (amount: number | null | undefined): string => {
     if (amount === null || amount === undefined) return '-';
-    return amount.toLocaleString('fr-FR', { 
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2 
-    }) + ' €';
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(amount);
   };
 
   const formatDate = (dateString: string | null) => {
@@ -58,7 +58,7 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
   const columns: ColumnDef<any>[] = [
     {
       accessorKey: "reference",
-      header: "Référence",
+      header: "Numéro",
       cell: ({ row }) => (
         <span className="font-medium">{row.getValue("reference") as string}</span>
       )
@@ -87,7 +87,7 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
     },
     {
       accessorKey: "total_amount",
-      header: "Montant total",
+      header: "Montant",
       cell: ({ row }) => {
         const amount = row.getValue("total_amount");
         return formatAmount(amount as number);

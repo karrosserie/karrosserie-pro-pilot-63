@@ -87,7 +87,7 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
           
           <Tabs defaultValue="details" className="w-full h-full">
             <TabsList className="grid w-full grid-cols-8">
-              <TabsTrigger value="details">Détails</TabsTrigger>
+              <TabsTrigger value="details">Fiche</TabsTrigger>
               <TabsTrigger value="vehicles" className="flex items-center gap-2">
                 Véhicules
                 <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">

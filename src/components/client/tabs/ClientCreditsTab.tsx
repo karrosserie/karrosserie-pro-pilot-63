@@ -4,7 +4,6 @@ import { useCredits } from '@/hooks/use-credits';
 import { SimpleTable } from '@/components/ui/simple-table';
 import { CreditCard, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
 interface ClientCreditsTabProps {
@@ -22,6 +21,7 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
     );
   }
 
+  // Filtrer les avoirs par client_id directement
   const clientCredits = credits?.filter(credit => credit.client_id === clientId) || [];
 
   const handleView = (credit: any) => {
@@ -40,10 +40,10 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
 
   const formatAmount = (amount: number | null | undefined): string => {
     if (amount === null || amount === undefined) return '-';
-    return amount.toLocaleString('fr-FR', { 
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2 
-    }) + ' €';
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(amount);
   };
 
   const formatDate = (dateString: string | null) => {
