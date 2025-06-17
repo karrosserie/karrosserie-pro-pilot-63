@@ -1,11 +1,12 @@
 
 import React from 'react';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
-import { DataTable } from '@/components/ui/data-table';
+import { SimpleTable } from '@/components/ui/simple-table';
 import { FileText, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { formatCurrency } from '@/lib/utils';
 
 interface ClientExpertiseReportsTabProps {
   clientId: string;
@@ -59,7 +60,7 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
       header: "Montant",
       cell: ({ row }) => {
         const amount = row.getValue("amount");
-        return amount ? `${amount}€` : "Non défini";
+        return amount ? formatCurrency(amount as number) : "Non défini";
       }
     },
     {
@@ -127,11 +128,9 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
   }
 
   return (
-    <DataTable
+    <SimpleTable
       columns={columns}
       data={clientReports}
-      searchKey="report_number"
-      searchPlaceholder="Rechercher par numéro de rapport..."
     />
   );
 };

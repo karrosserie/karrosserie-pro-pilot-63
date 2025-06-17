@@ -1,11 +1,12 @@
 
 import React from 'react';
 import { useCredits } from '@/hooks/use-credits';
-import { DataTable } from '@/components/ui/data-table';
+import { SimpleTable } from '@/components/ui/simple-table';
 import { CreditCard, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { formatCurrency } from '@/lib/utils';
 
 interface ClientCreditsTabProps {
   clientId: string;
@@ -43,7 +44,7 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
       accessorKey: "reference",
       header: "Référence",
       cell: ({ row }) => (
-        <span className="font-medium">#{row.getValue("reference") as string}</span>
+        <span className="font-medium">{row.getValue("reference") as string}</span>
       )
     },
     {
@@ -55,7 +56,7 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
       accessorKey: "amount",
       header: "Montant",
       cell: ({ row }) => (
-        <span className="font-medium">{row.getValue("amount") as number}€</span>
+        <span className="font-medium">{formatCurrency(row.getValue("amount") as number)}</span>
       )
     },
     {
@@ -121,11 +122,9 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   }
 
   return (
-    <DataTable
+    <SimpleTable
       columns={columns}
       data={clientCredits}
-      searchKey="reference"
-      searchPlaceholder="Rechercher par référence..."
     />
   );
 };

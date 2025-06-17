@@ -1,11 +1,12 @@
 
 import React from 'react';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
-import { DataTable } from '@/components/ui/data-table';
+import { SimpleTable } from '@/components/ui/simple-table';
 import { Banknote, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { formatCurrency } from '@/lib/utils';
 
 interface ClientReceiptsTabProps {
   clientId: string;
@@ -49,7 +50,7 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
       accessorKey: "reference",
       header: "Référence",
       cell: ({ row }) => (
-        <span className="font-medium">#{row.getValue("reference") as string}</span>
+        <span className="font-medium">{row.getValue("reference") as string}</span>
       )
     },
     {
@@ -61,7 +62,7 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
       accessorKey: "amount",
       header: "Montant",
       cell: ({ row }) => (
-        <span className="font-medium">{row.getValue("amount") as number}€</span>
+        <span className="font-medium">{formatCurrency(row.getValue("amount") as number)}</span>
       )
     },
     {
@@ -74,7 +75,7 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
       header: "Facture",
       cell: ({ row }) => {
         const invoice = row.getValue("invoices") as any;
-        return invoice ? `#${invoice.reference}` : "-";
+        return invoice ? invoice.reference : "-";
       }
     },
     {
@@ -135,11 +136,9 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
   }
 
   return (
-    <DataTable
+    <SimpleTable
       columns={columns}
       data={clientReceipts}
-      searchKey="reference"
-      searchPlaceholder="Rechercher par référence..."
     />
   );
 };
