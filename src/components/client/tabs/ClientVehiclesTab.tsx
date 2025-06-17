@@ -2,7 +2,7 @@
 import React from 'react';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Car, Calendar, FileText } from 'lucide-react';
+import { Car, Calendar } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface ClientVehiclesTabProps {
@@ -34,8 +34,6 @@ const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Véhicules du client ({clientVehicles.length})</h3>
-      
       <div className="grid gap-4">
         {clientVehicles.map((vehicle) => (
           <Card key={vehicle.id}>

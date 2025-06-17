@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import ClientForm from './ClientForm';
 import ClientVehiclesTab from './tabs/ClientVehiclesTab';
 import ClientExpertiseReportsTab from './tabs/ClientExpertiseReportsTab';
@@ -15,6 +16,12 @@ import ClientQuotesTab from './tabs/ClientQuotesTab';
 import ClientInvoicesTab from './tabs/ClientInvoicesTab';
 import ClientCreditsTab from './tabs/ClientCreditsTab';
 import ClientReceiptsTab from './tabs/ClientReceiptsTab';
+import { useVehicles } from '@/hooks/use-vehicles';
+import { useExpertiseReports } from '@/hooks/use-expertise-reports';
+import { useQuotes } from '@/hooks/use-quotes';
+import { useInvoices } from '@/hooks/use-invoices';
+import { useCredits } from '@/hooks/use-credits';
+import { useReceiptsData } from '@/hooks/use-receipts-data';
 
 interface ClientDialogProps {
   open: boolean;
@@ -35,6 +42,13 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
   onSubmit,
   mode
 }) => {
+  const { vehicles } = useVehicles();
+  const { reports } = useExpertiseReports();
+  const { quotes } = useQuotes();
+  const { invoices } = useInvoices();
+  const { credits } = useCredits();
+  const { receipts } = useReceiptsData();
+
   const handleCancel = () => {
     onOpenChange(false);
   };
@@ -43,6 +57,19 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
     onSubmit(data);
     onOpenChange(false);
   };
+
+  // Calculer les comptes pour chaque onglet
+  const clientVehicles = vehicles?.filter(vehicle => vehicle.client_id === defaultValues?.id) || [];
+  const clientReports = reports?.filter(report => report.client_id === defaultValues?.id) || [];
+  const clientQuotes = quotes?.filter(quote => quote.client_id === defaultValues?.id) || [];
+  const clientInvoices = invoices?.filter(invoice => invoice.client_id === defaultValues?.id) || [];
+  const clientCredits = credits?.filter(credit => credit.client_id === defaultValues?.id) || [];
+  const clientReceipts = receipts?.filter(receipt => {
+    if (receipt.invoices && receipt.invoices.client_id === defaultValues?.id) {
+      return true;
+    }
+    return false;
+  }) || [];
 
   // Si c'est en mode visualisation, on affiche les onglets
   if (mode === 'view') {
@@ -57,12 +84,42 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
           <Tabs defaultValue="details" className="w-full h-full">
             <TabsList className="grid w-full grid-cols-7">
               <TabsTrigger value="details">Détails</TabsTrigger>
-              <TabsTrigger value="vehicles">Véhicules</TabsTrigger>
-              <TabsTrigger value="expertise">Expertises</TabsTrigger>
-              <TabsTrigger value="quotes">Devis</TabsTrigger>
-              <TabsTrigger value="invoices">Factures</TabsTrigger>
-              <TabsTrigger value="credits">Avoirs</TabsTrigger>
-              <TabsTrigger value="receipts">Encaissements</TabsTrigger>
+              <TabsTrigger value="vehicles" className="flex items-center gap-2">
+                Véhicules
+                <Badge variant="secondary" className="text-xs">
+                  {clientVehicles.length}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="expertise" className="flex items-center gap-2">
+                Expertises
+                <Badge variant="secondary" className="text-xs">
+                  {clientReports.length}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="quotes" className="flex items-center gap-2">
+                Devis
+                <Badge variant="secondary" className="text-xs">
+                  {clientQuotes.length}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="invoices" className="flex items-center gap-2">
+                Factures
+                <Badge variant="secondary" className="text-xs">
+                  {clientInvoices.length}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="credits" className="flex items-center gap-2">
+                Avoirs
+                <Badge variant="secondary" className="text-xs">
+                  {clientCredits.length}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="receipts" className="flex items-center gap-2">
+                Encaissements
+                <Badge variant="secondary" className="text-xs">
+                  {clientReceipts.length}
+                </Badge>
+              </TabsTrigger>
             </TabsList>
             
             <div className="mt-4 overflow-y-auto max-h-[calc(90vh-200px)]">

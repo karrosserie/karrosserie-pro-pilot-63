@@ -40,8 +40,6 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Encaissements ({clientReceipts.length})</h3>
-      
       <div className="grid gap-4">
         {clientReceipts.map((receipt) => (
           <Card key={receipt.id}>

@@ -34,8 +34,6 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Devis ({clientQuotes.length})</h3>
-      
       <div className="grid gap-4">
         {clientQuotes.map((quote) => (
           <Card key={quote.id}>

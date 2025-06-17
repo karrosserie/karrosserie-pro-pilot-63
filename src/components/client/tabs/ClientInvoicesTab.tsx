@@ -34,8 +34,6 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Factures ({clientInvoices.length})</h3>
-      
       <div className="grid gap-4">
         {clientInvoices.map((invoice) => (
           <Card key={invoice.id}>

@@ -34,8 +34,6 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Rapports d'expertise ({clientReports.length})</h3>
-      
       <div className="grid gap-4">
         {clientReports.map((report) => (
           <Card key={report.id}>

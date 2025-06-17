@@ -34,8 +34,6 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Avoirs ({clientCredits.length})</h3>
-      
       <div className="grid gap-4">
         {clientCredits.map((credit) => (
           <Card key={credit.id}>
