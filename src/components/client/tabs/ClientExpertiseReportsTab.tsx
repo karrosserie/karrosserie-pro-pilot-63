@@ -2,16 +2,17 @@
 import React from 'react';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { DataTable } from '@/components/ui/data-table';
-import { FileText } from 'lucide-react';
+import { FileText, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface ClientExpertiseReportsTabProps {
   clientId: string;
 }
 
 const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ clientId }) => {
-  const { reports, isLoading } = useExpertiseReports();
+  const { reports, isLoading, deleteReport } = useExpertiseReports();
 
   if (isLoading) {
     return (
@@ -23,11 +24,27 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
 
   const clientReports = reports?.filter(report => report.client_id === clientId) || [];
 
+  const handleView = (report: any) => {
+    console.log('View report:', report);
+  };
+
+  const handleEdit = (report: any) => {
+    console.log('Edit report:', report);
+  };
+
+  const handleDelete = (report: any) => {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer ce rapport d'expertise ?`)) {
+      deleteReport.mutate(report.id);
+    }
+  };
+
   const columns: ColumnDef<any>[] = [
     {
       accessorKey: "report_number",
       header: "N° Rapport",
-      cell: ({ row }) => row.getValue("report_number") || "Non défini"
+      cell: ({ row }) => (
+        <span className="font-medium">{row.getValue("report_number") || "Non défini"}</span>
+      )
     },
     {
       accessorKey: "report_date",
@@ -63,6 +80,39 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
       cell: () => (
         <Badge variant="outline">Expertise</Badge>
       )
+    },
+    {
+      id: "actions",
+      header: "",
+      cell: ({ row }) => {
+        const report = row.original;
+        return (
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleView(report)}
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleEdit(report)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-red-500 hover:text-red-700"
+              onClick={() => handleDelete(report)}
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      }
     }
   ];
 

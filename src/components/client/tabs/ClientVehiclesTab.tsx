@@ -9,7 +9,7 @@ interface ClientVehiclesTabProps {
 }
 
 const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
-  const { vehicles, isLoading } = useVehicles();
+  const { vehicles, isLoading, deleteVehicle } = useVehicles();
 
   if (isLoading) {
     return (
@@ -31,6 +31,22 @@ const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
     );
   }
 
+  const handleViewVehicle = (vehicle: any) => {
+    // TODO: Implémenter la vue du véhicule
+    console.log('View vehicle:', vehicle);
+  };
+
+  const handleEditVehicle = (vehicle: any) => {
+    // TODO: Implémenter l'édition du véhicule
+    console.log('Edit vehicle:', vehicle);
+  };
+
+  const handleDeleteVehicle = (vehicle: any) => {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le véhicule ${vehicle.license_plate} ?`)) {
+      deleteVehicle.mutate(vehicle.id);
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {clientVehicles.map((vehicle) => (
@@ -42,10 +58,13 @@ const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
           licensePlate={vehicle.license_plate}
           status={vehicle.status as any}
           owner={vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Client inconnu'}
-          imageUrl={vehicle.image_url}
-          vehicleImages={vehicle.vehicle_images}
+          imageUrl={vehicle.vehicle_images?.[0] || undefined}
+          vehicleImages={Array.isArray(vehicle.vehicle_images) ? vehicle.vehicle_images : []}
           registrationDocumentFrontUrl={vehicle.registration_document_front_url}
           registrationDocumentBackUrl={vehicle.registration_document_back_url}
+          onView={() => handleViewVehicle(vehicle)}
+          onEdit={() => handleEditVehicle(vehicle)}
+          onDelete={() => handleDeleteVehicle(vehicle)}
         />
       ))}
     </div>

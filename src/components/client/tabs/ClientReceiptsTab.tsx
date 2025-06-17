@@ -2,16 +2,17 @@
 import React from 'react';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { DataTable } from '@/components/ui/data-table';
-import { Banknote } from 'lucide-react';
+import { Banknote, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface ClientReceiptsTabProps {
   clientId: string;
 }
 
 const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
-  const { receipts, isLoading } = useReceiptsData();
+  const { receipts, isLoading, deleteReceipt } = useReceiptsData();
 
   if (isLoading) {
     return (
@@ -29,11 +30,27 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
     return false;
   }) || [];
 
+  const handleView = (receipt: any) => {
+    console.log('View receipt:', receipt);
+  };
+
+  const handleEdit = (receipt: any) => {
+    console.log('Edit receipt:', receipt);
+  };
+
+  const handleDelete = (receipt: any) => {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'encaissement ${receipt.reference} ?`)) {
+      deleteReceipt.mutate(receipt.id);
+    }
+  };
+
   const columns: ColumnDef<any>[] = [
     {
       accessorKey: "reference",
       header: "Référence",
-      cell: ({ row }) => `#${row.getValue("reference")}`
+      cell: ({ row }) => (
+        <span className="font-medium">#{row.getValue("reference")}</span>
+      )
     },
     {
       accessorKey: "date",
@@ -43,7 +60,9 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
     {
       accessorKey: "amount",
       header: "Montant",
-      cell: ({ row }) => `${row.getValue("amount")}€`
+      cell: ({ row }) => (
+        <span className="font-medium">{row.getValue("amount")}€</span>
+      )
     },
     {
       accessorKey: "payment_method",
@@ -61,11 +80,47 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
     {
       accessorKey: "status",
       header: "Statut",
-      cell: ({ row }) => (
-        <Badge variant={row.getValue("status") === 'Encaissé' ? 'default' : 'secondary'}>
-          {row.getValue("status")}
-        </Badge>
-      )
+      cell: ({ row }) => {
+        const status = row.getValue("status");
+        return (
+          <Badge variant={status === 'Encaissé' ? 'default' : 'secondary'}>
+            {status}
+          </Badge>
+        );
+      }
+    },
+    {
+      id: "actions",
+      header: "",
+      cell: ({ row }) => {
+        const receipt = row.original;
+        return (
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleView(receipt)}
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleEdit(receipt)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-red-500 hover:text-red-700"
+              onClick={() => handleDelete(receipt)}
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      }
     }
   ];
 

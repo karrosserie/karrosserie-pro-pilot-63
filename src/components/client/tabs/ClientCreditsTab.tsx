@@ -2,16 +2,17 @@
 import React from 'react';
 import { useCredits } from '@/hooks/use-credits';
 import { DataTable } from '@/components/ui/data-table';
-import { CreditCard } from 'lucide-react';
+import { CreditCard, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface ClientCreditsTabProps {
   clientId: string;
 }
 
 const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
-  const { credits, isLoading } = useCredits();
+  const { credits, isLoading, deleteCredit } = useCredits();
 
   if (isLoading) {
     return (
@@ -23,11 +24,27 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
 
   const clientCredits = credits?.filter(credit => credit.client_id === clientId) || [];
 
+  const handleView = (credit: any) => {
+    console.log('View credit:', credit);
+  };
+
+  const handleEdit = (credit: any) => {
+    console.log('Edit credit:', credit);
+  };
+
+  const handleDelete = (credit: any) => {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'avoir ${credit.reference} ?`)) {
+      deleteCredit.mutate(credit.id);
+    }
+  };
+
   const columns: ColumnDef<any>[] = [
     {
       accessorKey: "reference",
       header: "Référence",
-      cell: ({ row }) => `#${row.getValue("reference")}`
+      cell: ({ row }) => (
+        <span className="font-medium">#{row.getValue("reference")}</span>
+      )
     },
     {
       accessorKey: "created_at",
@@ -37,7 +54,9 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
     {
       accessorKey: "amount",
       header: "Montant",
-      cell: ({ row }) => `${row.getValue("amount")}€`
+      cell: ({ row }) => (
+        <span className="font-medium">{row.getValue("amount")}€</span>
+      )
     },
     {
       accessorKey: "notes",
@@ -47,11 +66,47 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
     {
       accessorKey: "status",
       header: "Statut",
-      cell: ({ row }) => (
-        <Badge variant={row.getValue("status") === 'Payé' ? 'default' : 'secondary'}>
-          {row.getValue("status")}
-        </Badge>
-      )
+      cell: ({ row }) => {
+        const status = row.getValue("status");
+        return (
+          <Badge variant={status === 'Payé' ? 'default' : 'secondary'}>
+            {status}
+          </Badge>
+        );
+      }
+    },
+    {
+      id: "actions",
+      header: "",
+      cell: ({ row }) => {
+        const credit = row.original;
+        return (
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleView(credit)}
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleEdit(credit)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-red-500 hover:text-red-700"
+              onClick={() => handleDelete(credit)}
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      }
     }
   ];
 

@@ -2,16 +2,17 @@
 import React from 'react';
 import { useInvoices } from '@/hooks/use-invoices';
 import { DataTable } from '@/components/ui/data-table';
-import { Receipt } from 'lucide-react';
+import { Receipt, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface ClientInvoicesTabProps {
   clientId: string;
 }
 
 const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
-  const { invoices, isLoading } = useInvoices();
+  const { invoices, isLoading, deleteInvoice } = useInvoices();
 
   if (isLoading) {
     return (
@@ -23,11 +24,27 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
 
   const clientInvoices = invoices?.filter(invoice => invoice.client_id === clientId) || [];
 
+  const handleView = (invoice: any) => {
+    console.log('View invoice:', invoice);
+  };
+
+  const handleEdit = (invoice: any) => {
+    console.log('Edit invoice:', invoice);
+  };
+
+  const handleDelete = (invoice: any) => {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer la facture ${invoice.reference} ?`)) {
+      deleteInvoice.mutate(invoice.id);
+    }
+  };
+
   const columns: ColumnDef<any>[] = [
     {
       accessorKey: "reference",
       header: "Référence",
-      cell: ({ row }) => `#${row.getValue("reference")}`
+      cell: ({ row }) => (
+        <span className="font-medium">#{row.getValue("reference")}</span>
+      )
     },
     {
       accessorKey: "created_at",
@@ -37,7 +54,9 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
     {
       accessorKey: "amount",
       header: "Montant",
-      cell: ({ row }) => `${row.getValue("amount")}€`
+      cell: ({ row }) => (
+        <span className="font-medium">{row.getValue("amount")}€</span>
+      )
     },
     {
       accessorKey: "due_date",
@@ -58,11 +77,47 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
     {
       accessorKey: "status",
       header: "Statut",
-      cell: ({ row }) => (
-        <Badge variant={row.getValue("status") === 'Payée' ? 'default' : 'secondary'}>
-          {row.getValue("status")}
-        </Badge>
-      )
+      cell: ({ row }) => {
+        const status = row.getValue("status");
+        return (
+          <Badge variant={status === 'Payée' ? 'default' : 'secondary'}>
+            {status}
+          </Badge>
+        );
+      }
+    },
+    {
+      id: "actions",
+      header: "",
+      cell: ({ row }) => {
+        const invoice = row.original;
+        return (
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleView(invoice)}
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleEdit(invoice)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-red-500 hover:text-red-700"
+              onClick={() => handleDelete(invoice)}
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      }
     }
   ];
 
