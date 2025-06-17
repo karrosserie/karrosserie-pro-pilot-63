@@ -54,7 +54,7 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
-                  <span className="font-medium">Date:</span> {new Date(invoice.date).toLocaleDateString()}
+                  <span className="font-medium">Créé:</span> {new Date(invoice.created_at).toLocaleDateString()}
                 </div>
                 <div className="flex items-center">
                   <Euro className="h-4 w-4 mr-1" />

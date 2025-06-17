@@ -54,7 +54,7 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
-                  <span className="font-medium">Date:</span> {new Date(quote.date).toLocaleDateString()}
+                  <span className="font-medium">Créé:</span> {new Date(quote.created_at).toLocaleDateString()}
                 </div>
                 <div className="flex items-center">
                   <Euro className="h-4 w-4 mr-1" />
@@ -65,10 +65,12 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
                     <span className="font-medium">Véhicule:</span> {quote.vehicles.license_plate}
                   </div>
                 )}
-                <div className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  <span className="font-medium">Créé:</span> {new Date(quote.created_at).toLocaleDateString()}
-                </div>
+                {quote.valid_until && (
+                  <div className="flex items-center">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    <span className="font-medium">Valide jusqu'au:</span> {new Date(quote.valid_until).toLocaleDateString()}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
