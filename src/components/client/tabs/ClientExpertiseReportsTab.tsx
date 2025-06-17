@@ -6,7 +6,6 @@ import { FileText, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { formatCurrency } from '@/lib/utils';
 
 interface ClientExpertiseReportsTabProps {
   clientId: string;
@@ -39,10 +38,18 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
     }
   };
 
+  const formatAmount = (amount: number | null | undefined): string => {
+    if (amount === null || amount === undefined) return '-';
+    return amount.toLocaleString('fr-FR', { 
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2 
+    }) + ' €';
+  };
+
   const columns: ColumnDef<any>[] = [
     {
       accessorKey: "report_number",
-      header: "N° Rapport",
+      header: "Numéro de rapport",
       cell: ({ row }) => (
         <span className="font-medium">{row.getValue("report_number") || "Non défini"}</span>
       )
@@ -52,28 +59,37 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
       header: "Date",
       cell: ({ row }) => {
         const date = row.getValue("report_date");
-        return date ? new Date(date as string).toLocaleDateString() : "Non définie";
+        return date ? new Date(date as string).toLocaleDateString('fr-FR') : "Non définie";
       }
     },
     {
-      accessorKey: "amount",
-      header: "Montant",
+      accessorKey: "clients",
+      header: "Client",
       cell: ({ row }) => {
-        const amount = row.getValue("amount");
-        return amount ? formatCurrency(amount as number) : "Non défini";
+        const client = row.getValue("clients") as any;
+        return client ? `${client.first_name} ${client.last_name}` : "-";
       }
-    },
-    {
-      accessorKey: "claim_number",
-      header: "N° Sinistre",
-      cell: ({ row }) => row.getValue("claim_number") || "-"
     },
     {
       accessorKey: "vehicles",
       header: "Véhicule",
       cell: ({ row }) => {
         const vehicle = row.getValue("vehicles") as any;
-        return vehicle?.license_plate || "-";
+        if (!vehicle) return "-";
+        return `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate}`;
+      }
+    },
+    {
+      accessorKey: "expert_name",
+      header: "Expert",
+      cell: ({ row }) => row.getValue("expert_name") || "-"
+    },
+    {
+      accessorKey: "amount",
+      header: "Montant",
+      cell: ({ row }) => {
+        const amount = row.getValue("amount");
+        return formatAmount(amount as number);
       }
     },
     {
@@ -84,7 +100,7 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
     },
     {
       id: "actions",
-      header: "",
+      header: "Actions",
       cell: ({ row }) => {
         const report = row.original;
         return (

@@ -6,7 +6,7 @@ import { FileText, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { formatCurrency } from '@/lib/utils';
+import { StatusBadge } from '@/components/ui/status-badge';
 
 interface ClientQuotesTabProps {
   clientId: string;
@@ -39,32 +39,33 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
     }
   };
 
+  const formatAmount = (amount: number | null | undefined): string => {
+    if (amount === null || amount === undefined) return '-';
+    return amount.toLocaleString('fr-FR', { 
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2 
+    }) + ' €';
+  };
+
   const columns: ColumnDef<any>[] = [
     {
       accessorKey: "reference",
-      header: "Référence",
+      header: "Numéro",
       cell: ({ row }) => (
         <span className="font-medium">{row.getValue("reference") as string}</span>
       )
     },
     {
       accessorKey: "created_at",
-      header: "Date création",
-      cell: ({ row }) => new Date(row.getValue("created_at") as string).toLocaleDateString()
+      header: "Date",
+      cell: ({ row }) => new Date(row.getValue("created_at") as string).toLocaleDateString('fr-FR')
     },
     {
-      accessorKey: "amount",
-      header: "Montant",
-      cell: ({ row }) => (
-        <span className="font-medium">{formatCurrency(row.getValue("amount") as number)}</span>
-      )
-    },
-    {
-      accessorKey: "valid_until",
-      header: "Valide jusqu'au",
+      accessorKey: "clients",
+      header: "Client",
       cell: ({ row }) => {
-        const validUntil = row.getValue("valid_until") as string;
-        return validUntil ? new Date(validUntil).toLocaleDateString() : "-";
+        const client = row.getValue("clients") as any;
+        return client ? `${client.first_name} ${client.last_name}` : '-';
       }
     },
     {
@@ -72,7 +73,16 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
       header: "Véhicule",
       cell: ({ row }) => {
         const vehicle = row.getValue("vehicles") as any;
-        return vehicle?.license_plate || "-";
+        if (!vehicle) return '-';
+        return `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate}`;
+      }
+    },
+    {
+      accessorKey: "amount",
+      header: "Montant",
+      cell: ({ row }) => {
+        const amount = row.getValue("amount");
+        return formatAmount(amount as number);
       }
     },
     {
@@ -80,16 +90,12 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
       header: "Statut",
       cell: ({ row }) => {
         const status = row.getValue("status") as string;
-        return (
-          <Badge variant={status === 'Accepté' ? 'default' : 'secondary'}>
-            {status}
-          </Badge>
-        );
+        return <StatusBadge status={status || 'En attente'} />;
       }
     },
     {
       id: "actions",
-      header: "",
+      header: "Actions",
       cell: ({ row }) => {
         const quote = row.original;
         return (

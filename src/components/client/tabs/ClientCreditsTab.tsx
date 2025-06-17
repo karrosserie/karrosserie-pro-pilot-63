@@ -6,7 +6,6 @@ import { CreditCard, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { formatCurrency } from '@/lib/utils';
 
 interface ClientCreditsTabProps {
   clientId: string;
@@ -39,30 +38,64 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
     }
   };
 
+  const formatAmount = (amount: number | null | undefined): string => {
+    if (amount === null || amount === undefined) return '-';
+    return amount.toLocaleString('fr-FR', { 
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2 
+    }) + ' €';
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return '-';
+    try {
+      return new Date(dateString).toLocaleDateString('fr-FR');
+    } catch (error) {
+      return '-';
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Émis':
+        return 'bg-blue-100 text-blue-800';
+      case 'Utilisé':
+        return 'bg-green-100 text-green-800';
+      case 'Annulé':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   const columns: ColumnDef<any>[] = [
     {
       accessorKey: "reference",
-      header: "Référence",
+      header: "Numéro",
       cell: ({ row }) => (
         <span className="font-medium">{row.getValue("reference") as string}</span>
       )
     },
     {
       accessorKey: "created_at",
-      header: "Date création",
-      cell: ({ row }) => new Date(row.getValue("created_at") as string).toLocaleDateString()
+      header: "Date de création",
+      cell: ({ row }) => formatDate(row.getValue("created_at") as string)
+    },
+    {
+      accessorKey: "invoices",
+      header: "Facture liée",
+      cell: ({ row }) => {
+        const invoice = row.getValue("invoices") as any;
+        return invoice ? invoice.reference : "-";
+      }
     },
     {
       accessorKey: "amount",
       header: "Montant",
-      cell: ({ row }) => (
-        <span className="font-medium">{formatCurrency(row.getValue("amount") as number)}</span>
-      )
-    },
-    {
-      accessorKey: "notes",
-      header: "Notes",
-      cell: ({ row }) => (row.getValue("notes") as string) || "-"
+      cell: ({ row }) => {
+        const amount = row.getValue("amount");
+        return formatAmount(amount as number);
+      }
     },
     {
       accessorKey: "status",
@@ -70,15 +103,15 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
       cell: ({ row }) => {
         const status = row.getValue("status") as string;
         return (
-          <Badge variant={status === 'Payé' ? 'default' : 'secondary'}>
-            {status}
-          </Badge>
+          <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(status || 'Émis')}`}>
+            {status || 'Émis'}
+          </span>
         );
       }
     },
     {
       id: "actions",
-      header: "",
+      header: "Actions",
       cell: ({ row }) => {
         const credit = row.original;
         return (

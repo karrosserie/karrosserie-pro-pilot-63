@@ -4,9 +4,9 @@ import { useInvoices } from '@/hooks/use-invoices';
 import { SimpleTable } from '@/components/ui/simple-table';
 import { Receipt, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { formatCurrency } from '@/lib/utils';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface ClientInvoicesTabProps {
   clientId: string;
@@ -39,32 +39,54 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
     }
   };
 
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return '-';
+    try {
+      return format(new Date(dateString), 'dd/MM/yyyy', { locale: fr });
+    } catch (error) {
+      return '-';
+    }
+  };
+
+  const formatAmount = (amount: number) => {
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(amount);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Payée':
+        return 'bg-green-100 text-green-800';
+      case 'En attente de paiement':
+        return 'bg-amber-100 text-amber-800';
+      case 'Paiement partiel':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   const columns: ColumnDef<any>[] = [
     {
       accessorKey: "reference",
-      header: "Référence",
+      header: "Numéro",
       cell: ({ row }) => (
         <span className="font-medium">{row.getValue("reference") as string}</span>
       )
     },
     {
       accessorKey: "created_at",
-      header: "Date création",
-      cell: ({ row }) => new Date(row.getValue("created_at") as string).toLocaleDateString()
+      header: "Date de création",
+      cell: ({ row }) => formatDate(row.getValue("created_at") as string)
     },
     {
-      accessorKey: "amount",
-      header: "Montant",
-      cell: ({ row }) => (
-        <span className="font-medium">{formatCurrency(row.getValue("amount") as number)}</span>
-      )
-    },
-    {
-      accessorKey: "due_date",
-      header: "Échéance",
+      accessorKey: "clients",
+      header: "Client",
       cell: ({ row }) => {
-        const dueDate = row.getValue("due_date") as string;
-        return dueDate ? new Date(dueDate).toLocaleDateString() : "-";
+        const client = row.getValue("clients") as any;
+        return client ? `${client.first_name} ${client.last_name}` : '-';
       }
     },
     {
@@ -72,8 +94,14 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
       header: "Véhicule",
       cell: ({ row }) => {
         const vehicle = row.getValue("vehicles") as any;
-        return vehicle?.license_plate || "-";
+        if (!vehicle) return '-';
+        return `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate}`;
       }
+    },
+    {
+      accessorKey: "amount",
+      header: "Montant",
+      cell: ({ row }) => formatAmount((row.getValue("amount") as number) || 0)
     },
     {
       accessorKey: "status",
@@ -81,15 +109,15 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
       cell: ({ row }) => {
         const status = row.getValue("status") as string;
         return (
-          <Badge variant={status === 'Payée' ? 'default' : 'secondary'}>
-            {status}
-          </Badge>
+          <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(status || 'En attente de paiement')}`}>
+            {status || 'En attente de paiement'}
+          </span>
         );
       }
     },
     {
       id: "actions",
-      header: "",
+      header: "Actions",
       cell: ({ row }) => {
         const invoice = row.original;
         return (
