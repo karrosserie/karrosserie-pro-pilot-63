@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Car, User, Eye, Pencil, Trash, MoreVertical, FileText, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -121,8 +120,8 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
         </div>
       </div>
       
-      <div className="border-t border-gray-100 mt-4 pt-4 flex justify-end">
-        <div className="flex items-center">
+      <div className="border-t border-gray-100 mt-4 pt-4 flex justify-center">
+        <div className="flex items-center space-x-2">
           {onView && (
             <Button variant="ghost" size="icon" onClick={onView}>
               <Eye className="h-4 w-4" />
