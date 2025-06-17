@@ -4,6 +4,11 @@ import VehicleFormTabs from './form/VehicleFormTabs';
 import VehicleFormActions from './form/VehicleFormActions';
 import { useVehicleFormLogic } from './form/VehicleFormLogic';
 
+interface VehicleImage {
+  url: string;
+  phase: 'Avant' | 'Pendant' | 'Après';
+}
+
 interface VehicleFormProps {
   onSubmit: (data: any) => void;
   defaultValues?: any;

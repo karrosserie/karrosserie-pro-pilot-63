@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
@@ -9,6 +10,11 @@ import ReturnDamageAssessmentTab from './form/ReturnDamageAssessmentTab';
 import VehicleDetailsTab from './form/VehicleDetailsTab';
 import ReturnAttestationTab from './form/ReturnAttestationTab';
 import { FleetReturnFormData } from './FleetReturnForm.types';
+
+interface VehicleImage {
+  url: string;
+  phase: 'Avant' | 'Pendant' | 'Après';
+}
 
 interface FleetReturnFormProps {
   vehicle: FleetVehicle;
@@ -85,6 +91,16 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
     return 'Véhicule';
   };
 
+  const handleImagePhaseUpdate = (index: number, phase: 'Avant' | 'Pendant' | 'Après') => {
+    const updatedImages = [...formData.vehicleImages];
+    if (!updatedImages[index]) {
+      updatedImages[index] = { url: '', phase };
+    } else {
+      updatedImages[index] = { ...updatedImages[index], phase };
+    }
+    // Update the form data with the new images array
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
@@ -143,6 +159,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
             onImageAdd={handleImageAdd}
             onImageRemove={handleImageRemove}
             onImageUpdate={handleImageUpdate}
+            onImagePhaseUpdate={handleImagePhaseUpdate}
             isViewMode={isViewMode}
           />
         </TabsContent>
