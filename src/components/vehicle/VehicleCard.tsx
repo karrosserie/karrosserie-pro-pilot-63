@@ -120,7 +120,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
         </div>
       </div>
       
-      <div className="border-t border-gray-100 mt-4 pt-4 flex justify-end items-center">
+      <div className="border-t border-gray-100 mt-4 pt-4 flex justify-between items-center">
         <div className="flex items-center space-x-1">
           {onView && (
             <Button variant="ghost" size="icon" onClick={onView}>
@@ -142,25 +142,25 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
               <Trash className="h-4 w-4" />
             </Button>
           )}
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuItem>
-                <FileText className="h-4 w-4 mr-2" />
-                Créer un devis
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Receipt className="h-4 w-4 mr-2" />
-                Créer une facture
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuItem>
+              <FileText className="h-4 w-4 mr-2" />
+              Créer un devis
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Receipt className="h-4 w-4 mr-2" />
+              Créer une facture
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
