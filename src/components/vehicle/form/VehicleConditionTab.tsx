@@ -22,7 +22,7 @@ const VehicleConditionTab: React.FC<VehicleConditionTabProps> = ({
   onInputChange,
   onConditionChange
 }) => {
-  const defaultDamages = [
+  const defaultDamages: DamageItem[] = [
     // Partie Avant
     { id: 'capot', name: 'Capot', type: 'none' },
     { id: 'calandre', name: 'Calandre', type: 'none' },
@@ -59,7 +59,7 @@ const VehicleConditionTab: React.FC<VehicleConditionTabProps> = ({
     { id: 'aile-ar-d', name: 'Aile Ar', type: 'none' },
     { id: 'bas-caisse-d', name: 'Bas De Caisse', type: 'none' },
     { id: 'retroviseur-d', name: 'Retroviseur', type: 'none' }
-  ] as const satisfies readonly DamageItem[];
+  ];
 
   const getCurrentDamages = (): DamageItem[] => {
     if (!formData.condition || !formData.condition.damages) {
