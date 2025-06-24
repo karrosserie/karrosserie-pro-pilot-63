@@ -72,6 +72,8 @@ export const useClientActions = () => {
         company: data.company,
         driverLicenseFrontUrl: data.driverLicenseFrontUrl,
         driverLicenseBackUrl: data.driverLicenseBackUrl,
+        idCardFrontUrl: data.idCardFrontUrl,
+        idCardBackUrl: data.idCardBackUrl,
         user_id: user ? user.id : null
       });
     } else if (dialogMode === 'edit' && selectedClient) {
@@ -87,7 +89,9 @@ export const useClientActions = () => {
           zipCode: data.zipCode,
           company: data.company,
           driverLicenseFrontUrl: data.driverLicenseFrontUrl,
-          driverLicenseBackUrl: data.driverLicenseBackUrl
+          driverLicenseBackUrl: data.driverLicenseBackUrl,
+          idCardFrontUrl: data.idCardFrontUrl,
+          idCardBackUrl: data.idCardBackUrl
         }
       });
     }

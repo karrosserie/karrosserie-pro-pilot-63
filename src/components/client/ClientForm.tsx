@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PersonalInfoTab from './form/PersonalInfoTab';
@@ -27,7 +28,9 @@ const ClientForm: React.FC<ClientFormProps> = ({
     zipCode: defaultValues?.zipCode || '',
     company: defaultValues?.company || '',
     driverLicenseFrontUrl: defaultValues?.driverLicenseFrontUrl || '',
-    driverLicenseBackUrl: defaultValues?.driverLicenseBackUrl || ''
+    driverLicenseBackUrl: defaultValues?.driverLicenseBackUrl || '',
+    idCardFrontUrl: defaultValues?.idCardFrontUrl || '',
+    idCardBackUrl: defaultValues?.idCardBackUrl || ''
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,6 +48,14 @@ const ClientForm: React.FC<ClientFormProps> = ({
 
   const handleDriverLicenseBackUpload = (url: string) => {
     setFormData(prev => ({ ...prev, driverLicenseBackUrl: url }));
+  };
+
+  const handleIdCardFrontUpload = (url: string) => {
+    setFormData(prev => ({ ...prev, idCardFrontUrl: url }));
+  };
+
+  const handleIdCardBackUpload = (url: string) => {
+    setFormData(prev => ({ ...prev, idCardBackUrl: url }));
   };
 
   const validateForm = () => {
@@ -104,6 +115,8 @@ const ClientForm: React.FC<ClientFormProps> = ({
             formData={formData}
             handleDriverLicenseFrontUpload={handleDriverLicenseFrontUpload}
             handleDriverLicenseBackUpload={handleDriverLicenseBackUpload}
+            handleIdCardFrontUpload={handleIdCardFrontUpload}
+            handleIdCardBackUpload={handleIdCardBackUpload}
             isViewMode={isViewMode}
           />
         </TabsContent>

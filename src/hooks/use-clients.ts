@@ -14,6 +14,8 @@ const transformClientFromDB = (client: any) => {
     zipCode: client.postal_code,
     driverLicenseFrontUrl: client.driver_license_front_url || '',
     driverLicenseBackUrl: client.driver_license_back_url || '',
+    idCardFrontUrl: client.id_card_front_url || '',
+    idCardBackUrl: client.id_card_back_url || '',
   };
 };
 
