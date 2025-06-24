@@ -1,63 +1,127 @@
 
 import React, { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Bell, Search, Menu, User, LogOut, Settings, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
-import MobileMenuButton from './navbar/MobileMenuButton';
+import { useNavigate } from 'react-router-dom';
+import BrandLogo from './navbar/BrandLogo';
 import SearchBar from './navbar/SearchBar';
 import NotificationsPanel from './navbar/NotificationsPanel';
-import UserProfileMenu from './navbar/UserProfileMenu';
 import ImportDialog from './navbar/ImportDialog';
+import FAQButton from './navbar/FAQButton';
 
 interface NavbarProps {
-  onToggleSidebar: () => void;
-  isSidebarOpen?: boolean;
+  onMenuClick: () => void;
 }
 
-const Navbar = ({ onToggleSidebar, isSidebarOpen = false }: NavbarProps) => {
+const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
-  const [importDialogOpen, setImportDialogOpen] = useState(false);
-  const { user } = useAuth();
 
-  // Données mockées pour les alertes
-  const notifications = [
-    { id: 1, title: 'Nouveau message', description: 'Jean Dupont a commenté votre devis', time: 'Il y a 5 min', read: false },
-    { id: 2, title: 'Rappel', description: 'Véhicule à livrer aujourd\'hui', time: 'Il y a 1 heure', read: false },
-    { id: 3, title: 'Document signé', description: 'Marie Martin a signé l\'ordre de réparation', time: 'Il y a 3 heures', read: true },
-  ];
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/auth');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
   return (
-    <div className="sticky top-0 z-30 w-full bg-white border-b border-gray-200 shadow-sm">
-      <div className="px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between">
-        <div className="flex items-center">
-          <MobileMenuButton onClick={onToggleSidebar} />
+    <>
+      <nav className="bg-white border-b border-gray-200 fixed w-full top-0 z-30">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onMenuClick}
+                className="md:hidden mr-2"
+              >
+                <Menu className="h-6 w-6" />
+              </Button>
+              
+              <BrandLogo />
+              
+              <div className="hidden md:block ml-8 flex-1 max-w-md">
+                <SearchBar />
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <ImportDialog />
+              
+              <FAQButton />
+              
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="relative"
+              >
+                <Bell className="h-4 w-4" />
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs"
+                >
+                  3
+                </Badge>
+              </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative">
+                    <User className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/profile')}>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profil</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/settings')}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Paramètres</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/faq')}>
+                    <HelpCircle className="mr-2 h-4 w-4" />
+                    <span>Centre d'aide</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Se déconnecter</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
         </div>
 
-        <div className="hidden sm:block flex-1 max-w-md mx-4">
-          <SearchBar onImportClick={() => setImportDialogOpen(true)} />
+        <div className="md:hidden px-4 pb-3">
+          <SearchBar />
         </div>
+      </nav>
 
-        <div className="flex items-center space-x-1 sm:space-x-2">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="text-gray-600 sm:hidden h-9 w-9"
-          >
-            <Search className="h-4 w-4" />
-          </Button>
-          
-          <NotificationsPanel 
-            showNotifications={showNotifications} 
-            setShowNotifications={setShowNotifications}
-            notifications={notifications}
-          />
-          
-          <UserProfileMenu />
-        </div>
-      </div>
-
-      <ImportDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} />
-    </div>
+      <NotificationsPanel 
+        isOpen={showNotifications} 
+        onClose={() => setShowNotifications(false)} 
+      />
+    </>
   );
 };
 

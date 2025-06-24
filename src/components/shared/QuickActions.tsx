@@ -1,9 +1,10 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, Phone, Mail, MessageSquare, FileText, Calculator, Car, Users, X } from 'lucide-react';
+import { Plus, Phone, Mail, MessageSquare, FileText, Calculator, Car, Users, X, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useNavigate } from 'react-router-dom';
 
 interface QuickAction {
   id: string;
@@ -15,6 +16,7 @@ interface QuickAction {
 }
 
 const QuickActions: React.FC = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState({ x: 20, y: 20 });
   const [isDragging, setIsDragging] = useState(false);
@@ -69,6 +71,17 @@ const QuickActions: React.FC = () => {
       shortcut: 'Cmd+6',
       action: () => console.log('New client'),
       color: 'bg-teal-500 hover:bg-teal-600 text-white'
+    },
+    {
+      id: 'faq',
+      label: 'Centre d\'aide',
+      icon: HelpCircle,
+      shortcut: 'Cmd+H',
+      action: () => {
+        navigate('/faq');
+        setIsOpen(false);
+      },
+      color: 'bg-yellow-500 hover:bg-yellow-600 text-white'
     }
   ];
 
@@ -137,7 +150,9 @@ const QuickActions: React.FC = () => {
                   className={`${action.color} flex flex-col items-center justify-center h-20 w-24 relative group`}
                   onClick={() => {
                     action.action();
-                    setIsOpen(false);
+                    if (action.id !== 'faq') {
+                      setIsOpen(false);
+                    }
                   }}
                 >
                   <IconComponent className="h-5 w-5 mb-1" />
