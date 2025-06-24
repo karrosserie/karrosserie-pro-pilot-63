@@ -6,6 +6,7 @@ import { useDocumentUpload } from './document-uploader/hooks/useDocumentUpload';
 import { useImageCropping } from './document-uploader/hooks/useImageCropping';
 import { DocumentDisplay } from './document-uploader/DocumentDisplay';
 import { DocumentUploadLoading } from './document-uploader/DocumentUploadLoading';
+import { DocumentUploadProcessing } from './document-uploader/DocumentUploadProcessing';
 import { DocumentEmptyState } from './document-uploader/DocumentEmptyState';
 
 interface DocumentUploaderProps {
@@ -14,6 +15,7 @@ interface DocumentUploaderProps {
   currentDocumentUrl?: string | null;
   onUploadComplete: (url: string) => void;
   isViewMode?: boolean;
+  requiresAIProcessing?: boolean;
 }
 
 export function DocumentUploader({
@@ -21,12 +23,22 @@ export function DocumentUploader({
   documentId,
   currentDocumentUrl,
   onUploadComplete,
-  isViewMode = false
+  isViewMode = false,
+  requiresAIProcessing = false
 }: DocumentUploaderProps) {
-  const { isUploading, isDeleting, uploadFile, handleDelete } = useDocumentUpload({
+  const { 
+    isUploading, 
+    isDeleting, 
+    isProcessing, 
+    progress, 
+    currentMessage, 
+    uploadFile, 
+    handleDelete 
+  } = useDocumentUpload({
     documentType,
     documentId,
-    onUploadComplete
+    onUploadComplete,
+    requiresAIProcessing
   });
 
   const {
@@ -41,7 +53,16 @@ export function DocumentUploader({
     onFileUpload: uploadFile
   });
 
-  if (isUploading) {
+  if (isProcessing) {
+    return (
+      <DocumentUploadProcessing 
+        progress={progress} 
+        message={currentMessage}
+      />
+    );
+  }
+
+  if (isUploading && !isProcessing) {
     return <DocumentUploadLoading />;
   }
   
