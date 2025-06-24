@@ -17,7 +17,8 @@ import {
   TrendingDown,
   Wallet,
   Bot,
-  X
+  X,
+  HelpCircle
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -131,6 +132,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
       ]
     },
     { icon: <Receipt className="app-icon" />, label: 'Comptabilité', path: '/accounting' },
+    { icon: <HelpCircle className="app-icon" />, label: 'Centre d\'aide', path: '/faq' },
     { icon: <Settings className="app-icon" />, label: 'Paramètres', path: '/settings' },
   ];
 
