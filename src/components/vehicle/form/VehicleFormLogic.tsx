@@ -125,7 +125,7 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
     vehicleImageUrl: safeDefaultValues.vehicle_image_url || '',
     vehicleImages: parseVehicleImages(safeDefaultValues.vehicle_images),
     fuelType: safeDefaultValues.fuel_type || '',
-    condition: safeDefaultValues.condition || {}
+    condition: safeDefaultValues.condition || { damages: [] }
   });
 
   const [regDocPreview, setRegDocPreview] = useState<string | null>(
@@ -151,21 +151,33 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
     });
   };
 
-  // New handler for condition changes
+  // Updated handler for condition changes
   const handleConditionChange = (section: string, item: string, field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      condition: {
-        ...prev.condition,
-        [section]: {
-          ...prev.condition[section],
-          [item]: {
-            ...prev.condition[section]?.[item],
-            [field]: value
+    if (section === 'damages' && field === 'damages') {
+      // Handle damage assessment data
+      setFormData(prev => ({
+        ...prev,
+        condition: {
+          ...prev.condition,
+          damages: value
+        }
+      }));
+    } else {
+      // Handle legacy condition data structure
+      setFormData(prev => ({
+        ...prev,
+        condition: {
+          ...prev.condition,
+          [section]: {
+            ...prev.condition[section],
+            [item]: {
+              ...prev.condition[section]?.[item],
+              [field]: value
+            }
           }
         }
-      }
-    }));
+      }));
+    }
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, fileType: 'registrationDocument' | 'vehicleImage') => {
