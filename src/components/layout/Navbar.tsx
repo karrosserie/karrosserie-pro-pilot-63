@@ -28,6 +28,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -37,6 +38,35 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
       console.error('Error signing out:', error);
     }
   };
+
+  const handleImportClick = () => {
+    setImportDialogOpen(true);
+  };
+
+  // Mock notifications data
+  const notifications = [
+    {
+      id: 1,
+      title: "Nouveau devis accepté",
+      description: "Le devis #2024-001 a été accepté par le client",
+      time: "Il y a 2h",
+      read: false
+    },
+    {
+      id: 2,
+      title: "Rappel paiement",
+      description: "Facture #2024-015 en attente de paiement",
+      time: "Il y a 1j",
+      read: false
+    },
+    {
+      id: 3,
+      title: "Véhicule prêt",
+      description: "La réparation du véhicule est terminée",
+      time: "Il y a 2j",
+      read: true
+    }
+  ];
 
   return (
     <>
@@ -56,13 +86,11 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
               <BrandLogo />
               
               <div className="hidden md:block ml-8 flex-1 max-w-md">
-                <SearchBar />
+                <SearchBar onImportClick={handleImportClick} />
               </div>
             </div>
 
             <div className="flex items-center space-x-2">
-              <ImportDialog />
-              
               <FAQButton />
               
               <Button
@@ -113,13 +141,19 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
         </div>
 
         <div className="md:hidden px-4 pb-3">
-          <SearchBar />
+          <SearchBar onImportClick={handleImportClick} />
         </div>
       </nav>
 
       <NotificationsPanel 
-        isOpen={showNotifications} 
-        onClose={() => setShowNotifications(false)} 
+        showNotifications={showNotifications} 
+        setShowNotifications={setShowNotifications}
+        notifications={notifications}
+      />
+
+      <ImportDialog 
+        open={importDialogOpen}
+        onOpenChange={setImportDialogOpen}
       />
     </>
   );
