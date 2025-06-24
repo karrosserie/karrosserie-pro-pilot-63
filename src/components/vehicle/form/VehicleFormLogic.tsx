@@ -15,6 +15,15 @@ export interface VehicleFormData {
   mileage: string;
   insuranceCompany: string;
   insuranceExpiryDate: string;
+  insurancePolicyNumber: string;
+  insuranceContractNumber: string;
+  insurancePhone: string;
+  insuranceEmail: string;
+  insuranceAddress: string;
+  insuranceCity: string;
+  insurancePostalCode: string;
+  insuranceAgent: string;
+  insuranceAgentPhone: string;
   startDate: string;
   arrivalDate: string;
   endDate: string;
@@ -29,6 +38,7 @@ export interface VehicleFormData {
   vehicleImageUrl: string;
   vehicleImages: string[];
   fuelType: string;
+  condition: any;
 }
 
 interface UseVehicleFormLogicProps {
@@ -80,21 +90,27 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
   };
 
   const [formData, setFormData] = useState<VehicleFormData>({
-    // Required fields
     clientId: safeDefaultValues.client_id || '',
     vin: safeDefaultValues.vin || '',
     brand: safeDefaultValues.car_brands?.name || getBrandName(safeDefaultValues.brand_id || ''),
     model: safeDefaultValues.car_models?.name || '',
     modelId: safeDefaultValues.model_id || '',
     licensePlate: safeDefaultValues.license_plate || '',
-    
-    // Optional fields
     engineNumber: safeDefaultValues.engine_number || '',
     year: safeDefaultValues.year?.toString() || '',
     color: safeDefaultValues.color || '',
     mileage: safeDefaultValues.mileage?.toString() || '',
     insuranceCompany: safeDefaultValues.insurance_company || '',
     insuranceExpiryDate: safeDefaultValues.insurance_expiry_date || '',
+    insurancePolicyNumber: safeDefaultValues.insurance_policy_number || '',
+    insuranceContractNumber: safeDefaultValues.insurance_contract_number || '',
+    insurancePhone: safeDefaultValues.insurance_phone || '',
+    insuranceEmail: safeDefaultValues.insurance_email || '',
+    insuranceAddress: safeDefaultValues.insurance_address || '',
+    insuranceCity: safeDefaultValues.insurance_city || '',
+    insurancePostalCode: safeDefaultValues.insurance_postal_code || '',
+    insuranceAgent: safeDefaultValues.insurance_agent || '',
+    insuranceAgentPhone: safeDefaultValues.insurance_agent_phone || '',
     startDate: safeDefaultValues.start_date || '',
     arrivalDate: safeDefaultValues.arrival_date || '',
     endDate: safeDefaultValues.end_date || '',
@@ -108,7 +124,8 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
     registrationDocumentBackUrl: safeDefaultValues.registration_document_back_url || '',
     vehicleImageUrl: safeDefaultValues.vehicle_image_url || '',
     vehicleImages: parseVehicleImages(safeDefaultValues.vehicle_images),
-    fuelType: safeDefaultValues.fuel_type || ''
+    fuelType: safeDefaultValues.fuel_type || '',
+    condition: safeDefaultValues.condition || {}
   });
 
   const [regDocPreview, setRegDocPreview] = useState<string | null>(
@@ -132,6 +149,23 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
       }
       return { ...prev, [name]: value };
     });
+  };
+
+  // New handler for condition changes
+  const handleConditionChange = (section: string, item: string, field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      condition: {
+        ...prev.condition,
+        [section]: {
+          ...prev.condition[section],
+          [item]: {
+            ...prev.condition[section]?.[item],
+            [field]: value
+          }
+        }
+      }
+    }));
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, fileType: 'registrationDocument' | 'vehicleImage') => {
@@ -236,6 +270,7 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
     vehicleImagePreview,
     handleInputChange,
     handleSelectChange,
+    handleConditionChange,
     handleFileUpload,
     handleRemoveFile,
     handleFuelLevelChange,
