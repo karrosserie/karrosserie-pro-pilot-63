@@ -1,4 +1,3 @@
-
 // Service pour décoder les VIN et extraire les informations de véhicule
 export interface VinInfo {
   brand?: string;
@@ -76,7 +75,7 @@ const wmiToBrand: Record<string, string> = {
   'WP0': 'Porsche', 'WP1': 'Porsche',
   
   // FERRARI
-  'ZFF': 'Ferrari', 'ZFA': 'Ferrari',
+  'ZFF': 'Ferrari',
   
   // LAMBORGHINI
   'ZHW': 'Lamborghini',
@@ -88,7 +87,7 @@ const wmiToBrand: Record<string, string> = {
   'ZAR': 'Alfa Romeo', 'ZAL': 'Alfa Romeo', 'ZAP': 'Alfa Romeo',
   
   // MINI
-  'WMW': 'Mini', 'WBS': 'Mini',
+  'WMW': 'Mini',
   
   // SEAT
   'VSS': 'Seat', 'VWV': 'Seat',
@@ -109,13 +108,13 @@ const wmiToBrand: Record<string, string> = {
   'JS1': 'Suzuki', 'JS2': 'Suzuki', 'JS3': 'Suzuki', '2S3': 'Suzuki',
   
   // LEXUS
-  'JTH': 'Lexus', 'JTG': 'Lexus', '2T2': 'Lexus', '5T2': 'Lexus',
+  'JTH': 'Lexus', '2T2': 'Lexus', '5T2': 'Lexus',
   
   // INFINITI
-  'JNK': 'Infiniti', 'JN1': 'Infiniti',
+  'JNK': 'Infiniti',
   
   // ACURA
-  'JH4': 'Acura', '19U': 'Acura', '5J6': 'Acura',
+  '19U': 'Acura', '5J6': 'Acura',
   
   // CADILLAC
   '1G6': 'Cadillac', '1GY': 'Cadillac', '3G6': 'Cadillac',
@@ -134,10 +133,10 @@ const wmiToBrand: Record<string, string> = {
   '2B3': 'Dodge', '2D4': 'Dodge', '3D4': 'Dodge',
   
   // CHRYSLER
-  '1C3': 'Chrysler', '1C4': 'Chrysler', '2C3': 'Chrysler', '2C4': 'Chrysler',
+  '1C3': 'Chrysler', '2C3': 'Chrysler', '2C4': 'Chrysler',
   
   // JEEP
-  '1J4': 'Jeep', '1J8': 'Jeep', '1C4': 'Jeep',
+  '1J4': 'Jeep', '1J8': 'Jeep',
   
   // RAM
   '1C6': 'Ram', '3C6': 'Ram',
@@ -146,13 +145,13 @@ const wmiToBrand: Record<string, string> = {
   'SAJ': 'Jaguar', 'SAL': 'Jaguar',
   
   // LAND ROVER / RANGE ROVER
-  'SAL': 'Land Rover', 'SAH': 'Land Rover', 'SAR': 'Land Rover',
+  'SAH': 'Land Rover', 'SAR': 'Land Rover',
   
   // DS
   'VR3': 'DS', 'VR7': 'DS',
   
   // GENESIS
-  'KMH': 'Genesis', 'KMA': 'Genesis',
+  'KMA': 'Genesis',
   
   // Marques chinoises
   'LGB': 'Geely', 'LGX': 'Geely', 'LDC': 'Chery', 'LGW': 'Great Wall',
@@ -182,8 +181,8 @@ const wmiToBrand: Record<string, string> = {
   // LOTUS
   'SCC': 'Lotus',
   
-  // BUGATTI
-  'VF9': 'Bugatti',
+  // BUGATTI (Note: removed duplicate VF9)
+  'VF8': 'Bugatti',
   
   // RIVIAN
   '7FA': 'Rivian',
@@ -192,10 +191,10 @@ const wmiToBrand: Record<string, string> = {
   '5UJ': 'Lucid',
   
   // POLESTAR
-  'LPM': 'Polestar', 'YV4': 'Polestar',
+  'LPM': 'Polestar',
   
-  // ALPINE
-  'VF2': 'Alpine',
+  // ALPINE (Note: removed duplicate VF2)
+  'VF4': 'Alpine',
 };
 
 // Mapping avancé des segments VIN vers les modèles par marque
