@@ -8,13 +8,9 @@ interface DocumentsTabProps {
   formData: {
     driverLicenseFrontUrl: string;
     driverLicenseBackUrl: string;
-    idCardFrontUrl: string;
-    idCardBackUrl: string;
   };
   handleDriverLicenseFrontUpload: (url: string) => void;
   handleDriverLicenseBackUpload: (url: string) => void;
-  handleIdCardFrontUpload: (url: string) => void;
-  handleIdCardBackUpload: (url: string) => void;
   isViewMode?: boolean;
 }
 
@@ -23,8 +19,6 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({
   formData,
   handleDriverLicenseFrontUpload,
   handleDriverLicenseBackUpload,
-  handleIdCardFrontUpload,
-  handleIdCardBackUpload,
   isViewMode = false
 }) => {
   return (
@@ -47,28 +41,6 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({
           documentId={`${clientId}-back`}
           currentDocumentUrl={formData.driverLicenseBackUrl}
           onUploadComplete={handleDriverLicenseBackUpload}
-          isViewMode={isViewMode}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label>Carte d'identité nationale (Recto)</Label>
-        <DocumentUploader
-          documentType="id-card"
-          documentId={`${clientId}-id-front`}
-          currentDocumentUrl={formData.idCardFrontUrl}
-          onUploadComplete={handleIdCardFrontUpload}
-          isViewMode={isViewMode}
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label>Carte d'identité nationale (Verso)</Label>
-        <DocumentUploader
-          documentType="id-card"
-          documentId={`${clientId}-id-back`}
-          currentDocumentUrl={formData.idCardBackUrl}
-          onUploadComplete={handleIdCardBackUpload}
           isViewMode={isViewMode}
         />
       </div>

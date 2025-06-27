@@ -4,6 +4,7 @@ import VehicleIdentificationFields from './VehicleIdentificationFields';
 import VehicleBasicDetails from './VehicleBasicDetails';
 import VehicleSpecifications from './VehicleSpecifications';
 import VehicleInsuranceInfo from './VehicleInsuranceInfo';
+import VehicleDateStatus from './VehicleDateStatus';
 
 interface VehicleBasicInfoFormProps {
   formData: any;
@@ -44,6 +45,14 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
 
       {/* Insurance information */}
       <VehicleInsuranceInfo
+        formData={formData}
+        isViewMode={isViewMode}
+        onInputChange={onInputChange}
+        onSelectChange={onSelectChange}
+      />
+
+      {/* Date d'arrivée, Date de début, Date de fin, Statut */}
+      <VehicleDateStatus
         formData={formData}
         isViewMode={isViewMode}
         onInputChange={onInputChange}

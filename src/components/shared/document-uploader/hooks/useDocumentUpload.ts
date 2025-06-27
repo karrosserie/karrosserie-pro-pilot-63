@@ -3,20 +3,17 @@ import { useState } from 'react';
 import { useStorage } from '@/hooks/use-storage';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { useAIDocumentProcessing } from '@/hooks/use-ai-document-processing';
 
 interface UseDocumentUploadProps {
   documentType: string;
   documentId: string;
   onUploadComplete: (url: string) => void;
-  requiresAIProcessing?: boolean;
 }
 
 export function useDocumentUpload({
   documentType,
   documentId,
-  onUploadComplete,
-  requiresAIProcessing = false
+  onUploadComplete
 }: UseDocumentUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -24,30 +21,17 @@ export function useDocumentUpload({
   const { toast } = useToast();
   const { user } = useAuth();
 
-  const { isProcessing, progress, currentMessage, startProcessing } = useAIDocumentProcessing({
-    onComplete: async (file: File) => {
-      await performUpload(file);
-    },
-    onError: (error) => {
-      toast({
-        title: "Erreur",
-        description: error,
-        variant: "destructive"
-      });
-      setIsUploading(false);
-    }
-  });
-
-  const performUpload = async (file: File) => {
+  const uploadFile = async (file: File) => {
     if (!user) {
       toast({
         title: "Erreur",
         description: "Vous devez être connecté pour télécharger un document.",
         variant: "destructive"
       });
-      setIsUploading(false);
       return;
     }
+    
+    setIsUploading(true);
     
     try {
       console.log('Uploading file to storage...', { userId: user.id, documentType, documentId });
@@ -73,18 +57,6 @@ export function useDocumentUpload({
     }
   };
 
-  const uploadFile = async (file: File) => {
-    setIsUploading(true);
-    
-    if (requiresAIProcessing) {
-      // Store the file temporarily and start AI processing
-      (startProcessing as any).currentFile = file;
-      startProcessing();
-    } else {
-      await performUpload(file);
-    }
-  };
-
   const handleDelete = async (documentUrl: string) => {
     if (!documentUrl || !user) return;
     
@@ -107,11 +79,8 @@ export function useDocumentUpload({
   };
 
   return {
-    isUploading: isUploading || isProcessing,
+    isUploading,
     isDeleting,
-    isProcessing,
-    progress,
-    currentMessage,
     uploadFile,
     handleDelete
   };

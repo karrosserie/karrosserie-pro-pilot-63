@@ -23,7 +23,6 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     vehicleImagePreview,
     handleInputChange,
     handleSelectChange,
-    handleConditionChange,
     handleFileUpload,
     handleRemoveFile,
     handleFuelLevelChange,
@@ -46,7 +45,6 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
         vehicleImagePreview={vehicleImagePreview}
         onInputChange={handleInputChange}
         onSelectChange={handleSelectChange}
-        onConditionChange={handleConditionChange}
         onFileUpload={handleFileUpload}
         onRemoveFile={handleRemoveFile}
         onRegistrationFrontUpload={handleRegistrationFrontUpload}

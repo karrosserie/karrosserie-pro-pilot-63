@@ -6,10 +6,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { expertiseReportsService } from '@/services/supabase/expertise-reports';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
-import { Upload, FileText, X } from 'lucide-react';
+import { Upload, FileText, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { DocumentUploadProcessing } from '@/components/shared/document-uploader/DocumentUploadProcessing';
-import { useAIDocumentProcessing } from '@/hooks/use-ai-document-processing';
 import { v4 as uuidv4 } from 'uuid';
 
 interface ExpertiseReportUploaderProps {
@@ -28,20 +26,8 @@ export const ExpertiseReportUploader = ({
   const { createReport } = useExpertiseReports();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
-  const { isProcessing, progress, currentMessage, startProcessing } = useAIDocumentProcessing({
-    onComplete: () => {
-      uploadExpertiseReport();
-    },
-    onError: (error) => {
-      toast({
-        title: "Erreur",
-        description: error,
-        variant: "destructive"
-      });
-    }
-  });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -72,6 +58,8 @@ export const ExpertiseReportUploader = ({
       });
       return;
     }
+
+    setIsUploading(true);
 
     try {
       console.log('Starting expertise report upload...', { 
@@ -143,23 +131,10 @@ export const ExpertiseReportUploader = ({
         description: `Impossible d'importer le rapport d'expertise: ${error.message}`,
         variant: "destructive"
       });
+    } finally {
+      setIsUploading(false);
     }
   };
-
-  const handleImportClick = () => {
-    startProcessing();
-  };
-
-  if (isProcessing) {
-    return (
-      <div className={className}>
-        <DocumentUploadProcessing 
-          progress={progress} 
-          message={currentMessage}
-        />
-      </div>
-    );
-  }
 
   return (
     <div className={className}>
@@ -177,6 +152,7 @@ export const ExpertiseReportUploader = ({
               variant="ghost" 
               size="icon" 
               onClick={() => setSelectedFile(null)}
+              disabled={isUploading}
             >
               <X className="w-4 h-4" />
             </Button>
@@ -186,11 +162,22 @@ export const ExpertiseReportUploader = ({
             <Button 
               variant="outline" 
               onClick={onCancel}
+              disabled={isUploading}
             >
               Annuler
             </Button>
-            <Button onClick={handleImportClick}>
-              Analyser et importer
+            <Button 
+              onClick={uploadExpertiseReport}
+              disabled={isUploading}
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Importation...
+                </>
+              ) : (
+                'Importer'
+              )}
             </Button>
           </div>
         </div>

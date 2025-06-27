@@ -59,21 +59,15 @@ export const clientsService = {
       postal_code: client.zipCode,
       user_id: client.user_id,
       driver_license_front_url: client.driverLicenseFrontUrl || null,
-      driver_license_back_url: client.driverLicenseBackUrl || null,
-      id_card_front_url: client.idCardFrontUrl || null,
-      id_card_back_url: client.idCardBackUrl || null
+      driver_license_back_url: client.driverLicenseBackUrl || null
     };
 
     console.log('Creating client with data:', clientData);
     console.log('Client data structure:', {
       hasDriverLicenseFront: !!clientData.driver_license_front_url,
       hasDriverLicenseBack: !!clientData.driver_license_back_url,
-      hasIdCardFront: !!clientData.id_card_front_url,
-      hasIdCardBack: !!clientData.id_card_back_url,
       frontUrl: clientData.driver_license_front_url,
-      backUrl: clientData.driver_license_back_url,
-      idFrontUrl: clientData.id_card_front_url,
-      idBackUrl: clientData.id_card_back_url
+      backUrl: clientData.driver_license_back_url
     });
 
     const { data, error } = await supabase
@@ -110,9 +104,7 @@ export const clientsService = {
       city: client.city,
       postal_code: client.zipCode,
       driver_license_front_url: client.driverLicenseFrontUrl || null,
-      driver_license_back_url: client.driverLicenseBackUrl || null,
-      id_card_front_url: client.idCardFrontUrl || null,
-      id_card_back_url: client.idCardBackUrl || null
+      driver_license_back_url: client.driverLicenseBackUrl || null
     };
 
     console.log('Updating client with data:', clientData);

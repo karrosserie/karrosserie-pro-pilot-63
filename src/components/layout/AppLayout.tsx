@@ -26,7 +26,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       <Sidebar isMobile={!!isMobile} isOpen={sidebarOpen} onClose={closeSidebar} />
 
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-        <Navbar onMenuClick={toggleSidebar} />
+        <Navbar onToggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />
         <main className="flex-1 overflow-y-auto">
           <div className="min-h-full">
             {children}
