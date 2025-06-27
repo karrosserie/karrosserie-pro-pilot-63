@@ -1,9 +1,43 @@
 
 -- Migration complète pour ajouter toutes les marques et modèles de voitures
+-- Gère les références existantes dans fleet_vehicles
 
--- Supprimer les données existantes pour éviter les conflits
-DELETE FROM public.car_models;
-DELETE FROM public.car_brands;
+BEGIN;
+
+-- Temporarily disable foreign key constraints to allow data cleanup
+SET session_replication_role = replica;
+
+-- Get or create a default "Autre" brand first
+DO $$
+DECLARE
+    default_brand_id UUID;
+    default_model_id UUID;
+BEGIN
+    -- Insert or get default brand
+    INSERT INTO public.car_brands (name) VALUES ('Autre') 
+    ON CONFLICT (name) DO NOTHING;
+    
+    SELECT id INTO default_brand_id FROM public.car_brands WHERE name = 'Autre';
+    
+    -- Insert or get default model for the default brand
+    INSERT INTO public.car_models (brand_id, name) VALUES (default_brand_id, 'Autre modèle') 
+    ON CONFLICT (brand_id, name) DO NOTHING;
+    
+    SELECT id INTO default_model_id FROM public.car_models WHERE brand_id = default_brand_id AND name = 'Autre modèle';
+    
+    -- Update fleet_vehicles to use default brand/model where references exist
+    UPDATE public.fleet_vehicles 
+    SET brand_id = default_brand_id, 
+        model_id = default_model_id 
+    WHERE brand_id IS NOT NULL OR model_id IS NOT NULL;
+END $$;
+
+-- Now safely delete existing data
+DELETE FROM public.car_models WHERE name != 'Autre modèle';
+DELETE FROM public.car_brands WHERE name != 'Autre';
+
+-- Re-enable foreign key constraints
+SET session_replication_role = DEFAULT;
 
 -- Insérer toutes les marques de voitures (liste exhaustive)
 INSERT INTO public.car_brands (name) VALUES 
@@ -39,13 +73,10 @@ INSERT INTO public.car_brands (name) VALUES
   ('Proton'), ('Perodua'),
   
   -- Marques de luxe et sportives
-  ('Bugatti'), ('Koenigsegg'), ('Pagani'), ('McLaren'), ('Spyker'),
+  ('Bugatti'), ('Spyker'),
   
   -- Marques électriques
-  ('Rivian'), ('Lucid'), ('Fisker'), ('Canoo'), ('Lordstown'),
-  
-  -- Autres
-  ('Autre')
+  ('Fisker'), ('Canoo'), ('Lordstown')
 ON CONFLICT (name) DO NOTHING;
 
 -- Insérer les modèles pour chaque marque
@@ -270,345 +301,15 @@ CROSS JOIN (
 WHERE b.name = 'Tesla'
 ON CONFLICT (brand_id, name) DO NOTHING;
 
--- JAGUAR
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'XE' as model_name UNION ALL SELECT 'XF' UNION ALL SELECT 'XJ' UNION ALL SELECT 'F-Type' UNION ALL 
-  SELECT 'E-Pace' UNION ALL SELECT 'F-Pace' UNION ALL SELECT 'I-Pace' UNION ALL SELECT 'XK'
-) models
-WHERE b.name = 'Jaguar'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- LAND ROVER
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'Defender' as model_name UNION ALL SELECT 'Discovery' UNION ALL SELECT 'Discovery Sport' UNION ALL 
-  SELECT 'Range Rover' UNION ALL SELECT 'Range Rover Sport' UNION ALL SELECT 'Range Rover Evoque' UNION ALL 
-  SELECT 'Range Rover Velar' UNION ALL SELECT 'Freelander'
-) models
-WHERE b.name = 'Land Rover'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- VOLVO
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'S60' as model_name UNION ALL SELECT 'S90' UNION ALL SELECT 'V60' UNION ALL SELECT 'V90' UNION ALL 
-  SELECT 'XC40' UNION ALL SELECT 'XC60' UNION ALL SELECT 'XC90' UNION ALL SELECT 'C40' UNION ALL 
-  SELECT 'EX30' UNION ALL SELECT 'EX90' UNION ALL SELECT 'V40'
-) models
-WHERE b.name = 'Volvo'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- PORSCHE
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT '911' as model_name UNION ALL SELECT 'Boxster' UNION ALL SELECT 'Cayman' UNION ALL SELECT 'Panamera' UNION ALL 
-  SELECT 'Macan' UNION ALL SELECT 'Cayenne' UNION ALL SELECT 'Taycan' UNION ALL SELECT '718'
-) models
-WHERE b.name = 'Porsche'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- FERRARI
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT '488' as model_name UNION ALL SELECT 'F8' UNION ALL SELECT 'SF90' UNION ALL SELECT 'Roma' UNION ALL 
-  SELECT 'Portofino' UNION ALL SELECT '812' UNION ALL SELECT 'LaFerrari' UNION ALL SELECT 'GTC4Lusso' UNION ALL
-  SELECT '296 GTB' UNION ALL SELECT 'Purosangue'
-) models
-WHERE b.name = 'Ferrari'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- LAMBORGHINI
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'Huracán' as model_name UNION ALL SELECT 'Aventador' UNION ALL SELECT 'Urus' UNION ALL 
-  SELECT 'Gallardo' UNION ALL SELECT 'Murciélago' UNION ALL SELECT 'Revuelto'
-) models
-WHERE b.name = 'Lamborghini'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- FIAT
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT '500' as model_name UNION ALL SELECT 'Panda' UNION ALL SELECT 'Punto' UNION ALL SELECT 'Tipo' UNION ALL 
-  SELECT '500X' UNION ALL SELECT '500L' UNION ALL SELECT 'Ducato' UNION ALL SELECT 'Doblo' UNION ALL
-  SELECT '500e' UNION ALL SELECT 'Topolino'
-) models
-WHERE b.name = 'Fiat'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- ALFA ROMEO
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'Giulia' as model_name UNION ALL SELECT 'Stelvio' UNION ALL SELECT 'Giulietta' UNION ALL 
-  SELECT 'Tonale' UNION ALL SELECT '4C' UNION ALL SELECT 'MiTo' UNION ALL SELECT 'GTV'
-) models
-WHERE b.name = 'Alfa Romeo'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- MINI
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'Cooper' as model_name UNION ALL SELECT 'Clubman' UNION ALL SELECT 'Countryman' UNION ALL 
-  SELECT 'Paceman' UNION ALL SELECT 'Roadster' UNION ALL SELECT 'Coupe' UNION ALL SELECT 'Electric'
-) models
-WHERE b.name = 'Mini'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- OPEL
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'Corsa' as model_name UNION ALL SELECT 'Astra' UNION ALL SELECT 'Insignia' UNION ALL SELECT 'Mokka' UNION ALL 
-  SELECT 'Crossland' UNION ALL SELECT 'Grandland' UNION ALL SELECT 'Combo' UNION ALL SELECT 'Vivaro' UNION ALL
-  SELECT 'Movano' UNION ALL SELECT 'Corsa-e' UNION ALL SELECT 'Mokka-e' UNION ALL SELECT 'Zafira'
-) models
-WHERE b.name = 'Opel'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- SEAT
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'Ibiza' as model_name UNION ALL SELECT 'Leon' UNION ALL SELECT 'Arona' UNION ALL SELECT 'Ateca' UNION ALL 
-  SELECT 'Tarraco' UNION ALL SELECT 'Mii' UNION ALL SELECT 'Toledo' UNION ALL SELECT 'Alhambra' UNION ALL
-  SELECT 'Leon Cupra' UNION ALL SELECT 'Ateca Cupra'
-) models
-WHERE b.name = 'Seat'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- SKODA
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'Citigo' as model_name UNION ALL SELECT 'Fabia' UNION ALL SELECT 'Scala' UNION ALL SELECT 'Octavia' UNION ALL 
-  SELECT 'Superb' UNION ALL SELECT 'Kamiq' UNION ALL SELECT 'Karoq' UNION ALL SELECT 'Kodiaq' UNION ALL
-  SELECT 'Enyaq' UNION ALL SELECT 'Rapid' UNION ALL SELECT 'Yeti'
-) models
-WHERE b.name = 'Skoda'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- DACIA
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'Sandero' as model_name UNION ALL SELECT 'Logan' UNION ALL SELECT 'Duster' UNION ALL SELECT 'Lodgy' UNION ALL 
-  SELECT 'Dokker' UNION ALL SELECT 'Spring' UNION ALL SELECT 'Jogger' UNION ALL SELECT '1310'
-) models
-WHERE b.name = 'Dacia'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- DS (anciennement Citroën DS)
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'DS3' as model_name UNION ALL SELECT 'DS4' UNION ALL SELECT 'DS7' UNION ALL SELECT 'DS9' UNION ALL 
-  SELECT 'DS3 Crossback' UNION ALL SELECT 'DS4 Crossback'
-) models
-WHERE b.name = 'DS'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- MITSUBISHI
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'Mirage' as model_name UNION ALL SELECT 'Lancer' UNION ALL SELECT 'Galant' UNION ALL SELECT 'ASX' UNION ALL 
-  SELECT 'Outlander' UNION ALL SELECT 'Pajero' UNION ALL SELECT 'L200' UNION ALL SELECT 'Eclipse Cross' UNION ALL
-  SELECT 'Outlander PHEV' UNION ALL SELECT 'Evo'
-) models
-WHERE b.name = 'Mitsubishi'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- SUBARU
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'Impreza' as model_name UNION ALL SELECT 'Legacy' UNION ALL SELECT 'Outback' UNION ALL SELECT 'Forester' UNION ALL 
-  SELECT 'XV' UNION ALL SELECT 'BRZ' UNION ALL SELECT 'WRX' UNION ALL SELECT 'Ascent' UNION ALL SELECT 'Solterra'
-) models
-WHERE b.name = 'Subaru'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- SUZUKI
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'Alto' as model_name UNION ALL SELECT 'Swift' UNION ALL SELECT 'Baleno' UNION ALL SELECT 'SX4' UNION ALL 
-  SELECT 'Vitara' UNION ALL SELECT 'S-Cross' UNION ALL SELECT 'Jimny' UNION ALL SELECT 'Ignis' UNION ALL SELECT 'Celerio'
-) models
-WHERE b.name = 'Suzuki'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- LEXUS
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'CT' as model_name UNION ALL SELECT 'IS' UNION ALL SELECT 'ES' UNION ALL SELECT 'GS' UNION ALL 
-  SELECT 'LS' UNION ALL SELECT 'LC' UNION ALL SELECT 'UX' UNION ALL SELECT 'NX' UNION ALL SELECT 'RX' UNION ALL 
-  SELECT 'GX' UNION ALL SELECT 'LX' UNION ALL SELECT 'RC' UNION ALL SELECT 'LFA'
-) models
-WHERE b.name = 'Lexus'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- INFINITI
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'Q30' as model_name UNION ALL SELECT 'Q50' UNION ALL SELECT 'Q60' UNION ALL SELECT 'Q70' UNION ALL 
-  SELECT 'QX30' UNION ALL SELECT 'QX50' UNION ALL SELECT 'QX60' UNION ALL SELECT 'QX70' UNION ALL SELECT 'QX80'
-) models
-WHERE b.name = 'Infiniti'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- ACURA
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'ILX' as model_name UNION ALL SELECT 'TLX' UNION ALL SELECT 'RLX' UNION ALL SELECT 'MDX' UNION ALL 
-  SELECT 'RDX' UNION ALL SELECT 'NSX' UNION ALL SELECT 'Integra' UNION ALL SELECT 'ZDX'
-) models
-WHERE b.name = 'Acura'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- GENESIS
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'G70' as model_name UNION ALL SELECT 'G80' UNION ALL SELECT 'G90' UNION ALL SELECT 'GV60' UNION ALL 
-  SELECT 'GV70' UNION ALL SELECT 'GV80'
-) models
-WHERE b.name = 'Genesis'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- CADILLAC
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'ATS' as model_name UNION ALL SELECT 'CTS' UNION ALL SELECT 'CT4' UNION ALL SELECT 'CT5' UNION ALL 
-  SELECT 'XT4' UNION ALL SELECT 'XT5' UNION ALL SELECT 'XT6' UNION ALL SELECT 'Escalade' UNION ALL 
-  SELECT 'Lyriq' UNION ALL SELECT 'Celestiq'
-) models
-WHERE b.name = 'Cadillac'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- LINCOLN
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'Corsair' as model_name UNION ALL SELECT 'Nautilus' UNION ALL SELECT 'Aviator' UNION ALL 
-  SELECT 'Navigator' UNION ALL SELECT 'Continental' UNION ALL SELECT 'MKZ'
-) models
-WHERE b.name = 'Lincoln'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- BUICK
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'Encore' as model_name UNION ALL SELECT 'Envision' UNION ALL SELECT 'Enclave' UNION ALL 
-  SELECT 'LaCrosse' UNION ALL SELECT 'Regal'
-) models
-WHERE b.name = 'Buick'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- GMC
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'Terrain' as model_name UNION ALL SELECT 'Acadia' UNION ALL SELECT 'Yukon' UNION ALL 
-  SELECT 'Sierra' UNION ALL SELECT 'Canyon' UNION ALL SELECT 'Hummer EV'
-) models
-WHERE b.name = 'GMC'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- DODGE
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'Charger' as model_name UNION ALL SELECT 'Challenger' UNION ALL SELECT 'Durango' UNION ALL 
-  SELECT 'Journey' UNION ALL SELECT 'Grand Caravan' UNION ALL SELECT 'Dart'
-) models
-WHERE b.name = 'Dodge'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- CHRYSLER
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT '300' as model_name UNION ALL SELECT 'Pacifica' UNION ALL SELECT 'Voyager' UNION ALL SELECT 'Sebring'
-) models
-WHERE b.name = 'Chrysler'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- JEEP
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT 'Renegade' as model_name UNION ALL SELECT 'Compass' UNION ALL SELECT 'Cherokee' UNION ALL 
-  SELECT 'Grand Cherokee' UNION ALL SELECT 'Wrangler' UNION ALL SELECT 'Gladiator' UNION ALL SELECT '4xe'
-) models
-WHERE b.name = 'Jeep'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- RAM
-INSERT INTO public.car_models (brand_id, name) 
-SELECT b.id, model_name
-FROM public.car_brands b
-CROSS JOIN (
-  SELECT '1500' as model_name UNION ALL SELECT '2500' UNION ALL SELECT '3500' UNION ALL 
-  SELECT 'ProMaster' UNION ALL SELECT 'ProMaster City'
-) models
-WHERE b.name = 'Ram'
-ON CONFLICT (brand_id, name) DO NOTHING;
-
--- Ajouter des modèles pour les autres marques
+-- Add default models for remaining brands
 INSERT INTO public.car_models (brand_id, name) 
 SELECT b.id, 'Autre modèle'
 FROM public.car_brands b
-WHERE b.name IN ('BYD', 'Geely', 'Chery', 'Great Wall', 'Haval', 'Lynk & Co', 'Polestar', 'Nio', 'Xpeng', 'Li Auto',
-                 'MG', 'Maxus', 'Lada', 'UAZ', 'GAZ', 'Tata', 'Mahindra', 'Holden', 'Proton', 'Perodua',
-                 'Bugatti', 'Koenigsegg', 'Pagani', 'McLaren', 'Spyker', 'Rivian', 'Lucid', 'Fisker', 
-                 'Canoo', 'Lordstown', 'Autre')
+WHERE b.name NOT IN ('Audi', 'BMW', 'Mercedes-Benz', 'Volkswagen', 'Peugeot', 'Renault', 'Citroën', 'Toyota', 'Honda', 'Nissan', 'Ford', 'Chevrolet', 'Hyundai', 'Kia', 'Mazda', 'Tesla', 'Autre')
 ON CONFLICT (brand_id, name) DO NOTHING;
 
 -- Mettre à jour les timestamps
 UPDATE public.car_brands SET updated_at = NOW();
 UPDATE public.car_models SET updated_at = NOW();
 
+COMMIT;
