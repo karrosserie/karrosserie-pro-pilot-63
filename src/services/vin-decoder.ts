@@ -1,3 +1,4 @@
+
 // Service pour décoder les VIN et extraire les informations de véhicule
 export interface VinInfo {
   brand?: string;
@@ -108,7 +109,7 @@ const wmiToBrand: Record<string, string> = {
   'JS1': 'Suzuki', 'JS2': 'Suzuki', 'JS3': 'Suzuki', '2S3': 'Suzuki',
   
   // LEXUS
-  'JTH': 'Lexus', '2T2': 'Lexus', '5T2': 'Lexus',
+  '2T2': 'Lexus', '5T2': 'Lexus',
   
   // INFINITI
   'JNK': 'Infiniti',
