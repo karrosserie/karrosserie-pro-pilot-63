@@ -11,9 +11,9 @@ const ExpertiseReportHeader: React.FC<ExpertiseReportHeaderProps> = ({
   description
 }) => {
   return (
-    <div className="mb-6">
-      <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">{title}</h1>
-      <p className="text-gray-600 mt-1">{description}</p>
+    <div className="mb-6 sm:mb-8">
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{title}</h1>
+      <p className="text-sm sm:text-base text-gray-600">{description}</p>
     </div>
   );
 };

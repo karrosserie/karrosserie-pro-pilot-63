@@ -8,6 +8,8 @@ import { ExpertiseReportTableRow } from './table/ExpertiseReportTableRow';
 import { ExpertiseReportTableEmpty } from './table/ExpertiseReportTableEmpty';
 import { ExpertiseReportTableLoading } from './table/ExpertiseReportTableLoading';
 import { ExpertiseReportTableError } from './table/ExpertiseReportTableError';
+import ExpertiseReportMobileCard from './ExpertiseReportMobileCard';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ExpertiseReportTableProps {
   reports: ExpertiseReport[];
@@ -26,6 +28,8 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
   onEditReport,
   onDeleteReport
 }) => {
+  const isMobile = useIsMobile();
+
   if (isLoading) {
     return <ExpertiseReportTableLoading />;
   }
@@ -34,11 +38,33 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
     return <ExpertiseReportTableError error={error} />;
   }
 
+  if (reports.length === 0) {
+    return <ExpertiseReportTableEmpty />;
+  }
+
+  // Mobile view: cards
+  if (isMobile) {
+    return (
+      <div className="space-y-3 p-4">
+        {reports.map((report) => (
+          <ExpertiseReportMobileCard
+            key={report.id}
+            report={report}
+            onViewReport={onViewReport}
+            onEditReport={onEditReport}
+            onDeleteReport={onDeleteReport}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  // Desktop view: table
   return (
     <TooltipProvider>
-      <Table>
-        <ExpertiseReportTableHeader />
-        {reports.length > 0 ? (
+      <div className="overflow-x-auto">
+        <Table>
+          <ExpertiseReportTableHeader />
           <TableBody>
             {reports.map((report) => (
               <ExpertiseReportTableRow
@@ -50,10 +76,8 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
               />
             ))}
           </TableBody>
-        ) : (
-          <ExpertiseReportTableEmpty />
-        )}
-      </Table>
+        </Table>
+      </div>
     </TooltipProvider>
   );
 };

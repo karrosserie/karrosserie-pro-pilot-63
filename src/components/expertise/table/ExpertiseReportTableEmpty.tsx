@@ -7,13 +7,19 @@ export const ExpertiseReportTableEmpty: React.FC = () => {
   return (
     <TableBody>
       <TableRow>
-        <TableCell colSpan={8} className="text-center py-8">
-          <div className="flex flex-col items-center justify-center">
-            <FileText className="h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="font-medium text-gray-900 mb-2">Aucun rapport d'expertise</h3>
-            <p className="text-gray-500">
-              Commencez par créer ou importer votre premier rapport d'expertise.
-            </p>
+        <TableCell colSpan={8} className="text-center py-12">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="bg-gray-100 p-4 rounded-full">
+              <FileText className="h-8 w-8 text-gray-400" />
+            </div>
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-1">
+                Aucun rapport d'expertise
+              </h3>
+              <p className="text-sm text-gray-500">
+                Commencez par importer votre premier rapport d'expertise.
+              </p>
+            </div>
           </div>
         </TableCell>
       </TableRow>

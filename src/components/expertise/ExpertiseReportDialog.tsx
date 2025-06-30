@@ -11,6 +11,7 @@ import { ExpertiseReportForm } from '@/components/expertise/ExpertiseReportForm'
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ExpertiseReportDialogProps {
   report?: ExpertiseReport | null;
@@ -26,6 +27,7 @@ const ExpertiseReportDialog = ({
   const { toast } = useToast();
   const { updateReport, createReport } = useExpertiseReports();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isMobile = useIsMobile();
 
   const handleSubmit = async (formData: Partial<ExpertiseReport>) => {
     setIsSubmitting(true);
@@ -59,12 +61,16 @@ const ExpertiseReportDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={!isSubmitting ? onOpenChange : undefined}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
-        <DialogHeader>
-          <DialogTitle>
+      <DialogContent className={`${
+        isMobile 
+          ? 'w-[95vw] h-[90vh] max-w-none max-h-none m-2' 
+          : 'max-w-4xl max-h-[90vh]'
+      } overflow-hidden`}>
+        <DialogHeader className={isMobile ? 'px-2' : ''}>
+          <DialogTitle className={`${isMobile ? 'text-lg' : 'text-xl'}`}>
             {report ? `Modifier le rapport d'expertise - ${report.reference}` : "Créer un nouveau rapport d'expertise"}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className={`${isMobile ? 'text-sm' : ''}`}>
             {report
               ? "Modifiez les détails du rapport d'expertise."
               : "Créez un nouveau rapport d'expertise en remplissant les informations ci-dessous."
@@ -72,12 +78,14 @@ const ExpertiseReportDialog = ({
           </DialogDescription>
         </DialogHeader>
         
-        <ExpertiseReportForm
-          report={report}
-          onSubmit={handleSubmit}
-          onCancel={() => onOpenChange(false)}
-          isSubmitting={isSubmitting}
-        />
+        <div className={`${isMobile ? 'px-2' : ''} flex-1 overflow-hidden`}>
+          <ExpertiseReportForm
+            report={report}
+            onSubmit={handleSubmit}
+            onCancel={() => onOpenChange(false)}
+            isSubmitting={isSubmitting}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );
