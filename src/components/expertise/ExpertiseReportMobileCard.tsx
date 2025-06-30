@@ -27,7 +27,7 @@ const ExpertiseReportMobileCard: React.FC<ExpertiseReportMobileCardProps> = ({
   };
 
   const getVehicleDisplay = () => {
-    const vehicle = report.vehicles as any;
+    const vehicle = report.vehicles;
     if (!vehicle) return 'Aucun véhicule';
     
     const brand = vehicle.car_brands?.name || 'Marque inconnue';
@@ -38,7 +38,7 @@ const ExpertiseReportMobileCard: React.FC<ExpertiseReportMobileCardProps> = ({
   };
 
   const getClientDisplay = () => {
-    const client = report.clients as any;
+    const client = report.clients;
     return client ? `${client.first_name} ${client.last_name}` : "-";
   };
 
