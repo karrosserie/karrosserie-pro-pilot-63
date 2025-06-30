@@ -7,18 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
-interface ExpertiseReportWithRelations extends ExpertiseReport {
-  clients?: {
-    first_name: string;
-    last_name: string;
-  } | null;
-  vehicles?: {
-    brand: string;
-    model: string;
-    license_plate: string;
-  } | null;
-}
-
 interface ExpertiseReportTableRowProps {
   report: ExpertiseReport;
   onViewReport: (report: ExpertiseReport) => void;
@@ -57,8 +45,6 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
   onEditReport,
   onDeleteReport
 }) => {
-  const reportWithRelations = report as ExpertiseReportWithRelations;
-  
   return (
     <TableRow className="hover:bg-gray-50">
       <TableCell className="font-medium">
@@ -71,11 +57,11 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
         {new Date(report.created_at || '').toLocaleDateString('fr-FR')}
       </TableCell>
       <TableCell>
-        {reportWithRelations.clients ? (
+        {report.clients ? (
           <div className="flex items-center">
             <User className="h-4 w-4 mr-2 text-gray-400" />
             <span className="font-medium">
-              {reportWithRelations.clients.first_name} {reportWithRelations.clients.last_name}
+              {report.clients.first_name} {report.clients.last_name}
             </span>
           </div>
         ) : (
@@ -83,15 +69,15 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
         )}
       </TableCell>
       <TableCell>
-        {reportWithRelations.vehicles ? (
+        {report.vehicles ? (
           <div className="flex items-center">
             <Car className="h-4 w-4 mr-2 text-gray-400" />
             <div>
               <div className="font-medium">
-                {reportWithRelations.vehicles.brand} {reportWithRelations.vehicles.model}
+                {report.vehicles.car_brands?.name || 'Marque inconnue'} {report.vehicles.car_models?.name || 'Modèle inconnu'}
               </div>
               <div className="text-sm text-gray-500">
-                {reportWithRelations.vehicles.license_plate}
+                {report.vehicles.license_plate || 'Plaque non spécifiée'}
               </div>
             </div>
           </div>
