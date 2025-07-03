@@ -1,5 +1,4 @@
 
-import { isValidVin, decodeVin } from '@/services/vin-decoder';
 import { useCarBrands } from '@/hooks/use-car-brands';
 
 interface VinHandlerProps {
@@ -7,10 +6,58 @@ interface VinHandlerProps {
   setFormData: (data: any) => void;
 }
 
+interface VinInfo {
+  brand?: string;
+  model?: string;
+  year?: number;
+}
+
+// Fonction pour décoder le VIN via l'API
+const decodeVinViaAPI = async (vin: string): Promise<VinInfo> => {
+  try {
+    const response = await fetch('/functions/v1/vin-decoder', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ vin })
+    });
+
+    if (!response.ok) {
+      console.error('API VIN decoder error:', response.status);
+      return {};
+    }
+
+    const result = await response.json();
+    return result.success ? result.data : {};
+  } catch (error) {
+    console.error('Error calling VIN decoder API:', error);
+    return {};
+  }
+};
+
+// Fonction de validation VIN
+const isValidVin = (vin: string): boolean => {
+  if (!vin || vin.length !== 17) {
+    return false;
+  }
+
+  const validChars = /^[A-HJ-NPR-Z0-9]+$/i;
+  if (!validChars.test(vin)) {
+    return false;
+  }
+
+  if (vin.includes('I') || vin.includes('O') || vin.includes('Q')) {
+    return false;
+  }
+
+  return true;
+};
+
 export function useFleetVehicleVinHandler({ formData, setFormData }: VinHandlerProps) {
   const { carBrands } = useCarBrands();
 
-  const handleVinInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVinInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
     if (name === 'vin') {
@@ -19,22 +66,28 @@ export function useFleetVehicleVinHandler({ formData, setFormData }: VinHandlerP
       
       // Auto-decode VIN if valid
       if (isValidVin(upperValue)) {
-        const vinInfo = decodeVin(upperValue);
-        console.log('VIN décodé:', vinInfo);
+        console.log('VIN valide détecté, appel de l\'API...');
         
-        if (vinInfo.brand && carBrands.length > 0) {
-          const matchingBrand = carBrands.find(brand => 
-            brand.name.toLowerCase() === vinInfo.brand?.toLowerCase()
-          );
+        try {
+          const vinInfo = await decodeVinViaAPI(upperValue);
+          console.log('VIN décodé via API:', vinInfo);
           
-          if (matchingBrand) {
-            console.log('Marque détectée par VIN:', matchingBrand.name);
-            setFormData(prev => ({
-              ...prev,
-              brand_id: matchingBrand.id,
-              year: vinInfo.year || prev.year
-            }));
+          if (vinInfo.brand && carBrands.length > 0) {
+            const matchingBrand = carBrands.find(brand => 
+              brand.name.toLowerCase() === vinInfo.brand?.toLowerCase()
+            );
+            
+            if (matchingBrand) {
+              console.log('Marque détectée par VIN:', matchingBrand.name);
+              setFormData(prev => ({
+                ...prev,
+                brand_id: matchingBrand.id,
+                year: vinInfo.year || prev.year
+              }));
+            }
           }
+        } catch (error) {
+          console.error('Erreur lors du décodage VIN:', error);
         }
       }
     }
