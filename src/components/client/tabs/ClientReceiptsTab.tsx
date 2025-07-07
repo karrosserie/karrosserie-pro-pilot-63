@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { SimpleTable } from '@/components/ui/simple-table';
@@ -15,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Download, Printer, Mail } from 'lucide-react';
-import { ReceiptDialog } from '@/components/receipts/ReceiptDialog';
+import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 
 interface ClientReceiptsTabProps {
   clientId: string;
