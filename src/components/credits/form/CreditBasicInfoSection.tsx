@@ -15,12 +15,14 @@ interface CreditBasicInfoSectionProps {
   formData: any;
   errors: Record<string, string>;
   onFieldChange: (field: string, value: any) => void;
+  readOnly?: boolean;
 }
 
 export const CreditBasicInfoSection = ({ 
   formData, 
   errors, 
-  onFieldChange 
+  onFieldChange,
+  readOnly = false
 }: CreditBasicInfoSectionProps) => {
   const [isFranchiseCredit, setIsFranchiseCredit] = useState(false);
   const { invoices } = useInvoices();
@@ -36,6 +38,7 @@ export const CreditBasicInfoSection = ({
   }));
 
   const handleFranchiseSwitchChange = (checked: boolean) => {
+    if (readOnly) return;
     setIsFranchiseCredit(checked);
     if (!checked) {
       // Si on désactive le switch, on remet le statut par défaut
@@ -55,16 +58,19 @@ export const CreditBasicInfoSection = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center space-x-2 p-4 rounded-lg">
-          <Switch 
-            id="franchise-switch"
-            checked={isFranchiseCredit}
-            onCheckedChange={handleFranchiseSwitchChange}
-          />
-          <Label htmlFor="franchise-switch" className="text-sm">
-            Cet avoir correspond à une franchise offerte (nécessite la sélection d'une facture dans la liste ci-dessus)
-          </Label>
-        </div>
+        {!readOnly && (
+          <div className="flex items-center space-x-2 p-4 rounded-lg">
+            <Switch 
+              id="franchise-switch"
+              checked={isFranchiseCredit}
+              onCheckedChange={handleFranchiseSwitchChange}
+              disabled={readOnly}
+            />
+            <Label htmlFor="franchise-switch" className="text-sm">
+              Cet avoir correspond à une franchise offerte (nécessite la sélection d'une facture dans la liste ci-dessus)
+            </Label>
+          </div>
+        )}
 
         <div className="grid gap-4 grid-cols-1 md:grid-cols-5">
           <div>
@@ -79,7 +85,7 @@ export const CreditBasicInfoSection = ({
               )}
               placeholder="Généré automatiquement"
             />
-            {errors.reference && (
+            {errors.reference && !readOnly && (
               <p className="text-sm text-red-500 mt-1 flex items-center">
                 <AlertCircle className="h-4 w-4 mr-1" />
                 {errors.reference}
@@ -93,12 +99,14 @@ export const CreditBasicInfoSection = ({
               id="created_date"
               type="date"
               value={formData.created_date || new Date().toISOString().split('T')[0]}
-              onChange={(e) => onFieldChange('created_date', e.target.value)}
+              onChange={(e) => !readOnly && onFieldChange('created_date', e.target.value)}
+              readOnly={readOnly}
               className={cn(
+                readOnly && "bg-gray-50 cursor-not-allowed",
                 errors.created_date && "border-red-500 focus-visible:ring-red-500"
               )}
             />
-            {errors.created_date && (
+            {errors.created_date && !readOnly && (
               <p className="text-sm text-red-500 mt-1 flex items-center">
                 <AlertCircle className="h-4 w-4 mr-1" />
                 {errors.created_date}
@@ -112,11 +120,13 @@ export const CreditBasicInfoSection = ({
                 <Label htmlFor="status">Statut</Label>
                 <Select
                   value={formData.status || 'En attente'}
-                  onValueChange={(value) => onFieldChange('status', value)}
+                  onValueChange={(value) => !readOnly && onFieldChange('status', value)}
+                  disabled={readOnly}
                 >
                   <SelectTrigger 
                     id="status"
                     className={cn(
+                      readOnly && "bg-gray-50 cursor-not-allowed",
                       errors.status && "border-red-500 focus-visible:ring-red-500"
                     )}
                   >
@@ -130,7 +140,7 @@ export const CreditBasicInfoSection = ({
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.status && (
+                {errors.status && !readOnly && (
                   <p className="text-sm text-red-500 mt-1 flex items-center">
                     <AlertCircle className="h-4 w-4 mr-1" />
                     {errors.status}
@@ -146,14 +156,16 @@ export const CreditBasicInfoSection = ({
           <SearchableSelect
             options={invoiceOptions}
             value={formData.invoice_id || ''}
-            onValueChange={(value) => onFieldChange('invoice_id', value)}
+            onValueChange={(value) => !readOnly && onFieldChange('invoice_id', value)}
             placeholder="Sélectionner une facture"
             searchPlaceholder="Rechercher une facture..."
+            disabled={readOnly}
             className={cn(
+              readOnly && "bg-gray-50 cursor-not-allowed",
               errors.invoice_id && "border-red-500 focus-visible:ring-red-500"
             )}
           />
-          {errors.invoice_id && (
+          {errors.invoice_id && !readOnly && (
             <p className="text-sm text-red-500 mt-1 flex items-center">
               <AlertCircle className="h-4 w-4 mr-1" />
               {errors.invoice_id}
@@ -166,14 +178,16 @@ export const CreditBasicInfoSection = ({
           <Textarea
             id="notes"
             value={formData.notes || ''}
-            onChange={(e) => onFieldChange('notes', e.target.value)}
+            onChange={(e) => !readOnly && onFieldChange('notes', e.target.value)}
             placeholder="Notes supplémentaires"
+            readOnly={readOnly}
             className={cn(
+              readOnly && "bg-gray-50 cursor-not-allowed",
               errors.notes && "border-red-500 focus-visible:ring-red-500"
             )}
             rows={3}
           />
-          {errors.notes && (
+          {errors.notes && !readOnly && (
             <p className="text-sm text-red-500 mt-1 flex items-center">
               <AlertCircle className="h-4 w-4 mr-1" />
               {errors.notes}

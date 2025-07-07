@@ -11,13 +11,15 @@ interface CreditItemsSectionProps {
   onAddItem: () => void;
   onUpdateItem: (id: string, field: keyof CreditItem, value: any) => void;
   onRemoveItem: (id: string) => void;
+  readOnly?: boolean;
 }
 
 export const CreditItemsSection = ({
   items,
   onAddItem,
   onUpdateItem,
-  onRemoveItem
+  onRemoveItem,
+  readOnly = false
 }: CreditItemsSectionProps) => {
   return (
     <Card>
@@ -27,7 +29,7 @@ export const CreditItemsSection = ({
           Articles de l'avoir
         </CardTitle>
         <CardDescription>
-          Ajoutez les articles à créditer
+          {readOnly ? "Articles crédités" : "Ajoutez les articles à créditer"}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -38,82 +40,96 @@ export const CreditItemsSection = ({
         ) : (
           <div className="space-y-2">
             {/* Header */}
-            <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+            <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: readOnly ? '4fr 1fr 1.5fr 1fr 1fr 1.5fr' : '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
               <div>Désignation</div>
               <div>Qté</div>
               <div>Prix Unitaire (€)</div>
               <div>Remise (%)</div>
               <div>TVA (%)</div>
               <div>Total (€)</div>
-              <div></div>
+              {!readOnly && <div></div>}
             </div>
 
             {/* Item rows */}
             {items.map((item) => (
-              <div key={item.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+              <div key={item.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: readOnly ? '4fr 1fr 1.5fr 1fr 1fr 1.5fr' : '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
                 <Input
                   value={item.description}
-                  onChange={(e) => onUpdateItem(item.id, 'description', e.target.value)}
+                  onChange={(e) => !readOnly && onUpdateItem(item.id, 'description', e.target.value)}
                   placeholder="Désignation de l'article"
+                  readOnly={readOnly}
+                  className={readOnly ? "bg-gray-50 cursor-not-allowed" : ""}
                 />
                 <Input
                   type="number"
                   value={item.quantity}
-                  onChange={(e) => onUpdateItem(item.id, 'quantity', parseFloat(e.target.value) || 0)}
+                  onChange={(e) => !readOnly && onUpdateItem(item.id, 'quantity', parseFloat(e.target.value) || 0)}
                   min="0"
                   step="0.01"
+                  readOnly={readOnly}
+                  className={readOnly ? "bg-gray-50 cursor-not-allowed" : ""}
                 />
                 <Input
                   type="number"
                   value={item.unit_price}
-                  onChange={(e) => onUpdateItem(item.id, 'unit_price', parseFloat(e.target.value) || 0)}
+                  onChange={(e) => !readOnly && onUpdateItem(item.id, 'unit_price', parseFloat(e.target.value) || 0)}
                   min="0"
                   step="0.01"
                   placeholder="0.00"
+                  readOnly={readOnly}
+                  className={readOnly ? "bg-gray-50 cursor-not-allowed" : ""}
                 />
                 <Input
                   type="number"
                   value={item.discount}
-                  onChange={(e) => onUpdateItem(item.id, 'discount', parseFloat(e.target.value) || 0)}
+                  onChange={(e) => !readOnly && onUpdateItem(item.id, 'discount', parseFloat(e.target.value) || 0)}
                   min="0"
                   max="100"
                   step="0.1"
+                  readOnly={readOnly}
+                  className={readOnly ? "bg-gray-50 cursor-not-allowed" : ""}
                 />
                 <Input
                   type="number"
                   value={item.vat}
-                  onChange={(e) => onUpdateItem(item.id, 'vat', parseFloat(e.target.value) || 0)}
+                  onChange={(e) => !readOnly && onUpdateItem(item.id, 'vat', parseFloat(e.target.value) || 0)}
                   min="0"
                   step="0.1"
+                  readOnly={readOnly}
+                  className={readOnly ? "bg-gray-50 cursor-not-allowed" : ""}
                 />
                 <div className="text-right font-medium">
                   {item.total.toFixed(2)} €
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => onRemoveItem(item.id)}
-                  className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-                >
-                  <Trash className="h-4 w-4" />
-                </Button>
+                {!readOnly && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => onRemoveItem(item.id)}
+                    className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             ))}
           </div>
         )}
 
-        <div className="flex justify-end">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onAddItem}
-            className="w-auto"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Ajouter un article
-          </Button>
-        </div>
+        {!readOnly && (
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onAddItem}
+              className="w-auto"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Ajouter un article
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
