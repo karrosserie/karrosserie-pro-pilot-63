@@ -10,6 +10,7 @@ import Fleet from "@/pages/Fleet";
 import Settings from "@/pages/Settings";
 import Accounting from "@/pages/Accounting";
 import Cessions from "@/pages/Cessions";
+import Help from "@/pages/Help";
 
 export const coreRoutes = [
   {
@@ -89,6 +90,14 @@ export const coreRoutes = [
     element: (
       <ProtectedRoute>
         <Settings />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/help",
+    element: (
+      <ProtectedRoute>
+        <Help />
       </ProtectedRoute>
     )
   }
