@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { SimpleTable } from '@/components/ui/simple-table';
@@ -25,7 +26,6 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
   const { invoices } = useInvoices();
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState<any>(null);
 
   if (isLoading) {
@@ -67,7 +67,7 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
 
   const handleView = (receipt: any) => {
     setSelectedReceipt(receipt);
-    setViewDialogOpen(true);
+    setEditDialogOpen(true);
   };
 
   const handleEdit = (receipt: any) => {
@@ -134,8 +134,15 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
 
   const columns: ColumnDef<any>[] = [
     {
+      accessorKey: "reference",
+      header: "Référence",
+      cell: ({ row }) => (
+        <span className="font-medium">{row.getValue("reference") as string}</span>
+      )
+    },
+    {
       accessorKey: "date",
-      header: "Date",
+      header: "Date d'encaissement",
       cell: ({ row }) => formatDate(row.getValue("date") as string)
     },
     {
@@ -268,20 +275,11 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
       />
 
       {selectedReceipt && (
-        <>
-          <ReceiptDialog
-            open={editDialogOpen}
-            onOpenChange={setEditDialogOpen}
-            receipt={selectedReceipt}
-          />
-
-          <ReceiptDialog
-            open={viewDialogOpen}
-            onOpenChange={setViewDialogOpen}
-            receipt={selectedReceipt}
-            readOnly={true}
-          />
-        </>
+        <ReceiptDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          receipt={selectedReceipt}
+        />
       )}
     </>
   );
