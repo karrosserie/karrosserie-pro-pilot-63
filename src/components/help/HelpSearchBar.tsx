@@ -2,7 +2,12 @@
 import React from 'react';
 import { Search } from 'lucide-react';
 
-const HelpSearchBar = () => {
+interface HelpSearchBarProps {
+  searchTerm: string;
+  onSearchChange: (term: string) => void;
+}
+
+const HelpSearchBar = ({ searchTerm, onSearchChange }: HelpSearchBarProps) => {
   return (
     <div className="mb-8">
       <div className="relative">
@@ -10,6 +15,8 @@ const HelpSearchBar = () => {
         <input
           type="text"
           placeholder="Rechercher dans la FAQ..."
+          value={searchTerm}
+          onChange={(e) => onSearchChange(e.target.value)}
           className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
