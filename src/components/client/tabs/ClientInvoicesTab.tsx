@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useInvoices } from '@/hooks/use-invoices';
 import { SimpleTable } from '@/components/ui/simple-table';
 import { Receipt, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
@@ -21,6 +21,12 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Download, Printer, Mail, CreditCard, FileX } from 'lucide-react';
+import InvoiceDialog from '@/components/invoices/InvoiceDialog';
+import InvoiceEmailDialog from '@/components/invoices/InvoiceEmailDialog';
+import ReceiptDialog from '@/components/receipts/ReceiptDialog';
+import { CreditDialog } from '@/components/credits/CreditDialog';
+import { Invoice } from '@/services/supabase/invoices';
+import { useToast } from '@/hooks/use-toast';
 
 interface ClientInvoicesTabProps {
   clientId: string;
@@ -28,6 +34,12 @@ interface ClientInvoicesTabProps {
 
 const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
   const { invoices, isLoading, deleteInvoice } = useInvoices();
+  const { toast } = useToast();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
+  const [creditDialogOpen, setCreditDialogOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
   if (isLoading) {
     return (
@@ -39,45 +51,68 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
 
   const clientInvoices = invoices?.filter(invoice => invoice.client_id === clientId) || [];
 
-  const handleView = (invoice: any) => {
-    console.log('View invoice:', invoice);
+  const handleView = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setDialogOpen(true);
   };
 
-  const handleEdit = (invoice: any) => {
-    console.log('Edit invoice:', invoice);
+  const handleEdit = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setDialogOpen(true);
   };
 
-  const handleDelete = (invoice: any) => {
+  const handleDelete = async (invoice: Invoice) => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer la facture ${invoice.reference} ?`)) {
-      deleteInvoice.mutate(invoice.id);
+      try {
+        await deleteInvoice.mutateAsync(invoice.id);
+        toast({
+          title: "Facture supprimée",
+          description: "La facture a été supprimée avec succès."
+        });
+      } catch (error: any) {
+        toast({
+          title: "Erreur",
+          description: `Impossible de supprimer la facture: ${error.message}`,
+          variant: "destructive"
+        });
+      }
     }
   };
 
-  const handleDownload = (invoice: any) => {
-    console.log('Download invoice:', invoice);
+  const handleDownload = (invoice: Invoice) => {
+    toast({
+      title: "Téléchargement",
+      description: `Téléchargement de la facture ${invoice.reference}...`
+    });
   };
 
-  const handlePrint = (invoice: any) => {
-    console.log('Print invoice:', invoice);
+  const handlePrint = (invoice: Invoice) => {
+    toast({
+      title: "Impression",
+      description: `Impression de la facture ${invoice.reference}...`
+    });
   };
 
-  const handleSendEmail = (invoice: any) => {
-    console.log('Send email invoice:', invoice);
+  const handleSendEmail = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setEmailDialogOpen(true);
   };
 
-  const handleAddPayment = (invoice: any) => {
-    console.log('Add payment:', invoice);
+  const handleAddPayment = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setReceiptDialogOpen(true);
   };
 
-  const handleAddCredit = (invoice: any) => {
-    console.log('Add credit:', invoice);
+  const handleAddCredit = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setCreditDialogOpen(true);
   };
 
   const contextMenuProps = {
-    onDownload: (invoice: any) => console.log('Download invoice:', invoice),
-    onPrint: (invoice: any) => console.log('Print invoice:', invoice),
-    onSendEmail: (invoice: any) => console.log('Send email invoice:', invoice),
-    onCreateCredit: (invoice: any) => console.log('Create credit:', invoice)
+    onDownload: handleDownload,
+    onPrint: handlePrint,
+    onSendEmail: handleSendEmail,
+    onCreateCredit: handleAddCredit
   };
 
   const formatDate = (dateString: string | null) => {
@@ -166,14 +201,22 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleView(invoice)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleView(invoice);
+              }}
+              title="Voir les détails"
             >
               <Eye className="h-4 w-4" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleEdit(invoice)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEdit(invoice);
+              }}
+              title="Modifier"
             >
               <Pencil className="h-4 w-4" />
             </Button>
@@ -181,7 +224,11 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
               variant="ghost"
               size="icon"
               className="text-red-500 hover:text-red-700"
-              onClick={() => handleDelete(invoice)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(invoice);
+              }}
+              title="Supprimer"
             >
               <Trash className="h-4 w-4" />
             </Button>
@@ -232,30 +279,72 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
   }
 
   return (
-    <ContextMenu>
-      <ContextMenuTrigger asChild>
-        <div>
-          <SimpleTable
-            columns={columns}
-            data={clientInvoices}
-          />
-        </div>
-      </ContextMenuTrigger>
-      <ContextMenuContent>
-        <ContextMenuItem onClick={() => contextMenuProps.onDownload(clientInvoices[0])}>
-          Télécharger
-        </ContextMenuItem>
-        <ContextMenuItem onClick={() => contextMenuProps.onPrint(clientInvoices[0])}>
-          Imprimer
-        </ContextMenuItem>
-        <ContextMenuItem onClick={() => contextMenuProps.onSendEmail(clientInvoices[0])}>
-          Envoyer par e-mail
-        </ContextMenuItem>
-        <ContextMenuItem onClick={() => contextMenuProps.onCreateCredit(clientInvoices[0])}>
-          Créer un avoir
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
+    <>
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          <div>
+            <SimpleTable
+              columns={columns}
+              data={clientInvoices}
+            />
+          </div>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem onClick={() => contextMenuProps.onDownload(clientInvoices[0])}>
+            Télécharger
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => contextMenuProps.onPrint(clientInvoices[0])}>
+            Imprimer
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => contextMenuProps.onSendEmail(clientInvoices[0])}>
+            Envoyer par e-mail
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => contextMenuProps.onCreateCredit(clientInvoices[0])}>
+            Créer un avoir
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+
+      <InvoiceDialog
+        invoice={selectedInvoice}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
+
+      <InvoiceEmailDialog
+        invoice={selectedInvoice}
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+      />
+
+      <ReceiptDialog
+        receipt={selectedInvoice ? {
+          invoice: selectedInvoice.id,
+          reference: '',
+          date: new Date().toISOString().split('T')[0],
+          amount: selectedInvoice.amount || 0,
+          status: 'Encaissé',
+          payment_method: 'Virement',
+          bank_account: '',
+          notes: '',
+          payment_proofs: []
+        } : null}
+        open={receiptDialogOpen}
+        onOpenChange={setReceiptDialogOpen}
+      />
+
+      <CreditDialog
+        credit={selectedInvoice ? {
+          invoice_id: selectedInvoice.id,
+          reference: '',
+          status: 'Émis',
+          amount: 0,
+          notes: ''
+        } : null}
+        open={creditDialogOpen}
+        onOpenChange={setCreditDialogOpen}
+      />
+    </>
   );
 };
 
