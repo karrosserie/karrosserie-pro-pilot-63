@@ -24,6 +24,7 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   const { invoices } = useInvoices();
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [selectedCredit, setSelectedCredit] = useState<any>(null);
 
   if (isLoading) {
@@ -122,10 +123,21 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   };
 
   const handleView = (credit: any) => {
-    toast({
-      title: "Visualisation de l'avoir",
-      description: `Affichage de l'avoir ${credit.reference}`,
+    // Parse items_data if it exists
+    let items = [];
+    if (credit.items_data) {
+      try {
+        items = JSON.parse(credit.items_data);
+      } catch (error) {
+        console.error('Error parsing items_data:', error);
+      }
+    }
+
+    setSelectedCredit({
+      ...credit,
+      items
     });
+    setViewDialogOpen(true);
   };
 
   const handleEdit = (credit: any) => {
@@ -343,20 +355,38 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
       />
 
       {selectedCredit && (
-        <EditCreditDialog
-          open={editDialogOpen}
-          onOpenChange={setEditDialogOpen}
-          creditId={selectedCredit.id}
-          initialData={{
-            reference: selectedCredit.reference,
-            client_id: selectedCredit.client_id,
-            vehicle_id: selectedCredit.vehicle_id,
-            invoice_id: selectedCredit.invoice_id,
-            status: selectedCredit.status,
-            notes: selectedCredit.notes,
-            items: selectedCredit.items
-          }}
-        />
+        <>
+          <EditCreditDialog
+            open={editDialogOpen}
+            onOpenChange={setEditDialogOpen}
+            creditId={selectedCredit.id}
+            initialData={{
+              reference: selectedCredit.reference,
+              client_id: selectedCredit.client_id,
+              vehicle_id: selectedCredit.vehicle_id,
+              invoice_id: selectedCredit.invoice_id,
+              status: selectedCredit.status,
+              notes: selectedCredit.notes,
+              items: selectedCredit.items
+            }}
+          />
+
+          <EditCreditDialog
+            open={viewDialogOpen}
+            onOpenChange={setViewDialogOpen}
+            creditId={selectedCredit.id}
+            initialData={{
+              reference: selectedCredit.reference,
+              client_id: selectedCredit.client_id,
+              vehicle_id: selectedCredit.vehicle_id,
+              invoice_id: selectedCredit.invoice_id,
+              status: selectedCredit.status,
+              notes: selectedCredit.notes,
+              items: selectedCredit.items
+            }}
+            readOnly={true}
+          />
+        </>
       )}
     </>
   );
