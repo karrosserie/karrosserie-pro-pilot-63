@@ -22,12 +22,21 @@ import {
   Mail
 } from 'lucide-react';
 
+// Import des captures d'écran
+import dashboardOverview from '@/assets/screenshots/dashboard-overview.jpg';
+import clientsTable from '@/assets/screenshots/clients-table.jpg';
+import vehicleForm from '@/assets/screenshots/vehicle-form.jpg';
+import repairOrder from '@/assets/screenshots/repair-order.jpg';
+import cessionCreance from '@/assets/screenshots/cession-creance.jpg';
+import fleetManagement from '@/assets/screenshots/fleet-management.jpg';
+
 const Help = () => {
   const faqSections = [
     {
       id: "getting-started",
       title: "🚀 Prise en main",
       icon: <Settings className="h-5 w-5" />,
+      image: dashboardOverview,
       items: [
         {
           question: "Comment me connecter à l'application ?",
@@ -35,7 +44,8 @@ const Help = () => {
         },
         {
           question: "Comment naviguer dans l'interface ?",
-          answer: "L'application est organisée en modules accessibles via le menu latéral : Tableau de bord, Clients, Véhicules, Documents, Cessions, etc. Chaque section a ses propres fonctionnalités. Sur mobile, utilisez le bouton menu en haut à gauche."
+          answer: "L'application est organisée en modules accessibles via le menu latéral : Tableau de bord, Clients, Véhicules, Documents, Cessions, etc. Chaque section a ses propres fonctionnalités. Sur mobile, utilisez le bouton menu en haut à gauche.",
+          image: dashboardOverview
         },
         {
           question: "Comment personnaliser mon profil ?",
@@ -47,14 +57,17 @@ const Help = () => {
       id: "clients",
       title: "👥 Gestion des clients",
       icon: <Users className="h-5 w-5" />,
+      image: clientsTable,
       items: [
         {
           question: "Comment créer un nouveau client ?",
-          answer: "Allez dans 'Clients' puis cliquez sur '+ Nouveau client'. Remplissez les informations obligatoires : nom, prénom, email, téléphone. Vous pouvez ajouter l'adresse et des documents (permis de conduire). Cliquez sur 'Enregistrer'."
+          answer: "Allez dans 'Clients' puis cliquez sur '+ Nouveau client'. Remplissez les informations obligatoires : nom, prénom, email, téléphone. Vous pouvez ajouter l'adresse et des documents (permis de conduire). Cliquez sur 'Enregistrer'.",
+          image: clientsTable
         },
         {
           question: "Comment modifier un client existant ?",
-          answer: "Dans la liste des clients, cliquez sur l'icône crayon à droite de la ligne du client. Modifiez les informations nécessaires et sauvegardez. Vous pouvez aussi accéder à la fiche complète en cliquant sur le nom du client."
+          answer: "Dans la liste des clients, cliquez sur l'icône crayon à droite de la ligne du client. Modifiez les informations nécessaires et sauvegardez. Vous pouvez aussi accéder à la fiche complète en cliquant sur le nom du client.",
+          image: clientsTable
         },
         {
           question: "Comment rechercher un client ?",
@@ -70,14 +83,17 @@ const Help = () => {
       id: "vehicles",
       title: "🚗 Gestion des véhicules",
       icon: <Car className="h-5 w-5" />,
+      image: vehicleForm,
       items: [
         {
           question: "Comment ajouter un véhicule ?",
-          answer: "Dans 'Véhicules', cliquez sur '+ Nouveau véhicule'. Associez-le à un client, renseignez la marque, modèle, année, plaque d'immatriculation. Le numéro VIN permet un remplissage automatique des informations techniques."
+          answer: "Dans 'Véhicules', cliquez sur '+ Nouveau véhicule'. Associez-le à un client, renseignez la marque, modèle, année, plaque d'immatriculation. Le numéro VIN permet un remplissage automatique des informations techniques.",
+          image: vehicleForm
         },
         {
           question: "Comment fonctionne le décodage VIN automatique ?",
-          answer: "Saisissez un numéro VIN de 17 caractères valide. L'application décode automatiquement la marque, le modèle et l'année de fabrication grâce à notre API intégrée qui reconnaît plus de 500 codes constructeurs."
+          answer: "Saisissez un numéro VIN de 17 caractères valide. L'application décode automatiquement la marque, le modèle et l'année de fabrication grâce à notre API intégrée qui reconnaît plus de 500 codes constructeurs.",
+          image: vehicleForm
         },
         {
           question: "Quelles informations puis-je enregistrer pour un véhicule ?",
@@ -93,14 +109,17 @@ const Help = () => {
       id: "repair-orders",
       title: "🔧 Ordres de réparation",
       icon: <FileText className="h-5 w-5" />,
+      image: repairOrder,
       items: [
         {
           question: "Comment créer un ordre de réparation ?",
-          answer: "Dans 'Documents' > 'Ordres de réparation', cliquez sur 'Nouvel ordre'. Sélectionnez le client et le véhicule, ajoutez les réparations nécessaires avec descriptions, quantités et prix. Le système calcule automatiquement les totaux."
+          answer: "Dans 'Documents' > 'Ordres de réparation', cliquez sur 'Nouvel ordre'. Sélectionnez le client et le véhicule, ajoutez les réparations nécessaires avec descriptions, quantités et prix. Le système calcule automatiquement les totaux.",
+          image: repairOrder
         },
         {
           question: "Comment ajouter des réparations et pièces ?",
-          answer: "Dans l'ordre de réparation, utilisez les sections 'Réparations' et 'Pièces détachées'. Pour chaque ligne, indiquez la description, quantité, prix unitaire. Les calculs (sous-total, TVA, total) se font automatiquement."
+          answer: "Dans l'ordre de réparation, utilisez les sections 'Réparations' et 'Pièces détachées'. Pour chaque ligne, indiquez la description, quantité, prix unitaire. Les calculs (sous-total, TVA, total) se font automatiquement.",
+          image: repairOrder
         },
         {
           question: "Comment gérer les statuts des ordres ?",
@@ -139,14 +158,17 @@ const Help = () => {
       id: "cessions",
       title: "💳 Cessions de créance",
       icon: <CreditCard className="h-5 w-5" />,
+      image: cessionCreance,
       items: [
         {
           question: "Qu'est-ce qu'une cession de créance ?",
-          answer: "La cession de créance permet à votre client de vous céder ses droits au remboursement d'assurance. Résultat : l'assurance vous paie directement au lieu de rembourser le client, ce qui améliore votre trésorerie."
+          answer: "La cession de créance permet à votre client de vous céder ses droits au remboursement d'assurance. Résultat : l'assurance vous paie directement au lieu de rembourser le client, ce qui améliore votre trésorerie.",
+          image: cessionCreance
         },
         {
           question: "Comment créer une cession de créance ?",
-          answer: "Dans 'Cession de créance', cliquez sur 'Nouvelle cession'. Sélectionnez un ordre de réparation existant, les informations client/véhicule/montant sont automatiquement récupérées. Générez les documents légaux nécessaires."
+          answer: "Dans 'Cession de créance', cliquez sur 'Nouvelle cession'. Sélectionnez un ordre de réparation existant, les informations client/véhicule/montant sont automatiquement récupérées. Générez les documents légaux nécessaires.",
+          image: cessionCreance
         },
         {
           question: "Quels sont les statuts d'une cession ?",
@@ -162,14 +184,17 @@ const Help = () => {
       id: "fleet",
       title: "🚙 Véhicules de courtoisie",
       icon: <Clock className="h-5 w-5" />,
+      image: fleetManagement,
       items: [
         {
           question: "Comment gérer ma flotte de véhicules de courtoisie ?",
-          answer: "Dans 'Véhicules de courtoisie', ajoutez vos véhicules de prêt avec leurs caractéristiques. Vous pouvez suivre leur disponibilité, les réserver pour vos clients et gérer les contrats de prêt."
+          answer: "Dans 'Véhicules de courtoisie', ajoutez vos véhicules de prêt avec leurs caractéristiques. Vous pouvez suivre leur disponibilité, les réserver pour vos clients et gérer les contrats de prêt.",
+          image: fleetManagement
         },
         {
           question: "Comment faire une réservation de véhicule ?",
-          answer: "Créez une nouvelle réservation en sélectionnant le client, le véhicule disponible et les dates de prêt. Le système génère automatiquement le contrat de prêt avec état des lieux."
+          answer: "Créez une nouvelle réservation en sélectionnant le client, le véhicule disponible et les dates de prêt. Le système génère automatiquement le contrat de prêt avec état des lieux.",
+          image: fleetManagement
         },
         {
           question: "Comment gérer les retours de véhicules ?",
@@ -283,6 +308,16 @@ const Help = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
+              {/* Image de présentation de la section */}
+              {section.image && (
+                <div className="mb-6">
+                  <img 
+                    src={section.image} 
+                    alt={`Capture d'écran - ${section.title}`}
+                    className="w-full rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
+                  />
+                </div>
+              )}
               <Accordion type="single" collapsible className="w-full">
                 {section.items.map((item, index) => (
                   <AccordionItem key={index} value={`${section.id}-${index}`}>
@@ -290,7 +325,18 @@ const Help = () => {
                       {item.question}
                     </AccordionTrigger>
                     <AccordionContent className="text-gray-700 leading-relaxed">
-                      {item.answer}
+                      <div className="space-y-4">
+                        <p>{item.answer}</p>
+                        {item.image && (
+                          <div>
+                            <img 
+                              src={item.image} 
+                              alt={`Illustration - ${item.question}`}
+                              className="w-full max-w-2xl rounded-lg border border-gray-200 shadow-sm"
+                            />
+                          </div>
+                        )}
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
                 ))}
