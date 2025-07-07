@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { Rocket, Users, Car, Wrench, FileText, CreditCard, Truck, ClipboardList, DollarSign, Bot } from 'lucide-react';
 
 export interface FAQItem {
   question: string;
@@ -16,12 +16,12 @@ export interface FAQSection {
 export const faqSections: FAQSection[] = [
   {
     id: "getting-started",
-    title: "🚀 Prise en main",
-    icon: null,
+    title: "Prise en main",
+    icon: <Rocket className="h-5 w-5" />,
     items: [
       {
         question: "Comment me connecter à l'application ?",
-        answer: "Utilisez vos identifiants fournis lors de l'inscription. Cliquez sur 'Se connecter' et saisissez votre email et mot de passe. Si vous avez oublié votre mot de passe, utilisez le lien 'Mot de passe oublié' pour le réinitialiser. Vous recevrez un email avec les instructions pour créer un nouveau mot de passe."
+        answer: "Utilisez vos identifiants fournis lors de l'inscription. Cliquez sur 'Se connecter' et saisissez votre email et mot de passe. Si vous avez oublié votre mot de passe, utilisez le lien 'Mot de passe oublié' pour le réinitialiser. Vous recevrez un email avec les instructions détaillées pour créer un nouveau mot de passe sécurisé. Assurez-vous que votre navigateur accepte les cookies pour maintenir votre session active. Si vous rencontrez des difficultés persistantes, vérifiez que votre compte n'est pas temporairement bloqué après plusieurs tentatives de connexion infructueuses."
       },
       {
         question: "Comment naviguer dans l'interface ?",
@@ -35,8 +35,8 @@ export const faqSections: FAQSection[] = [
   },
   {
     id: "clients",
-    title: "👥 Gestion des clients",
-    icon: null,
+    title: "Gestion des clients",
+    icon: <Users className="h-5 w-5" />,
     items: [
       {
         question: "Comment créer un nouveau client ?",
@@ -58,8 +58,8 @@ export const faqSections: FAQSection[] = [
   },
   {
     id: "vehicles",
-    title: "🚗 Gestion des véhicules",
-    icon: null,
+    title: "Gestion des véhicules",
+    icon: <Car className="h-5 w-5" />,
     items: [
       {
         question: "Comment ajouter un véhicule ?",
@@ -81,8 +81,8 @@ export const faqSections: FAQSection[] = [
   },
   {
     id: "repair-orders",
-    title: "🔧 Ordres de réparation",
-    icon: null,
+    title: "Ordres de réparation",
+    icon: <Wrench className="h-5 w-5" />,
     items: [
       {
         question: "Comment créer un ordre de réparation ?",
@@ -104,8 +104,8 @@ export const faqSections: FAQSection[] = [
   },
   {
     id: "quotes-invoices",
-    title: "📄 Devis et factures",
-    icon: null,
+    title: "Devis et factures",
+    icon: <FileText className="h-5 w-5" />,
     items: [
       {
         question: "Comment créer un devis ?",
@@ -127,8 +127,8 @@ export const faqSections: FAQSection[] = [
   },
   {
     id: "cessions",
-    title: "💳 Cessions de créance",
-    icon: null,
+    title: "Cessions de créance",
+    icon: <CreditCard className="h-5 w-5" />,
     items: [
       {
         question: "Qu'est-ce qu'une cession de créance ?",
@@ -150,8 +150,8 @@ export const faqSections: FAQSection[] = [
   },
   {
     id: "fleet",
-    title: "🚙 Véhicules de courtoisie",
-    icon: null,
+    title: "Véhicules de courtoisie",
+    icon: <Truck className="h-5 w-5" />,
     items: [
       {
         question: "Comment gérer ma flotte de véhicules de courtoisie ?",
@@ -169,8 +169,8 @@ export const faqSections: FAQSection[] = [
   },
   {
     id: "expertise",
-    title: "📋 Rapports d'expertise",
-    icon: null,
+    title: "Rapports d'expertise",
+    icon: <ClipboardList className="h-5 w-5" />,
     items: [
       {
         question: "Comment importer un rapport d'expertise ?",
@@ -188,8 +188,8 @@ export const faqSections: FAQSection[] = [
   },
   {
     id: "payments",
-    title: "💰 Paiements et comptabilité",
-    icon: null,
+    title: "Paiements et comptabilité",
+    icon: <DollarSign className="h-5 w-5" />,
     items: [
       {
         question: "Comment enregistrer un encaissement ?",
@@ -211,8 +211,8 @@ export const faqSections: FAQSection[] = [
   },
   {
     id: "ai-assistant",
-    title: "🤖 Assistant IA",
-    icon: null,
+    title: "Assistant IA",
+    icon: <Bot className="h-5 w-5" />,
     items: [
       {
         question: "Comment fonctionne l'assistant IA ?",
