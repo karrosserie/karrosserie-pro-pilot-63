@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { SimpleTable } from '@/components/ui/simple-table';
@@ -5,6 +6,7 @@ import { Banknote, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { useToast } from '@/hooks/use-toast';
 
 interface ClientReceiptsTabProps {
   clientId: string;
@@ -12,6 +14,7 @@ interface ClientReceiptsTabProps {
 
 const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
   const { receipts, isLoading, deleteReceipt } = useReceiptsData();
+  const { toast } = useToast();
 
   if (isLoading) {
     return (
@@ -30,13 +33,19 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
   }) || [];
 
   const handleView = (receipt: any) => {
-    // TODO: Ouvrir le dialogue de visualisation de l'encaissement
-    console.log('View receipt:', receipt);
+    console.log('Viewing receipt:', receipt);
+    toast({
+      title: "Fonctionnalité à implémenter",
+      description: `Affichage de l'encaissement ${receipt.reference || 'sans référence'}`,
+    });
   };
 
   const handleEdit = (receipt: any) => {
-    // TODO: Ouvrir le dialogue d'édition de l'encaissement
-    console.log('Edit receipt:', receipt);
+    console.log('Editing receipt:', receipt);
+    toast({
+      title: "Fonctionnalité à implémenter",
+      description: `Édition de l'encaissement ${receipt.reference || 'sans référence'}`,
+    });
   };
 
   const handleDelete = (receipt: any) => {
@@ -118,7 +127,10 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleView(receipt)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleView(receipt);
+              }}
               title="Voir les détails"
             >
               <Eye className="h-4 w-4" />
@@ -126,7 +138,10 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleEdit(receipt)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEdit(receipt);
+              }}
               title="Modifier"
             >
               <Pencil className="h-4 w-4" />
@@ -135,7 +150,10 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
               variant="ghost"
               size="icon"
               className="text-red-500 hover:text-red-700"
-              onClick={() => handleDelete(receipt)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(receipt);
+              }}
               title="Supprimer"
             >
               <Trash className="h-4 w-4" />

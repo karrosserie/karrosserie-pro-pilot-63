@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Car, User, Eye, Pencil, Trash, MoreVertical, FileText, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -82,7 +83,8 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
                                   registrationDocumentBackUrl && 
                                   registrationDocumentBackUrl.trim() !== '';
 
-  const handleCreateQuote = () => {
+  const handleCreateQuote = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (onCreateQuote) {
       onCreateQuote();
     } else {
@@ -90,11 +92,33 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
     }
   };
 
-  const handleCreateInvoice = () => {
+  const handleCreateInvoice = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (onCreateInvoice) {
       onCreateInvoice();
     } else {
       console.log('Create invoice for vehicle:', licensePlate);
+    }
+  };
+
+  const handleView = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onView) {
+      onView();
+    }
+  };
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onEdit) {
+      onEdit();
+    }
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onDelete) {
+      onDelete();
     }
   };
 
@@ -143,12 +167,12 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
       <div className="border-t border-gray-100 mt-4 pt-4 flex justify-center">
         <div className="flex items-center space-x-1">
           {onView && (
-            <Button variant="ghost" size="icon" onClick={onView}>
+            <Button variant="ghost" size="icon" onClick={handleView}>
               <Eye className="h-4 w-4" />
             </Button>
           )}
           {onEdit && (
-            <Button variant="ghost" size="icon" onClick={onEdit}>
+            <Button variant="ghost" size="icon" onClick={handleEdit}>
               <Pencil className="h-4 w-4" />
             </Button>
           )}
@@ -157,8 +181,8 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
               variant="ghost" 
               size="icon"
               className="text-red-500 hover:text-red-700" 
-              onClick={onDelete}
-              >
+              onClick={handleDelete}
+            >
               <Trash className="h-4 w-4" />
             </Button>
           )}

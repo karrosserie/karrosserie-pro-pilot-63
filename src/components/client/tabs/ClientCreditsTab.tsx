@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useCredits } from '@/hooks/use-credits';
 import { useInvoices } from '@/hooks/use-invoices';
@@ -5,6 +6,7 @@ import { SimpleTable } from '@/components/ui/simple-table';
 import { CreditCard, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 interface ClientCreditsTabProps {
   clientId: string;
@@ -13,6 +15,7 @@ interface ClientCreditsTabProps {
 const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   const { credits, isLoading, deleteCredit } = useCredits();
   const { invoices } = useInvoices();
+  const { toast } = useToast();
 
   if (isLoading) {
     return (
@@ -37,13 +40,19 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   }) || [];
 
   const handleView = (credit: any) => {
-    // TODO: Ouvrir le dialogue de visualisation de l'avoir
-    console.log('View credit:', credit);
+    console.log('Viewing credit:', credit);
+    toast({
+      title: "Fonctionnalité à implémenter",
+      description: `Affichage de l'avoir ${credit.reference}`,
+    });
   };
 
   const handleEdit = (credit: any) => {
-    // TODO: Ouvrir le dialogue d'édition de l'avoir
-    console.log('Edit credit:', credit);
+    console.log('Editing credit:', credit);
+    toast({
+      title: "Fonctionnalité à implémenter",
+      description: `Édition de l'avoir ${credit.reference}`,
+    });
   };
 
   const handleDelete = (credit: any) => {
@@ -133,7 +142,10 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleView(credit)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleView(credit);
+              }}
               title="Voir les détails"
             >
               <Eye className="h-4 w-4" />
@@ -141,7 +153,10 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleEdit(credit)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEdit(credit);
+              }}
               title="Modifier"
             >
               <Pencil className="h-4 w-4" />
@@ -150,7 +165,10 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
               variant="ghost"
               size="icon"
               className="text-red-500 hover:text-red-700"
-              onClick={() => handleDelete(credit)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(credit);
+              }}
               title="Supprimer"
             >
               <Trash className="h-4 w-4" />

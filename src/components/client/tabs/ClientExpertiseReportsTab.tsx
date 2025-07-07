@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { SimpleTable } from '@/components/ui/simple-table';
@@ -5,6 +6,7 @@ import { FileText, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 interface ClientExpertiseReportsTabProps {
   clientId: string;
@@ -12,6 +14,7 @@ interface ClientExpertiseReportsTabProps {
 
 const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ clientId }) => {
   const { reports, isLoading, deleteReport } = useExpertiseReports();
+  const { toast } = useToast();
 
   if (isLoading) {
     return (
@@ -24,13 +27,19 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
   const clientReports = reports?.filter(report => report.client_id === clientId) || [];
 
   const handleView = (report: any) => {
-    // TODO: Ouvrir le dialogue de visualisation du rapport
-    console.log('View report:', report);
+    console.log('Viewing report:', report);
+    toast({
+      title: "Fonctionnalité à implémenter",
+      description: `Affichage du rapport ${report.reference || report.report_number}`,
+    });
   };
 
   const handleEdit = (report: any) => {
-    // TODO: Ouvrir le dialogue d'édition du rapport
-    console.log('Edit report:', report);
+    console.log('Editing report:', report);
+    toast({
+      title: "Fonctionnalité à implémenter",
+      description: `Édition du rapport ${report.reference || report.report_number}`,
+    });
   };
 
   const handleDelete = (report: any) => {
@@ -109,7 +118,10 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleView(report)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleView(report);
+              }}
               title="Voir les détails"
             >
               <Eye className="h-4 w-4" />
@@ -117,7 +129,10 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleEdit(report)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEdit(report);
+              }}
               title="Modifier"
             >
               <Pencil className="h-4 w-4" />
@@ -126,7 +141,10 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
               variant="ghost"
               size="icon"
               className="text-red-500 hover:text-red-700"
-              onClick={() => handleDelete(report)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(report);
+              }}
               title="Supprimer"
             >
               <Trash className="h-4 w-4" />

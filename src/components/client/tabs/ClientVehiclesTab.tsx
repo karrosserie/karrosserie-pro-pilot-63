@@ -3,6 +3,7 @@ import React from 'react';
 import { useVehicles } from '@/hooks/use-vehicles';
 import VehicleCardAdapter from '@/components/vehicle/VehicleCardAdapter';
 import { Car } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface ClientVehiclesTabProps {
   clientId: string;
@@ -10,6 +11,7 @@ interface ClientVehiclesTabProps {
 
 const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
   const { vehicles, isLoading, deleteVehicle } = useVehicles();
+  const { toast } = useToast();
 
   if (isLoading) {
     return (
@@ -32,19 +34,41 @@ const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
   }
 
   const handleViewVehicle = (vehicle: any) => {
-    // TODO: Implémenter la vue du véhicule
-    console.log('View vehicle:', vehicle);
+    console.log('Viewing vehicle:', vehicle);
+    toast({
+      title: "Fonctionnalité à implémenter",
+      description: `Affichage du véhicule ${vehicle.license_plate}`,
+    });
   };
 
   const handleEditVehicle = (vehicle: any) => {
-    // TODO: Implémenter l'édition du véhicule
-    console.log('Edit vehicle:', vehicle);
+    console.log('Editing vehicle:', vehicle);
+    toast({
+      title: "Fonctionnalité à implémenter",
+      description: `Édition du véhicule ${vehicle.license_plate}`,
+    });
   };
 
   const handleDeleteVehicle = (vehicle: any) => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer le véhicule ${vehicle.license_plate} ?`)) {
       deleteVehicle.mutate(vehicle.id);
     }
+  };
+
+  const handleCreateQuote = (vehicle: any) => {
+    console.log('Creating quote for vehicle:', vehicle);
+    toast({
+      title: "Fonctionnalité à implémenter",
+      description: `Création d'un devis pour le véhicule ${vehicle.license_plate}`,
+    });
+  };
+
+  const handleCreateInvoice = (vehicle: any) => {
+    console.log('Creating invoice for vehicle:', vehicle);
+    toast({
+      title: "Fonctionnalité à implémenter",
+      description: `Création d'une facture pour le véhicule ${vehicle.license_plate}`,
+    });
   };
 
   return (
@@ -56,6 +80,8 @@ const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
           onView={() => handleViewVehicle(vehicle)}
           onEdit={() => handleEditVehicle(vehicle)}
           onDelete={() => handleDeleteVehicle(vehicle)}
+          onCreateQuote={() => handleCreateQuote(vehicle)}
+          onCreateInvoice={() => handleCreateInvoice(vehicle)}
         />
       ))}
     </div>
