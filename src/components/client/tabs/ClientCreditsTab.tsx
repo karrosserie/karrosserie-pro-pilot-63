@@ -1,11 +1,20 @@
+
 import React, { useState } from 'react';
 import { useCredits } from '@/hooks/use-credits';
 import { useInvoices } from '@/hooks/use-invoices';
 import { SimpleTable } from '@/components/ui/simple-table';
-import { CreditCard, Eye, Pencil, Trash } from 'lucide-react';
+import { CreditCard, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Download, Printer, Mail } from 'lucide-react';
+import { EditCreditDialog } from '@/components/credits/EditCreditDialog';
 
 interface ClientCreditsTabProps {
   clientId: string;
@@ -15,6 +24,8 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   const { credits, isLoading, deleteCredit } = useCredits();
   const { invoices } = useInvoices();
   const { toast } = useToast();
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedCredit, setSelectedCredit] = useState<any>(null);
 
   if (isLoading) {
     return (
@@ -38,6 +49,79 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
     return false;
   }) || [];
 
+  const formatVehicleDisplay = (credit: any) => {
+    // First, try to get vehicle data from the credit itself
+    if (credit.vehicles) {
+      let brand = '';
+      let model = '';
+      
+      if (credit.vehicles.car_brands?.name) {
+        brand = credit.vehicles.car_brands.name;
+      } else if (credit.vehicles.brand) {
+        brand = credit.vehicles.brand;
+      }
+      
+      if (credit.vehicles.car_models?.name) {
+        model = credit.vehicles.car_models.name;
+      } else if (credit.vehicles.model) {
+        model = credit.vehicles.model;
+      }
+      
+      const licensePlate = credit.vehicles.license_plate || '';
+      
+      if (brand || model || licensePlate) {
+        return `${brand} ${model}${licensePlate ? ` - ${licensePlate}` : ''}`.trim() || '-';
+      }
+    }
+    
+    // If no vehicle data in credit, try to get it from the linked invoice
+    if (credit.invoice_id && invoices) {
+      const linkedInvoice = invoices.find(invoice => invoice.id === credit.invoice_id);
+      
+      if (linkedInvoice?.vehicles) {
+        let brand = '';
+        let model = '';
+        
+        if (linkedInvoice.vehicles.car_brands?.name) {
+          brand = linkedInvoice.vehicles.car_brands.name;
+        }
+        
+        if (linkedInvoice.vehicles.car_models?.name) {
+          model = linkedInvoice.vehicles.car_models.name;
+        }
+        
+        const licensePlate = linkedInvoice.vehicles.license_plate || '';
+        
+        if (brand || model || licensePlate) {
+          return `${brand} ${model}${licensePlate ? ` - ${licensePlate}` : ''}`.trim() || '-';
+        }
+      }
+    }
+    
+    return '-';
+  };
+
+  const getInvoiceDisplay = (invoiceId: string | null) => {
+    if (!invoiceId || !invoices) {
+      return 'Sans facture';
+    }
+    
+    const invoice = invoices.find(inv => inv.id === invoiceId);
+    if (!invoice) {
+      return 'Facture introuvable';
+    }
+    
+    const clientName = invoice.clients 
+      ? `${invoice.clients.first_name} ${invoice.clients.last_name}` 
+      : 'Client non assigné';
+    
+    const amount = typeof invoice.amount === 'number' 
+      ? invoice.amount.toFixed(2).replace('.', ',')
+      : '0,00';
+    
+    return `Facture n°${invoice.reference} - ${clientName} - ${amount} €`;
+  };
+
   const handleView = (credit: any) => {
     toast({
       title: "Fonctionnalité à implémenter",
@@ -46,16 +130,52 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   };
 
   const handleEdit = (credit: any) => {
+    // Parse items_data if it exists
+    let items = [];
+    if (credit.items_data) {
+      try {
+        items = JSON.parse(credit.items_data);
+      } catch (error) {
+        console.error('Error parsing items_data:', error);
+      }
+    }
+
+    setSelectedCredit({
+      ...credit,
+      items
+    });
+    setEditDialogOpen(true);
+  };
+
+  const handleDelete = async (credit: any) => {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'avoir ${credit.reference} ?`)) {
+      try {
+        await deleteCredit.mutateAsync(credit.id);
+      } catch (error) {
+        console.error('Error deleting credit:', error);
+      }
+    }
+  };
+
+  const handleDownload = (credit: any) => {
     toast({
-      title: "Fonctionnalité à implémenter",
-      description: `Édition de l'avoir ${credit.reference}`,
+      title: "Téléchargement",
+      description: `Téléchargement de l'avoir ${credit.reference}...`
     });
   };
 
-  const handleDelete = (credit: any) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'avoir ${credit.reference} ?`)) {
-      deleteCredit.mutate(credit.id);
-    }
+  const handlePrint = (credit: any) => {
+    toast({
+      title: "Impression",
+      description: `Impression de l'avoir ${credit.reference}...`
+    });
+  };
+
+  const handleSendEmail = (credit: any) => {
+    toast({
+      title: "Envoi par e-mail",
+      description: `Envoi de l'avoir ${credit.reference} par e-mail...`
+    });
   };
 
   const formatAmount = (amount: number | null | undefined): string => {
@@ -77,10 +197,10 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Émis':
-        return 'bg-blue-100 text-blue-800';
-      case 'Utilisé':
+      case 'Payé':
         return 'bg-green-100 text-green-800';
+      case 'En attente':
+        return 'bg-amber-100 text-amber-800';
       case 'Annulé':
         return 'bg-red-100 text-red-800';
       default:
@@ -88,6 +208,7 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
     }
   };
 
+  // Updated columns to match the Credits page
   const columns: ColumnDef<any>[] = [
     {
       accessorKey: "reference",
@@ -102,11 +223,19 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
       cell: ({ row }) => formatDate(row.getValue("created_at") as string)
     },
     {
-      accessorKey: "invoices",
-      header: "Facture liée",
+      accessorKey: "vehicles",
+      header: "Véhicule",
       cell: ({ row }) => {
-        const invoice = row.getValue("invoices") as any;
-        return invoice ? invoice.reference : "-";
+        const credit = row.original;
+        return formatVehicleDisplay(credit);
+      }
+    },
+    {
+      accessorKey: "invoice_id",
+      header: "Facture d'origine",
+      cell: ({ row }) => {
+        const credit = row.original;
+        return getInvoiceDisplay(credit.invoice_id);
       }
     },
     {
@@ -123,8 +252,8 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
       cell: ({ row }) => {
         const status = row.getValue("status") as string;
         return (
-          <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(status || 'Émis')}`}>
-            {status || 'Émis'}
+          <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(status || 'En attente')}`}>
+            {status || 'En attente'}
           </span>
         );
       }
@@ -167,9 +296,31 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
                 handleDelete(credit);
               }}
               title="Supprimer"
+              disabled={deleteCredit.isPending}
             >
               <Trash className="h-4 w-4" />
             </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56">
+                <DropdownMenuItem onClick={() => handleDownload(credit)}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Télécharger
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handlePrint(credit)}>
+                  <Printer className="mr-2 h-4 w-4" />
+                  Imprimer
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSendEmail(credit)}>
+                  <Mail className="mr-2 h-4 w-4" />
+                  Envoyer par e-mail
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         );
       }
@@ -187,10 +338,29 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   }
 
   return (
-    <SimpleTable
-      columns={columns}
-      data={clientCredits}
-    />
+    <>
+      <SimpleTable
+        columns={columns}
+        data={clientCredits}
+      />
+
+      {selectedCredit && (
+        <EditCreditDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          creditId={selectedCredit.id}
+          initialData={{
+            reference: selectedCredit.reference,
+            client_id: selectedCredit.client_id,
+            vehicle_id: selectedCredit.vehicle_id,
+            invoice_id: selectedCredit.invoice_id,
+            status: selectedCredit.status,
+            notes: selectedCredit.notes,
+            items: selectedCredit.items
+          }}
+        />
+      )}
+    </>
   );
 };
 
