@@ -1,19 +1,20 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { SimpleTable } from '@/components/ui/simple-table';
 import { Wrench, Eye, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
 import { RepairOrderActionsDropdown } from '@/components/repair-orders/RepairOrderActionsDropdown';
 import { calculateOrderAmount } from '@/components/repair-orders/utils/orderCalculations';
+import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
+import RepairOrderEmailDialog from '@/components/repair-orders/RepairOrderEmailDialog';
+import RepairOrderSignatureDialog from '@/components/repair-orders/RepairOrderSignatureDialog';
+import InvoiceDialog from '@/components/invoices/InvoiceDialog';
+import { RepairOrder } from '@/services/supabase/repair-orders';
+import { Invoice } from '@/services/supabase/invoices';
+import { useToast } from '@/hooks/use-toast';
 
 interface ClientRepairOrdersTabProps {
   clientId: string;
@@ -21,6 +22,15 @@ interface ClientRepairOrdersTabProps {
 
 const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId }) => {
   const { orders, isLoading, deleteOrder } = useRepairOrders();
+  const { toast } = useToast();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [signatureDialogOpen, setSignatureDialogOpen] = useState(false);
+  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<RepairOrder | null>(null);
+  const [selectedOrderForEmail, setSelectedOrderForEmail] = useState<RepairOrder | null>(null);
+  const [selectedOrderForSignature, setSelectedOrderForSignature] = useState<RepairOrder | null>(null);
+  const [prefilledInvoice, setPrefilledInvoice] = useState<Partial<Invoice> | null>(null);
 
   if (isLoading) {
     return (
@@ -32,27 +42,88 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
 
   const clientOrders = orders?.filter(order => order.client_id === clientId) || [];
 
-  const handleView = (order: any) => {
-    console.log('View repair order:', order);
+  const handleViewOrder = (order: RepairOrder) => {
+    setSelectedOrder(order);
+    setDialogOpen(true);
   };
 
-  const handleEdit = (order: any) => {
-    console.log('Edit repair order:', order);
+  const handleEditOrder = (order: RepairOrder) => {
+    setSelectedOrder(order);
+    setDialogOpen(true);
   };
 
-  const handleDelete = (order: any) => {
+  const handleDeleteOrder = async (order: RepairOrder) => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'ordre de réparation ${order.reference} ?`)) {
-      deleteOrder.mutate(order.id);
+      try {
+        await deleteOrder.mutateAsync(order.id);
+        toast({
+          title: "Ordre supprimé",
+          description: "L'ordre de réparation a été supprimé avec succès."
+        });
+      } catch (error: any) {
+        toast({
+          title: "Erreur",
+          description: `Impossible de supprimer l'ordre de réparation: ${error.message}`,
+          variant: "destructive"
+        });
+      }
     }
   };
 
+  const handleDownload = (order: RepairOrder) => {
+    toast({
+      title: "Téléchargement",
+      description: `Téléchargement de l'ordre de réparation ${order.reference}...`
+    });
+  };
+
+  const handlePrint = (order: RepairOrder) => {
+    toast({
+      title: "Impression",
+      description: `Impression de l'ordre de réparation ${order.reference}...`
+    });
+  };
+
+  const handleSendEmail = (order: RepairOrder) => {
+    setSelectedOrderForEmail(order);
+    setEmailDialogOpen(true);
+  };
+
+  const handleSignOrder = (order: RepairOrder) => {
+    setSelectedOrderForSignature(order);
+    setSignatureDialogOpen(true);
+  };
+
+  const handleRequestDocuments = (order: RepairOrder) => {
+    toast({
+      title: "Demande de justificatifs",
+      description: `Demande de justificatifs envoyée pour l'ordre de réparation ${order.reference}`
+    });
+  };
+
+  const handleConvertToInvoice = (order: RepairOrder) => {
+    const today = new Date().toISOString().split('T')[0];
+    
+    const prefilledData: Partial<Invoice> = {
+      client_id: order.client_id,
+      vehicle_id: order.vehicle_id,
+      repair_order_id: order.id,
+      status: 'En attente de paiement',
+      due_date: today,
+      notes: order.notes || '',
+    };
+
+    setPrefilledInvoice(prefilledData);
+    setInvoiceDialogOpen(true);
+  };
+
   const contextMenuProps = {
-    onDownload: (order: any) => console.log('Download order:', order),
-    onPrint: (order: any) => console.log('Print order:', order),
-    onSendEmail: (order: any) => console.log('Send email order:', order),
-    onSignOrder: (order: any) => console.log('Sign order:', order),
-    onRequestDocuments: (order: any) => console.log('Request documents:', order),
-    onConvertToInvoice: (order: any) => console.log('Convert to invoice:', order)
+    onDownload: handleDownload,
+    onPrint: handlePrint,
+    onSendEmail: handleSendEmail,
+    onSignOrder: handleSignOrder,
+    onRequestDocuments: handleRequestDocuments,
+    onConvertToInvoice: handleConvertToInvoice
   };
 
   const formatAmount = (amount: number | null | undefined): string => {
@@ -129,14 +200,22 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleView(order)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleViewOrder(order);
+              }}
+              title="Voir les détails"
             >
               <Eye className="h-4 w-4" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleEdit(order)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEditOrder(order);
+              }}
+              title="Modifier"
             >
               <Pencil className="h-4 w-4" />
             </Button>
@@ -144,7 +223,11 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
               variant="ghost"
               size="icon"
               className="text-red-500 hover:text-red-700"
-              onClick={() => handleDelete(order)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteOrder(order);
+              }}
+              title="Supprimer"
             >
               <Trash className="h-4 w-4" />
             </Button>
@@ -166,36 +249,41 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
   }
 
   return (
-    <ContextMenu>
-      <ContextMenuTrigger asChild>
-        <div>
-          <SimpleTable
-            columns={columns}
-            data={clientOrders}
-          />
-        </div>
-      </ContextMenuTrigger>
-      <ContextMenuContent>
-        <ContextMenuItem onClick={() => contextMenuProps.onDownload(clientOrders[0])}>
-          Télécharger
-        </ContextMenuItem>
-        <ContextMenuItem onClick={() => contextMenuProps.onPrint(clientOrders[0])}>
-          Imprimer
-        </ContextMenuItem>
-        <ContextMenuItem onClick={() => contextMenuProps.onSendEmail(clientOrders[0])}>
-          Envoyer par e-mail
-        </ContextMenuItem>
-        <ContextMenuItem onClick={() => contextMenuProps.onSignOrder(clientOrders[0])}>
-          Signature du client
-        </ContextMenuItem>
-        <ContextMenuItem onClick={() => contextMenuProps.onRequestDocuments(clientOrders[0])}>
-          Demander les justificatifs
-        </ContextMenuItem>
-        <ContextMenuItem onClick={() => contextMenuProps.onConvertToInvoice(clientOrders[0])}>
-          Convertir en facture
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
+    <>
+      <SimpleTable
+        columns={columns}
+        data={clientOrders}
+      />
+
+      <RepairOrderDialog
+        order={selectedOrder}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
+
+      <RepairOrderEmailDialog
+        repairOrder={selectedOrderForEmail}
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+      />
+
+      <RepairOrderSignatureDialog
+        repairOrder={selectedOrderForSignature}
+        open={signatureDialogOpen}
+        onOpenChange={setSignatureDialogOpen}
+      />
+
+      <InvoiceDialog
+        open={invoiceDialogOpen}
+        onOpenChange={(open) => {
+          setInvoiceDialogOpen(open);
+          if (!open) {
+            setPrefilledInvoice(null);
+          }
+        }}
+        invoice={prefilledInvoice as Invoice}
+      />
+    </>
   );
 };
 
