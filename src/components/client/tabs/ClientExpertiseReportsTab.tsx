@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { SimpleTable } from '@/components/ui/simple-table';
@@ -31,19 +32,31 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
 
   const clientReports = reports?.filter(report => report.client_id === clientId) || [];
 
-  const handleView = (report: any) => {
+  const handleViewReport = (report: ExpertiseReport) => {
     setSelectedReport(report);
     setViewDialogOpen(true);
   };
 
-  const handleEdit = (report: any) => {
+  const handleEditReport = (report: ExpertiseReport) => {
     setSelectedReport(report);
     setEditDialogOpen(true);
   };
 
-  const handleDelete = (report: any) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer ce rapport d'expertise ?`)) {
-      deleteReport.mutate(report.id);
+  const handleDeleteReport = async (id: string) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce rapport d\'expertise ?')) {
+      try {
+        await deleteReport.mutateAsync(id);
+        toast({
+          title: "Rapport supprimé",
+          description: "Le rapport d'expertise a été supprimé avec succès."
+        });
+      } catch (error: any) {
+        toast({
+          title: "Erreur",
+          description: `Impossible de supprimer le rapport d'expertise: ${error.message}`,
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -119,7 +132,7 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
               size="icon"
               onClick={(e) => {
                 e.stopPropagation();
-                handleView(report);
+                handleViewReport(report);
               }}
               title="Voir les détails"
             >
@@ -130,7 +143,7 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
               size="icon"
               onClick={(e) => {
                 e.stopPropagation();
-                handleEdit(report);
+                handleEditReport(report);
               }}
               title="Modifier"
             >
@@ -142,7 +155,7 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
               className="text-red-500 hover:text-red-700"
               onClick={(e) => {
                 e.stopPropagation();
-                handleDelete(report);
+                handleDeleteReport(report.id);
               }}
               title="Supprimer"
             >
