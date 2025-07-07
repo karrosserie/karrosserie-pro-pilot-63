@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Accordion, 
@@ -17,9 +18,7 @@ import {
   Receipt, 
   Bot,
   Settings,
-  Search,
-  Phone,
-  Mail
+  Search
 } from 'lucide-react';
 
 const Help = () => {
@@ -240,12 +239,6 @@ const Help = () => {
     }
   ];
 
-  const supportInfo = {
-    email: "support@karrosseriepro.fr",
-    phone: "01 23 45 67 89",
-    hours: "Lundi au vendredi, 9h-18h"
-  };
-
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="mb-8">
@@ -270,7 +263,7 @@ const Help = () => {
       </div>
 
       {/* FAQ Sections */}
-      <div className="space-y-6 mb-12">
+      <div className="space-y-6">
         {faqSections.map((section) => (
           <Card key={section.id} className="shadow-sm">
             <CardHeader>
@@ -299,43 +292,6 @@ const Help = () => {
           </Card>
         ))}
       </div>
-
-      {/* Support Contact */}
-      <Card className="bg-blue-50 border-blue-200">
-        <CardHeader>
-          <CardTitle className="text-xl text-blue-900">
-            Besoin d'aide supplémentaire ?
-          </CardTitle>
-          <CardDescription className="text-blue-700">
-            Notre équipe support est là pour vous aider
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="flex items-center gap-3">
-              <Mail className="h-5 w-5 text-blue-600" />
-              <div>
-                <p className="font-medium text-blue-900">Email</p>
-                <p className="text-blue-700">{supportInfo.email}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Phone className="h-5 w-5 text-blue-600" />
-              <div>
-                <p className="font-medium text-blue-900">Téléphone</p>
-                <p className="text-blue-700">{supportInfo.phone}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Clock className="h-5 w-5 text-blue-600" />
-              <div>
-                <p className="font-medium text-blue-900">Horaires</p>
-                <p className="text-blue-700">{supportInfo.hours}</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };
