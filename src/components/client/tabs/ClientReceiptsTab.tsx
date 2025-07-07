@@ -1,11 +1,21 @@
+
 import React, { useState } from 'react';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { SimpleTable } from '@/components/ui/simple-table';
-import { Banknote, Eye, Pencil, Trash } from 'lucide-react';
+import { Banknote, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { useToast } from '@/hooks/use-toast';
+import { useInvoices } from '@/hooks/use-invoices';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Download, Printer, Mail } from 'lucide-react';
+import { ReceiptDialog } from '@/components/receipts/ReceiptDialog';
 
 interface ClientReceiptsTabProps {
   clientId: string;
@@ -13,7 +23,11 @@ interface ClientReceiptsTabProps {
 
 const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
   const { receipts, isLoading, deleteReceipt } = useReceiptsData();
+  const { invoices } = useInvoices();
   const { toast } = useToast();
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [selectedReceipt, setSelectedReceipt] = useState<any>(null);
 
   if (isLoading) {
     return (
@@ -31,24 +45,62 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
     return false;
   }) || [];
 
+  const getInvoiceDisplay = (invoiceId: string | null) => {
+    if (!invoiceId || !invoices) {
+      return 'Sans facture';
+    }
+    
+    const invoice = invoices.find(inv => inv.id === invoiceId);
+    if (!invoice) {
+      return 'Facture introuvable';
+    }
+    
+    const clientName = invoice.clients 
+      ? `${invoice.clients.first_name} ${invoice.clients.last_name}` 
+      : 'Client non assigné';
+    
+    const amount = typeof invoice.amount === 'number' 
+      ? invoice.amount.toFixed(2).replace('.', ',')
+      : '0,00';
+    
+    return `Facture n°${invoice.reference} - ${clientName} - ${amount} €`;
+  };
+
   const handleView = (receipt: any) => {
-    toast({
-      title: "Fonctionnalité à implémenter",
-      description: `Affichage de l'encaissement ${receipt.reference || 'sans référence'}`,
-    });
+    setSelectedReceipt(receipt);
+    setViewDialogOpen(true);
   };
 
   const handleEdit = (receipt: any) => {
-    toast({
-      title: "Fonctionnalité à implémenter",
-      description: `Édition de l'encaissement ${receipt.reference || 'sans référence'}`,
-    });
+    setSelectedReceipt(receipt);
+    setEditDialogOpen(true);
   };
 
   const handleDelete = (receipt: any) => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'encaissement ?`)) {
       deleteReceipt.mutate(receipt.id);
     }
+  };
+
+  const handleDownload = (receipt: any) => {
+    toast({
+      title: "Téléchargement",
+      description: `Téléchargement de l'encaissement...`
+    });
+  };
+
+  const handlePrint = (receipt: any) => {
+    toast({
+      title: "Impression",
+      description: `Impression de l'encaissement...`
+    });
+  };
+
+  const handleSendEmail = (receipt: any) => {
+    toast({
+      title: "Envoi par e-mail",
+      description: `Envoi de l'encaissement par e-mail...`
+    });
   };
 
   const formatAmount = (amount: number | null | undefined): string => {
@@ -68,6 +120,19 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Encaissé':
+        return 'bg-green-100 text-green-800';
+      case 'En attente':
+        return 'bg-amber-100 text-amber-800';
+      case 'Annulé':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   const columns: ColumnDef<any>[] = [
     {
       accessorKey: "date",
@@ -75,11 +140,11 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
       cell: ({ row }) => formatDate(row.getValue("date") as string)
     },
     {
-      accessorKey: "invoices",
+      accessorKey: "invoice_id",
       header: "Facture",
       cell: ({ row }) => {
-        const invoice = row.getValue("invoices") as any;
-        return invoice?.reference || "-";
+        const receipt = row.original;
+        return getInvoiceDisplay(receipt.invoice_id);
       }
     },
     {
@@ -111,7 +176,11 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
       header: "Statut",
       cell: ({ row }) => {
         const status = row.getValue("status") as string;
-        return <StatusBadge status={status || 'En attente'} />;
+        return (
+          <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(status || 'En attente')}`}>
+            {status || 'En attente'}
+          </span>
+        );
       }
     },
     {
@@ -155,6 +224,27 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
             >
               <Trash className="h-4 w-4" />
             </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56">
+                <DropdownMenuItem onClick={() => handleDownload(receipt)}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Télécharger
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handlePrint(receipt)}>
+                  <Printer className="mr-2 h-4 w-4" />
+                  Imprimer
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSendEmail(receipt)}>
+                  <Mail className="mr-2 h-4 w-4" />
+                  Envoyer par e-mail
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         );
       }
@@ -172,10 +262,29 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
   }
 
   return (
-    <SimpleTable
-      columns={columns}
-      data={clientReceipts}
-    />
+    <>
+      <SimpleTable
+        columns={columns}
+        data={clientReceipts}
+      />
+
+      {selectedReceipt && (
+        <>
+          <ReceiptDialog
+            open={editDialogOpen}
+            onOpenChange={setEditDialogOpen}
+            receipt={selectedReceipt}
+          />
+
+          <ReceiptDialog
+            open={viewDialogOpen}
+            onOpenChange={setViewDialogOpen}
+            receipt={selectedReceipt}
+            readOnly={true}
+          />
+        </>
+      )}
+    </>
   );
 };
 
