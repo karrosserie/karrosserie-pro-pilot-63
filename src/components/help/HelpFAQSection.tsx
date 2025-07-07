@@ -19,7 +19,6 @@ const HelpFAQSectionComponent = ({ section }: HelpFAQSectionProps) => {
     <Card className="shadow-sm">
       <CardHeader>
         <CardTitle className="flex items-center gap-3 text-xl">
-          {section.icon}
           {section.title}
           <Badge variant="secondary" className="ml-auto">
             {section.items.length} questions
