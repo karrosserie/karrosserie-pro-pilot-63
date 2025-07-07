@@ -1,18 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuotes } from '@/hooks/use-quotes';
 import { SimpleTable } from '@/components/ui/simple-table';
 import { FileText, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +14,12 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Download, Printer, Mail, FileCheck, ArrowRight } from 'lucide-react';
+import QuoteDialog from '@/components/quotes/QuoteDialog';
+import QuoteEmailDialog from '@/components/quotes/QuoteEmailDialog';
+import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
+import { Quote } from '@/services/supabase/quotes';
+import { RepairOrder } from '@/services/supabase/repair-orders';
+import { useToast } from '@/hooks/use-toast';
 
 interface ClientQuotesTabProps {
   clientId: string;
@@ -28,6 +27,13 @@ interface ClientQuotesTabProps {
 
 const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
   const { quotes, isLoading, deleteQuote } = useQuotes();
+  const { toast } = useToast();
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [repairOrderDialogOpen, setRepairOrderDialogOpen] = useState(false);
+  const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
+  const [selectedQuoteForEmail, setSelectedQuoteForEmail] = useState<Quote | null>(null);
+  const [prefilledRepairOrder, setPrefilledRepairOrder] = useState<Partial<RepairOrder> | null>(null);
 
   if (isLoading) {
     return (
@@ -40,44 +46,64 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
   const clientQuotes = quotes?.filter(quote => quote.client_id === clientId) || [];
 
   const handleView = (quote: any) => {
-    console.log('View quote:', quote);
+    setSelectedQuote(quote);
+    setEditDialogOpen(true);
   };
 
   const handleEdit = (quote: any) => {
-    console.log('Edit quote:', quote);
+    setSelectedQuote(quote);
+    setEditDialogOpen(true);
   };
 
-  const handleDelete = (quote: any) => {
+  const handleDelete = async (quote: any) => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer le devis ${quote.reference} ?`)) {
-      deleteQuote.mutate(quote.id);
+      try {
+        await deleteQuote.mutateAsync(quote.id);
+      } catch (error: any) {
+        console.error('Error deleting quote:', error);
+      }
     }
   };
 
-  const handleDownload = (quote: any) => {
-    console.log('Download quote:', quote);
+  const handleDownload = (quote: Quote) => {
+    toast({
+      title: "Téléchargement",
+      description: `Téléchargement du devis ${quote.reference}...`
+    });
   };
 
-  const handlePrint = (quote: any) => {
-    console.log('Print quote:', quote);
+  const handlePrint = (quote: Quote) => {
+    toast({
+      title: "Impression",
+      description: `Impression du devis ${quote.reference}...`
+    });
   };
 
-  const handleSendEmail = (quote: any) => {
-    console.log('Send email quote:', quote);
+  const handleSendEmail = (quote: Quote) => {
+    setSelectedQuoteForEmail(quote);
+    setEmailDialogOpen(true);
   };
 
-  const handleRequestDocuments = (quote: any) => {
-    console.log('Request documents:', quote);
+  const handleRequestDocuments = (quote: Quote) => {
+    toast({
+      title: "Demande de justificatifs",
+      description: `Demande de justificatifs envoyée pour le devis ${quote.reference}`
+    });
   };
 
-  const handleConvertToRepairOrder = (quote: any) => {
-    console.log('Convert to repair order:', quote);
-  };
+  const handleConvertToRepairOrder = (quote: Quote) => {
+    const today = new Date().toISOString().split('T')[0];
+    
+    const prefilledData: Partial<RepairOrder> = {
+      client_id: quote.client_id,
+      vehicle_id: quote.vehicle_id,
+      status: 'En cours',
+      start_date: today,
+      notes: quote.notes || '',
+    };
 
-  const contextMenuProps = {
-    onDownload: (quote: any) => console.log('Download quote:', quote),
-    onPrint: (quote: any) => console.log('Print quote:', quote),
-    onSendEmail: (quote: any) => console.log('Send email quote:', quote),
-    onConvertToRepairOrder: (quote: any) => console.log('Convert to repair order:', quote)
+    setPrefilledRepairOrder(prefilledData);
+    setRepairOrderDialogOpen(true);
   };
 
   const formatAmount = (amount: number | null | undefined): string => {
@@ -144,14 +170,22 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleView(quote)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleView(quote);
+              }}
+              title="Voir les détails"
             >
               <Eye className="h-4 w-4" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleEdit(quote)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEdit(quote);
+              }}
+              title="Modifier"
             >
               <Pencil className="h-4 w-4" />
             </Button>
@@ -159,7 +193,11 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
               variant="ghost"
               size="icon"
               className="text-red-500 hover:text-red-700"
-              onClick={() => handleDelete(quote)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(quote);
+              }}
+              title="Supprimer"
             >
               <Trash className="h-4 w-4" />
             </Button>
@@ -210,30 +248,35 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
   }
 
   return (
-    <ContextMenu>
-      <ContextMenuTrigger asChild>
-        <div>
-          <SimpleTable
-            columns={columns}
-            data={clientQuotes}
-          />
-        </div>
-      </ContextMenuTrigger>
-      <ContextMenuContent>
-        <ContextMenuItem onClick={() => contextMenuProps.onDownload(clientQuotes[0])}>
-          Télécharger
-        </ContextMenuItem>
-        <ContextMenuItem onClick={() => contextMenuProps.onPrint(clientQuotes[0])}>
-          Imprimer
-        </ContextMenuItem>
-        <ContextMenuItem onClick={() => contextMenuProps.onSendEmail(clientQuotes[0])}>
-          Envoyer par e-mail
-        </ContextMenuItem>
-        <ContextMenuItem onClick={() => contextMenuProps.onConvertToRepairOrder(clientQuotes[0])}>
-          Convertir en ordre de réparation
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
+    <>
+      <SimpleTable
+        columns={columns}
+        data={clientQuotes}
+      />
+
+      <QuoteDialog
+        quote={selectedQuote}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
+
+      <QuoteEmailDialog
+        quote={selectedQuoteForEmail}
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+      />
+
+      <RepairOrderDialog
+        order={prefilledRepairOrder as RepairOrder}
+        open={repairOrderDialogOpen}
+        onOpenChange={(open) => {
+          setRepairOrderDialogOpen(open);
+          if (!open) {
+            setPrefilledRepairOrder(null);
+          }
+        }}
+      />
+    </>
   );
 };
 
