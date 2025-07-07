@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { SimpleTable } from '@/components/ui/simple-table';
 import { FileText, Eye, Pencil, Trash } from 'lucide-react';
@@ -7,6 +6,9 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { DocumentViewer } from '@/components/documents/DocumentViewer';
+import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
+import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 
 interface ClientExpertiseReportsTabProps {
   clientId: string;
@@ -15,6 +17,9 @@ interface ClientExpertiseReportsTabProps {
 const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ clientId }) => {
   const { reports, isLoading, deleteReport } = useExpertiseReports();
   const { toast } = useToast();
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<ExpertiseReport | null>(null);
 
   if (isLoading) {
     return (
@@ -27,19 +32,13 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
   const clientReports = reports?.filter(report => report.client_id === clientId) || [];
 
   const handleView = (report: any) => {
-    console.log('Viewing report:', report);
-    toast({
-      title: "Fonctionnalité à implémenter",
-      description: `Affichage du rapport ${report.reference || report.report_number}`,
-    });
+    setSelectedReport(report);
+    setViewDialogOpen(true);
   };
 
   const handleEdit = (report: any) => {
-    console.log('Editing report:', report);
-    toast({
-      title: "Fonctionnalité à implémenter",
-      description: `Édition du rapport ${report.reference || report.report_number}`,
-    });
+    setSelectedReport(report);
+    setEditDialogOpen(true);
   };
 
   const handleDelete = (report: any) => {
@@ -166,10 +165,29 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
   }
 
   return (
-    <SimpleTable
-      columns={columns}
-      data={clientReports}
-    />
+    <>
+      <SimpleTable
+        columns={columns}
+        data={clientReports}
+      />
+
+      {/* View Document Dialog */}
+      {selectedReport && (
+        <DocumentViewer
+          url={selectedReport.document_url}
+          open={viewDialogOpen}
+          onOpenChange={setViewDialogOpen}
+          title={`Rapport d'expertise - ${selectedReport.reference}`}
+        />
+      )}
+
+      {/* Edit Report Dialog */}
+      <ExpertiseReportDialog
+        report={selectedReport}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
+    </>
   );
 };
 

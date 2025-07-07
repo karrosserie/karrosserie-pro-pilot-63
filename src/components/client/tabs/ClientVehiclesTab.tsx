@@ -1,7 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useVehicles } from '@/hooks/use-vehicles';
 import VehicleCardAdapter from '@/components/vehicle/VehicleCardAdapter';
+import VehicleDialog from '@/components/vehicle/VehicleDialog';
+import VehicleDocumentDialogs from '@/components/vehicle/VehicleDocumentDialogs';
 import { Car } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -12,6 +14,12 @@ interface ClientVehiclesTabProps {
 const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
   const { vehicles, isLoading, deleteVehicle } = useVehicles();
   const { toast } = useToast();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
+  const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
+  const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
+  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
+  const [selectedVehicleForDocument, setSelectedVehicleForDocument] = useState<any>(null);
 
   if (isLoading) {
     return (
@@ -34,19 +42,15 @@ const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
   }
 
   const handleViewVehicle = (vehicle: any) => {
-    console.log('Viewing vehicle:', vehicle);
-    toast({
-      title: "Fonctionnalité à implémenter",
-      description: `Affichage du véhicule ${vehicle.license_plate}`,
-    });
+    setSelectedVehicle(vehicle);
+    setDialogMode('view');
+    setDialogOpen(true);
   };
 
   const handleEditVehicle = (vehicle: any) => {
-    console.log('Editing vehicle:', vehicle);
-    toast({
-      title: "Fonctionnalité à implémenter",
-      description: `Édition du véhicule ${vehicle.license_plate}`,
-    });
+    setSelectedVehicle(vehicle);
+    setDialogMode('edit');
+    setDialogOpen(true);
   };
 
   const handleDeleteVehicle = (vehicle: any) => {
@@ -56,35 +60,67 @@ const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
   };
 
   const handleCreateQuote = (vehicle: any) => {
-    console.log('Creating quote for vehicle:', vehicle);
-    toast({
-      title: "Fonctionnalité à implémenter",
-      description: `Création d'un devis pour le véhicule ${vehicle.license_plate}`,
-    });
+    setSelectedVehicleForDocument(vehicle);
+    setQuoteDialogOpen(true);
   };
 
   const handleCreateInvoice = (vehicle: any) => {
-    console.log('Creating invoice for vehicle:', vehicle);
-    toast({
-      title: "Fonctionnalité à implémenter",
-      description: `Création d'une facture pour le véhicule ${vehicle.license_plate}`,
-    });
+    setSelectedVehicleForDocument(vehicle);
+    setInvoiceDialogOpen(true);
+  };
+
+  const handleVehicleSubmit = (data: any) => {
+    // This will be handled by the VehicleDialog component
+    setDialogOpen(false);
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {clientVehicles.map((vehicle) => (
-        <VehicleCardAdapter
-          key={vehicle.id}
-          vehicle={vehicle}
-          onView={() => handleViewVehicle(vehicle)}
-          onEdit={() => handleEditVehicle(vehicle)}
-          onDelete={() => handleDeleteVehicle(vehicle)}
-          onCreateQuote={() => handleCreateQuote(vehicle)}
-          onCreateInvoice={() => handleCreateInvoice(vehicle)}
-        />
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {clientVehicles.map((vehicle) => (
+          <VehicleCardAdapter
+            key={vehicle.id}
+            vehicle={vehicle}
+            onView={() => handleViewVehicle(vehicle)}
+            onEdit={() => handleEditVehicle(vehicle)}
+            onDelete={() => handleDeleteVehicle(vehicle)}
+            onCreateQuote={() => handleCreateQuote(vehicle)}
+            onCreateInvoice={() => handleCreateInvoice(vehicle)}
+          />
+        ))}
+      </div>
+
+      <VehicleDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        title={
+          dialogMode === 'create' 
+            ? 'Ajouter un véhicule' 
+            : dialogMode === 'edit' 
+            ? 'Modifier le véhicule' 
+            : 'Détails du véhicule'
+        }
+        description={
+          dialogMode === 'create' 
+            ? 'Saisissez les informations du nouveau véhicule.'
+            : dialogMode === 'edit'
+            ? 'Modifiez les informations du véhicule.'
+            : ''
+        }
+        defaultValues={selectedVehicle || {}}
+        onSubmit={handleVehicleSubmit}
+        mode={dialogMode}
+      />
+
+      <VehicleDocumentDialogs
+        quoteDialogOpen={quoteDialogOpen}
+        setQuoteDialogOpen={setQuoteDialogOpen}
+        invoiceDialogOpen={invoiceDialogOpen}
+        setInvoiceDialogOpen={setInvoiceDialogOpen}
+        selectedVehicleForDocument={selectedVehicleForDocument}
+        setSelectedVehicleForDocument={setSelectedVehicleForDocument}
+      />
+    </>
   );
 };
 

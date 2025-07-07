@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { SimpleTable } from '@/components/ui/simple-table';
 import { Banknote, Eye, Pencil, Trash } from 'lucide-react';
@@ -33,7 +32,6 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
   }) || [];
 
   const handleView = (receipt: any) => {
-    console.log('Viewing receipt:', receipt);
     toast({
       title: "Fonctionnalité à implémenter",
       description: `Affichage de l'encaissement ${receipt.reference || 'sans référence'}`,
@@ -41,7 +39,6 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
   };
 
   const handleEdit = (receipt: any) => {
-    console.log('Editing receipt:', receipt);
     toast({
       title: "Fonctionnalité à implémenter",
       description: `Édition de l'encaissement ${receipt.reference || 'sans référence'}`,

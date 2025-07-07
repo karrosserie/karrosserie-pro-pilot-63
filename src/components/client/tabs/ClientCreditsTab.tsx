@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { useCredits } from '@/hooks/use-credits';
 import { useInvoices } from '@/hooks/use-invoices';
 import { SimpleTable } from '@/components/ui/simple-table';
@@ -40,7 +39,6 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   }) || [];
 
   const handleView = (credit: any) => {
-    console.log('Viewing credit:', credit);
     toast({
       title: "Fonctionnalité à implémenter",
       description: `Affichage de l'avoir ${credit.reference}`,
@@ -48,7 +46,6 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   };
 
   const handleEdit = (credit: any) => {
-    console.log('Editing credit:', credit);
     toast({
       title: "Fonctionnalité à implémenter",
       description: `Édition de l'avoir ${credit.reference}`,
