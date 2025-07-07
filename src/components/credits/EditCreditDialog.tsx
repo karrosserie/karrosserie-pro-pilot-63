@@ -22,27 +22,35 @@ interface EditCreditDialogProps {
     notes?: string;
     items?: any[];
   };
+  readOnly?: boolean;
 }
 
 export const EditCreditDialog = ({ 
   open, 
   onOpenChange, 
   creditId, 
-  initialData 
+  initialData,
+  readOnly = false
 }: EditCreditDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Modifier l'avoir</DialogTitle>
+          <DialogTitle>
+            {readOnly ? "Visualiser l'avoir" : "Modifier l'avoir"}
+          </DialogTitle>
           <DialogDescription>
-            Modifiez les informations de l'avoir {initialData?.reference}.
+            {readOnly 
+              ? `Détails de l'avoir ${initialData?.reference}.`
+              : `Modifiez les informations de l'avoir ${initialData?.reference}.`
+            }
           </DialogDescription>
         </DialogHeader>
         <EditCreditForm 
           creditId={creditId}
           initialData={initialData}
-          onClose={() => onOpenChange(false)} 
+          onClose={() => onOpenChange(false)}
+          readOnly={readOnly}
         />
       </DialogContent>
     </Dialog>

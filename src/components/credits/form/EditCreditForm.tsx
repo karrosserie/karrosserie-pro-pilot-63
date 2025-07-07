@@ -20,9 +20,15 @@ interface EditCreditFormProps {
     items?: any[];
   };
   onClose: () => void;
+  readOnly?: boolean;
 }
 
-export const EditCreditForm = ({ creditId, initialData, onClose }: EditCreditFormProps) => {
+export const EditCreditForm = ({ 
+  creditId, 
+  initialData, 
+  onClose, 
+  readOnly = false 
+}: EditCreditFormProps) => {
   const { updateCredit } = useCredits();
   const {
     formData,
@@ -54,6 +60,11 @@ export const EditCreditForm = ({ creditId, initialData, onClose }: EditCreditFor
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (readOnly) {
+      onClose();
+      return;
+    }
+    
     if (!validateForm()) {
       return;
     }
@@ -83,6 +94,7 @@ export const EditCreditForm = ({ creditId, initialData, onClose }: EditCreditFor
         formData={formData}
         errors={errors}
         onFieldChange={handleChange}
+        readOnly={readOnly}
       />
 
       <CreditItemsSection
@@ -90,9 +102,10 @@ export const EditCreditForm = ({ creditId, initialData, onClose }: EditCreditFor
         onAddItem={addItem}
         onUpdateItem={updateItem}
         onRemoveItem={removeItem}
+        readOnly={readOnly}
       />
 
-      {errors.items && (
+      {errors.items && !readOnly && (
         <p className="text-sm text-red-500 flex items-center">
           <AlertCircle className="h-4 w-4 mr-1" />
           {errors.items}
@@ -103,15 +116,17 @@ export const EditCreditForm = ({ creditId, initialData, onClose }: EditCreditFor
 
       <div className="flex justify-end space-x-2 pt-4 border-t">
         <Button type="button" variant="outline" onClick={onClose}>
-          Annuler
+          {readOnly ? 'Fermer' : 'Annuler'}
         </Button>
-        <Button 
-          type="submit" 
-          disabled={updateCredit.isPending}
-          className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-        >
-          {updateCredit.isPending ? 'Modification...' : 'Modifier l\'avoir'}
-        </Button>
+        {!readOnly && (
+          <Button 
+            type="submit" 
+            disabled={updateCredit.isPending}
+            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+          >
+            {updateCredit.isPending ? 'Modification...' : 'Modifier l\'avoir'}
+          </Button>
+        )}
       </div>
     </form>
   );
