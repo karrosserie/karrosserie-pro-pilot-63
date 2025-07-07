@@ -18,6 +18,8 @@ interface VehicleCardProps {
   onView?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  onCreateQuote?: () => void;
+  onCreateInvoice?: () => void;
 }
 
 const VehicleCard: React.FC<VehicleCardProps> = ({
@@ -32,7 +34,9 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
   registrationDocumentBackUrl,
   onView,
   onEdit,
-  onDelete
+  onDelete,
+  onCreateQuote,
+  onCreateInvoice
 }) => {
   // Détermine la couleur du statut
   const getStatusColor = () => {
@@ -77,6 +81,22 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
                                   registrationDocumentFrontUrl.trim() !== '' && 
                                   registrationDocumentBackUrl && 
                                   registrationDocumentBackUrl.trim() !== '';
+
+  const handleCreateQuote = () => {
+    if (onCreateQuote) {
+      onCreateQuote();
+    } else {
+      console.log('Create quote for vehicle:', licensePlate);
+    }
+  };
+
+  const handleCreateInvoice = () => {
+    if (onCreateInvoice) {
+      onCreateInvoice();
+    } else {
+      console.log('Create invoice for vehicle:', licensePlate);
+    }
+  };
 
   return (
     <div className="card-container flex flex-col h-full animate-fade-in">
@@ -150,11 +170,11 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleCreateQuote}>
                 <FileText className="h-4 w-4 mr-2" />
                 Créer un devis
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleCreateInvoice}>
                 <Receipt className="h-4 w-4 mr-2" />
                 Créer une facture
               </DropdownMenuItem>

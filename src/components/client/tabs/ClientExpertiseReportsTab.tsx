@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { SimpleTable } from '@/components/ui/simple-table';
@@ -25,10 +24,12 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
   const clientReports = reports?.filter(report => report.client_id === clientId) || [];
 
   const handleView = (report: any) => {
+    // TODO: Ouvrir le dialogue de visualisation du rapport
     console.log('View report:', report);
   };
 
   const handleEdit = (report: any) => {
+    // TODO: Ouvrir le dialogue d'édition du rapport
     console.log('Edit report:', report);
   };
 
@@ -109,6 +110,7 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
               variant="ghost"
               size="icon"
               onClick={() => handleView(report)}
+              title="Voir les détails"
             >
               <Eye className="h-4 w-4" />
             </Button>
@@ -116,6 +118,7 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
               variant="ghost"
               size="icon"
               onClick={() => handleEdit(report)}
+              title="Modifier"
             >
               <Pencil className="h-4 w-4" />
             </Button>
@@ -124,6 +127,7 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
               size="icon"
               className="text-red-500 hover:text-red-700"
               onClick={() => handleDelete(report)}
+              title="Supprimer"
             >
               <Trash className="h-4 w-4" />
             </Button>

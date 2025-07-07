@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useCredits } from '@/hooks/use-credits';
 import { useInvoices } from '@/hooks/use-invoices';
@@ -38,10 +37,12 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   }) || [];
 
   const handleView = (credit: any) => {
+    // TODO: Ouvrir le dialogue de visualisation de l'avoir
     console.log('View credit:', credit);
   };
 
   const handleEdit = (credit: any) => {
+    // TODO: Ouvrir le dialogue d'édition de l'avoir
     console.log('Edit credit:', credit);
   };
 
@@ -133,6 +134,7 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
               variant="ghost"
               size="icon"
               onClick={() => handleView(credit)}
+              title="Voir les détails"
             >
               <Eye className="h-4 w-4" />
             </Button>
@@ -140,6 +142,7 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
               variant="ghost"
               size="icon"
               onClick={() => handleEdit(credit)}
+              title="Modifier"
             >
               <Pencil className="h-4 w-4" />
             </Button>
@@ -148,6 +151,7 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
               size="icon"
               className="text-red-500 hover:text-red-700"
               onClick={() => handleDelete(credit)}
+              title="Supprimer"
             >
               <Trash className="h-4 w-4" />
             </Button>

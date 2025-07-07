@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { SimpleTable } from '@/components/ui/simple-table';
@@ -31,10 +30,12 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
   }) || [];
 
   const handleView = (receipt: any) => {
+    // TODO: Ouvrir le dialogue de visualisation de l'encaissement
     console.log('View receipt:', receipt);
   };
 
   const handleEdit = (receipt: any) => {
+    // TODO: Ouvrir le dialogue d'édition de l'encaissement
     console.log('Edit receipt:', receipt);
   };
 
@@ -118,6 +119,7 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
               variant="ghost"
               size="icon"
               onClick={() => handleView(receipt)}
+              title="Voir les détails"
             >
               <Eye className="h-4 w-4" />
             </Button>
@@ -125,6 +127,7 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
               variant="ghost"
               size="icon"
               onClick={() => handleEdit(receipt)}
+              title="Modifier"
             >
               <Pencil className="h-4 w-4" />
             </Button>
@@ -133,6 +136,7 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
               size="icon"
               className="text-red-500 hover:text-red-700"
               onClick={() => handleDelete(receipt)}
+              title="Supprimer"
             >
               <Trash className="h-4 w-4" />
             </Button>

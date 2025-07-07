@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useVehicles } from '@/hooks/use-vehicles';
-import VehicleCard from '@/components/vehicle/VehicleCard';
+import VehicleCardAdapter from '@/components/vehicle/VehicleCardAdapter';
 import { Car } from 'lucide-react';
 
 interface ClientVehiclesTabProps {
@@ -49,43 +49,15 @@ const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {clientVehicles.map((vehicle) => {
-        // Convertir les images de véhicule en format string array
-        let vehicleImages: string[] = [];
-        if (vehicle.vehicle_images) {
-          if (Array.isArray(vehicle.vehicle_images)) {
-            vehicleImages = vehicle.vehicle_images.map(img => String(img));
-          } else if (typeof vehicle.vehicle_images === 'string') {
-            try {
-              const parsed = JSON.parse(vehicle.vehicle_images);
-              if (Array.isArray(parsed)) {
-                vehicleImages = parsed.map(img => String(img));
-              }
-            } catch {
-              vehicleImages = [String(vehicle.vehicle_images)];
-            }
-          }
-        }
-
-        return (
-          <VehicleCard
-            key={vehicle.id}
-            brand={vehicle.car_brands?.name || 'Marque inconnue'}
-            model={vehicle.car_models?.name || 'Modèle inconnu'}
-            year={vehicle.year || 0}
-            licensePlate={vehicle.license_plate}
-            status={vehicle.status as any}
-            owner={vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Client inconnu'}
-            imageUrl={vehicleImages.length > 0 ? vehicleImages[0] : undefined}
-            vehicleImages={vehicleImages}
-            registrationDocumentFrontUrl={vehicle.registration_document_front_url}
-            registrationDocumentBackUrl={vehicle.registration_document_back_url}
-            onView={() => handleViewVehicle(vehicle)}
-            onEdit={() => handleEditVehicle(vehicle)}
-            onDelete={() => handleDeleteVehicle(vehicle)}
-          />
-        );
-      })}
+      {clientVehicles.map((vehicle) => (
+        <VehicleCardAdapter
+          key={vehicle.id}
+          vehicle={vehicle}
+          onView={() => handleViewVehicle(vehicle)}
+          onEdit={() => handleEditVehicle(vehicle)}
+          onDelete={() => handleDeleteVehicle(vehicle)}
+        />
+      ))}
     </div>
   );
 };

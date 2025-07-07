@@ -8,13 +8,17 @@ interface VehicleCardAdapterProps {
   onView: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  onCreateQuote?: () => void;
+  onCreateInvoice?: () => void;
 }
 
 const VehicleCardAdapter: React.FC<VehicleCardAdapterProps> = ({
   vehicle,
   onView,
   onEdit,
-  onDelete
+  onDelete,
+  onCreateQuote,
+  onCreateInvoice
 }) => {
   // Helper function to safely parse vehicle images
   const parseVehicleImages = (images: any): string[] => {
@@ -48,6 +52,8 @@ const VehicleCardAdapter: React.FC<VehicleCardAdapterProps> = ({
       onView={onView}
       onEdit={onEdit}
       onDelete={onDelete}
+      onCreateQuote={onCreateQuote}
+      onCreateInvoice={onCreateInvoice}
     />
   );
 };
