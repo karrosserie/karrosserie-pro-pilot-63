@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useCredits } from '@/hooks/use-credits';
 import { useInvoices } from '@/hooks/use-invoices';
@@ -124,7 +123,7 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
 
   const handleView = (credit: any) => {
     toast({
-      title: "Fonctionnalité à implémenter",
+      title: "Visualisation de l'avoir",
       description: `Affichage de l'avoir ${credit.reference}`,
     });
   };
@@ -208,7 +207,6 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
     }
   };
 
-  // Updated columns to match the Credits page
   const columns: ColumnDef<any>[] = [
     {
       accessorKey: "reference",
