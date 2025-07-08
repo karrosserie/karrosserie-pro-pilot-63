@@ -1,5 +1,5 @@
-
 import { useCarBrands } from '@/hooks/use-car-brands';
+import { supabase } from '@/integrations/supabase/client';
 
 interface VinHandlerProps {
   formData: any;
@@ -12,24 +12,19 @@ interface VinInfo {
   year?: number;
 }
 
-// Fonction pour décoder le VIN via l'API
+// Fonction pour décoder le VIN via l'API Supabase Edge Function
 const decodeVinViaAPI = async (vin: string): Promise<VinInfo> => {
   try {
-    const response = await fetch('/functions/v1/vin-decoder', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ vin })
+    const { data, error } = await supabase.functions.invoke('vin-decoder', {
+      body: { vin }
     });
 
-    if (!response.ok) {
-      console.error('API VIN decoder error:', response.status);
+    if (error) {
+      console.error('API VIN decoder error:', error);
       return {};
     }
 
-    const result = await response.json();
-    return result.success ? result.data : {};
+    return data.success ? data.data : {};
   } catch (error) {
     console.error('Error calling VIN decoder API:', error);
     return {};
