@@ -87,6 +87,38 @@ const wmiToBrand: Record<string, string> = {
   'YV1': 'Volvo', 'WP0': 'Porsche', 'ZFF': 'Ferrari'
 };
 
+// Mapping des modèles par marque
+const vinToModel: Record<string, Record<string, string[]>> = {
+  'Audi': {
+    'A3': ['8V', '8P', '8L', '8Y'],
+    'A4': ['8K', '8E', '8D', 'B9', '8W'],
+    'A6': ['4G', '4F', '4B', 'C8'],
+    'Q3': ['8U', 'F3'],
+    'Q5': ['8R', 'FY']
+  },
+  'BMW': {
+    'Série 3': ['3A', '3B', '3C', '3D', '3E', '3F', '3G'],
+    'Série 5': ['5A', '5B', '5C', '5D', '5E', '5F', '5G'],
+    'X3': ['X3', 'U3', 'G01'],
+    'X5': ['X5', 'U5', 'G05']
+  },
+  'Mercedes-Benz': {
+    'Classe C': ['204', '205', '202', '203'],
+    'Classe E': ['212', '213', '210', '211'],
+    'GLC': ['253', '254']
+  },
+  'Volkswagen': {
+    'Golf': ['1K', '5K', 'AU', 'AJ', 'CD'],
+    'Passat': ['3C', '3B', 'B8', 'B9'],
+    'Tiguan': ['5N', 'AD']
+  },
+  'Toyota': {
+    'Corolla': ['ZZE', 'ZRE', 'NRE', 'E12', 'E15', 'E21'],
+    'Camry': ['ACV', 'GSV', 'ASV'],
+    'RAV4': ['ACA', 'ZCA', 'XA']
+  }
+};
+
 // Mapping année
 const yearMapping: Record<string, number> = {
   'A': 2010, 'B': 2011, 'C': 2012, 'D': 2013, 'E': 2014,
@@ -98,18 +130,20 @@ const yearMapping: Record<string, number> = {
   '6': 2006, '7': 2007, '8': 2008, '9': 2009
 };
 
-// Décodage VIN
+// Décodage VIN avec détection de modèle
 function decodeVin(vin: string): VinInfo {
   if (!vin || vin.length !== 17) {
     return {};
   }
 
-  // WMI (3 premiers caractères)
+  // Extraire le WMI (3 premiers caractères)
   const wmi = vin.substring(0, 3);
+  
+  // Trouver la marque
   const brand = wmiToBrand[wmi];
   
   if (!brand) {
-    // Essayer avec 2 caractères
+    // Essayer avec les 2 premiers caractères si pas de correspondance avec 3
     const wmi2 = vin.substring(0, 2);
     const brandFromWmi2 = wmiToBrand[wmi2];
     if (brandFromWmi2) {
@@ -118,7 +152,7 @@ function decodeVin(vin: string): VinInfo {
     return {};
   }
 
-  // Année (10ème caractère)
+  // Extraire l'année (10ème caractère)
   const yearChar = vin.charAt(9);
   let year: number | undefined;
   
@@ -126,8 +160,34 @@ function decodeVin(vin: string): VinInfo {
     year = yearMapping[yearChar];
   }
 
+  // Détection du modèle
+  let model: string | undefined;
+  const modelCodes = vinToModel[brand];
+  
+  if (modelCodes) {
+    const segment1 = vin.substring(3, 5);
+    const segment2 = vin.substring(4, 6);
+    const segment3 = vin.substring(5, 7);
+    const segment4 = vin.substring(3, 8);
+    
+    for (const [modelName, codes] of Object.entries(modelCodes)) {
+      const found = codes.some(code => {
+        return segment1 === code || 
+               segment2 === code || 
+               segment3 === code ||
+               segment4.includes(code);
+      });
+      
+      if (found) {
+        model = modelName;
+        break;
+      }
+    }
+  }
+
   return {
     brand,
+    model,
     year
   };
 }
@@ -147,7 +207,7 @@ serve(async (req) => {
 
     let vin: string = '';
 
-    // Récupérer le VIN avec gestion d'erreur pour le JSON
+    // Récupérer le VIN
     if (req.method === 'GET') {
       const url = new URL(req.url)
       vin = url.searchParams.get('vin') || ''
