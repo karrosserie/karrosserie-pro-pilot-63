@@ -21,7 +21,7 @@ const ExpertiseReports = () => {
   const { toast } = useToast();
   
   const filteredReports = reports?.filter(report => {
-    const matchesSearch = report.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = report.report_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (report.clients && `${report.clients.first_name} ${report.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()));
     
     // Safe vehicle search with proper null checking
@@ -125,7 +125,7 @@ const ExpertiseReports = () => {
             url={selectedReport.document_url}
             open={viewDialogOpen}
             onOpenChange={setViewDialogOpen}
-            title={`Rapport d'expertise - ${selectedReport.reference}`}
+            title={`Rapport d'expertise - ${selectedReport.report_number || 'Sans numéro'}`}
           />
         )}
       </div>

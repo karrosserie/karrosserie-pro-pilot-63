@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -118,7 +119,8 @@ export const expertiseReportsService = {
 
     const reportWithAmount = {
       ...report,
-      amount: totalAmount
+      amount: totalAmount,
+      status: report.status || 'Importé'
     };
 
     const { data, error } = await supabase

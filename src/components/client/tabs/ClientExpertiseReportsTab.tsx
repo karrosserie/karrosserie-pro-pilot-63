@@ -116,9 +116,10 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
     },
     {
       header: "Statut",
-      cell: () => (
-        <Badge variant="outline">Expertise</Badge>
-      )
+      cell: ({ row }) => {
+        const status = row.original.status || "Importé";
+        return <Badge variant="outline">{status}</Badge>;
+      }
     },
     {
       id: "actions",
@@ -190,7 +191,7 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
           url={selectedReport.document_url}
           open={viewDialogOpen}
           onOpenChange={setViewDialogOpen}
-          title={`Rapport d'expertise - ${selectedReport.reference}`}
+          title={`Rapport d'expertise - ${selectedReport.report_number || 'Sans numéro'}`}
         />
       )}
 

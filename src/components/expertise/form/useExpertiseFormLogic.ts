@@ -9,7 +9,6 @@ interface UseExpertiseFormLogicProps {
 
 export const useExpertiseFormLogic = ({ report }: UseExpertiseFormLogicProps) => {
   const [formData, setFormData] = useState<Partial<ExpertiseReport>>({
-    reference: '',
     report_date: null,
     client_id: null,
     vehicle_id: null,
@@ -68,10 +67,6 @@ export const useExpertiseFormLogic = ({ report }: UseExpertiseFormLogicProps) =>
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
-    if (!formData.reference?.trim()) {
-      newErrors.reference = 'Le numéro de rapport est obligatoire';
-    }
-    
     if (!formData.expert_name?.trim()) {
       newErrors.expert_name = 'Le nom de l\'expert est recommandé';
     }
@@ -96,7 +91,6 @@ export const useExpertiseFormLogic = ({ report }: UseExpertiseFormLogicProps) =>
   useEffect(() => {
     if (report) {
       setFormData({
-        reference: report.reference,
         report_date: report.report_date,
         client_id: report.client_id,
         vehicle_id: report.vehicle_id,
@@ -128,12 +122,10 @@ export const useExpertiseFormLogic = ({ report }: UseExpertiseFormLogicProps) =>
         }
       }
     } else {
-      // Générer une référence automatique pour un nouveau rapport
-      const currentYear = new Date().getFullYear();
-      const randomNumber = Math.floor(1000 + Math.random() * 9000);
+      // Nouveau rapport - statut par défaut "Importé"
       setFormData(prev => ({
         ...prev,
-        reference: `RE-${currentYear}-${randomNumber}`
+        status: 'Importé'
       }));
     }
   }, [report]);
