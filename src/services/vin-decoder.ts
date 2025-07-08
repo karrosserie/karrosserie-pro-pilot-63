@@ -293,7 +293,8 @@ const vinToModel: Record<string, Record<string, string[]>> = {
     'Boxer': ['Y', 'Y3', 'Y4'],
     'e-208': ['P21', 'P2'],
     'e-2008': ['P24', 'P2'],
-    'RCZ': ['4C', '4C1']
+    'RCZ': ['4C', '4C1'],
+    '207': ['LHA', 'LHAH', 'WA', 'WB', 'WC']
   },
   'Renault': {
     'Twingo': ['CN0', 'BC', 'CN01', 'CN04', 'BC0'],
@@ -509,6 +510,7 @@ export function decodeVin(vin: string): VinInfo {
     const segment4 = vin.substring(3, 8);   // Positions 4-8 (VDS complet)
     const segment5 = vin.substring(6, 8);   // Positions 7-8
     const segment6 = vin.substring(7, 9);   // Positions 8-9
+    const segment7 = vin.substring(3, 7);   // Positions 4-7 (LHAH pour Peugeot 207)
     
     // Recherche par ordre de priorité
     for (const [modelName, codes] of Object.entries(modelCodes)) {
@@ -519,6 +521,7 @@ export function decodeVin(vin: string): VinInfo {
                segment3 === code ||
                segment5 === code ||
                segment6 === code ||
+               segment7 === code ||
                segment4.includes(code) ||
                vin.substring(3, 3 + code.length) === code;
       });
