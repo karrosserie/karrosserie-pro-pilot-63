@@ -35,10 +35,6 @@ const ExpertiseReportDialog = ({
     try {
       if (report && report.id) {
         await updateReport.mutateAsync({ id: report.id, data: formData });
-        toast({
-          title: "Rapport mis à jour",
-          description: "Le rapport d'expertise a été mis à jour avec succès."
-        });
       } else {
         await createReport.mutateAsync(formData as any);
         toast({
