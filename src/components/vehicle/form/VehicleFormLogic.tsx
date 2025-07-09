@@ -6,8 +6,7 @@ import { useCarModels } from '@/hooks/use-car-models';
 export interface VehicleFormData {
   clientId: string;
   vin: string;
-  brand: string;
-  model: string;
+  brandId: string;
   modelId: string;
   licensePlate: string;
   engineNumber: string;
@@ -83,8 +82,7 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
     // Required fields
     clientId: safeDefaultValues.client_id || '',
     vin: safeDefaultValues.vin || '',
-    brand: safeDefaultValues.car_brands?.name || getBrandName(safeDefaultValues.brand_id || ''),
-    model: safeDefaultValues.car_models?.name || '',
+    brandId: safeDefaultValues.brand_id || '',
     modelId: safeDefaultValues.model_id || '',
     licensePlate: safeDefaultValues.license_plate || '',
     
@@ -126,8 +124,8 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
   const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => {
       // Reset model if brand changes
-      if (name === 'brand') {
-        return { ...prev, [name]: value, model: '', modelId: '' };
+      if (name === 'brandId') {
+        return { ...prev, [name]: value, modelId: '' };
       }
       return { ...prev, [name]: value };
     });
@@ -206,7 +204,7 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
   };
 
   const validateRequiredFields = () => {
-    const requiredFields = ['clientId', 'vin', 'brand', 'model', 'licensePlate'];
+    const requiredFields = ['clientId', 'vin', 'brandId', 'modelId', 'licensePlate'];
     const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
     
     if (missingFields.length > 0) {
