@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Car } from 'lucide-react';
 
 interface VehiclesEmptyStateProps {
@@ -26,14 +25,6 @@ const VehiclesEmptyState: React.FC<VehiclesEmptyStateProps> = ({
           : 'Commencez par ajouter un véhicule.'
         }
       </p>
-      {!hasFilters && (
-        <div className="mt-6">
-          <Button onClick={onCreateVehicle} className="btn-primary">
-            <Car className="h-4 w-4 mr-2" />
-            Ajouter un véhicule
-          </Button>
-        </div>
-      )}
     </div>
   );
 };
