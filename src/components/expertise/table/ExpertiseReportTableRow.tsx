@@ -128,23 +128,6 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
               <Button 
                 variant="ghost" 
                 size="icon"
-                onClick={() => window.open(report.document_url, '_blank')}
-                disabled={!report.document_url}
-                className="h-8 w-8"
-              >
-                <Download className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              {report.document_url ? 'Télécharger' : 'Aucun document'}
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon"
                 onClick={() => onEditReport(report)}
                 disabled={isConverted}
                 className="h-8 w-8"
@@ -174,28 +157,39 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
             </TooltipContent>
           </Tooltip>
 
-          {onConvertToQuote && !isConverted && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem 
-                  onClick={() => onConvertToQuote(report)}
-                  disabled={isConverting || !report.client_id || !report.vehicle_id}
-                >
-                  {isConverting ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <FileCheck className="mr-2 h-4 w-4" />
-                  )}
-                  Convertir en devis
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem 
+                onClick={() => window.open(report.document_url, '_blank')}
+                disabled={!report.document_url}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Télécharger
+              </DropdownMenuItem>
+              
+              {onConvertToQuote && !isConverted && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={() => onConvertToQuote(report)}
+                    disabled={isConverting || !report.client_id || !report.vehicle_id}
+                  >
+                    {isConverting ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <FileCheck className="mr-2 h-4 w-4" />
+                    )}
+                    Convertir en devis
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </TableCell>
     </TableRow>
