@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCarBrands } from '@/hooks/use-car-brands';
 
 export function useVehiclesPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -14,6 +15,7 @@ export function useVehiclesPage() {
 
   const { vehicles, isLoading, error, createVehicle, updateVehicle, deleteVehicle } = useVehicles();
   const { user } = useAuth();
+  const { carBrands } = useCarBrands();
 
   // Filter vehicles based on search query
   const filteredVehicles = vehicles?.filter(vehicle => {
@@ -63,12 +65,40 @@ export function useVehiclesPage() {
     }
 
     try {
-      // Prepare the vehicle data - removing fuel_type reference
+      // Find brand ID from name if needed
+      let brandId = data.brandId;
+      if (!brandId && data.brand) {
+        const selectedBrand = carBrands.find(brand => brand.name === data.brand);
+        brandId = selectedBrand?.id;
+        console.log('Found brand ID for', data.brand, ':', brandId);
+      }
+
+      // Use model ID if available, otherwise use modelId field
+      let modelId = data.modelId;
+      if (!modelId && data.model) {
+        // If we only have model name, we need the modelId field that should be set
+        modelId = data.modelId;
+        console.log('Using modelId:', modelId);
+      }
+
+      if (!brandId) {
+        console.error('Brand ID not found for brand:', data.brand);
+        alert('Erreur: Impossible de trouver l\'ID de la marque');
+        return;
+      }
+
+      if (!modelId) {
+        console.error('Model ID not found for model:', data.model);
+        alert('Erreur: Impossible de trouver l\'ID du modèle');
+        return;
+      }
+
+      // Prepare the vehicle data using IDs
       const vehicleData = {
         client_id: data.clientId,
         vin: data.vin,
-        brand_id: data.brandId || data.brand,
-        model_id: data.modelId || data.model,
+        brand_id: brandId,
+        model_id: modelId,
         license_plate: data.licensePlate,
         engine_number: data.engineNumber,
         year: data.year ? parseInt(data.year) : null,
@@ -92,7 +122,7 @@ export function useVehiclesPage() {
         user_id: user.id
       };
 
-      console.log('Prepared vehicle data:', vehicleData);
+      console.log('Prepared vehicle data for submission:', vehicleData);
 
       if (dialogMode === 'create') {
         await createVehicle.mutateAsync(vehicleData);
