@@ -140,50 +140,62 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
             </TooltipContent>
           </Tooltip>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              {onConvertToQuote && !isConverted && (
-                <>
-                  <DropdownMenuItem 
-                    onClick={() => onConvertToQuote(report)}
-                    disabled={isConverting || !report.client_id || !report.vehicle_id}
-                  >
-                    {isConverting ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <FileCheck className="mr-2 h-4 w-4" />
-                    )}
-                    Convertir en devis
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                </>
-              )}
-              
-              <DropdownMenuItem 
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon"
                 onClick={() => onEditReport(report)}
                 disabled={isConverted}
+                className="h-8 w-8"
               >
-                <Pencil className="mr-2 h-4 w-4" />
-                Modifier
-              </DropdownMenuItem>
-              
-              <DropdownMenuSeparator />
-              
-              <DropdownMenuItem 
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {isConverted ? 'Impossible de modifier un rapport converti' : 'Modifier le rapport'}
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="text-red-500 hover:text-red-700 h-8 w-8"
                 onClick={() => onDeleteReport(report.id)}
                 disabled={isConverted}
-                className="text-red-600 focus:text-red-600"
               >
-                <Trash className="mr-2 h-4 w-4" />
-                Supprimer
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <Trash className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {isConverted ? 'Impossible de supprimer un rapport converti' : 'Supprimer le rapport'}
+            </TooltipContent>
+          </Tooltip>
+
+          {onConvertToQuote && !isConverted && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem 
+                  onClick={() => onConvertToQuote(report)}
+                  disabled={isConverting || !report.client_id || !report.vehicle_id}
+                >
+                  {isConverting ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <FileCheck className="mr-2 h-4 w-4" />
+                  )}
+                  Convertir en devis
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </TableCell>
     </TableRow>
