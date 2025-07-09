@@ -80,9 +80,20 @@ export const ExpertiseDetailsSection = ({ formData, errors, onFieldChange, globa
               )}
             </Popover>
           </div>
+
+          <div>
+            <Label htmlFor="policy_number">Numéro de police</Label>
+            <Input
+              id="policy_number"
+              value={formData.policy_number || ''}
+              onChange={(e) => onFieldChange('policy_number', e.target.value)}
+              placeholder="Ex: POL-2024-1234"
+              readOnly={isReadOnly}
+            />
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <Label htmlFor="expert_name">Nom de l'expert</Label>
             <Input
@@ -119,17 +130,6 @@ export const ExpertiseDetailsSection = ({ formData, errors, onFieldChange, globa
               type="date"
               value={formData.incident_date || ''}
               onChange={(e) => onFieldChange('incident_date', e.target.value)}
-              readOnly={isReadOnly}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="policy_number">Numéro de police</Label>
-            <Input
-              id="policy_number"
-              value={formData.policy_number || ''}
-              onChange={(e) => onFieldChange('policy_number', e.target.value)}
-              placeholder="Ex: POL-2024-1234"
               readOnly={isReadOnly}
             />
           </div>
