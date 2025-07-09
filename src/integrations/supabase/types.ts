@@ -1010,9 +1010,14 @@ export type Database = {
           client_id: string | null
           created_at: string
           document_url: string | null
+          expert_name: string | null
           id: string
+          incident_date: string | null
           notes: string | null
+          policy_number: string | null
           reference: string
+          report_date: string | null
+          report_number: string | null
           status: string | null
           tax_rate: number | null
           updated_at: string
@@ -1025,9 +1030,14 @@ export type Database = {
           client_id?: string | null
           created_at?: string
           document_url?: string | null
+          expert_name?: string | null
           id?: string
+          incident_date?: string | null
           notes?: string | null
+          policy_number?: string | null
           reference: string
+          report_date?: string | null
+          report_number?: string | null
           status?: string | null
           tax_rate?: number | null
           updated_at?: string
@@ -1040,9 +1050,14 @@ export type Database = {
           client_id?: string | null
           created_at?: string
           document_url?: string | null
+          expert_name?: string | null
           id?: string
+          incident_date?: string | null
           notes?: string | null
+          policy_number?: string | null
           reference?: string
+          report_date?: string | null
+          report_number?: string | null
           status?: string | null
           tax_rate?: number | null
           updated_at?: string
