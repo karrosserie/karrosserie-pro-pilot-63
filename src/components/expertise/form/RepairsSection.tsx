@@ -112,7 +112,7 @@ export const RepairsSection = ({ repairs, onRepairsChange, isReadOnly = false }:
                   value={repair.quantity}
                   onChange={(e) => updateRepair(repair.id, 'quantity', parseFloat(e.target.value) || 0)}
                   min="0"
-                  step="1"
+                  step="0.01"
                   readOnly={isReadOnly}
                   className={isReadOnly ? 'bg-gray-50' : ''}
                 />

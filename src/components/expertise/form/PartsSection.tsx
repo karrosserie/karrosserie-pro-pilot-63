@@ -112,7 +112,7 @@ export const PartsSection = ({ parts, onPartsChange, isReadOnly = false }: Parts
                   value={part.quantity}
                   onChange={(e) => updatePart(part.id, 'quantity', parseFloat(e.target.value) || 0)}
                   min="0"
-                  step="1"
+                  step="0.01"
                   readOnly={isReadOnly}
                   className={isReadOnly ? 'bg-gray-50' : ''}
                 />
