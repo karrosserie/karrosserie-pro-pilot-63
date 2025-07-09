@@ -19,6 +19,9 @@ interface ExpertiseReportTableProps {
   error: Error | null;
   onEditReport: (report: ExpertiseReport) => void;
   onDeleteReport: (id: string) => void;
+  onConvertToQuote?: (report: ExpertiseReport) => void;
+  convertingReportId?: string | null;
+  convertedReports?: Record<string, any>;
 }
 
 const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
@@ -26,7 +29,10 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
   isLoading,
   error,
   onEditReport,
-  onDeleteReport
+  onDeleteReport,
+  onConvertToQuote,
+  convertingReportId,
+  convertedReports = {}
 }) => {
   const isMobile = useIsMobile();
 
@@ -72,6 +78,9 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
                   report={report}
                   onEditReport={onEditReport}
                   onDeleteReport={onDeleteReport}
+                  onConvertToQuote={onConvertToQuote}
+                  isConverting={convertingReportId === report.id}
+                  isConverted={!!convertedReports[report.id]}
                 />
               ))
             ) : (

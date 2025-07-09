@@ -190,5 +190,71 @@ export const quotesService = {
     }
     
     return true;
+  },
+
+  // Vérifier si un devis existe pour un rapport d'expertise donné (temporaire via notes)
+  getByReportId: async (reportId: string) => {
+    const { data, error } = await supabase
+      .from('quotes')
+      .select('id, reference, notes')
+      .like('notes', `%Report ID: ${reportId}%`);
+      
+    if (error) {
+      console.error(`Error fetching quote for report ${reportId}:`, error);
+      return null;
+    }
+    
+    return data && data.length > 0 ? data[0] : null;
+  },
+
+  // Créer un devis à partir d'un rapport d'expertise
+  createFromReport: async (expertiseReport: any) => {
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      console.error('Error getting current user:', userError);
+      throw new Error('User not authenticated');
+    }
+
+    // Générer le prochain numéro de référence
+    const lastQuote = await quotesService.getLastQuoteByUser();
+    let nextNumber = 1;
+    
+    if (lastQuote?.reference) {
+      const match = lastQuote.reference.match(/D-(\d+)$/);
+      if (match) {
+        nextNumber = parseInt(match[1]) + 1;
+      }
+    }
+    
+    const nextReference = `D-${nextNumber.toString().padStart(6, '0')}`;
+    
+    const quoteData: any = {
+      reference: nextReference,
+      client_id: expertiseReport.client_id,
+      vehicle_id: expertiseReport.vehicle_id,
+      amount: 0, // Sera calculé selon les données du rapport
+      status: 'En cours',
+      notes: `Devis généré automatiquement à partir du rapport d'expertise ${expertiseReport.report_number}`,
+      user_id: user.id,
+      valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 jours de validité
+    };
+
+    // Temporairement, on va stocker l'ID du rapport dans les notes jusqu'à ce que la colonne soit ajoutée
+    quoteData.notes += ` (Report ID: ${expertiseReport.id})`;
+
+    const { data, error } = await supabase
+      .from('quotes')
+      .insert([quoteData])
+      .select()
+      .single();
+      
+    if (error) {
+      console.error('Error creating quote from report:', error);
+      throw new Error(error.message);
+    }
+
+    console.log('Quote created from report successfully:', data);
+    return data;
   }
 };

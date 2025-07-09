@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
-import { FileText, Pencil, Trash, Download, User, Car } from 'lucide-react';
+import { FileText, Pencil, Trash, Download, User, Car, FileCheck, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
@@ -11,6 +11,9 @@ interface ExpertiseReportTableRowProps {
   report: ExpertiseReport;
   onEditReport: (report: ExpertiseReport) => void;
   onDeleteReport: (id: string) => void;
+  onConvertToQuote?: (report: ExpertiseReport) => void;
+  isConverting?: boolean;
+  isConverted?: boolean;
 }
 
 const getStatusColor = (status: string) => {
@@ -25,6 +28,8 @@ const getStatusColor = (status: string) => {
       return 'bg-green-100 text-green-800 border-green-200';
     case 'Rejeté':
       return 'bg-red-100 text-red-800 border-red-200';
+    case 'Converti':
+      return 'bg-purple-100 text-purple-800 border-purple-200';
     default:
       return 'bg-gray-100 text-gray-800 border-gray-200';
   }
@@ -41,8 +46,23 @@ const formatAmount = (amount: number | null) => {
 export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = ({
   report,
   onEditReport,
-  onDeleteReport
+  onDeleteReport,
+  onConvertToQuote,
+  isConverting = false,
+  isConverted = false
 }) => {
+  const getStatusDisplay = () => {
+    const status = isConverted ? 'Converti' : (report.status || 'Importé');
+    return (
+      <Badge 
+        variant="outline" 
+        className={`${getStatusColor(status)} font-medium`}
+      >
+        {status}
+      </Badge>
+    );
+  };
+
   return (
     <TableRow className="hover:bg-gray-50">
       <TableCell className="font-medium">
@@ -92,15 +112,33 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
         {formatAmount(report.amount)}
       </TableCell>
       <TableCell>
-        <Badge 
-          variant="outline" 
-          className={`${getStatusColor(report.status || '')} font-medium`}
-        >
-          {report.status}
-        </Badge>
+        {getStatusDisplay()}
       </TableCell>
       <TableCell className="text-right">
         <div className="flex justify-end space-x-1">
+          {onConvertToQuote && !isConverted && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => onConvertToQuote(report)}
+                  disabled={isConverting || !report.client_id || !report.vehicle_id}
+                  className="h-8 w-8"
+                >
+                  {isConverting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <FileCheck className="h-4 w-4" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Convertir en devis</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+
           <Tooltip>
             <TooltipTrigger asChild>
               <Button 

@@ -1,7 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
+import { useReportToQuote } from '@/hooks/use-report-to-quote';
 import { useToast } from '@/hooks/use-toast';
 import { ExpertiseReportUploader } from '@/components/expertise/ExpertiseReportUploader';
 import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
@@ -12,6 +13,7 @@ import ExpertiseReportTable from '@/components/expertise/ExpertiseReportTable';
 
 const ExpertiseReports = () => {
   const { reports, isLoading, error, deleteReport } = useExpertiseReports();
+  const { convertToQuote, checkMultipleReports, isConverting, isConverted, convertedReports } = useReportToQuote();
   const [searchTerm, setSearchTerm] = useState('');
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -62,6 +64,21 @@ const ExpertiseReports = () => {
       }
     }
   };
+
+  // Effet pour vérifier le statut de conversion des rapports
+  useEffect(() => {
+    if (reports && reports.length > 0) {
+      checkMultipleReports(reports);
+    }
+  }, [reports, checkMultipleReports]);
+
+  const handleConvertToQuote = async (report: ExpertiseReport) => {
+    await convertToQuote(report);
+  };
+
+  const getConvertingReportId = () => {
+    return Object.keys(convertedReports).find(id => isConverting(id)) || null;
+  };
   
   return (
     <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8">
@@ -84,6 +101,9 @@ const ExpertiseReports = () => {
             error={error as Error | null}
             onEditReport={handleEditReport}
             onDeleteReport={handleDeleteReport}
+            onConvertToQuote={handleConvertToQuote}
+            convertingReportId={getConvertingReportId()}
+            convertedReports={convertedReports}
           />
         </div>
 
