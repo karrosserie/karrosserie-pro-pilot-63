@@ -137,8 +137,8 @@ export const QuoteBasicInfoSection = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="md:col-span-2">
             <Label htmlFor="report_number" className={cn(errors.report_number && "text-red-500")}>
               Numéro de rapport
             </Label>
@@ -159,7 +159,7 @@ export const QuoteBasicInfoSection = ({
             )}
           </div>
 
-          <div>
+          <div className="md:col-span-2">
             <Label htmlFor="policy_number" className={cn(errors.policy_number && "text-red-500")}>
               Numéro de police
             </Label>
@@ -202,8 +202,8 @@ export const QuoteBasicInfoSection = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="md:col-span-2">
             <Label htmlFor="expert_name" className={cn(errors.expert_name && "text-red-500")}>
               Nom de l'expert
             </Label>
@@ -224,7 +224,7 @@ export const QuoteBasicInfoSection = ({
             )}
           </div>
 
-          <div>
+          <div className="md:col-span-2">
             <Label htmlFor="claim_number" className={cn(errors.claim_number && "text-red-500")}>
               Numéro de sinistre
             </Label>
