@@ -88,19 +88,27 @@ export const useExpertiseFormLogic = ({ report }: UseExpertiseFormLogicProps) =>
     }
   };
 
+  // État pour stocker temporairement l'ID du véhicule à sélectionner
+  const [pendingVehicleId, setPendingVehicleId] = useState<string | null>(null);
+
   useEffect(() => {
     if (report) {
       setFormData({
         report_number: report.report_number || '',
         report_date: report.report_date,
         client_id: report.client_id,
-        vehicle_id: report.vehicle_id,
+        vehicle_id: null, // Ne pas définir le vehicle_id immédiatement
         policy_number: report.policy_number || '',
         expert_name: report.expert_name || '',
         status: report.status || 'Importé',
         claim_number: report.claim_number || '',
         incident_date: report.incident_date,
       });
+      
+      // Stocker l'ID du véhicule à sélectionner une fois les véhicules chargés
+      if (report.vehicle_id) {
+        setPendingVehicleId(report.vehicle_id);
+      }
       
       // Charger les réparations et pièces depuis le rapport
       if (report.repairs_data) {
@@ -128,6 +136,7 @@ export const useExpertiseFormLogic = ({ report }: UseExpertiseFormLogicProps) =>
         ...prev,
         status: 'Importé'
       }));
+      setPendingVehicleId(null);
     }
   }, [report]);
 
@@ -137,6 +146,8 @@ export const useExpertiseFormLogic = ({ report }: UseExpertiseFormLogicProps) =>
     parts,
     errors,
     isReadOnly,
+    pendingVehicleId,
+    setPendingVehicleId,
     setRepairs,
     setParts,
     handleChange,

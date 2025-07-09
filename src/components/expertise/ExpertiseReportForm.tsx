@@ -33,6 +33,8 @@ export const ExpertiseReportForm = ({
     parts,
     errors,
     isReadOnly,
+    pendingVehicleId,
+    setPendingVehicleId,
     setRepairs,
     setParts,
     handleChange,
@@ -102,6 +104,8 @@ export const ExpertiseReportForm = ({
         vehicleOptions={[]}
         isLoadingClients={isLoadingClients}
         isLoadingVehicles={false}
+        pendingVehicleId={pendingVehicleId}
+        setPendingVehicleId={setPendingVehicleId}
       />
 
       <ExpertiseDetailsSection 

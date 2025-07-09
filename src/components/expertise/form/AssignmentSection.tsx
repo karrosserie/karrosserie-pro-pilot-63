@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,24 +31,44 @@ interface AssignmentSectionProps {
   vehicleOptions: Vehicle[];
   isLoadingClients: boolean;
   isLoadingVehicles: boolean;
+  pendingVehicleId: string | null;
+  setPendingVehicleId: (id: string | null) => void;
 }
 
 export const AssignmentSection = ({
   formData,
   onFieldChange,
   clientOptions,
-  isLoadingClients
+  isLoadingClients,
+  pendingVehicleId,
+  setPendingVehicleId
 }: AssignmentSectionProps) => {
-  const isReadOnly = formData.status !== 'Importé';
   
   // Récupérer les véhicules du client sélectionné
   const { vehicles: clientVehicles, isLoading: isLoadingClientVehicles } = useClientVehicles(formData.client_id || undefined);
+
+  // Effect pour sélectionner automatiquement le véhicule une fois les véhicules chargés
+  useEffect(() => {
+    if (pendingVehicleId && clientVehicles && clientVehicles.length > 0 && !isLoadingClientVehicles) {
+      // Vérifier si le véhicule en attente existe dans la liste
+      const vehicleExists = clientVehicles.find(vehicle => vehicle.id === pendingVehicleId);
+      if (vehicleExists) {
+        onFieldChange('vehicle_id', pendingVehicleId);
+        setPendingVehicleId(null); // Réinitialiser l'état pending
+      } else {
+        console.warn(`Vehicle with id ${pendingVehicleId} not found in client vehicles`);
+        setPendingVehicleId(null);
+      }
+    }
+  }, [pendingVehicleId, clientVehicles, isLoadingClientVehicles, onFieldChange, setPendingVehicleId]);
 
   const handleClientChange = (clientId: string) => {
     onFieldChange('client_id', clientId);
     // Réinitialiser le véhicule sélectionné quand on change de client
     onFieldChange('vehicle_id', null);
   };
+  
+  const isReadOnly = formData.status !== 'Importé';
 
   return (
     <Card>
