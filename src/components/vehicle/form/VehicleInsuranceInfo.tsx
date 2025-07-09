@@ -22,18 +22,18 @@ const VehicleInsuranceInfo: React.FC<VehicleInsuranceInfoProps> = ({
 
   // Préparer les options pour SearchableSelect
   const insuranceOptions = insuranceCompanies.map(company => ({
-    value: company.name,
+    value: company.id,
     label: company.name
   }));
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
       <div className="md:col-span-4 space-y-2">
-        <Label htmlFor="insuranceCompany">Compagnie d'assurance</Label>
+        <Label htmlFor="insuranceCompanyId">Compagnie d'assurance</Label>
         <SearchableSelect
           options={insuranceOptions}
-          value={formData.insuranceCompany || ''}
-          onValueChange={(value) => onSelectChange('insuranceCompany', value)}
+          value={formData.insuranceCompanyId || ''}
+          onValueChange={(value) => onSelectChange('insuranceCompanyId', value)}
           placeholder="Sélectionner une compagnie"
           searchPlaceholder="Rechercher une compagnie..."
           disabled={isViewMode}

@@ -13,7 +13,7 @@ export interface VehicleFormData {
   year: string;
   color: string;
   mileage: string;
-  insuranceCompany: string;
+  insuranceCompanyId: string;
   insuranceExpiryDate: string;
   startDate: string;
   arrivalDate: string;
@@ -28,7 +28,6 @@ export interface VehicleFormData {
   registrationDocumentBackUrl: string;
   vehicleImageUrl: string;
   vehicleImages: string[];
-  fuelType: string;
 }
 
 interface UseVehicleFormLogicProps {
@@ -93,7 +92,7 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
     year: safeDefaultValues.year?.toString() || '',
     color: safeDefaultValues.color || '',
     mileage: safeDefaultValues.mileage?.toString() || '',
-    insuranceCompany: safeDefaultValues.insurance_company || '',
+    insuranceCompanyId: safeDefaultValues.insurance_company_id || '',
     insuranceExpiryDate: safeDefaultValues.insurance_expiry_date || '',
     startDate: safeDefaultValues.start_date || '',
     arrivalDate: safeDefaultValues.arrival_date || '',
@@ -107,8 +106,7 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
     registrationDocumentFrontUrl: safeDefaultValues.registration_document_front_url || '',
     registrationDocumentBackUrl: safeDefaultValues.registration_document_back_url || '',
     vehicleImageUrl: safeDefaultValues.vehicle_image_url || '',
-    vehicleImages: parseVehicleImages(safeDefaultValues.vehicle_images),
-    fuelType: safeDefaultValues.fuel_type || ''
+    vehicleImages: parseVehicleImages(safeDefaultValues.vehicle_images)
   });
 
   const [regDocPreview, setRegDocPreview] = useState<string | null>(

@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 import { VehicleStatus } from '@/types/vehicle';
@@ -16,6 +17,10 @@ export type Vehicle = Database['public']['Tables']['vehicles']['Row'] & {
     first_name: string;
     last_name: string;
   };
+  insurance_companies?: {
+    id: string;
+    name: string;
+  };
 };
 
 export type NewVehicle = Database['public']['Tables']['vehicles']['Insert'];
@@ -29,7 +34,8 @@ export const vehiclesService = {
         *,
         car_brands(id, name),
         car_models(id, name),
-        clients(id, first_name, last_name)
+        clients(id, first_name, last_name),
+        insurance_companies(id, name)
       `)
       .order('created_at', { ascending: false });
 
@@ -47,7 +53,8 @@ export const vehiclesService = {
       .select(`
         *,
         car_brands(id, name),
-        car_models(id, name)
+        car_models(id, name),
+        insurance_companies(id, name)
       `)
       .eq('client_id', clientId);
       
@@ -66,7 +73,8 @@ export const vehiclesService = {
         *,
         car_brands(id, name),
         car_models(id, name),
-        clients(id, first_name, last_name)
+        clients(id, first_name, last_name),
+        insurance_companies(id, name)
       `)
       .eq('id', id)
       .single();
@@ -98,7 +106,8 @@ export const vehiclesService = {
       .select(`
         *,
         car_brands(id, name),
-        car_models(id, name)
+        car_models(id, name),
+        insurance_companies(id, name)
       `)
       .single();
       
@@ -126,7 +135,8 @@ export const vehiclesService = {
       .select(`
         *,
         car_brands(id, name),
-        car_models(id, name)
+        car_models(id, name),
+        insurance_companies(id, name)
       `)
       .single();
       

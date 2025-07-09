@@ -20,6 +20,10 @@ interface Vehicle extends VehicleRow {
     first_name: string;
     last_name: string;
   };
+  insurance_companies?: {
+    id: string;
+    name: string;
+  };
 }
 
 export function useClientVehicles(clientId?: string) {
@@ -37,7 +41,8 @@ export function useClientVehicles(clientId?: string) {
         .select(`
           *,
           car_brands(id, name),
-          car_models(id, name)
+          car_models(id, name),
+          insurance_companies(id, name)
         `)
         .eq('client_id', clientId);
 
@@ -79,7 +84,8 @@ export function useVehicles() {
             id,
             first_name,
             last_name
-          )
+          ),
+          insurance_companies(id, name)
         `)
         .order('created_at', { ascending: false });
 
@@ -100,7 +106,8 @@ export function useVehicles() {
         .select(`
           *,
           car_brands(id, name),
-          car_models(id, name)
+          car_models(id, name),
+          insurance_companies(id, name)
         `)
         .single();
 
@@ -136,7 +143,8 @@ export function useVehicles() {
         .select(`
           *,
           car_brands(id, name),
-          car_models(id, name)
+          car_models(id, name),
+          insurance_companies(id, name)
         `)
         .single();
 
