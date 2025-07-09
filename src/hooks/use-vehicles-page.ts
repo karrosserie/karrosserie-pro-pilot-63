@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCarBrands } from '@/hooks/use-car-brands';
+import { carModelsService } from '@/services/supabase/car-models';
 
 export function useVehiclesPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -73,12 +74,18 @@ export function useVehiclesPage() {
         console.log('Found brand ID for', data.brand, ':', brandId);
       }
 
-      // Use model ID if available, otherwise use modelId field
+      // Find model ID from name if needed
       let modelId = data.modelId;
-      if (!modelId && data.model) {
-        // If we only have model name, we need the modelId field that should be set
-        modelId = data.modelId;
-        console.log('Using modelId:', modelId);
+      if (!modelId && data.model && brandId) {
+        // Fetch models for the brand and find the matching model
+        try {
+          const models = await carModelsService.getByBrandId(brandId);
+          const selectedModel = models.find(model => model.name === data.model);
+          modelId = selectedModel?.id;
+          console.log('Found model ID for', data.model, ':', modelId);
+        } catch (error) {
+          console.error('Error fetching models for brand:', brandId, error);
+        }
       }
 
       if (!brandId) {
