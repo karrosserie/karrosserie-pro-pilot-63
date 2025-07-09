@@ -7,8 +7,8 @@ export const ExpertiseReportTableEmpty: React.FC = () => {
   return (
     <TableBody>
       <TableRow>
-        <TableCell colSpan={8} className="text-center py-12">
-          <div className="flex flex-col items-center space-y-4">
+        <TableCell colSpan={8} className="text-center py-16">
+          <div className="flex flex-col items-center justify-center space-y-4 min-h-[300px]">
             <div className="bg-gray-100 p-4 rounded-full">
               <FileText className="h-8 w-8 text-gray-400" />
             </div>
