@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Pencil, Trash2, MoreVertical, FileText, Receipt, Car, User } from 'lucide-react';
+import { Eye, Pencil, Trash, MoreVertical, FileText, Receipt, Car, User } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { StatusBadge } from '@/components/ui/status-badge';
 
@@ -153,7 +153,7 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
                   className="text-red-500 hover:text-red-700" 
                   onClick={() => onDeleteVehicle(vehicle.id)}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash className="h-4 w-4" />
                 </Button>
               </div>
               
