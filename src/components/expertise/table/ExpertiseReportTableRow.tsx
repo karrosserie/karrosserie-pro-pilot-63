@@ -162,13 +162,14 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
                 variant="ghost" 
                 size="icon"
                 onClick={() => onEditReport(report)}
+                disabled={isConverted}
                 className="h-8 w-8"
               >
                 <Pencil className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              Modifier le rapport
+              {isConverted ? 'Impossible de modifier un rapport converti' : 'Modifier le rapport'}
             </TooltipContent>
           </Tooltip>
 
@@ -179,12 +180,13 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
                 size="icon" 
                 className="text-red-500 hover:text-red-700 h-8 w-8"
                 onClick={() => onDeleteReport(report.id)}
+                disabled={isConverted}
               >
                 <Trash className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              Supprimer le rapport
+              {isConverted ? 'Impossible de supprimer un rapport converti' : 'Supprimer le rapport'}
             </TooltipContent>
           </Tooltip>
         </div>
