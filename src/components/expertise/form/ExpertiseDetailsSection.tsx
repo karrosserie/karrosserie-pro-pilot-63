@@ -48,23 +48,23 @@ export const ExpertiseDetailsSection = ({ formData, errors, onFieldChange, globa
           </div>
 
           <div>
-            <Label htmlFor="report_date">Date du rapport</Label>
-            <Input
-              id="report_date"
-              type="date"
-              value={formData.report_date || ''}
-              onChange={(e) => onFieldChange('report_date', e.target.value)}
-              readOnly={isReadOnly}
-            />
-          </div>
-
-          <div>
             <Label htmlFor="policy_number">Numéro de police</Label>
             <Input
               id="policy_number"
               value={formData.policy_number || ''}
               onChange={(e) => onFieldChange('policy_number', e.target.value)}
               placeholder="Ex: POL-2024-1234"
+              readOnly={isReadOnly}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="report_date">Date du rapport</Label>
+            <Input
+              id="report_date"
+              type="date"
+              value={formData.report_date || ''}
+              onChange={(e) => onFieldChange('report_date', e.target.value)}
               readOnly={isReadOnly}
             />
           </div>
