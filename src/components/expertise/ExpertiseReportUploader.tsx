@@ -150,6 +150,18 @@ export const ExpertiseReportUploader = ({
 
   return (
     <div className={className}>
+      {isUploading && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
+            <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Analyse en cours</h3>
+            <p className="text-muted-foreground">
+              Veuillez patienter pendant que notre IA analyse votre rapport d'expertise...
+            </p>
+          </div>
+        </div>
+      )}
+      
       {selectedFile ? (
         <div className="flex flex-col items-center space-y-4">
           <div className="flex items-center justify-center w-full p-4 border-2 border-gray-300 border-solid rounded-md">
@@ -185,7 +197,7 @@ export const ExpertiseReportUploader = ({
               {isUploading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Importation...
+                  Analyse en cours...
                 </>
               ) : (
                 'Importer'
