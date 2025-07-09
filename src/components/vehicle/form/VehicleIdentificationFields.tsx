@@ -64,37 +64,42 @@ const VehicleIdentificationFields: React.FC<VehicleIdentificationFieldsProps> = 
   onSelectChange
 }) => {
   const { carBrands } = useCarBrands();
+  const [vinDecodeInfo, setVinDecodeInfo] = React.useState<any>(null);
 
-  // Effect pour détecter automatiquement la marque et le modèle quand le VIN change
+  // Effect pour décoder le VIN et stocker les informations
   useEffect(() => {
-    if (formData.vin && formData.vin.length === 17 && isValidVin(formData.vin) && onSelectChange) {
+    if (formData.vin && formData.vin.length === 17 && isValidVin(formData.vin) && !vinDecodeInfo) {
       const decodeVin = async () => {
         const vinInfo = await decodeVinViaAPI(formData.vin);
-        
         console.log('VIN décodé:', vinInfo);
-        
-        // Mettre à jour la marque si détectée et pas déjà définie
-        if (vinInfo.brand && !formData.brandId && carBrands.length > 0) {
-          const matchingBrand = carBrands.find(brand => 
-            brand.name.toLowerCase() === vinInfo.brand?.toLowerCase()
-          );
-          
-          if (matchingBrand) {
-            onSelectChange('brandId', matchingBrand.id);
-            console.log('Marque détectée automatiquement via VIN:', matchingBrand.name, 'ID:', matchingBrand.id);
-          }
-        }
-        
-        // Mettre à jour l'année si détectée et pas déjà définie
-        if (vinInfo.year && !formData.year) {
-          onSelectChange('year', vinInfo.year.toString());
-          console.log('Année détectée automatiquement:', vinInfo.year);
-        }
+        setVinDecodeInfo(vinInfo);
       };
       
       decodeVin();
     }
-  }, [formData.vin, formData.brandId, formData.year, onSelectChange, carBrands]);
+  }, [formData.vin, vinDecodeInfo]);
+
+  // Effect pour sélectionner la marque une fois les marques chargées
+  useEffect(() => {
+    if (vinDecodeInfo?.brand && !formData.brandId && carBrands.length > 0) {
+      const matchingBrand = carBrands.find(brand => 
+        brand.name.toLowerCase() === vinDecodeInfo.brand?.toLowerCase()
+      );
+      
+      if (matchingBrand && onSelectChange) {
+        onSelectChange('brandId', matchingBrand.id);
+        console.log('Marque détectée automatiquement via VIN:', matchingBrand.name, 'ID:', matchingBrand.id);
+      }
+    }
+  }, [vinDecodeInfo, formData.brandId, carBrands, onSelectChange]);
+
+  // Effect pour mettre à jour l'année
+  useEffect(() => {
+    if (vinDecodeInfo?.year && !formData.year && onSelectChange) {
+      onSelectChange('year', vinDecodeInfo.year.toString());
+      console.log('Année détectée automatiquement:', vinDecodeInfo.year);
+    }
+  }, [vinDecodeInfo, formData.year, onSelectChange]);
 
   return (
     <div className="space-y-4">

@@ -12,6 +12,7 @@ import {
 import { useClients } from '@/hooks/use-clients';
 import { useCarBrands } from '@/hooks/use-car-brands';
 import { useCarModels } from '@/hooks/use-car-models';
+import { supabase } from '@/integrations/supabase/client';
 
 interface VehicleBasicDetailsProps {
   formData: any;
@@ -37,13 +38,47 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
   const { carModels, isLoading: modelsLoading } = useCarModels(selectedBrandId);
   console.log('VehicleBasicDetails - carModels for brand ID', selectedBrandId, ':', carModels);
 
-  // Effect pour décoder automatiquement le modèle via VIN si l'API Edge Function fournit cette information
+  // Effect pour sélectionner automatiquement le modèle une fois les modèles chargés
   React.useEffect(() => {
-    if (formData.vin && formData.vin.length === 17 && selectedBrandId && carModels.length > 0 && !formData.modelId) {
-      // Le décodage du modèle via VIN sera géré par l'API Edge Function
-      // Cette logique peut être étendue plus tard si nécessaire
+    // Si on a un VIN, qu'une marque est sélectionnée, que les modèles sont chargés 
+    // et qu'aucun modèle n'est encore sélectionné
+    if (formData.vin && 
+        formData.vin.length === 17 && 
+        selectedBrandId && 
+        carModels.length > 0 && 
+        !formData.modelId && 
+        !modelsLoading) {
+      
+      // Appeler l'API pour décoder le VIN et obtenir le modèle
+      const decodeModelFromVin = async () => {
+        try {
+          const { data, error } = await supabase.functions.invoke('vin-decoder', {
+            body: { vin: formData.vin }
+          });
+
+          if (!error && data.success && data.data.model) {
+            const detectedModel = data.data.model;
+            console.log('Modèle détecté via VIN:', detectedModel);
+            
+            // Chercher le modèle correspondant dans la liste
+            const matchingModel = carModels.find(model => 
+              model.name.toLowerCase().includes(detectedModel.toLowerCase()) ||
+              detectedModel.toLowerCase().includes(model.name.toLowerCase())
+            );
+            
+            if (matchingModel) {
+              onSelectChange('modelId', matchingModel.id);
+              console.log('Modèle sélectionné automatiquement:', matchingModel.name, 'ID:', matchingModel.id);
+            }
+          }
+        } catch (error) {
+          console.error('Erreur lors du décodage du modèle via VIN:', error);
+        }
+      };
+      
+      decodeModelFromVin();
     }
-  }, [formData.vin, selectedBrandId, carModels, formData.modelId]);
+  }, [formData.vin, selectedBrandId, carModels, formData.modelId, modelsLoading, onSelectChange]);
 
   // Prepare client options for searchable select
   const clientOptions = clients?.map(client => ({
