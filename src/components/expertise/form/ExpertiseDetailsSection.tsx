@@ -49,36 +49,13 @@ export const ExpertiseDetailsSection = ({ formData, errors, onFieldChange, globa
 
           <div>
             <Label htmlFor="report_date">Date du rapport</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !formData.report_date && "text-muted-foreground"
-                  )}
-                  disabled={isReadOnly}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {formData.report_date ? (
-                    format(new Date(formData.report_date), "dd MMMM yyyy", { locale: fr })
-                  ) : (
-                    <span>Sélectionner une date</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              {!isReadOnly && (
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={formData.report_date ? new Date(formData.report_date) : undefined}
-                    onSelect={(date) => onFieldChange('report_date', date?.toISOString().split('T')[0])}
-                    initialFocus
-                    locale={fr}
-                  />
-                </PopoverContent>
-              )}
-            </Popover>
+            <Input
+              id="report_date"
+              type="date"
+              value={formData.report_date || ''}
+              onChange={(e) => onFieldChange('report_date', e.target.value)}
+              readOnly={isReadOnly}
+            />
           </div>
 
           <div>
