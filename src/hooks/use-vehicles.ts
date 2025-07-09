@@ -1,4 +1,5 @@
 
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -43,7 +44,7 @@ export function useClientVehicles(clientId?: string) {
           *,
           car_brands!inner(id, name),
           car_models!inner(id, name),
-          insurance_companies(id, name)
+          insurance_companies!inner(id, name)
         `)
         .eq('client_id', clientId);
 
@@ -86,7 +87,7 @@ export function useVehicles() {
             first_name,
             last_name
           ),
-          insurance_companies(id, name)
+          insurance_companies!inner(id, name)
         `)
         .order('created_at', { ascending: false });
 
@@ -108,7 +109,7 @@ export function useVehicles() {
           *,
           car_brands!inner(id, name),
           car_models!inner(id, name),
-          insurance_companies(id, name)
+          insurance_companies!inner(id, name)
         `)
         .single();
 
@@ -145,7 +146,7 @@ export function useVehicles() {
           *,
           car_brands!inner(id, name),
           car_models!inner(id, name),
-          insurance_companies(id, name)
+          insurance_companies!inner(id, name)
         `)
         .single();
 
