@@ -65,6 +65,12 @@ export function useVehiclesPage() {
       return;
     }
 
+    console.log('DEBUG - All form data fields:');
+    console.log('- clientId:', data.clientId, typeof data.clientId);
+    console.log('- brandId:', data.brandId, typeof data.brandId);
+    console.log('- modelId:', data.modelId, typeof data.modelId);
+    console.log('- insuranceCompanyId:', data.insuranceCompanyId, typeof data.insuranceCompanyId);
+
     try {
       const brandId = data.brandId;
       const modelId = data.modelId;
@@ -83,7 +89,7 @@ export function useVehiclesPage() {
 
       // Prepare the vehicle data using IDs
       const vehicleData = {
-        client_id: data.clientId,
+        client_id: data.clientId || null, // Convert empty string to null
         vin: data.vin,
         brand_id: brandId,
         model_id: modelId,
@@ -92,7 +98,7 @@ export function useVehiclesPage() {
         year: data.year ? parseInt(data.year) : null,
         color: data.color,
         mileage: data.mileage ? parseInt(data.mileage) : null,
-        insurance_company_id: data.insuranceCompanyId,
+        insurance_company_id: data.insuranceCompanyId || null, // Convert empty string to null
         insurance_expiry_date: data.insuranceExpiryDate || null,
         start_date: data.startDate || null,
         arrival_date: data.arrivalDate || null,
@@ -109,6 +115,12 @@ export function useVehiclesPage() {
         vehicle_images: JSON.stringify(data.vehicleImages?.filter((img: string) => img.trim() !== '') || []),
         user_id: user.id
       };
+
+      console.log('DEBUG - vehicleData before submission:');
+      console.log('- client_id:', vehicleData.client_id, typeof vehicleData.client_id);
+      console.log('- brand_id:', vehicleData.brand_id, typeof vehicleData.brand_id);
+      console.log('- model_id:', vehicleData.model_id, typeof vehicleData.model_id);
+      console.log('- insurance_company_id:', vehicleData.insurance_company_id, typeof vehicleData.insurance_company_id);
 
       console.log('Prepared vehicle data for submission:', vehicleData);
 
