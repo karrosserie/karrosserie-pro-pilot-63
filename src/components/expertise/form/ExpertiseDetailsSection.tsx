@@ -3,7 +3,13 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calculator, AlertCircle } from 'lucide-react';
+import { Calculator, AlertCircle, CalendarIcon } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 import { GlobalTotals } from './types';
 
@@ -29,6 +35,53 @@ export const ExpertiseDetailsSection = ({ formData, errors, onFieldChange, globa
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div>
+            <Label htmlFor="report_number">Numéro de rapport</Label>
+            <Input
+              id="report_number"
+              value={formData.report_number || ''}
+              onChange={(e) => onFieldChange('report_number', e.target.value)}
+              placeholder="Ex: RAP-2024-1234"
+              readOnly={isReadOnly}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="report_date">Date du rapport</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !formData.report_date && "text-muted-foreground"
+                  )}
+                  disabled={isReadOnly}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {formData.report_date ? (
+                    format(new Date(formData.report_date), "dd MMMM yyyy", { locale: fr })
+                  ) : (
+                    <span>Sélectionner une date</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              {!isReadOnly && (
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={formData.report_date ? new Date(formData.report_date) : undefined}
+                    onSelect={(date) => onFieldChange('report_date', date?.toISOString().split('T')[0])}
+                    initialFocus
+                    locale={fr}
+                  />
+                </PopoverContent>
+              )}
+            </Popover>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <Label htmlFor="expert_name">Nom de l'expert</Label>
