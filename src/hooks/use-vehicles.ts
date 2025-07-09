@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -10,20 +11,20 @@ interface Vehicle extends VehicleRow {
   car_brands?: {
     id: string;
     name: string;
-  };
+  } | null;
   car_models?: {
     id: string;
     name: string;
-  };
+  } | null;
   clients?: {
     id: string;
     first_name: string;
     last_name: string;
-  };
+  } | null;
   insurance_companies?: {
     id: string;
     name: string;
-  };
+  } | null;
 }
 
 export function useClientVehicles(clientId?: string) {
@@ -40,8 +41,8 @@ export function useClientVehicles(clientId?: string) {
         .from('vehicles')
         .select(`
           *,
-          car_brands(id, name),
-          car_models(id, name),
+          car_brands!inner(id, name),
+          car_models!inner(id, name),
           insurance_companies(id, name)
         `)
         .eq('client_id', clientId);
@@ -78,9 +79,9 @@ export function useVehicles() {
         .from('vehicles')
         .select(`
           *,
-          car_brands(id, name),
-          car_models(id, name),
-          clients (
+          car_brands!inner(id, name),
+          car_models!inner(id, name),
+          clients!inner(
             id,
             first_name,
             last_name
@@ -105,8 +106,8 @@ export function useVehicles() {
         .insert([vehicleData])
         .select(`
           *,
-          car_brands(id, name),
-          car_models(id, name),
+          car_brands!inner(id, name),
+          car_models!inner(id, name),
           insurance_companies(id, name)
         `)
         .single();
@@ -142,8 +143,8 @@ export function useVehicles() {
         .eq('id', id)
         .select(`
           *,
-          car_brands(id, name),
-          car_models(id, name),
+          car_brands!inner(id, name),
+          car_models!inner(id, name),
           insurance_companies(id, name)
         `)
         .single();
