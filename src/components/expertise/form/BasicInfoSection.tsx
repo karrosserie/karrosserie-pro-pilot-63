@@ -23,12 +23,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
   onFieldChange
 }) => {
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Informations de base</h3>
-      
-      <div className="text-sm text-gray-500">
-        Les détails du rapport sont maintenant dans la section "Détails de l'expertise".
-      </div>
+    <div className="hidden">
     </div>
   );
 };
