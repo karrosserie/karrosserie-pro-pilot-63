@@ -27,12 +27,10 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
   const { clients } = useClients();
   const { carBrands, isLoading: brandsLoading } = useCarBrands();
   
-  // Find brand ID based on brand name for fetching models
-  const selectedBrand = carBrands.find(brand => brand.name === formData.brand);
-  const selectedBrandId = selectedBrand?.id || '';
+  // Use brand ID directly for fetching models
+  const selectedBrandId = formData.brandId || '';
   
-  console.log('VehicleBasicDetails - formData.brand:', formData.brand);
-  console.log('VehicleBasicDetails - selectedBrand:', selectedBrand);
+  console.log('VehicleBasicDetails - formData.brandId:', formData.brandId);
   console.log('VehicleBasicDetails - selectedBrandId:', selectedBrandId);
   console.log('VehicleBasicDetails - carBrands:', carBrands);
   
@@ -47,37 +45,30 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
 
   // Prepare brand options for searchable select
   const brandOptions = carBrands.map(brand => ({
-    value: brand.name,
+    value: brand.id,
     label: brand.name
   }));
 
   // Prepare model options for searchable select
   const modelOptions = carModels.map(model => ({
-    value: model.name,
+    value: model.id,
     label: model.name
   }));
 
   console.log('VehicleBasicDetails - brandOptions:', brandOptions);
   console.log('VehicleBasicDetails - modelOptions:', modelOptions);
 
-  const handleBrandChange = (brandName: string) => {
-    console.log('VehicleBasicDetails - Brand changed to:', brandName);
-    onSelectChange('brand', brandName);
+  const handleBrandChange = (brandId: string) => {
+    console.log('VehicleBasicDetails - Brand changed to ID:', brandId);
+    onSelectChange('brandId', brandId);
     // Reset model when brand changes
     onSelectChange('model', '');
     onSelectChange('modelId', '');
   };
 
-  const handleModelChange = (modelName: string) => {
-    console.log('VehicleBasicDetails - Model changed to:', modelName);
-    // Find the model ID for storage
-    const selectedModel = carModels.find(model => model.name === modelName);
-    console.log('VehicleBasicDetails - Selected model object:', selectedModel);
-    
-    if (selectedModel) {
-      onSelectChange('model', selectedModel.name);
-      onSelectChange('modelId', selectedModel.id);
-    }
+  const handleModelChange = (modelId: string) => {
+    console.log('VehicleBasicDetails - Model changed to ID:', modelId);
+    onSelectChange('modelId', modelId);
   };
 
   // Show loading state for brands
@@ -107,7 +98,7 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
         </Label>
         <SearchableSelect
           options={brandOptions}
-          value={formData.brand || ''}
+          value={formData.brandId || ''}
           onValueChange={handleBrandChange}
           placeholder="Sélectionner une marque"
           searchPlaceholder="Rechercher une marque..."
@@ -121,19 +112,19 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
         </Label>
         <SearchableSelect
           options={modelOptions}
-          value={formData.model || ''}
+          value={formData.modelId || ''}
           onValueChange={handleModelChange}
           placeholder={
-            !formData.brand 
+            !formData.brandId 
               ? "Sélectionnez d'abord une marque" 
               : modelsLoading 
               ? "Chargement des modèles..."
               : "Sélectionner un modèle"
           }
           searchPlaceholder="Rechercher un modèle..."
-          disabled={isViewMode || !formData.brand || modelsLoading}
+          disabled={isViewMode || !formData.brandId || modelsLoading}
         />
-        {modelsLoading && formData.brand && (
+        {modelsLoading && formData.brandId && (
           <p className="text-sm text-gray-500">Chargement des modèles...</p>
         )}
       </div>

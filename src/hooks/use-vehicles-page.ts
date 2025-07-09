@@ -66,37 +66,18 @@ export function useVehiclesPage() {
     }
 
     try {
-      // Find brand ID from name if needed
-      let brandId = data.brandId;
-      if (!brandId && data.brand) {
-        const selectedBrand = carBrands.find(brand => brand.name === data.brand);
-        brandId = selectedBrand?.id;
-        console.log('Found brand ID for', data.brand, ':', brandId);
-      }
-
-      // Find model ID from name if needed
-      let modelId = data.modelId;
-      if (!modelId && data.model && brandId) {
-        // Fetch models for the brand and find the matching model
-        try {
-          const models = await carModelsService.getByBrandId(brandId);
-          const selectedModel = models.find(model => model.name === data.model);
-          modelId = selectedModel?.id;
-          console.log('Found model ID for', data.model, ':', modelId);
-        } catch (error) {
-          console.error('Error fetching models for brand:', brandId, error);
-        }
-      }
+      const brandId = data.brandId;
+      const modelId = data.modelId;
 
       if (!brandId) {
-        console.error('Brand ID not found for brand:', data.brand);
-        alert('Erreur: Impossible de trouver l\'ID de la marque');
+        console.error('Brand ID not provided');
+        alert('Erreur: Veuillez sélectionner une marque');
         return;
       }
 
       if (!modelId) {
-        console.error('Model ID not found for model:', data.model);
-        alert('Erreur: Impossible de trouver l\'ID du modèle');
+        console.error('Model ID not provided');
+        alert('Erreur: Veuillez sélectionner un modèle');
         return;
       }
 
