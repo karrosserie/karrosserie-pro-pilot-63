@@ -35,7 +35,7 @@ export const ExpertiseDetailsSection = ({ formData, errors, onFieldChange, globa
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div>
             <Label htmlFor="report_number">Numéro de rapport</Label>
             <Input
@@ -47,7 +47,7 @@ export const ExpertiseDetailsSection = ({ formData, errors, onFieldChange, globa
             />
           </div>
 
-          <div>
+          <div className="md:col-span-2">
             <Label htmlFor="policy_number">Numéro de police</Label>
             <Input
               id="policy_number"
@@ -70,8 +70,8 @@ export const ExpertiseDetailsSection = ({ formData, errors, onFieldChange, globa
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="md:col-span-2">
             <Label htmlFor="expert_name">Nom de l'expert</Label>
             <Input
               id="expert_name"
