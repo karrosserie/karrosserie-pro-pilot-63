@@ -98,20 +98,7 @@ export const ExpertiseReportUploader = ({
 
       console.log('Public URL generated:', publicUrlData.publicUrl);
 
-      // 4. Créer l'entrée dans la base de données
-      const reportNumber = `RE-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
-      
-      await createReport.mutateAsync({
-        id: reportId,
-        user_id: user.id,
-        report_number: reportNumber,
-        document_url: publicUrlData.publicUrl,
-        status: 'Importé'
-      });
-
-      console.log('Database entry created successfully');
-
-      // 5. Appel API externe pour traitement du document
+      // 4. Appel API externe pour traitement du document
       try {
         console.log('Calling external API for document processing...');
         const apiResponse = await fetch('https://n8n.karrosserie.pro/webhook/38917be3-c64c-46ff-82f9-7959ece86242', {
@@ -127,12 +114,13 @@ export const ExpertiseReportUploader = ({
 
         if (!apiResponse.ok) {
           console.error('External API call failed:', apiResponse.status, apiResponse.statusText);
+          throw new Error(`API call failed: ${apiResponse.status}`);
         } else {
           console.log('External API call successful');
         }
       } catch (apiError) {
         console.error('Error calling external API:', apiError);
-        // Ne pas faire échouer l'upload si l'API externe échoue
+        throw apiError;
       }
 
       toast({
