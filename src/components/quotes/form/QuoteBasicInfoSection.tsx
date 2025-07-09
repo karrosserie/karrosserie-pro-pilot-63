@@ -128,10 +128,10 @@ export const QuoteBasicInfoSection = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <div>
             <Label htmlFor="claim_number" className={cn(errors.claim_number && "text-red-500")}>
-              N° de sinistre
+              Numéro de sinistre
             </Label>
             <Input
               id="claim_number"
@@ -150,27 +150,6 @@ export const QuoteBasicInfoSection = ({
             )}
           </div>
 
-          <div>
-            <Label htmlFor="current_mileage" className={cn(errors.current_mileage && "text-red-500")}>
-              Kilométrage actuel
-            </Label>
-            <Input
-              id="current_mileage"
-              type="number"
-              value={currentMileage}
-              onChange={(e) => onCurrentMileageChange?.(e.target.value)}
-              placeholder="Kilométrage en km"
-              className={cn(
-                errors.current_mileage && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
-              )}
-            />
-            {errors.current_mileage && (
-              <p className="text-sm text-red-500 mt-1 flex items-center">
-                <AlertCircle className="h-4 w-4 mr-1" />
-                {errors.current_mileage}
-              </p>
-            )}
-          </div>
         </div>
       </CardContent>
     </Card>

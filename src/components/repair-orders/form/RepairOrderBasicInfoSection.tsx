@@ -121,9 +121,9 @@ export const RepairOrderBasicInfoSection = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <div>
-            <Label htmlFor="claim_number">N° de sinistre</Label>
+            <Label htmlFor="claim_number">Numéro de sinistre</Label>
             <Input
               id="claim_number"
               value={claimNumber}
@@ -141,25 +141,6 @@ export const RepairOrderBasicInfoSection = ({
             )}
           </div>
 
-          <div>
-            <Label htmlFor="current_mileage">Kilométrage actuel</Label>
-            <Input
-              id="current_mileage"
-              type="number"
-              value={currentMileage}
-              onChange={(e) => onCurrentMileageChange?.(e.target.value)}
-              placeholder="Kilométrage en km"
-              className={cn(
-                errors.current_mileage && "border-red-500 focus-visible:ring-red-500"
-              )}
-            />
-            {errors.current_mileage && (
-              <p className="text-sm text-red-500 mt-1 flex items-center">
-                <AlertCircle className="h-4 w-4 mr-1" />
-                {errors.current_mileage}
-              </p>
-            )}
-          </div>
         </div>
       </CardContent>
     </Card>
