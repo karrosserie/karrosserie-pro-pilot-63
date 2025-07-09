@@ -6,6 +6,7 @@ BEGIN;
 
 -- Ajouter les nouvelles colonnes à la table quotes
 ALTER TABLE quotes 
+ADD COLUMN IF NOT EXISTS claim_number TEXT,
 ADD COLUMN IF NOT EXISTS report_number TEXT,
 ADD COLUMN IF NOT EXISTS policy_number TEXT,
 ADD COLUMN IF NOT EXISTS report_date DATE,
