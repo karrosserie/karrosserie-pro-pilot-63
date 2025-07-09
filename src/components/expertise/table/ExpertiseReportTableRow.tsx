@@ -72,18 +72,15 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
 
   return (
     <TableRow className="hover:bg-gray-50">
-      <TableCell className="font-medium">
-        <div className="flex items-center">
-          <FileText className="h-4 w-4 mr-2 text-blue-600" />
-          {report.report_number || 'Non spécifié'}
-        </div>
+      <TableCell>
+        {report.report_number || 'Non spécifié'}
       </TableCell>
       <TableCell className="text-sm text-gray-600">
         {report.report_date ? new Date(report.report_date).toLocaleDateString('fr-FR') : 'Non spécifiée'}
       </TableCell>
       <TableCell>
         {report.clients ? (
-          <span className="font-medium">
+          <span>
             {report.clients.first_name} {report.clients.last_name}
           </span>
         ) : (
@@ -91,25 +88,17 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
         )}
       </TableCell>
       <TableCell>
-        {report.vehicles ? (
-          <div>
-            <div className="font-medium">
-              {report.vehicles.car_brands?.name || 'Marque inconnue'} {report.vehicles.car_models?.name || 'Modèle inconnu'}
-            </div>
-            <div className="text-sm text-gray-500">
-              {report.vehicles.license_plate || 'Plaque non spécifiée'}
-            </div>
-          </div>
-        ) : (
-          <span className="text-gray-400 italic">Non assigné</span>
-        )}
+        {report.vehicles 
+          ? `${report.vehicles.car_brands?.name || 'Marque inconnue'} ${report.vehicles.car_models?.name || 'Modèle inconnu'} - ${report.vehicles.license_plate || 'Plaque non spécifiée'}`
+          : 'Non assigné'
+        }
       </TableCell>
       <TableCell>
-        <span className={report.expert_name ? 'font-medium' : 'text-gray-400 italic'}>
+        <span className={report.expert_name ? '' : 'text-gray-400 italic'}>
           {report.expert_name || 'Non spécifié'}
         </span>
       </TableCell>
-      <TableCell className="font-medium">
+      <TableCell>
         {formatAmount(report.amount)}
       </TableCell>
       <TableCell>
