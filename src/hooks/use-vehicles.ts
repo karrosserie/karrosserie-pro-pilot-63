@@ -42,9 +42,9 @@ export function useClientVehicles(clientId?: string) {
         .from('vehicles')
         .select(`
           *,
-          car_brands!inner(id, name),
-          car_models!inner(id, name),
-          insurance_companies!inner(id, name)
+          car_brands(id, name),
+          car_models(id, name),
+          insurance_companies(id, name)
         `)
         .eq('client_id', clientId);
 
@@ -80,14 +80,14 @@ export function useVehicles() {
         .from('vehicles')
         .select(`
           *,
-          car_brands!inner(id, name),
-          car_models!inner(id, name),
-          clients!inner(
+          car_brands(id, name),
+          car_models(id, name),
+          clients(
             id,
             first_name,
             last_name
           ),
-          insurance_companies!inner(id, name)
+          insurance_companies(id, name)
         `)
         .order('created_at', { ascending: false });
 
@@ -107,9 +107,9 @@ export function useVehicles() {
         .insert([vehicleData])
         .select(`
           *,
-          car_brands!inner(id, name),
-          car_models!inner(id, name),
-          insurance_companies!inner(id, name)
+          car_brands(id, name),
+          car_models(id, name),
+          insurance_companies(id, name)
         `)
         .single();
 
@@ -144,9 +144,9 @@ export function useVehicles() {
         .eq('id', id)
         .select(`
           *,
-          car_brands!inner(id, name),
-          car_models!inner(id, name),
-          insurance_companies!inner(id, name)
+          car_brands(id, name),
+          car_models(id, name),
+          insurance_companies(id, name)
         `)
         .single();
 
