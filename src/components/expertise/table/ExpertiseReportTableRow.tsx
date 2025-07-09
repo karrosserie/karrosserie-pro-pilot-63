@@ -83,27 +83,21 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
       </TableCell>
       <TableCell>
         {report.clients ? (
-          <div className="flex items-center">
-            <User className="h-4 w-4 mr-2 text-gray-400" />
-            <span className="font-medium">
-              {report.clients.first_name} {report.clients.last_name}
-            </span>
-          </div>
+          <span className="font-medium">
+            {report.clients.first_name} {report.clients.last_name}
+          </span>
         ) : (
           <span className="text-gray-400 italic">Non assigné</span>
         )}
       </TableCell>
       <TableCell>
         {report.vehicles ? (
-          <div className="flex items-center">
-            <Car className="h-4 w-4 mr-2 text-gray-400" />
-            <div>
-              <div className="font-medium">
-                {report.vehicles.car_brands?.name || 'Marque inconnue'} {report.vehicles.car_models?.name || 'Modèle inconnu'}
-              </div>
-              <div className="text-sm text-gray-500">
-                {report.vehicles.license_plate || 'Plaque non spécifiée'}
-              </div>
+          <div>
+            <div className="font-medium">
+              {report.vehicles.car_brands?.name || 'Marque inconnue'} {report.vehicles.car_models?.name || 'Modèle inconnu'}
+            </div>
+            <div className="text-sm text-gray-500">
+              {report.vehicles.license_plate || 'Plaque non spécifiée'}
             </div>
           </div>
         ) : (
