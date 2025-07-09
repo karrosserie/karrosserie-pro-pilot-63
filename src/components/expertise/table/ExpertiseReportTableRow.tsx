@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
-import { FileText, Eye, Pencil, Trash, Download, User, Car } from 'lucide-react';
+import { FileText, Pencil, Trash, Download, User, Car } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
@@ -9,7 +9,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 
 interface ExpertiseReportTableRowProps {
   report: ExpertiseReport;
-  onViewReport: (report: ExpertiseReport) => void;
   onEditReport: (report: ExpertiseReport) => void;
   onDeleteReport: (id: string) => void;
 }
@@ -41,7 +40,6 @@ const formatAmount = (amount: number | null) => {
 
 export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = ({
   report,
-  onViewReport,
   onEditReport,
   onDeleteReport
 }) => {
@@ -103,23 +101,6 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
       </TableCell>
       <TableCell className="text-right">
         <div className="flex justify-end space-x-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => onViewReport(report)}
-                disabled={!report.document_url}
-                className="h-8 w-8"
-              >
-                <Eye className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              {report.document_url ? 'Voir le document' : 'Aucun document'}
-            </TooltipContent>
-          </Tooltip>
-
           <Tooltip>
             <TooltipTrigger asChild>
               <Button 

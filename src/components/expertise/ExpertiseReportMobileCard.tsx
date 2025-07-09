@@ -2,19 +2,17 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Pencil, Trash, FileText, Calendar, User, Car } from 'lucide-react';
+import { Pencil, Trash, FileText, Calendar, User, Car } from 'lucide-react';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 
 interface ExpertiseReportMobileCardProps {
   report: ExpertiseReport;
-  onViewReport: (report: ExpertiseReport) => void;
   onEditReport: (report: ExpertiseReport) => void;
   onDeleteReport: (id: string) => void;
 }
 
 const ExpertiseReportMobileCard: React.FC<ExpertiseReportMobileCardProps> = ({
   report,
-  onViewReport,
   onEditReport,
   onDeleteReport
 }) => {
@@ -96,15 +94,6 @@ const ExpertiseReportMobileCard: React.FC<ExpertiseReportMobileCardProps> = ({
 
       {/* Actions */}
       <div className="flex items-center justify-end space-x-2 pt-2 border-t border-gray-100">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onViewReport(report)}
-          className="text-xs"
-        >
-          <Eye className="h-3 w-3 mr-1" />
-          Voir
-        </Button>
         <Button
           variant="ghost"
           size="sm"

@@ -17,7 +17,6 @@ interface ExpertiseReportTableProps {
   reports: ExpertiseReport[];
   isLoading: boolean;
   error: Error | null;
-  onViewReport: (report: ExpertiseReport) => void;
   onEditReport: (report: ExpertiseReport) => void;
   onDeleteReport: (id: string) => void;
 }
@@ -26,7 +25,6 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
   reports,
   isLoading,
   error,
-  onViewReport,
   onEditReport,
   onDeleteReport
 }) => {
@@ -40,7 +38,6 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
           <ExpertiseReportMobileCard
             key={report.id}
             report={report}
-            onViewReport={onViewReport}
             onEditReport={onEditReport}
             onDeleteReport={onDeleteReport}
           />
@@ -73,7 +70,6 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
                 <ExpertiseReportTableRow
                   key={report.id}
                   report={report}
-                  onViewReport={onViewReport}
                   onEditReport={onEditReport}
                   onDeleteReport={onDeleteReport}
                 />

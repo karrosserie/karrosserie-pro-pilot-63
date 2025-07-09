@@ -2,12 +2,11 @@
 import React, { useState } from 'react';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { SimpleTable } from '@/components/ui/simple-table';
-import { FileText, Eye, Pencil, Trash } from 'lucide-react';
+import { FileText, Pencil, Trash } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { DocumentViewer } from '@/components/documents/DocumentViewer';
 import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 
@@ -18,7 +17,6 @@ interface ClientExpertiseReportsTabProps {
 const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ clientId }) => {
   const { reports, isLoading, deleteReport } = useExpertiseReports();
   const { toast } = useToast();
-  const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<ExpertiseReport | null>(null);
 
@@ -31,11 +29,6 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
   }
 
   const clientReports = reports?.filter(report => report.client_id === clientId) || [];
-
-  const handleViewReport = (report: ExpertiseReport) => {
-    setSelectedReport(report);
-    setViewDialogOpen(true);
-  };
 
   const handleEditReport = (report: ExpertiseReport) => {
     setSelectedReport(report);
@@ -133,17 +126,6 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
               size="icon"
               onClick={(e) => {
                 e.stopPropagation();
-                handleViewReport(report);
-              }}
-              title="Voir les détails"
-            >
-              <Eye className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
                 handleEditReport(report);
               }}
               title="Modifier"
@@ -184,16 +166,6 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
         columns={columns}
         data={clientReports}
       />
-
-      {/* View Document Dialog */}
-      {selectedReport && (
-        <DocumentViewer
-          url={selectedReport.document_url}
-          open={viewDialogOpen}
-          onOpenChange={setViewDialogOpen}
-          title={`Rapport d'expertise - ${selectedReport.report_number || 'Sans numéro'}`}
-        />
-      )}
 
       {/* Edit Report Dialog */}
       <ExpertiseReportDialog

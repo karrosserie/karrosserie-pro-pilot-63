@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
-import { DocumentViewer } from '@/components/documents/DocumentViewer';
 import { useToast } from '@/hooks/use-toast';
 import { ExpertiseReportUploader } from '@/components/expertise/ExpertiseReportUploader';
 import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
@@ -15,7 +14,6 @@ const ExpertiseReports = () => {
   const { reports, isLoading, error, deleteReport } = useExpertiseReports();
   const [searchTerm, setSearchTerm] = useState('');
   const [importDialogOpen, setImportDialogOpen] = useState(false);
-  const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<ExpertiseReport | null>(null);
   const { toast } = useToast();
@@ -42,11 +40,6 @@ const ExpertiseReports = () => {
     return matchesSearch || vehicleMatch;
   }) || [];
   
-  const handleViewReport = (report: ExpertiseReport) => {
-    setSelectedReport(report);
-    setViewDialogOpen(true);
-  };
-
   const handleEditReport = (report: ExpertiseReport) => {
     setSelectedReport(report);
     setEditDialogOpen(true);
@@ -89,7 +82,6 @@ const ExpertiseReports = () => {
             reports={filteredReports}
             isLoading={isLoading}
             error={error as Error | null}
-            onViewReport={handleViewReport}
             onEditReport={handleEditReport}
             onDeleteReport={handleDeleteReport}
           />
@@ -119,15 +111,6 @@ const ExpertiseReports = () => {
           onOpenChange={setEditDialogOpen}
         />
 
-        {/* View Document Dialog */}
-        {selectedReport && (
-          <DocumentViewer
-            url={selectedReport.document_url}
-            open={viewDialogOpen}
-            onOpenChange={setViewDialogOpen}
-            title={`Rapport d'expertise - ${selectedReport.report_number || 'Sans numéro'}`}
-          />
-        )}
       </div>
     </div>
   );
