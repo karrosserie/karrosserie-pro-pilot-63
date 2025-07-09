@@ -10,6 +10,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from '@/integrations/supabase/client';
+import { useCarBrands } from '@/hooks/use-car-brands';
+import { useCarModels } from '@/hooks/use-car-models';
 
 interface VehicleIdentificationFieldsProps {
   formData: any;
@@ -61,6 +63,7 @@ const VehicleIdentificationFields: React.FC<VehicleIdentificationFieldsProps> = 
   onInputChange,
   onSelectChange
 }) => {
+  const { carBrands } = useCarBrands();
 
   // Effect pour détecter automatiquement la marque et le modèle quand le VIN change
   useEffect(() => {
@@ -71,15 +74,15 @@ const VehicleIdentificationFields: React.FC<VehicleIdentificationFieldsProps> = 
         console.log('VIN décodé:', vinInfo);
         
         // Mettre à jour la marque si détectée et pas déjà définie
-        if (vinInfo.brand && !formData.brand) {
-          onSelectChange('brand', vinInfo.brand);
-          console.log('Marque détectée automatiquement:', vinInfo.brand);
-        }
-        
-        // Mettre à jour le modèle si détecté et pas déjà défini
-        if (vinInfo.model && !formData.model) {
-          onSelectChange('model', vinInfo.model);
-          console.log('Modèle détecté automatiquement:', vinInfo.model);
+        if (vinInfo.brand && !formData.brandId && carBrands.length > 0) {
+          const matchingBrand = carBrands.find(brand => 
+            brand.name.toLowerCase() === vinInfo.brand?.toLowerCase()
+          );
+          
+          if (matchingBrand) {
+            onSelectChange('brandId', matchingBrand.id);
+            console.log('Marque détectée automatiquement via VIN:', matchingBrand.name, 'ID:', matchingBrand.id);
+          }
         }
         
         // Mettre à jour l'année si détectée et pas déjà définie
@@ -91,7 +94,7 @@ const VehicleIdentificationFields: React.FC<VehicleIdentificationFieldsProps> = 
       
       decodeVin();
     }
-  }, [formData.vin, formData.brand, formData.model, formData.year, onSelectChange]);
+  }, [formData.vin, formData.brandId, formData.year, onSelectChange, carBrands]);
 
   return (
     <div className="space-y-4">
@@ -120,7 +123,7 @@ const VehicleIdentificationFields: React.FC<VehicleIdentificationFieldsProps> = 
           )}
           {formData.vin && isValidVin(formData.vin) && (
             <p className="text-sm text-green-600">
-              ✓ VIN valide - Marque et modèle détectés
+              ✓ VIN valide - Décodage automatique en cours...
             </p>
           )}
         </div>

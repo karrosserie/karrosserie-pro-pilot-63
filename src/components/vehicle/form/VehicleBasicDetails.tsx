@@ -37,6 +37,14 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
   const { carModels, isLoading: modelsLoading } = useCarModels(selectedBrandId);
   console.log('VehicleBasicDetails - carModels for brand ID', selectedBrandId, ':', carModels);
 
+  // Effect pour décoder automatiquement le modèle via VIN si l'API Edge Function fournit cette information
+  React.useEffect(() => {
+    if (formData.vin && formData.vin.length === 17 && selectedBrandId && carModels.length > 0 && !formData.modelId) {
+      // Le décodage du modèle via VIN sera géré par l'API Edge Function
+      // Cette logique peut être étendue plus tard si nécessaire
+    }
+  }, [formData.vin, selectedBrandId, carModels, formData.modelId]);
+
   // Prepare client options for searchable select
   const clientOptions = clients?.map(client => ({
     value: client.id,
