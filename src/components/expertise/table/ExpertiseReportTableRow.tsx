@@ -79,7 +79,7 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
         </div>
       </TableCell>
       <TableCell className="text-sm text-gray-600">
-        {new Date(report.created_at || '').toLocaleDateString('fr-FR')}
+        {report.report_date ? new Date(report.report_date).toLocaleDateString('fr-FR') : 'Non spécifiée'}
       </TableCell>
       <TableCell>
         {report.clients ? (

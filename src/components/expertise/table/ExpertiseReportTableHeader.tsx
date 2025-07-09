@@ -7,7 +7,7 @@ export const ExpertiseReportTableHeader: React.FC = () => {
     <TableHeader>
       <TableRow>
         <TableHead className="w-[200px]">Numéro de rapport</TableHead>
-        <TableHead className="w-[120px]">Date</TableHead>
+        <TableHead className="w-[120px]">Date du rapport</TableHead>
         <TableHead>Client</TableHead>
         <TableHead>Véhicule</TableHead>
         <TableHead>Expert</TableHead>
