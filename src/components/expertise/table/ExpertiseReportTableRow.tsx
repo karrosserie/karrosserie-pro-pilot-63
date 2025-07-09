@@ -50,7 +50,7 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
       <TableCell className="font-medium">
         <div className="flex items-center">
           <FileText className="h-4 w-4 mr-2 text-blue-600" />
-          {report.report_number || report.reference || 'Non spécifié'}
+          {report.report_number || 'Non spécifié'}
         </div>
       </TableCell>
       <TableCell className="text-sm text-gray-600">

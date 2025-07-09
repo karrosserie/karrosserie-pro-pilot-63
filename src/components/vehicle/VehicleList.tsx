@@ -46,7 +46,6 @@ const VehicleList = () => {
         color: data.color,
         vin: data.vin,
         mileage: data.mileage ? parseInt(data.mileage) : null,
-        fuel_type: data.fuelType,
         client_id: data.clientId,
         user_id: user ? user.id : null,
       });
@@ -61,7 +60,6 @@ const VehicleList = () => {
           color: data.color,
           vin: data.vin,
           mileage: data.mileage ? parseInt(data.mileage) : null,
-          fuel_type: data.fuelType,
           client_id: data.clientId,
         }
       });
@@ -165,7 +163,6 @@ const VehicleList = () => {
           color: selectedVehicle.color || '',
           vin: selectedVehicle.vin || '',
           mileage: selectedVehicle.mileage?.toString() || '',
-          fuelType: selectedVehicle.fuel_type || '',
           clientId: selectedVehicle.client_id || '',
         } : {}}
         onSubmit={handleVehicleSubmit}

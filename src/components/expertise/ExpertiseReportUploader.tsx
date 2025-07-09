@@ -99,12 +99,12 @@ export const ExpertiseReportUploader = ({
       console.log('Public URL generated:', publicUrlData.publicUrl);
 
       // 4. Créer l'entrée dans la base de données
-      const reportReference = `RE-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+      const reportNumber = `RE-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
       
       await createReport.mutateAsync({
         id: reportId,
         user_id: user.id,
-        reference: reportReference,
+        report_number: reportNumber,
         document_url: publicUrlData.publicUrl,
         status: 'Importé'
       });
