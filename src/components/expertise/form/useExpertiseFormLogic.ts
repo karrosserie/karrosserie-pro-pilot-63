@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 import { RepairItem, PartItem, GlobalTotals } from './types';
@@ -9,6 +8,7 @@ interface UseExpertiseFormLogicProps {
 
 export const useExpertiseFormLogic = ({ report }: UseExpertiseFormLogicProps) => {
   const [formData, setFormData] = useState<Partial<ExpertiseReport>>({
+    report_number: '',
     report_date: null,
     client_id: null,
     vehicle_id: null,
@@ -91,6 +91,7 @@ export const useExpertiseFormLogic = ({ report }: UseExpertiseFormLogicProps) =>
   useEffect(() => {
     if (report) {
       setFormData({
+        report_number: report.report_number || '',
         report_date: report.report_date,
         client_id: report.client_id,
         vehicle_id: report.vehicle_id,
