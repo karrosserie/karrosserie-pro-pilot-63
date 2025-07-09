@@ -216,28 +216,37 @@ export const quotesService = {
       throw new Error('User not authenticated');
     }
 
-    // Générer le prochain numéro de référence
+    // Générer le numéro de devis (entier auto-incrémenté)
     const lastQuote = await quotesService.getLastQuoteByUser();
-    let nextNumber = 1;
+    const lastNumber = lastQuote?.reference ? parseInt(lastQuote.reference) : 0;
+    const reference = (lastNumber + 1).toString();
     
-    if (lastQuote?.reference) {
-      const match = lastQuote.reference.match(/D-(\d+)$/);
-      if (match) {
-        nextNumber = parseInt(match[1]) + 1;
-      }
+    // Préparer les notes avec les réparations et pièces du rapport
+    let notes = `Créé depuis le rapport d'expertise ${expertiseReport.report_number}`;
+    
+    if (expertiseReport.repairs) {
+      notes += `\n\nRéparations:\n${expertiseReport.repairs}`;
     }
     
-    const nextReference = `D-${nextNumber.toString().padStart(6, '0')}`;
+    if (expertiseReport.parts) {
+      notes += `\n\nPièces:\n${expertiseReport.parts}`;
+    }
     
     const quoteData: any = {
-      reference: nextReference,
+      reference,
       client_id: expertiseReport.client_id,
       vehicle_id: expertiseReport.vehicle_id,
-      amount: 0, // Sera calculé selon les données du rapport
-      status: 'En cours',
-      notes: `Devis généré automatiquement à partir du rapport d'expertise ${expertiseReport.report_number}`,
+      amount: expertiseReport.total_amount || 0,
+      status: 'draft',
+      notes,
+      claim_number: expertiseReport.claim_number || '',
+      report_number: expertiseReport.report_number || '',
+      policy_number: expertiseReport.policy_number || '',
+      report_date: expertiseReport.report_date || '',
+      expert_name: expertiseReport.expert_name || '',
+      incident_date: expertiseReport.incident_date || '',
       user_id: user.id,
-      valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 jours de validité
+      valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
     };
 
     // Temporairement, on va stocker l'ID du rapport dans les notes jusqu'à ce que la colonne soit ajoutée

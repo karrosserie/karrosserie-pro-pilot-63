@@ -10,11 +10,11 @@ import { cn } from '@/lib/utils';
 
 // Interface étendue temporaire pour les nouveaux champs
 interface ExtendedQuote extends Quote {
-  report_number?: string;
-  policy_number?: string;
-  report_date?: string;
-  expert_name?: string;
-  incident_date?: string;
+  report_number: string;
+  policy_number: string;
+  report_date: string;
+  expert_name: string;
+  incident_date: string;
 }
 
 interface QuoteBasicInfoSectionProps {
