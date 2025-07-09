@@ -84,7 +84,7 @@ const ExpertiseReports = () => {
           onImportClick={() => setImportDialogOpen(true)}
         />
         
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden items-center justify-center">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <ExpertiseReportTable 
             reports={filteredReports}
             isLoading={isLoading}
