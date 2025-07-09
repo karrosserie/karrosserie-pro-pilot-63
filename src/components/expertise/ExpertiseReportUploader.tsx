@@ -111,6 +111,30 @@ export const ExpertiseReportUploader = ({
 
       console.log('Database entry created successfully');
 
+      // 5. Appel API externe pour traitement du document
+      try {
+        console.log('Calling external API for document processing...');
+        const apiResponse = await fetch('https://n8n.karrosserie.pro/webhook/38917be3-c64c-46ff-82f9-7959ece86242', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            URL: publicUrlData.publicUrl,
+            userId: user.id
+          }),
+        });
+
+        if (!apiResponse.ok) {
+          console.error('External API call failed:', apiResponse.status, apiResponse.statusText);
+        } else {
+          console.log('External API call successful');
+        }
+      } catch (apiError) {
+        console.error('Error calling external API:', apiError);
+        // Ne pas faire échouer l'upload si l'API externe échoue
+      }
+
       toast({
         title: "Rapport importé",
         description: "Le rapport d'expertise a été importé avec succès."
