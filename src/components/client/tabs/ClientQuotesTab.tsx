@@ -118,6 +118,7 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
     const prefilledData: Partial<RepairOrder> = {
       client_id: quote.client_id,
       vehicle_id: quote.vehicle_id,
+      quote_id: quote.id,
       status: 'En cours',
       notes: quote.notes || '',
       claim_number: quote.claim_number || '',
