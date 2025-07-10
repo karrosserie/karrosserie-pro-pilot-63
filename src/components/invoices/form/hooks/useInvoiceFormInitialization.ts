@@ -112,6 +112,9 @@ export const useInvoiceFormInitialization = ({
         console.log('New invoice or prefilled data, generating number...');
         // Pour une nouvelle facture, générer automatiquement le numéro
         const today = new Date().toISOString().split('T')[0];
+        const dueDate = new Date();
+        dueDate.setDate(dueDate.getDate() + 30);
+        const dueDateString = dueDate.toISOString().split('T')[0];
         
         try {
           const nextNumber = await generateNextInvoiceNumber();
@@ -124,7 +127,7 @@ export const useInvoiceFormInitialization = ({
             repair_order_id: invoice?.repair_order_id || null,
             status: 'En attente de paiement',
             date: today,
-            due_date: today,
+            due_date: dueDateString,
             payment_details: '',
             notes: (invoice as any)?.notes || '',
             report_number: (invoice as any)?.report_number || '',
@@ -202,7 +205,7 @@ export const useInvoiceFormInitialization = ({
             repair_order_id: invoice?.repair_order_id || null,
             status: 'En attente de paiement',
             date: today,
-            due_date: today,
+            due_date: dueDateString,
             payment_details: '',
             notes: (invoice as any)?.notes || '',
             report_number: (invoice as any)?.report_number || '',
