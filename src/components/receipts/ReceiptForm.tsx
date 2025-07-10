@@ -83,7 +83,7 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <Label htmlFor="reference">Numéro</Label>
+          <Label htmlFor="reference">Numéro <span className="text-red-500">*</span></Label>
           <Input
             id="reference"
             value={formData.reference}
@@ -94,7 +94,7 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
         </div>
         
         <div>
-          <Label htmlFor="date">Date</Label>
+          <Label htmlFor="date">Date <span className="text-red-500">*</span></Label>
           <Input
             id="date"
             type="date"
