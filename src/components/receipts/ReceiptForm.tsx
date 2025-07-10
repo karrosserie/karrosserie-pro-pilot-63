@@ -24,16 +24,41 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
   console.log('ReceiptForm - Accounts loaded:', accounts);
   console.log('ReceiptForm - Accounts loading state:', accountsLoading);
   console.log('ReceiptForm - Receipt prop:', receipt);
-  const [formData, setFormData] = useState<Receipt>({
-    reference: '',
-    date: new Date().toISOString().split('T')[0],
-    amount: 0,
-    status: 'Encaissé',
-    payment_method: 'Virement',
-    bank_account: '',
-    notes: '',
-    payment_proofs: [],
-    invoice: ''
+  const [formData, setFormData] = useState<Receipt>(() => {
+    // Si c'est un nouvel encaissement (pas de receipt passé en prop), générer le numéro immédiatement
+    if (!receipt) {
+      const nextNumber = receipts && receipts.length > 0 
+        ? Math.max(...receipts
+            .map(r => r.reference)
+            .filter(ref => ref && /^\d+$/.test(ref))
+            .map(ref => parseInt(ref!, 10))
+            .filter(num => !isNaN(num))) + 1
+        : 1;
+      
+      return {
+        reference: nextNumber.toString(),
+        date: new Date().toISOString().split('T')[0],
+        amount: 0,
+        status: 'Encaissé',
+        payment_method: 'Virement',
+        bank_account: '',
+        notes: '',
+        payment_proofs: [],
+        invoice: ''
+      };
+    }
+    
+    return {
+      reference: '',
+      date: new Date().toISOString().split('T')[0],
+      amount: 0,
+      status: 'Encaissé',
+      payment_method: 'Virement',
+      bank_account: '',
+      notes: '',
+      payment_proofs: [],
+      invoice: ''
+    };
   });
 
   // Calculer le prochain numéro d'encaissement
