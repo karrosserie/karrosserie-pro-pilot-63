@@ -15,6 +15,7 @@ import InvoiceEmailDialog from '@/components/invoices/InvoiceEmailDialog';
 import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 import { CreditDialog } from '@/components/credits/CreditDialog';
 import { useInvoices } from '@/hooks/use-invoices';
+import { useCredits } from '@/hooks/use-credits';
 import { Invoice } from '@/services/supabase/invoices';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
@@ -42,6 +43,7 @@ const Invoices = () => {
   const { confirm } = useConfirmation();
   
   const { invoices, isLoading, error, deleteInvoice } = useInvoices();
+  const { credits } = useCredits();
   
   const filteredInvoices = invoices?.filter(invoice => 
     invoice.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -76,6 +78,23 @@ const Invoices = () => {
       style: 'currency',
       currency: 'EUR'
     }).format(amount);
+  };
+
+  const getInvoiceCredits = (invoiceId: string) => {
+    return credits?.filter(credit => credit.invoice_id === invoiceId) || [];
+  };
+
+  const formatCreditsDisplay = (invoiceCredits: any[]) => {
+    if (invoiceCredits.length === 0) {
+      return '-';
+    }
+    
+    if (invoiceCredits.length === 1) {
+      return `${invoiceCredits[0].reference} (${formatAmount(invoiceCredits[0].amount || 0)})`;
+    }
+    
+    const totalAmount = invoiceCredits.reduce((sum, credit) => sum + (credit.amount || 0), 0);
+    return `${invoiceCredits.length} avoirs (${formatAmount(totalAmount)})`;
   };
   
   const handleCreateInvoice = () => {
@@ -193,13 +212,16 @@ const Invoices = () => {
               <TableHead>Client</TableHead>
               <TableHead>Véhicule</TableHead>
               <TableHead>Montant</TableHead>
+              <TableHead>Avoirs</TableHead>
               <TableHead>Statut</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredInvoices.length > 0 ? (
-              filteredInvoices.map((invoice) => (
+              filteredInvoices.map((invoice) => {
+                const invoiceCredits = getInvoiceCredits(invoice.id);
+                return (
                 <TableRow key={invoice.id}>
                   <TableCell className="font-medium">{invoice.reference}</TableCell>
                   <TableCell>{formatDate(invoice.created_at)}</TableCell>
@@ -216,6 +238,11 @@ const Invoices = () => {
                     }
                   </TableCell>
                   <TableCell>{formatAmount(invoice.amount || 0)}</TableCell>
+                  <TableCell>
+                    <span className={`text-sm ${invoiceCredits.length > 0 ? 'text-red-600 font-medium' : 'text-gray-500'}`}>
+                      {formatCreditsDisplay(invoiceCredits)}
+                    </span>
+                  </TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente de paiement')}`}>
                       {invoice.status || 'En attente de paiement'}
@@ -270,10 +297,11 @@ const Invoices = () => {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))
+                );
+              })
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-4">
+                <TableCell colSpan={8} className="text-center py-4">
                   <div className="flex flex-col items-center justify-center py-8">
                     <FileText className="h-10 w-10 text-gray-400 mb-2" />
                     <h3 className="font-medium text-gray-900">Aucun résultat</h3>
