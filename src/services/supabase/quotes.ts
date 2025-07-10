@@ -226,21 +226,21 @@ export const quotesService = {
     let parts = [];
     
     // Parser les réparations du rapport si elles existent
-    if (expertiseReport.repairs) {
+    if (expertiseReport.repairs_data) {
       try {
-        repairs = JSON.parse(expertiseReport.repairs);
+        repairs = JSON.parse(expertiseReport.repairs_data);
       } catch (error) {
-        console.error('Error parsing repairs:', error);
+        console.error('Error parsing repairs_data:', error);
         repairs = [];
       }
     }
     
     // Parser les pièces du rapport si elles existent
-    if (expertiseReport.parts) {
+    if (expertiseReport.parts_data) {
       try {
-        parts = JSON.parse(expertiseReport.parts);
+        parts = JSON.parse(expertiseReport.parts_data);
       } catch (error) {
-        console.error('Error parsing parts:', error);
+        console.error('Error parsing parts_data:', error);
         parts = [];
       }
     }
@@ -252,8 +252,8 @@ export const quotesService = {
       amount: expertiseReport.total_amount || 0,
       status: 'draft',
       notes: `Créé depuis le rapport d'expertise ${expertiseReport.report_number}`,
-      repairs_data: expertiseReport.repairs || null,
-      parts_data: expertiseReport.parts || null,
+      repairs_data: expertiseReport.repairs_data || null,
+      parts_data: expertiseReport.parts_data || null,
       claim_number: expertiseReport.claim_number || '',
       report_number: expertiseReport.report_number || '',
       policy_number: expertiseReport.policy_number || '',
