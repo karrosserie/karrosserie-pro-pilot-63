@@ -11,6 +11,16 @@ import { Invoice } from '@/services/supabase/invoices';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
 import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const RepairOrders = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,9 +28,12 @@ const RepairOrders = () => {
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [signatureDialogOpen, setSignatureDialogOpen] = useState(false);
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<RepairOrder | null>(null);
   const [selectedOrderForEmail, setSelectedOrderForEmail] = useState<RepairOrder | null>(null);
   const [selectedOrderForSignature, setSelectedOrderForSignature] = useState<RepairOrder | null>(null);
+  const [selectedOrderForConversion, setSelectedOrderForConversion] = useState<RepairOrder | null>(null);
+  const [selectedOrderForDeletion, setSelectedOrderForDeletion] = useState<RepairOrder | null>(null);
   const [prefilledInvoice, setPrefilledInvoice] = useState<Partial<Invoice> | null>(null);
   const { toast } = useToast();
   
@@ -118,8 +131,15 @@ const RepairOrders = () => {
   };
 
   const handleDeleteOrder = (order: RepairOrder) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet ordre de réparation ?')) {
-      deleteOrder.mutate(order.id);
+    setSelectedOrderForDeletion(order);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteOrder = () => {
+    if (selectedOrderForDeletion) {
+      deleteOrder.mutate(selectedOrderForDeletion.id);
+      setDeleteDialogOpen(false);
+      setSelectedOrderForDeletion(null);
     }
   };
 
@@ -189,6 +209,23 @@ const RepairOrders = () => {
         }}
         invoice={prefilledInvoice as Invoice}
       />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer l'ordre de réparation</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer cet ordre de réparation ? Cette action est irréversible et supprimera définitivement toutes les données associées.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteOrder} className="bg-red-600 hover:bg-red-700">
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
