@@ -79,7 +79,7 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <div>
           <Label htmlFor="reference">Numéro</Label>
           <Input
@@ -101,16 +101,16 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
             required
           />
         </div>
-      </div>
 
-      <div>
-        <Label htmlFor="bank_account">Compte bancaire</Label>
-        <Input
-          id="bank_account"
-          value={formData.bank_account}
-          onChange={(e) => handleFieldChange('bank_account', e.target.value)}
-          placeholder="Compte de destination"
-        />
+        <div>
+          <Label htmlFor="bank_account">Compte bancaire</Label>
+          <Input
+            id="bank_account"
+            value={formData.bank_account}
+            onChange={(e) => handleFieldChange('bank_account', e.target.value)}
+            placeholder="Compte de destination"
+          />
+        </div>
       </div>
 
       <InvoiceSelect
