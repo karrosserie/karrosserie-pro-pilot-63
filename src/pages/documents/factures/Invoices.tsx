@@ -98,7 +98,7 @@ const Invoices = () => {
             variant="secondary"
             className="bg-orange-100 text-orange-800 hover:bg-orange-100 text-xs"
            >
-             {credit.reference} - {formatAmount(credit.amount || 0)}
+             Avoir n°{credit.reference} - {formatAmount(credit.amount || 0)}
            </Badge>
         ))}
       </div>
