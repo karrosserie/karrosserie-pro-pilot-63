@@ -246,7 +246,7 @@ const Quotes = () => {
                   </TableCell>
                   <TableCell>{formatAmount(calculateQuoteAmount(quote))}</TableCell>
                   <TableCell>
-                    <StatusBadge status={quote.status || 'En attente'} />
+                    <StatusBadge status={quote.status === 'draft' ? 'En attente' : (quote.status || 'En attente')} />
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-1">
