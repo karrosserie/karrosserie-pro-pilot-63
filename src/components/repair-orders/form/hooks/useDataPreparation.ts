@@ -22,7 +22,8 @@ export const useDataPreparation = () => {
       report_date: formData.report_date || null,
       expert_name: formData.expert_name || '',
       incident_date: formData.incident_date || null,
-      quote_id: formData.quote_id || null
+      quote_id: formData.quote_id || null,
+      order_date: (formData as any).order_date || new Date().toISOString().split('T')[0]
     };
   };
 

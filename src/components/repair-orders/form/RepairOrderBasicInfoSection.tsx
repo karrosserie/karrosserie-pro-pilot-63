@@ -7,8 +7,13 @@ import { FileText, AlertCircle } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { cn } from '@/lib/utils';
 
+// Interface étendue temporaire pour le nouveau champ
+interface ExtendedRepairOrder extends RepairOrder {
+  order_date: string;
+}
+
 interface RepairOrderBasicInfoSectionProps {
-  formData: Partial<RepairOrder>;
+  formData: Partial<ExtendedRepairOrder>;
   errors: Record<string, string>;
   onFieldChange: (field: string, value: any) => void;
   claimNumber?: string;
@@ -67,7 +72,28 @@ export const RepairOrderBasicInfoSection = ({
             )}
           </div>
 
-          <div className="md:col-span-4">
+          <div>
+            <Label htmlFor="order_date" required className={cn(errors.order_date && "text-red-500")}>
+              Date
+            </Label>
+            <Input
+              id="order_date"
+              type="date"
+              value={formData.order_date || ''}
+              onChange={(e) => onFieldChange('order_date', e.target.value)}
+              className={cn(
+                errors.order_date && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
+              )}
+            />
+            {errors.order_date && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.order_date}
+              </p>
+            )}
+          </div>
+
+          <div className="md:col-span-3">
             <Label htmlFor="status">Statut</Label>
             <Select
               value={formData.status || 'En cours'}
