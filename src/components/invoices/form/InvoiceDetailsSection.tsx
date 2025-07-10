@@ -8,6 +8,7 @@ import { GlobalTotals } from './types';
 
 interface InvoiceDetailsSectionProps {
   paymentDetails: string;
+  notes: string;
   onFieldChange: (field: string, value: any) => void;
   globalTotals: GlobalTotals;
   isReadOnly: boolean;
@@ -15,6 +16,7 @@ interface InvoiceDetailsSectionProps {
 
 export const InvoiceDetailsSection = ({
   paymentDetails,
+  notes,
   onFieldChange,
   globalTotals,
   isReadOnly
@@ -38,6 +40,18 @@ export const InvoiceDetailsSection = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div>
+          <Label htmlFor="notes">Notes</Label>
+          <Textarea
+            id="notes"
+            value={notes}
+            onChange={(e) => onFieldChange('notes', e.target.value)}
+            placeholder="Notes et observations concernant la facture..."
+            rows={4}
+            disabled={isReadOnly}
+          />
+        </div>
+
         <div>
           <Label htmlFor="payment_details">Détails de paiement</Label>
           <Textarea

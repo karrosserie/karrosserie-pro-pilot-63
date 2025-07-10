@@ -8,10 +8,11 @@ import { GlobalTotals } from './types';
 interface RepairOrderDetailsSectionProps {
   onFieldChange: (field: string, value: any) => void;
   globalTotals: GlobalTotals;
+  notes: string;
   isReadOnly?: boolean;
 }
 
-export const RepairOrderDetailsSection = ({ onFieldChange, globalTotals, isReadOnly }: RepairOrderDetailsSectionProps) => {
+export const RepairOrderDetailsSection = ({ onFieldChange, globalTotals, notes, isReadOnly }: RepairOrderDetailsSectionProps) => {
   return (
     <Card>
       <CardContent className="space-y-4 pt-6">
@@ -25,6 +26,18 @@ export const RepairOrderDetailsSection = ({ onFieldChange, globalTotals, isReadO
           <div className="flex justify-end text-lg font-bold">
             Total : <span className="ml-2">{globalTotals.total.toFixed(2)} €</span>
           </div>
+        </div>
+
+        <div className="border-t pt-4">
+          <Label htmlFor="notes">Notes</Label>
+          <Textarea
+            id="notes"
+            value={notes}
+            onChange={(e) => onFieldChange('notes', e.target.value)}
+            placeholder="Notes et observations concernant l'ordre de réparation..."
+            rows={4}
+            readOnly={isReadOnly}
+          />
         </div>
       </CardContent>
     </Card>
