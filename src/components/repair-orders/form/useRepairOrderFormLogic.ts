@@ -58,7 +58,8 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
         policy_number: order.policy_number || '',
         report_date: order.report_date || '',
         expert_name: order.expert_name || '',
-        incident_date: order.incident_date || ''
+        incident_date: order.incident_date || '',
+        quote_id: order.quote_id || null
       };
       
       console.log('Setting form data with vehicle_id:', initialData.vehicle_id);
@@ -99,7 +100,8 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
             policy_number: order.policy_number || '',
             report_date: order.report_date || '',
             expert_name: order.expert_name || '',
-            incident_date: order.incident_date || ''
+            incident_date: order.incident_date || '',
+            quote_id: order.quote_id || null
           })
         }));
       });

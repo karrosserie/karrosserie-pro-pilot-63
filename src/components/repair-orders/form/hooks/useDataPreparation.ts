@@ -21,7 +21,8 @@ export const useDataPreparation = () => {
       policy_number: formData.policy_number || '',
       report_date: formData.report_date || null,
       expert_name: formData.expert_name || '',
-      incident_date: formData.incident_date || null
+      incident_date: formData.incident_date || null,
+      quote_id: formData.quote_id || null
     };
   };
 
