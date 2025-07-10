@@ -38,7 +38,12 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
 
   // Calculer le prochain numéro d'encaissement
   const getNextReceiptNumber = () => {
-    if (!receipts || receipts.length === 0) return 1;
+    console.log('getNextReceiptNumber - receipts:', receipts);
+    
+    if (!receipts || receipts.length === 0) {
+      console.log('No receipts found, returning 1');
+      return 1;
+    }
     
     const existingNumbers = receipts
       .map(r => r.reference)
@@ -46,7 +51,11 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
       .map(ref => parseInt(ref!, 10))
       .filter(num => !isNaN(num));
     
-    return existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+    console.log('Existing numbers:', existingNumbers);
+    const nextNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+    console.log('Next number will be:', nextNumber);
+    
+    return nextNumber;
   };
 
   useEffect(() => {
