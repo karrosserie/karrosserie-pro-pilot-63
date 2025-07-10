@@ -868,8 +868,6 @@ export type Database = {
           claim_number: string | null
           client_id: string | null
           created_at: string
-          current_mileage: string | null
-          description: string | null
           discounts_data: Json | null
           document_url: string | null
           due_date: string | null
@@ -878,10 +876,8 @@ export type Database = {
           incident_date: string | null
           notes: string | null
           parts_data: Json | null
-          payment_date: string | null
           payment_details: string | null
           payment_due_date: string | null
-          payment_method: string | null
           policy_number: string | null
           reference: string
           repair_order_id: string | null
@@ -899,8 +895,6 @@ export type Database = {
           claim_number?: string | null
           client_id?: string | null
           created_at?: string
-          current_mileage?: string | null
-          description?: string | null
           discounts_data?: Json | null
           document_url?: string | null
           due_date?: string | null
@@ -909,10 +903,8 @@ export type Database = {
           incident_date?: string | null
           notes?: string | null
           parts_data?: Json | null
-          payment_date?: string | null
           payment_details?: string | null
           payment_due_date?: string | null
-          payment_method?: string | null
           policy_number?: string | null
           reference: string
           repair_order_id?: string | null
@@ -930,8 +922,6 @@ export type Database = {
           claim_number?: string | null
           client_id?: string | null
           created_at?: string
-          current_mileage?: string | null
-          description?: string | null
           discounts_data?: Json | null
           document_url?: string | null
           due_date?: string | null
@@ -940,10 +930,8 @@ export type Database = {
           incident_date?: string | null
           notes?: string | null
           parts_data?: Json | null
-          payment_date?: string | null
           payment_details?: string | null
           payment_due_date?: string | null
-          payment_method?: string | null
           policy_number?: string | null
           reference?: string
           repair_order_id?: string | null
