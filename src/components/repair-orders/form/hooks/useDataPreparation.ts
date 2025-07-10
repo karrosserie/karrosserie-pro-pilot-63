@@ -13,18 +13,14 @@ export const useDataPreparation = () => {
     parts: RepairOrderPartItem[],
     discounts: RepairOrderDiscountItem[]
   ) => {
-    const notesData = {
-      description,
-      claimNumber,
-      currentMileage,
-      repairs,
-      parts,
-      discounts
-    };
-    
     return {
       ...formData,
-      notes: JSON.stringify(notesData),
+      description: description || '',
+      claim_number: claimNumber || '',
+      current_mileage: currentMileage || '',
+      repairs_data: JSON.stringify(repairs) || '[]',
+      parts_data: JSON.stringify(parts) || '[]',
+      discounts_data: JSON.stringify(discounts) || '[]',
       report_number: formData.report_number,
       policy_number: formData.policy_number,
       report_date: formData.report_date,
@@ -44,11 +40,18 @@ export const useDataPreparation = () => {
     }
   };
 
-  const parseOrderNotes = (notes: string) => {
+  const parseOrderData = (order: any) => {
     try {
-      return JSON.parse(notes);
+      return {
+        description: order.description || '',
+        claimNumber: order.claim_number || '',
+        currentMileage: order.current_mileage || '',
+        repairs: order.repairs_data ? JSON.parse(order.repairs_data) : [],
+        parts: order.parts_data ? JSON.parse(order.parts_data) : [],
+        discounts: order.discounts_data ? JSON.parse(order.discounts_data) : []
+      };
     } catch (e) {
-      console.error('Error parsing order notes:', e);
+      console.error('Error parsing order data:', e);
       return {
         description: '',
         claimNumber: '',
@@ -63,6 +66,6 @@ export const useDataPreparation = () => {
   return {
     prepareSubmitData,
     generateNextOrderNumber,
-    parseOrderNotes
+    parseOrderData
   };
 };

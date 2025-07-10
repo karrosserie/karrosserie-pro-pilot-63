@@ -30,7 +30,7 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
   } = useFormState();
 
   const { calculateGlobalTotals } = useCalculations(repairs, parts, discounts);
-  const { prepareSubmitData, generateNextOrderNumber, parseOrderNotes } = useDataPreparation();
+  const { prepareSubmitData, generateNextOrderNumber, parseOrderData } = useDataPreparation();
   const { validateForm, clearFieldError } = useFormValidation(formData, claimNumber, currentMileage, setErrors);
   const { handleChange, handleClaimNumberChange, handleCurrentMileageChange } = useFormHandlers(
     isReadOnly,
@@ -72,22 +72,14 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
         console.warn('Warning: vehicle_id is not defined in the order data');
       }
       
-      if (order.notes) {
-        const noteData = parseOrderNotes(order.notes);
-        setDescription(noteData.description || '');
-        setClaimNumber(noteData.claimNumber || '');
-        setCurrentMileage(noteData.currentMileage || '');
-        if (noteData.repairs) setRepairs(noteData.repairs);
-        if (noteData.parts) setParts(noteData.parts);
-        if (noteData.discounts) setDiscounts(noteData.discounts);
-      } else {
-        setDescription('');
-        setClaimNumber('');
-        setCurrentMileage('');
-        setRepairs([]);
-        setParts([]);
-        setDiscounts([]);
-      }
+      // Charger les données depuis les champs séparés
+      const orderData = parseOrderData(order);
+      setDescription(orderData.description || '');
+      setClaimNumber(orderData.claimNumber || '');
+      setCurrentMileage(orderData.currentMileage || '');
+      setRepairs(orderData.repairs || []);
+      setParts(orderData.parts || []);
+      setDiscounts(orderData.discounts || []);
       
       console.log('Form data initialized:', {
         reference: order.reference,
@@ -114,15 +106,15 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
         }));
       });
       
-      // Si on a des données de pré-remplissage avec des notes (comme d'un devis converti)
-      if (order && order.notes) {
-        const noteData = parseOrderNotes(order.notes);
-        setDescription(noteData.description || noteData.notes || '');
-        setClaimNumber(noteData.claimNumber || '');
-        setCurrentMileage(noteData.currentMileage || '');
-        if (noteData.repairs) setRepairs(noteData.repairs);
-        if (noteData.parts) setParts(noteData.parts);
-        if (noteData.discounts) setDiscounts(noteData.discounts);
+      // Si on a des données de pré-remplissage (comme d'un devis converti)
+      if (order) {
+        const orderData = parseOrderData(order);
+        setDescription(orderData.description || '');
+        setClaimNumber(orderData.claimNumber || '');
+        setCurrentMileage(orderData.currentMileage || '');
+        setRepairs(orderData.repairs || []);
+        setParts(orderData.parts || []);
+        setDiscounts(orderData.discounts || []);
       } else {
         setDescription('');
         setClaimNumber('');
