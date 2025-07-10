@@ -7,8 +7,8 @@ export interface Invoice {
   vehicle_id?: string | null;
   status?: string;
   created_at: string;
+  date?: string | null;
   due_date?: string | null;
-  payment_due_date?: string | null;
   payment_details?: string | null;
   notes?: string | null;
   amount?: number | null;

@@ -14,8 +14,8 @@ export const invoiceMutations = {
       client_id: invoice.client_id,
       vehicle_id: invoice.vehicle_id,
       status: invoice.status,
+      date: invoice.date,
       due_date: invoice.due_date,
-      payment_due_date: invoice.payment_due_date,
       payment_details: invoice.payment_details,
       amount: invoice.amount || 0,
       repairs_data: invoice.repairs_data,
@@ -48,8 +48,8 @@ export const invoiceMutations = {
     if (invoice.client_id !== undefined) cleanInvoice.client_id = invoice.client_id;
     if (invoice.vehicle_id !== undefined) cleanInvoice.vehicle_id = invoice.vehicle_id;
     if (invoice.status !== undefined) cleanInvoice.status = invoice.status;
+    if (invoice.date !== undefined) cleanInvoice.date = invoice.date;
     if (invoice.due_date !== undefined) cleanInvoice.due_date = invoice.due_date;
-    if (invoice.payment_due_date !== undefined) cleanInvoice.payment_due_date = invoice.payment_due_date;
     if (invoice.payment_details !== undefined) cleanInvoice.payment_details = invoice.payment_details;
     if (invoice.amount !== undefined) cleanInvoice.amount = invoice.amount;
     if (invoice.repairs_data !== undefined) cleanInvoice.repairs_data = invoice.repairs_data;

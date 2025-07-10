@@ -9,6 +9,7 @@ export const useInvoiceFormData = () => {
     client_id: '',
     vehicle_id: '',
     status: 'En attente de paiement',
+    date: '',
     due_date: '',
     payment_details: ''
   });

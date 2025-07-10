@@ -71,7 +71,26 @@ export const InvoiceBasicInfoSection = ({
           </div>
 
           <div>
-            <Label htmlFor="due_date">Date</Label>
+            <Label htmlFor="date">Date</Label>
+            <Input
+              id="date"
+              type="date"
+              value={formData.date || ''}
+              onChange={(e) => onFieldChange('date', e.target.value)}
+              className={cn(
+                errors.date && "border-red-500 focus-visible:ring-red-500"
+              )}
+            />
+            {errors.date && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.date}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="due_date">Date d'échéance</Label>
             <Input
               id="due_date"
               type="date"
@@ -85,25 +104,6 @@ export const InvoiceBasicInfoSection = ({
               <p className="text-sm text-red-500 mt-1 flex items-center">
                 <AlertCircle className="h-4 w-4 mr-1" />
                 {errors.due_date}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="payment_due_date">Date d'échéance</Label>
-            <Input
-              id="payment_due_date"
-              type="date"
-              value={formData.payment_due_date || ''}
-              onChange={(e) => onFieldChange('payment_due_date', e.target.value)}
-              className={cn(
-                errors.payment_due_date && "border-red-500 focus-visible:ring-red-500"
-              )}
-            />
-            {errors.payment_due_date && (
-              <p className="text-sm text-red-500 mt-1 flex items-center">
-                <AlertCircle className="h-4 w-4 mr-1" />
-                {errors.payment_due_date}
               </p>
             )}
           </div>

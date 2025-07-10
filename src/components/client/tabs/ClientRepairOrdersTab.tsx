@@ -109,6 +109,7 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
       vehicle_id: order.vehicle_id,
       repair_order_id: order.id,
       status: 'En attente de paiement',
+      date: today,
       due_date: today,
       notes: order.notes || '',
     };

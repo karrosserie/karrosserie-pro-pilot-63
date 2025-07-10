@@ -117,6 +117,7 @@ const RepairOrders = () => {
       vehicle_id: order.vehicle_id,
       repair_order_id: order.id,
       status: 'En attente de paiement',
+      date: today,
       due_date: today,
       notes: order.notes || '',
       // Ne pas inclure l'ID pour forcer la création d'une nouvelle facture

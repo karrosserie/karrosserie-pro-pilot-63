@@ -38,6 +38,7 @@ export const useInvoiceDataPreparation = ({
       client_id: formData.client_id || '',
       vehicle_id: formData.vehicle_id || '',
       status: formData.status || 'En attente de paiement',
+      date: formData.date || '',
       due_date: formData.due_date || '',
       payment_details: formData.payment_details || '',
       // Inclure les nouveaux champs de rapport
