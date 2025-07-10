@@ -39,7 +39,10 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
 
   // Auto-générer la référence au chargement (comme dans le formulaire des avoirs)
   useEffect(() => {
+    console.log('ReceiptForm useEffect - receipt:', receipt);
+    
     if (receipt) {
+      console.log('Setting form data from existing receipt');
       // Si on modifie un encaissement existant, utiliser ses données
       setFormData({
         reference: receipt.reference || '',
@@ -53,11 +56,18 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
         invoice: receipt.invoice || ''
       });
     } else {
+      console.log('Generating new reference for new receipt');
       // Si c'est un nouvel encaissement, générer la référence
       const generateReference = async () => {
         try {
+          console.log('Calling receiptsService.generateReference()');
           const reference = await receiptsService.generateReference();
-          setFormData(prev => ({ ...prev, reference }));
+          console.log('Generated reference:', reference);
+          setFormData(prev => {
+            const newData = { ...prev, reference };
+            console.log('Setting formData with reference:', newData);
+            return newData;
+          });
         } catch (error) {
           console.error('Error generating reference:', error);
           setFormData(prev => ({ ...prev, reference: '1' }));
