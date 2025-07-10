@@ -1,8 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import QuoteDialog from '@/components/quotes/QuoteDialog';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useReportToQuote } from '@/hooks/use-report-to-quote';
+import { Quote } from '@/services/supabase/quotes';
 import { useToast } from '@/hooks/use-toast';
 import { ExpertiseReportUploader } from '@/components/expertise/ExpertiseReportUploader';
 import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
@@ -17,7 +19,9 @@ const ExpertiseReports = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<ExpertiseReport | null>(null);
+  const [prefilledQuoteData, setPrefilledQuoteData] = useState<Partial<Quote> | null>(null);
   const { toast } = useToast();
   
   const filteredReports = reports?.filter(report => {
@@ -73,7 +77,42 @@ const ExpertiseReports = () => {
   }, [reports, checkMultipleReports]);
 
   const handleConvertToQuote = async (report: ExpertiseReport) => {
-    await convertToQuote(report);
+    if (!report.client_id || !report.vehicle_id) {
+      toast({
+        title: "Erreur",
+        description: "Le rapport doit avoir un client et un véhicule assignés pour être converti en devis.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Vérifier si déjà converti
+    const isAlreadyConverted = convertedReports[report.id];
+    if (isAlreadyConverted) {
+      toast({
+        title: "Information",
+        description: "Ce rapport a déjà été converti en devis.",
+        variant: "default"
+      });
+      return;
+    }
+
+    // Préparer les données préremplies pour le devis
+    const prefilledData: Partial<Quote> = {
+      client_id: report.client_id,
+      vehicle_id: report.vehicle_id,
+      report_id: report.id,
+      status: 'En attente',
+      notes: `Converti à partir du rapport d'expertise ${report.report_number || ''}`,
+      amount: report.amount,
+      claim_number: report.claim_number,
+      policy_number: report.policy_number,
+      incident_date: report.incident_date,
+      expert_name: report.expert_name,
+    };
+
+    setPrefilledQuoteData(prefilledData);
+    setQuoteDialogOpen(true);
   };
 
   const getConvertingReportId = () => {
@@ -129,6 +168,18 @@ const ExpertiseReports = () => {
           report={selectedReport}
           open={editDialogOpen}
           onOpenChange={setEditDialogOpen}
+        />
+
+        {/* Quote Dialog for conversion */}
+        <QuoteDialog
+          quote={prefilledQuoteData as Quote}
+          open={quoteDialogOpen}
+          onOpenChange={(open) => {
+            setQuoteDialogOpen(open);
+            if (!open) {
+              setPrefilledQuoteData(null);
+            }
+          }}
         />
 
       </div>
