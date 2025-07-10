@@ -53,7 +53,12 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
         client_id: order.client_id || null,
         vehicle_id: order.vehicle_id || null,
         status: order.status || 'En cours',
-        notes: order.notes || ''
+        notes: order.notes || '',
+        report_number: order.report_number || '',
+        policy_number: order.policy_number || '',
+        report_date: order.report_date || '',
+        expert_name: order.expert_name || '',
+        incident_date: order.incident_date || ''
       };
       
       console.log('Setting form data with vehicle_id:', initialData.vehicle_id);
@@ -89,7 +94,12 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
             client_id: order.client_id || null,
             vehicle_id: order.vehicle_id || null,
             status: order.status || 'En cours',
-            notes: order.notes || ''
+            notes: order.notes || '',
+            report_number: order.report_number || '',
+            policy_number: order.policy_number || '',
+            report_date: order.report_date || '',
+            expert_name: order.expert_name || '',
+            incident_date: order.incident_date || ''
           })
         }));
       });
