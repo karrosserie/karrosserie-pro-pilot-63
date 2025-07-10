@@ -1007,6 +1007,7 @@ export type Database = {
       quotes: {
         Row: {
           amount: number
+          claim_number: string | null
           client_id: string | null
           created_at: string
           document_url: string | null
@@ -1027,6 +1028,7 @@ export type Database = {
         }
         Insert: {
           amount: number
+          claim_number?: string | null
           client_id?: string | null
           created_at?: string
           document_url?: string | null
@@ -1047,6 +1049,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          claim_number?: string | null
           client_id?: string | null
           created_at?: string
           document_url?: string | null
