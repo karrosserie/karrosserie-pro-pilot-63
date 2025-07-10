@@ -102,15 +102,18 @@ const ExpertiseReports = () => {
     try {
       // Générer le numéro de devis automatiquement
       const quoteNumber = await generateNextQuoteNumber();
+      // Générer la date courante pour le champ valid_until
+      const currentDate = format(new Date(), 'yyyy-MM-dd');
 
       // Préparer les données préremplies pour le devis
       const prefilledData: Partial<Quote> = {
         reference: quoteNumber,
+        valid_until: currentDate,
         client_id: report.client_id,
         vehicle_id: report.vehicle_id,
         report_id: report.id,
         status: 'En attente',
-        notes: `Converti à partir du rapport d'expertise ${report.report_number || ''}`,
+        notes: '', // Laisser vide pour que l'utilisateur puisse saisir ce qu'il veut
         amount: report.amount,
         claim_number: report.claim_number,
         policy_number: report.policy_number,
