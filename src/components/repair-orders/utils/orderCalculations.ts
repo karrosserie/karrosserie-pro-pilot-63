@@ -2,30 +2,16 @@
 export const calculateOrderAmount = (order: any) => {
   console.log('=== CALCULATING ORDER AMOUNT ===');
   console.log('Order ID:', order.id);
-  console.log('Order notes:', order.notes);
   let totalAmount = 0;
   
-  // Parse notes to get repair data
-  let notesData = null;
-  if (order.notes) {
+  // Calculer le total des réparations depuis repairs_data
+  if (order.repairs_data) {
     try {
-      notesData = typeof order.notes === 'string' ? JSON.parse(order.notes) : order.notes;
-      console.log('Parsed notes data:', notesData);
-    } catch (error) {
-      console.error('Error parsing notes data:', error);
-      return 0;
-    }
-  } else {
-    console.log('No notes found in order');
-  }
-
-  // Calculer le total des réparations
-  if (notesData?.repairs) {
-    try {
-      const repairs = notesData.repairs;
+      const repairsData = typeof order.repairs_data === 'string' ? JSON.parse(order.repairs_data) : order.repairs_data;
+      console.log('Repairs data:', repairsData);
       
-      if (Array.isArray(repairs)) {
-        repairs.forEach((repair: any) => {
+      if (Array.isArray(repairsData)) {
+        repairsData.forEach((repair: any) => {
           const unitPrice = Number(repair.unitCost || repair.unit_price || repair.unitPrice || 0);
           const quantity = Number(repair.quantity || 0);
           const discount = Number(repair.discount || 0);
@@ -43,13 +29,14 @@ export const calculateOrderAmount = (order: any) => {
     }
   }
 
-  // Calculer le total des pièces
-  if (notesData?.parts) {
+  // Calculer le total des pièces depuis parts_data
+  if (order.parts_data) {
     try {
-      const parts = notesData.parts;
+      const partsData = typeof order.parts_data === 'string' ? JSON.parse(order.parts_data) : order.parts_data;
+      console.log('Parts data:', partsData);
       
-      if (Array.isArray(parts)) {
-        parts.forEach((part: any) => {
+      if (Array.isArray(partsData)) {
+        partsData.forEach((part: any) => {
           const unitPrice = Number(part.unitCost || part.unit_price || part.unitPrice || 0);
           const quantity = Number(part.quantity || 0);
           const discount = Number(part.discount || 0);
@@ -67,13 +54,14 @@ export const calculateOrderAmount = (order: any) => {
     }
   }
 
-  // Appliquer les remises globales
-  if (notesData?.discounts) {
+  // Appliquer les remises globales depuis discounts_data
+  if (order.discounts_data) {
     try {
-      const discounts = notesData.discounts;
+      const discountsData = typeof order.discounts_data === 'string' ? JSON.parse(order.discounts_data) : order.discounts_data;
+      console.log('Discounts data:', discountsData);
       
-      if (Array.isArray(discounts)) {
-        discounts.forEach((discount: any) => {
+      if (Array.isArray(discountsData)) {
+        discountsData.forEach((discount: any) => {
           const value = Number(discount.value || discount.amount || 0);
           if (discount.type === 'percentage') {
             totalAmount -= totalAmount * (value / 100);
