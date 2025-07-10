@@ -11,11 +11,10 @@ export const prepareSubmitData = (
   parts: QuotePartItem[],
   discounts: QuoteDiscountItem[]
 ) => {
-  // Préparer les notes avec uniquement les infos générales et remises
+  // Préparer les notes avec uniquement les infos générales
   const notesData = {
     notes,
-    currentMileage,
-    discounts
+    currentMileage
   };
   
   return {
@@ -23,6 +22,7 @@ export const prepareSubmitData = (
     claim_number: claimNumber,
     repairs_data: JSON.stringify(repairs),
     parts_data: JSON.stringify(parts),
+    discount_data: JSON.stringify(discounts),
     notes: JSON.stringify(notesData),
     // S'assurer que les nouveaux champs sont inclus
     report_number: formData.report_number || '',
@@ -53,7 +53,7 @@ export const parseQuoteNotes = (notesString: string | null) => {
       currentMileage: noteData.currentMileage || '',
       repairs: noteData.repairs || [],
       parts: noteData.parts || [],
-      discounts: noteData.discounts || []
+      discounts: noteData.discounts || [] // Garder pour rétrocompatibilité
     };
   } catch (e) {
     console.error('Error parsing quote notes:', e);

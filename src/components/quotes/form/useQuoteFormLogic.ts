@@ -115,14 +115,24 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
         }
       }
       
-      // Charger les données depuis les notes (pour currentMileage et discounts)
+      // Charger les remises depuis le nouveau champ dédié  
+      let discountsData = [];
+      if ((quote as any).discount_data) {
+        try {
+          discountsData = JSON.parse((quote as any).discount_data);
+        } catch (error) {
+          console.error('Error parsing discount_data:', error);
+        }
+      }
+      
+      // Charger les données depuis les notes (pour currentMileage et rétrocompatibilité des discounts)
       const parsedData = parseQuoteNotes(quote.notes);
       setNotes(parsedData.notes);
       setClaimNumber((quote as any).claim_number || parsedData.claimNumber || '');
       setCurrentMileage(parsedData.currentMileage);
       setRepairs(repairsData.length > 0 ? repairsData : parsedData.repairs);
       setParts(partsData.length > 0 ? partsData : parsedData.parts);
-      setDiscounts(parsedData.discounts);
+      setDiscounts(discountsData.length > 0 ? discountsData : parsedData.discounts);
     } else {
       // Pour un nouveau devis, définir la date du jour
       const today = new Date().toISOString().split('T')[0];
