@@ -27,6 +27,7 @@ import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 import { CreditDialog } from '@/components/credits/CreditDialog';
 import { Invoice } from '@/services/supabase/invoices';
 import { useToast } from '@/hooks/use-toast';
+import { useConfirmation } from '@/hooks/use-confirmation';
 
 interface ClientInvoicesTabProps {
   clientId: string;
@@ -35,6 +36,7 @@ interface ClientInvoicesTabProps {
 const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
   const { invoices, isLoading, deleteInvoice } = useInvoices();
   const { toast } = useToast();
+  const { confirm } = useConfirmation();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
@@ -62,7 +64,15 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
   };
 
   const handleDelete = async (invoice: Invoice) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer la facture ${invoice.reference} ?`)) {
+    const confirmed = await confirm({
+      title: 'Supprimer la facture',
+      description: `Êtes-vous sûr de vouloir supprimer la facture ${invoice.reference} ? Cette action est irréversible.`,
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
       try {
         await deleteInvoice.mutateAsync(invoice.id);
         toast({

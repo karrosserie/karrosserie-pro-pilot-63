@@ -20,6 +20,7 @@ import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
 import { Quote } from '@/services/supabase/quotes';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { useToast } from '@/hooks/use-toast';
+import { useConfirmation } from '@/hooks/use-confirmation';
 
 interface ClientQuotesTabProps {
   clientId: string;
@@ -28,6 +29,7 @@ interface ClientQuotesTabProps {
 const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
   const { quotes, isLoading, deleteQuote } = useQuotes();
   const { toast } = useToast();
+  const { confirm } = useConfirmation();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [repairOrderDialogOpen, setRepairOrderDialogOpen] = useState(false);
@@ -56,7 +58,15 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
   };
 
   const handleDelete = async (quote: any) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le devis ${quote.reference} ?`)) {
+    const confirmed = await confirm({
+      title: 'Supprimer le devis',
+      description: `Êtes-vous sûr de vouloir supprimer le devis ${quote.reference} ? Cette action est irréversible.`,
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
       try {
         await deleteQuote.mutateAsync(quote.id);
       } catch (error: any) {

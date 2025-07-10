@@ -7,6 +7,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { useToast } from '@/hooks/use-toast';
+import { useConfirmation } from '@/hooks/use-confirmation';
 import { useInvoices } from '@/hooks/use-invoices';
 import {
   DropdownMenu,
@@ -25,6 +26,7 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
   const { receipts, isLoading, deleteReceipt } = useReceiptsData();
   const { invoices } = useInvoices();
   const { toast } = useToast();
+  const { confirm } = useConfirmation();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState<any>(null);
 
@@ -75,8 +77,16 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
     setEditDialogOpen(true);
   };
 
-  const handleDelete = (receipt: any) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'encaissement ?`)) {
+  const handleDelete = async (receipt: any) => {
+    const confirmed = await confirm({
+      title: 'Supprimer l\'encaissement',
+      description: 'Êtes-vous sûr de vouloir supprimer cet encaissement ? Cette action est irréversible.',
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
       deleteReceipt.mutate(receipt.id);
     }
   };

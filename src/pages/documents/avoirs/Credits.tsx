@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useConfirmation } from '@/hooks/use-confirmation';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -81,6 +82,7 @@ const Credits = () => {
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [selectedCredit, setSelectedCredit] = useState<any>(null);
   const { toast } = useToast();
+  const { confirm } = useConfirmation();
   
   const { credits = [], isLoading, deleteCredit, error } = useCredits();
   const { invoices } = useInvoices();
@@ -253,7 +255,15 @@ const Credits = () => {
   };
 
   const handleDelete = async (credit: any) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'avoir ${credit.reference} ?`)) {
+    const confirmed = await confirm({
+      title: 'Supprimer l\'avoir',
+      description: `Êtes-vous sûr de vouloir supprimer l'avoir ${credit.reference} ? Cette action est irréversible.`,
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
       try {
         await deleteCredit.mutateAsync(credit.id);
       } catch (error) {

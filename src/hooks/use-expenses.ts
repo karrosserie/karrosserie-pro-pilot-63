@@ -1,6 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
+import { useConfirmation } from '@/hooks/use-confirmation';
 import { 
   getExpenses, 
   createExpense, 
@@ -14,6 +15,7 @@ import {
 
 export const useExpenses = () => {
   const { toast } = useToast();
+  const { confirm } = useConfirmation();
   const queryClient = useQueryClient();
 
   const { 
@@ -83,8 +85,16 @@ export const useExpenses = () => {
     }
   });
 
-  const handleDelete = (expense: ExpenseWithRelations) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer cette dépense ?`)) {
+  const handleDelete = async (expense: ExpenseWithRelations) => {
+    const confirmed = await confirm({
+      title: 'Supprimer la dépense',
+      description: 'Êtes-vous sûr de vouloir supprimer cette dépense ? Cette action est irréversible.',
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
       deleteMutation.mutate(expense.id);
     }
   };

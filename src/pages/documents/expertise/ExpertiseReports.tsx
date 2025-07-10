@@ -8,6 +8,7 @@ import { Quote } from '@/services/supabase/quotes';
 import { generateNextQuoteNumber } from '@/components/quotes/form/utils/quoteNumber';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { useConfirmation } from '@/hooks/use-confirmation';
 import { ExpertiseReportUploader } from '@/components/expertise/ExpertiseReportUploader';
 import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
@@ -25,6 +26,7 @@ const ExpertiseReports = () => {
   const [selectedReport, setSelectedReport] = useState<ExpertiseReport | null>(null);
   const [prefilledQuoteData, setPrefilledQuoteData] = useState<Partial<Quote> | null>(null);
   const { toast } = useToast();
+  const { confirm } = useConfirmation();
   
   const filteredReports = reports?.filter(report => {
     const matchesSearch = report.report_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -54,7 +56,15 @@ const ExpertiseReports = () => {
   };
 
   const handleDeleteReport = async (id: string) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce rapport d\'expertise ?')) {
+    const confirmed = await confirm({
+      title: 'Supprimer le rapport d\'expertise',
+      description: 'Êtes-vous sûr de vouloir supprimer ce rapport d\'expertise ? Cette action est irréversible.',
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
       try {
         await deleteReport.mutateAsync(id);
         toast({

@@ -15,6 +15,7 @@ import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { Invoice } from '@/services/supabase/invoices';
 import { useToast } from '@/hooks/use-toast';
+import { useConfirmation } from '@/hooks/use-confirmation';
 
 interface ClientRepairOrdersTabProps {
   clientId: string;
@@ -23,6 +24,7 @@ interface ClientRepairOrdersTabProps {
 const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId }) => {
   const { orders, isLoading, deleteOrder } = useRepairOrders();
   const { toast } = useToast();
+  const { confirm } = useConfirmation();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [signatureDialogOpen, setSignatureDialogOpen] = useState(false);
@@ -53,7 +55,15 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
   };
 
   const handleDeleteOrder = async (order: RepairOrder) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'ordre de réparation ${order.reference} ?`)) {
+    const confirmed = await confirm({
+      title: 'Supprimer l\'ordre de réparation',
+      description: `Êtes-vous sûr de vouloir supprimer l'ordre de réparation ${order.reference} ? Cette action est irréversible.`,
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
       try {
         await deleteOrder.mutateAsync(order.id);
         toast({

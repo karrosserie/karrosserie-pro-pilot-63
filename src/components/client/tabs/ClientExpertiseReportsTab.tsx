@@ -7,6 +7,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useConfirmation } from '@/hooks/use-confirmation';
 import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 
@@ -17,6 +18,7 @@ interface ClientExpertiseReportsTabProps {
 const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ clientId }) => {
   const { reports, isLoading, deleteReport } = useExpertiseReports();
   const { toast } = useToast();
+  const { confirm } = useConfirmation();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<ExpertiseReport | null>(null);
 
@@ -36,7 +38,15 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
   };
 
   const handleDeleteReport = async (id: string) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce rapport d\'expertise ?')) {
+    const confirmed = await confirm({
+      title: 'Supprimer le rapport d\'expertise',
+      description: 'Êtes-vous sûr de vouloir supprimer ce rapport d\'expertise ? Cette action est irréversible.',
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
       try {
         await deleteReport.mutateAsync(id);
         toast({

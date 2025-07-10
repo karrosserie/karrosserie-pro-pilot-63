@@ -6,6 +6,7 @@ import { CreditCard, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useConfirmation } from '@/hooks/use-confirmation';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +24,7 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   const { credits, isLoading, deleteCredit } = useCredits();
   const { invoices } = useInvoices();
   const { toast } = useToast();
+  const { confirm } = useConfirmation();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [selectedCredit, setSelectedCredit] = useState<any>(null);
@@ -159,7 +161,15 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   };
 
   const handleDelete = async (credit: any) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'avoir ${credit.reference} ?`)) {
+    const confirmed = await confirm({
+      title: 'Supprimer l\'avoir',
+      description: `Êtes-vous sûr de vouloir supprimer l'avoir ${credit.reference} ? Cette action est irréversible.`,
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
       try {
         await deleteCredit.mutateAsync(credit.id);
       } catch (error) {

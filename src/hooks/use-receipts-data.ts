@@ -2,10 +2,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { receiptsService, ReceiptWithClient } from '@/services/supabase/receipts';
 import { useToast } from '@/hooks/use-toast';
+import { useConfirmation } from '@/hooks/use-confirmation';
 
 export function useReceiptsData() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { confirm } = useConfirmation();
   
   const {
     data: receiptsData,
@@ -92,8 +94,16 @@ export function useReceiptsData() {
     }
   });
 
-  const handleDelete = (receipt: ReceiptWithClient) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'encaissement ${receipt.reference || 'sans référence'} ?`)) {
+  const handleDelete = async (receipt: ReceiptWithClient) => {
+    const confirmed = await confirm({
+      title: 'Supprimer l\'encaissement',
+      description: `Êtes-vous sûr de vouloir supprimer l'encaissement ${receipt.reference || 'sans référence'} ? Cette action est irréversible.`,
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
       deleteReceipt.mutate(receipt.id);
     }
   };
