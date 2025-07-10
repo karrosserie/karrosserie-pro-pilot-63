@@ -81,7 +81,7 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-5 gap-4">
         <div>
           <Label htmlFor="reference">Numéro <span className="text-red-500">*</span></Label>
           <Input
@@ -104,7 +104,7 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
           />
         </div>
 
-        <div>
+        <div className="col-span-3">
           <Label htmlFor="bank_account">Compte bancaire <span className="text-red-500">*</span></Label>
           <Select value={formData.bank_account} onValueChange={(value) => handleFieldChange('bank_account', value)} required>
             <SelectTrigger className="bg-background">
