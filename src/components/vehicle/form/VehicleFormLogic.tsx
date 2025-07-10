@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useCarBrands } from '@/hooks/use-car-brands';
 import { useCarModels } from '@/hooks/use-car-models';
+import { useNotification } from '@/hooks/use-notification';
 
 export interface VehicleFormData {
   clientId: string;
@@ -37,6 +38,7 @@ interface UseVehicleFormLogicProps {
 }
 
 export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: UseVehicleFormLogicProps) {
+  const { error } = useNotification();
   const { carBrands } = useCarBrands();
   
   // Ensure defaultValues is an object to prevent null access errors
@@ -208,7 +210,7 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
     const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
     
     if (missingFields.length > 0) {
-      alert('Les champs suivants sont obligatoires : Client, Numéro de série (VIN), Marque, Modèle, Plaque d\'immatriculation');
+      error('Les champs suivants sont obligatoires : Client, Numéro de série (VIN), Marque, Modèle, Plaque d\'immatriculation', 'Champs manquants');
       return false;
     }
     return true;

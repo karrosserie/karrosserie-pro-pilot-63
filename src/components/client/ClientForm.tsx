@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useNotification } from '@/hooks/use-notification';
 import PersonalInfoTab from './form/PersonalInfoTab';
 import DocumentsTab from './form/DocumentsTab';
 import ClientFormActions from './form/ClientFormActions';
@@ -17,6 +18,7 @@ const ClientForm: React.FC<ClientFormProps> = ({
   isViewMode = false,
   onCancel
 }) => {
+  const { error } = useNotification();
   const [formData, setFormData] = useState({
     firstName: defaultValues?.firstName || '',
     lastName: defaultValues?.lastName || '',
@@ -51,7 +53,7 @@ const ClientForm: React.FC<ClientFormProps> = ({
     const requiredFields = ['firstName', 'lastName', 'phone', 'address', 'city', 'zipCode'];
     for (const field of requiredFields) {
       if (!formData[field]?.trim()) {
-        alert(`Le champ ${getFieldLabel(field)} est obligatoire.`);
+        error(`Le champ ${getFieldLabel(field)} est obligatoire.`, 'Champ manquant');
         return false;
       }
     }

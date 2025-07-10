@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useVehicles } from '@/hooks/use-vehicles';
+import { useConfirmation } from '@/hooks/use-confirmation';
 import VehicleCardAdapter from '@/components/vehicle/VehicleCardAdapter';
 import VehicleDialog from '@/components/vehicle/VehicleDialog';
 import VehicleDocumentDialogs from '@/components/vehicle/VehicleDocumentDialogs';
@@ -13,6 +14,7 @@ interface ClientVehiclesTabProps {
 
 const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
   const { vehicles, isLoading, deleteVehicle } = useVehicles();
+  const { confirm } = useConfirmation();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
@@ -53,8 +55,16 @@ const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
     setDialogOpen(true);
   };
 
-  const handleDeleteVehicle = (vehicle: any) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le véhicule ${vehicle.license_plate} ?`)) {
+  const handleDeleteVehicle = async (vehicle: any) => {
+    const confirmed = await confirm({
+      title: 'Supprimer le véhicule',
+      description: `Êtes-vous sûr de vouloir supprimer le véhicule ${vehicle.license_plate} ?`,
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
       deleteVehicle.mutate(vehicle.id);
     }
   };

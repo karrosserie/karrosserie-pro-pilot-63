@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { calculateGlobalTotals } from '@/components/quotes/form/utils/calculations';
 import { useSearchParams } from 'react-router-dom';
+import { useConfirmation } from '@/hooks/use-confirmation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -32,6 +33,7 @@ import { Printer, Mail, FileCheck, ArrowRight, Download } from 'lucide-react';
 
 const Quotes = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { confirm } = useConfirmation();
   const { quotes, isLoading, error, deleteQuote } = useQuotes();
   const [searchTerm, setSearchTerm] = useState('');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -59,7 +61,15 @@ const Quotes = () => {
   };
 
   const handleDeleteQuote = async (id: string) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce devis ?')) {
+    const confirmed = await confirm({
+      title: 'Supprimer le devis',
+      description: 'Êtes-vous sûr de vouloir supprimer ce devis ? Cette action est irréversible.',
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
       try {
         await deleteQuote.mutateAsync(id);
       } catch (error: any) {

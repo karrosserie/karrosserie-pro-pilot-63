@@ -3,9 +3,13 @@ import { useState } from 'react';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCarBrands } from '@/hooks/use-car-brands';
+import { useConfirmation } from '@/hooks/use-confirmation';
+import { useNotification } from '@/hooks/use-notification';
 import { carModelsService } from '@/services/supabase/car-models';
 
 export function useVehiclesPage() {
+  const { confirm } = useConfirmation();
+  const { error: showError } = useNotification();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
@@ -52,7 +56,15 @@ export function useVehiclesPage() {
   };
 
   const handleDeleteVehicle = async (vehicleId: string) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?')) {
+    const confirmed = await confirm({
+      title: 'Supprimer le véhicule',
+      description: 'Êtes-vous sûr de vouloir supprimer ce véhicule ? Cette action est irréversible.',
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
       await deleteVehicle.mutateAsync(vehicleId);
     }
   };
@@ -77,13 +89,13 @@ export function useVehiclesPage() {
 
       if (!brandId) {
         console.error('Brand ID not provided');
-        alert('Erreur: Veuillez sélectionner une marque');
+        showError('Veuillez sélectionner une marque', 'Erreur');
         return;
       }
 
       if (!modelId) {
         console.error('Model ID not provided');
-        alert('Erreur: Veuillez sélectionner un modèle');
+        showError('Veuillez sélectionner un modèle', 'Erreur');
         return;
       }
 

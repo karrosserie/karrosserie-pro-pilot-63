@@ -1,10 +1,12 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
+import { useConfirmation } from '@/hooks/use-confirmation';
 import { accountsService, Account } from '@/services/supabase/accounts';
 
 export const useAccounts = () => {
   const { toast } = useToast();
+  const { confirm } = useConfirmation();
   const queryClient = useQueryClient();
 
   // Fetch accounts
@@ -86,8 +88,16 @@ export const useAccounts = () => {
     },
   });
 
-  const handleDelete = (account: Account) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le compte ${account.name} ?`)) {
+  const handleDelete = async (account: Account) => {
+    const confirmed = await confirm({
+      title: 'Supprimer le compte',
+      description: `Êtes-vous sûr de vouloir supprimer le compte ${account.name} ?`,
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
       deleteAccountMutation.mutate(account.id);
     }
   };
