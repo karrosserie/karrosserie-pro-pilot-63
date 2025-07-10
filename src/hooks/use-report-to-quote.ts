@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { quotesService } from '@/services/supabase/quotes';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 
 export const useReportToQuote = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [convertingReportId, setConvertingReportId] = useState<string | null>(null);
   const [convertedReports, setConvertedReports] = useState<Record<string, any>>({});
 
@@ -78,6 +80,9 @@ export const useReportToQuote = () => {
         title: "Conversion réussie",
         description: `Le rapport ${report.report_number} a été converti en devis ${newQuote.reference}.`
       });
+
+      // Rediriger vers la page des devis avec l'ID du nouveau devis
+      navigate(`/documents/devis?openQuote=${newQuote.id}`);
 
       return newQuote;
     } catch (error: any) {

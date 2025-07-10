@@ -1,6 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { calculateGlobalTotals } from '@/components/quotes/form/utils/calculations';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -30,6 +31,7 @@ import {
 import { Printer, Mail, FileCheck, ArrowRight, Download } from 'lucide-react';
 
 const Quotes = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { quotes, isLoading, error, deleteQuote } = useQuotes();
   const [searchTerm, setSearchTerm] = useState('');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -121,6 +123,23 @@ const Quotes = () => {
     // Sinon, utiliser le montant stocké dans amount
     return quote.amount || 0;
   };
+
+  // Effet pour ouvrir automatiquement un devis depuis l'URL
+  useEffect(() => {
+    const openQuoteId = searchParams.get('openQuote');
+    if (openQuoteId && quotes && quotes.length > 0) {
+      const quoteToOpen = quotes.find(quote => quote.id === openQuoteId);
+      if (quoteToOpen) {
+        setSelectedQuote(quoteToOpen);
+        setEditDialogOpen(true);
+        // Nettoyer le paramètre URL après ouverture
+        setSearchParams(params => {
+          params.delete('openQuote');
+          return params;
+        });
+      }
+    }
+  }, [quotes, searchParams, setSearchParams]);
 
   const handleDownload = (quote: Quote) => {
     toast({
