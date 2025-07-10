@@ -77,6 +77,7 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
         valid_until: quote.valid_until,
         notes: quote.notes || '',
         // Inclure les nouveaux champs
+        report_id: (quote as any).report_id || '',
         report_number: (quote as any).report_number || '',
         policy_number: (quote as any).policy_number || '',
         report_date: (quote as any).report_date || '',
@@ -134,12 +135,48 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
           // Appliquer les données de pré-remplissage si disponibles
           ...(prefillData && {
             client_id: prefillData.client_id || '',
-            vehicle_id: prefillData.vehicle_id || ''
+            vehicle_id: prefillData.vehicle_id || '',
+            report_id: prefillData.report_id || '',
+            report_number: prefillData.report_number || '',
+            policy_number: prefillData.policy_number || '',
+            report_date: prefillData.report_date || '',
+            expert_name: prefillData.expert_name || '',
+            incident_date: prefillData.incident_date || ''
           })
         }));
       });
+      
+      // Appliquer également les données de réparations et pièces depuis prefillData
+      if (prefillData?.repairs_data) {
+        try {
+          const repairsData = typeof prefillData.repairs_data === 'string' 
+            ? JSON.parse(prefillData.repairs_data) 
+            : prefillData.repairs_data;
+          setRepairs(repairsData);
+        } catch (error) {
+          console.error('Error parsing prefilled repairs_data:', error);
+        }
+      }
+      
+      if (prefillData?.parts_data) {
+        try {
+          const partsData = typeof prefillData.parts_data === 'string' 
+            ? JSON.parse(prefillData.parts_data) 
+            : prefillData.parts_data;
+          setParts(partsData);
+        } catch (error) {
+          console.error('Error parsing prefilled parts_data:', error);
+        }
+      }
+      
+      if (prefillData?.claim_number) {
+        setClaimNumber(prefillData.claim_number);
+      }
+      
       setNotes('');
-      setClaimNumber('');
+      if (!prefillData?.claim_number) {
+        setClaimNumber('');
+      }
     }
   }, [quote, prefillData]);
 
