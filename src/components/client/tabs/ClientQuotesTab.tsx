@@ -92,13 +92,44 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
   };
 
   const handleConvertToRepairOrder = (quote: Quote) => {
-    const today = new Date().toISOString().split('T')[0];
+    // Parser les données JSON du devis
+    let repairs = [];
+    let parts = [];
+    let discounts = [];
+    
+    try {
+      repairs = quote.repairs_data ? JSON.parse(quote.repairs_data as string) : [];
+    } catch (e) {
+      console.error('Error parsing repairs data:', e);
+    }
+    
+    try {
+      parts = quote.parts_data ? JSON.parse(quote.parts_data as string) : [];
+    } catch (e) {
+      console.error('Error parsing parts data:', e);
+    }
+    
+    try {
+      discounts = quote.discounts_data ? JSON.parse(quote.discounts_data as string) : [];
+    } catch (e) {
+      console.error('Error parsing discounts data:', e);
+    }
     
     const prefilledData: Partial<RepairOrder> = {
       client_id: quote.client_id,
       vehicle_id: quote.vehicle_id,
       status: 'En cours',
       notes: quote.notes || '',
+      claim_number: quote.claim_number || '',
+      report_number: quote.report_number || '',
+      policy_number: quote.policy_number || '',
+      report_date: quote.report_date || '',
+      expert_name: quote.expert_name || '',
+      incident_date: quote.incident_date || '',
+      // Convertir les données JSON en string pour l'ordre de réparation
+      repairs_data: JSON.stringify(repairs),
+      parts_data: JSON.stringify(parts),
+      discounts_data: JSON.stringify(discounts),
     };
 
     setPrefilledRepairOrder(prefilledData);
