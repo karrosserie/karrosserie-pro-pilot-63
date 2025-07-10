@@ -19,7 +19,11 @@ interface ReceiptFormProps {
 
 export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: ReceiptFormProps) => {
   const { receipts } = useReceiptsData();
-  const { accounts } = useAccounts();
+  const { accounts, isLoading: accountsLoading } = useAccounts();
+  
+  console.log('ReceiptForm - Accounts loaded:', accounts);
+  console.log('ReceiptForm - Accounts loading state:', accountsLoading);
+  console.log('ReceiptForm - Receipt prop:', receipt);
   const [formData, setFormData] = useState<Receipt>({
     reference: '',
     date: new Date().toISOString().split('T')[0],
