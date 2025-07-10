@@ -22,9 +22,7 @@ interface QuoteBasicInfoSectionProps {
   errors: Record<string, string>;
   onFieldChange: (field: string, value: any) => void;
   claimNumber?: string;
-  currentMileage?: string;
   onClaimNumberChange?: (value: string) => void;
-  onCurrentMileageChange?: (value: string) => void;
 }
 
 export const QuoteBasicInfoSection = ({ 
@@ -32,9 +30,7 @@ export const QuoteBasicInfoSection = ({
   errors, 
   onFieldChange,
   claimNumber = '',
-  currentMileage = '',
-  onClaimNumberChange,
-  onCurrentMileageChange
+  onClaimNumberChange
 }: QuoteBasicInfoSectionProps) => {
   console.log('QuoteBasicInfoSection - Errors received:', errors);
   console.log('QuoteBasicInfoSection - client_id error:', errors.client_id);

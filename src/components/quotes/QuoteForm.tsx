@@ -39,13 +39,11 @@ export const QuoteForm = ({
     errors,
     isReadOnly,
     claimNumber,
-    currentMileage,
     setRepairs,
     setParts,
     setDiscounts,
     handleChange,
     handleClaimNumberChange,
-    handleCurrentMileageChange,
     validateForm,
     calculateGlobalTotals,
     prepareSubmitData
@@ -59,7 +57,7 @@ export const QuoteForm = ({
     if (isSubmitting) return; // Prevent double submissions
     
     console.log('Validation attempt - Current errors before validation:', errors);
-    console.log('Form data before validation:', { formData, claimNumber, currentMileage });
+    console.log('Form data before validation:', { formData, claimNumber });
     
     const validationResult = validateForm();
     
@@ -99,9 +97,7 @@ export const QuoteForm = ({
         errors={errors}
         onFieldChange={handleChange}
         claimNumber={claimNumber}
-        currentMileage={currentMileage}
         onClaimNumberChange={handleClaimNumberChange}
-        onCurrentMileageChange={handleCurrentMileageChange}
       />
 
       <QuoteAssignmentSection 

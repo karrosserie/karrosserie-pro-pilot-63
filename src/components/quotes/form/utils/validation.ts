@@ -1,12 +1,11 @@
 
 export const validateQuoteForm = (
   formData: any,
-  claimNumber: string,
-  currentMileage: string
+  claimNumber: string
 ) => {
   const newErrors: Record<string, string> = {};
   
-  console.log('Starting validation with:', { formData, claimNumber, currentMileage });
+  console.log('Starting validation with:', { formData, claimNumber });
   
   if (!formData.reference?.trim()) {
     newErrors.reference = 'Le numéro du devis est obligatoire';
@@ -34,13 +33,6 @@ export const validateQuoteForm = (
     console.log('Claim number error detected:', claimNumber);
   }
 
-  if (currentMileage && currentMileage.trim().length > 0) {
-    const mileageNum = parseInt(currentMileage);
-    if (isNaN(mileageNum) || mileageNum < 0 || mileageNum > 999999) {
-      newErrors.current_mileage = 'Le kilométrage doit être un nombre entre 0 et 999999 km';
-      console.log('Current mileage error detected:', currentMileage);
-    }
-  }
   
   console.log('Validation complete. New errors:', newErrors);
   

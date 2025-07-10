@@ -24,7 +24,6 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
 
   const [notes, setNotes] = useState('');
   const [claimNumber, setClaimNumber] = useState('');
-  const [currentMileage, setCurrentMileage] = useState('');
   const [repairs, setRepairs] = useState<QuoteRepairItem[]>([]);
   const [parts, setParts] = useState<QuotePartItem[]>([]);
   const [discounts, setDiscounts] = useState<QuoteDiscountItem[]>([]);
@@ -34,7 +33,7 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
   const isReadOnly = formData.status === 'Facturé' || formData.status === 'Refusé' || formData.status === 'Annulé';
 
   const validateForm = () => {
-    const validationResult = validateQuoteForm(formData, claimNumber, currentMileage);
+    const validationResult = validateQuoteForm(formData, claimNumber);
     setErrors(validationResult.errors);
     return validationResult;
   };
@@ -67,16 +66,6 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
     }
   };
 
-  const handleCurrentMileageChange = (value: string) => {
-    if (!isReadOnly) {
-      setCurrentMileage(value);
-      console.log('Current mileage changed to:', value);
-      // Effacer l'erreur quand l'utilisateur modifie le champ
-      if (errors.current_mileage) {
-        setErrors(prev => ({ ...prev, current_mileage: '' }));
-      }
-    }
-  };
 
   useEffect(() => {
     if (quote) {
@@ -125,11 +114,10 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
         }
       }
       
-      // Charger les données depuis les notes (pour currentMileage et rétrocompatibilité des discounts)
+      // Charger les données depuis les notes (pour rétrocompatibilité des discounts)
       const parsedData = parseQuoteNotes(quote.notes);
       setNotes(parsedData.notes);
       setClaimNumber((quote as any).claim_number || parsedData.claimNumber || '');
-      setCurrentMileage(parsedData.currentMileage);
       setRepairs(repairsData.length > 0 ? repairsData : parsedData.repairs);
       setParts(partsData.length > 0 ? partsData : parsedData.parts);
       setDiscounts(discountsData.length > 0 ? discountsData : parsedData.discounts);
@@ -152,7 +140,6 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
       });
       setNotes('');
       setClaimNumber('');
-      setCurrentMileage('');
     }
   }, [quote, prefillData]);
 
@@ -160,7 +147,6 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
     formData,
     notes,
     claimNumber,
-    currentMileage,
     repairs,
     parts,
     discounts,
@@ -171,9 +157,8 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
     setDiscounts,
     handleChange,
     handleClaimNumberChange,
-    handleCurrentMileageChange,
     validateForm,
     calculateGlobalTotals: () => calculateGlobalTotals(repairs, parts, discounts),
-    prepareSubmitData: () => prepareSubmitData(formData, notes, claimNumber, currentMileage, repairs, parts, discounts)
+    prepareSubmitData: () => prepareSubmitData(formData, notes, claimNumber, repairs, parts, discounts)
   };
 };
