@@ -120,6 +120,11 @@ const RepairOrders = () => {
       date: today,
       due_date: today,
       notes: order.notes || '',
+      // Inclure les données de réparations, pièces et remises de l'ordre de réparation
+      // Convertir Json en string si nécessaire
+      repairs_data: order.repairs_data ? (typeof order.repairs_data === 'string' ? order.repairs_data : JSON.stringify(order.repairs_data)) : undefined,
+      parts_data: order.parts_data ? (typeof order.parts_data === 'string' ? order.parts_data : JSON.stringify(order.parts_data)) : undefined,
+      discounts_data: order.discounts_data ? (typeof order.discounts_data === 'string' ? order.discounts_data : JSON.stringify(order.discounts_data)) : undefined,
       // Ne pas inclure l'ID pour forcer la création d'une nouvelle facture
     };
 
