@@ -5,6 +5,8 @@ import QuoteDialog from '@/components/quotes/QuoteDialog';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useReportToQuote } from '@/hooks/use-report-to-quote';
 import { Quote } from '@/services/supabase/quotes';
+import { generateNextQuoteNumber } from '@/components/quotes/form/utils/quoteNumber';
+import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { ExpertiseReportUploader } from '@/components/expertise/ExpertiseReportUploader';
 import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
@@ -97,22 +99,39 @@ const ExpertiseReports = () => {
       return;
     }
 
-    // Préparer les données préremplies pour le devis
-    const prefilledData: Partial<Quote> = {
-      client_id: report.client_id,
-      vehicle_id: report.vehicle_id,
-      report_id: report.id,
-      status: 'En attente',
-      notes: `Converti à partir du rapport d'expertise ${report.report_number || ''}`,
-      amount: report.amount,
-      claim_number: report.claim_number,
-      policy_number: report.policy_number,
-      incident_date: report.incident_date,
-      expert_name: report.expert_name,
-    };
+    try {
+      // Générer le numéro de devis automatiquement
+      const quoteNumber = await generateNextQuoteNumber();
 
-    setPrefilledQuoteData(prefilledData);
-    setQuoteDialogOpen(true);
+      // Préparer les données préremplies pour le devis
+      const prefilledData: Partial<Quote> = {
+        reference: quoteNumber,
+        client_id: report.client_id,
+        vehicle_id: report.vehicle_id,
+        report_id: report.id,
+        status: 'En attente',
+        notes: `Converti à partir du rapport d'expertise ${report.report_number || ''}`,
+        amount: report.amount,
+        claim_number: report.claim_number,
+        policy_number: report.policy_number,
+        incident_date: report.incident_date,
+        expert_name: report.expert_name,
+        report_number: report.report_number,
+        report_date: report.report_date,
+        repairs_data: report.repairs_data,
+        parts_data: report.parts_data,
+      };
+
+      setPrefilledQuoteData(prefilledData);
+      setQuoteDialogOpen(true);
+    } catch (error) {
+      console.error('Error preparing quote data:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de préparer les données du devis.",
+        variant: "destructive"
+      });
+    }
   };
 
   const getConvertingReportId = () => {
