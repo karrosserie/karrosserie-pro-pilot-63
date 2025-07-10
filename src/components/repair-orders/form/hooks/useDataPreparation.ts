@@ -17,11 +17,11 @@ export const useDataPreparation = () => {
       repairs_data: JSON.stringify(repairs) || '[]',
       parts_data: JSON.stringify(parts) || '[]',
       discounts_data: JSON.stringify(discounts) || '[]',
-      report_number: formData.report_number,
-      policy_number: formData.policy_number,
-      report_date: formData.report_date,
-      expert_name: formData.expert_name,
-      incident_date: formData.incident_date
+      report_number: formData.report_number || '',
+      policy_number: formData.policy_number || '',
+      report_date: formData.report_date || null,
+      expert_name: formData.expert_name || '',
+      incident_date: formData.incident_date || null
     };
   };
 
