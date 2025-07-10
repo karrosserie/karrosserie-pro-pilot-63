@@ -82,7 +82,13 @@ const Invoices = () => {
   };
 
   const getInvoiceCredits = (invoiceId: string) => {
-    return credits?.filter(credit => credit.invoice_id === invoiceId) || [];
+    return credits?.filter(credit => credit.invoice_id === invoiceId)
+      .sort((a, b) => {
+        // Tri par ordre croissant de la référence
+        const refA = a.reference || '';
+        const refB = b.reference || '';
+        return refA.localeCompare(refB, 'fr', { numeric: true });
+      }) || [];
   };
 
   const renderCreditsBadges = (invoiceCredits: any[]) => {
