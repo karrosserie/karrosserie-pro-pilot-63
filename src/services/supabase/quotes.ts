@@ -251,7 +251,7 @@ export const quotesService = {
       vehicle_id: expertiseReport.vehicle_id,
       amount: expertiseReport.total_amount || 0,
       status: 'draft',
-      notes: `Créé depuis le rapport d'expertise ${expertiseReport.report_number}`,
+      notes: '',
       repairs_data: expertiseReport.repairs_data || null,
       parts_data: expertiseReport.parts_data || null,
       claim_number: expertiseReport.claim_number || '',
