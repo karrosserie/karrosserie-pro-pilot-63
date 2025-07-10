@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { calculateGlobalTotals } from '@/components/quotes/form/utils/calculations';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -71,6 +72,54 @@ const Quotes = () => {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 
     }) + ' €';
+  };
+
+  const calculateQuoteAmount = (quote: Quote): number => {
+    // Si le devis a des données de réparations et de pièces, calculer le total
+    let repairs = [];
+    let parts = [];
+    let discounts = [];
+
+    try {
+      if (quote.repairs_data && typeof quote.repairs_data === 'string') {
+        repairs = JSON.parse(quote.repairs_data);
+      } else if (Array.isArray(quote.repairs_data)) {
+        repairs = quote.repairs_data;
+      }
+    } catch (error) {
+      console.error('Error parsing repairs_data:', error);
+      repairs = [];
+    }
+
+    try {
+      if (quote.parts_data && typeof quote.parts_data === 'string') {
+        parts = JSON.parse(quote.parts_data);
+      } else if (Array.isArray(quote.parts_data)) {
+        parts = quote.parts_data;
+      }
+    } catch (error) {
+      console.error('Error parsing parts_data:', error);
+      parts = [];
+    }
+
+    try {
+      if (quote.discount_data && typeof quote.discount_data === 'string') {
+        discounts = JSON.parse(quote.discount_data);
+      } else if (Array.isArray(quote.discount_data)) {
+        discounts = quote.discount_data;
+      }
+    } catch (error) {
+      console.error('Error parsing discount_data:', error);
+      discounts = [];
+    }
+
+    if (repairs.length > 0 || parts.length > 0) {
+      const totals = calculateGlobalTotals(repairs, parts, discounts);
+      return totals.total;
+    }
+
+    // Sinon, utiliser le montant stocké dans amount
+    return quote.amount || 0;
   };
 
   const handleDownload = (quote: Quote) => {
@@ -195,7 +244,7 @@ const Quotes = () => {
                       : '-'
                     }
                   </TableCell>
-                  <TableCell>{formatAmount(quote.amount)}</TableCell>
+                  <TableCell>{formatAmount(calculateQuoteAmount(quote))}</TableCell>
                   <TableCell>
                     <StatusBadge status={quote.status || 'En attente'} />
                   </TableCell>
