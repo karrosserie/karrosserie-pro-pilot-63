@@ -10,6 +10,7 @@ import { calculateOrderAmount, formatAmount } from './utils/orderCalculations';
 interface RepairOrderTableRowProps {
   order: RepairOrder;
   onEditOrder: (order: RepairOrder) => void;
+  onDeleteOrder: (order: RepairOrder) => void;
   contextMenuProps?: {
     onDownload: (order: RepairOrder) => void;
     onPrint: (order: RepairOrder) => void;
@@ -20,7 +21,7 @@ interface RepairOrderTableRowProps {
   };
 }
 
-export const RepairOrderTableRow = ({ order, onEditOrder, contextMenuProps }: RepairOrderTableRowProps) => {
+export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, contextMenuProps }: RepairOrderTableRowProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'En cours':
@@ -85,7 +86,12 @@ export const RepairOrderTableRow = ({ order, onEditOrder, contextMenuProps }: Re
           <Button variant="ghost" size="icon" onClick={() => onEditOrder(order)}>
             <Pencil className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-red-500 hover:text-red-700"
+            onClick={() => onDeleteOrder(order)}
+          >
             <Trash className="h-4 w-4" />
           </Button>
           <RepairOrderActionsDropdown order={order} contextMenuProps={contextMenuProps} />

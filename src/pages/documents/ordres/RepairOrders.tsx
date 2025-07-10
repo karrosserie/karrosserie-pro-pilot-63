@@ -24,7 +24,7 @@ const RepairOrders = () => {
   const [prefilledInvoice, setPrefilledInvoice] = useState<Partial<Invoice> | null>(null);
   const { toast } = useToast();
   
-  const { orders, isLoading, error } = useRepairOrders();
+  const { orders, isLoading, error, deleteOrder } = useRepairOrders();
   
   const filteredOrders = orders?.filter(order => {
     const searchLower = searchTerm.toLowerCase();
@@ -117,6 +117,12 @@ const RepairOrders = () => {
     setInvoiceDialogOpen(true);
   };
 
+  const handleDeleteOrder = (order: RepairOrder) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet ordre de réparation ?')) {
+      deleteOrder.mutate(order.id);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="page-container">
@@ -144,6 +150,7 @@ const RepairOrders = () => {
       <RepairOrdersTable
         orders={filteredOrders}
         onEditOrder={handleEditOrder}
+        onDeleteOrder={handleDeleteOrder}
         contextMenuProps={{
           onDownload: handleDownload,
           onPrint: handlePrint,
