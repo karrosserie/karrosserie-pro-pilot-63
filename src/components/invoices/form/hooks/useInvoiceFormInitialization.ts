@@ -132,20 +132,63 @@ export const useInvoiceFormInitialization = ({
             incident_date: (invoice as any)?.incident_date || ''
           }));
           
-          // Si des notes sont fournies (depuis un ordre de réparation), les parser
-          if (invoice?.notes) {
-            console.log('Parsing notes from repair order:', invoice.notes);
-            const parsedData = parseInvoiceNotes(invoice.notes);
-            setClaimNumber(parsedData.claimNumber || '');
-            setRepairs(parsedData.repairs || []);
-            setParts(parsedData.parts || []);
-            setDiscounts(parsedData.discounts || []);
-          } else {
-            setClaimNumber('');
-            setRepairs([]);
-            setParts([]);
-            setDiscounts([]);
+          // Initialiser claim_number depuis l'invoice fournie
+          setClaimNumber((invoice as any)?.claim_number || '');
+          
+          // Initialiser les données de réparations, pièces et remises depuis l'invoice fournie
+          let repairsData: InvoiceRepairItem[] = [];
+          let partsData: InvoicePartItem[] = [];
+          let discountsData: InvoiceDiscountItem[] = [];
+
+          // Gérer les repairs_data
+          if (invoice?.repairs_data) {
+            try {
+              if (typeof invoice.repairs_data === 'string') {
+                repairsData = JSON.parse(invoice.repairs_data);
+              } else if (Array.isArray(invoice.repairs_data)) {
+                repairsData = invoice.repairs_data;
+              }
+            } catch (error) {
+              console.error('Erreur lors du parsing des repairs_data:', error);
+            }
           }
+
+          // Gérer les parts_data
+          if (invoice?.parts_data) {
+            try {
+              if (typeof invoice.parts_data === 'string') {
+                partsData = JSON.parse(invoice.parts_data);
+              } else if (Array.isArray(invoice.parts_data)) {
+                partsData = invoice.parts_data;
+              }
+            } catch (error) {
+              console.error('Erreur lors du parsing des parts_data:', error);
+            }
+          }
+
+          // Gérer les discounts_data
+          if (invoice?.discounts_data) {
+            try {
+              if (typeof invoice.discounts_data === 'string') {
+                discountsData = JSON.parse(invoice.discounts_data);
+              } else if (Array.isArray(invoice.discounts_data)) {
+                discountsData = invoice.discounts_data;
+              }
+            } catch (error) {
+              console.error('Erreur lors du parsing des discounts_data:', error);
+            }
+          }
+
+          setRepairs(repairsData);
+          setParts(partsData);
+          setDiscounts(discountsData);
+          
+          console.log('Initialized form with data from repair order:', {
+            claim_number: (invoice as any)?.claim_number,
+            repairs: repairsData,
+            parts: partsData,
+            discounts: discountsData
+          });
           
           console.log('Form data set with generated number:', nextNumber);
         } catch (error) {
@@ -165,6 +208,41 @@ export const useInvoiceFormInitialization = ({
             expert_name: (invoice as any)?.expert_name || '',
             incident_date: (invoice as any)?.incident_date || ''
           }));
+          
+          // Même logique que ci-dessus pour initialiser les données en cas d'erreur
+          setClaimNumber((invoice as any)?.claim_number || '');
+          
+          let repairsData: InvoiceRepairItem[] = [];
+          let partsData: InvoicePartItem[] = [];
+          let discountsData: InvoiceDiscountItem[] = [];
+
+          // Répéter la même logique de parsing pour la cohérence
+          if (invoice?.repairs_data) {
+            try {
+              repairsData = typeof invoice.repairs_data === 'string' ? JSON.parse(invoice.repairs_data) : invoice.repairs_data;
+            } catch (err) {
+              console.error('Erreur parsing repairs_data fallback:', err);
+            }
+          }
+          if (invoice?.parts_data) {
+            try {
+              partsData = typeof invoice.parts_data === 'string' ? JSON.parse(invoice.parts_data) : invoice.parts_data;
+            } catch (err) {
+              console.error('Erreur parsing parts_data fallback:', err);
+            }
+          }
+          if (invoice?.discounts_data) {
+            try {
+              discountsData = typeof invoice.discounts_data === 'string' ? JSON.parse(invoice.discounts_data) : invoice.discounts_data;
+            } catch (err) {
+              console.error('Erreur parsing discounts_data fallback:', err);
+            }
+          }
+
+          setRepairs(repairsData);
+          setParts(partsData);
+          setDiscounts(discountsData);
+          
           console.log('Set fallback form data with 1');
         }
       }
