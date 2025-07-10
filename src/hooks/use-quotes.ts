@@ -38,9 +38,23 @@ export function useQuotes() {
 
   const createQuote = useMutation({
     mutationFn: async (quoteData: any) => {
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        console.error('Error getting current user:', userError);
+        throw new Error('User not authenticated');
+      }
+
+      // Add user_id automatically
+      const quoteWithUserId = {
+        ...quoteData,
+        user_id: user.id
+      };
+
       const { data, error } = await supabase
         .from('quotes')
-        .insert([quoteData])
+        .insert([quoteWithUserId])
         .select(`
           *,
           clients(first_name, last_name),
