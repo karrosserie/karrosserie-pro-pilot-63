@@ -1010,6 +1010,7 @@ export type Database = {
           claim_number: string | null
           client_id: string | null
           created_at: string
+          discount_data: string | null
           document_url: string | null
           expert_name: string | null
           id: string
@@ -1020,6 +1021,7 @@ export type Database = {
           reference: string
           repairs_data: string | null
           report_date: string | null
+          report_id: string | null
           report_number: string | null
           status: string | null
           tax_rate: number | null
@@ -1033,6 +1035,7 @@ export type Database = {
           claim_number?: string | null
           client_id?: string | null
           created_at?: string
+          discount_data?: string | null
           document_url?: string | null
           expert_name?: string | null
           id?: string
@@ -1043,6 +1046,7 @@ export type Database = {
           reference: string
           repairs_data?: string | null
           report_date?: string | null
+          report_id?: string | null
           report_number?: string | null
           status?: string | null
           tax_rate?: number | null
@@ -1056,6 +1060,7 @@ export type Database = {
           claim_number?: string | null
           client_id?: string | null
           created_at?: string
+          discount_data?: string | null
           document_url?: string | null
           expert_name?: string | null
           id?: string
@@ -1066,6 +1071,7 @@ export type Database = {
           reference?: string
           repairs_data?: string | null
           report_date?: string | null
+          report_id?: string | null
           report_number?: string | null
           status?: string | null
           tax_rate?: number | null
@@ -1080,6 +1086,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "expertise_reports"
             referencedColumns: ["id"]
           },
           {
