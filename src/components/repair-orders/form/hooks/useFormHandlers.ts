@@ -2,9 +2,7 @@
 export const useFormHandlers = (
   isReadOnly: boolean,
   setFormData: any,
-  setDescription: any,
   setClaimNumber: any,
-  setCurrentMileage: any,
   clearFieldError: any,
   errors: Record<string, string>
 ) => {
@@ -13,12 +11,8 @@ export const useFormHandlers = (
       return;
     }
     
-    if (field === 'description') {
-      setDescription(value);
-    } else {
-      setFormData((prev: any) => ({ ...prev, [field]: value }));
-      console.log(`Field ${field} changed to:`, value);
-    }
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
+    console.log(`Field ${field} changed to:`, value);
     
     clearFieldError(field, errors);
   };
@@ -31,17 +25,8 @@ export const useFormHandlers = (
     }
   };
 
-  const handleCurrentMileageChange = (value: string) => {
-    if (!isReadOnly) {
-      setCurrentMileage(value);
-      console.log('Current mileage changed to:', value);
-      clearFieldError('current_mileage', errors);
-    }
-  };
-
   return {
     handleChange,
-    handleClaimNumberChange,
-    handleCurrentMileageChange
+    handleClaimNumberChange
   };
 };

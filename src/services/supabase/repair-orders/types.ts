@@ -27,12 +27,7 @@ export type RepairOrder = Database['public']['Tables']['repair_orders']['Row'] &
     reference: string;
     amount: number;
   } | null;
-  // These fields are now JSONB in database, so they use Json type from Supabase
-  client_signature?: string | null;
-  client_name_signature?: string | null;
   signature_date?: string | null;
-  description?: string | null;
-  current_mileage?: string | null;
   claim_number?: string | null;
   report_number?: string | null;
   policy_number?: string | null;

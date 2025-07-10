@@ -12,9 +12,7 @@ interface RepairOrderBasicInfoSectionProps {
   errors: Record<string, string>;
   onFieldChange: (field: string, value: any) => void;
   claimNumber?: string;
-  currentMileage?: string;
   onClaimNumberChange?: (value: string) => void;
-  onCurrentMileageChange?: (value: string) => void;
 }
 
 export const RepairOrderBasicInfoSection = ({ 
@@ -22,9 +20,7 @@ export const RepairOrderBasicInfoSection = ({
   errors, 
   onFieldChange,
   claimNumber = '',
-  currentMileage = '',
-  onClaimNumberChange,
-  onCurrentMileageChange
+  onClaimNumberChange
 }: RepairOrderBasicInfoSectionProps) => {
   const statusOptions = [
     { value: 'En cours', label: 'En cours' },
@@ -71,26 +67,7 @@ export const RepairOrderBasicInfoSection = ({
             )}
           </div>
 
-          <div>
-            <Label htmlFor="start_date">Date</Label>
-            <Input
-              id="start_date"
-              type="date"
-              value={formData.start_date || ''}
-              onChange={(e) => onFieldChange('start_date', e.target.value)}
-              className={cn(
-                errors.start_date && "border-red-500 focus-visible:ring-red-500"
-              )}
-            />
-            {errors.start_date && (
-              <p className="text-sm text-red-500 mt-1 flex items-center">
-                <AlertCircle className="h-4 w-4 mr-1" />
-                {errors.start_date}
-              </p>
-            )}
-          </div>
-
-          <div className="md:col-span-3">
+          <div className="md:col-span-4">
             <Label htmlFor="status">Statut</Label>
             <Select
               value={formData.status || 'En cours'}

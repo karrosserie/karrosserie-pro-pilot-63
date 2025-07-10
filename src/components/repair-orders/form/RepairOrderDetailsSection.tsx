@@ -6,13 +6,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { GlobalTotals } from './types';
 
 interface RepairOrderDetailsSectionProps {
-  description: string;
   onFieldChange: (field: string, value: any) => void;
   globalTotals: GlobalTotals;
   isReadOnly?: boolean;
 }
 
-export const RepairOrderDetailsSection = ({ description, onFieldChange, globalTotals, isReadOnly }: RepairOrderDetailsSectionProps) => {
+export const RepairOrderDetailsSection = ({ onFieldChange, globalTotals, isReadOnly }: RepairOrderDetailsSectionProps) => {
   return (
     <Card>
       <CardContent className="space-y-4 pt-6">
@@ -26,18 +25,6 @@ export const RepairOrderDetailsSection = ({ description, onFieldChange, globalTo
           <div className="flex justify-end text-lg font-bold">
             Total : <span className="ml-2">{globalTotals.total.toFixed(2)} €</span>
           </div>
-        </div>
-
-        <div className="border-t pt-4">
-          <Label htmlFor="description">Notes</Label>
-          <Textarea
-            id="description"
-            value={description}
-            onChange={(e) => onFieldChange('description', e.target.value)}
-            placeholder="Notes et observations concernant l'ordre de réparation..."
-            rows={4}
-            readOnly={isReadOnly}
-          />
         </div>
       </CardContent>
     </Card>

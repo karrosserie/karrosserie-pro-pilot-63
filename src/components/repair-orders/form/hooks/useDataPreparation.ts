@@ -6,18 +6,14 @@ import { repairOrdersService } from '@/services/supabase/repair-orders';
 export const useDataPreparation = () => {
   const prepareSubmitData = (
     formData: Partial<RepairOrder>,
-    description: string,
     claimNumber: string,
-    currentMileage: string,
     repairs: RepairOrderRepairItem[],
     parts: RepairOrderPartItem[],
     discounts: RepairOrderDiscountItem[]
   ) => {
     return {
       ...formData,
-      description: description || '',
       claim_number: claimNumber || '',
-      current_mileage: currentMileage || '',
       repairs_data: JSON.stringify(repairs) || '[]',
       parts_data: JSON.stringify(parts) || '[]',
       discounts_data: JSON.stringify(discounts) || '[]',
@@ -43,9 +39,7 @@ export const useDataPreparation = () => {
   const parseOrderData = (order: any) => {
     try {
       return {
-        description: order.description || '',
         claimNumber: order.claim_number || '',
-        currentMileage: order.current_mileage || '',
         repairs: order.repairs_data ? JSON.parse(order.repairs_data) : [],
         parts: order.parts_data ? JSON.parse(order.parts_data) : [],
         discounts: order.discounts_data ? JSON.parse(order.discounts_data) : []
@@ -53,9 +47,7 @@ export const useDataPreparation = () => {
     } catch (e) {
       console.error('Error parsing order data:', e);
       return {
-        description: '',
         claimNumber: '',
-        currentMileage: '',
         repairs: [],
         parts: [],
         discounts: []

@@ -179,7 +179,6 @@ const Quotes = () => {
 
   const handleConvertToRepairOrder = (quote: Quote) => {
     // Préparer les données de l'ordre de réparation à partir du devis
-    const today = new Date().toISOString().split('T')[0];
     
     // Parser les données JSON du devis
     let repairs = [];
@@ -208,7 +207,6 @@ const Quotes = () => {
       client_id: quote.client_id,
       vehicle_id: quote.vehicle_id,
       status: 'En cours',
-      start_date: today,
       notes: quote.notes || '',
       claim_number: quote.claim_number || '',
       report_number: quote.report_number || '',
