@@ -10,6 +10,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import InvoiceEmailDialog from '@/components/invoices/InvoiceEmailDialog';
 import ReceiptDialog from '@/components/receipts/ReceiptDialog';
@@ -84,17 +85,24 @@ const Invoices = () => {
     return credits?.filter(credit => credit.invoice_id === invoiceId) || [];
   };
 
-  const formatCreditsDisplay = (invoiceCredits: any[]) => {
+  const renderCreditsBadges = (invoiceCredits: any[]) => {
     if (invoiceCredits.length === 0) {
-      return '-';
+      return <span className="text-gray-500 text-sm">-</span>;
     }
     
-    if (invoiceCredits.length === 1) {
-      return `${invoiceCredits[0].reference} (${formatAmount(invoiceCredits[0].amount || 0)})`;
-    }
-    
-    const totalAmount = invoiceCredits.reduce((sum, credit) => sum + (credit.amount || 0), 0);
-    return `${invoiceCredits.length} avoirs (${formatAmount(totalAmount)})`;
+    return (
+      <div className="flex flex-col gap-1">
+        {invoiceCredits.map((credit) => (
+          <Badge
+            key={credit.id}
+            variant="secondary"
+            className="bg-orange-100 text-orange-800 hover:bg-orange-100 text-xs"
+          >
+            {credit.reference} ({formatAmount(credit.amount || 0)})
+          </Badge>
+        ))}
+      </div>
+    );
   };
   
   const handleCreateInvoice = () => {
@@ -239,9 +247,7 @@ const Invoices = () => {
                   </TableCell>
                   <TableCell>{formatAmount(invoice.amount || 0)}</TableCell>
                   <TableCell>
-                    <span className={`text-sm ${invoiceCredits.length > 0 ? 'text-red-600 font-medium' : 'text-gray-500'}`}>
-                      {formatCreditsDisplay(invoiceCredits)}
-                    </span>
+                    {renderCreditsBadges(invoiceCredits)}
                   </TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente de paiement')}`}>
