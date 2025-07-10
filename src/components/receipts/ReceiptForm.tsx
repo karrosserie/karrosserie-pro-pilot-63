@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { InvoiceSelect } from './form/InvoiceSelect';
 import { Receipt } from './form/types';
+import { useReceiptsData } from '@/hooks/use-receipts-data';
 
 interface ReceiptFormProps {
   receipt?: Receipt | null;
@@ -16,6 +17,7 @@ interface ReceiptFormProps {
 }
 
 export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: ReceiptFormProps) => {
+  const { receipts } = useReceiptsData();
   const [formData, setFormData] = useState<Receipt>({
     reference: '',
     date: new Date().toISOString().split('T')[0],
@@ -27,6 +29,19 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
     payment_proofs: [],
     invoice: ''
   });
+
+  // Calculer le prochain numéro d'encaissement
+  const getNextReceiptNumber = () => {
+    if (!receipts || receipts.length === 0) return 1;
+    
+    const existingNumbers = receipts
+      .map(r => r.reference)
+      .filter(ref => ref && /^\d+$/.test(ref))
+      .map(ref => parseInt(ref!, 10))
+      .filter(num => !isNaN(num));
+    
+    return existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+  };
 
   useEffect(() => {
     if (receipt) {
@@ -41,8 +56,14 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
         payment_proofs: receipt.payment_proofs || [],
         invoice: receipt.invoice || ''
       });
+    } else {
+      // Pour un nouvel encaissement, générer automatiquement le numéro
+      setFormData(prev => ({
+        ...prev,
+        reference: getNextReceiptNumber().toString()
+      }));
     }
-  }, [receipt]);
+  }, [receipt, receipts]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,12 +81,13 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="reference">Référence</Label>
+          <Label htmlFor="reference">Numéro</Label>
           <Input
             id="reference"
             value={formData.reference}
-            onChange={(e) => handleFieldChange('reference', e.target.value)}
-            placeholder="Généré automatiquement si vide"
+            readOnly
+            className="bg-muted"
+            placeholder="Auto-généré"
           />
         </div>
         
@@ -79,6 +101,16 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
             required
           />
         </div>
+      </div>
+
+      <div>
+        <Label htmlFor="bank_account">Compte bancaire</Label>
+        <Input
+          id="bank_account"
+          value={formData.bank_account}
+          onChange={(e) => handleFieldChange('bank_account', e.target.value)}
+          placeholder="Compte de destination"
+        />
       </div>
 
       <InvoiceSelect
@@ -115,16 +147,6 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
             </SelectContent>
           </Select>
         </div>
-      </div>
-
-      <div>
-        <Label htmlFor="bank_account">Compte bancaire</Label>
-        <Input
-          id="bank_account"
-          value={formData.bank_account}
-          onChange={(e) => handleFieldChange('bank_account', e.target.value)}
-          placeholder="Compte de destination"
-        />
       </div>
 
       <div>
