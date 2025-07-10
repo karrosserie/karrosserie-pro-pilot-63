@@ -60,12 +60,24 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
       });
     } else {
       // Pour un nouvel encaissement, générer automatiquement le numéro
+      const nextNumber = getNextReceiptNumber().toString();
       setFormData(prev => ({
         ...prev,
-        reference: getNextReceiptNumber().toString()
+        reference: nextNumber
       }));
     }
   }, [receipt, receipts]);
+
+  // Générer le numéro immédiatement pour les nouveaux encaissements
+  useEffect(() => {
+    if (!receipt && receipts) {
+      const nextNumber = getNextReceiptNumber().toString();
+      setFormData(prev => ({
+        ...prev,
+        reference: nextNumber
+      }));
+    }
+  }, [receipts]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
