@@ -13,9 +13,7 @@ export const useInvoiceFormData = () => {
     payment_details: ''
   });
 
-  const [description, setDescription] = useState('');
   const [claimNumber, setClaimNumber] = useState('');
-  const [currentMileage, setCurrentMileage] = useState('');
   const [repairs, setRepairs] = useState<InvoiceRepairItem[]>([]);
   const [parts, setParts] = useState<InvoicePartItem[]>([]);
   const [discounts, setDiscounts] = useState<InvoiceDiscountItem[]>([]);
@@ -27,12 +25,8 @@ export const useInvoiceFormData = () => {
   return {
     formData,
     setFormData,
-    description,
-    setDescription,
     claimNumber,
     setClaimNumber,
-    currentMileage,
-    setCurrentMileage,
     repairs,
     setRepairs,
     parts,

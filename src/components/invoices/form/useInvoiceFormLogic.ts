@@ -15,12 +15,8 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
   const {
     formData,
     setFormData,
-    description,
-    setDescription,
     claimNumber,
     setClaimNumber,
-    currentMileage,
-    setCurrentMileage,
     repairs,
     setRepairs,
     parts,
@@ -35,27 +31,20 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
   const {
     validateForm,
     handleChange,
-    handleClaimNumberChange,
-    handleCurrentMileageChange
+    handleClaimNumberChange
   } = useInvoiceFormHandlers({
     formData,
-    description,
     claimNumber,
-    currentMileage,
     isReadOnly,
     errors,
     setFormData,
-    setDescription,
     setClaimNumber,
-    setCurrentMileage,
     setErrors
   });
 
   const { prepareSubmitData } = useInvoiceDataPreparation({
     formData,
-    description,
     claimNumber,
-    currentMileage,
     repairs,
     parts,
     discounts
@@ -64,9 +53,7 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
   useInvoiceFormInitialization({
     invoice,
     setFormData,
-    setDescription,
     setClaimNumber,
-    setCurrentMileage,
     setRepairs,
     setParts,
     setDiscounts
@@ -79,9 +66,7 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
 
   return {
     formData,
-    description,
     claimNumber,
-    currentMileage,
     repairs,
     parts,
     discounts,
@@ -92,7 +77,6 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
     setDiscounts,
     handleChange,
     handleClaimNumberChange,
-    handleCurrentMileageChange,
     validateForm,
     calculateGlobalTotals: () => calculateGlobalTotals(repairs, parts, discounts),
     prepareSubmitData

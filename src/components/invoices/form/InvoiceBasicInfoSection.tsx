@@ -21,9 +21,7 @@ interface InvoiceBasicInfoSectionProps {
   errors: Record<string, string>;
   onFieldChange: (field: string, value: any) => void;
   claimNumber?: string;
-  currentMileage?: string;
   onClaimNumberChange?: (value: string) => void;
-  onCurrentMileageChange?: (value: string) => void;
 }
 
 export const InvoiceBasicInfoSection = ({ 
@@ -31,9 +29,7 @@ export const InvoiceBasicInfoSection = ({
   errors, 
   onFieldChange,
   claimNumber = '',
-  currentMileage = '',
-  onClaimNumberChange,
-  onCurrentMileageChange
+  onClaimNumberChange
 }: InvoiceBasicInfoSectionProps) => {
   const statusOptions = [
     { value: 'En attente de paiement', label: 'En attente de paiement' },

@@ -30,20 +30,17 @@ export const InvoiceForm = ({
   
   const {
     formData,
-    description,
     repairs,
     parts,
     discounts,
     errors,
     isReadOnly,
     claimNumber,
-    currentMileage,
     setRepairs,
     setParts,
     setDiscounts,
     handleChange,
     handleClaimNumberChange,
-    handleCurrentMileageChange,
     validateForm,
     calculateGlobalTotals,
     prepareSubmitData
@@ -87,9 +84,7 @@ export const InvoiceForm = ({
         errors={errors}
         onFieldChange={handleChange}
         claimNumber={claimNumber}
-        currentMileage={currentMileage}
         onClaimNumberChange={handleClaimNumberChange}
-        onCurrentMileageChange={handleCurrentMileageChange}
       />
 
       <InvoiceAssignmentSection 
@@ -119,7 +114,6 @@ export const InvoiceForm = ({
       />
 
       <InvoiceDetailsSection 
-        description={description}
         onFieldChange={handleChange}
         globalTotals={globalTotals}
         isReadOnly={isReadOnly}

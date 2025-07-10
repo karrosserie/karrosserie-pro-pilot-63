@@ -7,7 +7,6 @@ import { FileText } from 'lucide-react';
 import { GlobalTotals } from './types';
 
 interface InvoiceDetailsSectionProps {
-  description: string;
   paymentDetails: string;
   onFieldChange: (field: string, value: any) => void;
   globalTotals: GlobalTotals;
@@ -15,7 +14,6 @@ interface InvoiceDetailsSectionProps {
 }
 
 export const InvoiceDetailsSection = ({
-  description,
   paymentDetails,
   onFieldChange,
   globalTotals,
@@ -40,18 +38,6 @@ export const InvoiceDetailsSection = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div>
-          <Label htmlFor="description">Notes</Label>
-          <Textarea
-            id="description"
-            value={description}
-            onChange={(e) => onFieldChange('description', e.target.value)}
-            placeholder="Notes ou instructions spécifiques"
-            rows={3}
-            disabled={isReadOnly}
-          />
-        </div>
-        
         <div>
           <Label htmlFor="payment_details">Détails de paiement</Label>
           <Textarea

@@ -8,18 +8,14 @@ export interface Invoice {
   status?: string;
   created_at: string;
   due_date?: string | null;
-  payment_date?: string | null;
   payment_due_date?: string | null;
   payment_details?: string | null;
-  payment_method?: string | null;
-  description?: string | null;
   notes?: string | null;
   amount?: number | null;
   repairs_data?: string | any[] | null;
   parts_data?: string | any[] | null;
   discounts_data?: string | any[] | null;
   claim_number?: string | null;
-  current_mileage?: string | null;
   clients?: {
     id: string;
     first_name: string;

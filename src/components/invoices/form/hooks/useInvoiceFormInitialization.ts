@@ -7,9 +7,7 @@ import { parseInvoiceNotes, generateNextInvoiceNumber } from '../utils/invoiceFo
 interface UseInvoiceFormInitializationProps {
   invoice?: Invoice | null;
   setFormData: (updater: (prev: Partial<Invoice>) => Partial<Invoice>) => void;
-  setDescription: (value: string) => void;
   setClaimNumber: (value: string) => void;
-  setCurrentMileage: (value: string) => void;
   setRepairs: (value: InvoiceRepairItem[]) => void;
   setParts: (value: InvoicePartItem[]) => void;
   setDiscounts: (value: InvoiceDiscountItem[]) => void;
@@ -18,9 +16,7 @@ interface UseInvoiceFormInitializationProps {
 export const useInvoiceFormInitialization = ({
   invoice,
   setFormData,
-  setDescription,
   setClaimNumber,
-  setCurrentMileage,
   setRepairs,
   setParts,
   setDiscounts
@@ -50,17 +46,13 @@ export const useInvoiceFormInitialization = ({
         
         // Pour une facture existante, récupérer les données directement depuis les champs de la facture
         console.log('Loading existing invoice data:', {
-          description: invoice.description,
           claim_number: invoice.claim_number,
-          current_mileage: invoice.current_mileage,
           repairs_data: invoice.repairs_data,
           parts_data: invoice.parts_data,
           discounts_data: invoice.discounts_data
         });
 
-        setDescription(invoice.description || '');
         setClaimNumber(invoice.claim_number || '');
-        setCurrentMileage(invoice.current_mileage || '');
         
         // Traiter les données de réparations, pièces et remises
         let repairsData: InvoiceRepairItem[] = [];
@@ -142,16 +134,12 @@ export const useInvoiceFormInitialization = ({
           if (invoice?.notes) {
             console.log('Parsing notes from repair order:', invoice.notes);
             const parsedData = parseInvoiceNotes(invoice.notes);
-            setDescription(parsedData.description || '');
             setClaimNumber(parsedData.claimNumber || '');
-            setCurrentMileage(parsedData.currentMileage || '');
             setRepairs(parsedData.repairs || []);
             setParts(parsedData.parts || []);
             setDiscounts(parsedData.discounts || []);
           } else {
-            setDescription('');
             setClaimNumber('');
-            setCurrentMileage('');
             setRepairs([]);
             setParts([]);
             setDiscounts([]);
@@ -180,5 +168,5 @@ export const useInvoiceFormInitialization = ({
     };
 
     initializeForm();
-  }, [invoice, setFormData, setDescription, setClaimNumber, setCurrentMileage, setRepairs, setParts, setDiscounts]);
+  }, [invoice, setFormData, setClaimNumber, setRepairs, setParts, setDiscounts]);
 };

@@ -4,9 +4,7 @@ import { InvoiceRepairItem, InvoicePartItem, InvoiceDiscountItem } from '../type
 
 interface UseInvoiceDataPreparationProps {
   formData: Partial<Invoice>;
-  description: string;
   claimNumber: string;
-  currentMileage: string;
   repairs: InvoiceRepairItem[];
   parts: InvoicePartItem[];
   discounts: InvoiceDiscountItem[];
@@ -14,9 +12,7 @@ interface UseInvoiceDataPreparationProps {
 
 export const useInvoiceDataPreparation = ({
   formData,
-  description,
   claimNumber,
-  currentMileage,
   repairs,
   parts,
   discounts
@@ -24,9 +20,7 @@ export const useInvoiceDataPreparation = ({
   const prepareSubmitData = () => {
     console.log('Preparing submit data with:', {
       formData,
-      description,
       claimNumber,
-      currentMileage,
       repairs,
       parts,
       discounts
@@ -35,9 +29,7 @@ export const useInvoiceDataPreparation = ({
     // Préparer les données selon le format attendu par la base de données
     const submitData = {
       ...formData,
-      description: description || '',
       claim_number: claimNumber || '',
-      current_mileage: currentMileage || '',
       repairs_data: repairs || [],
       parts_data: parts || [],
       discounts_data: discounts || [],

@@ -16,15 +16,12 @@ export const invoiceMutations = {
       status: invoice.status,
       due_date: invoice.due_date,
       payment_due_date: invoice.payment_due_date,
-      payment_date: invoice.payment_date,
       payment_details: invoice.payment_details,
-      description: invoice.description,
       amount: invoice.amount || 0,
       repairs_data: invoice.repairs_data,
       parts_data: invoice.parts_data,
       discounts_data: invoice.discounts_data,
       claim_number: invoice.claim_number,
-      current_mileage: invoice.current_mileage,
       user_id: user.id
     };
 
@@ -53,15 +50,12 @@ export const invoiceMutations = {
     if (invoice.status !== undefined) cleanInvoice.status = invoice.status;
     if (invoice.due_date !== undefined) cleanInvoice.due_date = invoice.due_date;
     if (invoice.payment_due_date !== undefined) cleanInvoice.payment_due_date = invoice.payment_due_date;
-    if (invoice.payment_date !== undefined) cleanInvoice.payment_date = invoice.payment_date;
     if (invoice.payment_details !== undefined) cleanInvoice.payment_details = invoice.payment_details;
-    if (invoice.description !== undefined) cleanInvoice.description = invoice.description;
     if (invoice.amount !== undefined) cleanInvoice.amount = invoice.amount;
     if (invoice.repairs_data !== undefined) cleanInvoice.repairs_data = invoice.repairs_data;
     if (invoice.parts_data !== undefined) cleanInvoice.parts_data = invoice.parts_data;
     if (invoice.discounts_data !== undefined) cleanInvoice.discounts_data = invoice.discounts_data;
     if (invoice.claim_number !== undefined) cleanInvoice.claim_number = invoice.claim_number;
-    if (invoice.current_mileage !== undefined) cleanInvoice.current_mileage = invoice.current_mileage;
 
     const { data, error } = await supabase
       .from('invoices')

@@ -6,10 +6,9 @@ export const useInvoiceValidation = () => {
   const validateForm = (
     formData: Partial<Invoice>,
     claimNumber: string,
-    currentMileage: string,
     setErrors: (errors: Record<string, string>) => void
   ) => {
-    const validationResult = validateInvoiceForm(formData, claimNumber, currentMileage);
+    const validationResult = validateInvoiceForm(formData, claimNumber);
     setErrors(validationResult.errors);
     return validationResult.isValid;
   };
