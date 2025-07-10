@@ -5,34 +5,30 @@ export const generateReference = async (): Promise<string> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    // Récupérer le dernier encaissement pour ce user
-    const { data: lastReceipt, error } = await supabase
+    const { data, error } = await supabase
       .from('receipts')
       .select('reference')
       .eq('user_id', user.id)
-      .order('reference', { ascending: false })
-      .limit(1)
-      .single();
+      .order('created_at', { ascending: false })
+      .limit(1);
 
-    if (error && error.code !== 'PGRST116') {
-      console.error('Error fetching last receipt for reference generation:', error);
-      // En cas d'erreur, retourner 1 par défaut
+    if (error) {
+      console.warn('Error fetching last reference, generating default:', error);
       return '1';
     }
 
-    if (!lastReceipt || !lastReceipt.reference) {
-      return '1';
+    if (data && data.length > 0) {
+      const lastReference = data[0].reference;
+      const lastNumber = parseInt(lastReference);
+      
+      if (!isNaN(lastNumber)) {
+        return (lastNumber + 1).toString();
+      }
     }
 
-    // Extraire le numéro de la référence (on suppose que c'est un simple entier)
-    const currentNumber = parseInt(lastReceipt.reference, 10);
-    if (isNaN(currentNumber)) {
-      return '1';
-    }
-
-    return (currentNumber + 1).toString();
+    return '1';
   } catch (error) {
-    console.error('Error generating receipt reference:', error);
+    console.error('Error generating reference:', error);
     return '1';
   }
 };
