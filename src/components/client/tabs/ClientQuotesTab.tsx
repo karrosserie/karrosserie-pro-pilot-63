@@ -98,7 +98,6 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
       client_id: quote.client_id,
       vehicle_id: quote.vehicle_id,
       status: 'En cours',
-      start_date: today,
       notes: quote.notes || '',
     };
 
