@@ -221,16 +221,41 @@ export const quotesService = {
     const lastNumber = lastQuote?.reference ? parseInt(lastQuote.reference) : 0;
     const reference = (lastNumber + 1).toString();
     
-    // Préparer les notes avec les réparations et pièces du rapport
-    let notes = `Créé depuis le rapport d'expertise ${expertiseReport.report_number}`;
+    // Préparer les données pour le devis avec les réparations et pièces du rapport
+    let repairs = [];
+    let parts = [];
     
+    // Parser les réparations du rapport si elles existent
     if (expertiseReport.repairs) {
-      notes += `\n\nRéparations:\n${expertiseReport.repairs}`;
+      try {
+        repairs = JSON.parse(expertiseReport.repairs);
+      } catch (error) {
+        console.error('Error parsing repairs:', error);
+        repairs = [];
+      }
     }
     
+    // Parser les pièces du rapport si elles existent
     if (expertiseReport.parts) {
-      notes += `\n\nPièces:\n${expertiseReport.parts}`;
+      try {
+        parts = JSON.parse(expertiseReport.parts);
+      } catch (error) {
+        console.error('Error parsing parts:', error);
+        parts = [];
+      }
     }
+    
+    // Créer l'objet notes au format JSON attendu par le formulaire
+    const notesData = {
+      notes: `Créé depuis le rapport d'expertise ${expertiseReport.report_number} (Report ID: ${expertiseReport.id})`,
+      claimNumber: expertiseReport.claim_number || '',
+      currentMileage: '',
+      repairs: repairs,
+      parts: parts,
+      discounts: []
+    };
+    
+    const notes = JSON.stringify(notesData);
     
     const quoteData: any = {
       reference,
@@ -248,9 +273,6 @@ export const quotesService = {
       user_id: user.id,
       valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
     };
-
-    // Temporairement, on va stocker l'ID du rapport dans les notes jusqu'à ce que la colonne soit ajoutée
-    quoteData.notes += ` (Report ID: ${expertiseReport.id})`;
 
     const { data, error } = await supabase
       .from('quotes')
