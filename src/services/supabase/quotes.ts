@@ -245,25 +245,15 @@ export const quotesService = {
       }
     }
     
-    // Créer l'objet notes au format JSON attendu par le formulaire
-    const notesData = {
-      notes: `Créé depuis le rapport d'expertise ${expertiseReport.report_number} (Report ID: ${expertiseReport.id})`,
-      claimNumber: expertiseReport.claim_number || '',
-      currentMileage: '',
-      repairs: repairs,
-      parts: parts,
-      discounts: []
-    };
-    
-    const notes = JSON.stringify(notesData);
-    
     const quoteData: any = {
       reference,
       client_id: expertiseReport.client_id,
       vehicle_id: expertiseReport.vehicle_id,
       amount: expertiseReport.total_amount || 0,
       status: 'draft',
-      notes,
+      notes: `Créé depuis le rapport d'expertise ${expertiseReport.report_number} (Report ID: ${expertiseReport.id})`,
+      repairs_data: expertiseReport.repairs || null,
+      parts_data: expertiseReport.parts || null,
       claim_number: expertiseReport.claim_number || '',
       report_number: expertiseReport.report_number || '',
       policy_number: expertiseReport.policy_number || '',

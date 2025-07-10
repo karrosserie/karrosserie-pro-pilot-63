@@ -11,17 +11,18 @@ export const prepareSubmitData = (
   parts: QuotePartItem[],
   discounts: QuoteDiscountItem[]
 ) => {
+  // Préparer les notes avec uniquement les infos générales et remises
   const notesData = {
     notes,
     currentMileage,
-    repairs,
-    parts,
     discounts
   };
   
   return {
     ...formData,
     claim_number: claimNumber,
+    repairs_data: JSON.stringify(repairs),
+    parts_data: JSON.stringify(parts),
     notes: JSON.stringify(notesData),
     // S'assurer que les nouveaux champs sont inclus
     report_number: formData.report_number || '',

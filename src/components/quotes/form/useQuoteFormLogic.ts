@@ -95,13 +95,33 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
         incident_date: (quote as any).incident_date || ''
       });
       
-      // Charger les données depuis les notes (format JSON)
+      // Charger les données depuis les nouveaux champs dédiés
+      let repairsData = [];
+      let partsData = [];
+      
+      if ((quote as any).repairs_data) {
+        try {
+          repairsData = JSON.parse((quote as any).repairs_data);
+        } catch (error) {
+          console.error('Error parsing repairs_data:', error);
+        }
+      }
+      
+      if ((quote as any).parts_data) {
+        try {
+          partsData = JSON.parse((quote as any).parts_data);
+        } catch (error) {
+          console.error('Error parsing parts_data:', error);
+        }
+      }
+      
+      // Charger les données depuis les notes (pour currentMileage et discounts)
       const parsedData = parseQuoteNotes(quote.notes);
       setNotes(parsedData.notes);
       setClaimNumber((quote as any).claim_number || parsedData.claimNumber || '');
       setCurrentMileage(parsedData.currentMileage);
-      setRepairs(parsedData.repairs);
-      setParts(parsedData.parts);
+      setRepairs(repairsData.length > 0 ? repairsData : parsedData.repairs);
+      setParts(partsData.length > 0 ? partsData : parsedData.parts);
       setDiscounts(parsedData.discounts);
     } else {
       // Pour un nouveau devis, définir la date du jour
