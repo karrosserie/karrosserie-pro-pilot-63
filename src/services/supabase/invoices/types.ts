@@ -16,6 +16,12 @@ export interface Invoice {
   parts_data?: string | any[] | null;
   discounts_data?: string | any[] | null;
   claim_number?: string | null;
+  // Nouveaux champs ajoutés pour les informations du sinistre
+  policy_number?: string | null;
+  report_date?: string | null;
+  expert_name?: string | null;
+  report_number?: string | null;
+  incident_date?: string | null;
   clients?: {
     id: string;
     first_name: string;

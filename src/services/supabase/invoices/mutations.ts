@@ -22,6 +22,13 @@ export const invoiceMutations = {
       parts_data: invoice.parts_data,
       discounts_data: invoice.discounts_data,
       claim_number: invoice.claim_number,
+      // Ajout des nouveaux champs pour les informations du sinistre
+      policy_number: invoice.policy_number,
+      report_date: invoice.report_date,
+      expert_name: invoice.expert_name,
+      report_number: invoice.report_number,
+      incident_date: invoice.incident_date,
+      notes: invoice.notes,
       user_id: user.id
     };
 
@@ -56,6 +63,13 @@ export const invoiceMutations = {
     if (invoice.parts_data !== undefined) cleanInvoice.parts_data = invoice.parts_data;
     if (invoice.discounts_data !== undefined) cleanInvoice.discounts_data = invoice.discounts_data;
     if (invoice.claim_number !== undefined) cleanInvoice.claim_number = invoice.claim_number;
+    // Ajout des nouveaux champs pour les informations du sinistre
+    if (invoice.policy_number !== undefined) cleanInvoice.policy_number = invoice.policy_number;
+    if (invoice.report_date !== undefined) cleanInvoice.report_date = invoice.report_date;
+    if (invoice.expert_name !== undefined) cleanInvoice.expert_name = invoice.expert_name;
+    if (invoice.report_number !== undefined) cleanInvoice.report_number = invoice.report_number;
+    if (invoice.incident_date !== undefined) cleanInvoice.incident_date = invoice.incident_date;
+    if (invoice.notes !== undefined) cleanInvoice.notes = invoice.notes;
 
     const { data, error } = await supabase
       .from('invoices')

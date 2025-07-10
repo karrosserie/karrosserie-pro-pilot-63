@@ -112,6 +112,13 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
       date: today,
       due_date: today,
       notes: order.notes || '',
+      // Informations du sinistre depuis l'ordre de réparation
+      claim_number: order.claim_number || '',
+      policy_number: order.policy_number || '',
+      report_date: order.report_date || '',
+      expert_name: order.expert_name || '',
+      report_number: order.report_number || '',
+      incident_date: order.incident_date || '',
       // Inclure les données de réparations, pièces et remises de l'ordre de réparation
       // Convertir Json en string si nécessaire
       repairs_data: order.repairs_data ? (typeof order.repairs_data === 'string' ? order.repairs_data : JSON.stringify(order.repairs_data)) : undefined,
