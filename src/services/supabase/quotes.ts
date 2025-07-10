@@ -192,12 +192,12 @@ export const quotesService = {
     return true;
   },
 
-  // Vérifier si un devis existe pour un rapport d'expertise donné (temporaire via notes)
+  // Vérifier si un devis existe pour un rapport d'expertise donné
   getByReportId: async (reportId: string) => {
     const { data, error } = await supabase
       .from('quotes')
-      .select('id, reference, notes')
-      .like('notes', `%Report ID: ${reportId}%`);
+      .select('id, reference')
+      .filter('report_id', 'eq', reportId);
       
     if (error) {
       console.error(`Error fetching quote for report ${reportId}:`, error);
@@ -251,7 +251,7 @@ export const quotesService = {
       vehicle_id: expertiseReport.vehicle_id,
       amount: expertiseReport.total_amount || 0,
       status: 'draft',
-      notes: `Créé depuis le rapport d'expertise ${expertiseReport.report_number} (Report ID: ${expertiseReport.id})`,
+      notes: `Créé depuis le rapport d'expertise ${expertiseReport.report_number}`,
       repairs_data: expertiseReport.repairs || null,
       parts_data: expertiseReport.parts || null,
       claim_number: expertiseReport.claim_number || '',
@@ -260,6 +260,7 @@ export const quotesService = {
       report_date: expertiseReport.report_date || '',
       expert_name: expertiseReport.expert_name || '',
       incident_date: expertiseReport.incident_date || '',
+      report_id: expertiseReport.id,
       user_id: user.id,
       valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
     };
