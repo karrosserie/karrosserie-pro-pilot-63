@@ -91,7 +91,6 @@ export const SimpleReceiptsTable = ({
           <TableHead>Facture</TableHead>
           <TableHead>Montant</TableHead>
           <TableHead>Méthode de paiement</TableHead>
-          <TableHead>Compte bancaire</TableHead>
           <TableHead>Statut</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
@@ -108,7 +107,6 @@ export const SimpleReceiptsTable = ({
               {formatAmount(receipt.amount)}
             </TableCell>
             <TableCell>{receipt.payment_method}</TableCell>
-            <TableCell>{receipt.bank_account || 'Non spécifié'}</TableCell>
             <TableCell>
               <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(receipt.status)}`}>
                 {receipt.status}
