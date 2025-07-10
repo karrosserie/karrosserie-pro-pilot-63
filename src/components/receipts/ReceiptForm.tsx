@@ -9,6 +9,7 @@ import { InvoiceSelect } from './form/InvoiceSelect';
 import { Receipt } from './form/types';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { useAccounts } from '@/hooks/use-accounts';
+import { receiptsService } from '@/services/supabase/receipts';
 
 interface ReceiptFormProps {
   receipt?: Receipt | null;
@@ -36,30 +37,10 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
     invoice: ''
   });
 
-  // Calculer le prochain numéro d'encaissement
-  const getNextReceiptNumber = () => {
-    console.log('getNextReceiptNumber - receipts:', receipts);
-    
-    if (!receipts || receipts.length === 0) {
-      console.log('No receipts found, returning 1');
-      return 1;
-    }
-    
-    const existingNumbers = receipts
-      .map(r => r.reference)
-      .filter(ref => ref && /^\d+$/.test(ref))
-      .map(ref => parseInt(ref!, 10))
-      .filter(num => !isNaN(num));
-    
-    console.log('Existing numbers:', existingNumbers);
-    const nextNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
-    console.log('Next number will be:', nextNumber);
-    
-    return nextNumber;
-  };
-
+  // Auto-générer la référence au chargement (comme dans le formulaire des avoirs)
   useEffect(() => {
     if (receipt) {
+      // Si on modifie un encaissement existant, utiliser ses données
       setFormData({
         reference: receipt.reference || '',
         date: receipt.date || new Date().toISOString().split('T')[0],
@@ -72,25 +53,20 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
         invoice: receipt.invoice || ''
       });
     } else {
-      // Pour un nouvel encaissement, générer automatiquement le numéro
-      const nextNumber = getNextReceiptNumber().toString();
-      setFormData(prev => ({
-        ...prev,
-        reference: nextNumber
-      }));
-    }
-  }, [receipt, receipts]);
+      // Si c'est un nouvel encaissement, générer la référence
+      const generateReference = async () => {
+        try {
+          const reference = await receiptsService.generateReference();
+          setFormData(prev => ({ ...prev, reference }));
+        } catch (error) {
+          console.error('Error generating reference:', error);
+          setFormData(prev => ({ ...prev, reference: '1' }));
+        }
+      };
 
-  // Générer le numéro dès que possible pour les nouveaux encaissements
-  useEffect(() => {
-    if (!receipt) {
-      const nextNumber = getNextReceiptNumber().toString();
-      setFormData(prev => ({
-        ...prev,
-        reference: nextNumber
-      }));
+      generateReference();
     }
-  }, [receipts, receipt]);
+  }, [receipt]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
