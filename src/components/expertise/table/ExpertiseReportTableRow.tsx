@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
-import { FileText, Pencil, Trash, Download, User, Car, FileCheck, Loader2, MoreHorizontal } from 'lucide-react';
+import { FileText, Pencil, Trash, Download, User, Car, FileCheck, Loader2, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
@@ -143,7 +143,7 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                <MoreHorizontal className="h-4 w-4" />
+                <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
