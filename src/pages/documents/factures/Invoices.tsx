@@ -21,6 +21,7 @@ import { ErrorMessage } from '@/components/ui/error-message';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
+import { useConfirmation } from '@/hooks/use-confirmation';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,6 +39,7 @@ const Invoices = () => {
   const [creditDialogOpen, setCreditDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const { toast } = useToast();
+  const { confirm } = useConfirmation();
   
   const { invoices, isLoading, error, deleteInvoice } = useInvoices();
   
@@ -87,7 +89,15 @@ const Invoices = () => {
   };
 
   const handleDelete = async (invoice: Invoice) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer la facture ${invoice.reference} ?`)) {
+    const confirmed = await confirm({
+      title: 'Supprimer la facture',
+      description: `Êtes-vous sûr de vouloir supprimer la facture ${invoice.reference} ? Cette action est irréversible.`,
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
       await deleteInvoice.mutateAsync(invoice.id);
     }
   };
