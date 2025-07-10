@@ -38,7 +38,19 @@ interface NavItemProps {
 }
 
 const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems = [], onClose }: NavItemProps) => {
-  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
+  const location = useLocation();
+  
+  // Check if any submenu item is active to determine if submenu should be open by default
+  const hasActiveSubItem = hasSubMenu && subMenuItems.some(item => location.pathname === item.path);
+  const [isSubMenuOpen, setIsSubMenuOpen] = useState(hasActiveSubItem);
+  
+  // Update submenu state when location changes
+  React.useEffect(() => {
+    if (hasSubMenu) {
+      const shouldBeOpen = subMenuItems.some(item => location.pathname === item.path);
+      setIsSubMenuOpen(shouldBeOpen);
+    }
+  }, [location.pathname, hasSubMenu, subMenuItems]);
   
   const toggleSubMenu = (e: React.MouseEvent) => {
     if (hasSubMenu) {
