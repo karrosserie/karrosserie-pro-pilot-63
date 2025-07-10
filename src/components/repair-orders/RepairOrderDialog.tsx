@@ -52,7 +52,7 @@ const RepairOrderDialog = ({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle>
-            {isExistingOrder ? `Modifier l'ordre de réparation - ${order.reference}` : "Créer un nouvel ordre de réparation"}
+            {isExistingOrder ? "Modifier l'ordre de réparation" : "Créer un nouvel ordre de réparation"}
           </DialogTitle>
           <DialogDescription>
             {isExistingOrder

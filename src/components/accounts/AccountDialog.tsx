@@ -74,7 +74,7 @@ const AccountDialog = ({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {account ? `Modifier le compte - ${account.name}` : "Nouveau compte"}
+            {account ? "Modifier le compte" : "Nouveau compte"}
           </DialogTitle>
           <DialogDescription>
             {account

@@ -64,7 +64,7 @@ const ExpertiseReportDialog = ({
       } overflow-hidden`}>
         <DialogHeader className={isMobile ? 'px-2' : ''}>
           <DialogTitle className={`${isMobile ? 'text-lg' : 'text-xl'}`}>
-            {report ? `Modifier le rapport d'expertise - ${report.report_number || 'Sans numéro'}` : "Créer un nouveau rapport d'expertise"}
+            {report ? "Modifier le rapport d'expertise" : "Créer un nouveau rapport d'expertise"}
           </DialogTitle>
           <DialogDescription className={`${isMobile ? 'text-sm' : ''}`}>
             {report

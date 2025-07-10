@@ -50,7 +50,7 @@ const InvoiceDialog = ({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {invoice && invoice.id ? `Modifier la facture - ${invoice.reference}` : "Créer une nouvelle facture"}
+            {invoice && invoice.id ? "Modifier la facture" : "Créer une nouvelle facture"}
           </DialogTitle>
           <DialogDescription>
             {invoice && invoice.id

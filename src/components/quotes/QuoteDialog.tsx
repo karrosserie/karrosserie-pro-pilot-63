@@ -55,7 +55,7 @@ const QuoteDialog = ({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {quote ? `Modifier le devis - ${quote.reference}` : "Créer un nouveau devis"}
+            {quote ? "Modifier le devis" : "Créer un nouveau devis"}
           </DialogTitle>
           <DialogDescription>
             {quote
