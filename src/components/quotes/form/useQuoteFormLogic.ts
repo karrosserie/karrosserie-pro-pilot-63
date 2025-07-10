@@ -106,11 +106,11 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
       
       // Charger les remises depuis le nouveau champ dédié  
       let discountsData = [];
-      if ((quote as any).discount_data) {
+      if ((quote as any).discounts_data) {
         try {
-          discountsData = JSON.parse((quote as any).discount_data);
+          discountsData = JSON.parse((quote as any).discounts_data);
         } catch (error) {
-          console.error('Error parsing discount_data:', error);
+          console.error('Error parsing discounts_data:', error);
         }
       }
       

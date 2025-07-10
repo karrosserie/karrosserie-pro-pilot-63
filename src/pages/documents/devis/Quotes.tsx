@@ -115,13 +115,13 @@ const Quotes = () => {
     }
 
     try {
-      if (quote.discount_data && typeof quote.discount_data === 'string') {
-        discounts = JSON.parse(quote.discount_data);
-      } else if (Array.isArray(quote.discount_data)) {
-        discounts = quote.discount_data;
+      if ((quote as any).discounts_data && typeof (quote as any).discounts_data === 'string') {
+        discounts = JSON.parse((quote as any).discounts_data);
+      } else if (Array.isArray((quote as any).discounts_data)) {
+        discounts = (quote as any).discounts_data;
       }
     } catch (error) {
-      console.error('Error parsing discount_data:', error);
+      console.error('Error parsing discounts_data:', error);
       discounts = [];
     }
 

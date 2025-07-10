@@ -15,7 +15,7 @@ export const prepareSubmitData = (
     claim_number: claimNumber,
     repairs_data: JSON.stringify(repairs),
     parts_data: JSON.stringify(parts),
-    discount_data: JSON.stringify(discounts),
+    discounts_data: JSON.stringify(discounts),
     notes: notes,
     // S'assurer que les nouveaux champs sont inclus
     report_number: formData.report_number || '',
