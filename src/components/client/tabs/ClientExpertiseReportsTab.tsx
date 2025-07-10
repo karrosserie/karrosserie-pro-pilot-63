@@ -95,11 +95,6 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
       }
     },
     {
-      accessorKey: "expert_name",
-      header: "Expert",
-      cell: ({ row }) => row.getValue("expert_name") || "-"
-    },
-    {
       accessorKey: "amount",
       header: "Montant",
       cell: ({ row }) => {
