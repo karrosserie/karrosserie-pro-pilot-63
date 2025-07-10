@@ -94,11 +94,6 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
         }
       </TableCell>
       <TableCell>
-        <span className={report.expert_name ? '' : 'text-gray-400 italic'}>
-          {report.expert_name || 'Non spécifié'}
-        </span>
-      </TableCell>
-      <TableCell>
         {formatAmount(report.amount)}
       </TableCell>
       <TableCell>
