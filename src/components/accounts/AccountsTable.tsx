@@ -96,16 +96,15 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
         <TableBody>
           {accounts.map((account) => (
             <TableRow key={account.id}>
-              <TableCell className="font-medium">
+              <TableCell>
                 <div className="flex items-center">
-                  {getTypeIcon(account.type)}
-                  <span className="ml-2">{account.name}</span>
+                  <span>{account.name}</span>
                 </div>
               </TableCell>
               <TableCell>{account.bank}</TableCell>
               <TableCell className="font-mono text-sm">{account.iban}</TableCell>
               <TableCell className="font-mono text-sm">{account.bic}</TableCell>
-              <TableCell className="font-medium">
+              <TableCell>
                 {formatAmount(account.balance)}
               </TableCell>
               <TableCell>

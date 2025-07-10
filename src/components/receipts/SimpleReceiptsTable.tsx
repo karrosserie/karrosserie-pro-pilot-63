@@ -98,12 +98,12 @@ export const SimpleReceiptsTable = ({
       <TableBody>
         {receipts.map((receipt) => (
           <TableRow key={receipt.id}>
-            <TableCell className="font-medium">{receipt.reference || 'N/A'}</TableCell>
+            <TableCell>{receipt.reference || 'N/A'}</TableCell>
             <TableCell>{formatDate(receipt.date)}</TableCell>
             <TableCell>
               {getInvoiceDisplay(receipt.invoice_id)}
             </TableCell>
-            <TableCell className="font-medium">
+            <TableCell>
               {formatAmount(receipt.amount)}
             </TableCell>
             <TableCell>{receipt.payment_method}</TableCell>

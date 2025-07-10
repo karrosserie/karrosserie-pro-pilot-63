@@ -61,7 +61,7 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete, isLoading }: Expense
           {expenses.length > 0 ? (
             expenses.map((expense) => (
               <TableRow key={expense.id}>
-                <TableCell className="font-medium">{expense.type}</TableCell>
+                <TableCell>{expense.type}</TableCell>
                 <TableCell>{new Date(expense.date).toLocaleDateString('fr-FR')}</TableCell>
                 <TableCell>{expense.supplier}</TableCell>
                 <TableCell>{expense.category}</TableCell>
