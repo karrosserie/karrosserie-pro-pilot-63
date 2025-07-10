@@ -52,7 +52,7 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
         reference: order.reference || '',
         client_id: order.client_id || null,
         vehicle_id: order.vehicle_id || null,
-        status: order.status || 'En cours',
+        status: order.status || 'En attente',
         notes: order.notes || '',
         report_number: order.report_number || '',
         policy_number: order.policy_number || '',
@@ -95,7 +95,7 @@ export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps)
           ...(order && {
             client_id: order.client_id || null,
             vehicle_id: order.vehicle_id || null,
-            status: order.status || 'En cours',
+            status: order.status || 'En attente',
             notes: order.notes || '',
             report_number: order.report_number || '',
             policy_number: order.policy_number || '',
