@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { InvoiceSelect } from './form/InvoiceSelect';
 import { Receipt } from './form/types';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
+import { useAccounts } from '@/hooks/use-accounts';
 
 interface ReceiptFormProps {
   receipt?: Receipt | null;
@@ -18,6 +19,7 @@ interface ReceiptFormProps {
 
 export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: ReceiptFormProps) => {
   const { receipts } = useReceiptsData();
+  const { accounts } = useAccounts();
   const [formData, setFormData] = useState<Receipt>({
     reference: '',
     date: new Date().toISOString().split('T')[0],
@@ -103,13 +105,19 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
         </div>
 
         <div>
-          <Label htmlFor="bank_account">Compte bancaire</Label>
-          <Input
-            id="bank_account"
-            value={formData.bank_account}
-            onChange={(e) => handleFieldChange('bank_account', e.target.value)}
-            placeholder="Compte de destination"
-          />
+          <Label htmlFor="bank_account">Compte bancaire <span className="text-red-500">*</span></Label>
+          <Select value={formData.bank_account} onValueChange={(value) => handleFieldChange('bank_account', value)} required>
+            <SelectTrigger className="bg-background">
+              <SelectValue placeholder="Sélectionner un compte" />
+            </SelectTrigger>
+            <SelectContent className="bg-background border shadow-lg z-50">
+              {accounts.map((account) => (
+                <SelectItem key={account.id} value={account.id}>
+                  {account.name} - {account.bank}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -120,7 +128,7 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="amount">Montant (€)</Label>
+          <Label htmlFor="amount">Montant (€) <span className="text-red-500">*</span></Label>
           <Input
             id="amount"
             type="number"
@@ -133,12 +141,12 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
         </div>
 
         <div>
-          <Label htmlFor="payment_method">Mode de paiement</Label>
-          <Select value={formData.payment_method} onValueChange={(value) => handleFieldChange('payment_method', value)}>
-            <SelectTrigger>
+          <Label htmlFor="payment_method">Mode de paiement <span className="text-red-500">*</span></Label>
+          <Select value={formData.payment_method} onValueChange={(value) => handleFieldChange('payment_method', value)} required>
+            <SelectTrigger className="bg-background">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-background border shadow-lg z-50">
               <SelectItem value="Virement">Virement</SelectItem>
               <SelectItem value="Chèque">Chèque</SelectItem>
               <SelectItem value="Espèces">Espèces</SelectItem>
