@@ -87,10 +87,10 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
           <Label htmlFor="reference">Numéro <span className="text-red-500">*</span></Label>
           <Input
             id="reference"
-            value={formData.reference}
+            value={formData.reference || ''}
             readOnly
             className="bg-muted"
-            placeholder="Auto-généré"
+            placeholder="Généré automatiquement"
           />
         </div>
         
