@@ -68,11 +68,8 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
   const clientOrders = orders?.filter(order => order.client_id === defaultValues?.id) || [];
   const clientInvoices = invoices?.filter(invoice => invoice.client_id === defaultValues?.id) || [];
   
-  // For credits, include both direct client credits and credits via invoices
+  // For credits, include credits via invoices only (since direct client_id is removed)
   const clientCredits = credits?.filter(credit => {
-    if (credit.client_id === defaultValues?.id) {
-      return true;
-    }
     if (credit.invoice_id && invoices) {
       const relatedInvoice = invoices.find(invoice => invoice.id === credit.invoice_id);
       return relatedInvoice?.client_id === defaultValues?.id;

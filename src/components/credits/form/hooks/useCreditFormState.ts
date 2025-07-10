@@ -6,8 +6,6 @@ import { creditsService } from '@/services/supabase/credits';
 export const useCreditFormState = () => {
   const [formData, setFormData] = useState<CreditFormData>({
     reference: '',
-    client_id: null,
-    vehicle_id: null,
     invoice_id: null,
     status: 'En attente',
     notes: ''

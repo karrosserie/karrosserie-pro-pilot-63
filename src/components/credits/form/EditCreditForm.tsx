@@ -12,8 +12,6 @@ interface EditCreditFormProps {
   creditId: string;
   initialData?: {
     reference: string;
-    client_id: string | null;
-    vehicle_id: string | null;
     invoice_id: string | null;
     status: 'En attente' | 'Payé';
     notes?: string;

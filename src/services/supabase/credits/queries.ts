@@ -33,50 +33,12 @@ export const getCredits = async (): Promise<Credit[]> => {
       creditsData.map(async (credit: Credit) => {
         const enrichedCredit = { ...credit };
 
-        // First, try to get client and vehicle from the credit itself
+        // Get client and vehicle from the invoice only
         let clientData = null;
         let vehicleData = null;
 
-        // Fetch client data if client_id exists
-        if (credit.client_id) {
-          try {
-            console.log('Fetching client for credit:', credit.id, 'client_id:', credit.client_id);
-            const { data: client, error: clientError } = await supabase
-              .from('clients')
-              .select('id, first_name, last_name')
-              .eq('id', credit.client_id)
-              .maybeSingle();
-            
-            if (!clientError && client) {
-              console.log('Found client:', client);
-              clientData = client;
-            }
-          } catch (clientError) {
-            console.warn(`Could not fetch client for credit ${credit.id}:`, clientError);
-          }
-        }
-
-        // Fetch vehicle data if vehicle_id exists
-        if (credit.vehicle_id) {
-          try {
-            console.log('Fetching vehicle for credit:', credit.id, 'vehicle_id:', credit.vehicle_id);
-            const { data: vehicle, error: vehicleError } = await supabase
-              .from('vehicles')
-              .select('id, brand, model, license_plate')
-              .eq('id', credit.vehicle_id)
-              .maybeSingle();
-            
-            if (!vehicleError && vehicle) {
-              console.log('Found vehicle:', vehicle);
-              vehicleData = vehicle;
-            }
-          } catch (vehicleError) {
-            console.warn(`Could not fetch vehicle for credit ${credit.id}:`, vehicleError);
-          }
-        }
-
-        // If we don't have client or vehicle from the credit, try to get them from the invoice
-        if (credit.invoice_id && (!clientData || !vehicleData)) {
+        // Get client and vehicle data from the invoice
+        if (credit.invoice_id) {
           try {
             console.log('Fetching invoice details for credit:', credit.id, 'invoice_id:', credit.invoice_id);
             const { data: invoice, error: invoiceError } = await supabase
@@ -179,30 +141,11 @@ export const getCredit = async (id: string): Promise<Credit> => {
     // Fetch relations separately
     const enrichedCredit = { ...data };
 
-    // Try to get client and vehicle data
+    // Get client and vehicle data from the invoice
     let clientData = null;
     let vehicleData = null;
 
-    if (data.client_id) {
-      const { data: client } = await supabase
-        .from('clients')
-        .select('id, first_name, last_name')
-        .eq('id', data.client_id)
-        .maybeSingle();
-      if (client) clientData = client;
-    }
-
-    if (data.vehicle_id) {
-      const { data: vehicle } = await supabase
-        .from('vehicles')
-        .select('id, brand, model, license_plate')
-        .eq('id', data.vehicle_id)
-        .maybeSingle();
-      if (vehicle) vehicleData = vehicle;
-    }
-
-    // If we don't have client or vehicle, try to get them from the invoice
-    if (data.invoice_id && (!clientData || !vehicleData)) {
+    if (data.invoice_id) {
       const { data: invoice } = await supabase
         .from('invoices')
         .select('id, reference, client_id, vehicle_id')
@@ -212,7 +155,7 @@ export const getCredit = async (id: string): Promise<Credit> => {
       if (invoice) {
         enrichedCredit.invoices = { id: invoice.id, reference: invoice.reference };
 
-        if (!clientData && invoice.client_id) {
+        if (invoice.client_id) {
           const { data: client } = await supabase
             .from('clients')
             .select('id, first_name, last_name')
@@ -221,7 +164,7 @@ export const getCredit = async (id: string): Promise<Credit> => {
           if (client) clientData = client;
         }
 
-        if (!vehicleData && invoice.vehicle_id) {
+        if (invoice.vehicle_id) {
           const { data: vehicle } = await supabase
             .from('vehicles')
             .select('id, brand, model, license_plate')
@@ -230,13 +173,6 @@ export const getCredit = async (id: string): Promise<Credit> => {
           if (vehicle) vehicleData = vehicle;
         }
       }
-    } else if (data.invoice_id) {
-      const { data: invoice } = await supabase
-        .from('invoices')
-        .select('id, reference')
-        .eq('id', data.invoice_id)
-        .maybeSingle();
-      if (invoice) enrichedCredit.invoices = invoice;
     }
 
     if (clientData) enrichedCredit.clients = clientData;

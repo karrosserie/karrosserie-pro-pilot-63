@@ -5,8 +5,6 @@ import { CreditFormData, CreditItem } from '../types';
 interface UseEditCreditFormStateProps {
   initialData?: {
     reference: string;
-    client_id: string | null;
-    vehicle_id: string | null;
     invoice_id: string | null;
     status: 'En attente' | 'Payé';
     notes?: string;
@@ -17,8 +15,6 @@ interface UseEditCreditFormStateProps {
 export const useEditCreditFormState = ({ initialData }: UseEditCreditFormStateProps) => {
   const [formData, setFormData] = useState<CreditFormData>({
     reference: initialData?.reference || '',
-    client_id: initialData?.client_id || null,
-    vehicle_id: initialData?.vehicle_id || null,
     invoice_id: initialData?.invoice_id || null,
     status: initialData?.status || 'En attente',
     notes: initialData?.notes || ''

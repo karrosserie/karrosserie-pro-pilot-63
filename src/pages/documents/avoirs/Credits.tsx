@@ -479,8 +479,6 @@ const Credits = () => {
             creditId={selectedCredit.id}
             initialData={{
               reference: selectedCredit.reference,
-              client_id: selectedCredit.client_id,
-              vehicle_id: selectedCredit.vehicle_id,
               invoice_id: selectedCredit.invoice_id,
               status: selectedCredit.status,
               notes: selectedCredit.notes,
@@ -494,8 +492,6 @@ const Credits = () => {
             creditId={selectedCredit.id}
             initialData={{
               reference: selectedCredit.reference,
-              client_id: selectedCredit.client_id,
-              vehicle_id: selectedCredit.vehicle_id,
               invoice_id: selectedCredit.invoice_id,
               status: selectedCredit.status,
               notes: selectedCredit.notes,

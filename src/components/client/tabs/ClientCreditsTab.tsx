@@ -37,13 +37,8 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
     );
   }
 
-  // Filter credits: direct client assignment OR via invoice belonging to client
+  // Filter credits: credit linked to an invoice belonging to the client
   const clientCredits = credits?.filter(credit => {
-    // Direct client assignment
-    if (credit.client_id === clientId) {
-      return true;
-    }
-    // Credit linked to an invoice belonging to the client
     if (credit.invoice_id && invoices) {
       const relatedInvoice = invoices.find(invoice => invoice.id === credit.invoice_id);
       return relatedInvoice?.client_id === clientId;
@@ -372,8 +367,6 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
             creditId={selectedCredit.id}
             initialData={{
               reference: selectedCredit.reference,
-              client_id: selectedCredit.client_id,
-              vehicle_id: selectedCredit.vehicle_id,
               invoice_id: selectedCredit.invoice_id,
               status: selectedCredit.status,
               notes: selectedCredit.notes,
@@ -387,8 +380,6 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
             creditId={selectedCredit.id}
             initialData={{
               reference: selectedCredit.reference,
-              client_id: selectedCredit.client_id,
-              vehicle_id: selectedCredit.vehicle_id,
               invoice_id: selectedCredit.invoice_id,
               status: selectedCredit.status,
               notes: selectedCredit.notes,
