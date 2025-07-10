@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { quotesService } from '@/services/supabase/quotes';
 import { useToast } from '@/hooks/use-toast';
+import { useQueryClient } from '@tanstack/react-query';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 
 export const useReportToQuote = () => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [convertingReportId, setConvertingReportId] = useState<string | null>(null);
   const [convertedReports, setConvertedReports] = useState<Record<string, any>>({});
 
@@ -68,6 +70,9 @@ export const useReportToQuote = () => {
       
       // Mettre à jour l'état local
       setConvertedReports(prev => ({ ...prev, [report.id]: newQuote }));
+      
+      // Invalider le cache des devis pour rafraîchir l'affichage
+      queryClient.invalidateQueries({ queryKey: ['quotes'] });
       
       toast({
         title: "Conversion réussie",
