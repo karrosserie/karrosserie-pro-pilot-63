@@ -47,7 +47,13 @@ export const useInvoiceDataPreparation = ({
       vehicle_id: formData.vehicle_id || '',
       status: formData.status || 'En attente de paiement',
       due_date: formData.due_date || '',
-      payment_details: formData.payment_details || ''
+      payment_details: formData.payment_details || '',
+      // Inclure les nouveaux champs de rapport
+      report_number: (formData as any).report_number || '',
+      policy_number: (formData as any).policy_number || '',
+      report_date: (formData as any).report_date || null,
+      expert_name: (formData as any).expert_name || '',
+      incident_date: (formData as any).incident_date || null
     };
 
     console.log('Final submit data:', submitData);

@@ -40,7 +40,12 @@ export const useInvoiceFormInitialization = ({
           vehicle_id: invoice.vehicle_id,
           status: invoice.status || 'En attente de paiement',
           due_date: invoice.due_date,
-          payment_details: invoice.payment_details || ''
+          payment_details: invoice.payment_details || '',
+          report_number: (invoice as any).report_number || '',
+          policy_number: (invoice as any).policy_number || '',
+          report_date: (invoice as any).report_date || '',
+          expert_name: (invoice as any).expert_name || '',
+          incident_date: (invoice as any).incident_date || ''
         }));
         
         // Pour une facture existante, récupérer les données directement depuis les champs de la facture
@@ -125,7 +130,12 @@ export const useInvoiceFormInitialization = ({
             repair_order_id: invoice?.repair_order_id || null,
             status: 'En attente de paiement',
             due_date: today,
-            payment_details: ''
+            payment_details: '',
+            report_number: (invoice as any)?.report_number || '',
+            policy_number: (invoice as any)?.policy_number || '',
+            report_date: (invoice as any)?.report_date || '',
+            expert_name: (invoice as any)?.expert_name || '',
+            incident_date: (invoice as any)?.incident_date || ''
           }));
           
           // Si des notes sont fournies (depuis un ordre de réparation), les parser
@@ -157,7 +167,12 @@ export const useInvoiceFormInitialization = ({
             repair_order_id: invoice?.repair_order_id || null,
             status: 'En attente de paiement',
             due_date: today,
-            payment_details: ''
+            payment_details: '',
+            report_number: (invoice as any)?.report_number || '',
+            policy_number: (invoice as any)?.policy_number || '',
+            report_date: (invoice as any)?.report_date || '',
+            expert_name: (invoice as any)?.expert_name || '',
+            incident_date: (invoice as any)?.incident_date || ''
           }));
           console.log('Set fallback form data with 1');
         }
