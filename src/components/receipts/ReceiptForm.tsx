@@ -54,7 +54,7 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting, presele
         bank_account: receipt.bank_account || '',
         notes: receipt.notes || '',
         payment_proofs: receipt.payment_proofs || [],
-        invoice: receipt.invoice || ''
+        invoice: receipt.invoice_id || receipt.invoice || ''
       });
     } else {
       console.log('Generating new reference for new receipt');
