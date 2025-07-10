@@ -40,6 +40,7 @@ export function useReceiptsData() {
       receiptsService.create(newReceipt),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['receipts'] });
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
       toast({
         title: "Encaissement créé",
         description: "L'encaissement a été créé avec succès."
@@ -60,6 +61,7 @@ export function useReceiptsData() {
       receiptsService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['receipts'] });
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
       toast({
         title: "Encaissement mis à jour",
         description: "L'encaissement a été mis à jour avec succès."
@@ -79,6 +81,7 @@ export function useReceiptsData() {
     mutationFn: (id: string) => receiptsService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['receipts'] });
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
       toast({
         title: "Encaissement supprimé",
         description: "L'encaissement a été supprimé avec succès."
