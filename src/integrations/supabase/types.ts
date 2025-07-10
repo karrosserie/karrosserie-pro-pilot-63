@@ -346,7 +346,6 @@ export type Database = {
       credits: {
         Row: {
           amount: number
-          client_id: string | null
           created_at: string
           id: string
           invoice_id: string | null
@@ -356,11 +355,9 @@ export type Database = {
           status: string
           updated_at: string
           user_id: string
-          vehicle_id: string | null
         }
         Insert: {
           amount?: number
-          client_id?: string | null
           created_at?: string
           id?: string
           invoice_id?: string | null
@@ -370,11 +367,9 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id: string
-          vehicle_id?: string | null
         }
         Update: {
           amount?: number
-          client_id?: string | null
           created_at?: string
           id?: string
           invoice_id?: string | null
@@ -384,28 +379,13 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id?: string
-          vehicle_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "credits_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "credits_invoice_id_fkey"
             columns: ["invoice_id"]
             isOneToOne: false
             referencedRelation: "invoices"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "credits_vehicle_id_fkey"
-            columns: ["vehicle_id"]
-            isOneToOne: false
-            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
