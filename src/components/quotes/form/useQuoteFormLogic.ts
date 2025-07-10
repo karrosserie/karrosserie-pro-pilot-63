@@ -92,7 +92,7 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
       // Charger les données depuis les notes (format JSON)
       const parsedData = parseQuoteNotes(quote.notes);
       setNotes(parsedData.notes);
-      setClaimNumber(parsedData.claimNumber);
+      setClaimNumber((quote as any).claim_number || parsedData.claimNumber || '');
       setCurrentMileage(parsedData.currentMileage);
       setRepairs(parsedData.repairs);
       setParts(parsedData.parts);

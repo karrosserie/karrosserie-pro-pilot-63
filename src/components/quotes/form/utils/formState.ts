@@ -13,7 +13,6 @@ export const prepareSubmitData = (
 ) => {
   const notesData = {
     notes,
-    claimNumber,
     currentMileage,
     repairs,
     parts,
@@ -22,6 +21,7 @@ export const prepareSubmitData = (
   
   return {
     ...formData,
+    claim_number: claimNumber,
     notes: JSON.stringify(notesData)
   };
 };
