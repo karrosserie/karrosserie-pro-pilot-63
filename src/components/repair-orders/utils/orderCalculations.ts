@@ -1,5 +1,8 @@
 
 export const calculateOrderAmount = (order: any) => {
+  console.log('=== CALCULATING ORDER AMOUNT ===');
+  console.log('Order ID:', order.id);
+  console.log('Order notes:', order.notes);
   let totalAmount = 0;
   
   // Parse notes to get repair data
@@ -7,10 +10,13 @@ export const calculateOrderAmount = (order: any) => {
   if (order.notes) {
     try {
       notesData = typeof order.notes === 'string' ? JSON.parse(order.notes) : order.notes;
+      console.log('Parsed notes data:', notesData);
     } catch (error) {
       console.error('Error parsing notes data:', error);
       return 0;
     }
+  } else {
+    console.log('No notes found in order');
   }
 
   // Calculer le total des réparations
@@ -81,6 +87,7 @@ export const calculateOrderAmount = (order: any) => {
     }
   }
 
+  console.log('Final calculated amount:', totalAmount);
   return totalAmount > 0 ? totalAmount : 0;
 };
 
