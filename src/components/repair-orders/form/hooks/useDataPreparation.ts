@@ -24,7 +24,12 @@ export const useDataPreparation = () => {
     
     return {
       ...formData,
-      notes: JSON.stringify(notesData)
+      notes: JSON.stringify(notesData),
+      report_number: formData.report_number,
+      policy_number: formData.policy_number,
+      report_date: formData.report_date,
+      expert_name: formData.expert_name,
+      incident_date: formData.incident_date
     };
   };
 

@@ -36,6 +36,11 @@ export type RepairOrder = Database['public']['Tables']['repair_orders']['Row'] &
   description?: string | null;
   current_mileage?: string | null;
   claim_number?: string | null;
+  report_number?: string | null;
+  policy_number?: string | null;
+  report_date?: string | null;
+  expert_name?: string | null;
+  incident_date?: string | null;
 };
 
 export type NewRepairOrder = Database['public']['Tables']['repair_orders']['Insert'];

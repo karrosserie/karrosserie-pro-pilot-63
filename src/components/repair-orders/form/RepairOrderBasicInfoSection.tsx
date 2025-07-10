@@ -121,8 +121,94 @@ export const RepairOrderBasicInfoSection = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="md:col-span-2">
+            <Label htmlFor="report_number" className={cn(errors.report_number && "text-red-500")}>
+              Numéro de rapport
+            </Label>
+            <Input
+              id="report_number"
+              value={formData.report_number || ''}
+              onChange={(e) => onFieldChange('report_number', e.target.value)}
+              placeholder="Numéro de rapport"
+              className={cn(
+                errors.report_number && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
+              )}
+            />
+            {errors.report_number && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.report_number}
+              </p>
+            )}
+          </div>
+
+          <div className="md:col-span-2">
+            <Label htmlFor="policy_number" className={cn(errors.policy_number && "text-red-500")}>
+              Numéro de police
+            </Label>
+            <Input
+              id="policy_number"
+              value={formData.policy_number || ''}
+              onChange={(e) => onFieldChange('policy_number', e.target.value)}
+              placeholder="Numéro de police"
+              className={cn(
+                errors.policy_number && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
+              )}
+            />
+            {errors.policy_number && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.policy_number}
+              </p>
+            )}
+          </div>
+
           <div>
+            <Label htmlFor="report_date" className={cn(errors.report_date && "text-red-500")}>
+              Date du rapport
+            </Label>
+            <Input
+              id="report_date"
+              type="date"
+              value={formData.report_date || ''}
+              onChange={(e) => onFieldChange('report_date', e.target.value)}
+              className={cn(
+                errors.report_date && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
+              )}
+            />
+            {errors.report_date && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.report_date}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="md:col-span-2">
+            <Label htmlFor="expert_name" className={cn(errors.expert_name && "text-red-500")}>
+              Nom de l'expert
+            </Label>
+            <Input
+              id="expert_name"
+              value={formData.expert_name || ''}
+              onChange={(e) => onFieldChange('expert_name', e.target.value)}
+              placeholder="Nom de l'expert"
+              className={cn(
+                errors.expert_name && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
+              )}
+            />
+            {errors.expert_name && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.expert_name}
+              </p>
+            )}
+          </div>
+
+          <div className="md:col-span-2">
             <Label htmlFor="claim_number">Numéro de sinistre</Label>
             <Input
               id="claim_number"
@@ -141,6 +227,26 @@ export const RepairOrderBasicInfoSection = ({
             )}
           </div>
 
+          <div>
+            <Label htmlFor="incident_date" className={cn(errors.incident_date && "text-red-500")}>
+              Date du sinistre
+            </Label>
+            <Input
+              id="incident_date"
+              type="date"
+              value={formData.incident_date || ''}
+              onChange={(e) => onFieldChange('incident_date', e.target.value)}
+              className={cn(
+                errors.incident_date && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
+              )}
+            />
+            {errors.incident_date && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.incident_date}
+              </p>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
