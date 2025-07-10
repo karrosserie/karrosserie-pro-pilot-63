@@ -106,13 +106,17 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
 
         <div className="col-span-2">
           <Label htmlFor="bank_account">Compte bancaire <span className="text-red-500">*</span></Label>
-          <Select value={formData.bank_account} onValueChange={(value) => handleFieldChange('bank_account', value)} required>
+          <Select 
+            value={formData.bank_account || ""} 
+            onValueChange={(value) => handleFieldChange('bank_account', value)} 
+            required
+          >
             <SelectTrigger className="bg-background">
               <SelectValue placeholder="Sélectionner un compte" />
             </SelectTrigger>
             <SelectContent className="bg-background border shadow-lg z-50">
-              {accounts.map((account) => (
-                <SelectItem key={account.id} value={account.id}>
+              {accounts?.map((account) => (
+                <SelectItem key={account.id} value={account.id || ""}>
                   {account.name} - {account.bank}
                 </SelectItem>
               ))}
