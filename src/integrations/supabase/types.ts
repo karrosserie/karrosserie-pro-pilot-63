@@ -1167,12 +1167,8 @@ export type Database = {
           client_name_signature: string | null
           client_signature: string | null
           created_at: string
-          current_mileage: string | null
-          description: string | null
           discounts_data: Json | null
           document_url: string | null
-          end_date: string | null
-          estimated_hours: number | null
           expert_name: string | null
           id: string
           incident_date: string | null
@@ -1185,7 +1181,6 @@ export type Database = {
           report_date: string | null
           report_number: string | null
           signature_date: string | null
-          start_date: string | null
           status: string | null
           updated_at: string
           user_id: string
@@ -1197,12 +1192,8 @@ export type Database = {
           client_name_signature?: string | null
           client_signature?: string | null
           created_at?: string
-          current_mileage?: string | null
-          description?: string | null
           discounts_data?: Json | null
           document_url?: string | null
-          end_date?: string | null
-          estimated_hours?: number | null
           expert_name?: string | null
           id?: string
           incident_date?: string | null
@@ -1215,7 +1206,6 @@ export type Database = {
           report_date?: string | null
           report_number?: string | null
           signature_date?: string | null
-          start_date?: string | null
           status?: string | null
           updated_at?: string
           user_id: string
@@ -1227,12 +1217,8 @@ export type Database = {
           client_name_signature?: string | null
           client_signature?: string | null
           created_at?: string
-          current_mileage?: string | null
-          description?: string | null
           discounts_data?: Json | null
           document_url?: string | null
-          end_date?: string | null
-          estimated_hours?: number | null
           expert_name?: string | null
           id?: string
           incident_date?: string | null
@@ -1245,7 +1231,6 @@ export type Database = {
           report_date?: string | null
           report_number?: string | null
           signature_date?: string | null
-          start_date?: string | null
           status?: string | null
           updated_at?: string
           user_id?: string
