@@ -139,8 +139,8 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
               </div>
             </div>
             
-            <div className="border-t border-gray-100 mt-4 pt-4 flex justify-between items-center">
-              <div className="flex space-x-1">
+            <div className="border-t border-gray-100 mt-4 pt-4 flex justify-center">
+              <div className="flex items-center space-x-1">
                 <Button variant="ghost" size="icon" onClick={() => onViewVehicle(vehicle)}>
                   <Eye className="h-4 w-4" />
                 </Button>
@@ -155,25 +155,25 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
                 >
                   <Trash className="h-4 w-4" />
                 </Button>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56 bg-white border shadow-lg z-50" align="end">
+                    <DropdownMenuItem onClick={(e) => handleCreateQuote(e, vehicle)} className="cursor-pointer">
+                      <FileText className="h-4 w-4 mr-2" />
+                      Créer un devis
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => handleCreateInvoice(e, vehicle)} className="cursor-pointer">
+                      <Receipt className="h-4 w-4 mr-2" />
+                      Créer une facture
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 bg-white border shadow-lg z-50" align="end">
-                  <DropdownMenuItem onClick={(e) => handleCreateQuote(e, vehicle)} className="cursor-pointer">
-                    <FileText className="h-4 w-4 mr-2" />
-                    Créer un devis
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={(e) => handleCreateInvoice(e, vehicle)} className="cursor-pointer">
-                    <Receipt className="h-4 w-4 mr-2" />
-                    Créer une facture
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
           </div>
         );
