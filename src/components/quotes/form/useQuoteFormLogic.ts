@@ -86,7 +86,13 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
         vehicle_id: quote.vehicle_id,
         status: quote.status || 'En attente',
         valid_until: quote.valid_until,
-        notes: quote.notes || ''
+        notes: quote.notes || '',
+        // Inclure les nouveaux champs
+        report_number: (quote as any).report_number || '',
+        policy_number: (quote as any).policy_number || '',
+        report_date: (quote as any).report_date || '',
+        expert_name: (quote as any).expert_name || '',
+        incident_date: (quote as any).incident_date || ''
       });
       
       // Charger les données depuis les notes (format JSON)
