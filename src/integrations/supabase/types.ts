@@ -1173,6 +1173,7 @@ export type Database = {
           id: string
           incident_date: string | null
           notes: string | null
+          order_date: string | null
           parts_data: Json | null
           policy_number: string | null
           quote_id: string | null
@@ -1198,6 +1199,7 @@ export type Database = {
           id?: string
           incident_date?: string | null
           notes?: string | null
+          order_date?: string | null
           parts_data?: Json | null
           policy_number?: string | null
           quote_id?: string | null
@@ -1223,6 +1225,7 @@ export type Database = {
           id?: string
           incident_date?: string | null
           notes?: string | null
+          order_date?: string | null
           parts_data?: Json | null
           policy_number?: string | null
           quote_id?: string | null
