@@ -335,19 +335,13 @@ const Invoices = () => {
       />
 
       <ReceiptDialog
-        receipt={selectedInvoice ? {
-          invoice: selectedInvoice.id,
-          reference: '',
-          date: new Date().toISOString().split('T')[0],
-          amount: selectedInvoice.amount || 0,
-          status: 'Encaissé',
-          payment_method: 'Virement',
-          bank_account: '',
-          notes: '',
-          payment_proofs: []
-        } : null}
+        receipt={null}
         open={receiptDialogOpen}
         onOpenChange={setReceiptDialogOpen}
+        preselectedInvoice={selectedInvoice ? {
+          id: selectedInvoice.id,
+          amount: selectedInvoice.amount || 0
+        } : null}
       />
 
       <CreditDialog

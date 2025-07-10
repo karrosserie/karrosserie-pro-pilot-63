@@ -17,12 +17,14 @@ interface ReceiptDialogProps {
   receipt?: Receipt | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  preselectedInvoice?: { id: string; amount: number } | null;
 }
 
 const ReceiptDialog = ({
   receipt,
   open,
-  onOpenChange
+  onOpenChange,
+  preselectedInvoice
 }: ReceiptDialogProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -119,6 +121,7 @@ const ReceiptDialog = ({
           onSubmit={handleSubmit}
           onCancel={() => onOpenChange(false)}
           isSubmitting={isSubmitting}
+          preselectedInvoice={preselectedInvoice}
         />
       </DialogContent>
     </Dialog>

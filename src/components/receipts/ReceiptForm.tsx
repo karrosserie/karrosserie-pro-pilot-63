@@ -16,9 +16,10 @@ interface ReceiptFormProps {
   onSubmit: (formData: Receipt) => void;
   onCancel: () => void;
   isSubmitting: boolean;
+  preselectedInvoice?: { id: string; amount: number } | null;
 }
 
-export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: ReceiptFormProps) => {
+export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting, preselectedInvoice }: ReceiptFormProps) => {
   const { receipts } = useReceiptsData();
   const { accounts, isLoading: accountsLoading } = useAccounts();
   
@@ -64,13 +65,29 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting }: Recei
           const reference = await receiptsService.generateReference();
           console.log('Generated reference:', reference);
           setFormData(prev => {
-            const newData = { ...prev, reference };
-            console.log('Setting formData with reference:', newData);
+            const newData = { 
+              ...prev, 
+              reference,
+              // Si on a une facture pré-sélectionnée, pré-remplir l'invoice et le montant
+              ...(preselectedInvoice ? {
+                invoice: preselectedInvoice.id,
+                amount: preselectedInvoice.amount
+              } : {})
+            };
+            console.log('Setting formData with reference and preselected data:', newData);
             return newData;
           });
         } catch (error) {
           console.error('Error generating reference:', error);
-          setFormData(prev => ({ ...prev, reference: '1' }));
+          setFormData(prev => ({ 
+            ...prev, 
+            reference: '1',
+            // Si on a une facture pré-sélectionnée, pré-remplir l'invoice et le montant même en cas d'erreur
+            ...(preselectedInvoice ? {
+              invoice: preselectedInvoice.id,
+              amount: preselectedInvoice.amount
+            } : {})
+          }));
         }
       };
 
