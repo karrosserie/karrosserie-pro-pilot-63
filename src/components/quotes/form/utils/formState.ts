@@ -22,7 +22,13 @@ export const prepareSubmitData = (
   return {
     ...formData,
     claim_number: claimNumber,
-    notes: JSON.stringify(notesData)
+    notes: JSON.stringify(notesData),
+    // S'assurer que les nouveaux champs sont inclus
+    report_number: formData.report_number || '',
+    policy_number: formData.policy_number || '',
+    report_date: formData.report_date || null,
+    expert_name: formData.expert_name || '',
+    incident_date: formData.incident_date || null
   };
 };
 
