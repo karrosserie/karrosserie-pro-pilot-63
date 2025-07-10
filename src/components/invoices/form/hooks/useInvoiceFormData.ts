@@ -11,7 +11,8 @@ export const useInvoiceFormData = () => {
     status: 'En attente de paiement',
     date: '',
     due_date: '',
-    payment_details: ''
+    payment_details: '',
+    notes: ''
   });
 
   const [claimNumber, setClaimNumber] = useState('');

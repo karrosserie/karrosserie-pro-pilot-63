@@ -8,6 +8,7 @@ import { RepairOrderAssignmentSection } from './form/RepairOrderAssignmentSectio
 import { RepairOrderRepairsSection } from './form/RepairOrderRepairsSection';
 import { RepairOrderPartsSection } from './form/RepairOrderPartsSection';
 import { RepairOrderDiscountsSection } from './form/RepairOrderDiscountsSection';
+import { RepairOrderNotesSection } from './form/RepairOrderNotesSection';
 import { RepairOrderDetailsSection } from './form/RepairOrderDetailsSection';
 import { RepairOrderFormActions } from './form/RepairOrderFormActions';
 import { useRepairOrderFormLogic } from './form/useRepairOrderFormLogic';
@@ -106,6 +107,12 @@ export const RepairOrderForm = ({
       <RepairOrderDiscountsSection
         discounts={discounts}
         onDiscountsChange={setDiscounts}
+        isReadOnly={isReadOnly}
+      />
+
+      <RepairOrderNotesSection 
+        notes={formData.notes || ''}
+        onFieldChange={handleChange}
         isReadOnly={isReadOnly}
       />
 

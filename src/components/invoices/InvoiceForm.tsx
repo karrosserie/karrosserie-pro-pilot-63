@@ -8,6 +8,7 @@ import { InvoiceAssignmentSection } from './form/InvoiceAssignmentSection';
 import { InvoiceRepairsSection } from './form/InvoiceRepairsSection';
 import { InvoicePartsSection } from './form/InvoicePartsSection';
 import { InvoiceGlobalDiscountsSection } from './form/InvoiceGlobalDiscountsSection';
+import { InvoiceNotesSection } from './form/InvoiceNotesSection';
 import { InvoiceDetailsSection } from './form/InvoiceDetailsSection';
 import { InvoiceFormActions } from './form/InvoiceFormActions';
 import { useInvoiceFormLogic } from './form/useInvoiceFormLogic';
@@ -110,6 +111,12 @@ export const InvoiceForm = ({
       <InvoiceGlobalDiscountsSection
         discounts={discounts}
         onDiscountsChange={setDiscounts}
+        isReadOnly={isReadOnly}
+      />
+
+      <InvoiceNotesSection 
+        notes={formData.notes || ''}
+        onFieldChange={handleChange}
         isReadOnly={isReadOnly}
       />
 
