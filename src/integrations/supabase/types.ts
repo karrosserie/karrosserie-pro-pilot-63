@@ -1169,10 +1169,15 @@ export type Database = {
           document_url: string | null
           end_date: string | null
           estimated_hours: number | null
+          expert_name: string | null
           id: string
+          incident_date: string | null
           notes: string | null
+          policy_number: string | null
           quote_id: string | null
           reference: string
+          report_date: string | null
+          report_number: string | null
           signature_date: string | null
           start_date: string | null
           status: string | null
@@ -1188,10 +1193,15 @@ export type Database = {
           document_url?: string | null
           end_date?: string | null
           estimated_hours?: number | null
+          expert_name?: string | null
           id?: string
+          incident_date?: string | null
           notes?: string | null
+          policy_number?: string | null
           quote_id?: string | null
           reference: string
+          report_date?: string | null
+          report_number?: string | null
           signature_date?: string | null
           start_date?: string | null
           status?: string | null
@@ -1207,10 +1217,15 @@ export type Database = {
           document_url?: string | null
           end_date?: string | null
           estimated_hours?: number | null
+          expert_name?: string | null
           id?: string
+          incident_date?: string | null
           notes?: string | null
+          policy_number?: string | null
           quote_id?: string | null
           reference?: string
+          report_date?: string | null
+          report_number?: string | null
           signature_date?: string | null
           start_date?: string | null
           status?: string | null
