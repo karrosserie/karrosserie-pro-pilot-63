@@ -209,7 +209,10 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting, presele
           disabled={isSubmitting}
           className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
         >
-          {isSubmitting ? 'Création...' : 'Créer l\'encaissement'}
+          {isSubmitting 
+            ? (receipt ? 'Modification...' : 'Création...') 
+            : (receipt ? 'Modifier l\'encaissement' : 'Créer l\'encaissement')
+          }
         </Button>
       </div>
     </form>
