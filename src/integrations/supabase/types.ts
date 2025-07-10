@@ -873,16 +873,21 @@ export type Database = {
           discounts_data: Json | null
           document_url: string | null
           due_date: string | null
+          expert_name: string | null
           id: string
+          incident_date: string | null
           notes: string | null
           parts_data: Json | null
           payment_date: string | null
           payment_details: string | null
           payment_due_date: string | null
           payment_method: string | null
+          policy_number: string | null
           reference: string
           repair_order_id: string | null
           repairs_data: Json | null
+          report_date: string | null
+          report_number: string | null
           status: string | null
           tax_rate: number | null
           updated_at: string
@@ -899,16 +904,21 @@ export type Database = {
           discounts_data?: Json | null
           document_url?: string | null
           due_date?: string | null
+          expert_name?: string | null
           id?: string
+          incident_date?: string | null
           notes?: string | null
           parts_data?: Json | null
           payment_date?: string | null
           payment_details?: string | null
           payment_due_date?: string | null
           payment_method?: string | null
+          policy_number?: string | null
           reference: string
           repair_order_id?: string | null
           repairs_data?: Json | null
+          report_date?: string | null
+          report_number?: string | null
           status?: string | null
           tax_rate?: number | null
           updated_at?: string
@@ -925,16 +935,21 @@ export type Database = {
           discounts_data?: Json | null
           document_url?: string | null
           due_date?: string | null
+          expert_name?: string | null
           id?: string
+          incident_date?: string | null
           notes?: string | null
           parts_data?: Json | null
           payment_date?: string | null
           payment_details?: string | null
           payment_due_date?: string | null
           payment_method?: string | null
+          policy_number?: string | null
           reference?: string
           repair_order_id?: string | null
           repairs_data?: Json | null
+          report_date?: string | null
+          report_number?: string | null
           status?: string | null
           tax_rate?: number | null
           updated_at?: string
