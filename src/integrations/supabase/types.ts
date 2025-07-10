@@ -1015,8 +1015,10 @@ export type Database = {
           id: string
           incident_date: string | null
           notes: string | null
+          parts_data: string | null
           policy_number: string | null
           reference: string
+          repairs_data: string | null
           report_date: string | null
           report_number: string | null
           status: string | null
@@ -1036,8 +1038,10 @@ export type Database = {
           id?: string
           incident_date?: string | null
           notes?: string | null
+          parts_data?: string | null
           policy_number?: string | null
           reference: string
+          repairs_data?: string | null
           report_date?: string | null
           report_number?: string | null
           status?: string | null
@@ -1057,8 +1061,10 @@ export type Database = {
           id?: string
           incident_date?: string | null
           notes?: string | null
+          parts_data?: string | null
           policy_number?: string | null
           reference?: string
+          repairs_data?: string | null
           report_date?: string | null
           report_number?: string | null
           status?: string | null
