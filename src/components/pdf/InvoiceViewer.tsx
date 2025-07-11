@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 20,
-    borderBottom: 1,
+    borderBottom: '1px solid #000',
     paddingBottom: 10
   },
   title: {
@@ -57,21 +57,18 @@ const styles = StyleSheet.create({
   clientSection: {
     marginBottom: 20,
     padding: 10,
-    border: 1,
-    borderColor: '#cccccc'
+    border: '1px solid #cccccc'
   },
   tableHeader: {
     flexDirection: 'row',
     backgroundColor: '#f0f0f0',
     padding: 5,
-    borderBottom: 1,
-    borderColor: '#cccccc'
+    borderBottom: '1px solid #cccccc'
   },
   tableRow: {
     flexDirection: 'row',
     padding: 5,
-    borderBottom: 1,
-    borderColor: '#eeeeee'
+    borderBottom: '1px solid #eeeeee'
   },
   col1: { width: '20%' },
   col2: { width: '15%' },
@@ -97,22 +94,19 @@ const styles = StyleSheet.create({
     marginBottom: 20
   },
   paymentTable: {
-    border: 1,
-    borderColor: '#cccccc',
+    border: '1px solid #cccccc',
     marginTop: 10
   },
   paymentHeader: {
     flexDirection: 'row',
     backgroundColor: '#f0f0f0',
     padding: 5,
-    borderBottom: 1,
-    borderColor: '#cccccc'
+    borderBottom: '1px solid #cccccc'
   },
   paymentRow: {
     flexDirection: 'row',
     padding: 5,
-    borderBottom: 1,
-    borderColor: '#eeeeee'
+    borderBottom: '1px solid #eeeeee'
   },
   paymentCol1: { width: '12%' },
   paymentCol2: { width: '12%' },
@@ -134,7 +128,7 @@ const styles = StyleSheet.create({
     right: 20,
     fontSize: 8,
     textAlign: 'center',
-    borderTop: 1,
+    borderTop: '1px solid #000',
     paddingTop: 10,
     color: '#666666'
   }
