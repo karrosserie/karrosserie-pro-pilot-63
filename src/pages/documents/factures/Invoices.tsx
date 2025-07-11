@@ -46,6 +46,11 @@ const Invoices = () => {
   const { confirm } = useConfirmation();
   
   const { invoices, isLoading, error, deleteInvoice } = useInvoices();
+  
+  console.log('=== DONNÉES FACTURES DANS LE COMPOSANT ===');
+  console.log('invoices:', invoices);
+  console.log('Premier invoice (si existant):', invoices?.[0]);
+  console.log('Premier invoice.clients:', invoices?.[0]?.clients);
   const { credits } = useCredits();
   
   const filteredInvoices = invoices?.filter(invoice => 

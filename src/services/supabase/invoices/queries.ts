@@ -4,6 +4,7 @@ import { Invoice } from './types';
 
 export const invoiceQueries = {
   getAll: async (): Promise<Invoice[]> => {
+    console.log('=== DEBUT RÉCUPÉRATION FACTURES ===');
     console.log('Fetching invoices...');
     
     // First, try to get invoices with joins
@@ -155,6 +156,11 @@ export const invoiceQueries = {
         } as Invoice;
       })
     );
+    
+    console.log('=== FACTURES TRANSFORMÉES AVANT RETOUR ===');
+    console.log('transformedInvoices:', transformedInvoices);
+    console.log('Premier invoice transformé:', transformedInvoices[0]);
+    console.log('Premier invoice.clients transformé:', transformedInvoices[0]?.clients);
     
     return transformedInvoices;
   },
