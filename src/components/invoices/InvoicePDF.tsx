@@ -39,12 +39,11 @@ const styles = StyleSheet.create({
     color: 'white',
     backgroundColor: '#404348',
     padding: 6,
-    textAlign: 'center',
-    marginBottom: 12,
+    textAlign: 'center'
   },
   logo: {
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: 5,
+    marginBottom: 5,
     maxWidth: 120,
     height: 'auto',
   },
