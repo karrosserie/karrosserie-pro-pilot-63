@@ -60,7 +60,7 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
               <span className="text-right">{invoice.claim_number || 'N/A'}</span>
             </div>
             <div className="flex justify-between">
-              <span className="font-medium">Date facturation</span>
+              <span className="font-medium">Date de facturation</span>
               <span className="text-right">{formatDate(invoice.created_at)}</span>
             </div>
             <div className="flex justify-between">
