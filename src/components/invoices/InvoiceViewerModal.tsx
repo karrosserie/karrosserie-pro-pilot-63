@@ -6,6 +6,7 @@ import { calculateInvoiceTotals } from '@/utils/invoiceCalculations';
 import InvoiceHeader from './InvoiceHeader';
 import InvoiceItemsTable from './InvoiceItemsTable';
 import InvoiceTotals from './InvoiceTotals';
+import InvoicePaymentsTable from './InvoicePaymentsTable';
 import InvoiceFooter from './InvoiceFooter';
 
 interface InvoiceViewerModalProps {
@@ -39,6 +40,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
               totalDiscount={totals.totalDiscount}
               finalTotal={totals.finalTotal}
             />
+            <InvoicePaymentsTable invoiceId={invoice.id} />
             <InvoiceFooter />
           </div>
         </div>
