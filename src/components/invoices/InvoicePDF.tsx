@@ -43,7 +43,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   logo: {
-    width: 120,
+    maxWidth: 120,
+    maxHeight: 60,
     marginBottom: 8,
   },
   companyInfo: {
