@@ -28,7 +28,6 @@ export const pdfStyles = StyleSheet.create({
     backgroundColor: '#404348',
     padding: 6,
     textAlign: 'center',
-    marginBottom: 12,
   },
   logo: {
     marginBottom: 8
