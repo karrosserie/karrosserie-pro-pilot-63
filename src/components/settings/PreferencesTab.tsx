@@ -365,30 +365,30 @@ const PreferencesTab = () => {
                            </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                             <td className="p-3 border-t-2 border-l-2 border-r-2 border-white">Réparation pare-chocs avant</td>
-                             <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-white">1</td>
-                             <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-white">350,00 €</td>
-                             <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-white">0%</td>
-                             <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-white">20%</td>
-                             <td className="p-3 text-right font-medium border-t-2 border-l-2 border-r-2 border-white">350,00 €</td>
-                           </tr>
                            <tr>
-                             <td className="p-3 border-t-2 border-l-2 border-r-2 border-white">Peinture carrosserie</td>
-                             <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-white">1</td>
-                             <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-white">450,00 €</td>
-                             <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-white">0%</td>
-                             <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-white">20%</td>
-                             <td className="p-3 text-right font-medium border-t-2 border-l-2 border-r-2 border-white">450,00 €</td>
+                              <td className="p-3 border-t-2 border-l-2 border-r-2 border-black">Réparation pare-chocs avant</td>
+                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">1</td>
+                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">350,00 €</td>
+                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">0%</td>
+                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">20%</td>
+                              <td className="p-3 text-right font-medium border-t-2 border-l-2 border-r-2 border-black">350,00 €</td>
+                            </tr>
+                            <tr>
+                              <td className="p-3 border-t-2 border-l-2 border-r-2 border-black">Peinture carrosserie</td>
+                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">1</td>
+                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">450,00 €</td>
+                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">0%</td>
+                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">20%</td>
+                              <td className="p-3 text-right font-medium border-t-2 border-l-2 border-r-2 border-black">450,00 €</td>
+                            </tr>
+                            <tr>
+                              <td className="p-3 border-t-2 border-l-2 border-r-2 border-black">Pièce détachée - Feu avant gauche</td>
+                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">1</td>
+                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">125,00 €</td>
+                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">5%</td>
+                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">20%</td>
+                              <td className="p-3 text-right font-medium border-t-2 border-l-2 border-r-2 border-black">118,75 €</td>
                            </tr>
-                           <tr>
-                             <td className="p-3 border-t-2 border-l-2 border-r-2 border-white">Pièce détachée - Feu avant gauche</td>
-                             <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-white">1</td>
-                             <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-white">125,00 €</td>
-                             <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-white">5%</td>
-                             <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-white">20%</td>
-                             <td className="p-3 text-right font-medium border-t-2 border-l-2 border-r-2 border-white">118,75 €</td>
-                          </tr>
                         </tbody>
                      </table>
                      
