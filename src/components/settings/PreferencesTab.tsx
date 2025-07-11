@@ -191,7 +191,7 @@ const PreferencesTab = () => {
             <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 h-[750px] overflow-y-auto">
               {selectedTemplate === "default" ? (
                 // Modèle par défaut
-                <div className="bg-white p-4 rounded shadow-sm">
+                <div className="bg-white p-4 rounded shadow-sm h-full flex flex-col">
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs">
                     {/* Colonne 1 - Informations entreprise */}
                     <div>
