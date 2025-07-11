@@ -40,28 +40,28 @@ export const ImageCropperCanvas: React.FC<ImageCropperCanvasProps> = ({
           maxHeight: '600px'
         }}
       >
-        <div className="w-full h-full flex justify-center items-center overflow-hidden">
-          <div className="max-w-[80%] max-h-[80%] flex justify-center items-center">
-            <ReactCrop
-              crop={crop}
-              onChange={onCropChange}
-              onComplete={onCropComplete}
-              className="flex justify-center items-center max-w-full max-h-full"
-            >
-              <img
-                ref={imageRef}
-                src={imageUrl}
-                alt="Image à recadrer"
-                onLoad={onImageLoad}
-                className="object-contain max-w-full max-h-full"
-                style={{
-                  transform: `scale(${zoom}) rotate(${rotation}deg)`,
-                  transformOrigin: 'center center',
-                  transition: 'transform 0.2s ease-in-out'
-                }}
-              />
-            </ReactCrop>
-          </div>
+        <div className="w-full h-full flex justify-center items-center p-4">
+          <ReactCrop
+            crop={crop}
+            onChange={onCropChange}
+            onComplete={onCropComplete}
+            className="flex justify-center items-center"
+          >
+            <img
+              ref={imageRef}
+              src={imageUrl}
+              alt="Image à recadrer"
+              onLoad={onImageLoad}
+              className="object-contain"
+              style={{
+                transform: `scale(${zoom}) rotate(${rotation}deg)`,
+                transformOrigin: 'center center',
+                transition: 'transform 0.2s ease-in-out',
+                maxWidth: '70%',
+                maxHeight: '70%'
+              }}
+            />
+          </ReactCrop>
         </div>
       </div>
     </div>
