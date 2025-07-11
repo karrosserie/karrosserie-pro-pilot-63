@@ -254,7 +254,7 @@ const PreferencesTab = () => {
                       </div>
                       
                       {/* Encadré Montant dû */}
-                      <div className="bg-blue-600 text-white p-2 text-center mt-3 rounded">
+                      <div className="bg-blue-600 text-white p-2 text-center mt-3">
                         <p className="text-xs mb-1">Montant dû</p>
                         <p className="text-sm font-bold">1 250,00 €</p>
                       </div>
@@ -326,7 +326,7 @@ const PreferencesTab = () => {
                             <span>TVA</span>
                             <span>183,75 €</span>
                           </div>
-                          <div className="flex justify-between font-bold text-sm bg-blue-600 text-white p-2 rounded">
+                          <div className="flex justify-between font-bold text-sm bg-blue-600 text-white p-2">
                             <span>TOTAL</span>
                             <span>1 102,50 €</span>
                           </div>
