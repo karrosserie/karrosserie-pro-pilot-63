@@ -348,7 +348,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [] }: InvoicePDFProps) =>
                 <Text style={[styles.tableCell, { flex: 2 }]}>
                   {payment.created_at ? format(new Date(payment.created_at), 'dd/MM/yyyy', { locale: fr }) : '-'}
                 </Text>
-                <Text style={[styles.tableCell, { flex: 2 }]}>{payment.payment_method_name || payment.payment_method || '-'}</Text>
+                <Text style={[styles.tableCell, { flex: 2 }]}>{payment.payment_method || '-'}</Text>
                 <Text style={[styles.tableCellRight, { flex: 1, fontWeight: 'bold' }]}>
                   {formatAmount(payment.amount || 0)}
                 </Text>

@@ -17,6 +17,7 @@ import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 import { CreditDialog } from '@/components/credits/CreditDialog';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useCredits } from '@/hooks/use-credits';
+import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { useCompany } from '@/hooks/use-company';
 import { Invoice } from '@/services/supabase/invoices';
 import LoadingSpinner from '@/components/ui/loading-spinner';
@@ -48,6 +49,7 @@ const Invoices = () => {
   
   const { invoices, isLoading, error, deleteInvoice } = useInvoices();
   const { credits } = useCredits();
+  const { receipts } = useReceiptsData();
   const { companyData } = useCompany();
   
   console.log('=== DONNÉES FACTURES DANS LE COMPOSANT ===');
@@ -152,7 +154,7 @@ const Invoices = () => {
       });
 
       const { generateInvoicePDF } = await import('@/utils/pdfGenerator');
-      const result = await generateInvoicePDF(invoice, companyData, credits);
+      const result = await generateInvoicePDF(invoice, companyData, receipts);
       
       if (result.success) {
         toast({
