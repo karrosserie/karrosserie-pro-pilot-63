@@ -89,34 +89,34 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
               <div>
                 <h3 className="text-lg font-semibold mb-4 text-gray-800">Détails de la facture</h3>
                 <div className="space-y-2 text-sm">
-                  <div className="flex">
-                    <span className="font-medium w-32">Facture</span>
-                    <span>N° {invoice.reference}</span>
+                  <div className="flex justify-between">
+                    <span className="font-medium">Facture</span>
+                    <span className="text-right">N° {invoice.reference}</span>
                   </div>
-                  <div className="flex">
-                    <span className="font-medium w-32">Date facturation</span>
-                    <span>{formatDate(invoice.created_at)}</span>
+                  <div className="flex justify-between">
+                    <span className="font-medium">Date facturation</span>
+                    <span className="text-right">{formatDate(invoice.created_at)}</span>
                   </div>
-                  <div className="flex">
-                    <span className="font-medium w-32">Date d'échéance</span>
-                    <span>{formatDate(invoice.due_date)}</span>
+                  <div className="flex justify-between">
+                    <span className="font-medium">Date d'échéance</span>
+                    <span className="text-right">{formatDate(invoice.due_date)}</span>
                   </div>
-                  <div className="flex">
-                    <span className="font-medium w-32">Véhicule</span>
-                    <span>
+                  <div className="flex justify-between">
+                    <span className="font-medium">Véhicule</span>
+                    <span className="text-right">
                       {invoice.vehicles ? 
                         `${invoice.vehicles.car_brands?.name || 'N/A'} ${invoice.vehicles.car_models?.name || 'N/A'}` : 
                         'N/A'
                       }
                     </span>
                   </div>
-                  <div className="flex">
-                    <span className="font-medium w-32">Immatriculation</span>
-                    <span>{invoice.vehicles?.license_plate || 'N/A'}</span>
+                  <div className="flex justify-between">
+                    <span className="font-medium">Immatriculation</span>
+                    <span className="text-right">{invoice.vehicles?.license_plate || 'N/A'}</span>
                   </div>
-                  <div className="flex">
-                    <span className="font-medium w-32">N° de sinistre</span>
-                    <span>{invoice.claim_number || 'N/A'}</span>
+                  <div className="flex justify-between">
+                    <span className="font-medium">N° de sinistre</span>
+                    <span className="text-right">{invoice.claim_number || 'N/A'}</span>
                   </div>
                 </div>
                 
