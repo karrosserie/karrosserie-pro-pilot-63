@@ -12,8 +12,9 @@ interface InvoicePaymentsTableProps {
 const InvoicePaymentsTable = ({ invoiceId, invoiceTotal }: InvoicePaymentsTableProps) => {
   const { receipts } = useReceiptsData();
   
-  // Filtrer les encaissements pour cette facture
-  const invoicePayments = receipts?.filter(receipt => receipt.invoice_id === invoiceId) || [];
+  // Filtrer et trier les encaissements pour cette facture par date croissante
+  const invoicePayments = receipts?.filter(receipt => receipt.invoice_id === invoiceId)
+    .sort((a, b) => new Date(a.created_at || '').getTime() - new Date(b.created_at || '').getTime()) || [];
   
   // Calculer le total encaissé et le solde restant
   const totalPaid = invoicePayments.reduce((total, payment) => total + (payment.amount || 0), 0);
@@ -26,7 +27,7 @@ const InvoicePaymentsTable = ({ invoiceId, invoiceTotal }: InvoicePaymentsTableP
 
   return (
     <div className="mt-6 mb-6">
-      <h3 className="text-lg font-semibold mb-4 text-gray-800">Encaissements</h3>
+      <h3 className="text-lg font-semibold mb-4 text-gray-800">Liste des paiements</h3>
       <table className="w-full bg-white">
         <thead>
           <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
@@ -49,19 +50,19 @@ const InvoicePaymentsTable = ({ invoiceId, invoiceTotal }: InvoicePaymentsTableP
           ))}
         </tbody>
         <tfoot>
-          <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white font-medium">
-            <td colSpan={2} className="p-3 text-sm text-right">
+          <tr className="bg-transparent">
+            <td colSpan={2} className="p-3 text-sm text-right font-medium">
               Total encaissé :
             </td>
             <td className="p-3 text-sm text-right font-bold">
               {formatAmount(totalPaid)}
             </td>
           </tr>
-          <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white font-medium">
-            <td colSpan={2} className="p-3 text-sm text-right">
+          <tr className="bg-transparent">
+            <td colSpan={2} className="p-3 text-sm text-right font-medium">
               Solde restant :
             </td>
-            <td className="p-3 text-sm text-right font-bold">
+            <td className="p-3 text-sm text-right font-bold text-red-600">
               {formatAmount(remainingBalance)}
             </td>
           </tr>
