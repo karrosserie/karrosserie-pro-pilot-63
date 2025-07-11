@@ -156,8 +156,6 @@ const styles = StyleSheet.create({
     fontSize: 6,
     color: '#666',
     paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#e5e5e5',
   },
   paymentTable: {
     marginTop: 15,
@@ -195,9 +193,9 @@ const InvoicePDF = ({ invoice, companyData, receipts = [] }: InvoicePDFProps) =>
             <View style={styles.title}>
               <Text>FACTURE</Text>
             </View>
-            {companyData?.logo_url ? (
+            {companyData?.logo_url && (
               <Image style={styles.logo} src={companyData.logo_url} />
-            ) : null}
+            )}
             <Text style={styles.companyName}>{companyData?.name || 'KARROSSERIE'}</Text>
             <View style={styles.companyInfo}>
               <Text>{companyData?.address || 'Votre adresse'}</Text>
@@ -348,7 +346,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [] }: InvoicePDFProps) =>
                 <Text style={[styles.tableCell, { flex: 2 }]}>
                   {payment.created_at ? format(new Date(payment.created_at), 'dd/MM/yyyy', { locale: fr }) : '-'}
                 </Text>
-                <Text style={[styles.tableCell, { flex: 2 }]}>{payment.payment_method || '-'}</Text>
+                <Text style={[styles.tableCell, { flex: 2 }]}>{payment.payment_method_name || payment.payment_method || '-'}</Text>
                 <Text style={[styles.tableCellRight, { flex: 1, fontWeight: 'bold' }]}>
                   {formatAmount(payment.amount || 0)}
                 </Text>
