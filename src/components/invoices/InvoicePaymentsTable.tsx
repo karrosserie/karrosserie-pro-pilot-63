@@ -26,7 +26,6 @@ const InvoicePaymentsTable = ({ invoiceId }: InvoicePaymentsTableProps) => {
         <thead>
           <tr className="bg-gray-100">
             <th className="border border-gray-300 p-3 text-left text-sm font-medium">Date</th>
-            <th className="border border-gray-300 p-3 text-left text-sm font-medium">Référence</th>
             <th className="border border-gray-300 p-3 text-left text-sm font-medium">Mode de paiement</th>
             <th className="border border-gray-300 p-3 text-right text-sm font-medium">Montant</th>
           </tr>
@@ -37,7 +36,6 @@ const InvoicePaymentsTable = ({ invoiceId }: InvoicePaymentsTableProps) => {
               <td className="border border-gray-300 p-3 text-sm">
                 {payment.created_at ? format(new Date(payment.created_at), 'dd/MM/yyyy', { locale: fr }) : '-'}
               </td>
-              <td className="border border-gray-300 p-3 text-sm">{payment.reference || '-'}</td>
               <td className="border border-gray-300 p-3 text-sm">{payment.payment_method || '-'}</td>
               <td className="border border-gray-300 p-3 text-sm text-right font-medium">
                 {formatAmount(payment.amount || 0)}
@@ -47,7 +45,7 @@ const InvoicePaymentsTable = ({ invoiceId }: InvoicePaymentsTableProps) => {
         </tbody>
         <tfoot>
           <tr className="bg-gray-100 font-medium">
-            <td colSpan={3} className="border border-gray-300 p-3 text-sm text-right">
+            <td colSpan={2} className="border border-gray-300 p-3 text-sm text-right">
               Total encaissé :
             </td>
             <td className="border border-gray-300 p-3 text-sm text-right font-bold">
