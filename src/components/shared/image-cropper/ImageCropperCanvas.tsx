@@ -50,13 +50,13 @@ export const ImageCropperCanvas: React.FC<ImageCropperCanvasProps> = ({
               src={imageUrl}
               alt="Image à recadrer"
               onLoad={onImageLoad}
-              className="object-contain"
+              className="max-w-full max-h-full object-contain"
               style={{
                 transform: `scale(${zoom}) rotate(${rotation}deg)`,
                 transformOrigin: 'center center',
                 transition: 'transform 0.2s ease-in-out',
-                maxWidth: `${100 / zoom}%`,
-                maxHeight: `${100 / zoom}%`,
+                maxWidth: '100%',
+                maxHeight: '100%',
                 width: 'auto',
                 height: 'auto'
               }}
