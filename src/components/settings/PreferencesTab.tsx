@@ -440,20 +440,20 @@ const PreferencesTab = () => {
                     </div>
                     <div className="text-right">
                       <h1 className="text-3xl font-bold text-black mb-1">FACTURE</h1>
-                      <p className="text-blue-500 text-sm">2024/12/0036</p>
-                    </div>
-                  </div>
-
-                  {/* Informations client */}
-                  <div className="mb-6 text-right">
-                    <p className="font-bold text-blue-500 mb-1">Demo user</p>
-                    <div className="text-sm space-y-0">
-                      <p className="m-0">TÉL : +33646464646</p>
-                      <p className="m-0">EMAIL : demo@demo.com</p>
-                      <p className="m-0">ADRESSE : 11 rue juramy 13004</p>
-                      <p className="m-0">Immatricule : AZ-ER-RTY</p>
-                      <p className="m-0">Kilométrage : 500 Km</p>
-                      <p className="m-0">Véhicule : Slio Biomm</p>
+                      <p className="text-blue-500 text-sm mb-4">2024/12/0036</p>
+                      
+                      {/* Informations client */}
+                      <div className="mb-6">
+                        <p className="font-bold text-blue-500 mb-1">Demo user</p>
+                        <div className="text-sm space-y-0">
+                          <p className="m-0">TÉL : +33646464646</p>
+                          <p className="m-0">EMAIL : demo@demo.com</p>
+                          <p className="m-0">ADRESSE : 11 rue juramy 13004</p>
+                          <p className="m-0">Immatricule : AZ-ER-RTY</p>
+                          <p className="m-0">Kilométrage : 500 Km</p>
+                          <p className="m-0">Véhicule : Slio Biomm</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
