@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Invoice } from '@/services/supabase/invoices';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useCompany } from '@/hooks/use-company';
 
 interface InvoiceViewerModalProps {
   invoice: Invoice | null;
@@ -12,6 +13,7 @@ interface InvoiceViewerModalProps {
 }
 
 const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalProps) => {
+  const { companyData } = useCompany();
   if (!invoice) return null;
 
   const formatDate = (dateString: string | null) => {
@@ -63,16 +65,22 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
               <div>
                 <div>
                   <h1 className="text-2xl font-bold text-white px-4 py-2 rounded text-center" style={{backgroundColor: 'rgba(64,67,72,255)'}}>FACTURE</h1>
-                  <div className="bg-orange-500 rounded-full p-3 w-fit mt-2">
-                    <span className="text-white font-bold text-xl">KR</span>
-                  </div>
-                  <p className="text-gray-600 mt-2">KARROSSERIE</p>
+                  {companyData.logo_url ? (
+                    <div className="w-20 h-20 mt-2 flex items-center justify-center">
+                      <img src={companyData.logo_url} alt="Logo entreprise" className="max-w-full max-h-full object-contain" />
+                    </div>
+                  ) : (
+                    <div className="bg-orange-500 rounded-full p-3 w-fit mt-2">
+                      <span className="text-white font-bold text-xl">KR</span>
+                    </div>
+                  )}
+                  <p className="text-gray-600 mt-2">{companyData.name || 'KARROSSERIE'}</p>
                   <div className="text-sm text-gray-600 mt-2">
-                    <p>Votre adresse</p>
-                    <p>Téléphone : +33 1 23 45 67 89</p>
-                    <p>E-mail : contact@karrosserie.fr</p>
-                    <p>SIRET : 123 456 789 00123</p>
-                    <p>N° de TVA : FR 12 123456789</p>
+                    <p>{companyData.address || 'Votre adresse'}</p>
+                    <p>Téléphone : {companyData.phone || '+33 1 23 45 67 89'}</p>
+                    <p>E-mail : {companyData.email || 'contact@karrosserie.fr'}</p>
+                    <p>SIRET : {companyData.siret || '123 456 789 00123'}</p>
+                    <p>N° de TVA : {companyData.tva || 'FR 12 123456789'}</p>
                   </div>
                 </div>
               </div>
