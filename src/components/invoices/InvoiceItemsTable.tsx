@@ -12,11 +12,11 @@ const InvoiceItemsTable = ({ items }: InvoiceItemsTableProps) => {
         <thead>
           <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
             <th className="p-3 text-left text-sm font-medium">Article</th>
-            <th className="p-3 text-center text-sm font-medium">Quantité</th>
-            <th className="p-3 text-center text-sm font-medium">Coût Unitaire</th>
-            <th className="p-3 text-center text-sm font-medium">Remise</th>
-            <th className="p-3 text-center text-sm font-medium">TVA</th>
-            <th className="p-3 text-center text-sm font-medium">Total HT</th>
+            <th className="p-3 text-right text-sm font-medium">Quantité</th>
+            <th className="p-3 text-right text-sm font-medium">Coût Unitaire</th>
+            <th className="p-3 text-right text-sm font-medium">Remise</th>
+            <th className="p-3 text-right text-sm font-medium">TVA</th>
+            <th className="p-3 text-right text-sm font-medium">Total HT</th>
           </tr>
         </thead>
         <tbody>
@@ -28,11 +28,11 @@ const InvoiceItemsTable = ({ items }: InvoiceItemsTableProps) => {
             return (
               <tr key={item.id || index} className="bg-transparent">
                 <td className="p-3 text-sm">{item.label || item.description || 'N/A'}</td>
-                <td className="p-3 text-sm text-center">{(item.quantity || 0).toString().replace('.', ',')}</td>
-                <td className="p-3 text-sm text-center">{formatAmount(item.unitCost || 0)}</td>
-                <td className="p-3 text-sm text-center">{item.discount || 0}%</td>
-                <td className="p-3 text-sm text-center">{item.vat || 20}%</td>
-                <td className="p-3 text-sm text-center font-medium">{formatAmount(itemTotalHT)}</td>
+                <td className="p-3 text-sm text-right">{(item.quantity || 0).toString().replace('.', ',')}</td>
+                <td className="p-3 text-sm text-right">{formatAmount(item.unitCost || 0)}</td>
+                <td className="p-3 text-sm text-right">{item.discount || 0}%</td>
+                <td className="p-3 text-sm text-right">{item.vat || 20}%</td>
+                <td className="p-3 text-sm text-right font-medium">{formatAmount(itemTotalHT)}</td>
               </tr>
             );
           }) : (
