@@ -30,17 +30,12 @@ export const pdfStyles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 12,
   },
-  logoContainer: {
-    width: 120,
-    height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
   logo: {
-    maxWidth: '100%',
-    maxHeight: '100%',
-    objectFit: 'contain',
+    maxWidth: 120,
+    maxHeight: 60,
+    marginBottom: 8,
+    aspectRatio: '2/1',
+    objectFit: 'scale-down',
   },
   companyInfo: {
     fontSize: 7,

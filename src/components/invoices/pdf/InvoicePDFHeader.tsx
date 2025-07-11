@@ -31,9 +31,7 @@ const InvoicePDFHeader = ({ invoice, companyData, totalPaidAmount, finalTotal }:
           <Text>FACTURE</Text>
         </View>
         {companyData?.logo_url ? (
-          <View style={pdfStyles.logoContainer}>
-            <Image style={pdfStyles.logo} src={companyData.logo_url} />
-          </View>
+          <Image style={pdfStyles.logo} src={companyData.logo_url} />
         ) : null}
         <Text style={pdfStyles.companyName}>{companyData?.name || 'KARROSSERIE'}</Text>
         <View style={pdfStyles.companyInfo}>
