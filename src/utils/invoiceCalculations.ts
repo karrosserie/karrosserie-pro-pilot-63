@@ -3,7 +3,7 @@ export interface InvoiceItem {
   label?: string;
   description?: string;
   quantity?: number;
-  unitPrice?: number;
+  unitCost?: number;
   discount?: number;
   vat?: number;
 }
@@ -19,17 +19,17 @@ export const calculateInvoiceTotals = (repairsData: any, partsData: any) => {
   const allItems = [...repairs, ...parts];
 
   const subtotal = allItems.reduce((sum, item) => 
-    sum + ((item.quantity || 0) * (item.unitPrice || 0)), 0);
+    sum + ((item.quantity || 0) * (item.unitCost || 0)), 0);
 
   const totalDiscount = allItems.reduce((sum, item) => {
-    const itemTotal = (item.quantity || 0) * (item.unitPrice || 0);
+    const itemTotal = (item.quantity || 0) * (item.unitCost || 0);
     return sum + (itemTotal * (item.discount || 0) / 100);
   }, 0);
 
   const subtotalAfterDiscount = subtotal - totalDiscount;
 
   const totalVAT = allItems.reduce((sum, item) => {
-    const itemTotal = (item.quantity || 0) * (item.unitPrice || 0);
+    const itemTotal = (item.quantity || 0) * (item.unitCost || 0);
     const itemAfterDiscount = itemTotal - (itemTotal * (item.discount || 0) / 100);
     return sum + (itemAfterDiscount * (item.vat || 20) / 100);
   }, 0);

@@ -21,7 +21,7 @@ const InvoiceItemsTable = ({ items }: InvoiceItemsTableProps) => {
         </thead>
         <tbody>
           {items.length > 0 ? items.map((item, index) => {
-            const itemTotal = (item.quantity || 0) * (item.unitPrice || 0);
+            const itemTotal = (item.quantity || 0) * (item.unitCost || 0);
             const discountAmount = itemTotal * (item.discount || 0) / 100;
             const itemTotalHT = itemTotal - discountAmount;
             
@@ -29,7 +29,7 @@ const InvoiceItemsTable = ({ items }: InvoiceItemsTableProps) => {
               <tr key={item.id || index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                 <td className="border border-gray-300 p-3 text-sm">{item.label || item.description || 'N/A'}</td>
                 <td className="border border-gray-300 p-3 text-sm text-center">{(item.quantity || 0).toString().replace('.', ',')}</td>
-                <td className="border border-gray-300 p-3 text-sm text-center">{formatAmount(item.unitPrice || 0)}</td>
+                <td className="border border-gray-300 p-3 text-sm text-center">{formatAmount(item.unitCost || 0)}</td>
                 <td className="border border-gray-300 p-3 text-sm text-center">{item.discount || 0}%</td>
                 <td className="border border-gray-300 p-3 text-sm text-center">{item.vat || 20}%</td>
                 <td className="border border-gray-300 p-3 text-sm text-center font-medium">{formatAmount(itemTotalHT)}</td>
