@@ -471,7 +471,7 @@ const PreferencesTab = () => {
 
                    {/* Tableau */}
                    <div className="mb-6 flex-1">
-                     <table className="w-full bg-gray-100 text-sm rounded-xl overflow-hidden border border-gray-300">
+                     <table className="w-full bg-white border-2 border-black text-sm rounded-xl overflow-hidden">
                        <thead>
                          <tr>
                            <th className="border border-black p-2 text-left font-bold border-r">Réf</th>
@@ -531,7 +531,7 @@ const PreferencesTab = () => {
 
                   {/* Totaux */}
                   <div className="flex justify-center">
-                    <table className="bg-gray-100 text-sm rounded-xl overflow-hidden border border-gray-300">
+                    <table className="border-2 border-black text-sm rounded-xl overflow-hidden">
                       <tbody>
                          <tr>
                            <td className="p-2 bg-gray-100 font-bold border-r border-black">TOTAL HT</td>
