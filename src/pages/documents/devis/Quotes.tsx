@@ -13,12 +13,13 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, MoreVertical, FileImage } from 'lucide-react';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useToast } from '@/hooks/use-toast';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import QuoteEmailDialog from '@/components/quotes/QuoteEmailDialog';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
+import QuoteViewerDialog from '@/components/quotes/QuoteViewerDialog';
 import { Quote } from '@/services/supabase/quotes';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { StatusBadge } from '@/components/ui/status-badge';
@@ -39,8 +40,10 @@ const Quotes = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [repairOrderDialogOpen, setRepairOrderDialogOpen] = useState(false);
+  const [viewerDialogOpen, setViewerDialogOpen] = useState(false);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [selectedQuoteForEmail, setSelectedQuoteForEmail] = useState<Quote | null>(null);
+  const [selectedQuoteForViewer, setSelectedQuoteForViewer] = useState<Quote | null>(null);
   const [prefilledRepairOrder, setPrefilledRepairOrder] = useState<Partial<RepairOrder> | null>(null);
   const { toast } = useToast();
   
@@ -175,6 +178,11 @@ const Quotes = () => {
       title: "Demande de justificatifs",
       description: `Demande de justificatifs envoyée pour le devis ${quote.reference}`
     });
+  };
+
+  const handleViewPDF = (quote: Quote) => {
+    setSelectedQuoteForViewer(quote);
+    setViewerDialogOpen(true);
   };
 
   const handleConvertToRepairOrder = (quote: Quote) => {
@@ -312,22 +320,25 @@ const Quotes = () => {
                   <TableCell>
                     <StatusBadge status={quote.status === 'draft' ? 'En attente' : (quote.status || 'En attente')} />
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1">
-                      <Button variant="ghost" size="icon">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleEditQuote(quote)}>
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-red-500 hover:text-red-700" 
-                        onClick={() => handleDeleteQuote(quote.id)}
-                        >
-                        <Trash className="h-4 w-4" />
-                      </Button>
+                   <TableCell className="text-right">
+                     <div className="flex justify-end space-x-1">
+                       <Button variant="ghost" size="icon" onClick={() => handleViewPDF(quote)}>
+                         <FileImage className="h-4 w-4" />
+                       </Button>
+                       <Button variant="ghost" size="icon">
+                         <Eye className="h-4 w-4" />
+                       </Button>
+                       <Button variant="ghost" size="icon" onClick={() => handleEditQuote(quote)}>
+                         <Pencil className="h-4 w-4" />
+                       </Button>
+                       <Button 
+                         variant="ghost" 
+                         size="icon" 
+                         className="text-red-500 hover:text-red-700" 
+                         onClick={() => handleDeleteQuote(quote.id)}
+                         >
+                         <Trash className="h-4 w-4" />
+                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
@@ -400,6 +411,12 @@ const Quotes = () => {
             setPrefilledRepairOrder(null);
           }
         }}
+      />
+
+      <QuoteViewerDialog
+        quote={selectedQuoteForViewer}
+        open={viewerDialogOpen}
+        onOpenChange={setViewerDialogOpen}
       />
     </div>
   );
