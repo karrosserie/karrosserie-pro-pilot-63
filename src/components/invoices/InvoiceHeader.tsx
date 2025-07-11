@@ -47,6 +47,7 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
             <p className="text-gray-600 font-bold">{companyData.name || 'KARROSSERIE'}</p>
             <div className="text-sm text-gray-600">
               <p>{companyData.address || 'Votre adresse'}</p>
+              <p>{companyData.zipcode || ''} {companyData.city || ''}</p>
               <p>Téléphone : {companyData.phone || '+33 1 23 45 67 89'}</p>
               <p>E-mail : {companyData.email || 'contact@karrosserie.fr'}</p>
               <p>SIRET : {companyData.siret || '123 456 789 00123'}</p>
