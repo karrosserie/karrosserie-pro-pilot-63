@@ -117,8 +117,12 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
             <p className="font-medium">{invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client non spécifié'}</p>
             <p>{invoice.clients?.address || 'Adresse non renseignée'}</p>
             <p>{invoice.clients?.postal_code || ''} {invoice.clients?.city || 'Ville non renseignée'}</p>
-            <p>Téléphone : {invoice.clients?.phone || 'Non renseigné'}</p>
-            <p>E-mail : {invoice.clients?.email || 'Non renseigné'}</p>
+            {invoice.clients?.phone && (
+              <p>Téléphone : {invoice.clients.phone}</p>
+            )}
+            {invoice.clients?.email && (
+              <p>E-mail : {invoice.clients.email}</p>
+            )}
           </div>
         </div>
       </div>
