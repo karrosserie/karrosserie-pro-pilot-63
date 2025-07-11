@@ -165,43 +165,21 @@ const PreferencesTab = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Productivité</CardTitle>
+          <CardTitle>Facturation</CardTitle>
           <CardDescription>
-            Configurez les fonctionnalités pour améliorer votre productivité.
+            Configurez les paramètres de facturation de votre entreprise.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="auto-save">Sauvegarde automatique</Label>
-              <p className="text-sm text-muted-foreground">
-                Sauvegarder automatiquement les modifications en cours
-              </p>
-            </div>
-            <Switch id="auto-save" defaultChecked />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="keyboard-shortcuts">Raccourcis clavier</Label>
-              <p className="text-sm text-muted-foreground">
-                Activer les raccourcis clavier pour une navigation rapide
-              </p>
-            </div>
-            <Switch id="keyboard-shortcuts" defaultChecked />
-          </div>
-
           <div className="space-y-2">
-            <Label htmlFor="items-per-page">Éléments par page</Label>
-            <Select defaultValue="25">
+            <Label htmlFor="invoice-template">Modèle de facture</Label>
+            <Select defaultValue="default">
               <SelectTrigger>
-                <SelectValue placeholder="Sélectionnez le nombre d'éléments" />
+                <SelectValue placeholder="Sélectionnez un modèle de facture" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10 éléments</SelectItem>
-                <SelectItem value="25">25 éléments</SelectItem>
-                <SelectItem value="50">50 éléments</SelectItem>
-                <SelectItem value="100">100 éléments</SelectItem>
+              <SelectContent className="bg-white z-50">
+                <SelectItem value="default">Modèle par défaut</SelectItem>
+                <SelectItem value="alternative">Modèle alternatif</SelectItem>
               </SelectContent>
             </Select>
           </div>
