@@ -56,6 +56,10 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
               <span className="text-right">N° {invoice.reference}</span>
             </div>
             <div className="flex justify-between">
+              <span className="font-medium">N° de sinistre</span>
+              <span className="text-right">{invoice.claim_number || 'N/A'}</span>
+            </div>
+            <div className="flex justify-between">
               <span className="font-medium">Date facturation</span>
               <span className="text-right">{formatDate(invoice.created_at)}</span>
             </div>
@@ -77,8 +81,8 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
               <span className="text-right">{invoice.vehicles?.license_plate || 'N/A'}</span>
             </div>
             <div className="flex justify-between">
-              <span className="font-medium">N° de sinistre</span>
-              <span className="text-right">{invoice.claim_number || 'N/A'}</span>
+              <span className="font-medium">Kilométrage</span>
+              <span className="text-right">{invoice.vehicles?.mileage || 'N/A'} km</span>
             </div>
           </div>
           

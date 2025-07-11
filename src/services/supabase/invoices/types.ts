@@ -30,6 +30,7 @@ export interface Invoice {
   vehicles?: {
     id: string;
     license_plate: string;
+    mileage?: number | null;
     car_brands?: {
       id: string;
       name: string;
