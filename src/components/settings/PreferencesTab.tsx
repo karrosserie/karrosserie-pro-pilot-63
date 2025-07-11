@@ -287,7 +287,7 @@ const PreferencesTab = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr className="border-b">
+                        <tr>
                           <td className="p-2">Réparation pare-chocs avant</td>
                           <td className="p-2 text-right">1</td>
                           <td className="p-2 text-right">350,00 €</td>
@@ -295,7 +295,7 @@ const PreferencesTab = () => {
                           <td className="p-2 text-right">20%</td>
                           <td className="p-2 text-right font-medium">350,00 €</td>
                         </tr>
-                        <tr className="border-b">
+                        <tr>
                           <td className="p-2">Peinture carrosserie</td>
                           <td className="p-2 text-right">1</td>
                           <td className="p-2 text-right">450,00 €</td>
@@ -303,7 +303,7 @@ const PreferencesTab = () => {
                           <td className="p-2 text-right">20%</td>
                           <td className="p-2 text-right font-medium">450,00 €</td>
                         </tr>
-                        <tr className="border-b">
+                        <tr>
                           <td className="p-2">Pièce détachée - Feu avant gauche</td>
                           <td className="p-2 text-right">1</td>
                           <td className="p-2 text-right">125,00 €</td>
@@ -318,7 +318,7 @@ const PreferencesTab = () => {
                     <div className="mt-4 flex justify-end">
                       <div className="w-56">
                         <div className="space-y-1 text-xs">
-                          <div className="flex justify-between">
+                          <div className="flex justify-between font-bold">
                             <span>Sous-total</span>
                             <span>918,75 €</span>
                           </div>
