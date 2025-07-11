@@ -443,12 +443,12 @@ const PreferencesTab = () => {
                       
                       {/* Informations client */}
                       <div className="mb-6">
-                        <p className="font-bold text-blue-500 mb-1">Demo user</p>
+                        <p className="font-bold">Demo user</p>
                         <div className="text-sm space-y-0">
                           <p className="m-0">11 rue juramy</p>
                           <p className="m-0">13004 MARSEILLE</p>
-                          <p className="m-0">+33646464646</p>
-                          <p className="m-0">demo@demo.com</p>
+                          <p className="m-0">Téléphone : +33646464646</p>
+                          <p className="m-0">E-mail : demo@demo.com</p>
                           <p className="m-0">Véhicule : Slio Biomm</p>
                           <p className="m-0">Immatriculation : AZ-ER-RTY</p>
                           <p className="m-0">Kilométrage : 500 Km</p>
