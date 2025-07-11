@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const PreferencesTab = () => {
   const { toast } = useToast();
+  const [selectedTemplate, setSelectedTemplate] = useState("default");
 
   const handleSavePreferences = () => {
     toast({
@@ -173,7 +174,7 @@ const PreferencesTab = () => {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="invoice-template">Modèle de facture</Label>
-            <Select defaultValue="default">
+            <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
               <SelectTrigger>
                 <SelectValue placeholder="Sélectionnez un modèle de facture" />
               </SelectTrigger>
@@ -182,6 +183,191 @@ const PreferencesTab = () => {
                 <SelectItem value="alternative">Modèle alternatif</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Aperçu du modèle de facture */}
+          <div className="space-y-2">
+            <Label>Aperçu du modèle</Label>
+            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 max-h-96 overflow-y-auto">
+              {selectedTemplate === "default" ? (
+                // Modèle par défaut
+                <div className="bg-white p-4 rounded shadow-sm">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs">
+                    {/* Colonne 1 - Informations entreprise */}
+                    <div>
+                      <h1 className="text-lg font-bold text-white px-3 py-1 text-center mb-3" style={{backgroundColor: 'rgba(64,67,72,255)'}}>FACTURE</h1>
+                      <div className="bg-orange-500 rounded-full p-2 w-fit mb-3">
+                        <span className="text-white font-bold text-sm">KR</span>
+                      </div>
+                      <p className="text-gray-600 font-bold mb-2">KARROSSERIE</p>
+                      <div className="text-xs text-gray-600 space-y-1">
+                        <p>123 Rue de l&apos;Automobile</p>
+                        <p>75001 Paris</p>
+                        <p>Téléphone : +33 1 23 45 67 89</p>
+                        <p>E-mail : contact@karrosserie.fr</p>
+                        <p>SIRET : 123 456 789 00123</p>
+                        <p>N° TVA : FR 12 123456789</p>
+                      </div>
+                    </div>
+
+                    {/* Colonne 2 - Détails de la facture */}
+                    <div>
+                      <h3 className="text-sm font-semibold mb-3 text-gray-800">Détails de la facture</h3>
+                      <div className="text-xs space-y-1">
+                        <div className="flex justify-between">
+                          <span className="font-medium">Facture</span>
+                          <span>N° F-2024-001</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="font-medium">N° de sinistre</span>
+                          <span>SIN-2024-001</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="font-medium">Date de facturation</span>
+                          <span>11/07/2025</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="font-medium">Date d&apos;échéance</span>
+                          <span>10/08/2025</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="font-medium">Véhicule</span>
+                          <span>Peugeot 308</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="font-medium">Immatriculation</span>
+                          <span>AB-123-CD</span>
+                        </div>
+                      </div>
+                      
+                      {/* Encadré Montant dû */}
+                      <div className="bg-blue-600 text-white p-2 text-center mt-3 rounded">
+                        <p className="text-xs mb-1">Montant dû</p>
+                        <p className="text-sm font-bold">1 250,00 €</p>
+                      </div>
+                    </div>
+
+                    {/* Colonne 3 - Facture pour */}
+                    <div>
+                      <h3 className="text-sm font-semibold mb-3 text-gray-800">Facture pour</h3>
+                      <div className="text-xs space-y-1">
+                        <p className="font-medium">Jean Dupont</p>
+                        <p>456 Avenue de la République</p>
+                        <p>75011 Paris</p>
+                        <p>Téléphone : +33 6 12 34 56 78</p>
+                        <p>E-mail : jean.dupont@email.com</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tableau simplifié des articles */}
+                  <div className="mt-4">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="bg-gray-700 text-white">
+                          <th className="p-1 text-left">Article</th>
+                          <th className="p-1 text-right">Qté</th>
+                          <th className="p-1 text-right">Prix U.</th>
+                          <th className="p-1 text-right">Total HT</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="p-1">Réparation pare-chocs avant</td>
+                          <td className="p-1 text-right">1</td>
+                          <td className="p-1 text-right">350,00 €</td>
+                          <td className="p-1 text-right">350,00 €</td>
+                        </tr>
+                        <tr>
+                          <td className="p-1">Peinture carrosserie</td>
+                          <td className="p-1 text-right">1</td>
+                          <td className="p-1 text-right">450,00 €</td>
+                          <td className="p-1 text-right">450,00 €</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    
+                    {/* Totaux */}
+                    <div className="flex justify-end mt-2">
+                      <div className="w-40">
+                        <div className="flex justify-between text-xs">
+                          <span>Sous-total:</span>
+                          <span>800,00 €</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span>TVA:</span>
+                          <span>160,00 €</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-bold bg-blue-600 text-white p-1 rounded">
+                          <span>TOTAL:</span>
+                          <span>960,00 €</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                // Modèle alternatif
+                <div className="bg-white p-4 rounded shadow-sm">
+                  <div className="text-center mb-4">
+                    <h1 className="text-2xl font-bold text-blue-800 mb-2">FACTURE</h1>
+                    <div className="bg-blue-100 p-3 rounded-lg">
+                      <p className="font-bold text-blue-800">KARROSSERIE</p>
+                      <p className="text-sm">123 Rue de l&apos;Automobile, 75001 Paris</p>
+                      <p className="text-sm">Tel: +33 1 23 45 67 89 | Email: contact@karrosserie.fr</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 mb-4 text-xs">
+                    <div className="border border-blue-200 p-2 rounded">
+                      <h3 className="font-semibold text-blue-800 mb-2">Facturé à:</h3>
+                      <p className="font-medium">Jean Dupont</p>
+                      <p>456 Avenue de la République</p>
+                      <p>75011 Paris</p>
+                    </div>
+                    
+                    <div className="border border-blue-200 p-2 rounded">
+                      <h3 className="font-semibold text-blue-800 mb-2">Détails:</h3>
+                      <p>Facture N°: F-2024-001</p>
+                      <p>Date: 11/07/2025</p>
+                      <p>Véhicule: Peugeot 308 (AB-123-CD)</p>
+                    </div>
+                  </div>
+                  
+                  <div className="border border-blue-200 rounded mb-4">
+                    <div className="bg-blue-800 text-white p-2 rounded-t">
+                      <div className="grid grid-cols-4 gap-2 text-xs font-semibold">
+                        <span>Description</span>
+                        <span className="text-center">Quantité</span>
+                        <span className="text-center">Prix unitaire</span>
+                        <span className="text-right">Total</span>
+                      </div>
+                    </div>
+                    <div className="p-2">
+                      <div className="grid grid-cols-4 gap-2 text-xs py-1">
+                        <span>Réparation pare-chocs avant</span>
+                        <span className="text-center">1</span>
+                        <span className="text-center">350,00 €</span>
+                        <span className="text-right">350,00 €</span>
+                      </div>
+                      <div className="grid grid-cols-4 gap-2 text-xs py-1">
+                        <span>Peinture carrosserie</span>
+                        <span className="text-center">1</span>
+                        <span className="text-center">450,00 €</span>
+                        <span className="text-right">450,00 €</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end">
+                    <div className="bg-blue-800 text-white p-3 rounded text-center">
+                      <p className="text-xs">TOTAL À PAYER</p>
+                      <p className="text-lg font-bold">960,00 €</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
