@@ -113,19 +113,10 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
         {/* Colonne 3 - Facture pour */}
         <div>
           <h3 className="text-lg font-semibold mb-4 text-gray-800">Facture pour</h3>
-          {/* Debug - affiche les données brutes */}
-          <pre className="text-xs bg-gray-100 p-2 mb-2 overflow-auto">
-            {JSON.stringify({ 
-              client_id: invoice.client_id,
-              clients: invoice.clients,
-              hasClients: !!invoice.clients,
-              clientsType: typeof invoice.clients
-            }, null, 2)}
-          </pre>
           <div className="text-sm mb-4">
             <p className="font-medium">{invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client non spécifié'}</p>
             <p>{invoice.clients?.address || 'Adresse non renseignée'}</p>
-            <p>{invoice.clients?.zipcode || ''} {invoice.clients?.city || 'Ville non renseignée'}</p>
+            <p>{invoice.clients?.postal_code || ''} {invoice.clients?.city || 'Ville non renseignée'}</p>
             <p>Téléphone : {invoice.clients?.phone || 'Non renseigné'}</p>
             <p>E-mail : {invoice.clients?.email || 'Non renseigné'}</p>
           </div>
