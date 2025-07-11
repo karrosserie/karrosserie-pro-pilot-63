@@ -36,11 +36,11 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
           <div>
             <h1 className="text-2xl font-bold text-white px-4 py-2 text-center" style={{backgroundColor: 'rgba(64,67,72,255)'}}>FACTURE</h1>
             {companyData.logo_url ? (
-              <div className="flex items-center justify-start" style={{maxWidth: '175px'}}>
+              <div className="flex items-center justify-start my-5" style={{maxWidth: '120px'}}>
                 <img src={companyData.logo_url} alt="Logo entreprise" className="max-w-full h-auto object-contain" />
               </div>
             ) : (
-              <div className="bg-orange-500 rounded-full p-3 w-fit">
+              <div className="bg-orange-500 rounded-full p-3 w-fit my-5">
                 <span className="text-white font-bold text-xl">KR</span>
               </div>
             )}
