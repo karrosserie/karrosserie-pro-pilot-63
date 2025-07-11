@@ -1,5 +1,5 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Font, Image } from '@react-pdf/renderer';
 import { Invoice } from '@/services/supabase/invoices';
 import { InvoiceItem, formatAmount, calculateInvoiceTotals } from '@/utils/invoiceCalculations';
 import { format } from 'date-fns';
@@ -15,144 +15,157 @@ interface InvoicePDFProps {
 const styles = StyleSheet.create({
   page: {
     fontFamily: 'Helvetica',
-    fontSize: 12,
-    paddingTop: 35,
-    paddingBottom: 65,
-    paddingHorizontal: 35,
+    fontSize: 10,
+    paddingTop: 30,
+    paddingBottom: 60,
+    paddingHorizontal: 30,
   },
   section: {
-    margin: 10,
-    padding: 10,
+    margin: 8,
+    padding: 8,
   },
   header: {
     flexDirection: 'row',
-    marginBottom: 20,
-    paddingBottom: 20,
+    marginBottom: 15,
+    paddingBottom: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#404348',
   },
   headerColumn: {
     flex: 1,
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
   },
   title: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
     color: 'white',
     backgroundColor: '#404348',
-    padding: 8,
+    padding: 6,
     textAlign: 'center',
-    marginBottom: 15,
+    marginBottom: 12,
+  },
+  logo: {
+    maxWidth: 120,
+    maxHeight: 60,
+    marginBottom: 8,
   },
   companyInfo: {
-    fontSize: 10,
-    lineHeight: 1.5,
-    marginBottom: 10,
+    fontSize: 9,
+    lineHeight: 1.4,
+    marginBottom: 8,
   },
   companyName: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 4,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 8,
     color: '#404348',
   },
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 3,
-    fontSize: 10,
+    marginBottom: 2,
+    fontSize: 9,
+  },
+  detailLabel: {
+    fontWeight: 'bold',
+    fontSize: 9,
+  },
+  detailValue: {
+    fontSize: 9,
+    textAlign: 'right',
   },
   table: {
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: 15,
+    marginBottom: 15,
   },
   tableHeader: {
     backgroundColor: '#404348',
     flexDirection: 'row',
-    padding: 8,
+    padding: 6,
   },
   tableHeaderText: {
     color: 'white',
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: 'bold',
   },
   tableRow: {
     flexDirection: 'row',
-    padding: 8,
+    padding: 6,
     borderBottomWidth: 1,
     borderBottomColor: '#e5e5e5',
   },
   tableCell: {
-    fontSize: 10,
+    fontSize: 9,
   },
   tableCellRight: {
-    fontSize: 10,
+    fontSize: 9,
     textAlign: 'right',
   },
   totalsSection: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginTop: 20,
+    marginTop: 15,
   },
   totalsBox: {
-    width: 200,
+    width: 180,
   },
   totalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 5,
-    fontSize: 10,
+    marginBottom: 4,
+    fontSize: 9,
   },
   totalRowBold: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 5,
-    fontSize: 10,
+    marginBottom: 4,
+    fontSize: 9,
     fontWeight: 'bold',
   },
   finalTotal: {
     backgroundColor: '#2563eb',
     color: 'white',
-    padding: 10,
+    padding: 8,
     flexDirection: 'row',
     justifyContent: 'space-between',
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 10,
   },
   amountDue: {
     backgroundColor: '#2563eb',
     color: 'white',
-    padding: 12,
+    padding: 10,
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: 8,
   },
   amountDueText: {
-    fontSize: 10,
-    marginBottom: 3,
+    fontSize: 9,
+    marginBottom: 2,
   },
   amountDueValue: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   footer: {
     position: 'absolute',
-    bottom: 30,
-    left: 35,
-    right: 35,
+    bottom: 25,
+    left: 30,
+    right: 30,
     textAlign: 'center',
-    fontSize: 8,
+    fontSize: 7,
     color: '#666',
-    paddingTop: 10,
+    paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: '#e5e5e5',
   },
   paymentTable: {
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: 15,
+    marginBottom: 15,
   },
 });
 
@@ -186,6 +199,9 @@ const InvoicePDF = ({ invoice, companyData, receipts = [] }: InvoicePDFProps) =>
             <View style={styles.title}>
               <Text>FACTURE</Text>
             </View>
+            {companyData?.logo_url ? (
+              <Image style={styles.logo} src={companyData.logo_url} />
+            ) : null}
             <Text style={styles.companyName}>{companyData?.name || 'KARROSSERIE'}</Text>
             <View style={styles.companyInfo}>
               <Text>{companyData?.address || 'Votre adresse'}</Text>
@@ -201,24 +217,24 @@ const InvoicePDF = ({ invoice, companyData, receipts = [] }: InvoicePDFProps) =>
           <View style={styles.headerColumn}>
             <Text style={styles.sectionTitle}>Détails de la facture</Text>
             <View style={styles.detailRow}>
-              <Text>Facture</Text>
-              <Text>N° {invoice.reference}</Text>
+              <Text style={styles.detailLabel}>Facture</Text>
+              <Text style={styles.detailValue}>N° {invoice.reference}</Text>
             </View>
             <View style={styles.detailRow}>
-              <Text>N° de sinistre</Text>
-              <Text>{invoice.claim_number || 'N/A'}</Text>
+              <Text style={styles.detailLabel}>N° de sinistre</Text>
+              <Text style={styles.detailValue}>{invoice.claim_number || 'N/A'}</Text>
             </View>
             <View style={styles.detailRow}>
-              <Text>Date de facturation</Text>
-              <Text>{formatDate(invoice.created_at)}</Text>
+              <Text style={styles.detailLabel}>Date de facturation</Text>
+              <Text style={styles.detailValue}>{formatDate(invoice.created_at)}</Text>
             </View>
             <View style={styles.detailRow}>
-              <Text>Date d'échéance</Text>
-              <Text>{formatDate(invoice.due_date)}</Text>
+              <Text style={styles.detailLabel}>Date d'échéance</Text>
+              <Text style={styles.detailValue}>{formatDate(invoice.due_date)}</Text>
             </View>
             <View style={styles.detailRow}>
-              <Text>Véhicule</Text>
-              <Text>
+              <Text style={styles.detailLabel}>Véhicule</Text>
+              <Text style={styles.detailValue}>
                 {invoice.vehicles ? 
                   `${invoice.vehicles.car_brands?.name || 'N/A'} ${invoice.vehicles.car_models?.name || 'N/A'}` : 
                   'N/A'
@@ -226,19 +242,19 @@ const InvoicePDF = ({ invoice, companyData, receipts = [] }: InvoicePDFProps) =>
               </Text>
             </View>
             <View style={styles.detailRow}>
-              <Text>Immatriculation</Text>
-              <Text>{invoice.vehicles?.license_plate || 'N/A'}</Text>
+              <Text style={styles.detailLabel}>Immatriculation</Text>
+              <Text style={styles.detailValue}>{invoice.vehicles?.license_plate || 'N/A'}</Text>
             </View>
             {invoice.vehicles?.mileage != null && (
               <View style={styles.detailRow}>
-                <Text>Kilométrage</Text>
-                <Text>{invoice.vehicles.mileage} km</Text>
+                <Text style={styles.detailLabel}>Kilométrage</Text>
+                <Text style={styles.detailValue}>{invoice.vehicles.mileage} km</Text>
               </View>
             )}
             {totalPaidAmount > 0 && (
               <View style={styles.detailRow}>
-                <Text>Montant payé</Text>
-                <Text>{formatAmount(totalPaidAmount)}</Text>
+                <Text style={styles.detailLabel}>Montant payé</Text>
+                <Text style={styles.detailValue}>{formatAmount(totalPaidAmount)}</Text>
               </View>
             )}
             
