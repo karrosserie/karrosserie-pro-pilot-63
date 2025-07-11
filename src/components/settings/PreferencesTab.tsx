@@ -222,32 +222,32 @@ const PreferencesTab = () => {
                      {/* Colonne 2 - Détails de la facture */}
                      <div>
                        <h3 className="text-lg font-semibold mb-3 text-gray-800">Détails de la facture</h3>
-                       <div className="text-base space-y-1">
-                         <div className="flex justify-between">
+                       <div className="text-base">
+                         <div className="flex justify-between m-0">
                            <span className="font-medium">Facture</span>
                            <span>N° 1</span>
                          </div>
-                         <div className="flex justify-between">
+                         <div className="flex justify-between m-0">
                            <span className="font-medium">N° de sinistre</span>
                            <span>SIN-2024-001</span>
                          </div>
-                         <div className="flex justify-between">
+                         <div className="flex justify-between m-0">
                            <span className="font-medium">Date de facturation</span>
                            <span>11/07/2025</span>
                          </div>
-                         <div className="flex justify-between">
+                         <div className="flex justify-between m-0">
                            <span className="font-medium">Date d&apos;échéance</span>
                            <span>10/08/2025</span>
                          </div>
-                         <div className="flex justify-between">
+                         <div className="flex justify-between m-0">
                            <span className="font-medium">Véhicule</span>
                            <span>Peugeot 308</span>
                          </div>
-                         <div className="flex justify-between">
+                         <div className="flex justify-between m-0">
                            <span className="font-medium">Immatriculation</span>
                            <span>AB-123-CD</span>
                          </div>
-                         <div className="flex justify-between">
+                         <div className="flex justify-between m-0">
                            <span className="font-medium">Kilométrage</span>
                            <span>85 000 km</span>
                          </div>
