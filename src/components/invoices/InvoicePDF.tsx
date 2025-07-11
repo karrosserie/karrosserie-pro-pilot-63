@@ -54,7 +54,6 @@ const styles = StyleSheet.create({
   companyName: {
     fontSize: 10,
     fontWeight: 'bold',
-    marginTop: 8,
     marginBottom: 4,
   },
   sectionTitle: {
