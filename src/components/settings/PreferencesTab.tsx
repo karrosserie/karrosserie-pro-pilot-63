@@ -338,26 +338,6 @@ const PreferencesTab = () => {
                       </div>
                     </div>
 
-                    {/* Section Paiements */}
-                    <div className="mt-4">
-                      <h4 className="text-sm font-semibold mb-2">Paiements effectués</h4>
-                      <table className="w-full text-xs border border-gray-200">
-                        <thead>
-                          <tr className="bg-gray-100">
-                            <th className="p-2 text-left">Date</th>
-                            <th className="p-2 text-left">Méthode</th>
-                            <th className="p-2 text-right">Montant</th>
-                            <th className="p-2 text-left">Notes</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td className="p-2 text-center text-gray-500" colSpan={4}>Aucun paiement enregistré</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-
                     {/* Mentions légales en bas */}
                     <div className="mt-8 pt-4 border-t text-[10px] text-gray-500 text-center">
                       <p>
