@@ -411,7 +411,7 @@ const PreferencesTab = () => {
       </Card>
 
       <div className="flex justify-end">
-        <Button onClick={handleSavePreferences}>
+        <Button onClick={handleSavePreferences} className="bg-orange-500 hover:bg-orange-600 text-white">
           Sauvegarder les préférences
         </Button>
       </div>
