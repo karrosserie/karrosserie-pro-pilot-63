@@ -69,8 +69,52 @@ export const useImageCropper = (imageUrl: string, onCropComplete: (blob: Blob) =
     console.log('Centering offset:', offsetX, 'x', offsetY);
 
     // Ajuster les coordonnées de crop en tenant compte de l'offset de centrage
-    const adjustedCropX = completedCrop.x - offsetX;
-    const adjustedCropY = completedCrop.y - offsetY;
+    let adjustedCropX = completedCrop.x - offsetX;
+    let adjustedCropY = completedCrop.y - offsetY;
+    let adjustedCropWidth = completedCrop.width;
+    let adjustedCropHeight = completedCrop.height;
+    
+    // Transformer les coordonnées de crop en fonction de la rotation
+    if (rotation !== 0) {
+      const centerX = displayedWidth / 2;
+      const centerY = displayedHeight / 2;
+      
+      // Coordonnées relatives au centre de l'image
+      const relativeX = adjustedCropX - centerX;
+      const relativeY = adjustedCropY - centerY;
+      
+      // Point du coin inférieur droit du crop
+      const relativeX2 = (adjustedCropX + adjustedCropWidth) - centerX;
+      const relativeY2 = (adjustedCropY + adjustedCropHeight) - centerY;
+      
+      const rotationInRadians = (-rotation * Math.PI) / 180; // Rotation inverse
+      
+      // Transformer les coordonnées avec la rotation inverse
+      const transformedX = relativeX * Math.cos(rotationInRadians) - relativeY * Math.sin(rotationInRadians);
+      const transformedY = relativeX * Math.sin(rotationInRadians) + relativeY * Math.cos(rotationInRadians);
+      
+      const transformedX2 = relativeX2 * Math.cos(rotationInRadians) - relativeY2 * Math.sin(rotationInRadians);
+      const transformedY2 = relativeX2 * Math.sin(rotationInRadians) + relativeY2 * Math.cos(rotationInRadians);
+      
+      // Revenir aux coordonnées absolues
+      const finalX = transformedX + centerX;
+      const finalY = transformedY + centerY;
+      const finalX2 = transformedX2 + centerX;
+      const finalY2 = transformedY2 + centerY;
+      
+      // Calculer la nouvelle zone de crop (prendre le rectangle englobant)
+      adjustedCropX = Math.min(finalX, finalX2);
+      adjustedCropY = Math.min(finalY, finalY2);
+      adjustedCropWidth = Math.abs(finalX2 - finalX);
+      adjustedCropHeight = Math.abs(finalY2 - finalY);
+      
+      console.log('Rotation-adjusted crop:', {
+        x: adjustedCropX,
+        y: adjustedCropY,
+        width: adjustedCropWidth,
+        height: adjustedCropHeight
+      });
+    }
     
     // Ratio entre la taille naturelle et la taille affichée avec zoom
     const scaleX = image.naturalWidth / displayedWidth;
@@ -81,8 +125,8 @@ export const useImageCropper = (imageUrl: string, onCropComplete: (blob: Blob) =
     // Convertir vers les coordonnées naturelles
     const naturalCropX = Math.max(0, adjustedCropX * scaleX);
     const naturalCropY = Math.max(0, adjustedCropY * scaleY);
-    const naturalCropWidth = Math.min(completedCrop.width * scaleX, image.naturalWidth - naturalCropX);
-    const naturalCropHeight = Math.min(completedCrop.height * scaleY, image.naturalHeight - naturalCropY);
+    const naturalCropWidth = Math.min(adjustedCropWidth * scaleX, image.naturalWidth - naturalCropX);
+    const naturalCropHeight = Math.min(adjustedCropHeight * scaleY, image.naturalHeight - naturalCropY);
 
     console.log('Adjusted crop coordinates:', {
       x: adjustedCropX,
