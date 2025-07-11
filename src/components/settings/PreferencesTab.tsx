@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -6,96 +6,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useCompany } from '@/hooks/use-company';
-import { supabase } from "@/integrations/supabase/client";
 import { formatAmount } from '@/utils/invoiceCalculations';
 
 const PreferencesTab = () => {
   const { toast } = useToast();
   const { companyData } = useCompany();
   const [selectedTemplate, setSelectedTemplate] = useState("default");
-  const [language, setLanguage] = useState("fr");
-  const [timezone, setTimezone] = useState("europe/paris");
-  const [currency, setCurrency] = useState("eur");
-  const [showRepairOrderDetails, setShowRepairOrderDetails] = useState(true);
-  const [showClientSignature, setShowClientSignature] = useState(false);
-  const [showZeroPriceProducts, setShowZeroPriceProducts] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  // Charger les préférences existantes
-  useEffect(() => {
-    const loadPreferences = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from('user_preferences')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (data) {
-        setLanguage(data.language);
-        setTimezone(data.timezone);
-        setCurrency(data.currency);
-        setSelectedTemplate(data.invoice_template);
-        setShowRepairOrderDetails(data.show_repair_order_details);
-        setShowClientSignature(data.show_client_signature);
-        setShowZeroPriceProducts(data.show_zero_price_products);
-      }
-    };
-
-    loadPreferences();
-  }, []);
-
-  const handleSavePreferences = async () => {
-    setLoading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Erreur",
-          description: "Vous devez être connecté pour sauvegarder les préférences.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const preferences = {
-        user_id: user.id,
-        language,
-        timezone,
-        currency,
-        invoice_template: selectedTemplate,
-        show_repair_order_details: showRepairOrderDetails,
-        show_client_signature: showClientSignature,
-        show_zero_price_products: showZeroPriceProducts,
-      };
-
-      const { error } = await supabase
-        .from('user_preferences')
-        .upsert(preferences, { onConflict: 'user_id' });
-
-      if (error) {
-        toast({
-          title: "Erreur",
-          description: "Impossible de sauvegarder les préférences.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Préférences sauvegardées",
-          description: "Vos préférences ont été mises à jour avec succès.",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de la sauvegarde.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+  const handleSavePreferences = () => {
+    toast({
+      title: "Préférences sauvegardées",
+      description: "Vos préférences ont été mises à jour avec succès.",
+    });
   };
 
   return (
@@ -110,7 +32,7 @@ const PreferencesTab = () => {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="language">Langue</Label>
-            <Select value={language} onValueChange={setLanguage}>
+            <Select defaultValue="fr">
               <SelectTrigger>
                 <SelectValue placeholder="Sélectionnez une langue" />
               </SelectTrigger>
@@ -125,7 +47,7 @@ const PreferencesTab = () => {
 
           <div className="space-y-2">
             <Label htmlFor="timezone">Fuseau horaire</Label>
-            <Select value={timezone} onValueChange={setTimezone}>
+            <Select defaultValue="europe/paris">
               <SelectTrigger>
                 <SelectValue placeholder="Sélectionnez un fuseau horaire" />
               </SelectTrigger>
@@ -140,7 +62,7 @@ const PreferencesTab = () => {
 
           <div className="space-y-2">
             <Label htmlFor="currency">Devise</Label>
-            <Select value={currency} onValueChange={setCurrency}>
+            <Select defaultValue="eur">
               <SelectTrigger>
                 <SelectValue placeholder="Sélectionnez une devise" />
               </SelectTrigger>
@@ -170,7 +92,7 @@ const PreferencesTab = () => {
                 Inclure les détails de l'ordre de réparation sur les documents
               </p>
             </div>
-            <Switch id="show-repair-order" checked={showRepairOrderDetails} onCheckedChange={setShowRepairOrderDetails} />
+            <Switch id="show-repair-order" defaultChecked />
           </div>
 
           <div className="flex items-center justify-between">
@@ -180,7 +102,7 @@ const PreferencesTab = () => {
                 Permettre aux clients de signer électroniquement les factures
               </p>
             </div>
-            <Switch id="client-signatures-invoices" checked={showClientSignature} onCheckedChange={setShowClientSignature} />
+            <Switch id="client-signatures-invoices" />
           </div>
 
           <div className="flex items-center justify-between">
@@ -200,7 +122,7 @@ const PreferencesTab = () => {
                 Activez cette option pour inclure des produits avec un prix unitaire de zéro sur les ordres de réparation et les factures
               </p>
             </div>
-            <Switch id="show-zero-price-products" checked={showZeroPriceProducts} onCheckedChange={setShowZeroPriceProducts} />
+            <Switch id="show-zero-price-products" />
           </div>
 
           <div className="flex items-center justify-between">
@@ -278,7 +200,7 @@ const PreferencesTab = () => {
                      <div>
                        <h1 className="text-2xl font-bold text-white px-3 py-1 text-center mb-3" style={{backgroundColor: 'rgba(64,67,72,255)'}}>FACTURE</h1>
                        {companyData.logo_url ? (
-                         <div className="flex items-center justify-start mb-3" style={{maxWidth: '160px'}}>
+                         <div className="flex items-center justify-start mb-3" style={{maxWidth: '120px'}}>
                            <img src={companyData.logo_url} alt="Logo entreprise" className="max-w-full h-auto object-contain" />
                          </div>
                        ) : (
@@ -286,46 +208,46 @@ const PreferencesTab = () => {
                            <span className="text-white font-bold text-base">KR</span>
                          </div>
                        )}
-                       <p className="text-gray-600 font-bold">{companyData.name || 'KARROSSERIE'}</p>
-                       <div className="text-base text-gray-600">
-                         <p className="m-0">{companyData.address || 'Votre adresse'}</p>
-                         <p className="m-0">{companyData.zipcode || ''} {companyData.city || ''}</p>
-                         <p className="m-0">Téléphone : {companyData.phone || '+33 1 23 45 67 89'}</p>
-                         <p className="m-0">E-mail : {companyData.email || 'contact@karrosserie.fr'}</p>
-                         <p className="m-0">SIRET : {companyData.siret || '123 456 789 00123'}</p>
-                         <p className="m-0">N° TVA : {companyData.tva || 'FR 12 123456789'}</p>
+                       <p className="text-gray-600 font-bold mb-2">{companyData.name || 'KARROSSERIE'}</p>
+                       <div className="text-base text-gray-600 space-y-1">
+                         <p>{companyData.address || 'Votre adresse'}</p>
+                         <p>{companyData.zipcode || ''} {companyData.city || ''}</p>
+                         <p>Téléphone : {companyData.phone || '+33 1 23 45 67 89'}</p>
+                         <p>E-mail : {companyData.email || 'contact@karrosserie.fr'}</p>
+                         <p>SIRET : {companyData.siret || '123 456 789 00123'}</p>
+                         <p>N° TVA : {companyData.tva || 'FR 12 123456789'}</p>
                        </div>
                      </div>
 
                      {/* Colonne 2 - Détails de la facture */}
                      <div>
                        <h3 className="text-lg font-semibold mb-3 text-gray-800">Détails de la facture</h3>
-                       <div className="text-base">
-                         <div className="flex justify-between m-0">
+                       <div className="text-base space-y-1">
+                         <div className="flex justify-between">
                            <span className="font-medium">Facture</span>
                            <span>N° 1</span>
                          </div>
-                         <div className="flex justify-between m-0">
+                         <div className="flex justify-between">
                            <span className="font-medium">N° de sinistre</span>
                            <span>SIN-2024-001</span>
                          </div>
-                          <div className="flex justify-between m-0 bg-gray-100 p-2 rounded-xl">
-                            <span className="font-medium">Date de facturation</span>
-                            <span>11/07/2025</span>
-                          </div>
-                          <div className="flex justify-between m-0 bg-gray-100 p-2 rounded-xl">
-                            <span className="font-medium">Date d&apos;échéance</span>
-                            <span>10/08/2025</span>
-                          </div>
-                         <div className="flex justify-between m-0">
+                         <div className="flex justify-between">
+                           <span className="font-medium">Date de facturation</span>
+                           <span>11/07/2025</span>
+                         </div>
+                         <div className="flex justify-between">
+                           <span className="font-medium">Date d&apos;échéance</span>
+                           <span>10/08/2025</span>
+                         </div>
+                         <div className="flex justify-between">
                            <span className="font-medium">Véhicule</span>
                            <span>Peugeot 308</span>
                          </div>
-                         <div className="flex justify-between m-0">
+                         <div className="flex justify-between">
                            <span className="font-medium">Immatriculation</span>
                            <span>AB-123-CD</span>
                          </div>
-                         <div className="flex justify-between m-0">
+                         <div className="flex justify-between">
                            <span className="font-medium">Kilométrage</span>
                            <span>85 000 km</span>
                          </div>
@@ -341,55 +263,55 @@ const PreferencesTab = () => {
                      {/* Colonne 3 - Facture pour */}
                      <div>
                        <h3 className="text-lg font-semibold mb-3 text-gray-800">Facture pour</h3>
-                       <div className="text-base">
-                         <p className="font-medium m-0">Jean Dupont</p>
-                         <p className="m-0">456 Avenue de la République</p>
-                         <p className="m-0">75011 Paris</p>
-                         <p className="m-0">Téléphone : +33 6 12 34 56 78</p>
-                         <p className="m-0">E-mail : jean.dupont@email.com</p>
+                       <div className="text-base space-y-1">
+                         <p className="font-medium">Jean Dupont</p>
+                         <p>456 Avenue de la République</p>
+                         <p>75011 Paris</p>
+                         <p>Téléphone : +33 6 12 34 56 78</p>
+                         <p>E-mail : jean.dupont@email.com</p>
                        </div>
                      </div>
                    </div>
 
                    {/* Tableau complet des articles - maintenant directement après le header */}
                    <div className="mt-6">
-                       <table className="w-full text-base bg-white rounded-xl overflow-hidden border-2 border-black">
-                         <thead>
-                            <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
-                              <th className="p-3 text-left font-medium border-r-2 border-white">Article</th>
-                              <th className="p-3 text-right font-medium border-r-2 border-white">Quantité</th>
-                              <th className="p-3 text-right font-medium border-r-2 border-white">Coût Unitaire</th>
-                              <th className="p-3 text-right font-medium border-r-2 border-white">Remise</th>
-                              <th className="p-3 text-right font-medium border-r-2 border-white">TVA</th>
-                              <th className="p-3 text-right font-medium">Total HT</th>
-                           </tr>
-                        </thead>
-                        <tbody>
-                           <tr>
-                              <td className="p-3 border-t-2 border-l-2 border-r-2 border-black">Réparation pare-chocs avant</td>
-                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">1</td>
-                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">350,00 €</td>
-                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">0%</td>
-                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">20%</td>
-                              <td className="p-3 text-right font-medium border-t-2 border-l-2 border-r-2 border-black">350,00 €</td>
-                            </tr>
-                            <tr>
-                              <td className="p-3 border-t-2 border-l-2 border-r-2 border-black">Peinture carrosserie</td>
-                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">1</td>
-                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">450,00 €</td>
-                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">0%</td>
-                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">20%</td>
-                              <td className="p-3 text-right font-medium border-t-2 border-l-2 border-r-2 border-black">450,00 €</td>
-                            </tr>
-                            <tr>
-                              <td className="p-3 border-t-2 border-l-2 border-r-2 border-black">Pièce détachée - Feu avant gauche</td>
-                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">1</td>
-                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">125,00 €</td>
-                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">5%</td>
-                              <td className="p-3 text-right border-t-2 border-l-2 border-r-2 border-black">20%</td>
-                              <td className="p-3 text-right font-medium border-t-2 border-l-2 border-r-2 border-black">118,75 €</td>
-                           </tr>
-                        </tbody>
+                     <table className="w-full text-base bg-white">
+                       <thead>
+                         <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
+                           <th className="p-3 text-left font-medium">Article</th>
+                           <th className="p-3 text-right font-medium">Quantité</th>
+                           <th className="p-3 text-right font-medium">Coût Unitaire</th>
+                           <th className="p-3 text-right font-medium">Remise</th>
+                           <th className="p-3 text-right font-medium">TVA</th>
+                           <th className="p-3 text-right font-medium">Total HT</th>
+                         </tr>
+                       </thead>
+                       <tbody>
+                         <tr>
+                           <td className="p-3">Réparation pare-chocs avant</td>
+                           <td className="p-3 text-right">1</td>
+                           <td className="p-3 text-right">350,00 €</td>
+                           <td className="p-3 text-right">0%</td>
+                           <td className="p-3 text-right">20%</td>
+                           <td className="p-3 text-right font-medium">350,00 €</td>
+                         </tr>
+                         <tr>
+                           <td className="p-3">Peinture carrosserie</td>
+                           <td className="p-3 text-right">1</td>
+                           <td className="p-3 text-right">450,00 €</td>
+                           <td className="p-3 text-right">0%</td>
+                           <td className="p-3 text-right">20%</td>
+                           <td className="p-3 text-right font-medium">450,00 €</td>
+                         </tr>
+                         <tr>
+                           <td className="p-3">Pièce détachée - Feu avant gauche</td>
+                           <td className="p-3 text-right">1</td>
+                           <td className="p-3 text-right">125,00 €</td>
+                           <td className="p-3 text-right">5%</td>
+                           <td className="p-3 text-right">20%</td>
+                           <td className="p-3 text-right font-medium">118,75 €</td>
+                         </tr>
+                       </tbody>
                      </table>
                      
                      {/* Totaux */}
@@ -424,134 +346,62 @@ const PreferencesTab = () => {
                  </div>
               ) : (
                 // Modèle alternatif
-                <div className="bg-white p-4 rounded shadow-sm h-full flex flex-col">
-                  {/* Header avec nom d'entreprise et FACTURE */}
-                  <div className="flex justify-between items-start mb-6">
-                    <div>
-                      <h1 className="text-2xl font-bold text-red-600 mb-2">{companyData.name || "Z's ISTRES"}</h1>
-                      <div className="text-sm space-y-0">
-                        <p className="m-0">{companyData.address || '75 ROUTE DE LA'}</p>
-                        <p className="m-0">{companyData.zipcode || '13800'} {companyData.city || 'ISTRES'}</p>
-                        <p className="m-0">Téléphone : {companyData.phone || '+33646252624'}</p>
-                        <p className="m-0">E-mail : {companyData.email || 'kenneford@mail.com'}</p>
-                        <p className="m-0">SIRET : {companyData.siret || '902 000 675955'}</p>
-                        <p className="m-0">N° TVA : {companyData.tva || 'FR902 000 675'}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <h1 className="text-3xl font-bold text-black mb-1">FACTURE N° 5</h1>
-                      
-                      {/* Informations client */}
-                      <div className="mb-6">
-                        <p className="font-bold">Demo user</p>
-                        <div className="text-sm space-y-0">
-                          <p className="m-0">11 rue juramy</p>
-                          <p className="m-0">13004 MARSEILLE</p>
-                          <p className="m-0">Téléphone : +33646464646</p>
-                          <p className="m-0">E-mail : demo@demo.com</p>
-                          <p className="m-0">Véhicule : Slio Biomm</p>
-                          <p className="m-0">Immatriculation : AZ-ER-RTY</p>
-                          <p className="m-0">Kilométrage : 500 Km</p>
-                        </div>
-                      </div>
+                <div className="bg-white p-4 rounded shadow-sm">
+                  <div className="text-center mb-4">
+                    <h1 className="text-2xl font-bold text-blue-800 mb-2">FACTURE</h1>
+                    <div className="bg-blue-100 p-3 rounded-lg">
+                      <p className="font-bold text-blue-800">KARROSSERIE</p>
+                      <p className="text-sm">123 Rue de l&apos;Automobile, 75001 Paris</p>
+                      <p className="text-sm">Tel: +33 1 23 45 67 89 | Email: contact@karrosserie.fr</p>
                     </div>
                   </div>
-
-                   {/* Dates encadrées */}
-                   <div className="flex justify-center gap-8 mb-6">
-                     <div className="border-2 border-black px-6 py-2 text-center rounded-xl">
-                       <p className="font-bold text-sm">DATE</p>
-                       <p className="text-sm">11/12/2024</p>
-                     </div>
-                     <div className="border-2 border-black px-6 py-2 text-center rounded-xl">
-                       <p className="font-bold text-sm">DATE D'ÉCHÉANCE</p>
-                       <p className="text-sm">11/12/2024</p>
-                     </div>
-                   </div>
-
-                   {/* Tableau */}
-                   <div className="mb-6 flex-1">
-                     <table className="w-full bg-white border-2 border-black text-sm rounded-xl overflow-hidden">
-                       <thead>
-                         <tr>
-                           <th className="border-2 border-black p-2 text-left font-bold border-r">Réf</th>
-                           <th className="border-2 border-black p-2 text-left font-bold border-r">Description</th>
-                           <th className="border-2 border-black p-2 text-center font-bold border-r">Quantité</th>
-                           <th className="border-2 border-black p-2 text-center font-bold border-r">Remise</th>
-                           <th className="border-2 border-black p-2 text-center font-bold border-r">Prix HT</th>
-                           <th className="border-2 border-black p-2 text-center font-bold border-r">TVA</th>
-                           <th className="border-2 border-black p-2 text-center font-bold border-r">Total HT</th>
-                           <th className="border-2 border-black p-2 text-center font-bold">Total TTC</th>
-                         </tr>
-                      </thead>
-                       <tbody>
-                         <tr>
-                            <td className="p-2 border-t-2 border-l-2 border-r-2 border-black">T1</td>
-                            <td className="p-2 border-t-2 border-l-2 border-r-2 border-black">Réparation pare-chocs</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">2</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">0%</td>
-                            <td className="p-2 text-center font-bold border-t-2 border-l-2 border-r-2 border-black">110,00€</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">20%</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">220,00€</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">264,00€</td>
-                          </tr>
-                          <tr>
-                            <td className="p-2 border-t-2 border-l-2 border-r-2 border-black">T2</td>
-                            <td className="p-2 border-t-2 border-l-2 border-r-2 border-black">Peinture</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">2</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">0%</td>
-                            <td className="p-2 text-center font-bold border-t-2 border-l-2 border-r-2 border-black">110,00€</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">20%</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">220,00€</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">264,00€</td>
-                          </tr>
-                          <tr>
-                            <td className="p-2 border-t-2 border-l-2 border-r-2 border-black">-</td>
-                            <td className="p-2 border-t-2 border-l-2 border-r-2 border-black">GRILLE DE PARE-CHOCS AV</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">1</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">5%</td>
-                            <td className="p-2 text-center font-bold border-t-2 border-l-2 border-r-2 border-black">95,00€</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">20%</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">90,25€</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">108,30€</td>
-                          </tr>
-                          <tr>
-                            <td className="p-2 border-t-2 border-l-2 border-r-2 border-black">-</td>
-                            <td className="p-2 border-t-2 border-l-2 border-r-2 border-black">CONDENSEUR DE CLIMATISATION MOTRIO</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">5</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">0%</td>
-                            <td className="p-2 text-center font-bold border-t-2 border-l-2 border-r-2 border-black">0,00€</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">20%</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">0,00€</td>
-                            <td className="p-2 text-center border-t-2 border-l-2 border-r-2 border-black">0,00€</td>
-                         </tr>
-                       </tbody>
-                    </table>
+                  
+                  <div className="grid grid-cols-2 gap-4 mb-4 text-xs">
+                    <div className="border border-blue-200 p-2 rounded">
+                      <h3 className="font-semibold text-blue-800 mb-2">Facturé à:</h3>
+                      <p className="font-medium">Jean Dupont</p>
+                      <p>456 Avenue de la République</p>
+                      <p>75011 Paris</p>
+                    </div>
+                    
+                    <div className="border border-blue-200 p-2 rounded">
+                      <h3 className="font-semibold text-blue-800 mb-2">Détails:</h3>
+                      <p>Facture N°: F-2024-001</p>
+                      <p>Date: 11/07/2025</p>
+                      <p>Véhicule: Peugeot 308 (AB-123-CD)</p>
+                    </div>
                   </div>
-
-                  {/* Totaux */}
-                  <div className="flex justify-center">
-                    <table className="border-2 border-black text-sm rounded-xl overflow-hidden">
-                      <tbody>
-                         <tr>
-                           <td className="p-2 bg-gray-100 font-bold border-r border-black">TOTAL HT</td>
-                           <td className="p-2 bg-gray-100 font-bold border-r border-black">TOTAL TVA</td>
-                           <td className="p-2 bg-gray-100 font-bold border-r border-black">Total Remise</td>
-                           <td className="p-2 bg-gray-100 font-bold">Total TTC</td>
-                         </tr>
-                         <tr>
-                           <td className="p-2 text-center border-r border-black">530,25€</td>
-                           <td className="p-2 text-center border-r border-black">106,05€</td>
-                           <td className="p-2 text-center border-r border-black">4,75€</td>
-                           <td className="p-2 text-center font-bold">636,30€</td>
-                         </tr>
-                      </tbody>
-                    </table>
+                  
+                  <div className="border border-blue-200 rounded mb-4">
+                    <div className="bg-blue-800 text-white p-2 rounded-t">
+                      <div className="grid grid-cols-4 gap-2 text-xs font-semibold">
+                        <span>Description</span>
+                        <span className="text-center">Quantité</span>
+                        <span className="text-center">Prix unitaire</span>
+                        <span className="text-right">Total</span>
+                      </div>
+                    </div>
+                    <div className="p-2">
+                      <div className="grid grid-cols-4 gap-2 text-xs py-1">
+                        <span>Réparation pare-chocs avant</span>
+                        <span className="text-center">1</span>
+                        <span className="text-center">350,00 €</span>
+                        <span className="text-right">350,00 €</span>
+                      </div>
+                      <div className="grid grid-cols-4 gap-2 text-xs py-1">
+                        <span>Peinture carrosserie</span>
+                        <span className="text-center">1</span>
+                        <span className="text-center">450,00 €</span>
+                        <span className="text-right">450,00 €</span>
+                      </div>
+                    </div>
                   </div>
-
-                  {/* Footer */}
-                  <div className="mt-auto pt-4 border-t text-xs text-blue-500 text-center">
-                    <p>SARL au capital de 9 000,00 - SIRET 90140277700014</p>
+                  
+                  <div className="flex justify-end">
+                    <div className="bg-blue-800 text-white p-3 rounded text-center">
+                      <p className="text-xs">TOTAL À PAYER</p>
+                      <p className="text-lg font-bold">960,00 €</p>
+                    </div>
                   </div>
                 </div>
               )}
@@ -561,12 +411,8 @@ const PreferencesTab = () => {
       </Card>
 
       <div className="flex justify-end">
-        <Button 
-          onClick={handleSavePreferences} 
-          disabled={loading}
-          className="bg-orange-500 hover:bg-orange-600 text-white"
-        >
-          {loading ? "Sauvegarde..." : "Sauvegarder les préférences"}
+        <Button onClick={handleSavePreferences}>
+          Sauvegarder les préférences
         </Button>
       </div>
     </div>

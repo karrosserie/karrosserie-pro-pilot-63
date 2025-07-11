@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          operationName?: string
+          query?: string
+          variables?: Json
+          extensions?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       bank_accounts: {
@@ -1221,48 +1246,6 @@ export type Database = {
           },
         ]
       }
-      user_preferences: {
-        Row: {
-          created_at: string
-          currency: string
-          id: string
-          invoice_template: string
-          language: string
-          show_client_signature: boolean
-          show_repair_order_details: boolean
-          show_zero_price_products: boolean
-          timezone: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          currency?: string
-          id?: string
-          invoice_template?: string
-          language?: string
-          show_client_signature?: boolean
-          show_repair_order_details?: boolean
-          show_zero_price_products?: boolean
-          timezone?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          currency?: string
-          id?: string
-          invoice_template?: string
-          language?: string
-          show_client_signature?: boolean
-          show_repair_order_details?: boolean
-          show_zero_price_products?: boolean
-          timezone?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       vehicles: {
         Row: {
           arrival_date: string | null
@@ -1519,6 +1502,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },
