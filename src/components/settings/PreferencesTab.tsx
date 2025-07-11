@@ -83,32 +83,82 @@ const PreferencesTab = () => {
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="animations">Animations</Label>
+              <Label htmlFor="show-repair-order">Afficher l'ordre de réparation sur vos ordres de réparation et factures</Label>
               <p className="text-sm text-muted-foreground">
-                Activer les animations dans l'interface
+                Inclure les détails de l'ordre de réparation sur les documents
               </p>
             </div>
-            <Switch id="animations" defaultChecked />
+            <Switch id="show-repair-order" defaultChecked />
           </div>
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="compact-mode">Mode compact</Label>
+              <Label htmlFor="client-signatures-invoices">Activer les signatures des clients sur les factures</Label>
               <p className="text-sm text-muted-foreground">
-                Réduire l'espacement pour afficher plus d'informations
+                Permettre aux clients de signer électroniquement les factures
               </p>
             </div>
-            <Switch id="compact-mode" />
+            <Switch id="client-signatures-invoices" />
           </div>
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="sidebar-auto-collapse">Réduction automatique de la barre latérale</Label>
+              <Label htmlFor="client-signatures-repair-orders">Activer les signatures des clients sur les ordres de réparation</Label>
               <p className="text-sm text-muted-foreground">
-                Réduire automatiquement la barre latérale sur les petits écrans
+                Permettre aux clients de signer électroniquement les ordres de réparation
               </p>
             </div>
-            <Switch id="sidebar-auto-collapse" defaultChecked />
+            <Switch id="client-signatures-repair-orders" />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="show-zero-price-products">Afficher les produits avec un prix unitaire zéro</Label>
+              <p className="text-sm text-muted-foreground">
+                Activez cette option pour inclure des produits avec un prix unitaire de zéro sur les ordres de réparation et les factures
+              </p>
+            </div>
+            <Switch id="show-zero-price-products" />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="date-based-reference">Activer le format de référence basé sur la date pour les ordres de réparation et les factures</Label>
+              <p className="text-sm text-muted-foreground">
+                Si cette option est activée, la référence inclura la date au format YYYY/MM/0000
+              </p>
+            </div>
+            <Switch id="date-based-reference" />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="show-payment-details">Souhaitez-vous afficher les détails des paiements effectués (liste des paiements) sur la facture ou l'avoir ?</Label>
+              <p className="text-sm text-muted-foreground">
+                Inclure la liste complète des paiements sur les documents
+              </p>
+            </div>
+            <Switch id="show-payment-details" defaultChecked />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="activities-homepage">Définir la page d'aperçu des activités comme page d'accueil</Label>
+              <p className="text-sm text-muted-foreground">
+                Utiliser la page d'activités comme page d'accueil par défaut
+              </p>
+            </div>
+            <Switch id="activities-homepage" />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="show-warning-text">Afficher le texte 'Avertissement' sur le ordre de réparation ou la facture</Label>
+              <p className="text-sm text-muted-foreground">
+                Activez cette option pour inclure un avertissement expliquant les limites du ordre de réparation. Si vous souhaitez adopter un ton plus souple, désactivez cette option
+              </p>
+            </div>
+            <Switch id="show-warning-text" defaultChecked />
           </div>
         </CardContent>
       </Card>
