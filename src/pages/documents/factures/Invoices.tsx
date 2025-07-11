@@ -32,8 +32,6 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Printer, Mail, Signature, CreditCard, FileX, Download } from 'lucide-react';
-import { pdf } from '@react-pdf/renderer';
-import { InvoicePDF } from '@/components/pdf/InvoiceViewer';
 
 const Invoices = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -137,81 +135,11 @@ const Invoices = () => {
     }
   };
 
-  const handleDownload = async (invoice: Invoice) => {
-    try {
-      const invoiceData = {
-        reference: invoice.reference || '',
-        date: formatDate(invoice.created_at),
-        due_date: formatDate(invoice.due_date),
-        vehicle: {
-          model: invoice.vehicles?.car_models?.name || 'Modèle inconnu',
-          brand: invoice.vehicles?.car_brands?.name || 'Marque inconnue',
-          license_plate: invoice.vehicles?.license_plate || '',
-          mileage: '0',
-          fuel_level: ''
-        },
-        company: {
-          name: "DEMO GEOFFREY MOYA",
-          address: "10 rue courteissade",
-          zipCode: "13320",
-          city: "Bouc bel air",
-          country: "France",
-          siren: "567890123",
-          siret: "56789012300013",
-          tva: "FR 567890123",
-          phone: "+33650363126",
-          email: "geoffrey.moya@gmail.com"
-        },
-        client: {
-          name: invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : '',
-          phone: '',
-          email: '',
-          address: '',
-          zipCode: '',
-          city: ''
-        },
-        articles: [
-          {
-            description: 'Facture de réparation',
-            quantity: '1',
-            discount: '0',
-            unitCost: ((invoice.amount || 0) / 1.2).toFixed(2),
-            vat: '20',
-            total: ((invoice.amount || 0) / 1.2).toFixed(2)
-          }
-        ],
-        receipts: [],
-        notes: invoice.notes || '',
-        amountHT: ((invoice.amount || 0) / 1.2).toFixed(2),
-        amountVat: ((invoice.amount || 0) * 0.2 / 1.2).toFixed(2),
-        amount: (invoice.amount || 0).toString(),
-        payment_method: 'espèces',
-        paidAmount: '0.00',
-        remainAmount: (invoice.amount || 0).toString()
-      };
-
-      const blob = await pdf(<InvoicePDF invoice={invoiceData} />).toBlob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Facture_${invoice.reference}_${formatDate(invoice.created_at)}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      toast({
-        title: "Téléchargement réussi",
-        description: `La facture ${invoice.reference} a été téléchargée.`
-      });
-    } catch (error) {
-      console.error('Erreur lors de la génération du PDF:', error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur s'est produite lors de la génération du PDF.",
-        variant: "destructive"
-      });
-    }
+  const handleDownload = (invoice: Invoice) => {
+    toast({
+      title: "Téléchargement",
+      description: `Téléchargement de la facture ${invoice.reference}...`
+    });
   };
 
   const handlePrint = (invoice: Invoice) => {

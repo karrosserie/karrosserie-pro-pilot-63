@@ -19,8 +19,6 @@ import { useToast } from '@/hooks/use-toast';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import QuoteEmailDialog from '@/components/quotes/QuoteEmailDialog';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
-import { pdf } from '@react-pdf/renderer';
-import { QuotePDF } from '@/components/pdf/QuoteViewer';
 import { Quote } from '@/services/supabase/quotes';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { StatusBadge } from '@/components/ui/status-badge';
@@ -153,118 +151,11 @@ const Quotes = () => {
     }
   }, [quotes, searchParams, setSearchParams]);
 
-  const handleDownload = async (quote: any) => {
-    try {
-      // Préparer les données pour le PDF comme dans QuoteViewer
-      let repairs = [];
-      let parts = [];
-      let discounts = [];
-
-      try {
-        repairs = quote.repairs_data ? JSON.parse(quote.repairs_data as string) : [];
-      } catch (e) {
-        console.error('Error parsing repairs data:', e);
-      }
-      
-      try {
-        parts = quote.parts_data ? JSON.parse(quote.parts_data as string) : [];
-      } catch (e) {
-        console.error('Error parsing parts data:', e);
-      }
-      
-      try {
-        discounts = quote.discounts_data ? JSON.parse(quote.discounts_data as string) : [];
-      } catch (e) {
-        console.error('Error parsing discounts data:', e);
-      }
-
-      const quoteData = {
-        reference: quote.reference || '',
-        date: new Date(quote.created_at).toLocaleDateString('fr-FR'),
-        company: {
-          name: "DEMO GEOFFREY MOYA",
-          address: "10 rue courteissade",
-          zipCode: "13320",
-          city: "Bouc bel air",
-          country: "France",
-          siren: "567890123",
-          siret: "56789012300013",
-          tva: "FR 567890123",
-          phone: "+33650363126",
-          email: "geoffrey.moya@gmail.com"
-        },
-        client: quote.clients ? {
-          nom: `${quote.clients.first_name} ${quote.clients.last_name}`,
-          telephone: quote.clients.phone || '',
-          email: quote.clients.email || '',
-          address: quote.clients.address || '',
-          zipCode: quote.clients.zip_code || '',
-          city: quote.clients.city || ''
-        } : {
-          nom: 'Client inconnu',
-          telephone: '',
-          email: '',
-          address: '',
-          zipCode: '',
-          city: ''
-        },
-        vehicle: quote.vehicles ? {
-          brand: quote.vehicles.car_brands?.name || 'Marque inconnue',
-          model: quote.vehicles.car_models?.name || 'Modèle inconnu',
-          license_plate: quote.vehicles.license_plate || '',
-          mileage: quote.vehicles.mileage?.toString() || ''
-        } : {
-          brand: 'Marque inconnue',
-          model: 'Modèle inconnu',
-          license_plate: '',
-          mileage: ''
-        },
-        articles: [
-          ...repairs.map((repair: any) => ({
-            description: repair.description || 'Réparation',
-            quantity: repair.quantity?.toString() || '1',
-            discount: repair.discount?.toString() || '0',
-            unitCost: repair.unitPrice?.toFixed(2) || '0.00',
-            vat: '20',
-            total: ((repair.unitPrice || 0) * (repair.quantity || 1)).toFixed(2)
-          })),
-          ...parts.map((part: any) => ({
-            description: part.description || 'Pièce',
-            quantity: part.quantity?.toString() || '1',
-            discount: part.discount?.toString() || '0',
-            unitCost: part.unitPrice?.toFixed(2) || '0.00',
-            vat: '20',
-            total: ((part.unitPrice || 0) * (part.quantity || 1)).toFixed(2)
-          }))
-        ],
-        notes: quote.notes || ''
-      };
-
-      // Générer le PDF
-      const blob = await pdf(<QuotePDF quoteData={quoteData} />).toBlob();
-      
-      // Créer le lien de téléchargement
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Devis_${quote.reference || 'SANS_REF'}_${new Date().toISOString().split('T')[0]}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      toast({
-        title: "Téléchargement réussi",
-        description: `Le devis ${quote.reference} a été téléchargé avec succès.`
-      });
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      toast({
-        title: "Erreur de téléchargement",
-        description: "Une erreur s'est produite lors de la génération du PDF.",
-        variant: "destructive"
-      });
-    }
+  const handleDownload = (quote: Quote) => {
+    toast({
+      title: "Téléchargement",
+      description: `Téléchargement du devis ${quote.reference}...`
+    });
   };
 
   const handlePrint = (quote: Quote) => {
