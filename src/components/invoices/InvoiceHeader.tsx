@@ -106,7 +106,7 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
           {/* Encadré Montant dû */}
           <div className="bg-blue-600 text-white p-4 rounded-lg text-center mt-4">
             <p className="text-sm mb-1">Montant dû</p>
-            <p className="text-2xl font-bold">{formatAmount(finalTotal)}</p>
+            <p className="text-2xl font-bold">{formatAmount(finalTotal - totalPaidAmount)}</p>
           </div>
         </div>
 
