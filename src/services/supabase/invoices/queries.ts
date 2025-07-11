@@ -19,6 +19,7 @@ export const invoiceQueries = {
         vehicles (
           id,
           license_plate,
+          mileage,
           car_brands(id, name),
           car_models(id, name)
         ),
@@ -67,6 +68,7 @@ export const invoiceQueries = {
               .select(`
                 id, 
                 license_plate,
+                mileage,
                 car_brands(id, name),
                 car_models(id, name)
               `)
@@ -121,6 +123,7 @@ export const invoiceQueries = {
         vehicles (
           id,
           license_plate,
+          mileage,
           car_brands(id, name),
           car_models(id, name)
         ),

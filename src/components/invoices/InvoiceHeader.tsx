@@ -3,6 +3,7 @@ import { Invoice } from '@/services/supabase/invoices';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { formatAmount } from '@/utils/invoiceCalculations';
+import { useCredits } from '@/hooks/use-credits';
 
 interface InvoiceHeaderProps {
   invoice: Invoice;
@@ -11,6 +12,13 @@ interface InvoiceHeaderProps {
 }
 
 const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps) => {
+  const { credits } = useCredits();
+  
+  // Calculer le total des encaissements pour cette facture
+  const totalPaidAmount = credits
+    ?.filter(credit => credit.invoice_id === invoice.id)
+    ?.reduce((total, credit) => total + (credit.amount || 0), 0) || 0;
+
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
     try {
@@ -86,10 +94,10 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
                 <span className="text-right">{invoice.vehicles.mileage} km</span>
               </div>
             )}
-            {invoice.paid_amount != null && invoice.paid_amount > 0 && (
+            {totalPaidAmount > 0 && (
               <div className="flex justify-between">
                 <span className="font-medium">Montant payé</span>
-                <span className="text-right">{formatAmount(invoice.paid_amount)}</span>
+                <span className="text-right">{formatAmount(totalPaidAmount)}</span>
               </div>
             )}
           </div>
