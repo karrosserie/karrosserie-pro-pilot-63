@@ -57,8 +57,8 @@ export const ImageCropperCanvas: React.FC<ImageCropperCanvasProps> = ({
                 transform: `scale(${zoom}) rotate(${rotation}deg)`,
                 transformOrigin: 'center center',
                 transition: 'transform 0.2s ease-in-out',
-                maxWidth: `${100 / zoom}%`,
-                maxHeight: `${100 / zoom}%`,
+                maxWidth: '80%',
+                maxHeight: '80%',
                 width: 'auto',
                 height: 'auto'
               }}
