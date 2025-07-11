@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useQuotes } from '@/hooks/use-quotes';
 import { SimpleTable } from '@/components/ui/simple-table';
-import { FileText, Eye, Pencil, Trash, MoreVertical, FileImage } from 'lucide-react';
+import { FileText, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
@@ -17,7 +17,6 @@ import { Download, Printer, Mail, FileCheck, ArrowRight } from 'lucide-react';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import QuoteEmailDialog from '@/components/quotes/QuoteEmailDialog';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
-import QuoteViewerDialog from '@/components/quotes/QuoteViewerDialog';
 import { Quote } from '@/services/supabase/quotes';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { useToast } from '@/hooks/use-toast';
@@ -34,10 +33,8 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [repairOrderDialogOpen, setRepairOrderDialogOpen] = useState(false);
-  const [viewerDialogOpen, setViewerDialogOpen] = useState(false);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [selectedQuoteForEmail, setSelectedQuoteForEmail] = useState<Quote | null>(null);
-  const [selectedQuoteForViewer, setSelectedQuoteForViewer] = useState<Quote | null>(null);
   const [prefilledRepairOrder, setPrefilledRepairOrder] = useState<Partial<RepairOrder> | null>(null);
 
   if (isLoading) {
@@ -102,11 +99,6 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
       title: "Demande de justificatifs",
       description: `Demande de justificatifs envoyée pour le devis ${quote.reference}`
     });
-  };
-
-  const handleViewPDF = (quote: Quote) => {
-    setSelectedQuoteForViewer(quote);
-    setViewerDialogOpen(true);
   };
 
   const handleConvertToRepairOrder = (quote: Quote) => {
@@ -221,17 +213,6 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
               size="icon"
               onClick={(e) => {
                 e.stopPropagation();
-                handleViewPDF(quote);
-              }}
-              title="Visualiser le PDF"
-            >
-              <FileImage className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
                 handleView(quote);
               }}
               title="Voir les détails"
@@ -335,12 +316,6 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
             setPrefilledRepairOrder(null);
           }
         }}
-      />
-
-      <QuoteViewerDialog
-        quote={selectedQuoteForViewer}
-        open={viewerDialogOpen}
-        onOpenChange={setViewerDialogOpen}
       />
     </>
   );
