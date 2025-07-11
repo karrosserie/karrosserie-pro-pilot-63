@@ -44,6 +44,8 @@ const styles = StyleSheet.create({
   logo: {
     maxWidth: 120,
     height: 'auto',
+    marginTop: 10,
+    marginBottom: 10,
   },
   companyInfo: {
     fontSize: 9,
