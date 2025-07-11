@@ -46,11 +46,19 @@ export const useImageCropper = (imageUrl: string, onCropComplete: (blob: Blob) =
     console.log('Current zoom:', zoom);
     console.log('Current rotation:', rotation);
 
-    const scaleX = image.naturalWidth / (image.width * zoom);
-    const scaleY = image.naturalHeight / (image.height * zoom);
+    // Calcul correct des ratios d'échelle en tenant compte du zoom
+    // Le zoom augmente la taille affichée, donc on doit diviser par le zoom pour retrouver la taille de base
+    const baseDisplayedWidth = image.width;
+    const baseDisplayedHeight = image.height;
     
-    console.log('Scale ratios with zoom:', { scaleX, scaleY });
+    // Ratio entre la taille naturelle et la taille affichée de base (sans zoom)
+    const scaleX = image.naturalWidth / baseDisplayedWidth;
+    const scaleY = image.naturalHeight / baseDisplayedHeight;
+    
+    console.log('Scale ratios (natural/displayed):', { scaleX, scaleY });
 
+    // Les coordonnées de crop sont basées sur l'image zoomée affichée
+    // On doit les convertir vers les coordonnées naturelles
     const naturalCropX = completedCrop.x * scaleX;
     const naturalCropY = completedCrop.y * scaleY;
     const naturalCropWidth = completedCrop.width * scaleX;
