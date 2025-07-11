@@ -74,7 +74,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
                       <span className="text-white font-bold text-xl">KR</span>
                     </div>
                   )}
-                  <p className="text-gray-600 mt-2">{companyData.name || 'KARROSSERIE'}</p>
+                  <p className="text-gray-600 font-bold">{companyData.name || 'KARROSSERIE'}</p>
                   <div className="text-sm text-gray-600 mt-2">
                     <p>{companyData.address || 'Votre adresse'}</p>
                     <p>Téléphone : {companyData.phone || '+33 1 23 45 67 89'}</p>
