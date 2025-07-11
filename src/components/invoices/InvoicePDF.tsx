@@ -15,7 +15,7 @@ interface InvoicePDFProps {
 const styles = StyleSheet.create({
   page: {
     fontFamily: 'Helvetica',
-    fontSize: 10,
+    fontSize: 8,
     paddingTop: 30,
     paddingBottom: 60,
     paddingHorizontal: 30,
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   title: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: 'bold',
     color: 'white',
     backgroundColor: '#404348',
@@ -50,17 +50,17 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   companyInfo: {
-    fontSize: 9,
+    fontSize: 7,
     lineHeight: 1.4,
     marginBottom: 8,
   },
   companyName: {
-    fontSize: 10,
+    fontSize: 8,
     fontWeight: 'bold',
     marginBottom: 4,
   },
   sectionTitle: {
-    fontSize: 12,
+    fontSize: 9,
     fontWeight: 'bold',
     marginBottom: 8,
     color: '#404348',
@@ -69,14 +69,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 2,
-    fontSize: 9,
+    fontSize: 7,
   },
   detailLabel: {
     fontWeight: 'bold',
-    fontSize: 9,
+    fontSize: 7,
   },
   detailValue: {
-    fontSize: 9,
+    fontSize: 7,
     textAlign: 'right',
   },
   table: {
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   },
   tableHeaderText: {
     color: 'white',
-    fontSize: 9,
+    fontSize: 7,
     fontWeight: 'bold',
   },
   tableRow: {
@@ -98,10 +98,10 @@ const styles = StyleSheet.create({
     padding: 6
   },
   tableCell: {
-    fontSize: 9,
+    fontSize: 7,
   },
   tableCellRight: {
-    fontSize: 9,
+    fontSize: 7,
     textAlign: 'right',
   },
   totalsSection: {
@@ -116,13 +116,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 4,
-    fontSize: 9,
+    fontSize: 7,
   },
   totalRowBold: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 4,
-    fontSize: 9,
+    fontSize: 7,
     fontWeight: 'bold',
   },
   finalTotal: {
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     fontWeight: 'bold',
-    fontSize: 10,
+    fontSize: 8,
   },
   amountDue: {
     backgroundColor: '#2563eb',
@@ -142,11 +142,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   amountDueText: {
-    fontSize: 9,
+    fontSize: 7,
     marginBottom: 2,
   },
   amountDueValue: {
-    fontSize: 14,
+    fontSize: 10,
     fontWeight: 'bold',
   },
   footer: {
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     left: 30,
     right: 30,
     textAlign: 'center',
-    fontSize: 7,
+    fontSize: 5,
     color: '#666',
     paddingTop: 8,
     borderTopWidth: 1,
