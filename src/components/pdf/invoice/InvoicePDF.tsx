@@ -6,7 +6,9 @@ interface InvoicePDFProps {
   invoice: any;
 }
 
-export const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => (
+export const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => {
+  console.log('🔥 NOUVEAU PDF TEMPLATE CHARGÉ - Version 2024', invoice);
+  return (
   <Document>
     <Page size="A4" style={invoiceStyles.page}>
       {/* Dark header bar */}
@@ -137,4 +139,5 @@ export const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice }) => (
       </View>
     </Page>
   </Document>
-);
+  );
+};
