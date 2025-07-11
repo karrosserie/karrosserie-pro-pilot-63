@@ -366,28 +366,28 @@ const PreferencesTab = () => {
                         </thead>
                         <tbody>
                           <tr>
-                             <td className="p-3 border-r-2 border-white">Réparation pare-chocs avant</td>
-                             <td className="p-3 text-right border-r-2 border-white">1</td>
-                             <td className="p-3 text-right border-r-2 border-white">350,00 €</td>
-                             <td className="p-3 text-right border-r-2 border-white">0%</td>
-                             <td className="p-3 text-right border-r-2 border-white">20%</td>
-                             <td className="p-3 text-right font-medium">350,00 €</td>
+                             <td className="p-3 border-2 border-r-2 border-white">Réparation pare-chocs avant</td>
+                             <td className="p-3 text-right border-2 border-r-2 border-white">1</td>
+                             <td className="p-3 text-right border-2 border-r-2 border-white">350,00 €</td>
+                             <td className="p-3 text-right border-2 border-r-2 border-white">0%</td>
+                             <td className="p-3 text-right border-2 border-r-2 border-white">20%</td>
+                             <td className="p-3 text-right font-medium border-2">350,00 €</td>
                            </tr>
                            <tr>
-                             <td className="p-3 border-r-2 border-white">Peinture carrosserie</td>
-                             <td className="p-3 text-right border-r-2 border-white">1</td>
-                             <td className="p-3 text-right border-r-2 border-white">450,00 €</td>
-                             <td className="p-3 text-right border-r-2 border-white">0%</td>
-                             <td className="p-3 text-right border-r-2 border-white">20%</td>
-                             <td className="p-3 text-right font-medium">450,00 €</td>
+                             <td className="p-3 border-2 border-r-2 border-white">Peinture carrosserie</td>
+                             <td className="p-3 text-right border-2 border-r-2 border-white">1</td>
+                             <td className="p-3 text-right border-2 border-r-2 border-white">450,00 €</td>
+                             <td className="p-3 text-right border-2 border-r-2 border-white">0%</td>
+                             <td className="p-3 text-right border-2 border-r-2 border-white">20%</td>
+                             <td className="p-3 text-right font-medium border-2">450,00 €</td>
                            </tr>
                            <tr>
-                             <td className="p-3 border-r-2 border-white">Pièce détachée - Feu avant gauche</td>
-                             <td className="p-3 text-right border-r-2 border-white">1</td>
-                             <td className="p-3 text-right border-r-2 border-white">125,00 €</td>
-                             <td className="p-3 text-right border-r-2 border-white">5%</td>
-                             <td className="p-3 text-right border-r-2 border-white">20%</td>
-                             <td className="p-3 text-right font-medium">118,75 €</td>
+                             <td className="p-3 border-2 border-r-2 border-white">Pièce détachée - Feu avant gauche</td>
+                             <td className="p-3 text-right border-2 border-r-2 border-white">1</td>
+                             <td className="p-3 text-right border-2 border-r-2 border-white">125,00 €</td>
+                             <td className="p-3 text-right border-2 border-r-2 border-white">5%</td>
+                             <td className="p-3 text-right border-2 border-r-2 border-white">20%</td>
+                             <td className="p-3 text-right font-medium border-2">118,75 €</td>
                           </tr>
                         </tbody>
                      </table>
@@ -486,44 +486,44 @@ const PreferencesTab = () => {
                       </thead>
                        <tbody>
                          <tr>
-                           <td className="p-2 border-r border-black">T1</td>
-                           <td className="p-2 border-r border-black">Réparation pare-chocs</td>
-                           <td className="p-2 text-center border-r border-black">2</td>
-                           <td className="p-2 text-center border-r border-black">0%</td>
-                           <td className="p-2 text-center font-bold border-r border-black">110,00€</td>
-                           <td className="p-2 text-center border-r border-black">20%</td>
-                           <td className="p-2 text-center border-r border-black">220,00€</td>
-                           <td className="p-2 text-center">264,00€</td>
-                         </tr>
-                         <tr>
-                           <td className="p-2 border-r border-black">T2</td>
-                           <td className="p-2 border-r border-black">Peinture</td>
-                           <td className="p-2 text-center border-r border-black">2</td>
-                           <td className="p-2 text-center border-r border-black">0%</td>
-                           <td className="p-2 text-center font-bold border-r border-black">110,00€</td>
-                           <td className="p-2 text-center border-r border-black">20%</td>
-                           <td className="p-2 text-center border-r border-black">220,00€</td>
-                           <td className="p-2 text-center">264,00€</td>
-                         </tr>
-                         <tr>
-                           <td className="p-2 border-r border-black">-</td>
-                           <td className="p-2 border-r border-black">GRILLE DE PARE-CHOCS AV</td>
-                           <td className="p-2 text-center border-r border-black">1</td>
-                           <td className="p-2 text-center border-r border-black">5%</td>
-                           <td className="p-2 text-center font-bold border-r border-black">95,00€</td>
-                           <td className="p-2 text-center border-r border-black">20%</td>
-                           <td className="p-2 text-center border-r border-black">90,25€</td>
-                           <td className="p-2 text-center">108,30€</td>
-                         </tr>
-                         <tr>
-                           <td className="p-2 border-r border-black">-</td>
-                           <td className="p-2 border-r border-black">CONDENSEUR DE CLIMATISATION MOTRIO</td>
-                           <td className="p-2 text-center border-r border-black">5</td>
-                           <td className="p-2 text-center border-r border-black">0%</td>
-                           <td className="p-2 text-center font-bold border-r border-black">0,00€</td>
-                           <td className="p-2 text-center border-r border-black">20%</td>
-                           <td className="p-2 text-center border-r border-black">0,00€</td>
-                           <td className="p-2 text-center">0,00€</td>
+                            <td className="p-2 border-2 border-r border-black">T1</td>
+                            <td className="p-2 border-2 border-r border-black">Réparation pare-chocs</td>
+                            <td className="p-2 text-center border-2 border-r border-black">2</td>
+                            <td className="p-2 text-center border-2 border-r border-black">0%</td>
+                            <td className="p-2 text-center font-bold border-2 border-r border-black">110,00€</td>
+                            <td className="p-2 text-center border-2 border-r border-black">20%</td>
+                            <td className="p-2 text-center border-2 border-r border-black">220,00€</td>
+                            <td className="p-2 text-center border-2">264,00€</td>
+                          </tr>
+                          <tr>
+                            <td className="p-2 border-2 border-r border-black">T2</td>
+                            <td className="p-2 border-2 border-r border-black">Peinture</td>
+                            <td className="p-2 text-center border-2 border-r border-black">2</td>
+                            <td className="p-2 text-center border-2 border-r border-black">0%</td>
+                            <td className="p-2 text-center font-bold border-2 border-r border-black">110,00€</td>
+                            <td className="p-2 text-center border-2 border-r border-black">20%</td>
+                            <td className="p-2 text-center border-2 border-r border-black">220,00€</td>
+                            <td className="p-2 text-center border-2">264,00€</td>
+                          </tr>
+                          <tr>
+                            <td className="p-2 border-2 border-r border-black">-</td>
+                            <td className="p-2 border-2 border-r border-black">GRILLE DE PARE-CHOCS AV</td>
+                            <td className="p-2 text-center border-2 border-r border-black">1</td>
+                            <td className="p-2 text-center border-2 border-r border-black">5%</td>
+                            <td className="p-2 text-center font-bold border-2 border-r border-black">95,00€</td>
+                            <td className="p-2 text-center border-2 border-r border-black">20%</td>
+                            <td className="p-2 text-center border-2 border-r border-black">90,25€</td>
+                            <td className="p-2 text-center border-2">108,30€</td>
+                          </tr>
+                          <tr>
+                            <td className="p-2 border-2 border-r border-black">-</td>
+                            <td className="p-2 border-2 border-r border-black">CONDENSEUR DE CLIMATISATION MOTRIO</td>
+                            <td className="p-2 text-center border-2 border-r border-black">5</td>
+                            <td className="p-2 text-center border-2 border-r border-black">0%</td>
+                            <td className="p-2 text-center font-bold border-2 border-r border-black">0,00€</td>
+                            <td className="p-2 text-center border-2 border-r border-black">20%</td>
+                            <td className="p-2 text-center border-2 border-r border-black">0,00€</td>
+                            <td className="p-2 text-center border-2">0,00€</td>
                          </tr>
                        </tbody>
                     </table>
