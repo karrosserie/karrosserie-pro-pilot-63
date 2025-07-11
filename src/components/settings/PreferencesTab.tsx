@@ -353,40 +353,40 @@ const PreferencesTab = () => {
 
                    {/* Tableau complet des articles - maintenant directement après le header */}
                    <div className="mt-6">
-                      <table className="w-full text-base bg-white rounded-xl overflow-hidden">
-                        <thead>
-                           <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
-                             <th className="p-3 text-left font-medium border-r border-white">Article</th>
-                             <th className="p-3 text-right font-medium border-r border-white">Quantité</th>
-                             <th className="p-3 text-right font-medium border-r border-white">Coût Unitaire</th>
-                             <th className="p-3 text-right font-medium border-r border-white">Remise</th>
-                             <th className="p-3 text-right font-medium border-r border-white">TVA</th>
-                             <th className="p-3 text-right font-medium">Total HT</th>
+                       <table className="w-full text-base bg-white rounded-xl overflow-hidden border-2 border-black">
+                         <thead>
+                            <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
+                              <th className="p-3 text-left font-medium border-r-2 border-white">Article</th>
+                              <th className="p-3 text-right font-medium border-r-2 border-white">Quantité</th>
+                              <th className="p-3 text-right font-medium border-r-2 border-white">Coût Unitaire</th>
+                              <th className="p-3 text-right font-medium border-r-2 border-white">Remise</th>
+                              <th className="p-3 text-right font-medium border-r-2 border-white">TVA</th>
+                              <th className="p-3 text-right font-medium">Total HT</th>
                            </tr>
                         </thead>
                         <tbody>
                           <tr>
-                             <td className="p-3 border-r border-white">Réparation pare-chocs avant</td>
-                             <td className="p-3 text-right border-r border-white">1</td>
-                             <td className="p-3 text-right border-r border-white">350,00 €</td>
-                             <td className="p-3 text-right border-r border-white">0%</td>
-                             <td className="p-3 text-right border-r border-white">20%</td>
-                            <td className="p-3 text-right font-medium">350,00 €</td>
-                          </tr>
-                          <tr>
-                             <td className="p-3 border-r border-white">Peinture carrosserie</td>
-                             <td className="p-3 text-right border-r border-white">1</td>
-                             <td className="p-3 text-right border-r border-white">450,00 €</td>
-                             <td className="p-3 text-right border-r border-white">0%</td>
-                             <td className="p-3 text-right border-r border-white">20%</td>
+                             <td className="p-3 border-r-2 border-white">Réparation pare-chocs avant</td>
+                             <td className="p-3 text-right border-r-2 border-white">1</td>
+                             <td className="p-3 text-right border-r-2 border-white">350,00 €</td>
+                             <td className="p-3 text-right border-r-2 border-white">0%</td>
+                             <td className="p-3 text-right border-r-2 border-white">20%</td>
+                             <td className="p-3 text-right font-medium">350,00 €</td>
+                           </tr>
+                           <tr>
+                             <td className="p-3 border-r-2 border-white">Peinture carrosserie</td>
+                             <td className="p-3 text-right border-r-2 border-white">1</td>
+                             <td className="p-3 text-right border-r-2 border-white">450,00 €</td>
+                             <td className="p-3 text-right border-r-2 border-white">0%</td>
+                             <td className="p-3 text-right border-r-2 border-white">20%</td>
                              <td className="p-3 text-right font-medium">450,00 €</td>
                            </tr>
                            <tr>
-                             <td className="p-3 border-r border-white">Pièce détachée - Feu avant gauche</td>
-                             <td className="p-3 text-right border-r border-white">1</td>
-                             <td className="p-3 text-right border-r border-white">125,00 €</td>
-                             <td className="p-3 text-right border-r border-white">5%</td>
-                             <td className="p-3 text-right border-r border-white">20%</td>
+                             <td className="p-3 border-r-2 border-white">Pièce détachée - Feu avant gauche</td>
+                             <td className="p-3 text-right border-r-2 border-white">1</td>
+                             <td className="p-3 text-right border-r-2 border-white">125,00 €</td>
+                             <td className="p-3 text-right border-r-2 border-white">5%</td>
+                             <td className="p-3 text-right border-r-2 border-white">20%</td>
                              <td className="p-3 text-right font-medium">118,75 €</td>
                           </tr>
                         </tbody>
