@@ -27,9 +27,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     marginBottom: 15,
-    paddingBottom: 15,
-    borderBottomWidth: 0,
-    borderBottomColor: '#404348',
+    paddingBottom: 15
   },
   headerColumn: {
     flex: 1,
@@ -96,8 +94,6 @@ const styles = StyleSheet.create({
   tableRow: {
     flexDirection: 'row',
     padding: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
   },
   tableCell: {
     fontSize: 9,
