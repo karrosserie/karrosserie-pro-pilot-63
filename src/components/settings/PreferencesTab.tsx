@@ -474,13 +474,13 @@ const PreferencesTab = () => {
                      <table className="w-full bg-white border-2 border-black text-sm rounded-xl overflow-hidden">
                        <thead>
                          <tr>
-                           <th className="border border-black p-2 text-left font-bold border-r">Réf</th>
-                           <th className="border border-black p-2 text-left font-bold border-r">Description</th>
-                           <th className="border border-black p-2 text-center font-bold border-r">Quantité</th>
-                           <th className="border border-black p-2 text-center font-bold border-r">Remise</th>
-                           <th className="border border-black p-2 text-center font-bold border-r">Prix HT</th>
-                           <th className="border border-black p-2 text-center font-bold border-r">TVA</th>
-                           <th className="border border-black p-2 text-center font-bold border-r">Total HT</th>
+                           <th className="border-2 border-black p-2 text-left font-bold border-r">Réf</th>
+                           <th className="border-2 border-black p-2 text-left font-bold border-r">Description</th>
+                           <th className="border-2 border-black p-2 text-center font-bold border-r">Quantité</th>
+                           <th className="border-2 border-black p-2 text-center font-bold border-r">Remise</th>
+                           <th className="border-2 border-black p-2 text-center font-bold border-r">Prix HT</th>
+                           <th className="border-2 border-black p-2 text-center font-bold border-r">TVA</th>
+                           <th className="border-2 border-black p-2 text-center font-bold border-r">Total HT</th>
                            <th className="border border-black p-2 text-center font-bold">Total TTC</th>
                          </tr>
                       </thead>
