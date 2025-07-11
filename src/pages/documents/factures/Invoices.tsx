@@ -34,6 +34,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Printer, Mail, Signature, CreditCard, FileX, Download } from 'lucide-react';
+import { generateInvoicePDF } from '@/utils/pdfGenerator';
 
 const Invoices = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -151,7 +152,6 @@ const Invoices = () => {
         description: "Génération du PDF en cours..."
       });
 
-      const { generateInvoicePDF } = await import('@/utils/pdfGenerator');
       const result = await generateInvoicePDF(invoice, companyData, credits);
       
       if (result.success) {
