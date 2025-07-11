@@ -80,13 +80,13 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
               <span className="font-medium">Immatriculation</span>
               <span className="text-right">{invoice.vehicles?.license_plate || 'N/A'}</span>
             </div>
-            {invoice.vehicles?.mileage && (
+            {invoice.vehicles?.mileage != null && (
               <div className="flex justify-between">
                 <span className="font-medium">Kilométrage</span>
                 <span className="text-right">{invoice.vehicles.mileage} km</span>
               </div>
             )}
-            {invoice.paid_amount && invoice.paid_amount > 0 && (
+            {invoice.paid_amount != null && invoice.paid_amount > 0 && (
               <div className="flex justify-between">
                 <span className="font-medium">Montant payé</span>
                 <span className="text-right">{formatAmount(invoice.paid_amount)}</span>
