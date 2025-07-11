@@ -8,7 +8,7 @@ interface InvoiceItemsTableProps {
 const InvoiceItemsTable = ({ items }: InvoiceItemsTableProps) => {
   return (
     <div className="mb-6">
-      <table className="w-full bg-white" style={{ borderBottom: '2px solid rgba(64,67,72,255)' }}>
+      <table className="w-full bg-white">
         <thead>
           <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
             <th className="p-3 text-left text-sm font-medium">Article</th>

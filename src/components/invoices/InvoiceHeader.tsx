@@ -29,7 +29,7 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
   };
 
   return (
-    <div className="p-6 border-b">
+    <div className="p-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Colonne 1 - Informations entreprise */}
         <div>

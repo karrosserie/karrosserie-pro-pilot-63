@@ -28,7 +28,7 @@ const InvoicePaymentsTable = ({ invoiceId, invoiceTotal }: InvoicePaymentsTableP
   return (
     <div className="mt-6 mb-6">
       <h3 className="text-lg font-semibold mb-4 text-gray-800">Liste des paiements</h3>
-      <table className="w-full bg-white" style={{ borderBottom: '2px solid rgba(64,67,72,255)' }}>
+      <table className="w-full bg-white">
         <thead>
           <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
             <th className="p-3 text-left text-sm font-medium">Date</th>
