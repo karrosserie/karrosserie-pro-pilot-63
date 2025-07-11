@@ -22,22 +22,22 @@ const InvoicePaymentsTable = ({ invoiceId }: InvoicePaymentsTableProps) => {
   return (
     <div className="mt-6 mb-6">
       <h3 className="text-lg font-semibold mb-4 text-gray-800">Encaissements</h3>
-      <table className="w-full border-collapse border border-gray-300">
+      <table className="w-full bg-white">
         <thead>
           <tr className="bg-gray-100">
-            <th className="border border-gray-300 p-3 text-left text-sm font-medium">Date</th>
-            <th className="border border-gray-300 p-3 text-left text-sm font-medium">Mode de paiement</th>
-            <th className="border border-gray-300 p-3 text-right text-sm font-medium">Montant</th>
+            <th className="p-3 text-left text-sm font-medium">Date</th>
+            <th className="p-3 text-left text-sm font-medium">Mode de paiement</th>
+            <th className="p-3 text-right text-sm font-medium">Montant</th>
           </tr>
         </thead>
         <tbody>
           {invoicePayments.map((payment, index) => (
             <tr key={payment.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-              <td className="border border-gray-300 p-3 text-sm">
+              <td className="p-3 text-sm">
                 {payment.created_at ? format(new Date(payment.created_at), 'dd/MM/yyyy', { locale: fr }) : '-'}
               </td>
-              <td className="border border-gray-300 p-3 text-sm">{payment.payment_method || '-'}</td>
-              <td className="border border-gray-300 p-3 text-sm text-right font-medium">
+              <td className="p-3 text-sm">{payment.payment_method || '-'}</td>
+              <td className="p-3 text-sm text-right font-medium">
                 {formatAmount(payment.amount || 0)}
               </td>
             </tr>
@@ -45,10 +45,10 @@ const InvoicePaymentsTable = ({ invoiceId }: InvoicePaymentsTableProps) => {
         </tbody>
         <tfoot>
           <tr className="bg-gray-100 font-medium">
-            <td colSpan={2} className="border border-gray-300 p-3 text-sm text-right">
+            <td colSpan={2} className="p-3 text-sm text-right">
               Total encaissé :
             </td>
-            <td className="border border-gray-300 p-3 text-sm text-right font-bold">
+            <td className="p-3 text-sm text-right font-bold">
               {formatAmount(invoicePayments.reduce((total, payment) => total + (payment.amount || 0), 0))}
             </td>
           </tr>
