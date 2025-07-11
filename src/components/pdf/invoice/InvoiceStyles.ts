@@ -8,183 +8,209 @@ export const invoiceStyles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'Helvetica'
   },
-  headerSection: {
-    backgroundColor: '#4a4a4a',
+  
+  // Header section with dark background
+  headerBar: {
+    backgroundColor: '#4a5568',
+    paddingVertical: 12,
+    paddingHorizontal: 20
+  },
+  headerTitle: {
     color: 'white',
-    padding: 15,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
+    fontSize: 24,
+    fontWeight: 'bold'
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: 'white'
-  },
-  mainContent: {
+  
+  // Main content area
+  contentArea: {
     padding: 20
   },
+  
+  // Top section with company and invoice details
   topSection: {
     flexDirection: 'row',
-    marginBottom: 20
+    marginBottom: 25
   },
-  leftInfo: {
-    flex: 1,
+  
+  // Left side - Company info
+  leftPanel: {
+    width: '40%',
     paddingRight: 20
   },
-  rightInfo: {
-    flex: 1,
-    paddingLeft: 20
+  companyLogo: {
+    width: 60,
+    height: 60,
+    backgroundColor: '#2d3748',
+    borderRadius: 30,
+    marginBottom: 15,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   companyName: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333'
+    color: '#2d3748',
+    marginBottom: 5
   },
   companyDetails: {
     fontSize: 9,
-    marginBottom: 2,
-    color: '#666'
+    color: '#4a5568',
+    marginBottom: 2
   },
-  sectionTitle: {
+  
+  // Right side panels
+  rightPanel: {
+    width: '60%',
+    paddingLeft: 20
+  },
+  
+  // Details section
+  detailsSection: {
+    backgroundColor: '#f7fafc',
+    padding: 15,
+    marginBottom: 15,
+    border: '1px solid #e2e8f0'
+  },
+  detailsTitle: {
     fontSize: 12,
     fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#333'
+    color: '#2d3748',
+    marginBottom: 10
   },
   detailRow: {
     flexDirection: 'row',
     marginBottom: 4
   },
-  label: {
-    width: 80,
+  detailLabel: {
+    width: 90,
     fontSize: 9,
-    color: '#666'
+    color: '#4a5568'
   },
-  value: {
+  detailValue: {
     flex: 1,
     fontSize: 9,
-    color: '#333'
+    color: '#2d3748',
+    fontWeight: 'bold'
   },
+  
+  // Client section
   clientSection: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f7fafc',
     padding: 15,
-    marginBottom: 20,
-    border: '1px solid #e9ecef'
+    border: '1px solid #e2e8f0'
   },
   clientTitle: {
     fontSize: 12,
     fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#333'
+    color: '#2d3748',
+    marginBottom: 8
   },
-  amountDueSection: {
-    backgroundColor: '#007bff',
-    color: 'white',
-    padding: 15,
-    marginBottom: 20,
-    textAlign: 'center'
+  clientInfo: {
+    fontSize: 9,
+    color: '#2d3748',
+    marginBottom: 2
+  },
+  
+  // Amount due section - big blue box
+  amountDueContainer: {
+    backgroundColor: '#3182ce',
+    padding: 20,
+    marginVertical: 25,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   amountDueLabel: {
-    fontSize: 12,
+    color: 'white',
+    fontSize: 14,
     marginBottom: 5
   },
   amountDueValue: {
-    fontSize: 24,
+    color: 'white',
+    fontSize: 28,
     fontWeight: 'bold'
   },
-  table: {
+  
+  // Table styles
+  tableContainer: {
+    border: '1px solid #e2e8f0',
     marginBottom: 20
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#6c757d',
+    backgroundColor: '#4a5568',
+    paddingVertical: 10,
+    paddingHorizontal: 8
+  },
+  tableHeaderText: {
     color: 'white',
-    padding: 8,
     fontSize: 10,
     fontWeight: 'bold'
   },
   tableRow: {
     flexDirection: 'row',
-    padding: 8,
-    borderBottom: '1px solid #dee2e6',
-    fontSize: 9
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    borderBottom: '1px solid #e2e8f0'
   },
   tableRowEven: {
-    backgroundColor: '#f8f9fa'
+    backgroundColor: '#f7fafc'
   },
-  col1: { width: '35%', paddingRight: 5 },
-  col2: { width: '10%', textAlign: 'center' },
-  col3: { width: '15%', textAlign: 'right' },
-  col4: { width: '10%', textAlign: 'center' },
-  col5: { width: '10%', textAlign: 'center' },
-  col6: { width: '20%', textAlign: 'right' },
-  totalsSection: {
-    marginTop: 20,
-    alignItems: 'flex-end'
+  tableCell: {
+    fontSize: 9,
+    color: '#2d3748'
+  },
+  
+  // Column widths
+  colArticle: { width: '35%', paddingRight: 5 },
+  colQuantity: { width: '10%', textAlign: 'center' },
+  colUnitPrice: { width: '15%', textAlign: 'right' },
+  colDiscount: { width: '10%', textAlign: 'center' },
+  colTVA: { width: '10%', textAlign: 'center' },
+  colTotal: { width: '20%', textAlign: 'right' },
+  
+  // Totals section
+  totalsContainer: {
+    alignItems: 'flex-end',
+    marginTop: 20
   },
   totalRow: {
     flexDirection: 'row',
-    width: 250,
+    width: 200,
     justifyContent: 'space-between',
-    marginBottom: 5,
-    padding: 5
+    paddingVertical: 3,
+    paddingHorizontal: 10
   },
   totalRowFinal: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#3182ce',
     color: 'white',
-    fontWeight: 'bold',
-    padding: 10
-  },
-  totalLabel: {
-    fontSize: 11
-  },
-  totalValue: {
-    fontSize: 11,
-    textAlign: 'right'
-  },
-  footer: {
-    marginTop: 30,
-    fontSize: 8,
-    textAlign: 'center',
-    color: '#666666',
-    borderTop: '1px solid #dee2e6',
-    paddingTop: 15
-  },
-  paymentSection: {
-    marginTop: 20,
-    marginBottom: 20
-  },
-  paymentTable: {
-    border: '1px solid #dee2e6',
-    marginTop: 10
-  },
-  paymentHeader: {
-    flexDirection: 'row',
-    backgroundColor: '#6c757d',
-    color: 'white',
-    padding: 5,
-    fontSize: 9,
     fontWeight: 'bold'
   },
-  paymentRow: {
-    flexDirection: 'row',
-    padding: 5,
-    borderBottom: '1px solid #dee2e6',
-    fontSize: 8
+  totalLabel: {
+    fontSize: 10
   },
-  paymentCol1: { width: '12%' },
-  paymentCol2: { width: '12%' },
-  paymentCol3: { width: '12%' },
-  paymentCol4: { width: '12%' },
-  paymentCol5: { width: '12%' },
-  paymentCol6: { width: '15%' },
-  paymentCol7: { width: '25%' },
-  summarySection: {
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: '#f8f9fa',
-    border: '1px solid #dee2e6'
+  totalValue: {
+    fontSize: 10,
+    textAlign: 'right'
+  },
+  
+  // Footer
+  footer: {
+    marginTop: 40,
+    paddingTop: 15,
+    borderTop: '1px solid #e2e8f0',
+    fontSize: 8,
+    color: '#4a5568',
+    textAlign: 'center'
+  },
+  
+  // Payment section
+  paymentSection: {
+    marginTop: 30
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#2d3748',
+    marginBottom: 10
   }
 });
