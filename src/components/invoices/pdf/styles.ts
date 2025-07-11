@@ -31,10 +31,11 @@ export const pdfStyles = StyleSheet.create({
     marginBottom: 12,
   },
   logo: {
-    maxWidth: 120,
-    maxHeight: 60,
+    width: 120,
+    height: 60,
     marginBottom: 8,
-    objectFit: 'scale-down',
+    objectFit: 'contain',
+    objectPosition: 'center',
   },
   companyInfo: {
     fontSize: 7,
