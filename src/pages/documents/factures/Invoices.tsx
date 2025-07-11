@@ -24,6 +24,8 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
+import { pdf } from '@react-pdf/renderer';
+import { QuotePDF } from '@/components/pdf/QuoteViewer';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -135,11 +137,118 @@ const Invoices = () => {
     }
   };
 
-  const handleDownload = (invoice: Invoice) => {
-    toast({
-      title: "Téléchargement",
-      description: `Téléchargement de la facture ${invoice.reference}...`
-    });
+  const handleDownload = async (invoice: any) => {
+    try {
+      // Préparer les données pour le PDF comme pour les devis
+      let repairs = [];
+      let parts = [];
+      let discounts = [];
+
+      try {
+        repairs = invoice.repairs_data ? JSON.parse(invoice.repairs_data as string) : [];
+      } catch (e) {
+        console.error('Error parsing repairs data:', e);
+      }
+      
+      try {
+        parts = invoice.parts_data ? JSON.parse(invoice.parts_data as string) : [];
+      } catch (e) {
+        console.error('Error parsing parts data:', e);
+      }
+      
+      try {
+        discounts = invoice.discounts_data ? JSON.parse(invoice.discounts_data as string) : [];
+      } catch (e) {
+        console.error('Error parsing discounts data:', e);
+      }
+
+      const invoiceData = {
+        reference: invoice.reference || '',
+        date: new Date(invoice.created_at).toLocaleDateString('fr-FR'),
+        company: {
+          name: "DEMO GEOFFREY MOYA",
+          address: "10 rue courteissade",
+          zipCode: "13320",
+          city: "Bouc bel air",
+          country: "France",
+          siren: "567890123",
+          siret: "56789012300013",
+          tva: "FR 567890123",
+          phone: "+33650363126",
+          email: "geoffrey.moya@gmail.com"
+        },
+        client: invoice.clients ? {
+          nom: `${invoice.clients.first_name} ${invoice.clients.last_name}`,
+          telephone: invoice.clients.phone || '',
+          email: invoice.clients.email || '',
+          address: invoice.clients.address || '',
+          zipCode: invoice.clients.zip_code || '',
+          city: invoice.clients.city || ''
+        } : {
+          nom: 'Client inconnu',
+          telephone: '',
+          email: '',
+          address: '',
+          zipCode: '',
+          city: ''
+        },
+        vehicle: invoice.vehicles ? {
+          brand: invoice.vehicles.car_brands?.name || 'Marque inconnue',
+          model: invoice.vehicles.car_models?.name || 'Modèle inconnu',
+          license_plate: invoice.vehicles.license_plate || '',
+          mileage: invoice.vehicles.mileage?.toString() || ''
+        } : {
+          brand: 'Marque inconnue',
+          model: 'Modèle inconnu',
+          license_plate: '',
+          mileage: ''
+        },
+        articles: [
+          ...repairs.map((repair: any) => ({
+            description: repair.description || 'Réparation',
+            quantity: repair.quantity?.toString() || '1',
+            discount: repair.discount?.toString() || '0',
+            unitCost: repair.unitPrice?.toFixed(2) || '0.00',
+            vat: '20',
+            total: ((repair.unitPrice || 0) * (repair.quantity || 1)).toFixed(2)
+          })),
+          ...parts.map((part: any) => ({
+            description: part.description || 'Pièce',
+            quantity: part.quantity?.toString() || '1',
+            discount: part.discount?.toString() || '0',
+            unitCost: part.unitPrice?.toFixed(2) || '0.00',
+            vat: '20',
+            total: ((part.unitPrice || 0) * (part.quantity || 1)).toFixed(2)
+          }))
+        ],
+        notes: invoice.notes || ''
+      };
+
+      // Générer le PDF
+      const blob = await pdf(<QuotePDF quoteData={invoiceData} />).toBlob();
+      
+      // Créer le lien de téléchargement
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Facture_${invoice.reference || 'SANS_REF'}_${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Téléchargement réussi",
+        description: `La facture ${invoice.reference} a été téléchargée avec succès.`
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Erreur de téléchargement",
+        description: "Une erreur s'est produite lors de la génération du PDF.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handlePrint = (invoice: Invoice) => {
