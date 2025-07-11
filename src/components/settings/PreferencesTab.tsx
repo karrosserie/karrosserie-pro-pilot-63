@@ -366,28 +366,28 @@ const PreferencesTab = () => {
                         </thead>
                         <tbody>
                           <tr>
-                            <td className="p-3 border-r border-gray-300">Réparation pare-chocs avant</td>
-                            <td className="p-3 text-right border-r border-gray-300">1</td>
-                            <td className="p-3 text-right border-r border-gray-300">350,00 €</td>
-                            <td className="p-3 text-right border-r border-gray-300">0%</td>
-                            <td className="p-3 text-right border-r border-gray-300">20%</td>
+                             <td className="p-3 border-r border-white">Réparation pare-chocs avant</td>
+                             <td className="p-3 text-right border-r border-white">1</td>
+                             <td className="p-3 text-right border-r border-white">350,00 €</td>
+                             <td className="p-3 text-right border-r border-white">0%</td>
+                             <td className="p-3 text-right border-r border-white">20%</td>
                             <td className="p-3 text-right font-medium">350,00 €</td>
                           </tr>
                           <tr>
-                            <td className="p-3 border-r border-gray-300">Peinture carrosserie</td>
-                            <td className="p-3 text-right border-r border-gray-300">1</td>
-                            <td className="p-3 text-right border-r border-gray-300">450,00 €</td>
-                            <td className="p-3 text-right border-r border-gray-300">0%</td>
-                            <td className="p-3 text-right border-r border-gray-300">20%</td>
-                            <td className="p-3 text-right font-medium">450,00 €</td>
-                          </tr>
-                          <tr>
-                            <td className="p-3 border-r border-gray-300">Pièce détachée - Feu avant gauche</td>
-                            <td className="p-3 text-right border-r border-gray-300">1</td>
-                            <td className="p-3 text-right border-r border-gray-300">125,00 €</td>
-                            <td className="p-3 text-right border-r border-gray-300">5%</td>
-                            <td className="p-3 text-right border-r border-gray-300">20%</td>
-                            <td className="p-3 text-right font-medium">118,75 €</td>
+                             <td className="p-3 border-r border-white">Peinture carrosserie</td>
+                             <td className="p-3 text-right border-r border-white">1</td>
+                             <td className="p-3 text-right border-r border-white">450,00 €</td>
+                             <td className="p-3 text-right border-r border-white">0%</td>
+                             <td className="p-3 text-right border-r border-white">20%</td>
+                             <td className="p-3 text-right font-medium">450,00 €</td>
+                           </tr>
+                           <tr>
+                             <td className="p-3 border-r border-white">Pièce détachée - Feu avant gauche</td>
+                             <td className="p-3 text-right border-r border-white">1</td>
+                             <td className="p-3 text-right border-r border-white">125,00 €</td>
+                             <td className="p-3 text-right border-r border-white">5%</td>
+                             <td className="p-3 text-right border-r border-white">20%</td>
+                             <td className="p-3 text-right font-medium">118,75 €</td>
                           </tr>
                         </tbody>
                      </table>
