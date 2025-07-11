@@ -188,7 +188,7 @@ const PreferencesTab = () => {
           {/* Aperçu du modèle de facture */}
           <div className="space-y-2">
             <Label>Aperçu du modèle</Label>
-            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 max-h-[768px] overflow-y-auto">
+            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 h-[750px] overflow-y-auto">
               {selectedTemplate === "default" ? (
                 // Modèle par défaut
                 <div className="bg-white p-4 rounded shadow-sm">
