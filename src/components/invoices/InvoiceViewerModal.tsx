@@ -56,17 +56,18 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
         <div className="bg-white">
-          {/* Header avec fond gris foncé */}
-          <div className="bg-gray-800 text-white p-6">
-            <div className="flex justify-between items-start">
-              <div className="flex items-center space-x-4">
+          {/* Header sans fond noir */}
+          <div className="p-6 border-b">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Colonne 1 - Informations entreprise */}
+              <div className="flex items-start space-x-4">
                 <div className="bg-orange-500 rounded-full p-3">
                   <span className="text-white font-bold text-xl">KR</span>
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold">FACTURE</h1>
-                  <p className="text-gray-300">KARROSSERIE</p>
-                  <div className="text-sm text-gray-300 mt-2">
+                  <h1 className="text-2xl font-bold text-gray-800">FACTURE</h1>
+                  <p className="text-gray-600">KARROSSERIE</p>
+                  <div className="text-sm text-gray-600 mt-2">
                     <p>ADRESSE : Votre adresse</p>
                     <p>PHONE : +33 1 23 45 67 89</p>
                     <p>EMAIL : contact@karrosserie.fr</p>
@@ -75,14 +76,8 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Corps de la facture */}
-          <div className="p-6">
-            {/* Détails en deux colonnes */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              {/* Colonne gauche - Détails de la facture */}
+              {/* Colonne 2 - Détails de la facture */}
               <div>
                 <h3 className="text-lg font-semibold mb-4 text-gray-800">Détails de la facture :</h3>
                 <div className="space-y-2 text-sm">
@@ -118,7 +113,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
                 </div>
               </div>
 
-              {/* Colonne droite - Facture pour + Montant dû */}
+              {/* Colonne 3 - Facture pour + Montant dû */}
               <div>
                 <h3 className="text-lg font-semibold mb-4 text-gray-800">Facture pour :</h3>
                 <div className="text-sm mb-4">
@@ -134,6 +129,11 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Corps de la facture */}
+          <div className="p-6">
+            {/* Le contenu a été déplacé dans le header */}
 
             {/* Tableau des articles */}
             <div className="mb-6">
