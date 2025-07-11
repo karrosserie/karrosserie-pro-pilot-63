@@ -31,11 +31,8 @@ export const pdfStyles = StyleSheet.create({
     marginBottom: 12,
   },
   logo: {
-    width: 120,
     height: 60,
     marginBottom: 8,
-    objectFit: 'contain',
-    objectPosition: 'center',
   },
   companyInfo: {
     fontSize: 7,
