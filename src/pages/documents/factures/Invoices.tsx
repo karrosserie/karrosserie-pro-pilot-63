@@ -20,6 +20,7 @@ import { useCredits } from '@/hooks/use-credits';
 import { Invoice } from '@/services/supabase/invoices';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
+import InvoiceViewerModal from '@/components/invoices/InvoiceViewerModal';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
@@ -39,6 +40,7 @@ const Invoices = () => {
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
   const [creditDialogOpen, setCreditDialogOpen] = useState(false);
+  const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const { toast } = useToast();
   const { confirm } = useConfirmation();
@@ -164,6 +166,11 @@ const Invoices = () => {
     setCreditDialogOpen(true);
   };
 
+  const handleViewInvoice = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setViewerModalOpen(true);
+  };
+
   if (isLoading) {
     return (
       <div className="page-container">
@@ -262,7 +269,7 @@ const Invoices = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-1">
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" onClick={() => handleViewInvoice(invoice)}>
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => handleEditInvoice(invoice)}>
@@ -360,6 +367,12 @@ const Invoices = () => {
         } : null}
         open={creditDialogOpen}
         onOpenChange={setCreditDialogOpen}
+      />
+
+      <InvoiceViewerModal
+        invoice={selectedInvoice}
+        open={viewerModalOpen}
+        onOpenChange={setViewerModalOpen}
       />
     </div>
   );
