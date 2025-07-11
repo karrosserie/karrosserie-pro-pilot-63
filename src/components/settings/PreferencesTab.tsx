@@ -200,7 +200,7 @@ const PreferencesTab = () => {
                     <div>
                       <h1 className="text-lg font-bold text-white px-3 py-1 text-center mb-3" style={{backgroundColor: 'rgba(64,67,72,255)'}}>FACTURE</h1>
                       {companyData.logo_url ? (
-                        <div className="flex items-center justify-start mb-3" style={{maxWidth: '80px'}}>
+                        <div className="flex items-center justify-start mb-3" style={{maxWidth: '120px'}}>
                           <img src={companyData.logo_url} alt="Logo entreprise" className="max-w-full h-auto object-contain" />
                         </div>
                       ) : (
