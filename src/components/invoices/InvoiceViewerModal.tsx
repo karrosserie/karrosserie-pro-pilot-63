@@ -66,8 +66,8 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
                 <div>
                   <h1 className="text-2xl font-bold text-white px-4 py-2 rounded text-center" style={{backgroundColor: 'rgba(64,67,72,255)'}}>FACTURE</h1>
                   {companyData.logo_url ? (
-                    <div className="w-20 h-20 mt-2 flex items-center justify-center">
-                      <img src={companyData.logo_url} alt="Logo entreprise" className="max-w-full max-h-full object-contain" />
+                    <div className="mt-2 flex items-center justify-start" style={{maxWidth: '200px'}}>
+                      <img src={companyData.logo_url} alt="Logo entreprise" className="max-w-full h-auto object-contain" />
                     </div>
                   ) : (
                     <div className="bg-orange-500 rounded-full p-3 w-fit mt-2">
