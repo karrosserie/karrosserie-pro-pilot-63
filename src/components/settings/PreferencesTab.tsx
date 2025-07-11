@@ -208,14 +208,14 @@ const PreferencesTab = () => {
                            <span className="text-white font-bold text-base">KR</span>
                          </div>
                        )}
-                       <p className="text-gray-600 font-bold mb-2">{companyData.name || 'KARROSSERIE'}</p>
-                       <div className="text-base text-gray-600 space-y-1">
-                         <p>{companyData.address || 'Votre adresse'}</p>
-                         <p>{companyData.zipcode || ''} {companyData.city || ''}</p>
-                         <p>Téléphone : {companyData.phone || '+33 1 23 45 67 89'}</p>
-                         <p>E-mail : {companyData.email || 'contact@karrosserie.fr'}</p>
-                         <p>SIRET : {companyData.siret || '123 456 789 00123'}</p>
-                         <p>N° TVA : {companyData.tva || 'FR 12 123456789'}</p>
+                       <p className="text-gray-600 font-bold">{companyData.name || 'KARROSSERIE'}</p>
+                       <div className="text-base text-gray-600">
+                         <p className="m-0">{companyData.address || 'Votre adresse'}</p>
+                         <p className="m-0">{companyData.zipcode || ''} {companyData.city || ''}</p>
+                         <p className="m-0">Téléphone : {companyData.phone || '+33 1 23 45 67 89'}</p>
+                         <p className="m-0">E-mail : {companyData.email || 'contact@karrosserie.fr'}</p>
+                         <p className="m-0">SIRET : {companyData.siret || '123 456 789 00123'}</p>
+                         <p className="m-0">N° TVA : {companyData.tva || 'FR 12 123456789'}</p>
                        </div>
                      </div>
 
