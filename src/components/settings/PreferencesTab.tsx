@@ -319,19 +319,15 @@ const PreferencesTab = () => {
                       <div className="w-56">
                         <div className="space-y-1 text-xs">
                           <div className="flex justify-between">
-                            <span>Sous-total HT :</span>
+                            <span>Sous-total</span>
                             <span>918,75 €</span>
                           </div>
                           <div className="flex justify-between">
-                            <span>Total remises :</span>
-                            <span>6,25 €</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Total TVA (20%) :</span>
+                            <span>TVA</span>
                             <span>183,75 €</span>
                           </div>
                           <div className="flex justify-between font-bold text-sm bg-blue-600 text-white p-2 rounded">
-                            <span>TOTAL TTC :</span>
+                            <span>TOTAL</span>
                             <span>1 102,50 €</span>
                           </div>
                         </div>
