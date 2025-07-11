@@ -194,8 +194,8 @@ const PreferencesTab = () => {
             <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 h-[1000px] overflow-y-auto max-w-[880px]">
               {selectedTemplate === "default" ? (
                 // Modèle par défaut
-                <div className="bg-white p-4 rounded shadow-sm h-full flex flex-col">
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs">
+                <div className="bg-white p-4 rounded shadow-sm h-full flex flex-col text-sm">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {/* Colonne 1 - Informations entreprise */}
                     <div>
                       <h1 className="text-lg font-bold text-white px-3 py-1 text-center mb-3" style={{backgroundColor: 'rgba(64,67,72,255)'}}>FACTURE</h1>
@@ -209,7 +209,7 @@ const PreferencesTab = () => {
                         </div>
                       )}
                       <p className="text-gray-600 font-bold mb-2">{companyData.name || 'KARROSSERIE'}</p>
-                      <div className="text-xs text-gray-600 space-y-1">
+                      <div className="text-sm text-gray-600 space-y-1">
                         <p>{companyData.address || 'Votre adresse'}</p>
                         <p>{companyData.zipcode || ''} {companyData.city || ''}</p>
                         <p>Téléphone : {companyData.phone || '+33 1 23 45 67 89'}</p>
@@ -222,7 +222,7 @@ const PreferencesTab = () => {
                     {/* Colonne 2 - Détails de la facture */}
                     <div>
                       <h3 className="text-sm font-semibold mb-3 text-gray-800">Détails de la facture</h3>
-                      <div className="text-xs space-y-1">
+                      <div className="text-sm space-y-1">
                         <div className="flex justify-between">
                           <span className="font-medium">Facture</span>
                           <span>N° 1</span>
@@ -255,15 +255,15 @@ const PreferencesTab = () => {
                       
                       {/* Encadré Montant dû */}
                       <div className="bg-blue-600 text-white p-2 text-center mt-3">
-                        <p className="text-xs mb-1">Montant dû</p>
-                        <p className="text-sm font-bold">1 250,00 €</p>
+                        <p className="text-sm mb-1">Montant dû</p>
+                        <p className="text-base font-bold">1 250,00 €</p>
                       </div>
                     </div>
 
                     {/* Colonne 3 - Facture pour */}
                     <div>
                       <h3 className="text-sm font-semibold mb-3 text-gray-800">Facture pour</h3>
-                      <div className="text-xs space-y-1">
+                      <div className="text-sm space-y-1">
                         <p className="font-medium">Jean Dupont</p>
                         <p>456 Avenue de la République</p>
                         <p>75011 Paris</p>
@@ -275,7 +275,7 @@ const PreferencesTab = () => {
 
                   {/* Tableau complet des articles comme dans la vraie facture */}
                   <div className="mt-4 flex-1">
-                    <table className="w-full text-xs bg-white">
+                    <table className="w-full text-sm bg-white">
                       <thead>
                         <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
                           <th className="p-2 text-left font-medium">Article</th>
@@ -317,7 +317,7 @@ const PreferencesTab = () => {
                     {/* Totaux */}
                     <div className="mt-4 flex justify-end">
                       <div className="w-56">
-                        <div className="space-y-1 text-xs">
+                        <div className="space-y-1 text-sm">
                           <div className="flex justify-between font-bold">
                             <span>Sous-total</span>
                             <span>918,75 €</span>
@@ -326,7 +326,7 @@ const PreferencesTab = () => {
                             <span>TVA</span>
                             <span>183,75 €</span>
                           </div>
-                          <div className="flex justify-between font-bold text-sm bg-blue-600 text-white p-2">
+                          <div className="flex justify-between font-bold text-base bg-blue-600 text-white p-2">
                             <span>TOTAL</span>
                             <span>1 102,50 €</span>
                           </div>
@@ -335,7 +335,7 @@ const PreferencesTab = () => {
                     </div>
 
                     {/* Mentions légales en bas */}
-                    <div className="mt-8 pt-4 border-t text-[10px] text-gray-500 text-center">
+                    <div className="mt-8 pt-4 border-t text-xs text-gray-500 text-center">
                       <p>
                         {companyData.name || 'KARROSSERIE'} - {companyData.address || 'Votre adresse'} {companyData.zipcode || ''} {companyData.city || ''} - 
                         SIRET {companyData.siret || '123 456 789 00123'} - N° TVA : {companyData.tva || 'FR 12 123456789'} - 
