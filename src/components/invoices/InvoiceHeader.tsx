@@ -3,7 +3,7 @@ import { Invoice } from '@/services/supabase/invoices';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { formatAmount } from '@/utils/invoiceCalculations';
-import { useCredits } from '@/hooks/use-credits';
+import { useReceiptsData } from '@/hooks/use-receipts-data';
 
 interface InvoiceHeaderProps {
   invoice: Invoice;
@@ -12,12 +12,12 @@ interface InvoiceHeaderProps {
 }
 
 const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps) => {
-  const { credits } = useCredits();
+  const { receipts } = useReceiptsData();
   
   // Calculer le total des encaissements pour cette facture
-  const totalPaidAmount = credits
-    ?.filter(credit => credit.invoice_id === invoice.id)
-    ?.reduce((total, credit) => total + (credit.amount || 0), 0) || 0;
+  const totalPaidAmount = receipts
+    ?.filter(receipt => receipt.invoice_id === invoice.id)
+    ?.reduce((total, receipt) => total + (receipt.amount || 0), 0) || 0;
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
