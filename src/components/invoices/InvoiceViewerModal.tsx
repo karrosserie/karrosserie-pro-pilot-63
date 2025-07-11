@@ -68,33 +68,33 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
                   </div>
                   <p className="text-gray-600 mt-2">KARROSSERIE</p>
                   <div className="text-sm text-gray-600 mt-2">
-                    <p>ADRESSE : Votre adresse</p>
-                    <p>PHONE : +33 1 23 45 67 89</p>
-                    <p>EMAIL : contact@karrosserie.fr</p>
+                    <p>Votre adresse</p>
+                    <p>Téléphone : +33 1 23 45 67 89</p>
+                    <p>E-mail : contact@karrosserie.fr</p>
                     <p>SIRET : 123 456 789 00123</p>
-                    <p>TVA : FR 12 123456789</p>
+                    <p>N° de TVA : FR 12 123456789</p>
                   </div>
                 </div>
               </div>
 
               {/* Colonne 2 - Détails de la facture */}
               <div>
-                <h3 className="text-lg font-semibold mb-4 text-gray-800">Détails de la facture :</h3>
+                <h3 className="text-lg font-semibold mb-4 text-gray-800">Détails de la facture</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex">
-                    <span className="font-medium w-32">Facture:</span>
+                    <span className="font-medium w-32">Facture</span>
                     <span>N° {invoice.reference}</span>
                   </div>
                   <div className="flex">
-                    <span className="font-medium w-32">Date facturation:</span>
+                    <span className="font-medium w-32">Date facturation</span>
                     <span>{formatDate(invoice.created_at)}</span>
                   </div>
                   <div className="flex">
-                    <span className="font-medium w-32">Date d'échéance:</span>
+                    <span className="font-medium w-32">Date d'échéance</span>
                     <span>{formatDate(invoice.due_date)}</span>
                   </div>
                   <div className="flex">
-                    <span className="font-medium w-32">Véhicule:</span>
+                    <span className="font-medium w-32">Véhicule</span>
                     <span>
                       {invoice.vehicles ? 
                         `${invoice.vehicles.car_brands?.name || 'N/A'} ${invoice.vehicles.car_models?.name || 'N/A'}` : 
@@ -103,11 +103,11 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
                     </span>
                   </div>
                   <div className="flex">
-                    <span className="font-medium w-32">Immatricule:</span>
+                    <span className="font-medium w-32">Immatriculation</span>
                     <span>{invoice.vehicles?.license_plate || 'N/A'}</span>
                   </div>
                   <div className="flex">
-                    <span className="font-medium w-32">N° Sinistre:</span>
+                    <span className="font-medium w-32">N° de sinistre</span>
                     <span>{invoice.claim_number || 'N/A'}</span>
                   </div>
                 </div>
@@ -121,7 +121,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
 
               {/* Colonne 3 - Facture pour */}
               <div>
-                <h3 className="text-lg font-semibold mb-4 text-gray-800">Facture pour :</h3>
+                <h3 className="text-lg font-semibold mb-4 text-gray-800">Facture pour</h3>
                 <div className="text-sm mb-4">
                   <p className="font-medium">{invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'N/A'}</p>
                   <p>Adresse du client disponible</p>
