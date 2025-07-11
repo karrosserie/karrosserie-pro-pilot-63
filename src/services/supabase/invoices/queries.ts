@@ -19,7 +19,7 @@ export const invoiceQueries = {
           email,
           phone,
           address,
-          zipcode,
+          postal_code,
           city
         ),
         vehicles (
@@ -61,7 +61,7 @@ export const invoiceQueries = {
           if (invoice.client_id) {
             const { data: client } = await supabase
               .from('clients')
-              .select('id, first_name, last_name, email, phone, address, zipcode, city')
+              .select('id, first_name, last_name, email, phone, address, postal_code, city')
               .eq('id', invoice.client_id)
               .single();
             clientData = client;
@@ -113,7 +113,7 @@ export const invoiceQueries = {
           console.log('Récupération manuelle des données client pour invoice:', invoice.id, 'client_id:', invoice.client_id);
           const { data: clientData, error: clientError } = await supabase
             .from('clients')
-            .select('id, first_name, last_name, email, phone, address, zipcode, city')
+            .select('id, first_name, last_name, email, phone, address, postal_code, city')
             .eq('id', invoice.client_id)
             .single();
             
@@ -178,7 +178,7 @@ export const invoiceQueries = {
           email,
           phone,
           address,
-          zipcode,
+          postal_code,
           city
         ),
         vehicles (
@@ -210,7 +210,7 @@ export const invoiceQueries = {
       console.log('Récupération manuelle des données client pour client_id:', data.client_id);
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
-        .select('id, first_name, last_name, email, phone, address, zipcode, city')
+        .select('id, first_name, last_name, email, phone, address, postal_code, city')
         .eq('id', data.client_id)
         .single();
         
