@@ -12,6 +12,7 @@ export interface Invoice {
   payment_details?: string | null;
   notes?: string | null;
   amount?: number | null;
+  paid_amount?: number | null;
   repairs_data?: string | any[] | null;
   parts_data?: string | any[] | null;
   discounts_data?: string | any[] | null;
