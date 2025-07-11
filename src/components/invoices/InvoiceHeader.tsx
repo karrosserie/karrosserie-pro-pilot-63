@@ -14,6 +14,9 @@ interface InvoiceHeaderProps {
 const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps) => {
   const { receipts } = useReceiptsData();
   
+  // Debug pour voir les données client
+  console.log('Client data:', invoice.clients);
+  
   // Calculer le total des encaissements pour cette facture
   const totalPaidAmount = receipts
     ?.filter(receipt => receipt.invoice_id === invoice.id)
