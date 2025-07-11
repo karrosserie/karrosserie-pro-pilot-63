@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -6,18 +6,96 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useCompany } from '@/hooks/use-company';
+import { supabase } from "@/integrations/supabase/client";
 import { formatAmount } from '@/utils/invoiceCalculations';
 
 const PreferencesTab = () => {
   const { toast } = useToast();
   const { companyData } = useCompany();
   const [selectedTemplate, setSelectedTemplate] = useState("default");
+  const [language, setLanguage] = useState("fr");
+  const [timezone, setTimezone] = useState("europe/paris");
+  const [currency, setCurrency] = useState("eur");
+  const [showRepairOrderDetails, setShowRepairOrderDetails] = useState(true);
+  const [showClientSignature, setShowClientSignature] = useState(false);
+  const [showZeroPriceProducts, setShowZeroPriceProducts] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSavePreferences = () => {
-    toast({
-      title: "Préférences sauvegardées",
-      description: "Vos préférences ont été mises à jour avec succès.",
-    });
+  // Charger les préférences existantes
+  useEffect(() => {
+    const loadPreferences = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (data) {
+        setLanguage(data.language);
+        setTimezone(data.timezone);
+        setCurrency(data.currency);
+        setSelectedTemplate(data.invoice_template);
+        setShowRepairOrderDetails(data.show_repair_order_details);
+        setShowClientSignature(data.show_client_signature);
+        setShowZeroPriceProducts(data.show_zero_price_products);
+      }
+    };
+
+    loadPreferences();
+  }, []);
+
+  const handleSavePreferences = async () => {
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Erreur",
+          description: "Vous devez être connecté pour sauvegarder les préférences.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const preferences = {
+        user_id: user.id,
+        language,
+        timezone,
+        currency,
+        invoice_template: selectedTemplate,
+        show_repair_order_details: showRepairOrderDetails,
+        show_client_signature: showClientSignature,
+        show_zero_price_products: showZeroPriceProducts,
+      };
+
+      const { error } = await supabase
+        .from('user_preferences')
+        .upsert(preferences, { onConflict: 'user_id' });
+
+      if (error) {
+        toast({
+          title: "Erreur",
+          description: "Impossible de sauvegarder les préférences.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Préférences sauvegardées",
+          description: "Vos préférences ont été mises à jour avec succès.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la sauvegarde.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,7 +110,7 @@ const PreferencesTab = () => {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="language">Langue</Label>
-            <Select defaultValue="fr">
+            <Select value={language} onValueChange={setLanguage}>
               <SelectTrigger>
                 <SelectValue placeholder="Sélectionnez une langue" />
               </SelectTrigger>
@@ -47,7 +125,7 @@ const PreferencesTab = () => {
 
           <div className="space-y-2">
             <Label htmlFor="timezone">Fuseau horaire</Label>
-            <Select defaultValue="europe/paris">
+            <Select value={timezone} onValueChange={setTimezone}>
               <SelectTrigger>
                 <SelectValue placeholder="Sélectionnez un fuseau horaire" />
               </SelectTrigger>
@@ -62,7 +140,7 @@ const PreferencesTab = () => {
 
           <div className="space-y-2">
             <Label htmlFor="currency">Devise</Label>
-            <Select defaultValue="eur">
+            <Select value={currency} onValueChange={setCurrency}>
               <SelectTrigger>
                 <SelectValue placeholder="Sélectionnez une devise" />
               </SelectTrigger>
@@ -92,7 +170,7 @@ const PreferencesTab = () => {
                 Inclure les détails de l'ordre de réparation sur les documents
               </p>
             </div>
-            <Switch id="show-repair-order" defaultChecked />
+            <Switch id="show-repair-order" checked={showRepairOrderDetails} onCheckedChange={setShowRepairOrderDetails} />
           </div>
 
           <div className="flex items-center justify-between">
@@ -102,7 +180,7 @@ const PreferencesTab = () => {
                 Permettre aux clients de signer électroniquement les factures
               </p>
             </div>
-            <Switch id="client-signatures-invoices" />
+            <Switch id="client-signatures-invoices" checked={showClientSignature} onCheckedChange={setShowClientSignature} />
           </div>
 
           <div className="flex items-center justify-between">
@@ -122,7 +200,7 @@ const PreferencesTab = () => {
                 Activez cette option pour inclure des produits avec un prix unitaire de zéro sur les ordres de réparation et les factures
               </p>
             </div>
-            <Switch id="show-zero-price-products" />
+            <Switch id="show-zero-price-products" checked={showZeroPriceProducts} onCheckedChange={setShowZeroPriceProducts} />
           </div>
 
           <div className="flex items-center justify-between">
@@ -483,8 +561,12 @@ const PreferencesTab = () => {
       </Card>
 
       <div className="flex justify-end">
-        <Button onClick={handleSavePreferences} className="bg-orange-500 hover:bg-orange-600 text-white">
-          Sauvegarder les préférences
+        <Button 
+          onClick={handleSavePreferences} 
+          disabled={loading}
+          className="bg-orange-500 hover:bg-orange-600 text-white"
+        >
+          {loading ? "Sauvegarde..." : "Sauvegarder les préférences"}
         </Button>
       </div>
     </div>
