@@ -51,7 +51,7 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
               <p>Téléphone : {companyData.phone || '+33 1 23 45 67 89'}</p>
               <p>E-mail : {companyData.email || 'contact@karrosserie.fr'}</p>
               <p>SIRET : {companyData.siret || '123 456 789 00123'}</p>
-              <p>N° de TVA : {companyData.tva || 'FR 12 123456789'}</p>
+              <p>N° TVA : {companyData.tva || 'FR 12 123456789'}</p>
             </div>
           </div>
         </div>
