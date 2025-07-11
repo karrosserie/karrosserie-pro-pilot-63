@@ -46,19 +46,22 @@ export const ImageCropperCanvas: React.FC<ImageCropperCanvasProps> = ({
             onChange={onCropChange}
             onComplete={onCropComplete}
             className="flex justify-center items-center"
+            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
           >
             <img
               ref={imageRef}
               src={imageUrl}
               alt="Image à recadrer"
               onLoad={onImageLoad}
-              className="object-contain"
+              className="object-contain block"
               style={{
                 transform: `scale(${zoom}) rotate(${rotation}deg)`,
                 transformOrigin: 'center center',
                 transition: 'transform 0.2s ease-in-out',
                 maxWidth: '70%',
-                maxHeight: '70%'
+                maxHeight: '70%',
+                margin: 'auto',
+                display: 'block'
               }}
             />
           </ReactCrop>
