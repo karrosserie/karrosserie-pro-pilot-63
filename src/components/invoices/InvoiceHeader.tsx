@@ -120,8 +120,8 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
             <p className="font-medium">{invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'N/A'}</p>
             <p className="text-xs text-gray-500">Debug: {JSON.stringify(invoice.clients)}</p>
             {invoice.clients?.address && <p>{invoice.clients.address}</p>}
-            {(invoice.clients?.zipcode || invoice.clients?.city) && (
-              <p>{invoice.clients.zipcode || ''} {invoice.clients.city || ''}</p>
+            {(invoice.clients?.postal_code || invoice.clients?.city) && (
+              <p>{invoice.clients.postal_code || ''} {invoice.clients.city || ''}</p>
             )}
             {invoice.clients?.phone && <p>Téléphone : {invoice.clients.phone}</p>}
             {invoice.clients?.email && <p>E-mail : {invoice.clients.email}</p>}
