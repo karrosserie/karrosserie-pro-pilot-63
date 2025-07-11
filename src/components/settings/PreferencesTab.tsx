@@ -459,11 +459,11 @@ const PreferencesTab = () => {
 
                    {/* Dates encadrées */}
                    <div className="flex justify-center gap-8 mb-6">
-                     <div className="border-2 border-black p-2 text-center rounded-xl">
+                     <div className="border-2 border-black px-6 py-2 text-center rounded-xl">
                        <p className="font-bold text-sm">DATE</p>
                        <p className="text-sm">11/12/2024</p>
                      </div>
-                     <div className="border-2 border-black p-2 text-center rounded-xl">
+                     <div className="border-2 border-black px-6 py-2 text-center rounded-xl">
                        <p className="font-bold text-sm">DATE D'ÉCHÉANCE</p>
                        <p className="text-sm">11/12/2024</p>
                      </div>
