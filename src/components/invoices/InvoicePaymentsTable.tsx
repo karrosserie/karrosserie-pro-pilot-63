@@ -32,7 +32,7 @@ const InvoicePaymentsTable = ({ invoiceId }: InvoicePaymentsTableProps) => {
         </thead>
         <tbody>
           {invoicePayments.map((payment, index) => (
-            <tr key={payment.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+            <tr key={payment.id} className="bg-transparent">
               <td className="p-3 text-sm">
                 {payment.created_at ? format(new Date(payment.created_at), 'dd/MM/yyyy', { locale: fr }) : '-'}
               </td>

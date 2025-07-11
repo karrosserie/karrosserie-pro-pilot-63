@@ -26,7 +26,7 @@ const InvoiceItemsTable = ({ items }: InvoiceItemsTableProps) => {
             const itemTotalHT = itemTotal - discountAmount;
             
             return (
-              <tr key={item.id || index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+              <tr key={item.id || index} className="bg-transparent">
                 <td className="p-3 text-sm">{item.label || item.description || 'N/A'}</td>
                 <td className="p-3 text-sm text-center">{(item.quantity || 0).toString().replace('.', ',')}</td>
                 <td className="p-3 text-sm text-center">{formatAmount(item.unitCost || 0)}</td>
