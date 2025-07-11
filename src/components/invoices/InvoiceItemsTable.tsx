@@ -28,7 +28,7 @@ const InvoiceItemsTable = ({ items }: InvoiceItemsTableProps) => {
             return (
               <tr key={item.id || index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                 <td className="border border-gray-300 p-3 text-sm">{item.label || item.description || 'N/A'}</td>
-                <td className="border border-gray-300 p-3 text-sm text-center">{item.quantity || 0}</td>
+                <td className="border border-gray-300 p-3 text-sm text-center">{(item.quantity || 0).toString().replace('.', ',')}</td>
                 <td className="border border-gray-300 p-3 text-sm text-center">{formatAmount(item.unitPrice || 0)}</td>
                 <td className="border border-gray-300 p-3 text-sm text-center">{item.discount || 0}%</td>
                 <td className="border border-gray-300 p-3 text-sm text-center">{item.vat || 20}%</td>
