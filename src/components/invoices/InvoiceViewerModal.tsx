@@ -62,7 +62,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
               {/* Colonne 1 - Informations entreprise */}
               <div>
                 <div>
-                  <h1 className="text-2xl font-bold text-white px-4 py-2 rounded" style={{backgroundColor: 'rgba(64,67,72,255)'}}>FACTURE</h1>
+                  <h1 className="text-2xl font-bold text-white px-4 py-2 rounded text-center" style={{backgroundColor: 'rgba(64,67,72,255)'}}>FACTURE</h1>
                   <div className="bg-orange-500 rounded-full p-3 w-fit mt-2">
                     <span className="text-white font-bold text-xl">KR</span>
                   </div>
