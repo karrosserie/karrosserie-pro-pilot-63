@@ -26,6 +26,8 @@ export const ImageCropperCanvas: React.FC<ImageCropperCanvasProps> = ({
   onCropComplete,
   onImageLoad
 }) => {
+  console.log(zoom);
+  console.log(100 / zoom);
   return (
     <div className="my-4 flex justify-center items-center" style={{ height: '70vh' }}>
       <div 
