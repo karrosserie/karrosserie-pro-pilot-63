@@ -263,12 +263,12 @@ const PreferencesTab = () => {
                      {/* Colonne 3 - Facture pour */}
                      <div>
                        <h3 className="text-lg font-semibold mb-3 text-gray-800">Facture pour</h3>
-                       <div className="text-base space-y-1">
-                         <p className="font-medium">Jean Dupont</p>
-                         <p>456 Avenue de la République</p>
-                         <p>75011 Paris</p>
-                         <p>Téléphone : +33 6 12 34 56 78</p>
-                         <p>E-mail : jean.dupont@email.com</p>
+                       <div className="text-base">
+                         <p className="font-medium m-0">Jean Dupont</p>
+                         <p className="m-0">456 Avenue de la République</p>
+                         <p className="m-0">75011 Paris</p>
+                         <p className="m-0">Téléphone : +33 6 12 34 56 78</p>
+                         <p className="m-0">E-mail : jean.dupont@email.com</p>
                        </div>
                      </div>
                    </div>
