@@ -486,8 +486,8 @@ const PreferencesTab = () => {
                       </thead>
                        <tbody>
                          <tr>
-                           <td className="p-2 border-2 border-r border-black">T1</td>
-                           <td className="p-2 border-2 border-r border-black">Réparation pare-chocs</td>
+                           <td className="p-2 border-r border-black">T1</td>
+                           <td className="p-2 border-r border-black">Réparation pare-chocs</td>
                            <td className="p-2 text-center border-r border-black">2</td>
                            <td className="p-2 text-center border-r border-black">0%</td>
                            <td className="p-2 text-center font-bold border-r border-black">110,00€</td>
