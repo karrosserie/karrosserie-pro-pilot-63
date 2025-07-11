@@ -43,8 +43,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   logo: {
-    marginTop: 20,
-    marginBottom: 20,
     maxWidth: 120,
     height: 'auto',
   },
@@ -56,6 +54,7 @@ const styles = StyleSheet.create({
   companyName: {
     fontSize: 10,
     fontWeight: 'bold',
+    marginTop: 8,
     marginBottom: 4,
   },
   sectionTitle: {
