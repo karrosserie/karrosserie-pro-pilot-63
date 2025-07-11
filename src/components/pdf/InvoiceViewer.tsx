@@ -122,10 +122,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9'
   },
   footer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
+    marginTop: 30,
     fontSize: 8,
     textAlign: 'center',
     borderTop: '1px solid #000',
