@@ -104,18 +104,39 @@ export const invoiceQueries = {
       return enrichedInvoices;
     }
     
-    // Transform the joined data to match our Invoice interface
-    const transformedInvoices = (invoicesWithJoins || []).map(invoice => ({
-      ...invoice,
-      clients: Array.isArray(invoice.clients) && invoice.clients.length > 0 ? invoice.clients[0] : invoice.clients,
-      vehicles: Array.isArray(invoice.vehicles) && invoice.vehicles.length > 0 ? invoice.vehicles[0] : invoice.vehicles,
-      repair_orders: Array.isArray(invoice.repair_orders) && invoice.repair_orders.length > 0 ? invoice.repair_orders[0] : invoice.repair_orders
-    })) as Invoice[];
+    // Transform the joined data to match our Invoice interface et récupérer manuellement si nécessaire
+    const transformedInvoices = await Promise.all(
+      (invoicesWithJoins || []).map(async (invoice) => {
+        let enrichedInvoice = { ...invoice };
+        
+        // Si pas de données client mais un client_id, récupérer manuellement
+        if (!invoice.clients && invoice.client_id) {
+          console.log('Récupération manuelle des données client pour client_id:', invoice.client_id);
+          const { data: clientData, error: clientError } = await supabase
+            .from('clients')
+            .select('id, first_name, last_name, email, phone, address, zipcode, city')
+            .eq('id', invoice.client_id)
+            .single();
+            
+          if (!clientError && clientData) {
+            enrichedInvoice.clients = clientData;
+          }
+        }
+        
+        return {
+          ...enrichedInvoice,
+          clients: Array.isArray(enrichedInvoice.clients) && enrichedInvoice.clients.length > 0 ? enrichedInvoice.clients[0] : enrichedInvoice.clients,
+          vehicles: Array.isArray(enrichedInvoice.vehicles) && enrichedInvoice.vehicles.length > 0 ? enrichedInvoice.vehicles[0] : enrichedInvoice.vehicles,
+          repair_orders: Array.isArray(enrichedInvoice.repair_orders) && enrichedInvoice.repair_orders.length > 0 ? enrichedInvoice.repair_orders[0] : enrichedInvoice.repair_orders
+        } as Invoice;
+      })
+    );
     
     return transformedInvoices;
   },
 
   getById: async (id: string): Promise<Invoice> => {
+    // Essayer d'abord avec les joins
     const { data, error } = await supabase
       .from('invoices')
       .select(`
@@ -150,12 +171,46 @@ export const invoiceQueries = {
       throw new Error(error.message);
     }
     
+    // Si les joins ont échoué ou si clients est null, récupérer les données manuellement
+    let enrichedData = { ...data };
+    
+    if (!data.clients && data.client_id) {
+      console.log('Récupération manuelle des données client pour client_id:', data.client_id);
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id, first_name, last_name, email, phone, address, zipcode, city')
+        .eq('id', data.client_id)
+        .single();
+        
+      if (!clientError && clientData) {
+        enrichedData.clients = clientData;
+      }
+    }
+    
+    if (!data.vehicles && data.vehicle_id) {
+      const { data: vehicleData, error: vehicleError } = await supabase
+        .from('vehicles')
+        .select(`
+          id, 
+          license_plate,
+          mileage,
+          car_brands(id, name),
+          car_models(id, name)
+        `)
+        .eq('id', data.vehicle_id)
+        .single();
+        
+      if (!vehicleError && vehicleData) {
+        enrichedData.vehicles = vehicleData;
+      }
+    }
+    
     // Transform the joined data to match our Invoice interface
     const transformedInvoice = {
-      ...data,
-      clients: Array.isArray(data.clients) && data.clients.length > 0 ? data.clients[0] : data.clients,
-      vehicles: Array.isArray(data.vehicles) && data.vehicles.length > 0 ? data.vehicles[0] : data.vehicles,
-      repair_orders: Array.isArray(data.repair_orders) && data.repair_orders.length > 0 ? data.repair_orders[0] : data.repair_orders
+      ...enrichedData,
+      clients: Array.isArray(enrichedData.clients) && enrichedData.clients.length > 0 ? enrichedData.clients[0] : enrichedData.clients,
+      vehicles: Array.isArray(enrichedData.vehicles) && enrichedData.vehicles.length > 0 ? enrichedData.vehicles[0] : enrichedData.vehicles,
+      repair_orders: Array.isArray(enrichedData.repair_orders) && enrichedData.repair_orders.length > 0 ? enrichedData.repair_orders[0] : enrichedData.repair_orders
     } as Invoice;
     
     return transformedInvoice;
