@@ -46,24 +46,51 @@ export const useImageCropper = (imageUrl: string, onCropComplete: (blob: Blob) =
     console.log('Current zoom:', zoom);
     console.log('Current rotation:', rotation);
 
-    // Calcul correct des ratios d'échelle en tenant compte du zoom
-    // Le zoom augmente la taille affichée, donc on doit diviser par le zoom pour retrouver la taille de base
-    const baseDisplayedWidth = image.width;
-    const baseDisplayedHeight = image.height;
+    // Calculer la taille réelle de l'image affichée avec le zoom
+    const displayedWidth = image.width * zoom;
+    const displayedHeight = image.height * zoom;
     
-    // Ratio entre la taille naturelle et la taille affichée de base (sans zoom)
-    const scaleX = image.naturalWidth / baseDisplayedWidth;
-    const scaleY = image.naturalHeight / baseDisplayedHeight;
+    // Calculer l'offset de centrage dans le conteneur ReactCrop
+    const container = imageRef.current.parentElement;
+    if (!container) {
+      setIsLoading(false);
+      return;
+    }
     
-    console.log('Scale ratios (natural/displayed):', { scaleX, scaleY });
+    const containerRect = container.getBoundingClientRect();
+    const imageRect = image.getBoundingClientRect();
+    
+    // Offset de l'image par rapport au conteneur (due au centrage)
+    const offsetX = (containerRect.width - displayedWidth) / 2;
+    const offsetY = (containerRect.height - displayedHeight) / 2;
+    
+    console.log('Container size:', containerRect.width, 'x', containerRect.height);
+    console.log('Displayed image size with zoom:', displayedWidth, 'x', displayedHeight);
+    console.log('Centering offset:', offsetX, 'x', offsetY);
 
-    // Les coordonnées de crop sont basées sur l'image zoomée affichée
-    // On doit les convertir vers les coordonnées naturelles
-    const naturalCropX = completedCrop.x * scaleX;
-    const naturalCropY = completedCrop.y * scaleY;
-    const naturalCropWidth = completedCrop.width * scaleX;
-    const naturalCropHeight = completedCrop.height * scaleY;
+    // Ajuster les coordonnées de crop en tenant compte de l'offset de centrage
+    const adjustedCropX = completedCrop.x - offsetX;
+    const adjustedCropY = completedCrop.y - offsetY;
+    
+    // Ratio entre la taille naturelle et la taille affichée avec zoom
+    const scaleX = image.naturalWidth / displayedWidth;
+    const scaleY = image.naturalHeight / displayedHeight;
+    
+    console.log('Scale ratios (natural/displayed with zoom):', { scaleX, scaleY });
 
+    // Convertir vers les coordonnées naturelles
+    const naturalCropX = Math.max(0, adjustedCropX * scaleX);
+    const naturalCropY = Math.max(0, adjustedCropY * scaleY);
+    const naturalCropWidth = Math.min(completedCrop.width * scaleX, image.naturalWidth - naturalCropX);
+    const naturalCropHeight = Math.min(completedCrop.height * scaleY, image.naturalHeight - naturalCropY);
+
+    console.log('Adjusted crop coordinates:', {
+      x: adjustedCropX,
+      y: adjustedCropY,
+      width: completedCrop.width,
+      height: completedCrop.height
+    });
+    
     console.log('Natural crop coordinates:', {
       x: naturalCropX,
       y: naturalCropY,
