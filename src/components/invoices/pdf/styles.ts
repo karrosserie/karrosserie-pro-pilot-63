@@ -30,8 +30,8 @@ export const pdfStyles = StyleSheet.create({
     textAlign: 'center',
   },
   logo: {
-    marginTop: 10,
-    marginBottom: 10
+    marginTop: 8,
+    marginBottom: 8
   },
   companyInfo: {
     fontSize: 7,

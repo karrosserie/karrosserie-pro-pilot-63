@@ -21,7 +21,6 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Download, Printer, Mail, CreditCard, FileX } from 'lucide-react';
-import { generateInvoicePDF } from '@/utils/pdfGenerator';
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import InvoiceEmailDialog from '@/components/invoices/InvoiceEmailDialog';
 import ReceiptDialog from '@/components/receipts/ReceiptDialog';
@@ -97,6 +96,10 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
         description: "Génération du PDF en cours..."
       });
 
+      const { generateInvoicePDF } = await import('@/utils/pdfGenerator');
+      const { useCompany } = await import('@/hooks/use-company');
+      const { useReceiptsData } = await import('@/hooks/use-receipts-data');
+      
       // Note: En pratique, ces hooks devraient être utilisés au niveau du composant
       // Pour cette démo, on passe des données vides pour companyData et receipts
       const result = await generateInvoicePDF(invoice, {}, []);
