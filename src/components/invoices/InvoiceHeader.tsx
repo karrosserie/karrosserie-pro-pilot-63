@@ -50,7 +50,7 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
         {/* Colonne 2 - Détails de la facture */}
         <div>
           <h3 className="text-lg font-semibold mb-4 text-gray-800">Détails de la facture</h3>
-          <div className="space-y-2 text-sm">
+          <div className="text-sm">
             <div className="flex justify-between">
               <span className="font-medium">Facture</span>
               <span className="text-right">N° {invoice.reference}</span>
