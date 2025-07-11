@@ -195,10 +195,10 @@ const PreferencesTab = () => {
               {selectedTemplate === "default" ? (
                 // Modèle par défaut
                  <div className="bg-white p-4 rounded shadow-sm h-full flex flex-col">
-                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs flex-1">
+                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-sm">
                      {/* Colonne 1 - Informations entreprise */}
                      <div>
-                       <h1 className="text-lg font-bold text-white px-3 py-1 text-center mb-3" style={{backgroundColor: 'rgba(64,67,72,255)'}}>FACTURE</h1>
+                       <h1 className="text-xl font-bold text-white px-3 py-1 text-center mb-3" style={{backgroundColor: 'rgba(64,67,72,255)'}}>FACTURE</h1>
                        {companyData.logo_url ? (
                          <div className="flex items-center justify-start mb-3" style={{maxWidth: '120px'}}>
                            <img src={companyData.logo_url} alt="Logo entreprise" className="max-w-full h-auto object-contain" />
@@ -209,7 +209,7 @@ const PreferencesTab = () => {
                          </div>
                        )}
                        <p className="text-gray-600 font-bold mb-2">{companyData.name || 'KARROSSERIE'}</p>
-                       <div className="text-xs text-gray-600 space-y-1">
+                       <div className="text-sm text-gray-600 space-y-1">
                          <p>{companyData.address || 'Votre adresse'}</p>
                          <p>{companyData.zipcode || ''} {companyData.city || ''}</p>
                          <p>Téléphone : {companyData.phone || '+33 1 23 45 67 89'}</p>
@@ -221,8 +221,8 @@ const PreferencesTab = () => {
 
                      {/* Colonne 2 - Détails de la facture */}
                      <div>
-                       <h3 className="text-sm font-semibold mb-3 text-gray-800">Détails de la facture</h3>
-                       <div className="text-xs space-y-1">
+                       <h3 className="text-base font-semibold mb-3 text-gray-800">Détails de la facture</h3>
+                       <div className="text-sm space-y-1">
                          <div className="flex justify-between">
                            <span className="font-medium">Facture</span>
                            <span>N° 1</span>
@@ -255,15 +255,15 @@ const PreferencesTab = () => {
                        
                        {/* Encadré Montant dû */}
                        <div className="bg-blue-600 text-white p-2 text-center mt-3">
-                         <p className="text-xs mb-1">Montant dû</p>
-                         <p className="text-sm font-bold">1 250,00 €</p>
+                         <p className="text-sm mb-1">Montant dû</p>
+                         <p className="text-base font-bold">1 250,00 €</p>
                        </div>
                      </div>
 
                      {/* Colonne 3 - Facture pour */}
                      <div>
-                       <h3 className="text-sm font-semibold mb-3 text-gray-800">Facture pour</h3>
-                       <div className="text-xs space-y-1">
+                       <h3 className="text-base font-semibold mb-3 text-gray-800">Facture pour</h3>
+                       <div className="text-sm space-y-1">
                          <p className="font-medium">Jean Dupont</p>
                          <p>456 Avenue de la République</p>
                          <p>75011 Paris</p>
@@ -273,43 +273,43 @@ const PreferencesTab = () => {
                      </div>
                    </div>
 
-                   {/* Tableau complet des articles comme dans la vraie facture */}
-                   <div className="mt-4 flex-1">
-                     <table className="w-full text-xs bg-white">
+                   {/* Tableau complet des articles - maintenant directement après le header */}
+                   <div className="mt-6">
+                     <table className="w-full text-sm bg-white">
                        <thead>
                          <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
-                           <th className="p-2 text-left font-medium">Article</th>
-                           <th className="p-2 text-right font-medium">Quantité</th>
-                           <th className="p-2 text-right font-medium">Coût Unitaire</th>
-                           <th className="p-2 text-right font-medium">Remise</th>
-                           <th className="p-2 text-right font-medium">TVA</th>
-                           <th className="p-2 text-right font-medium">Total HT</th>
+                           <th className="p-3 text-left font-medium">Article</th>
+                           <th className="p-3 text-right font-medium">Quantité</th>
+                           <th className="p-3 text-right font-medium">Coût Unitaire</th>
+                           <th className="p-3 text-right font-medium">Remise</th>
+                           <th className="p-3 text-right font-medium">TVA</th>
+                           <th className="p-3 text-right font-medium">Total HT</th>
                          </tr>
                        </thead>
                        <tbody>
                          <tr>
-                           <td className="p-2">Réparation pare-chocs avant</td>
-                           <td className="p-2 text-right">1</td>
-                           <td className="p-2 text-right">350,00 €</td>
-                           <td className="p-2 text-right">0%</td>
-                           <td className="p-2 text-right">20%</td>
-                           <td className="p-2 text-right font-medium">350,00 €</td>
+                           <td className="p-3">Réparation pare-chocs avant</td>
+                           <td className="p-3 text-right">1</td>
+                           <td className="p-3 text-right">350,00 €</td>
+                           <td className="p-3 text-right">0%</td>
+                           <td className="p-3 text-right">20%</td>
+                           <td className="p-3 text-right font-medium">350,00 €</td>
                          </tr>
                          <tr>
-                           <td className="p-2">Peinture carrosserie</td>
-                           <td className="p-2 text-right">1</td>
-                           <td className="p-2 text-right">450,00 €</td>
-                           <td className="p-2 text-right">0%</td>
-                           <td className="p-2 text-right">20%</td>
-                           <td className="p-2 text-right font-medium">450,00 €</td>
+                           <td className="p-3">Peinture carrosserie</td>
+                           <td className="p-3 text-right">1</td>
+                           <td className="p-3 text-right">450,00 €</td>
+                           <td className="p-3 text-right">0%</td>
+                           <td className="p-3 text-right">20%</td>
+                           <td className="p-3 text-right font-medium">450,00 €</td>
                          </tr>
                          <tr>
-                           <td className="p-2">Pièce détachée - Feu avant gauche</td>
-                           <td className="p-2 text-right">1</td>
-                           <td className="p-2 text-right">125,00 €</td>
-                           <td className="p-2 text-right">5%</td>
-                           <td className="p-2 text-right">20%</td>
-                           <td className="p-2 text-right font-medium">118,75 €</td>
+                           <td className="p-3">Pièce détachée - Feu avant gauche</td>
+                           <td className="p-3 text-right">1</td>
+                           <td className="p-3 text-right">125,00 €</td>
+                           <td className="p-3 text-right">5%</td>
+                           <td className="p-3 text-right">20%</td>
+                           <td className="p-3 text-right font-medium">118,75 €</td>
                          </tr>
                        </tbody>
                      </table>
@@ -317,7 +317,7 @@ const PreferencesTab = () => {
                      {/* Totaux */}
                      <div className="mt-4 flex justify-end">
                        <div className="w-56">
-                         <div className="space-y-1 text-xs">
+                         <div className="space-y-1 text-sm">
                            <div className="flex justify-between font-bold">
                              <span>Sous-total</span>
                              <span>918,75 €</span>
@@ -326,7 +326,7 @@ const PreferencesTab = () => {
                              <span>TVA</span>
                              <span>183,75 €</span>
                            </div>
-                           <div className="flex justify-between font-bold text-sm bg-blue-600 text-white p-2">
+                           <div className="flex justify-between font-bold text-base bg-blue-600 text-white p-2">
                              <span>TOTAL</span>
                              <span>1 102,50 €</span>
                            </div>
