@@ -17,6 +17,7 @@ import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 import { CreditDialog } from '@/components/credits/CreditDialog';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useCredits } from '@/hooks/use-credits';
+import { useCompany } from '@/hooks/use-company';
 import { Invoice } from '@/services/supabase/invoices';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
@@ -46,12 +47,13 @@ const Invoices = () => {
   const { confirm } = useConfirmation();
   
   const { invoices, isLoading, error, deleteInvoice } = useInvoices();
+  const { credits } = useCredits();
+  const { companyData } = useCompany();
   
   console.log('=== DONNÉES FACTURES DANS LE COMPOSANT ===');
   console.log('invoices:', invoices);
   console.log('Premier invoice (si existant):', invoices?.[0]);
   console.log('Premier invoice.clients:', invoices?.[0]?.clients);
-  const { credits } = useCredits();
   
   const filteredInvoices = invoices?.filter(invoice => 
     invoice.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -142,11 +144,32 @@ const Invoices = () => {
     }
   };
 
-  const handleDownload = (invoice: Invoice) => {
-    toast({
-      title: "Téléchargement",
-      description: `Téléchargement de la facture ${invoice.reference}...`
-    });
+  const handleDownload = async (invoice: Invoice) => {
+    try {
+      toast({
+        title: "Génération du PDF",
+        description: "Génération du PDF en cours..."
+      });
+
+      const { generateInvoicePDF } = await import('@/utils/pdfGenerator');
+      const result = await generateInvoicePDF(invoice, companyData, credits);
+      
+      if (result.success) {
+        toast({
+          title: "Téléchargement réussi",
+          description: `La facture ${invoice.reference} a été téléchargée.`
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors du téléchargement:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer le PDF. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handlePrint = (invoice: Invoice) => {
