@@ -430,28 +430,28 @@ const PreferencesTab = () => {
                     <div>
                       <h1 className="text-2xl font-bold text-red-600 mb-2">{companyData.name || "Z's ISTRES"}</h1>
                       <div className="text-sm space-y-0">
-                        <p className="m-0">ADRESSE : {companyData.address || '75 ROUTE DE LA'}</p>
+                        <p className="m-0">{companyData.address || '75 ROUTE DE LA'}</p>
                         <p className="m-0">{companyData.zipcode || '13800'} {companyData.city || 'ISTRES'}</p>
-                        <p className="m-0">TÉL : {companyData.phone || '+33646252624'}</p>
-                        <p className="m-0">EMAIL : {companyData.email || 'kenneford@mail.com'}</p>
+                        <p className="m-0">Téléphone : {companyData.phone || '+33646252624'}</p>
+                        <p className="m-0">E-mail : {companyData.email || 'kenneford@mail.com'}</p>
                         <p className="m-0">SIRET : {companyData.siret || '902 000 675955'}</p>
-                        <p className="m-0">TVA : {companyData.tva || 'FR902 000 675'}</p>
+                        <p className="m-0">N° TVA : {companyData.tva || 'FR902 000 675'}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <h1 className="text-3xl font-bold text-black mb-1">FACTURE</h1>
-                      <p className="text-blue-500 text-sm mb-4">2024/12/0036</p>
+                      <h1 className="text-3xl font-bold text-black mb-1">FACTURE N° 5</h1>
                       
                       {/* Informations client */}
                       <div className="mb-6">
                         <p className="font-bold text-blue-500 mb-1">Demo user</p>
                         <div className="text-sm space-y-0">
-                          <p className="m-0">TÉL : +33646464646</p>
-                          <p className="m-0">EMAIL : demo@demo.com</p>
-                          <p className="m-0">ADRESSE : 11 rue juramy 13004</p>
-                          <p className="m-0">Immatricule : AZ-ER-RTY</p>
-                          <p className="m-0">Kilométrage : 500 Km</p>
+                          <p className="m-0">11 rue juramy</p>
+                          <p className="m-0">13004 MARSEILLE</p>
+                          <p className="m-0">+33646464646</p>
+                          <p className="m-0">demo@demo.com</p>
                           <p className="m-0">Véhicule : Slio Biomm</p>
+                          <p className="m-0">Immatriculation : AZ-ER-RTY</p>
+                          <p className="m-0">Kilométrage : 500 Km</p>
                         </div>
                       </div>
                     </div>
