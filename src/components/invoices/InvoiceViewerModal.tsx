@@ -41,7 +41,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
               finalTotal={totals.finalTotal}
             />
             <InvoicePaymentsTable invoiceId={invoice.id} invoiceTotal={totals.finalTotal} />
-            <InvoiceFooter />
+            <InvoiceFooter companyData={companyData} />
           </div>
         </div>
       </DialogContent>

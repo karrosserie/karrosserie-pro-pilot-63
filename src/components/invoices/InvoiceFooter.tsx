@@ -1,10 +1,21 @@
 import React from 'react';
 
-const InvoiceFooter = () => {
+interface InvoiceFooterProps {
+  companyData?: any;
+}
+
+const InvoiceFooter = ({ companyData }: InvoiceFooterProps) => {
+  if (!companyData) {
+    return null;
+  }
+
   return (
     <div className="mt-8 pt-4 border-t text-xs text-gray-500 text-center">
-      <p>Les factures émises par KARROSSERIE sont basées sur les informations disponibles au moment de leur établissement.</p>
-      <p>Toute modification des conditions pourra entraîner le règlement intégral.</p>
+      <p>
+        {companyData.name} - Siège social : {companyData.address} {companyData.zipcode} {companyData.city} France - 
+        SIRET {companyData.siret} - N° TVA intracommunautaire : {companyData.tva || ''} - 
+        Tel : {companyData.phone} - Email : {companyData.email}
+      </p>
     </div>
   );
 };
