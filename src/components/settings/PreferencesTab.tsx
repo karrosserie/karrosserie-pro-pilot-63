@@ -309,11 +309,11 @@ const PreferencesTab = () => {
                            <span className="font-medium">N° de sinistre</span>
                            <span>SIN-2024-001</span>
                          </div>
-                          <div className="flex justify-between m-0 bg-gray-100 p-2 rounded">
+                          <div className="flex justify-between m-0 bg-gray-100 p-2 rounded-xl">
                             <span className="font-medium">Date de facturation</span>
                             <span>11/07/2025</span>
                           </div>
-                          <div className="flex justify-between m-0 bg-gray-100 p-2 rounded">
+                          <div className="flex justify-between m-0 bg-gray-100 p-2 rounded-xl">
                             <span className="font-medium">Date d&apos;échéance</span>
                             <span>10/08/2025</span>
                           </div>
@@ -353,7 +353,7 @@ const PreferencesTab = () => {
 
                    {/* Tableau complet des articles - maintenant directement après le header */}
                    <div className="mt-6">
-                      <table className="w-full text-base bg-white rounded-lg overflow-hidden">
+                      <table className="w-full text-base bg-white rounded-xl overflow-hidden">
                         <thead>
                           <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
                             <th className="p-3 text-left font-medium">Article</th>
@@ -459,11 +459,11 @@ const PreferencesTab = () => {
 
                    {/* Dates encadrées */}
                    <div className="flex justify-center gap-8 mb-6">
-                     <div className="border-2 border-black p-2 text-center rounded">
+                     <div className="border-2 border-black p-2 text-center rounded-xl">
                        <p className="font-bold text-sm">DATE</p>
                        <p className="text-sm">11/12/2024</p>
                      </div>
-                     <div className="border-2 border-black p-2 text-center rounded">
+                     <div className="border-2 border-black p-2 text-center rounded-xl">
                        <p className="font-bold text-sm">DATE D'ÉCHÉANCE</p>
                        <p className="text-sm">11/12/2024</p>
                      </div>
@@ -471,7 +471,7 @@ const PreferencesTab = () => {
 
                    {/* Tableau */}
                    <div className="mb-6 flex-1">
-                     <table className="w-full border-2 border-black text-sm rounded-lg overflow-hidden">
+                     <table className="w-full border-2 border-black text-sm rounded-xl overflow-hidden">
                        <thead>
                         <tr className="bg-gray-100">
                           <th className="border border-black p-2 text-left font-bold">Réf</th>
