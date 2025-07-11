@@ -75,7 +75,7 @@ const PreferencesTab = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Interface utilisateur</CardTitle>
+          <CardTitle>Paramètres d'affichage</CardTitle>
           <CardDescription>
             Personnalisez l'apparence et le comportement de l'interface.
           </CardDescription>
