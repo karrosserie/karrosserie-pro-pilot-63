@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     left: 30,
     right: 30,
     textAlign: 'center',
-    fontSize: 7,
+    fontSize: 6,
     color: '#666',
     paddingTop: 8,
     borderTopWidth: 1,

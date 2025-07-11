@@ -10,7 +10,7 @@ const InvoiceFooter = ({ companyData }: InvoiceFooterProps) => {
   }
 
   return (
-    <div className="mt-8 pt-4 border-t text-xs text-gray-500 text-center">
+    <div className="mt-8 pt-4 border-t text-[10px] text-gray-500 text-center">
       <p>
         {companyData.name} - {companyData.address} {companyData.zipcode} {companyData.city} - 
         SIRET {companyData.siret} - N° TVA : {companyData.tva || ''} - 
