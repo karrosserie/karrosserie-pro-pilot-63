@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreditCard, Settings as SettingsIcon, User, Bell, Sliders } from 'lucide-react';
 import CompanyTab from '@/components/settings/CompanyTab';
@@ -11,6 +11,14 @@ import { useCompany } from '@/hooks/use-company';
 
 const Settings = () => {
   const { isLoading } = useCompany();
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem('settings-active-tab') || 'account';
+  });
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    localStorage.setItem('settings-active-tab', value);
+  };
 
   if (isLoading) {
     return (
@@ -32,7 +40,7 @@ const Settings = () => {
         <p className="text-gray-600 mt-1">Configurez votre compte et vos préférences.</p>
       </div>
       
-      <Tabs defaultValue="account" className="w-full">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid grid-cols-2 md:grid-cols-5 mb-6">
           <TabsTrigger value="account">
             <User className="h-4 w-4 mr-2" />
