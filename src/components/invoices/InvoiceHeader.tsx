@@ -34,7 +34,7 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
         {/* Colonne 1 - Informations entreprise */}
         <div>
           <div>
-            <h1 className="text-2xl font-bold text-white px-4 py-2 rounded text-center" style={{backgroundColor: 'rgba(64,67,72,255)'}}>FACTURE</h1>
+            <h1 className="text-2xl font-bold text-white px-4 py-2 text-center" style={{backgroundColor: 'rgba(64,67,72,255)'}}>FACTURE</h1>
             {companyData.logo_url ? (
               <div className="flex items-center justify-start" style={{maxWidth: '175px'}}>
                 <img src={companyData.logo_url} alt="Logo entreprise" className="max-w-full h-auto object-contain" />
@@ -104,7 +104,7 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
           </div>
           
           {/* Encadré Montant dû */}
-          <div className="bg-blue-600 text-white p-4 rounded-lg text-center mt-4">
+          <div className="bg-blue-600 text-white p-4 text-center mt-4">
             <p className="text-sm mb-1">Montant dû</p>
             <p className="text-2xl font-bold">{formatAmount(finalTotal - totalPaidAmount)}</p>
           </div>

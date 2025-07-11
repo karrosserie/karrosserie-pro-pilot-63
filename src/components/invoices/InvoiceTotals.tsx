@@ -22,7 +22,7 @@ const InvoiceTotals = ({ subtotalAfterDiscount, totalVAT, totalDiscount, finalTo
             <span>{formatAmount(totalVAT)}</span>
           </div>
           <div>
-            <div className="flex justify-between bg-blue-600 text-white p-3 rounded font-bold">
+            <div className="flex justify-between bg-blue-600 text-white p-3 font-bold">
               <span>TOTAL</span>
               <span>{formatAmount(finalTotal)}</span>
             </div>
