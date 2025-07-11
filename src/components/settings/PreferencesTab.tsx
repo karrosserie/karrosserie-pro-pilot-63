@@ -481,13 +481,13 @@ const PreferencesTab = () => {
                            <th className="border-2 border-black p-2 text-center font-bold border-r">Prix HT</th>
                            <th className="border-2 border-black p-2 text-center font-bold border-r">TVA</th>
                            <th className="border-2 border-black p-2 text-center font-bold border-r">Total HT</th>
-                           <th className="border border-black p-2 text-center font-bold">Total TTC</th>
+                           <th className="border-2 border-black p-2 text-center font-bold">Total TTC</th>
                          </tr>
                       </thead>
                        <tbody>
                          <tr>
-                           <td className="p-2 border-r border-black">T1</td>
-                           <td className="p-2 border-r border-black">Réparation pare-chocs</td>
+                           <td className="p-2 border-2 border-r border-black">T1</td>
+                           <td className="p-2 border-2 border-r border-black">Réparation pare-chocs</td>
                            <td className="p-2 text-center border-r border-black">2</td>
                            <td className="p-2 text-center border-r border-black">0%</td>
                            <td className="p-2 text-center font-bold border-r border-black">110,00€</td>
