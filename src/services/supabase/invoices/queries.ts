@@ -107,11 +107,9 @@ export const invoiceQueries = {
     // Transform the joined data to match our Invoice interface et récupérer manuellement si nécessaire
     const transformedInvoices = await Promise.all(
       (invoicesWithJoins || []).map(async (invoice) => {
-        let enrichedInvoice = { ...invoice };
-        
         // Si pas de données client mais un client_id, récupérer manuellement
         if (!invoice.clients && invoice.client_id) {
-          console.log('Récupération manuelle des données client pour client_id:', invoice.client_id);
+          console.log('Récupération manuelle des données client pour invoice:', invoice.id, 'client_id:', invoice.client_id);
           const { data: clientData, error: clientError } = await supabase
             .from('clients')
             .select('id, first_name, last_name, email, phone, address, zipcode, city')
@@ -119,15 +117,41 @@ export const invoiceQueries = {
             .single();
             
           if (!clientError && clientData) {
-            enrichedInvoice.clients = clientData;
+            invoice.clients = clientData;
+            console.log('Données client récupérées avec succès:', clientData);
+          } else {
+            console.error('Erreur lors de la récupération du client:', clientError);
+          }
+        }
+        
+        // Si pas de données véhicule mais un vehicle_id, récupérer manuellement
+        if (!invoice.vehicles && invoice.vehicle_id) {
+          console.log('Récupération manuelle des données véhicule pour invoice:', invoice.id, 'vehicle_id:', invoice.vehicle_id);
+          const { data: vehicleData, error: vehicleError } = await supabase
+            .from('vehicles')
+            .select(`
+              id, 
+              license_plate,
+              mileage,
+              car_brands(id, name),
+              car_models(id, name)
+            `)
+            .eq('id', invoice.vehicle_id)
+            .single();
+            
+          if (!vehicleError && vehicleData) {
+            invoice.vehicles = vehicleData;
+            console.log('Données véhicule récupérées avec succès:', vehicleData);
+          } else {
+            console.error('Erreur lors de la récupération du véhicule:', vehicleError);
           }
         }
         
         return {
-          ...enrichedInvoice,
-          clients: Array.isArray(enrichedInvoice.clients) && enrichedInvoice.clients.length > 0 ? enrichedInvoice.clients[0] : enrichedInvoice.clients,
-          vehicles: Array.isArray(enrichedInvoice.vehicles) && enrichedInvoice.vehicles.length > 0 ? enrichedInvoice.vehicles[0] : enrichedInvoice.vehicles,
-          repair_orders: Array.isArray(enrichedInvoice.repair_orders) && enrichedInvoice.repair_orders.length > 0 ? enrichedInvoice.repair_orders[0] : enrichedInvoice.repair_orders
+          ...invoice,
+          clients: Array.isArray(invoice.clients) && invoice.clients.length > 0 ? invoice.clients[0] : invoice.clients,
+          vehicles: Array.isArray(invoice.vehicles) && invoice.vehicles.length > 0 ? invoice.vehicles[0] : invoice.vehicles,
+          repair_orders: Array.isArray(invoice.repair_orders) && invoice.repair_orders.length > 0 ? invoice.repair_orders[0] : invoice.repair_orders
         } as Invoice;
       })
     );
