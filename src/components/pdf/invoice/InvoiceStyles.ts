@@ -4,107 +4,175 @@ export const invoiceStyles = StyleSheet.create({
   page: {
     flexDirection: 'column',
     backgroundColor: '#ffffff',
-    padding: 20,
+    padding: 0,
     fontSize: 10,
     fontFamily: 'Helvetica'
   },
-  header: {
-    marginBottom: 20,
-    borderBottom: '1px solid #000',
-    paddingBottom: 10
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10
-  },
-  companyInfo: {
-    marginBottom: 10
-  },
-  companyName: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginBottom: 5
-  },
-  row: {
-    flexDirection: 'row',
-    marginBottom: 2
-  },
-  invoiceDetails: {
+  headerSection: {
+    backgroundColor: '#4a4a4a',
+    color: 'white',
+    padding: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: 'white'
+  },
+  mainContent: {
+    padding: 20
+  },
+  topSection: {
+    flexDirection: 'row',
     marginBottom: 20
   },
-  leftColumn: {
-    flex: 1
+  leftInfo: {
+    flex: 1,
+    paddingRight: 20
   },
-  rightColumn: {
-    flex: 1
+  rightInfo: {
+    flex: 1,
+    paddingLeft: 20
+  },
+  companyName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333'
+  },
+  companyDetails: {
+    fontSize: 9,
+    marginBottom: 2,
+    color: '#666'
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#333'
   },
   detailRow: {
     flexDirection: 'row',
-    marginBottom: 3
+    marginBottom: 4
   },
   label: {
-    width: 120,
-    fontWeight: 'bold'
+    width: 80,
+    fontSize: 9,
+    color: '#666'
   },
   value: {
-    flex: 1
+    flex: 1,
+    fontSize: 9,
+    color: '#333'
   },
   clientSection: {
+    backgroundColor: '#f8f9fa',
+    padding: 15,
     marginBottom: 20,
-    padding: 10,
-    border: '1px solid #cccccc'
+    border: '1px solid #e9ecef'
+  },
+  clientTitle: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#333'
+  },
+  amountDueSection: {
+    backgroundColor: '#007bff',
+    color: 'white',
+    padding: 15,
+    marginBottom: 20,
+    textAlign: 'center'
+  },
+  amountDueLabel: {
+    fontSize: 12,
+    marginBottom: 5
+  },
+  amountDueValue: {
+    fontSize: 24,
+    fontWeight: 'bold'
+  },
+  table: {
+    marginBottom: 20
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#f0f0f0',
-    padding: 5,
-    borderBottom: '1px solid #cccccc'
+    backgroundColor: '#6c757d',
+    color: 'white',
+    padding: 8,
+    fontSize: 10,
+    fontWeight: 'bold'
   },
   tableRow: {
     flexDirection: 'row',
-    padding: 5,
-    borderBottom: '1px solid #eeeeee'
+    padding: 8,
+    borderBottom: '1px solid #dee2e6',
+    fontSize: 9
   },
-  col1: { width: '20%' },
-  col2: { width: '15%' },
-  col3: { width: '15%' },
-  col4: { width: '15%' },
-  col5: { width: '15%' },
-  col6: { width: '20%' },
+  tableRowEven: {
+    backgroundColor: '#f8f9fa'
+  },
+  col1: { width: '35%', paddingRight: 5 },
+  col2: { width: '10%', textAlign: 'center' },
+  col3: { width: '15%', textAlign: 'right' },
+  col4: { width: '10%', textAlign: 'center' },
+  col5: { width: '10%', textAlign: 'center' },
+  col6: { width: '20%', textAlign: 'right' },
   totalsSection: {
     marginTop: 20,
     alignItems: 'flex-end'
   },
   totalRow: {
     flexDirection: 'row',
-    width: 200,
+    width: 250,
     justifyContent: 'space-between',
-    marginBottom: 3
+    marginBottom: 5,
+    padding: 5
+  },
+  totalRowFinal: {
+    backgroundColor: '#007bff',
+    color: 'white',
+    fontWeight: 'bold',
+    padding: 10
   },
   totalLabel: {
-    fontWeight: 'bold'
+    fontSize: 11
+  },
+  totalValue: {
+    fontSize: 11,
+    textAlign: 'right'
+  },
+  footer: {
+    marginTop: 30,
+    fontSize: 8,
+    textAlign: 'center',
+    color: '#666666',
+    borderTop: '1px solid #dee2e6',
+    paddingTop: 15
   },
   paymentSection: {
     marginTop: 20,
     marginBottom: 20
   },
   paymentTable: {
-    border: '1px solid #cccccc',
+    border: '1px solid #dee2e6',
     marginTop: 10
   },
   paymentHeader: {
     flexDirection: 'row',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#6c757d',
+    color: 'white',
     padding: 5,
-    borderBottom: '1px solid #cccccc'
+    fontSize: 9,
+    fontWeight: 'bold'
   },
   paymentRow: {
     flexDirection: 'row',
     padding: 5,
-    borderBottom: '1px solid #eeeeee'
+    borderBottom: '1px solid #dee2e6',
+    fontSize: 8
   },
   paymentCol1: { width: '12%' },
   paymentCol2: { width: '12%' },
@@ -112,19 +180,11 @@ export const invoiceStyles = StyleSheet.create({
   paymentCol4: { width: '12%' },
   paymentCol5: { width: '12%' },
   paymentCol6: { width: '15%' },
-  paymentCol7: { width: '10%' },
-  paymentCol8: { width: '15%' },
+  paymentCol7: { width: '25%' },
   summarySection: {
     marginTop: 10,
     padding: 10,
-    backgroundColor: '#f9f9f9'
-  },
-  footer: {
-    marginTop: 30,
-    fontSize: 8,
-    textAlign: 'center',
-    borderTop: '1px solid #000',
-    paddingTop: 10,
-    color: '#666666'
+    backgroundColor: '#f8f9fa',
+    border: '1px solid #dee2e6'
   }
 });
