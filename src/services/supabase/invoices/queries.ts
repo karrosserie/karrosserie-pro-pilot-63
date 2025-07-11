@@ -171,6 +171,8 @@ export const invoiceQueries = {
       throw new Error(error.message);
     }
     
+    console.log('Données récupérées depuis Supabase:', data);
+    
     // Si les joins ont échoué ou si clients est null, récupérer les données manuellement
     let enrichedData = { ...data };
     
