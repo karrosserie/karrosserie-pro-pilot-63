@@ -60,13 +60,13 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
           <div className="p-6 border-b">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Colonne 1 - Informations entreprise */}
-              <div className="flex items-start space-x-4">
-                <div className="bg-orange-500 rounded-full p-3">
-                  <span className="text-white font-bold text-xl">KR</span>
-                </div>
+              <div>
                 <div>
                   <h1 className="text-2xl font-bold text-gray-800">FACTURE</h1>
-                  <p className="text-gray-600">KARROSSERIE</p>
+                  <div className="bg-orange-500 rounded-full p-3 w-fit mt-2">
+                    <span className="text-white font-bold text-xl">KR</span>
+                  </div>
+                  <p className="text-gray-600 mt-2">KARROSSERIE</p>
                   <div className="text-sm text-gray-600 mt-2">
                     <p>ADRESSE : Votre adresse</p>
                     <p>PHONE : +33 1 23 45 67 89</p>
