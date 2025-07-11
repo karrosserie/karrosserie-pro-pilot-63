@@ -59,7 +59,7 @@ const InvoicePaymentsTable = ({ invoiceId, invoiceTotal }: InvoicePaymentsTableP
             </td>
           </tr>
           <tr className="bg-transparent">
-            <td colSpan={2} className="p-3 text-sm text-right font-medium">
+            <td colSpan={2} className="p-3 text-sm text-right font-medium text-red-600">
               Solde restant :
             </td>
             <td className="p-3 text-sm text-right font-bold text-red-600">
