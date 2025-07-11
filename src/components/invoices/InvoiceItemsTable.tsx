@@ -10,7 +10,7 @@ const InvoiceItemsTable = ({ items }: InvoiceItemsTableProps) => {
     <div className="mb-6">
       <table className="w-full bg-white">
         <thead>
-          <tr className="bg-gray-100">
+          <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
             <th className="p-3 text-left text-sm font-medium">Article</th>
             <th className="p-3 text-center text-sm font-medium">Quantité</th>
             <th className="p-3 text-center text-sm font-medium">Coût Unitaire</th>

@@ -24,7 +24,7 @@ const InvoicePaymentsTable = ({ invoiceId }: InvoicePaymentsTableProps) => {
       <h3 className="text-lg font-semibold mb-4 text-gray-800">Encaissements</h3>
       <table className="w-full bg-white">
         <thead>
-          <tr className="bg-gray-100">
+          <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
             <th className="p-3 text-left text-sm font-medium">Date</th>
             <th className="p-3 text-left text-sm font-medium">Mode de paiement</th>
             <th className="p-3 text-right text-sm font-medium">Montant</th>
@@ -44,7 +44,7 @@ const InvoicePaymentsTable = ({ invoiceId }: InvoicePaymentsTableProps) => {
           ))}
         </tbody>
         <tfoot>
-          <tr className="bg-gray-100 font-medium">
+          <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white font-medium">
             <td colSpan={2} className="p-3 text-sm text-right">
               Total encaissé :
             </td>
