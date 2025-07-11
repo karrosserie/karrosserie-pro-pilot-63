@@ -181,31 +181,62 @@ const Quotes = () => {
       const quoteData = {
         reference: quote.reference || '',
         date: new Date(quote.created_at).toLocaleDateString('fr-FR'),
+        company: {
+          name: "DEMO GEOFFREY MOYA",
+          address: "10 rue courteissade",
+          zipCode: "13320",
+          city: "Bouc bel air",
+          country: "France",
+          siren: "567890123",
+          siret: "56789012300013",
+          tva: "FR 567890123",
+          phone: "+33650363126",
+          email: "geoffrey.moya@gmail.com"
+        },
         client: quote.clients ? {
-          name: `${quote.clients.first_name} ${quote.clients.last_name}`,
+          nom: `${quote.clients.first_name} ${quote.clients.last_name}`,
+          telephone: quote.clients.phone || '',
+          email: quote.clients.email || '',
           address: quote.clients.address || '',
-          phone: quote.clients.phone || '',
-          email: quote.clients.email || ''
+          zipCode: quote.clients.zip_code || '',
+          city: quote.clients.city || ''
         } : {
-          name: 'Client inconnu',
+          nom: 'Client inconnu',
+          telephone: '',
+          email: '',
           address: '',
-          phone: '',
-          email: ''
+          zipCode: '',
+          city: ''
         },
         vehicle: quote.vehicles ? {
           brand: quote.vehicles.car_brands?.name || 'Marque inconnue',
           model: quote.vehicles.car_models?.name || 'Modèle inconnu',
-          plate: quote.vehicles.license_plate || '',
-          year: quote.vehicles.year?.toString() || ''
+          license_plate: quote.vehicles.license_plate || '',
+          mileage: quote.vehicles.mileage?.toString() || ''
         } : {
           brand: 'Marque inconnue',
           model: 'Modèle inconnu',
-          plate: '',
-          year: ''
+          license_plate: '',
+          mileage: ''
         },
-        repairs: repairs,
-        parts: parts,
-        discounts: discounts,
+        articles: [
+          ...repairs.map((repair: any) => ({
+            description: repair.description || 'Réparation',
+            quantity: repair.quantity?.toString() || '1',
+            discount: repair.discount?.toString() || '0',
+            unitCost: repair.unitPrice?.toFixed(2) || '0.00',
+            vat: '20',
+            total: ((repair.unitPrice || 0) * (repair.quantity || 1)).toFixed(2)
+          })),
+          ...parts.map((part: any) => ({
+            description: part.description || 'Pièce',
+            quantity: part.quantity?.toString() || '1',
+            discount: part.discount?.toString() || '0',
+            unitCost: part.unitPrice?.toFixed(2) || '0.00',
+            vat: '20',
+            total: ((part.unitPrice || 0) * (part.quantity || 1)).toFixed(2)
+          }))
+        ],
         notes: quote.notes || ''
       };
 
