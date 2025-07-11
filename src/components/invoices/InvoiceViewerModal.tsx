@@ -111,21 +111,21 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
                     <span>{invoice.claim_number || 'N/A'}</span>
                   </div>
                 </div>
+                
+                {/* Encadré Montant dû */}
+                <div className="bg-blue-600 text-white p-4 rounded-lg text-center mt-4">
+                  <p className="text-sm mb-1">Montant dû:</p>
+                  <p className="text-2xl font-bold">{formatAmount(finalTotal)}</p>
+                </div>
               </div>
 
-              {/* Colonne 3 - Facture pour + Montant dû */}
+              {/* Colonne 3 - Facture pour */}
               <div>
                 <h3 className="text-lg font-semibold mb-4 text-gray-800">Facture pour :</h3>
                 <div className="text-sm mb-4">
                   <p className="font-medium">{invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'N/A'}</p>
                   <p>Adresse du client disponible</p>
                   <p>dans les données client</p>
-                </div>
-                
-                {/* Encadré Montant dû */}
-                <div className="bg-blue-600 text-white p-4 rounded-lg text-center">
-                  <p className="text-sm mb-1">Montant dû:</p>
-                  <p className="text-2xl font-bold">{formatAmount(finalTotal)}</p>
                 </div>
               </div>
             </div>
