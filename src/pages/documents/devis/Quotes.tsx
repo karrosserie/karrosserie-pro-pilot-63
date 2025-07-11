@@ -19,6 +19,8 @@ import { useToast } from '@/hooks/use-toast';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import QuoteEmailDialog from '@/components/quotes/QuoteEmailDialog';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
+import { pdf } from '@react-pdf/renderer';
+import { QuotePDF } from '@/components/pdf/QuoteViewer';
 import { Quote } from '@/services/supabase/quotes';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { StatusBadge } from '@/components/ui/status-badge';
@@ -151,11 +153,87 @@ const Quotes = () => {
     }
   }, [quotes, searchParams, setSearchParams]);
 
-  const handleDownload = (quote: Quote) => {
-    toast({
-      title: "Téléchargement",
-      description: `Téléchargement du devis ${quote.reference}...`
-    });
+  const handleDownload = async (quote: any) => {
+    try {
+      // Préparer les données pour le PDF comme dans QuoteViewer
+      let repairs = [];
+      let parts = [];
+      let discounts = [];
+
+      try {
+        repairs = quote.repairs_data ? JSON.parse(quote.repairs_data as string) : [];
+      } catch (e) {
+        console.error('Error parsing repairs data:', e);
+      }
+      
+      try {
+        parts = quote.parts_data ? JSON.parse(quote.parts_data as string) : [];
+      } catch (e) {
+        console.error('Error parsing parts data:', e);
+      }
+      
+      try {
+        discounts = quote.discounts_data ? JSON.parse(quote.discounts_data as string) : [];
+      } catch (e) {
+        console.error('Error parsing discounts data:', e);
+      }
+
+      const quoteData = {
+        reference: quote.reference || '',
+        date: new Date(quote.created_at).toLocaleDateString('fr-FR'),
+        client: quote.clients ? {
+          name: `${quote.clients.first_name} ${quote.clients.last_name}`,
+          address: quote.clients.address || '',
+          phone: quote.clients.phone || '',
+          email: quote.clients.email || ''
+        } : {
+          name: 'Client inconnu',
+          address: '',
+          phone: '',
+          email: ''
+        },
+        vehicle: quote.vehicles ? {
+          brand: quote.vehicles.car_brands?.name || 'Marque inconnue',
+          model: quote.vehicles.car_models?.name || 'Modèle inconnu',
+          plate: quote.vehicles.license_plate || '',
+          year: quote.vehicles.year?.toString() || ''
+        } : {
+          brand: 'Marque inconnue',
+          model: 'Modèle inconnu',
+          plate: '',
+          year: ''
+        },
+        repairs: repairs,
+        parts: parts,
+        discounts: discounts,
+        notes: quote.notes || ''
+      };
+
+      // Générer le PDF
+      const blob = await pdf(<QuotePDF quoteData={quoteData} />).toBlob();
+      
+      // Créer le lien de téléchargement
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Devis_${quote.reference || 'SANS_REF'}_${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Téléchargement réussi",
+        description: `Le devis ${quote.reference} a été téléchargé avec succès.`
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Erreur de téléchargement",
+        description: "Une erreur s'est produite lors de la génération du PDF.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handlePrint = (quote: Quote) => {
