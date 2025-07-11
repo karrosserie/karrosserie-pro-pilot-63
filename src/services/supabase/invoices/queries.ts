@@ -104,8 +104,8 @@ export const invoiceQueries = {
 
       return enrichedInvoices;
     }
-    
-    // Transform the joined data to match our Invoice interface et récupérer manuellement si nécessaire
+    console.log('=== JOINS RÉUSSIS, TRANSFORMATION EN COURS ===');
+    console.log('invoicesWithJoins:', invoicesWithJoins);
     const transformedInvoices = await Promise.all(
       (invoicesWithJoins || []).map(async (invoice) => {
         // Si pas de données client mais un client_id, récupérer manuellement
