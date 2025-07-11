@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Invoice } from '@/services/supabase/invoices';
 import { useCompany } from '@/hooks/use-company';
 import { calculateInvoiceTotals } from '@/utils/invoiceCalculations';
-import { useQueryClient } from '@tanstack/react-query';
 import InvoiceHeader from './InvoiceHeader';
 import InvoiceItemsTable from './InvoiceItemsTable';
 import InvoiceTotals from './InvoiceTotals';
@@ -17,14 +16,6 @@ interface InvoiceViewerModalProps {
 
 const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalProps) => {
   const { companyData } = useCompany();
-  const queryClient = useQueryClient();
-  
-  // Force refresh des données quand la modal s'ouvre
-  useEffect(() => {
-    if (open) {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] });
-    }
-  }, [open, queryClient]);
   
   if (!invoice) return null;
 

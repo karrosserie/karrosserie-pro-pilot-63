@@ -30,7 +30,7 @@ export interface Invoice {
     email?: string;
     phone?: string;
     address?: string;
-    postal_code?: string;
+    zipcode?: string;
     city?: string;
   };
   vehicles?: {

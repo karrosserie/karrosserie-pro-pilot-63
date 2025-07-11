@@ -18,7 +18,7 @@ export const invoiceQueries = {
           email,
           phone,
           address,
-          postal_code,
+          zipcode,
           city
         ),
         vehicles (
@@ -60,7 +60,7 @@ export const invoiceQueries = {
           if (invoice.client_id) {
             const { data: client } = await supabase
               .from('clients')
-              .select('id, first_name, last_name, email, phone, address, postal_code, city')
+              .select('id, first_name, last_name, email, phone, address, zipcode, city')
               .eq('id', invoice.client_id)
               .single();
             clientData = client;
@@ -127,7 +127,7 @@ export const invoiceQueries = {
           email,
           phone,
           address,
-          postal_code,
+          zipcode,
           city
         ),
         vehicles (
