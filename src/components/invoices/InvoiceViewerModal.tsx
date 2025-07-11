@@ -40,7 +40,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
               totalDiscount={totals.totalDiscount}
               finalTotal={totals.finalTotal}
             />
-            <InvoicePaymentsTable invoiceId={invoice.id} />
+            <InvoicePaymentsTable invoiceId={invoice.id} invoiceTotal={totals.finalTotal} />
             <InvoiceFooter />
           </div>
         </div>

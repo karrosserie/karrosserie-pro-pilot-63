@@ -6,13 +6,18 @@ import { fr } from 'date-fns/locale';
 
 interface InvoicePaymentsTableProps {
   invoiceId: string;
+  invoiceTotal: number;
 }
 
-const InvoicePaymentsTable = ({ invoiceId }: InvoicePaymentsTableProps) => {
+const InvoicePaymentsTable = ({ invoiceId, invoiceTotal }: InvoicePaymentsTableProps) => {
   const { receipts } = useReceiptsData();
   
   // Filtrer les encaissements pour cette facture
   const invoicePayments = receipts?.filter(receipt => receipt.invoice_id === invoiceId) || [];
+  
+  // Calculer le total encaissé et le solde restant
+  const totalPaid = invoicePayments.reduce((total, payment) => total + (payment.amount || 0), 0);
+  const remainingBalance = invoiceTotal - totalPaid;
   
   // Ne pas afficher le tableau s'il n'y a pas d'encaissements
   if (invoicePayments.length === 0) {
@@ -49,7 +54,15 @@ const InvoicePaymentsTable = ({ invoiceId }: InvoicePaymentsTableProps) => {
               Total encaissé :
             </td>
             <td className="p-3 text-sm text-right font-bold">
-              {formatAmount(invoicePayments.reduce((total, payment) => total + (payment.amount || 0), 0))}
+              {formatAmount(totalPaid)}
+            </td>
+          </tr>
+          <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white font-medium">
+            <td colSpan={2} className="p-3 text-sm text-right">
+              Solde restant :
+            </td>
+            <td className="p-3 text-sm text-right font-bold">
+              {formatAmount(remainingBalance)}
             </td>
           </tr>
         </tfoot>
