@@ -273,9 +273,9 @@ const PreferencesTab = () => {
                      </div>
                    </div>
 
-                   {/* Tableau complet des articles - maintenant directement après le header */}
-                   <div className="mt-6">
-                     <table className="w-full text-base bg-white">
+                    {/* Tableau complet des articles - maintenant directement après le header */}
+                    <div className="mt-6">
+                      <table className="w-full text-base bg-white border-2 border-black rounded-lg overflow-hidden">
                        <thead>
                          <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
                            <th className="p-3 text-left font-medium">Article</th>
@@ -453,7 +453,7 @@ const PreferencesTab = () => {
 
                   {/* Totaux */}
                   <div className="flex justify-end">
-                    <table className="border border-black text-sm rounded-lg overflow-hidden">
+                    <table className="border-2 border-black text-sm rounded-lg overflow-hidden">
                       <tbody>
                         <tr>
                           <td className="border-2 border-black p-2 font-bold text-center">TOTAL HT</td>
