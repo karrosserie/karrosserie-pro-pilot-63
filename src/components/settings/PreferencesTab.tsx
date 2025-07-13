@@ -361,8 +361,7 @@ const PreferencesTab = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <h2 className="text-3xl font-bold text-black mb-2">FACTURE</h2>
-                        <p className="text-gray-700 mb-4 text-2xl font-bold">5</p>
+                        <h2 className="text-3xl font-bold text-black mb-2">FACTURE N°5</h2>
                         
                         {/* Informations client déplacées ici */}
                         <div className="text-left p-4">
@@ -393,7 +392,7 @@ const PreferencesTab = () => {
                     </div>
 
                      {/* Tableau des articles avec bordure globale */}
-                    <div className="border-2 border-black rounded-lg overflow-hidden mb-6">
+                    <div className="border border-black rounded-lg overflow-hidden mb-6">
                       <table className="w-full text-sm border-collapse">
                         <thead>
                           <tr>
@@ -454,7 +453,7 @@ const PreferencesTab = () => {
 
                   {/* Totaux */}
                   <div className="flex justify-end">
-                    <table className="border-2 border-black text-sm rounded-lg overflow-hidden">
+                    <table className="border border-black text-sm rounded-lg overflow-hidden">
                       <tbody>
                         <tr>
                           <td className="border-2 border-black p-2 font-bold text-center">TOTAL HT</td>
