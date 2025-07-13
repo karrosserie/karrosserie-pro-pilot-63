@@ -286,32 +286,32 @@ const PreferencesTab = () => {
                            <th className="p-3 text-right font-medium">Total HT</th>
                          </tr>
                        </thead>
-                       <tbody>
-                         <tr>
-                           <td className="p-3">Réparation pare-chocs avant</td>
-                           <td className="p-3 text-right">1</td>
-                           <td className="p-3 text-right">350,00 €</td>
-                           <td className="p-3 text-right">0%</td>
-                           <td className="p-3 text-right">20%</td>
-                           <td className="p-3 text-right font-medium">350,00 €</td>
-                         </tr>
-                         <tr>
-                           <td className="p-3">Peinture carrosserie</td>
-                           <td className="p-3 text-right">1</td>
-                           <td className="p-3 text-right">450,00 €</td>
-                           <td className="p-3 text-right">0%</td>
-                           <td className="p-3 text-right">20%</td>
-                           <td className="p-3 text-right font-medium">450,00 €</td>
-                         </tr>
-                         <tr>
-                           <td className="p-3">Pièce détachée - Feu avant gauche</td>
-                           <td className="p-3 text-right">1</td>
-                           <td className="p-3 text-right">125,00 €</td>
-                           <td className="p-3 text-right">5%</td>
-                           <td className="p-3 text-right">20%</td>
-                           <td className="p-3 text-right font-medium">118,75 €</td>
-                         </tr>
-                       </tbody>
+                        <tbody>
+                          <tr className="border-b-2 border-gray-900">
+                            <td className="p-3 border-r-2 border-gray-900">Réparation pare-chocs avant</td>
+                            <td className="p-3 text-right border-r-2 border-gray-900">1</td>
+                            <td className="p-3 text-right border-r-2 border-gray-900">350,00 €</td>
+                            <td className="p-3 text-right border-r-2 border-gray-900">0%</td>
+                            <td className="p-3 text-right border-r-2 border-gray-900">20%</td>
+                            <td className="p-3 text-right font-medium">350,00 €</td>
+                          </tr>
+                          <tr className="border-b-2 border-gray-900">
+                            <td className="p-3 border-r-2 border-gray-900">Peinture carrosserie</td>
+                            <td className="p-3 text-right border-r-2 border-gray-900">1</td>
+                            <td className="p-3 text-right border-r-2 border-gray-900">450,00 €</td>
+                            <td className="p-3 text-right border-r-2 border-gray-900">0%</td>
+                            <td className="p-3 text-right border-r-2 border-gray-900">20%</td>
+                            <td className="p-3 text-right font-medium">450,00 €</td>
+                          </tr>
+                          <tr className="border-b-2 border-gray-900">
+                            <td className="p-3 border-r-2 border-gray-900">Pièce détachée - Feu avant gauche</td>
+                            <td className="p-3 text-right border-r-2 border-gray-900">1</td>
+                            <td className="p-3 text-right border-r-2 border-gray-900">125,00 €</td>
+                            <td className="p-3 text-right border-r-2 border-gray-900">5%</td>
+                            <td className="p-3 text-right border-r-2 border-gray-900">20%</td>
+                            <td className="p-3 text-right font-medium">118,75 €</td>
+                          </tr>
+                        </tbody>
                      </table>
                      
                      {/* Totaux */}
