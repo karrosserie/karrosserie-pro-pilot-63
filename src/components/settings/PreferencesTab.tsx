@@ -362,25 +362,25 @@ const PreferencesTab = () => {
                       </div>
                       <div className="text-right">
                         <h2 className="text-3xl font-bold text-black mb-2">FACTURE</h2>
-                        <p className="text-gray-500 mb-4">2024/12/0036</p>
+                        <p className="text-gray-500 mb-4">5</p>
                         
                         {/* Informations client déplacées ici */}
                         <div className="text-left p-4">
-                          <p className="text-sm font-medium text-gray-700 mb-2">Demo user</p>
+                          <p className="text-sm font-medium text-gray-700">JEAN DUPONT</p>
                           <div className="text-sm text-gray-600 space-y-1">
                             <p><strong>TEL :</strong> +33646464646</p>
-                            <p><strong>EMAIL :</strong> demo@user.com</p>
-                            <p><strong>ADRESSE :</strong> 11 rue jurany 13004</p>
-                            <p>Immatricule : AZ-ER-RTY</p>
-                            <p>Kilométrage : 500 Km</p>
-                            <p>Véhicule : Sito Blomn</p>
+                            <p><strong>EMAIL :</strong> jeandupont@yopmail.com</p>
+                            <p><strong>ADRESSE :</strong> 134 Boulevard Michelet 13008 MARSEILLE</p>
+                            <p><strong>Immatriculatriculation :</strong> AZ-ER-RTY</p>
+                            <p><strong>Kilométrage :</strong> 95678 Km</p>
+                            <p><strong>Véhicule :</strong> PEUGEOT 308 II</p>
                           </div>
                         </div>
                       </div>
                     </div>
 
                     {/* Dates avec coins arrondis et plus d'espace */}
-                    <div className="flex justify-center gap-16 mb-8">
+                    <div className="flex justify-center gap-32 mb-8">
                       <div className="border-2 border-black rounded-lg px-4 py-2 text-center">
                         <div className="font-bold text-sm mb-1">DATE</div>
                         <div className="text-sm">11/12/2024</div>
@@ -392,7 +392,7 @@ const PreferencesTab = () => {
                     </div>
 
                     {/* Tableau des articles avec bordure globale épaisse */}
-                    <div className="border-4 border-black rounded-lg overflow-hidden mb-6">
+                    <div className="border-2 border-black rounded-lg overflow-hidden mb-6">
                       <table className="w-full text-sm border-collapse">
                         <thead>
                           <tr>
