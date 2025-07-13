@@ -344,66 +344,136 @@ const PreferencesTab = () => {
                      </p>
                    </div>
                  </div>
-              ) : (
-                // Modèle alternatif
-                <div className="bg-white p-4 rounded shadow-sm">
-                  <div className="text-center mb-4">
-                    <h1 className="text-2xl font-bold text-blue-800 mb-2">FACTURE</h1>
-                    <div className="bg-blue-100 p-3 rounded-lg">
-                      <p className="font-bold text-blue-800">KARROSSERIE</p>
-                      <p className="text-sm">123 Rue de l&apos;Automobile, 75001 Paris</p>
-                      <p className="text-sm">Tel: +33 1 23 45 67 89 | Email: contact@karrosserie.fr</p>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4 mb-4 text-xs">
-                    <div className="border border-blue-200 p-2 rounded">
-                      <h3 className="font-semibold text-blue-800 mb-2">Facturé à:</h3>
-                      <p className="font-medium">Jean Dupont</p>
-                      <p>456 Avenue de la République</p>
-                      <p>75011 Paris</p>
-                    </div>
-                    
-                    <div className="border border-blue-200 p-2 rounded">
-                      <h3 className="font-semibold text-blue-800 mb-2">Détails:</h3>
-                      <p>Facture N°: F-2024-001</p>
-                      <p>Date: 11/07/2025</p>
-                      <p>Véhicule: Peugeot 308 (AB-123-CD)</p>
-                    </div>
-                  </div>
-                  
-                  <div className="border border-blue-200 rounded mb-4">
-                    <div className="bg-blue-800 text-white p-2 rounded-t">
-                      <div className="grid grid-cols-4 gap-2 text-xs font-semibold">
-                        <span>Description</span>
-                        <span className="text-center">Quantité</span>
-                        <span className="text-center">Prix unitaire</span>
-                        <span className="text-right">Total</span>
-                      </div>
-                    </div>
-                    <div className="p-2">
-                      <div className="grid grid-cols-4 gap-2 text-xs py-1">
-                        <span>Réparation pare-chocs avant</span>
-                        <span className="text-center">1</span>
-                        <span className="text-center">350,00 €</span>
-                        <span className="text-right">350,00 €</span>
-                      </div>
-                      <div className="grid grid-cols-4 gap-2 text-xs py-1">
-                        <span>Peinture carrosserie</span>
-                        <span className="text-center">1</span>
-                        <span className="text-center">450,00 €</span>
-                        <span className="text-right">450,00 €</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-end">
-                    <div className="bg-blue-800 text-white p-3 rounded text-center">
-                      <p className="text-xs">TOTAL À PAYER</p>
-                      <p className="text-lg font-bold">960,00 €</p>
-                    </div>
-                  </div>
-                </div>
+               ) : (
+                 // Modèle alternatif - basé sur l'image de référence
+                 <div className="bg-white p-6 rounded shadow-sm" style={{ fontFamily: 'Arial, sans-serif' }}>
+                   {/* En-tête avec entreprise et FACTURE */}
+                   <div className="flex justify-between items-start mb-8">
+                     <div>
+                       <h1 className="text-2xl font-bold text-red-600 mb-4">ZS ISTRES</h1>
+                       <div className="text-sm text-gray-700 space-y-1">
+                         <p><strong>ADRESSE :</strong> 75 ROUTE DE LA</p>
+                         <p>CABANE NOIRE 13800 ISTRES</p>
+                         <p><strong>TEL :</strong> +33646252624</p>
+                         <p><strong>EMAIL :</strong> kenneforauto@gmail.com</p>
+                         <p><strong>SIRET :</strong> 902 000 675955</p>
+                         <p><strong>TVA :</strong> FR902 000 675</p>
+                       </div>
+                     </div>
+                     <div className="text-right">
+                       <h2 className="text-3xl font-bold text-black mb-2">FACTURE</h2>
+                       <p className="text-gray-500">2024/12/0036</p>
+                     </div>
+                   </div>
+
+                   {/* Informations client */}
+                   <div className="flex justify-between mb-8">
+                     <div>
+                       <p className="text-sm font-medium text-gray-700 mb-2">Demo user</p>
+                       <div className="text-sm text-gray-600 space-y-1">
+                         <p><strong>TEL :</strong> +33646464646</p>
+                         <p><strong>EMAIL :</strong> demo@user.com</p>
+                         <p><strong>ADRESSE :</strong> 11 rue jurany 13004</p>
+                         <p>Immatricule : AZ-ER-RTY</p>
+                         <p>Kilométrage : 500 Km</p>
+                         <p>Véhicule : Sito Blomn</p>
+                       </div>
+                     </div>
+                   </div>
+
+                   {/* Dates */}
+                   <div className="flex justify-center gap-8 mb-8">
+                     <div className="border-2 border-black rounded px-4 py-2 text-center">
+                       <div className="font-bold text-sm mb-1">DATE</div>
+                       <div className="text-sm">11/12/2024</div>
+                     </div>
+                     <div className="border-2 border-black rounded px-4 py-2 text-center">
+                       <div className="font-bold text-sm mb-1">DATE D'ECHANCE</div>
+                       <div className="text-sm">11/12/2024</div>
+                     </div>
+                   </div>
+
+                   {/* Tableau des articles */}
+                   <table className="w-full text-sm border-collapse border-2 border-black mb-6">
+                     <thead>
+                       <tr className="bg-gray-100">
+                         <th className="border-2 border-black p-2 text-left">Réf</th>
+                         <th className="border-2 border-black p-2 text-left">Description</th>
+                         <th className="border-2 border-black p-2 text-center">Quantité</th>
+                         <th className="border-2 border-black p-2 text-center">Remise</th>
+                         <th className="border-2 border-black p-2 text-center">Prix HT</th>
+                         <th className="border-2 border-black p-2 text-center">TVA</th>
+                         <th className="border-2 border-black p-2 text-center">Total HT</th>
+                         <th className="border-2 border-black p-2 text-center border-r-4 border-r-black">Total TTC</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       <tr>
+                         <td className="border-2 border-black p-2">T1</td>
+                         <td className="border-2 border-black p-2">-</td>
+                         <td className="border-2 border-black p-2 text-center">2</td>
+                         <td className="border-2 border-black p-2 text-center">0%</td>
+                         <td className="border-2 border-black p-2 text-center">110,00€</td>
+                         <td className="border-2 border-black p-2 text-center">20%</td>
+                         <td className="border-2 border-black p-2 text-center">220,00€</td>
+                         <td className="border-2 border-black p-2 text-center border-r-4 border-r-black">264,00€</td>
+                       </tr>
+                       <tr>
+                         <td className="border-2 border-black p-2">T2</td>
+                         <td className="border-2 border-black p-2">-</td>
+                         <td className="border-2 border-black p-2 text-center">2</td>
+                         <td className="border-2 border-black p-2 text-center">0%</td>
+                         <td className="border-2 border-black p-2 text-center">110,00€</td>
+                         <td className="border-2 border-black p-2 text-center">20%</td>
+                         <td className="border-2 border-black p-2 text-center">220,00€</td>
+                         <td className="border-2 border-black p-2 text-center border-r-4 border-r-black">264,00€</td>
+                       </tr>
+                       <tr>
+                         <td className="border-2 border-black p-2">-</td>
+                         <td className="border-2 border-black p-2">GRILLE DE PARE-CHOCS AV</td>
+                         <td className="border-2 border-black p-2 text-center">1</td>
+                         <td className="border-2 border-black p-2 text-center">5%</td>
+                         <td className="border-2 border-black p-2 text-center">95,00€</td>
+                         <td className="border-2 border-black p-2 text-center">20%</td>
+                         <td className="border-2 border-black p-2 text-center">90,25€</td>
+                         <td className="border-2 border-black p-2 text-center border-r-4 border-r-black">108,30€</td>
+                       </tr>
+                       <tr>
+                         <td className="border-2 border-black p-2">-</td>
+                         <td className="border-2 border-black p-2">CONDENSEUR DE CLIMATISATION MOTRIO</td>
+                         <td className="border-2 border-black p-2 text-center">5</td>
+                         <td className="border-2 border-black p-2 text-center">0%</td>
+                         <td className="border-2 border-black p-2 text-center">0,00€</td>
+                         <td className="border-2 border-black p-2 text-center">20%</td>
+                         <td className="border-2 border-black p-2 text-center">0,00€</td>
+                         <td className="border-2 border-black p-2 text-center border-r-4 border-r-black">0,00€</td>
+                       </tr>
+                     </tbody>
+                   </table>
+
+                   {/* Totaux */}
+                   <div className="flex justify-center">
+                     <table className="border-2 border-black text-sm">
+                       <tr className="bg-gray-100">
+                         <td className="border-2 border-black p-2 font-bold text-center">TOTAL HT</td>
+                         <td className="border-2 border-black p-2 font-bold text-center">TOTAL TVA</td>
+                         <td className="border-2 border-black p-2 font-bold text-center">Total Remise</td>
+                         <td className="border-2 border-black p-2 font-bold text-center border-r-4 border-r-black">Total TTC</td>
+                       </tr>
+                       <tr>
+                         <td className="border-2 border-black p-2 text-center">530,25€</td>
+                         <td className="border-2 border-black p-2 text-center">106,05€</td>
+                         <td className="border-2 border-black p-2 text-center">5,30€</td>
+                         <td className="border-2 border-black p-2 text-center border-r-4 border-r-black">630,00€</td>
+                       </tr>
+                     </table>
+                   </div>
+
+                   {/* Footer */}
+                   <div className="mt-8 text-xs text-center text-gray-500">
+                     <p>SARL au capital de 8 000,00 € - SIRET: 90194807700014</p>
+                   </div>
+                 </div>
               )}
             </div>
           </div>
