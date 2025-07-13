@@ -370,7 +370,8 @@ const PreferencesTab = () => {
                           <div className="text-sm text-gray-600 space-y-1">
                             <p><strong>TEL :</strong> +33646464646</p>
                             <p><strong>EMAIL :</strong> jeandupont@yopmail.com</p>
-                            <p><strong>ADRESSE :</strong> 134 Boulevard Michelet 13008 MARSEILLE</p>
+                            <p><strong>ADRESSE :</strong> 134 Boulevard Michelet</p>
+                            <p>13008 MARSEILLE</p>
                             <p><strong>Immatriculatriculation :</strong> AZ-ER-RTY</p>
                             <p><strong>Kilométrage :</strong> 95678 Km</p>
                             <p><strong>Véhicule :</strong> PEUGEOT 308 II</p>
@@ -408,8 +409,8 @@ const PreferencesTab = () => {
                         </thead>
                      <tbody>
                        <tr>
+                         <td className="border border-black p-2"></td>
                          <td className="border border-black p-2">T1</td>
-                         <td className="border border-black p-2">-</td>
                          <td className="border border-black p-2 text-center">2</td>
                          <td className="border border-black p-2 text-center">0%</td>
                          <td className="border border-black p-2 text-center">110,00€</td>
@@ -418,8 +419,8 @@ const PreferencesTab = () => {
                          <td className="border border-black p-2 text-center border-r border-r-black">264,00€</td>
                        </tr>
                        <tr>
+                         <td className="border border-black p-2"></td>
                          <td className="border border-black p-2">T2</td>
-                         <td className="border border-black p-2">-</td>
                          <td className="border border-black p-2 text-center">2</td>
                          <td className="border border-black p-2 text-center">0%</td>
                          <td className="border border-black p-2 text-center">110,00€</td>
@@ -428,7 +429,7 @@ const PreferencesTab = () => {
                          <td className="border border-black p-2 text-center border-r border-r-black">264,00€</td>
                        </tr>
                        <tr>
-                         <td className="border border-black p-2">-</td>
+                         <td className="border border-black p-2"></td>
                          <td className="border border-black p-2">GRILLE DE PARE-CHOCS AV</td>
                          <td className="border border-black p-2 text-center">1</td>
                          <td className="border border-black p-2 text-center">5%</td>
@@ -438,7 +439,7 @@ const PreferencesTab = () => {
                          <td className="border border-black p-2 text-center border-r border-r-black">108,30€</td>
                        </tr>
                        <tr>
-                         <td className="border border-black p-2">-</td>
+                         <td className="border border-black p-2"></td>
                          <td className="border border-black p-2">CONDENSEUR DE CLIMATISATION MOTRIO</td>
                          <td className="border border-black p-2 text-center">5</td>
                          <td className="border border-black p-2 text-center">0%</td>
