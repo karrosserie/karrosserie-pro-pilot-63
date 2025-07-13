@@ -366,8 +366,8 @@ const PreferencesTab = () => {
                         
                         {/* Informations client déplacées ici */}
                         <div className="text-left p-4">
-                          <p className="text-sm font-medium text-gray-700">JEAN DUPONT</p>
                           <div className="text-sm text-gray-600 space-y-1">
+                            <p>JEAN DUPONT</p>
                             <p><strong>TEL :</strong> +33646464646</p>
                             <p><strong>EMAIL :</strong> jeandupont@yopmail.com</p>
                             <p><strong>ADRESSE :</strong> 134 Boulevard Michelet</p>
