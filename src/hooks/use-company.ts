@@ -54,7 +54,7 @@ export function useCompany() {
     };
 
     loadCompanyData();
-  }, [user, toast]);
+  }, [user?.id]);
 
   const saveCompanyData = async () => {
     if (!user) {
