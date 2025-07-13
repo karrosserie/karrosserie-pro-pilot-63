@@ -362,7 +362,7 @@ const PreferencesTab = () => {
                       </div>
                       <div className="text-right">
                         <h2 className="text-3xl font-bold text-black mb-2">FACTURE</h2>
-                        <p className="text-gray-500 mb-4">5</p>
+                        <p className="text-gray-700 mb-4">5</p>
                         
                         {/* Informations client déplacées ici */}
                         <div className="text-left p-4">
