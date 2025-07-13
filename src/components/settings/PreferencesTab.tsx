@@ -345,56 +345,54 @@ const PreferencesTab = () => {
                    </div>
                  </div>
                ) : (
-                 // Modèle alternatif - basé sur l'image de référence
-                 <div className="bg-white p-6 rounded shadow-sm" style={{ fontFamily: 'Arial, sans-serif' }}>
-                   {/* En-tête avec entreprise et FACTURE */}
-                   <div className="flex justify-between items-start mb-8">
-                     <div>
-                       <h1 className="text-2xl font-bold text-red-600 mb-4">ZS ISTRES</h1>
-                       <div className="text-sm text-gray-700 space-y-1">
-                         <p><strong>ADRESSE :</strong> 75 ROUTE DE LA</p>
-                         <p>CABANE NOIRE 13800 ISTRES</p>
-                         <p><strong>TEL :</strong> +33646252624</p>
-                         <p><strong>EMAIL :</strong> kenneforauto@gmail.com</p>
-                         <p><strong>SIRET :</strong> 902 000 675955</p>
-                         <p><strong>TVA :</strong> FR902 000 675</p>
-                       </div>
-                     </div>
-                     <div className="text-right">
-                       <h2 className="text-3xl font-bold text-black mb-2">FACTURE</h2>
-                       <p className="text-gray-500">2024/12/0036</p>
-                     </div>
-                   </div>
+                  // Modèle alternatif - basé sur l'image de référence
+                  <div className="bg-white p-6 rounded shadow-sm" style={{ fontFamily: 'Arial, sans-serif' }}>
+                    {/* En-tête avec entreprise et FACTURE */}
+                    <div className="flex justify-between items-start mb-8">
+                      <div>
+                        <h1 className="text-2xl font-bold text-red-600 mb-4">ZS ISTRES</h1>
+                        <div className="text-sm text-gray-700 space-y-1">
+                          <p><strong>ADRESSE :</strong> 75 ROUTE DE LA</p>
+                          <p>CABANE NOIRE 13800 ISTRES</p>
+                          <p><strong>TEL :</strong> +33646252624</p>
+                          <p><strong>EMAIL :</strong> kenneforauto@gmail.com</p>
+                          <p><strong>SIRET :</strong> 902 000 675955</p>
+                          <p><strong>TVA :</strong> FR902 000 675</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <h2 className="text-3xl font-bold text-black mb-2">FACTURE</h2>
+                        <p className="text-gray-500 mb-4">2024/12/0036</p>
+                        
+                        {/* Informations client déplacées ici */}
+                        <div className="text-left bg-gray-50 p-4 rounded-lg">
+                          <p className="text-sm font-medium text-gray-700 mb-2">Demo user</p>
+                          <div className="text-sm text-gray-600 space-y-1">
+                            <p><strong>TEL :</strong> +33646464646</p>
+                            <p><strong>EMAIL :</strong> demo@user.com</p>
+                            <p><strong>ADRESSE :</strong> 11 rue jurany 13004</p>
+                            <p>Immatricule : AZ-ER-RTY</p>
+                            <p>Kilométrage : 500 Km</p>
+                            <p>Véhicule : Sito Blomn</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
-                   {/* Informations client */}
-                   <div className="flex justify-between mb-8">
-                     <div>
-                       <p className="text-sm font-medium text-gray-700 mb-2">Demo user</p>
-                       <div className="text-sm text-gray-600 space-y-1">
-                         <p><strong>TEL :</strong> +33646464646</p>
-                         <p><strong>EMAIL :</strong> demo@user.com</p>
-                         <p><strong>ADRESSE :</strong> 11 rue jurany 13004</p>
-                         <p>Immatricule : AZ-ER-RTY</p>
-                         <p>Kilométrage : 500 Km</p>
-                         <p>Véhicule : Sito Blomn</p>
-                       </div>
-                     </div>
-                   </div>
+                    {/* Dates avec coins arrondis */}
+                    <div className="flex justify-center gap-8 mb-8">
+                      <div className="border-2 border-black rounded-lg px-4 py-2 text-center">
+                        <div className="font-bold text-sm mb-1">DATE</div>
+                        <div className="text-sm">11/12/2024</div>
+                      </div>
+                      <div className="border-2 border-black rounded-lg px-4 py-2 text-center">
+                        <div className="font-bold text-sm mb-1">DATE D'ECHANCE</div>
+                        <div className="text-sm">11/12/2024</div>
+                      </div>
+                    </div>
 
-                   {/* Dates */}
-                   <div className="flex justify-center gap-8 mb-8">
-                     <div className="border-2 border-black rounded px-4 py-2 text-center">
-                       <div className="font-bold text-sm mb-1">DATE</div>
-                       <div className="text-sm">11/12/2024</div>
-                     </div>
-                     <div className="border-2 border-black rounded px-4 py-2 text-center">
-                       <div className="font-bold text-sm mb-1">DATE D'ECHANCE</div>
-                       <div className="text-sm">11/12/2024</div>
-                     </div>
-                   </div>
-
-                   {/* Tableau des articles */}
-                   <table className="w-full text-sm border-collapse border-2 border-black mb-6">
+                    {/* Tableau des articles avec coins arrondis */}
+                    <table className="w-full text-sm border-collapse border-2 border-black mb-6 rounded-lg overflow-hidden">
                      <thead>
                        <tr className="bg-gray-100">
                          <th className="border-2 border-black p-2 text-left">Réf</th>
