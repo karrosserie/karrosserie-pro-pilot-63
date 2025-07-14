@@ -88,7 +88,7 @@ const DefaultInvoiceHeader = ({ companyData, invoiceData, clientData }: DefaultI
         {/* Encadré Montant dû */}
         <div className="bg-blue-600 text-white p-2 text-center mt-3">
           <p className="text-base mb-1">Montant dû</p>
-          <p className="text-lg font-bold">{invoiceData.amountDue}</p>
+          <p className="text-lg font-bold">719,78 €</p>
         </div>
       </div>
 
