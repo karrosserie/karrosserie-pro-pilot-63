@@ -99,8 +99,8 @@ const DefaultInvoiceHeader = ({ companyData, invoiceData, clientData }: DefaultI
           <p className="font-medium">{clientData.name}</p>
           <p>{clientData.address}</p>
           <p>{clientData.city}</p>
-          <p>Téléphone : {clientData.phone}</p>
-          <p>E-mail : {clientData.email}</p>
+          {clientData.phone && <p>Téléphone : {clientData.phone}</p>}
+          {clientData.email && <p>E-mail : {clientData.email}</p>}
         </div>
       </div>
     </div>
