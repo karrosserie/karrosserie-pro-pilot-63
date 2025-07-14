@@ -89,7 +89,7 @@ const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items
           <h2 className="text-3xl font-bold text-black mb-2">FACTURE {defaultInvoiceData.number}</h2>
           
           {/* Informations client déplacées ici */}
-          <div className="text-left p-4">
+          <div className="text-left p-4 w-1/2">
             <div className="text-sm text-gray-600 space-y-1">
               <p><strong>{defaultClientData.name}</strong></p>
               {defaultClientData.phone && <p><strong>TEL :</strong> {defaultClientData.phone}</p>}
