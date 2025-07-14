@@ -17,7 +17,7 @@ interface DefaultInvoiceItemsTableProps {
 
 const DefaultInvoiceItemsTable = ({ items }: DefaultInvoiceItemsTableProps) => {
   return (
-    <div className="mt-6">
+    <div>
       <table className="w-full text-base bg-white border-collapse">
         <thead>
           <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
