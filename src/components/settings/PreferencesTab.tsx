@@ -477,16 +477,16 @@ const PreferencesTab = () => {
                       <table className="text-sm border-collapse">
                         <tbody>
                           <tr>
-                            <td className="border-r-2 border-black p-2 font-bold text-center">TOTAL HT</td>
-                            <td className="border-r-2 border-black p-2 font-bold text-center">TOTAL TVA</td>
+                            <td className="border-r-2 border-black p-2 font-bold text-center">Total HT</td>
+                            <td className="border-r-2 border-black p-2 font-bold text-center">Total TVA</td>
                             <td className="border-r-2 border-black p-2 font-bold text-center">Total Remise</td>
                             <td className="p-2 font-bold text-center">Total TTC</td>
                           </tr>
                           <tr>
-                            <td className="border-r-2 border-black border-t-2 border-black p-2 text-center">530,25€</td>
-                            <td className="border-r-2 border-black border-t-2 border-black p-2 text-center">106,05€</td>
-                            <td className="border-r-2 border-black border-t-2 border-black p-2 text-center">5,30€</td>
-                            <td className="border-t-2 border-black p-2 text-center">630,00€</td>
+                            <td className="border-r-2 border-black border-t-2 border-black p-2 font-bold">530,25€</td>
+                            <td className="border-r-2 border-black border-t-2 border-black p-2 font-bold">106,05€</td>
+                            <td className="border-r-2 border-black border-t-2 border-black p-2 font-bold">5,30€</td>
+                            <td className="border-t-2 border-black p-2 font-bold">630,00€</td>
                           </tr>
                         </tbody>
                       </table>
