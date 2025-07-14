@@ -3,14 +3,16 @@ import { InvoiceItem, formatAmount } from '@/utils/invoiceCalculations';
 
 interface InvoiceItemsTableProps {
   items: InvoiceItem[];
+  tableRowClasses?: string;
+  tableHeaderClasses?: string;
 }
 
-const InvoiceItemsTable = ({ items }: InvoiceItemsTableProps) => {
+const InvoiceItemsTable = ({ items, tableRowClasses = "", tableHeaderClasses = "border-b" }: InvoiceItemsTableProps) => {
   return (
     <div className="mb-6">
       <table className="w-full bg-white">
         <thead>
-          <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
+          <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className={`text-white ${tableHeaderClasses}`}>
             <th className="p-3 text-left text-sm font-medium">Article</th>
             <th className="p-3 text-right text-sm font-medium">Quantité</th>
             <th className="p-3 text-right text-sm font-medium">Coût Unitaire</th>
@@ -26,7 +28,7 @@ const InvoiceItemsTable = ({ items }: InvoiceItemsTableProps) => {
             const itemTotalHT = itemTotal - discountAmount;
             
             return (
-              <tr key={item.id || index} className="bg-transparent">
+              <tr key={item.id || index} className={`bg-transparent ${tableRowClasses}`}>
                 <td className="p-3 text-sm">{item.label || item.description || 'N/A'}</td>
                 <td className="p-3 text-sm text-right">{(item.quantity || 0).toString().replace('.', ',')}</td>
                 <td className="p-3 text-sm text-right">{formatAmount(item.unitCost || 0)}</td>
