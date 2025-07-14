@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { useCompany } from '@/hooks/use-company';
 import { useUserPreferences } from '@/hooks/use-user-preferences';
@@ -71,21 +71,16 @@ const PreferencesTab = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <h3 className="text-lg font-medium mb-4">Choisir un modèle</h3>
-            <RadioGroup 
-              value={selectedTemplate} 
-              onValueChange={setSelectedTemplate}
-              className="grid grid-cols-2 gap-4"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="default" id="default" />
-                <Label htmlFor="default">Modèle par défaut</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="alternative" id="alternative" />
-                <Label htmlFor="alternative">Modèle alternatif</Label>
-              </div>
-            </RadioGroup>
+            <Label htmlFor="template-select" className="text-lg font-medium mb-4 block">Choisir un modèle</Label>
+            <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Sélectionner un modèle" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default">Modèle par défaut</SelectItem>
+                <SelectItem value="alternative">Modèle alternatif</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div>

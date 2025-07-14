@@ -2,9 +2,74 @@ import React from 'react';
 
 interface AlternativeInvoicePreviewProps {
   companyData: any;
+  invoiceData?: {
+    number?: string;
+    date?: string;
+    dueDate?: string;
+  };
+  clientData?: {
+    name?: string;
+    phone?: string;
+    email?: string;
+    address?: string;
+    city?: string;
+    licensePlate?: string;
+    mileage?: string;
+    vehicle?: string;
+  };
+  items?: Array<{
+    ref?: string;
+    description?: string;
+    quantity?: number;
+    discount?: number;
+    unitPrice?: number;
+    vat?: number;
+    totalHT?: number;
+    totalTTC?: number;
+  }>;
+  totals?: {
+    totalHT?: string;
+    totalVAT?: string;
+    totalDiscount?: string;
+    totalTTC?: string;
+  };
 }
 
-const AlternativeInvoicePreview = ({ companyData }: AlternativeInvoicePreviewProps) => {
+const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items, totals }: AlternativeInvoicePreviewProps) => {
+  // Données par défaut pour l'aperçu
+  const defaultInvoiceData = {
+    number: 'N°5',
+    date: '11/12/2024',
+    dueDate: '11/12/2024',
+    ...invoiceData
+  };
+
+  const defaultClientData = {
+    name: 'JEAN DUPONT',
+    phone: '+33 6 12 34 56 78',
+    email: 'jean.dupont@email.com',
+    address: '134 Boulevard Michelet',
+    city: '13008 MARSEILLE',
+    licensePlate: 'AB-123-CD',
+    mileage: '85 678 Km',
+    vehicle: 'PEUGEOT 308',
+    ...clientData
+  };
+
+  const defaultItems = items || [
+    { ref: '', description: 'T1', quantity: 2, discount: 0, unitPrice: 110.00, vat: 20, totalHT: 220.00, totalTTC: 264.00 },
+    { ref: '', description: 'T2', quantity: 2, discount: 0, unitPrice: 110.00, vat: 20, totalHT: 220.00, totalTTC: 264.00 },
+    { ref: '', description: 'GRILLE DE PARE-CHOCS AV', quantity: 1, discount: 5, unitPrice: 95.00, vat: 20, totalHT: 90.25, totalTTC: 108.30 },
+    { ref: '', description: 'CONDENSEUR DE CLIMATISATION MOTRIO', quantity: 5, discount: 0, unitPrice: 0.00, vat: 20, totalHT: 0.00, totalTTC: 0.00 }
+  ];
+
+  const defaultTotals = {
+    totalHT: '530,25€',
+    totalVAT: '106,05€',
+    totalDiscount: '5,30€',
+    totalTTC: '630,00€',
+    ...totals
+  };
   return (
     <div className="bg-white p-6 rounded shadow-sm" style={{ fontFamily: 'Arial, sans-serif' }}>
       {/* En-tête avec entreprise et FACTURE */}
@@ -21,19 +86,19 @@ const AlternativeInvoicePreview = ({ companyData }: AlternativeInvoicePreviewPro
           </div>
         </div>
         <div className="text-right">
-          <h2 className="text-3xl font-bold text-black mb-2">FACTURE N°5</h2>
+          <h2 className="text-3xl font-bold text-black mb-2">FACTURE {defaultInvoiceData.number}</h2>
           
           {/* Informations client déplacées ici */}
           <div className="text-left p-4">
             <div className="text-sm text-gray-600 space-y-1">
-              <p><strong>JEAN DUPONT</strong></p>
-              <p><strong>TEL :</strong> +33 6 12 34 56 78</p>
-              <p><strong>EMAIL :</strong> jean.dupont@email.com</p>
-              <p><strong>ADRESSE :</strong> 134 Boulevard Michelet</p>
-              <p>13008 MARSEILLE</p>
-              <p><strong>Immatriculation :</strong> AB-123-CD</p>
-              <p><strong>Kilométrage :</strong> 85 678 Km</p>
-              <p><strong>Véhicule :</strong> PEUGEOT 308</p>
+              <p><strong>{defaultClientData.name}</strong></p>
+              <p><strong>TEL :</strong> {defaultClientData.phone}</p>
+              <p><strong>EMAIL :</strong> {defaultClientData.email}</p>
+              <p><strong>ADRESSE :</strong> {defaultClientData.address}</p>
+              <p>{defaultClientData.city}</p>
+              <p><strong>Immatriculation :</strong> {defaultClientData.licensePlate}</p>
+              <p><strong>Kilométrage :</strong> {defaultClientData.mileage}</p>
+              <p><strong>Véhicule :</strong> {defaultClientData.vehicle}</p>
             </div>
           </div>
         </div>
@@ -43,11 +108,11 @@ const AlternativeInvoicePreview = ({ companyData }: AlternativeInvoicePreviewPro
       <div className="flex justify-center gap-48 mb-8">
         <div className="border-2 border-black rounded-lg px-4 py-2 text-center">
           <div className="font-bold text-sm mb-1">DATE</div>
-          <div className="font-bold text-sm">11/12/2024</div>
+          <div className="font-bold text-sm">{defaultInvoiceData.date}</div>
         </div>
         <div className="border-2 border-black rounded-lg px-4 py-2 text-center">
           <div className="font-bold text-sm mb-1">DATE D'ECHANCE</div>
-          <div className="font-bold text-sm">11/12/2024</div>
+          <div className="font-bold text-sm">{defaultInvoiceData.dueDate}</div>
         </div>
       </div>
 
@@ -67,46 +132,18 @@ const AlternativeInvoicePreview = ({ companyData }: AlternativeInvoicePreviewPro
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td className="border-r-2 border-black p-2 font-bold"></td>
-              <td className="border-r-2 border-black p-2 font-bold">T1</td>
-              <td className="border-r-2 border-black p-2 font-bold">2</td>
-              <td className="border-r-2 border-black p-2 font-bold">0%</td>
-              <td className="border-r-2 border-black p-2 font-bold">110,00€</td>
-              <td className="border-r-2 border-black p-2 font-bold">20%</td>
-              <td className="border-r-2 border-black p-2 font-bold">220,00€</td>
-              <td className="p-2 font-bold">264,00€</td>
-            </tr>
-            <tr>
-              <td className="border-r-2 border-black p-2 font-bold"></td>
-              <td className="border-r-2 border-black p-2 font-bold">T2</td>
-              <td className="border-r-2 border-black p-2 font-bold">2</td>
-              <td className="border-r-2 border-black p-2 font-bold">0%</td>
-              <td className="border-r-2 border-black p-2 font-bold">110,00€</td>
-              <td className="border-r-2 border-black p-2 font-bold">20%</td>
-              <td className="border-r-2 border-black p-2 font-bold">220,00€</td>
-              <td className="p-2 font-bold">264,00€</td>
-            </tr>
-            <tr>
-              <td className="border-r-2 border-black p-2 font-bold"></td>
-              <td className="border-r-2 border-black p-2 font-bold">GRILLE DE PARE-CHOCS AV</td>
-              <td className="border-r-2 border-black p-2 font-bold">1</td>
-              <td className="border-r-2 border-black p-2 font-bold">5%</td>
-              <td className="border-r-2 border-black p-2 font-bold">95,00€</td>
-              <td className="border-r-2 border-black p-2 font-bold">20%</td>
-              <td className="border-r-2 border-black p-2 font-bold">90,25€</td>
-              <td className="p-2 font-bold">108,30€</td>
-            </tr>
-            <tr>
-              <td className="border-r-2 border-black p-2 font-bold"></td>
-              <td className="border-r-2 border-black p-2 font-bold">CONDENSEUR DE CLIMATISATION MOTRIO</td>
-              <td className="border-r-2 border-black p-2 font-bold">5</td>
-              <td className="border-r-2 border-black p-2 font-bold">0%</td>
-              <td className="border-r-2 border-black p-2 font-bold">0,00€</td>
-              <td className="border-r-2 border-black p-2 font-bold">20%</td>
-              <td className="border-r-2 border-black p-2 font-bold">0,00€</td>
-              <td className="p-2 font-bold">0,00€</td>
-            </tr>
+            {defaultItems.map((item, index) => (
+              <tr key={index}>
+                <td className="border-r-2 border-black p-2 font-bold">{item.ref}</td>
+                <td className="border-r-2 border-black p-2 font-bold">{item.description}</td>
+                <td className="border-r-2 border-black p-2 font-bold">{item.quantity}</td>
+                <td className="border-r-2 border-black p-2 font-bold">{item.discount}%</td>
+                <td className="border-r-2 border-black p-2 font-bold">{item.unitPrice.toFixed(2).replace('.', ',')}€</td>
+                <td className="border-r-2 border-black p-2 font-bold">{item.vat}%</td>
+                <td className="border-r-2 border-black p-2 font-bold">{item.totalHT.toFixed(2).replace('.', ',')}€</td>
+                <td className="p-2 font-bold">{item.totalTTC.toFixed(2).replace('.', ',')}€</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -123,10 +160,10 @@ const AlternativeInvoicePreview = ({ companyData }: AlternativeInvoicePreviewPro
                 <td className="p-2 font-bold text-center">Total TTC</td>
               </tr>
               <tr>
-                <td className="border-r-2 border-black border-t-2 border-black p-2 font-bold">530,25€</td>
-                <td className="border-r-2 border-black border-t-2 border-black p-2 font-bold">106,05€</td>
-                <td className="border-r-2 border-black border-t-2 border-black p-2 font-bold">5,30€</td>
-                <td className="border-t-2 border-black p-2 font-bold">630,00€</td>
+                <td className="border-r-2 border-black border-t-2 border-black p-2 font-bold">{defaultTotals.totalHT}</td>
+                <td className="border-r-2 border-black border-t-2 border-black p-2 font-bold">{defaultTotals.totalVAT}</td>
+                <td className="border-r-2 border-black border-t-2 border-black p-2 font-bold">{defaultTotals.totalDiscount}</td>
+                <td className="border-t-2 border-black p-2 font-bold">{defaultTotals.totalTTC}</td>
               </tr>
             </tbody>
           </table>

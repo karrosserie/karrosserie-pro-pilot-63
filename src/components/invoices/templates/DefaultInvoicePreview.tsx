@@ -2,9 +2,76 @@ import React from 'react';
 
 interface DefaultInvoicePreviewProps {
   companyData: any;
+  invoiceData?: {
+    number?: string;
+    claimNumber?: string;
+    billingDate?: string;
+    dueDate?: string;
+    vehicle?: string;
+    licensePlate?: string;
+    mileage?: string;
+    amountDue?: string;
+  };
+  clientData?: {
+    name?: string;
+    address?: string;
+    city?: string;
+    phone?: string;
+    email?: string;
+  };
+  items?: Array<{
+    ref?: string;
+    description?: string;
+    quantity?: number;
+    discount?: number;
+    unitPrice?: number;
+    vat?: number;
+    totalHT?: number;
+    totalTTC?: number;
+  }>;
+  totals?: {
+    subtotal?: string;
+    vat?: string;
+    total?: string;
+  };
 }
 
-const DefaultInvoicePreview = ({ companyData }: DefaultInvoicePreviewProps) => {
+const DefaultInvoicePreview = ({ companyData, invoiceData, clientData, items, totals }: DefaultInvoicePreviewProps) => {
+  // Données par défaut pour l'aperçu
+  const defaultInvoiceData = {
+    number: 'N° 5',
+    claimNumber: 'SIN-2024-001',
+    billingDate: '11/07/2025',
+    dueDate: '10/08/2025',
+    vehicle: 'Peugeot 308',
+    licensePlate: 'AB-123-CD',
+    mileage: '85 679 km',
+    amountDue: '1 250,00 €',
+    ...invoiceData
+  };
+
+  const defaultClientData = {
+    name: 'Jean Dupont',
+    address: '134 Boulevard Michelet',
+    city: '13008 MARSEILLE',
+    phone: '+33 6 12 34 56 78',
+    email: 'jean.dupont@email.com',
+    ...clientData
+  };
+
+  const defaultItems = items || [
+    { ref: '', description: 'T1', quantity: 2, discount: 0, unitPrice: 110.00, vat: 20, totalHT: 220.00, totalTTC: 264.00 },
+    { ref: '', description: 'T2', quantity: 2, discount: 0, unitPrice: 110.00, vat: 20, totalHT: 220.00, totalTTC: 264.00 },
+    { ref: '', description: 'GRILLE DE PARE-CHOCS AV', quantity: 1, discount: 5, unitPrice: 95.00, vat: 20, totalHT: 90.25, totalTTC: 108.30 },
+    { ref: '', description: 'CONDENSEUR DE CLIMATISATION MOTRIO', quantity: 5, discount: 0, unitPrice: 0.00, vat: 20, totalHT: 0.00, totalTTC: 0.00 }
+  ];
+
+  const defaultTotals = {
+    subtotal: '918,75 €',
+    vat: '183,75 €',
+    total: '1 102,50 €',
+    ...totals
+  };
   return (
     <div className="bg-white p-4 rounded shadow-sm h-full flex flex-col" style={{ minHeight: '500px' }}>
       {/* En-tête avec 3 colonnes */}
@@ -38,38 +105,38 @@ const DefaultInvoicePreview = ({ companyData }: DefaultInvoicePreviewProps) => {
           <div className="text-base space-y-1">
             <div className="flex justify-between">
               <span className="font-medium">Facture</span>
-              <span>N° 5</span>
+              <span>{defaultInvoiceData.number}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-medium">N° de sinistre</span>
-              <span>SIN-2024-001</span>
+              <span>{defaultInvoiceData.claimNumber}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-medium">Date de facturation</span>
-              <span>11/07/2025</span>
+              <span>{defaultInvoiceData.billingDate}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-medium">Date d&apos;échéance</span>
-              <span>10/08/2025</span>
+              <span>{defaultInvoiceData.dueDate}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-medium">Véhicule</span>
-              <span>Peugeot 308</span>
+              <span>{defaultInvoiceData.vehicle}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-medium">Immatriculation</span>
-              <span>AB-123-CD</span>
+              <span>{defaultInvoiceData.licensePlate}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-medium">Kilométrage</span>
-              <span>85 679 km</span>
+              <span>{defaultInvoiceData.mileage}</span>
             </div>
           </div>
           
           {/* Encadré Montant dû */}
           <div className="bg-blue-600 text-white p-2 text-center mt-3">
             <p className="text-base mb-1">Montant dû</p>
-            <p className="text-lg font-bold">1 250,00 €</p>
+            <p className="text-lg font-bold">{defaultInvoiceData.amountDue}</p>
           </div>
         </div>
 
@@ -77,11 +144,11 @@ const DefaultInvoicePreview = ({ companyData }: DefaultInvoicePreviewProps) => {
         <div>
           <h3 className="text-lg font-semibold mb-3 text-gray-800">Facture pour</h3>
           <div className="text-base space-y-1">
-            <p className="font-medium">Jean Dupont</p>
-            <p>134 Boulevard Michelet</p>
-            <p>13008 MARSEILLE</p>
-            <p>Téléphone : +33 6 12 34 56 78</p>
-            <p>E-mail : jean.dupont@email.com</p>
+            <p className="font-medium">{defaultClientData.name}</p>
+            <p>{defaultClientData.address}</p>
+            <p>{defaultClientData.city}</p>
+            <p>Téléphone : {defaultClientData.phone}</p>
+            <p>E-mail : {defaultClientData.email}</p>
           </div>
         </div>
       </div>
@@ -102,46 +169,18 @@ const DefaultInvoicePreview = ({ companyData }: DefaultInvoicePreviewProps) => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td className="p-3"></td>
-              <td className="p-3">T1</td>
-              <td className="p-3 text-center">2</td>
-              <td className="p-3 text-center">0%</td>
-              <td className="p-3 text-center">110,00€</td>
-              <td className="p-3 text-center">20%</td>
-              <td className="p-3 text-center">220,00€</td>
-              <td className="p-3 text-center">264,00€</td>
-            </tr>
-            <tr>
-              <td className="p-3"></td>
-              <td className="p-3">T2</td>
-              <td className="p-3 text-center">2</td>
-              <td className="p-3 text-center">0%</td>
-              <td className="p-3 text-center">110,00€</td>
-              <td className="p-3 text-center">20%</td>
-              <td className="p-3 text-center">220,00€</td>
-              <td className="p-3 text-center">264,00€</td>
-            </tr>
-            <tr>
-              <td className="p-3"></td>
-              <td className="p-3">GRILLE DE PARE-CHOCS AV</td>
-              <td className="p-3 text-center">1</td>
-              <td className="p-3 text-center">5%</td>
-              <td className="p-3 text-center">95,00€</td>
-              <td className="p-3 text-center">20%</td>
-              <td className="p-3 text-center">90,25€</td>
-              <td className="p-3 text-center">108,30€</td>
-            </tr>
-            <tr>
-              <td className="p-3"></td>
-              <td className="p-3">CONDENSEUR DE CLIMATISATION MOTRIO</td>
-              <td className="p-3 text-center">5</td>
-              <td className="p-3 text-center">0%</td>
-              <td className="p-3 text-center">0,00€</td>
-              <td className="p-3 text-center">20%</td>
-              <td className="p-3 text-center">0,00€</td>
-              <td className="p-3 text-center">0,00€</td>
-            </tr>
+            {defaultItems.map((item, index) => (
+              <tr key={index}>
+                <td className="p-3">{item.ref}</td>
+                <td className="p-3">{item.description}</td>
+                <td className="p-3 text-center">{item.quantity}</td>
+                <td className="p-3 text-center">{item.discount}%</td>
+                <td className="p-3 text-center">{item.unitPrice.toFixed(2).replace('.', ',')}€</td>
+                <td className="p-3 text-center">{item.vat}%</td>
+                <td className="p-3 text-center">{item.totalHT.toFixed(2).replace('.', ',')}€</td>
+                <td className="p-3 text-center">{item.totalTTC.toFixed(2).replace('.', ',')}€</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -152,15 +191,15 @@ const DefaultInvoicePreview = ({ companyData }: DefaultInvoicePreviewProps) => {
           <div className="space-y-1 text-base">
             <div className="flex justify-between font-bold">
               <span>Sous-total</span>
-              <span>918,75 €</span>
+              <span>{defaultTotals.subtotal}</span>
             </div>
             <div className="flex justify-between">
               <span>TVA</span>
-              <span>183,75 €</span>
+              <span>{defaultTotals.vat}</span>
             </div>
             <div className="flex justify-between font-bold text-lg bg-blue-600 text-white p-2">
               <span>TOTAL</span>
-              <span>1 102,50 €</span>
+              <span>{defaultTotals.total}</span>
             </div>
           </div>
         </div>
