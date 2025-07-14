@@ -2,8 +2,8 @@ import React from 'react';
 
 const DefaultInvoicePaymentsTable = () => {
   return (
-    <div className="mt-2">
-      <h3 className="text-lg font-semibold mb-3 text-gray-800">Liste des paiements</h3>
+    <div>
+      <h3 className="text-lg font-semibold mb-1 text-gray-800">Liste des paiements</h3>
       <table className="w-full text-base bg-white border-collapse">
         <thead>
           <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
