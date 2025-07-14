@@ -391,7 +391,7 @@ const PreferencesTab = () => {
                             <p><strong>EMAIL :</strong> jeandupont@yopmail.com</p>
                             <p><strong>ADRESSE :</strong> 134 Boulevard Michelet</p>
                             <p>13008 MARSEILLE</p>
-                            <p><strong>Immatriculatriculation :</strong> AZ-ER-RTY</p>
+                            <p><strong>Immatriculation :</strong> AZ-ER-RTY</p>
                             <p><strong>Kilométrage :</strong> 95678 Km</p>
                             <p><strong>Véhicule :</strong> PEUGEOT 308 II</p>
                           </div>
