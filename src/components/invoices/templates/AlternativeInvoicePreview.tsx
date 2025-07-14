@@ -134,14 +134,26 @@ const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items
           <tbody>
             {defaultItems.map((item, index) => (
               <tr key={index}>
-                <td className="border-r-2 border-black p-2 font-bold">{item.ref}</td>
-                <td className="border-r-2 border-black p-2 font-bold">{item.description}</td>
-                <td className="border-r-2 border-black p-2 font-bold text-center">{item.quantity?.toString().replace('.', ',')}</td>
-                <td className="border-r-2 border-black p-2 font-bold text-center">{item.discount}%</td>
-                <td className="border-r-2 border-black p-2 font-bold text-center">{item.unitPrice?.toFixed(2).replace('.', ',')}€</td>
-                <td className="border-r-2 border-black p-2 font-bold text-center">{item.vat}%</td>
-                <td className="border-r-2 border-black p-2 font-bold text-center">{item.totalHT?.toFixed(2).replace('.', ',')}€</td>
-                <td className="p-2 font-bold text-center">{item.totalTTC?.toFixed(2).replace('.', ',')}€</td>
+                <td className="border-r-2 border-black p-2 font-bold">{item.ref || ''}</td>
+                <td className="border-r-2 border-black p-2 font-bold">{item.description || ''}</td>
+                <td className="border-r-2 border-black p-2 font-bold text-center">
+                  {item.quantity !== undefined && item.quantity !== null ? item.quantity.toString().replace('.', ',') : '0'}
+                </td>
+                <td className="border-r-2 border-black p-2 font-bold text-center">
+                  {item.discount !== undefined && item.discount !== null ? item.discount : 0}%
+                </td>
+                <td className="border-r-2 border-black p-2 font-bold text-center">
+                  {item.unitPrice !== undefined && item.unitPrice !== null ? item.unitPrice.toFixed(2).replace('.', ',') : '0,00'}€
+                </td>
+                <td className="border-r-2 border-black p-2 font-bold text-center">
+                  {item.vat !== undefined && item.vat !== null ? item.vat : 20}%
+                </td>
+                <td className="border-r-2 border-black p-2 font-bold text-center">
+                  {item.totalHT !== undefined && item.totalHT !== null ? item.totalHT.toFixed(2).replace('.', ',') : '0,00'}€
+                </td>
+                <td className="p-2 font-bold text-center">
+                  {item.totalTTC !== undefined && item.totalTTC !== null ? item.totalTTC.toFixed(2).replace('.', ',') : '0,00'}€
+                </td>
               </tr>
             ))}
           </tbody>
