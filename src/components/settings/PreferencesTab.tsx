@@ -403,11 +403,11 @@ const PreferencesTab = () => {
                     <div className="flex justify-center gap-48 mb-8">
                       <div className="border-2 border-black rounded-lg px-4 py-2 text-center">
                         <div className="font-bold text-sm mb-1">DATE</div>
-                        <div className="text-sm">11/12/2024</div>
+                        <div className="font-bold text-sm">11/12/2024</div>
                       </div>
                       <div className="border-2 border-black rounded-lg px-4 py-2 text-center">
                         <div className="font-bold text-sm mb-1">DATE D'ECHANCE</div>
-                        <div className="text-sm">11/12/2024</div>
+                        <div className="font-bold text-sm">11/12/2024</div>
                       </div>
                     </div>
 
@@ -495,7 +495,9 @@ const PreferencesTab = () => {
 
                   {/* Footer */}
                   <div className="mt-8 text-xs text-center text-gray-500">
-                    <p>SARL au capital de 8 000,00 € - SIRET: 90194807700014</p>
+                    <p>{companyData.name || 'AUTO PAINT'} - {companyData.address || '25 rue sainte victoire'} {companyData.zipcode || '13006'} {companyData.city || 'MARSEILLE'} - 
+                       SIRET {companyData.siret || '12345678900010'} - N° TVA : {companyData.tva || 'FR123456789'} - 
+                       Tel : {companyData.phone || '+330646465242'} - Email : {companyData.email || 'autopaint@yopmail.com'}</p>
                   </div>
                 </div>
               )}
