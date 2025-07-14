@@ -279,55 +279,55 @@ const PreferencesTab = () => {
                         <table className="w-full text-base bg-white border-collapse">
                           <thead>
                             <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
-                              <th className="p-3 text-left font-medium border-r-2 border-black">Réf</th>
-                              <th className="p-3 text-left font-medium border-r-2 border-black">Description</th>
-                              <th className="p-3 text-center font-medium border-r-2 border-black">Quantité</th>
-                              <th className="p-3 text-center font-medium border-r-2 border-black">Remise</th>
-                              <th className="p-3 text-center font-medium border-r-2 border-black">Prix HT</th>
-                              <th className="p-3 text-center font-medium border-r-2 border-black">TVA</th>
-                              <th className="p-3 text-center font-medium border-r-2 border-black">Total HT</th>
+                              <th className="p-3 text-left font-medium border-r border-black">Réf</th>
+                              <th className="p-3 text-left font-medium border-r border-black">Description</th>
+                              <th className="p-3 text-center font-medium border-r border-black">Quantité</th>
+                              <th className="p-3 text-center font-medium border-r border-black">Remise</th>
+                              <th className="p-3 text-center font-medium border-r border-black">Prix HT</th>
+                              <th className="p-3 text-center font-medium border-r border-black">TVA</th>
+                              <th className="p-3 text-center font-medium border-r border-black">Total HT</th>
                               <th className="p-3 text-center font-medium">Total TTC</th>
                             </tr>
                           </thead>
                           <tbody>
-                            <tr className="border-b-2 border-black">
-                              <td className="p-3 border-r-2 border-black"></td>
-                              <td className="p-3 border-r-2 border-black">T1</td>
-                              <td className="p-3 text-center border-r-2 border-black">2</td>
-                              <td className="p-3 text-center border-r-2 border-black">0%</td>
-                              <td className="p-3 text-center border-r-2 border-black">110,00€</td>
-                              <td className="p-3 text-center border-r-2 border-black">20%</td>
-                              <td className="p-3 text-center border-r-2 border-black">220,00€</td>
+                            <tr className="border-b border-black">
+                              <td className="p-3 border-r border-black"></td>
+                              <td className="p-3 border-r border-black">T1</td>
+                              <td className="p-3 text-center border-r border-black">2</td>
+                              <td className="p-3 text-center border-r border-black">0%</td>
+                              <td className="p-3 text-center border-r border-black">110,00€</td>
+                              <td className="p-3 text-center border-r border-black">20%</td>
+                              <td className="p-3 text-center border-r border-black">220,00€</td>
                               <td className="p-3 text-center">264,00€</td>
                             </tr>
-                            <tr className="border-b-2 border-black">
-                              <td className="p-3 border-r-2 border-black"></td>
-                              <td className="p-3 border-r-2 border-black">T2</td>
-                              <td className="p-3 text-center border-r-2 border-black">2</td>
-                              <td className="p-3 text-center border-r-2 border-black">0%</td>
-                              <td className="p-3 text-center border-r-2 border-black">110,00€</td>
-                              <td className="p-3 text-center border-r-2 border-black">20%</td>
-                              <td className="p-3 text-center border-r-2 border-black">220,00€</td>
+                            <tr className="border-b border-black">
+                              <td className="p-3 border-r border-black"></td>
+                              <td className="p-3 border-r border-black">T2</td>
+                              <td className="p-3 text-center border-r border-black">2</td>
+                              <td className="p-3 text-center border-r border-black">0%</td>
+                              <td className="p-3 text-center border-r border-black">110,00€</td>
+                              <td className="p-3 text-center border-r border-black">20%</td>
+                              <td className="p-3 text-center border-r border-black">220,00€</td>
                               <td className="p-3 text-center">264,00€</td>
                             </tr>
-                            <tr className="border-b-2 border-black">
-                              <td className="p-3 border-r-2 border-black"></td>
-                              <td className="p-3 border-r-2 border-black">GRILLE DE PARE-CHOCS AV</td>
-                              <td className="p-3 text-center border-r-2 border-black">1</td>
-                              <td className="p-3 text-center border-r-2 border-black">5%</td>
-                              <td className="p-3 text-center border-r-2 border-black">95,00€</td>
-                              <td className="p-3 text-center border-r-2 border-black">20%</td>
-                              <td className="p-3 text-center border-r-2 border-black">90,25€</td>
+                            <tr className="border-b border-black">
+                              <td className="p-3 border-r border-black"></td>
+                              <td className="p-3 border-r border-black">GRILLE DE PARE-CHOCS AV</td>
+                              <td className="p-3 text-center border-r border-black">1</td>
+                              <td className="p-3 text-center border-r border-black">5%</td>
+                              <td className="p-3 text-center border-r border-black">95,00€</td>
+                              <td className="p-3 text-center border-r border-black">20%</td>
+                              <td className="p-3 text-center border-r border-black">90,25€</td>
                               <td className="p-3 text-center">108,30€</td>
                             </tr>
                             <tr>
-                              <td className="p-3 border-r-2 border-black"></td>
-                              <td className="p-3 border-r-2 border-black">CONDENSEUR DE CLIMATISATION MOTRIO</td>
-                              <td className="p-3 text-center border-r-2 border-black">5</td>
-                              <td className="p-3 text-center border-r-2 border-black">0%</td>
-                              <td className="p-3 text-center border-r-2 border-black">0,00€</td>
-                              <td className="p-3 text-center border-r-2 border-black">20%</td>
-                              <td className="p-3 text-center border-r-2 border-black">0,00€</td>
+                              <td className="p-3 border-r border-black"></td>
+                              <td className="p-3 border-r border-black">CONDENSEUR DE CLIMATISATION MOTRIO</td>
+                              <td className="p-3 text-center border-r border-black">5</td>
+                              <td className="p-3 text-center border-r border-black">0%</td>
+                              <td className="p-3 text-center border-r border-black">0,00€</td>
+                              <td className="p-3 text-center border-r border-black">20%</td>
+                              <td className="p-3 text-center border-r border-black">0,00€</td>
                               <td className="p-3 text-center">0,00€</td>
                             </tr>
                           </tbody>
