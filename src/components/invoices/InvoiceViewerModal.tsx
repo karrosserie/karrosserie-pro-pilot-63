@@ -25,7 +25,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
   const totals = calculateInvoiceTotals(invoice.repairs_data, invoice.parts_data);
   const template = preferences?.invoice_template || 'default';
 
-  // Styles conditionnels selon le template
+  // Styles conditionnels selon le template pour le modèle alternatif uniquement
   const getTableClasses = () => {
     if (template === 'alternative') {
       return "border-2 border-black rounded-lg overflow-hidden";
@@ -35,21 +35,14 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
 
   const getTableRowClasses = () => {
     if (template === 'alternative') {
-      return "border-b-2 border-black";
+      return "border-r-2 border-black";
     }
     return "";
   };
 
   const getTableHeaderClasses = () => {
     if (template === 'alternative') {
-      return "border-b-2 border-black bg-gray-50";
-    }
-    return "border-b";
-  };
-
-  const getTotalsClasses = () => {
-    if (template === 'alternative') {
-      return "border-2 border-black rounded-lg overflow-hidden";
+      return "border-r-2 border-b-2 border-black";
     }
     return "";
   };
@@ -73,15 +66,13 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
               />
             </div>
             
-            <div className={getTotalsClasses()}>
-              <InvoiceTotals 
-                subtotalAfterDiscount={totals.subtotalAfterDiscount}
-                totalVAT={totals.totalVAT}
-                totalDiscount={totals.totalDiscount}
-                finalTotal={totals.finalTotal}
-                template={template}
-              />
-            </div>
+            <InvoiceTotals 
+              subtotalAfterDiscount={totals.subtotalAfterDiscount}
+              totalVAT={totals.totalVAT}
+              totalDiscount={totals.totalDiscount}
+              finalTotal={totals.finalTotal}
+              template={template}
+            />
             
             <InvoicePaymentsTable invoiceId={invoice.id} invoiceTotal={totals.finalTotal} />
             <InvoiceFooter companyData={companyData} />
