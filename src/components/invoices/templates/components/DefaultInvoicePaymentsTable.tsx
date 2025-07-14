@@ -4,7 +4,7 @@ const DefaultInvoicePaymentsTable = () => {
   return (
     <div>
       <h3 className="text-lg font-semibold mb-1 text-gray-800">Liste des paiements</h3>
-      <table className="w-full text-base bg-white border-collapse">
+      <table className="w-full text-base bg-white">
         <thead>
           <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
             <th className="p-3 text-left font-medium">Date</th>
