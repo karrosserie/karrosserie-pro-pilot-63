@@ -249,7 +249,7 @@ const PreferencesTab = () => {
                          </div>
                          <div className="flex justify-between">
                            <span className="font-medium">Kilométrage</span>
-                           <span>85 000 km</span>
+                           <span>85 679 km</span>
                          </div>
                        </div>
                        
@@ -265,8 +265,8 @@ const PreferencesTab = () => {
                        <h3 className="text-lg font-semibold mb-3 text-gray-800">Facture pour</h3>
                        <div className="text-base space-y-1">
                          <p className="font-medium">Jean Dupont</p>
-                         <p>456 Avenue de la République</p>
-                         <p>75011 Paris</p>
+                         <p>134 Boulevard Michelet</p>
+                         <p>13008 MARSEILLE</p>
                          <p>Téléphone : +33 6 12 34 56 78</p>
                          <p>E-mail : jean.dupont@email.com</p>
                        </div>
@@ -384,14 +384,14 @@ const PreferencesTab = () => {
                         {/* Informations client déplacées ici */}
                         <div className="text-left p-4">
                           <div className="text-sm text-gray-600 space-y-1">
-                            <p>JEAN DUPONT</p>
-                            <p><strong>TEL :</strong> +33646464646</p>
-                            <p><strong>EMAIL :</strong> jeandupont@yopmail.com</p>
+                            <p><strong>JEAN DUPONT</strong></p>
+                            <p><strong>TEL :</strong> +33 6 12 34 56 78</p>
+                            <p><strong>EMAIL :</strong> jean.dupont@email.com</p>
                             <p><strong>ADRESSE :</strong> 134 Boulevard Michelet</p>
                             <p>13008 MARSEILLE</p>
-                            <p><strong>Immatriculation :</strong> AZ-ER-RTY</p>
-                            <p><strong>Kilométrage :</strong> 95678 Km</p>
-                            <p><strong>Véhicule :</strong> PEUGEOT 308 II</p>
+                            <p><strong>Immatriculation :</strong> AB-123-CD</p>
+                            <p><strong>Kilométrage :</strong> 85 678 Km</p>
+                            <p><strong>Véhicule :</strong> PEUGEOT 308</p>
                           </div>
                         </div>
                       </div>
