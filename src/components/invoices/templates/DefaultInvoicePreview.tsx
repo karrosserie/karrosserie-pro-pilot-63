@@ -1,4 +1,9 @@
 import React from 'react';
+import DefaultInvoiceHeader from './components/DefaultInvoiceHeader';
+import DefaultInvoiceItemsTable from './components/DefaultInvoiceItemsTable';
+import DefaultInvoiceTotals from './components/DefaultInvoiceTotals';
+import DefaultInvoicePaymentsTable from './components/DefaultInvoicePaymentsTable';
+import DefaultInvoiceFooter from './components/DefaultInvoiceFooter';
 
 interface DefaultInvoicePreviewProps {
   companyData: any;
@@ -72,187 +77,22 @@ const DefaultInvoicePreview = ({ companyData, invoiceData, clientData, items, to
     total: '1 102,50 €',
     ...totals
   };
+
   return (
     <div className="bg-white p-4 rounded shadow-sm h-full flex flex-col min-h-full" style={{ minHeight: '500px', backgroundColor: 'white' }}>
-      {/* En-tête avec 3 colonnes */}
-      <div className="grid grid-cols-3 gap-6 mb-6">
-        {/* Colonne 1 - Entreprise */}
-        <div>
-          <h1 className="text-2xl font-bold text-white px-3 py-1 text-center mb-3" style={{backgroundColor: 'rgba(64,67,72,255)'}}>FACTURE</h1>
-          {companyData.logo_url ? (
-            <div className="flex items-center justify-start mb-3" style={{maxWidth: '120px'}}>
-              <img src={companyData.logo_url} alt="Logo entreprise" className="max-w-full h-auto object-contain" />
-            </div>
-          ) : (
-            <div className="bg-orange-500 rounded-full p-2 w-fit mb-3">
-              <span className="text-white font-bold text-base">KR</span>
-            </div>
-          )}
-          <p className="text-gray-600 font-bold mb-2">{companyData.name || 'KARROSSERIE'}</p>
-          <div className="text-base text-gray-600 space-y-1">
-            <p>{companyData.address || 'Votre adresse'}</p>
-            <p>{companyData.zipcode || ''} {companyData.city || ''}</p>
-            <p>Téléphone : {companyData.phone || '+33 1 23 45 67 89'}</p>
-            <p>E-mail : {companyData.email || 'contact@karrosserie.fr'}</p>
-            <p>SIRET : {companyData.siret || '123 456 789 00123'}</p>
-            <p>N° TVA : {companyData.tva || 'FR 12 123456789'}</p>
-          </div>
-        </div>
+      <DefaultInvoiceHeader 
+        companyData={companyData}
+        invoiceData={defaultInvoiceData}
+        clientData={defaultClientData}
+      />
+      
+      <DefaultInvoiceItemsTable items={defaultItems} />
+      
+      <DefaultInvoiceTotals totals={defaultTotals} />
+      
+      <DefaultInvoicePaymentsTable />
 
-        {/* Colonne 2 - Détails de la facture */}
-        <div>
-          <h3 className="text-lg font-semibold mb-3 text-gray-800">Détails de la facture</h3>
-          <div className="text-base space-y-1">
-            <div className="flex justify-between">
-              <span className="font-medium">Facture</span>
-              <span>{defaultInvoiceData.number}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-medium">N° de sinistre</span>
-              <span>{defaultInvoiceData.claimNumber}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-medium">Date de facturation</span>
-              <span>{defaultInvoiceData.billingDate}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-medium">Date d&apos;échéance</span>
-              <span>{defaultInvoiceData.dueDate}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-medium">Véhicule</span>
-              <span>{defaultInvoiceData.vehicle}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-medium">Immatriculation</span>
-              <span>{defaultInvoiceData.licensePlate}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-medium">Kilométrage</span>
-              <span>{defaultInvoiceData.mileage}</span>
-            </div>
-          </div>
-          
-          {/* Encadré Montant dû */}
-          <div className="bg-blue-600 text-white p-2 text-center mt-3">
-            <p className="text-base mb-1">Montant dû</p>
-            <p className="text-lg font-bold">{defaultInvoiceData.amountDue}</p>
-          </div>
-        </div>
-
-        {/* Colonne 3 - Facture pour */}
-        <div>
-          <h3 className="text-lg font-semibold mb-3 text-gray-800">Facture pour</h3>
-          <div className="text-base space-y-1">
-            <p className="font-medium">{defaultClientData.name}</p>
-            <p>{defaultClientData.address}</p>
-            <p>{defaultClientData.city}</p>
-            <p>Téléphone : {defaultClientData.phone}</p>
-            <p>E-mail : {defaultClientData.email}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Tableau complet des articles */}
-      <div className="mt-6">
-        <table className="w-full text-base bg-white border-collapse">
-          <thead>
-            <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
-              <th className="p-3 text-left font-medium">Réf</th>
-              <th className="p-3 text-left font-medium">Description</th>
-              <th className="p-3 text-center font-medium">Quantité</th>
-              <th className="p-3 text-center font-medium">Remise</th>
-              <th className="p-3 text-center font-medium">Prix HT</th>
-              <th className="p-3 text-center font-medium">TVA</th>
-              <th className="p-3 text-center font-medium">Total HT</th>
-              <th className="p-3 text-center font-medium">Total TTC</th>
-            </tr>
-          </thead>
-          <tbody>
-            {defaultItems.map((item, index) => (
-              <tr key={index}>
-                <td className="p-3">{item.ref}</td>
-                <td className="p-3">{item.description}</td>
-                <td className="p-3 text-center">{item.quantity}</td>
-                <td className="p-3 text-center">{item.discount}%</td>
-                <td className="p-3 text-center">{item.unitPrice.toFixed(2).replace('.', ',')}€</td>
-                <td className="p-3 text-center">{item.vat}%</td>
-                <td className="p-3 text-center">{item.totalHT.toFixed(2).replace('.', ',')}€</td>
-                <td className="p-3 text-center">{item.totalTTC.toFixed(2).replace('.', ',')}€</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-       
-      {/* Totaux */}
-      <div className="mt-4 flex justify-end">
-        <div className="w-56">
-          <div className="space-y-1 text-base">
-            <div className="flex justify-between font-bold">
-              <span>Sous-total</span>
-              <span>{defaultTotals.subtotal}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>TVA</span>
-              <span>{defaultTotals.vat}</span>
-            </div>
-            <div className="flex justify-between font-bold text-lg bg-blue-600 text-white p-2">
-              <span>TOTAL</span>
-              <span>{defaultTotals.total}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Tableau des encaissements */}
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold mb-3 text-gray-800">Liste des paiements</h3>
-        <table className="w-full text-base bg-white border-collapse">
-          <thead>
-            <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
-              <th className="p-3 text-left font-medium">Date</th>
-              <th className="p-3 text-left font-medium">Mode de paiement</th>
-              <th className="p-3 text-right font-medium">Montant</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="p-3">10/07/2025</td>
-              <td className="p-3">Virement</td>
-              <td className="p-3 text-right">200,00 €</td>
-            </tr>
-            <tr>
-              <td className="p-3">11/07/2025</td>
-              <td className="p-3">Virement</td>
-              <td className="p-3 text-right">175,00 €</td>
-            </tr>
-          </tbody>
-        </table>
-        <div className="mt-2 flex justify-end">
-          <div className="w-56">
-            <div className="space-y-1 text-base">
-              <div className="flex justify-between font-bold">
-                <span>Total encaissé :</span>
-                <span>375,00 €</span>
-              </div>
-              <div className="flex justify-between font-bold text-red-600">
-                <span>Solde restant :</span>
-                <span>719,78 €</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer fixe en bas */}
-      <div className="mt-auto pt-4 border-t text-[10px] text-gray-500 text-center">
-        <p>
-          {companyData.name || 'AUTO PAINT'} - {companyData.address || '25 rue sainte victoire'} {companyData.zipcode || '13006'} {companyData.city || 'MARSEILLE'} - 
-          SIRET {companyData.siret || '12345678900010'} - N° TVA : {companyData.tva || 'FR123456789'} - 
-          Tel : {companyData.phone || '+330646465242'} - Email : {companyData.email || 'autopaint@yopmail.com'}
-        </p>
-      </div>
+      <DefaultInvoiceFooter companyData={companyData} />
     </div>
   );
 };
