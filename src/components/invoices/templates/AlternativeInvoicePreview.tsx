@@ -95,7 +95,7 @@ const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items
               {defaultClientData.phone && <p><strong>TEL :</strong> {defaultClientData.phone}</p>}
               {defaultClientData.email && <p><strong>EMAIL :</strong> {defaultClientData.email}</p>}
               {defaultClientData.address && <p><strong>ADRESSE :</strong> {defaultClientData.address}</p> }
-              {defaultClientData.city && <p className="ml-4">{defaultClientData.city}</p>}
+              {defaultClientData.city && <p>{defaultClientData.city}</p>}
               <p><strong>Immatriculation :</strong> {defaultClientData.licensePlate}</p>
               <p><strong>Kilométrage :</strong> {defaultClientData.mileage}</p>
               <p><strong>Véhicule :</strong> {defaultClientData.vehicle}</p>
