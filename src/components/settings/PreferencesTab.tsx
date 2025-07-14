@@ -194,7 +194,7 @@ const PreferencesTab = () => {
             <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 h-[1200px] overflow-y-auto w-full">
               {selectedTemplate === "default" ? (
                 // Modèle par défaut
-                 <div className="bg-white p-4 rounded shadow-sm h-full flex flex-col">
+                <div className="bg-white p-4 rounded shadow-sm h-full flex flex-col">
                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-base">
                      {/* Colonne 1 - Informations entreprise */}
                      <div>
@@ -273,98 +273,96 @@ const PreferencesTab = () => {
                      </div>
                    </div>
 
-                    {/* Tableau complet des articles - maintenant directement après le header */}
-                    <div className="mt-6">
-                      <div className="border-2 border-black rounded-lg overflow-hidden">
+                      {/* Tableau complet des articles - maintenant directement après le header */}
+                      <div className="mt-6">
                         <table className="w-full text-base bg-white border-collapse">
                           <thead>
                             <tr style={{ backgroundColor: 'rgba(64,67,72,255)' }} className="text-white">
-                              <th className="p-3 text-left font-medium border-r-2 border-black">Réf</th>
-                              <th className="p-3 text-left font-medium border-r-2 border-black">Description</th>
-                              <th className="p-3 text-center font-medium border-r-2 border-black">Quantité</th>
-                              <th className="p-3 text-center font-medium border-r-2 border-black">Remise</th>
-                              <th className="p-3 text-center font-medium border-r-2 border-black">Prix HT</th>
-                              <th className="p-3 text-center font-medium border-r-2 border-black">TVA</th>
-                              <th className="p-3 text-center font-medium border-r-2 border-black">Total HT</th>
+                              <th className="p-3 text-left font-medium">Réf</th>
+                              <th className="p-3 text-left font-medium">Description</th>
+                              <th className="p-3 text-center font-medium">Quantité</th>
+                              <th className="p-3 text-center font-medium">Remise</th>
+                              <th className="p-3 text-center font-medium">Prix HT</th>
+                              <th className="p-3 text-center font-medium">TVA</th>
+                              <th className="p-3 text-center font-medium">Total HT</th>
                               <th className="p-3 text-center font-medium">Total TTC</th>
                             </tr>
                           </thead>
                           <tbody>
-                            <tr className="border-b-2 border-black">
-                              <td className="p-3 border-r-2 border-black"></td>
-                              <td className="p-3 border-r-2 border-black">T1</td>
-                              <td className="p-3 text-center border-r-2 border-black">2</td>
-                              <td className="p-3 text-center border-r-2 border-black">0%</td>
-                              <td className="p-3 text-center border-r-2 border-black">110,00€</td>
-                              <td className="p-3 text-center border-r-2 border-black">20%</td>
-                              <td className="p-3 text-center border-r-2 border-black">220,00€</td>
+                            <tr className="border-b">
+                              <td className="p-3"></td>
+                              <td className="p-3">T1</td>
+                              <td className="p-3 text-center">2</td>
+                              <td className="p-3 text-center">0%</td>
+                              <td className="p-3 text-center">110,00€</td>
+                              <td className="p-3 text-center">20%</td>
+                              <td className="p-3 text-center">220,00€</td>
                               <td className="p-3 text-center">264,00€</td>
                             </tr>
-                            <tr className="border-b-2 border-black">
-                              <td className="p-3 border-r-2 border-black"></td>
-                              <td className="p-3 border-r-2 border-black">T2</td>
-                              <td className="p-3 text-center border-r-2 border-black">2</td>
-                              <td className="p-3 text-center border-r-2 border-black">0%</td>
-                              <td className="p-3 text-center border-r-2 border-black">110,00€</td>
-                              <td className="p-3 text-center border-r-2 border-black">20%</td>
-                              <td className="p-3 text-center border-r-2 border-black">220,00€</td>
+                            <tr className="border-b">
+                              <td className="p-3"></td>
+                              <td className="p-3">T2</td>
+                              <td className="p-3 text-center">2</td>
+                              <td className="p-3 text-center">0%</td>
+                              <td className="p-3 text-center">110,00€</td>
+                              <td className="p-3 text-center">20%</td>
+                              <td className="p-3 text-center">220,00€</td>
                               <td className="p-3 text-center">264,00€</td>
                             </tr>
-                            <tr className="border-b-2 border-black">
-                              <td className="p-3 border-r-2 border-black"></td>
-                              <td className="p-3 border-r-2 border-black">GRILLE DE PARE-CHOCS AV</td>
-                              <td className="p-3 text-center border-r-2 border-black">1</td>
-                              <td className="p-3 text-center border-r-2 border-black">5%</td>
-                              <td className="p-3 text-center border-r-2 border-black">95,00€</td>
-                              <td className="p-3 text-center border-r-2 border-black">20%</td>
-                              <td className="p-3 text-center border-r-2 border-black">90,25€</td>
+                            <tr className="border-b">
+                              <td className="p-3"></td>
+                              <td className="p-3">GRILLE DE PARE-CHOCS AV</td>
+                              <td className="p-3 text-center">1</td>
+                              <td className="p-3 text-center">5%</td>
+                              <td className="p-3 text-center">95,00€</td>
+                              <td className="p-3 text-center">20%</td>
+                              <td className="p-3 text-center">90,25€</td>
                               <td className="p-3 text-center">108,30€</td>
                             </tr>
                             <tr>
-                              <td className="p-3 border-r-2 border-black"></td>
-                              <td className="p-3 border-r-2 border-black">CONDENSEUR DE CLIMATISATION MOTRIO</td>
-                              <td className="p-3 text-center border-r-2 border-black">5</td>
-                              <td className="p-3 text-center border-r-2 border-black">0%</td>
-                              <td className="p-3 text-center border-r-2 border-black">0,00€</td>
-                              <td className="p-3 text-center border-r-2 border-black">20%</td>
-                              <td className="p-3 text-center border-r-2 border-black">0,00€</td>
+                              <td className="p-3"></td>
+                              <td className="p-3">CONDENSEUR DE CLIMATISATION MOTRIO</td>
+                              <td className="p-3 text-center">5</td>
+                              <td className="p-3 text-center">0%</td>
+                              <td className="p-3 text-center">0,00€</td>
+                              <td className="p-3 text-center">20%</td>
+                              <td className="p-3 text-center">0,00€</td>
                               <td className="p-3 text-center">0,00€</td>
                             </tr>
                           </tbody>
                         </table>
-                       </div>
-                      
+                      </div>
+                       
                       {/* Totaux */}
-                     <div className="mt-4 flex justify-end">
-                       <div className="w-56">
-                         <div className="space-y-1 text-base">
-                           <div className="flex justify-between font-bold">
-                             <span>Sous-total</span>
-                             <span>918,75 €</span>
-                           </div>
-                           <div className="flex justify-between">
-                             <span>TVA</span>
-                             <span>183,75 €</span>
-                           </div>
-                           <div className="flex justify-between font-bold text-lg bg-blue-600 text-white p-2">
-                             <span>TOTAL</span>
-                             <span>1 102,50 €</span>
-                           </div>
-                         </div>
-                       </div>
-                     </div>
-                   </div>
+                      <div className="mt-4 flex justify-end">
+                        <div className="w-56">
+                          <div className="space-y-1 text-base">
+                            <div className="flex justify-between font-bold">
+                              <span>Sous-total</span>
+                              <span>918,75 €</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>TVA</span>
+                              <span>183,75 €</span>
+                            </div>
+                            <div className="flex justify-between font-bold text-lg bg-blue-600 text-white p-2">
+                              <span>TOTAL</span>
+                              <span>1 102,50 €</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
 
-                   {/* Footer fixe en bas - toujours visible */}
-                   <div className="mt-auto pt-4 border-t text-[10px] text-gray-500 text-center">
-                     <p>
-                       {companyData.name || 'AUTO PAINT'} - {companyData.address || '25 rue sainte victoire'} {companyData.zipcode || '13006'} {companyData.city || 'MARSEILLE'} - 
-                       SIRET {companyData.siret || '12345678900010'} - N° TVA : {companyData.tva || 'FR123456789'} - 
-                       Tel : {companyData.phone || '+330646465242'} - Email : {companyData.email || 'autopaint@yopmail.com'}
-                     </p>
-                   </div>
-                 </div>
-               ) : (
+                    {/* Footer fixe en bas - toujours visible */}
+                    <div className="mt-auto pt-4 border-t text-[10px] text-gray-500 text-center">
+                      <p>
+                        {companyData.name || 'AUTO PAINT'} - {companyData.address || '25 rue sainte victoire'} {companyData.zipcode || '13006'} {companyData.city || 'MARSEILLE'} - 
+                        SIRET {companyData.siret || '12345678900010'} - N° TVA : {companyData.tva || 'FR123456789'} - 
+                        Tel : {companyData.phone || '+330646465242'} - Email : {companyData.email || 'autopaint@yopmail.com'}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
                   // Modèle alternatif - basé sur l'image de référence
                   <div className="bg-white p-6 rounded shadow-sm" style={{ fontFamily: 'Arial, sans-serif' }}>
                     {/* En-tête avec entreprise et FACTURE */}
