@@ -416,56 +416,56 @@ const PreferencesTab = () => {
                       <table className="w-full text-sm border-collapse">
                         <thead>
                           <tr>
-                            <th className="border-r-2 border-black p-2 text-left">Réf</th>
-                            <th className="border-r-2 border-black p-2 text-left">Description</th>
-                            <th className="border-r-2 border-black p-2 text-center">Quantité</th>
-                            <th className="border-r-2 border-black p-2 text-center">Remise</th>
-                            <th className="border-r-2 border-black p-2 text-center">Prix HT</th>
-                            <th className="border-r-2 border-black p-2 text-center">TVA</th>
-                            <th className="border-r-2 border-black p-2 text-center">Total HT</th>
-                            <th className="border-b-2 border-black p-2 text-center">Total TTC</th>
+                            <th className="border-r-2 border-b-2 border-black p-2 font-bold text-left">Réf</th>
+                            <th className="border-r-2 border-b-2 border-black p-2 font-bold text-left">Description</th>
+                            <th className="border-r-2 border-b-2 border-black p-2 font-bold text-center">Quantité</th>
+                            <th className="border-r-2 border-b-2 border-black p-2 font-bold text-center">Remise</th>
+                            <th className="border-r-2 border-b-2 border-black p-2 font-bold text-center">Prix HT</th>
+                            <th className="border-r-2 border-b-2 border-black p-2 font-bold text-center">TVA</th>
+                            <th className="border-r-2 border-b-2 border-black p-2 font-bold text-center">Total HT</th>
+                            <th className="border-b-2 border-black p-2 font-bold text-center">Total TTC</th>
                           </tr>
                         </thead>
                      <tbody>
                        <tr>
-                         <td className="border-r-2 border-black p-2"></td>
-                         <td className="border-r-2 border-black p-2">T1</td>
-                         <td className="border-r-2 border-black p-2 text-center">2</td>
-                         <td className="border-r-2 border-black p-2 text-center">0%</td>
-                         <td className="border-r-2 border-black p-2 text-center">110,00€</td>
-                         <td className="border-r-2 border-black p-2 text-center">20%</td>
-                         <td className="border-r-2 border-black p-2 text-center">220,00€</td>
-                         <td className="p-2 text-center">264,00€</td>
+                         <td className="border-r-2 border-black p-2 font-bold"></td>
+                         <td className="border-r-2 border-black p-2 font-bold">T1</td>
+                         <td className="border-r-2 border-black p-2 font-bold">2</td>
+                         <td className="border-r-2 border-black p-2 font-bold">0%</td>
+                         <td className="border-r-2 border-black p-2 font-bold">110,00€</td>
+                         <td className="border-r-2 border-black p-2 font-bold">20%</td>
+                         <td className="border-r-2 border-black p-2 font-bold">220,00€</td>
+                         <td className="p-2 font-bold">264,00€</td>
                        </tr>
                        <tr>
-                         <td className="border-r-2 border-black p-2"></td>
-                         <td className="border-r-2 border-black p-2">T2</td>
-                         <td className="border-r-2 border-black p-2 text-center">2</td>
-                         <td className="border-r-2 border-black p-2 text-center">0%</td>
-                         <td className="border-r-2 border-black p-2 text-center">110,00€</td>
-                         <td className="border-r-2 border-black p-2 text-center">20%</td>
-                         <td className="border-r-2 border-black p-2 text-center">220,00€</td>
-                         <td className="p-2 text-center">264,00€</td>
+                         <td className="border-r-2 border-black p-2 font-bold"></td>
+                         <td className="border-r-2 border-black p-2 font-bold">T2</td>
+                         <td className="border-r-2 border-black p-2 font-bold">2</td>
+                         <td className="border-r-2 border-black p-2 font-bold">0%</td>
+                         <td className="border-r-2 border-black p-2 font-bold">110,00€</td>
+                         <td className="border-r-2 border-black p-2 font-bold">20%</td>
+                         <td className="border-r-2 border-black p-2 font-bold">220,00€</td>
+                         <td className="p-2 font-bold">264,00€</td>
                        </tr>
                        <tr>
-                         <td className="border-r-2 border-black p-2"></td>
-                         <td className="border-r-2 border-black p-2">GRILLE DE PARE-CHOCS AV</td>
-                         <td className="border-r-2 border-black p-2 text-center">1</td>
-                         <td className="border-r-2 border-black p-2 text-center">5%</td>
-                         <td className="border-r-2 border-black p-2 text-center">95,00€</td>
-                         <td className="border-r-2 border-black p-2 text-center">20%</td>
-                         <td className="border-r-2 border-black p-2 text-center">90,25€</td>
-                         <td className="p-2 text-center">108,30€</td>
+                         <td className="border-r-2 border-black p-2 font-bold"></td>
+                         <td className="border-r-2 border-black p-2 font-bold">GRILLE DE PARE-CHOCS AV</td>
+                         <td className="border-r-2 border-black p-2 font-bold">1</td>
+                         <td className="border-r-2 border-black p-2 font-bold">5%</td>
+                         <td className="border-r-2 border-black p-2 font-bold">95,00€</td>
+                         <td className="border-r-2 border-black p-2 font-bold">20%</td>
+                         <td className="border-r-2 border-black p-2 font-bold">90,25€</td>
+                         <td className="p-2 font-bold">108,30€</td>
                        </tr>
                        <tr>
-                         <td className="border-r-2 border-black p-2"></td>
-                         <td className="border-r-2 border-black p-2">CONDENSEUR DE CLIMATISATION MOTRIO</td>
-                         <td className="border-r-2 border-black p-2 text-center">5</td>
-                         <td className="border-r-2 border-black p-2 text-center">0%</td>
-                         <td className="border-r-2 border-black p-2 text-center">0,00€</td>
-                         <td className="border-r-2 border-black p-2 text-center">20%</td>
-                         <td className="border-r-2 border-black p-2 text-center">0,00€</td>
-                         <td className="p-2 text-center">0,00€</td>
+                         <td className="border-r-2 border-black p-2 font-bold"></td>
+                         <td className="border-r-2 border-black p-2 font-bold">CONDENSEUR DE CLIMATISATION MOTRIO</td>
+                         <td className="border-r-2 border-black p-2 font-bold">5</td>
+                         <td className="border-r-2 border-black p-2 font-bold">0%</td>
+                         <td className="border-r-2 border-black p-2 font-bold">0,00€</td>
+                         <td className="border-r-2 border-black p-2 font-bold">20%</td>
+                         <td className="border-r-2 border-black p-2 font-bold">0,00€</td>
+                         <td className="p-2 font-bold">0,00€</td>
                        </tr>
                       </tbody>
                     </table>
