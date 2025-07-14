@@ -199,7 +199,7 @@ const PreferencesTab = () => {
 
           <div>
             <h3 className="text-lg font-medium mb-4">Aperçu du modèle sélectionné</h3>
-            <div className="border rounded-lg h-96 overflow-auto bg-white">
+            <div className="border rounded-lg h-[48rem] overflow-auto bg-white">
               {selectedTemplate === 'default' ? (
                 <DefaultInvoicePreview companyData={companyData} />
               ) : (
