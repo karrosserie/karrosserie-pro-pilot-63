@@ -87,9 +87,7 @@ const DefaultInvoicePreview = ({ companyData, invoiceData, clientData, items, to
       />
       
       <DefaultInvoiceItemsTable items={defaultItems} />
-      
       <DefaultInvoiceTotals totals={defaultTotals} />
-      
       <DefaultInvoicePaymentsTable />
 
       <DefaultInvoiceFooter companyData={companyData} />
