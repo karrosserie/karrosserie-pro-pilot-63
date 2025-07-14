@@ -289,7 +289,7 @@ const PreferencesTab = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            <tr className="border-b">
+                            <tr>
                               <td className="p-3"></td>
                               <td className="p-3">T1</td>
                               <td className="p-3 text-center">2</td>
@@ -299,7 +299,7 @@ const PreferencesTab = () => {
                               <td className="p-3 text-center">220,00€</td>
                               <td className="p-3 text-center">264,00€</td>
                             </tr>
-                            <tr className="border-b">
+                            <tr>
                               <td className="p-3"></td>
                               <td className="p-3">T2</td>
                               <td className="p-3 text-center">2</td>
@@ -309,7 +309,7 @@ const PreferencesTab = () => {
                               <td className="p-3 text-center">220,00€</td>
                               <td className="p-3 text-center">264,00€</td>
                             </tr>
-                            <tr className="border-b">
+                            <tr>
                               <td className="p-3"></td>
                               <td className="p-3">GRILLE DE PARE-CHOCS AV</td>
                               <td className="p-3 text-center">1</td>
