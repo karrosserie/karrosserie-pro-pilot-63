@@ -24,7 +24,7 @@ const DefaultInvoiceItemsTable = ({ items }: DefaultInvoiceItemsTableProps) => {
             <th className="p-3 text-left font-medium">Description</th>
             <th className="p-3 text-center font-medium">Quantité</th>
             <th className="p-3 text-center font-medium">Remise</th>
-            <th className="p-3 text-center font-medium">Prix HT</th>
+            <th className="p-3 text-center font-medium">Coût unitaire</th>
             <th className="p-3 text-center font-medium">TVA</th>
             <th className="p-3 text-center font-medium">Total HT</th>
           </tr>
