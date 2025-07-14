@@ -73,7 +73,7 @@ const DefaultInvoicePreview = ({ companyData, invoiceData, clientData, items, to
     ...totals
   };
   return (
-    <div className="bg-white p-4 rounded shadow-sm h-full flex flex-col" style={{ minHeight: '500px' }}>
+    <div className="bg-white p-4 rounded shadow-sm h-full flex flex-col min-h-full" style={{ minHeight: '500px', backgroundColor: 'white' }}>
       {/* En-tête avec 3 colonnes */}
       <div className="grid grid-cols-3 gap-6 mb-6">
         {/* Colonne 1 - Entreprise */}

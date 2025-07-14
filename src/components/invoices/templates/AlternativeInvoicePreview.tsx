@@ -71,7 +71,7 @@ const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items
     ...totals
   };
   return (
-    <div className="bg-white p-6 rounded shadow-sm" style={{ fontFamily: 'Arial, sans-serif' }}>
+    <div className="bg-white p-6 rounded shadow-sm h-full" style={{ fontFamily: 'Arial, sans-serif', backgroundColor: 'white', minHeight: '100%' }}>
       {/* En-tête avec entreprise et FACTURE */}
       <div className="flex justify-between items-start mb-8">
         <div>
