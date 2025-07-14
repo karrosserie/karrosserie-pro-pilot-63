@@ -113,13 +113,13 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
     const repairs = Array.isArray(invoice.repairs_data) ? invoice.repairs_data : [];
     items.push(...repairs.map((repair: any) => ({
       ref: repair.ref || '',
-      description: repair.description || '',
+      description: repair.description || repair.label || '',
       quantity: repair.quantity || 1,
       discount: repair.discount || 0,
-      unitPrice: repair.price || 0,
+      unitPrice: repair.unitCost || repair.price || 0,
       vat: repair.vat || 20,
-      totalHT: (repair.price || 0) * (repair.quantity || 1) * (1 - (repair.discount || 0) / 100),
-      totalTTC: (repair.price || 0) * (repair.quantity || 1) * (1 - (repair.discount || 0) / 100) * (1 + (repair.vat || 20) / 100)
+      totalHT: (repair.unitCost || repair.price || 0) * (repair.quantity || 1) * (1 - (repair.discount || 0) / 100),
+      totalTTC: (repair.unitCost || repair.price || 0) * (repair.quantity || 1) * (1 - (repair.discount || 0) / 100) * (1 + (repair.vat || 20) / 100)
     })));
   }
 
@@ -127,13 +127,13 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
     const parts = Array.isArray(invoice.parts_data) ? invoice.parts_data : [];
     items.push(...parts.map((part: any) => ({
       ref: part.ref || '',
-      description: part.description || '',
+      description: part.description || part.label || '',
       quantity: part.quantity || 1,
       discount: part.discount || 0,
-      unitPrice: part.price || 0,
+      unitPrice: part.unitCost || part.price || 0,
       vat: part.vat || 20,
-      totalHT: (part.price || 0) * (part.quantity || 1) * (1 - (part.discount || 0) / 100),
-      totalTTC: (part.price || 0) * (part.quantity || 1) * (1 - (part.discount || 0) / 100) * (1 + (part.vat || 20) / 100)
+      totalHT: (part.unitCost || part.price || 0) * (part.quantity || 1) * (1 - (part.discount || 0) / 100),
+      totalTTC: (part.unitCost || part.price || 0) * (part.quantity || 1) * (1 - (part.discount || 0) / 100) * (1 + (part.vat || 20) / 100)
     })));
   }
 
