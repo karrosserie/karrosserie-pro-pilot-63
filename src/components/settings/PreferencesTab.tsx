@@ -423,7 +423,7 @@ const PreferencesTab = () => {
                             <th className="border-r-2 border-black p-2 text-center">Prix HT</th>
                             <th className="border-r-2 border-black p-2 text-center">TVA</th>
                             <th className="border-r-2 border-black p-2 text-center">Total HT</th>
-                            <th className="p-2 text-center">Total TTC</th>
+                            <th className="border-b-2 border-black p-2 text-center">Total TTC</th>
                           </tr>
                         </thead>
                      <tbody>
