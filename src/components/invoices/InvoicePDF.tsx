@@ -425,7 +425,13 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
               <Text style={alternativeStyles.dateLabel}>DATE</Text>
               <Text style={alternativeStyles.dateValue}>{clientData?.billingDate || formatDate(invoice.date || invoice.created_at)}</Text>
             </View>
-            {documentType !== 'repair_order' && (
+            {documentType === 'credit' && (
+              <View style={[alternativeStyles.dateBox, { marginLeft: 125 }]}>
+                <Text style={alternativeStyles.dateLabel}>FACTURE ASSOCIÉE</Text>
+                <Text style={alternativeStyles.dateValue}>{invoice.reference || 'N/A'}</Text>
+              </View>
+            )}
+            {documentType === 'invoice' && (
               <View style={[alternativeStyles.dateBox, { marginLeft: 125 }]}>
                 <Text style={alternativeStyles.dateLabel}>DATE D'ÉCHÉANCE</Text>
                 <Text style={alternativeStyles.dateValue}>{formatDate(invoice.due_date)}</Text>
