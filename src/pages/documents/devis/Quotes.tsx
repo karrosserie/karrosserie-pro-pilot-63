@@ -190,6 +190,11 @@ const Quotes = () => {
     setEmailDialogOpen(true);
   };
 
+  const handleViewQuote = (quote: Quote) => {
+    setSelectedQuote(quote);
+    setEditDialogOpen(true);
+  };
+
   const handleRequestDocuments = (quote: Quote) => {
     toast({
       title: "Demande de justificatifs",
@@ -334,7 +339,7 @@ const Quotes = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-1">
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" onClick={() => handleViewQuote(quote)}>
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => handleEditQuote(quote)}>

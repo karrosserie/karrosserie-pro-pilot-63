@@ -148,6 +148,11 @@ const RepairOrders = () => {
     setDeleteDialogOpen(true);
   };
 
+  const handleViewOrder = (order: RepairOrder) => {
+    setSelectedOrder(order);
+    setDialogOpen(true);
+  };
+
   const confirmDeleteOrder = () => {
     if (selectedOrderForDeletion) {
       deleteOrder.mutate(selectedOrderForDeletion.id);
@@ -184,6 +189,7 @@ const RepairOrders = () => {
         orders={filteredOrders}
         onEditOrder={handleEditOrder}
         onDeleteOrder={handleDeleteOrder}
+        onViewOrder={handleViewOrder}
         contextMenuProps={{
           onDownload: handleDownload,
           onPrint: handlePrint,

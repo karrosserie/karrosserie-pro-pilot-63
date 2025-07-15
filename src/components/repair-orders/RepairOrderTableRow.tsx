@@ -11,6 +11,7 @@ interface RepairOrderTableRowProps {
   order: RepairOrder;
   onEditOrder: (order: RepairOrder) => void;
   onDeleteOrder: (order: RepairOrder) => void;
+  onViewOrder?: (order: RepairOrder) => void;
   contextMenuProps?: {
     onDownload: (order: RepairOrder) => void;
     onPrint: (order: RepairOrder) => void;
@@ -21,7 +22,7 @@ interface RepairOrderTableRowProps {
   };
 }
 
-export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, contextMenuProps }: RepairOrderTableRowProps) => {
+export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onViewOrder, contextMenuProps }: RepairOrderTableRowProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'En cours':
@@ -80,7 +81,7 @@ export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, context
       </TableCell>
       <TableCell className="text-right">
         <div className="flex justify-end space-x-1">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" onClick={() => onViewOrder?.(order)}>
             <Eye className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" onClick={() => onEditOrder(order)}>
