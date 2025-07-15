@@ -206,15 +206,13 @@ const alternativeStyles = StyleSheet.create({
     marginBottom: 15,
   },
   clientInfoSection: {
+    marginTop: 4,
     width: 200,
-    backgroundColor: '#f9f9f9',
-    padding: 10,
-    marginLeft: 'auto',
   },
   clientInfo: {
-    fontSize: 9,
-    lineHeight: 1.4,
-    marginBottom: 2,
+    fontSize: 8,
+    lineHeight: 1.3,
+    marginBottom: 1,
   },
   dateSection: {
     flexDirection: 'row',
@@ -430,6 +428,12 @@ const QuotePDF = ({ quote, companyData, receipts = [], clientData, vehicleData, 
     if (!dateString) return '';
     return new Date(dateString).toLocaleDateString('fr-FR');
   };
+
+  console.log('QuotePDF - clientData:', clientData);
+  console.log('QuotePDF - quote.repairs_data:', quote.repairs_data);
+  console.log('QuotePDF - quote.parts_data:', quote.parts_data);
+  console.log('QuotePDF - repairs parsed:', repairs);
+  console.log('QuotePDF - parts parsed:', parts);
 
   if (template === 'alternative') {
     return (
