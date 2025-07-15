@@ -597,6 +597,29 @@ const QuotePDF = ({ quote, companyData, receipts = [], clientData, vehicleData, 
                 <Text style={{ fontSize: 9, textAlign: 'right' }}>{clientData.mileage}</Text>
               </View>
             )}
+            
+            {/* Encadré Montant total */}
+            <View style={{
+              backgroundColor: '#2563eb',
+              color: 'white',
+              padding: 12,
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: 10,
+            }}>
+              <Text style={{
+                fontSize: 10,
+                fontWeight: 'normal',
+                color: 'white',
+                marginBottom: 2,
+              }}>Montant total</Text>
+              <Text style={{
+                fontSize: 16,
+                fontWeight: 'bold',
+                color: 'white',
+              }}>{clientData?.totals?.total || formatCurrency(totalTTC)}</Text>
+            </View>
           </View>
 
           <View style={defaultStyles.headerColumn}>
