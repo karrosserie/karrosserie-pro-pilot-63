@@ -516,7 +516,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
         <View style={defaultStyles.header}>
           <View style={defaultStyles.headerColumn}>
             <View style={defaultStyles.title}>
-              <Text>FACTURE</Text>
+              <Text>{documentType === 'repair_order' ? 'ORDRE DE RÉPARATION' : documentType === 'credit' ? 'AVOIR' : 'FACTURE'}</Text>
             </View>
             {companyData?.logo_url && (
               <Image src={companyData.logo_url} style={{ width: 80, height: 60, marginBottom: 8 }} />
@@ -533,9 +533,9 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
           </View>
 
           <View style={defaultStyles.headerColumn}>
-            <Text style={defaultStyles.sectionTitle}>Détails de la facture</Text>
+            <Text style={defaultStyles.sectionTitle}>{documentType === 'repair_order' ? 'Détails de l\'ordre de réparation' : documentType === 'credit' ? 'Détails de l\'avoir' : 'Détails de la facture'}</Text>
             <View style={defaultStyles.detailRow}>
-              <Text style={defaultStyles.detailLabel}>Facture</Text>
+              <Text style={defaultStyles.detailLabel}>{documentType === 'repair_order' ? 'Ordre de réparation' : documentType === 'credit' ? 'Avoir' : 'Facture'}</Text>
               <Text style={defaultStyles.detailValue}>N° {clientData?.number || invoice.reference}</Text>
             </View>
             {clientData?.claimNumber && (
@@ -545,7 +545,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
               </View>
             )}
             <View style={defaultStyles.detailRow}>
-              <Text style={defaultStyles.detailLabel}>Date de facturation</Text>
+              <Text style={defaultStyles.detailLabel}>{documentType === 'repair_order' ? 'Date de création' : documentType === 'credit' ? 'Date de l\'avoir' : 'Date de facturation'}</Text>
               <Text style={defaultStyles.detailValue}>{clientData?.billingDate || formatDate(invoice.date || invoice.created_at)}</Text>
             </View>
             {clientData?.dueDate && (
@@ -572,20 +572,43 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
                 <Text style={defaultStyles.detailValue}>{clientData.mileage}</Text>
               </View>
             )}
-            <View style={defaultStyles.detailRow}>
-              <Text style={defaultStyles.detailLabel}>Montant payé</Text>
-              <Text style={defaultStyles.detailValue}>375,00 €</Text>
-            </View>
             
-            {/* Encadré Montant dû */}
+            {/* Section Délai prévisionnel pour les ordres de réparation */}
+            {documentType === 'repair_order' && vehicleData?.start_date && vehicleData?.end_date && (
+              <View style={{ marginTop: 15, backgroundColor: '#f8f9fa', padding: 8, borderRadius: 4 }}>
+                <Text style={[defaultStyles.detailLabel, { marginBottom: 5, fontSize: 10 }]}>Délai prévisionnel</Text>
+                <View style={defaultStyles.detailRow}>
+                  <Text style={defaultStyles.detailLabel}>Date de début</Text>
+                  <Text style={defaultStyles.detailValue}>{formatDate(vehicleData.start_date)}</Text>
+                </View>
+                <View style={defaultStyles.detailRow}>
+                  <Text style={defaultStyles.detailLabel}>Date de fin</Text>
+                  <Text style={defaultStyles.detailValue}>{formatDate(vehicleData.end_date)}</Text>
+                </View>
+              </View>
+            )}
+            
+            {/* Montant payé seulement pour les factures */}
+            {documentType === 'invoice' && (
+              <View style={defaultStyles.detailRow}>
+                <Text style={defaultStyles.detailLabel}>Montant payé</Text>
+                <Text style={defaultStyles.detailValue}>375,00 €</Text>
+              </View>
+            )}
+            
+            {/* Encadré Montant dû/total */}
             <View style={defaultStyles.amountDueBox}>
-              <Text style={defaultStyles.amountDueLabel}>Montant dû</Text>
+              <Text style={defaultStyles.amountDueLabel}>
+                {documentType === 'repair_order' ? 'Montant total' : documentType === 'credit' ? 'Montant de l\'avoir' : 'Montant dû'}
+              </Text>
               <Text style={defaultStyles.amountDueValue}>{clientData?.amountDue || '719,78 €'}</Text>
             </View>
           </View>
 
           <View style={defaultStyles.headerColumn}>
-            <Text style={defaultStyles.sectionTitle}>Facture pour</Text>
+            <Text style={defaultStyles.sectionTitle}>
+              {documentType === 'repair_order' ? 'Ordre de réparation pour' : documentType === 'credit' ? 'Avoir pour' : 'Facture pour'}
+            </Text>
             <View style={defaultStyles.companyInfo}>
               <Text style={defaultStyles.companyName}>{clientData?.name || 'Client non spécifié'}</Text>
               <Text>{clientData?.address || 'Adresse non renseignée'}</Text>
@@ -643,40 +666,44 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
           </View>
         </View>
 
-        {/* Section Paiements */}
-        <View style={[defaultStyles.table, { marginTop: 20 }]}>
-          <Text style={[defaultStyles.sectionTitle, { marginBottom: 8 }]}>Liste des paiements</Text>
-          <View style={defaultStyles.tableHeader}>
-            <Text style={[defaultStyles.tableHeaderText, { flex: 2 }]}>Date</Text>
-            <Text style={[defaultStyles.tableHeaderText, { flex: 2 }]}>Mode de paiement</Text>
-            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>Montant</Text>
-          </View>
-          
-          <View style={defaultStyles.tableRow}>
-            <Text style={[defaultStyles.tableCell, { flex: 2 }]}>10/07/2025</Text>
-            <Text style={[defaultStyles.tableCell, { flex: 2 }]}>Virement</Text>
-            <Text style={[defaultStyles.tableCellRight, { flex: 1 }]}>200,00 €</Text>
-          </View>
-          <View style={defaultStyles.tableRow}>
-            <Text style={[defaultStyles.tableCell, { flex: 2 }]}>11/07/2025</Text>
-            <Text style={[defaultStyles.tableCell, { flex: 2 }]}>Virement</Text>
-            <Text style={[defaultStyles.tableCellRight, { flex: 1 }]}>175,00 €</Text>
-          </View>
-        </View>
+        {/* Section Paiements - seulement pour les factures */}
+        {documentType === 'invoice' && (
+          <>
+            <View style={[defaultStyles.table, { marginTop: 20 }]}>
+              <Text style={[defaultStyles.sectionTitle, { marginBottom: 8 }]}>Liste des paiements</Text>
+              <View style={defaultStyles.tableHeader}>
+                <Text style={[defaultStyles.tableHeaderText, { flex: 2 }]}>Date</Text>
+                <Text style={[defaultStyles.tableHeaderText, { flex: 2 }]}>Mode de paiement</Text>
+                <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>Montant</Text>
+              </View>
+              
+              <View style={defaultStyles.tableRow}>
+                <Text style={[defaultStyles.tableCell, { flex: 2 }]}>10/07/2025</Text>
+                <Text style={[defaultStyles.tableCell, { flex: 2 }]}>Virement</Text>
+                <Text style={[defaultStyles.tableCellRight, { flex: 1 }]}>200,00 €</Text>
+              </View>
+              <View style={defaultStyles.tableRow}>
+                <Text style={[defaultStyles.tableCell, { flex: 2 }]}>11/07/2025</Text>
+                <Text style={[defaultStyles.tableCell, { flex: 2 }]}>Virement</Text>
+                <Text style={[defaultStyles.tableCellRight, { flex: 1 }]}>175,00 €</Text>
+              </View>
+            </View>
 
-        {/* Résumé des paiements */}
-        <View style={[defaultStyles.totalsSection, { marginTop: 10 }]}>
-          <View style={defaultStyles.totalsBox}>
-            <View style={defaultStyles.totalRowBold}>
-              <Text>Total encaissé :</Text>
-              <Text>375,00 €</Text>
+            {/* Résumé des paiements */}
+            <View style={[defaultStyles.totalsSection, { marginTop: 10 }]}>
+              <View style={defaultStyles.totalsBox}>
+                <View style={defaultStyles.totalRowBold}>
+                  <Text>Total encaissé :</Text>
+                  <Text>375,00 €</Text>
+                </View>
+                <View style={[defaultStyles.totalRowBold, { color: '#dc2626' }]}>
+                  <Text>Solde restant :</Text>
+                  <Text>719,78 €</Text>
+                </View>
+              </View>
             </View>
-            <View style={[defaultStyles.totalRowBold, { color: '#dc2626' }]}>
-              <Text>Solde restant :</Text>
-              <Text>719,78 €</Text>
-            </View>
-          </View>
-        </View>
+          </>
+        )}
 
         {/* Footer par défaut */}
         <Text style={defaultStyles.footer} fixed>
