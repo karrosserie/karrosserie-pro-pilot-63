@@ -559,6 +559,12 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
                                                                documentType === 'quote' ? 'Date du devis' : 'Date de facturation'}</Text>
               <Text style={defaultStyles.detailValue}>{clientData?.billingDate || formatDate(invoice.date || invoice.created_at)}</Text>
             </View>
+            {documentType === 'credit' && (
+              <View style={defaultStyles.detailRow}>
+                <Text style={defaultStyles.detailLabel}>Facture associée</Text>
+                <Text style={defaultStyles.detailValue}>{clientData?.invoiceReference || invoice.reference || 'N/A'}</Text>
+              </View>
+            )}
             {clientData?.dueDate && (
               <View style={defaultStyles.detailRow}>
                 <Text style={defaultStyles.detailLabel}>Date d'échéance</Text>
