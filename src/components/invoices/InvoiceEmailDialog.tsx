@@ -57,6 +57,7 @@ export const InvoiceEmailDialog = ({ invoice, open, onOpenChange }: InvoiceEmail
           data={emailData}
           onChange={handleFieldChange}
           isLoading={isLoading}
+          invoiceReference={invoice?.reference}
         />
 
         <EmailDialogActions
