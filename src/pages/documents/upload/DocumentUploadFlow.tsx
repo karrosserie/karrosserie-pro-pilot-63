@@ -1,11 +1,34 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
+import DocumentUploadWorkflow from "@/components/documents/upload/DocumentUploadWorkflow";
 
 export default function DocumentUploadFlow() {
+  const [showWorkflow, setShowWorkflow] = useState(false);
+
   const handleStart = () => {
-    // TODO: Implement document upload flow
-    console.log("Starting document upload flow");
+    setShowWorkflow(true);
   };
+
+  const handleBackToStart = () => {
+    setShowWorkflow(false);
+  };
+
+  const handleComplete = (documents: { [key: string]: File }) => {
+    console.log("Documents uploaded:", documents);
+    // TODO: Handle document submission
+    // For now, redirect back to start
+    setShowWorkflow(false);
+  };
+
+  if (showWorkflow) {
+    return (
+      <DocumentUploadWorkflow
+        onBack={handleBackToStart}
+        onComplete={handleComplete}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
