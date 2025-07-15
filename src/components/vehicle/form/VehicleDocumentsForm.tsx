@@ -4,6 +4,11 @@ import { Label } from '@/components/ui/label';
 import { DocumentUploader } from '@/components/shared/DocumentUploader';
 import MultipleVehicleImages from './MultipleVehicleImages';
 
+interface VehicleImageData {
+  url: string;
+  timing: 'Avant' | 'Pendant' | 'Après';
+}
+
 interface VehicleDocumentsFormProps {
   formData: any;
   isViewMode: boolean;
@@ -14,7 +19,7 @@ interface VehicleDocumentsFormProps {
   onRegistrationFrontUpload: (url: string) => void;
   onRegistrationBackUpload: (url: string) => void;
   onVehicleImageUpload: (url: string) => void;
-  onVehicleImagesUpdate: (images: string[]) => void;
+  onVehicleImagesUpdate: (images: VehicleImageData[]) => void;
 }
 
 const VehicleDocumentsForm: React.FC<VehicleDocumentsFormProps> = ({
@@ -25,33 +30,37 @@ const VehicleDocumentsForm: React.FC<VehicleDocumentsFormProps> = ({
   onVehicleImagesUpdate
 }) => {
   const vehicleId = formData.id || 'new-vehicle';
-  const vehicleImages = formData.vehicleImages || [''];
+  
+  // Convertir les données existantes ou initialiser avec un tableau vide
+  const vehicleImages: VehicleImageData[] = formData.vehicleImages || [];
 
   const handleImageAdd = (url: string) => {
-    if (vehicleImages[vehicleImages.length - 1] === '') {
+    if (vehicleImages.length === 0 || vehicleImages[vehicleImages.length - 1].url !== '') {
+      // Ajouter une nouvelle image avec le timing par défaut
+      const newImage: VehicleImageData = { url, timing: 'Avant' };
+      onVehicleImagesUpdate([...vehicleImages, newImage]);
+    } else {
       // Remplacer le dernier slot vide
       const updatedImages = [...vehicleImages];
-      updatedImages[updatedImages.length - 1] = url;
+      updatedImages[updatedImages.length - 1] = { url, timing: 'Avant' };
       onVehicleImagesUpdate(updatedImages);
-    } else {
-      // Ajouter une nouvelle image
-      onVehicleImagesUpdate([...vehicleImages, url]);
     }
   };
 
   const handleImageRemove = (index: number) => {
     const updatedImages = vehicleImages.filter((_, i) => i !== index);
-    // S'assurer qu'il y a au moins un slot vide si toutes les images sont supprimées
-    if (updatedImages.length === 0) {
-      onVehicleImagesUpdate(['']);
-    } else {
-      onVehicleImagesUpdate(updatedImages);
-    }
+    onVehicleImagesUpdate(updatedImages);
   };
 
   const handleImageUpdate = (index: number, url: string) => {
     const updatedImages = [...vehicleImages];
-    updatedImages[index] = url;
+    updatedImages[index] = { ...updatedImages[index], url };
+    onVehicleImagesUpdate(updatedImages);
+  };
+
+  const handleImageTimingUpdate = (index: number, timing: 'Avant' | 'Pendant' | 'Après') => {
+    const updatedImages = [...vehicleImages];
+    updatedImages[index] = { ...updatedImages[index], timing };
     onVehicleImagesUpdate(updatedImages);
   };
 
@@ -86,6 +95,7 @@ const VehicleDocumentsForm: React.FC<VehicleDocumentsFormProps> = ({
         onImageAdd={handleImageAdd}
         onImageRemove={handleImageRemove}
         onImageUpdate={handleImageUpdate}
+        onImageTimingUpdate={handleImageTimingUpdate}
       />
     </div>
   );

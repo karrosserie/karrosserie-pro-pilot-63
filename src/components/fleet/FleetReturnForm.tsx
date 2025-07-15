@@ -137,12 +137,18 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
             vehicleId={vehicle.id}
             mileage={formData.returnMileage}
             fuelLevel={formData.fuelLevelReturn}
-            vehicleImages={formData.vehicleImages}
+            vehicleImages={formData.vehicleImages.map((img: any) => 
+              typeof img === 'string' ? { url: img, timing: 'Avant' as const } : img
+            )}
             onMileageChange={handleMileageChange}
             onFuelLevelChange={handleFuelLevelChange}
             onImageAdd={handleImageAdd}
             onImageRemove={handleImageRemove}
             onImageUpdate={handleImageUpdate}
+            onImageTimingUpdate={(index, timing) => {
+              // Stub pour le moment - peut être implémenté plus tard
+              console.log('Timing update:', index, timing);
+            }}
             isViewMode={isViewMode}
           />
         </TabsContent>

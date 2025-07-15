@@ -3,15 +3,22 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { DocumentUploader } from '@/components/shared/DocumentUploader';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, X } from 'lucide-react';
+
+interface VehicleImageData {
+  url: string;
+  timing: 'Avant' | 'Pendant' | 'Après';
+}
 
 interface MultipleVehicleImagesProps {
   vehicleId: string;
-  vehicleImages: string[];
+  vehicleImages: VehicleImageData[];
   isViewMode: boolean;
   onImageAdd: (url: string) => void;
   onImageRemove: (index: number) => void;
   onImageUpdate: (index: number, url: string) => void;
+  onImageTimingUpdate: (index: number, timing: 'Avant' | 'Pendant' | 'Après') => void;
 }
 
 const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
@@ -20,7 +27,8 @@ const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
   isViewMode,
   onImageAdd,
   onImageRemove,
-  onImageUpdate
+  onImageUpdate,
+  onImageTimingUpdate
 }) => {
   const addNewImageSlot = () => {
     // Ajouter un slot vide pour une nouvelle image
@@ -28,13 +36,7 @@ const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
   };
 
   const handleImageUpload = (index: number, url: string) => {
-    if (vehicleImages[index] === '') {
-      // Si c'est un slot vide, utiliser onImageUpdate pour le remplir
-      onImageUpdate(index, url);
-    } else {
-      // Si c'est une image existante, la remplacer
-      onImageUpdate(index, url);
-    }
+    onImageUpdate(index, url);
   };
 
   return (
@@ -66,28 +68,50 @@ const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
           />
         )}
         
-        {vehicleImages.map((imageUrl, index) => (
+        {vehicleImages.map((imageData, index) => (
           <div key={index} className="relative">
-            <div className="flex items-start gap-2">
-              <div className="flex-1">
-                <DocumentUploader
-                  documentType="vehicle-image"
-                  documentId={`${vehicleId}-${index}`}
-                  currentDocumentUrl={imageUrl}
-                  onUploadComplete={(url) => handleImageUpload(index, url)}
-                  isViewMode={isViewMode}
-                />
+            <div className="space-y-2">
+              <div className="flex items-start gap-2">
+                <div className="flex-1">
+                  <DocumentUploader
+                    documentType="vehicle-image"
+                    documentId={`${vehicleId}-${index}`}
+                    currentDocumentUrl={imageData.url}
+                    onUploadComplete={(url) => handleImageUpload(index, url)}
+                    isViewMode={isViewMode}
+                  />
+                </div>
+                {!isViewMode && vehicleImages.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onImageRemove(index)}
+                    className="text-red-500 hover:text-red-600"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
-              {!isViewMode && vehicleImages.length > 1 && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onImageRemove(index)}
-                  className="text-red-500 hover:text-red-600"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+              
+              {imageData.url && (
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm font-medium">Timing:</Label>
+                  <Select
+                    value={imageData.timing}
+                    onValueChange={(value) => onImageTimingUpdate(index, value as 'Avant' | 'Pendant' | 'Après')}
+                    disabled={isViewMode}
+                  >
+                    <SelectTrigger className="w-32">
+                      <SelectValue placeholder="Sélectionner" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Avant">Avant</SelectItem>
+                      <SelectItem value="Pendant">Pendant</SelectItem>
+                      <SelectItem value="Après">Après</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               )}
             </div>
           </div>

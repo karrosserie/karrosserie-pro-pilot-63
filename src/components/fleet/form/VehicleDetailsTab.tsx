@@ -5,16 +5,22 @@ import { Input } from '@/components/ui/input';
 import FuelGauge from '@/components/vehicle/form/FuelGauge';
 import MultipleVehicleImages from '@/components/vehicle/form/MultipleVehicleImages';
 
+interface VehicleImageData {
+  url: string;
+  timing: 'Avant' | 'Pendant' | 'Après';
+}
+
 interface VehicleDetailsTabProps {
   vehicleId: string;
   mileage: number;
   fuelLevel: number;
-  vehicleImages: string[];
+  vehicleImages: VehicleImageData[];
   onMileageChange: (mileage: number) => void;
   onFuelLevelChange: (level: number) => void;
   onImageAdd: (url: string) => void;
   onImageRemove: (index: number) => void;
   onImageUpdate: (index: number, url: string) => void;
+  onImageTimingUpdate: (index: number, timing: 'Avant' | 'Pendant' | 'Après') => void;
   isViewMode?: boolean;
 }
 
@@ -28,6 +34,7 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
   onImageAdd,
   onImageRemove,
   onImageUpdate,
+  onImageTimingUpdate,
   isViewMode = false
 }) => {
   const handleMileageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,7 +59,7 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
   };
 
   // S'assurer qu'il y a au moins un slot vide pour ajouter une image
-  const displayImages = vehicleImages.length === 0 ? [''] : vehicleImages;
+  const displayImages = vehicleImages.length === 0 ? [{ url: '', timing: 'Avant' as const }] : vehicleImages;
 
   return (
     <div className="space-y-6">
@@ -96,6 +103,7 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
             onImageAdd={handleImageAdd}
             onImageRemove={handleImageRemove}
             onImageUpdate={handleImageUpdate}
+            onImageTimingUpdate={onImageTimingUpdate}
           />
         </div>
       </div>

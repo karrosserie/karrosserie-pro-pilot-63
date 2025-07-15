@@ -4,6 +4,11 @@ import { useCarBrands } from '@/hooks/use-car-brands';
 import { useCarModels } from '@/hooks/use-car-models';
 import { useNotification } from '@/hooks/use-notification';
 
+export interface VehicleImageData {
+  url: string;
+  timing: 'Avant' | 'Pendant' | 'Après';
+}
+
 export interface VehicleFormData {
   clientId: string;
   vin: string;
@@ -28,7 +33,7 @@ export interface VehicleFormData {
   registrationDocumentFrontUrl: string;
   registrationDocumentBackUrl: string;
   vehicleImageUrl: string;
-  vehicleImages: string[];
+  vehicleImages: VehicleImageData[];
 }
 
 interface UseVehicleFormLogicProps {
@@ -60,18 +65,28 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
   };
 
   // Parse vehicle images from database
-  const parseVehicleImages = (vehicleImages: any) => {
-    if (!vehicleImages) return [''];
-    if (Array.isArray(vehicleImages)) return vehicleImages.length > 0 ? vehicleImages : [''];
+  const parseVehicleImages = (vehicleImages: any): VehicleImageData[] => {
+    if (!vehicleImages) return [];
+    if (Array.isArray(vehicleImages)) {
+      // Si c'est déjà un tableau d'objets VehicleImageData, retourner tel quel
+      if (vehicleImages.length > 0 && typeof vehicleImages[0] === 'object' && vehicleImages[0].url) {
+        return vehicleImages;
+      }
+      // Si c'est un tableau de strings (ancienne structure), convertir
+      return vehicleImages.filter(img => img && img.trim() !== '').map(url => ({
+        url,
+        timing: 'Avant' as const
+      }));
+    }
     if (typeof vehicleImages === 'string') {
       try {
         const parsed = JSON.parse(vehicleImages);
-        return Array.isArray(parsed) && parsed.length > 0 ? parsed : [''];
+        return parseVehicleImages(parsed);
       } catch {
-        return vehicleImages.trim() !== '' ? [vehicleImages] : [''];
+        return vehicleImages.trim() !== '' ? [{ url: vehicleImages, timing: 'Avant' as const }] : [];
       }
     }
-    return [''];
+    return [];
   };
 
   // Get brand and model names from IDs for display
@@ -201,7 +216,7 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
     setFormData(prev => ({ ...prev, vehicleImageUrl: url }));
   };
 
-  const handleVehicleImagesUpdate = (images: string[]) => {
+  const handleVehicleImagesUpdate = (images: VehicleImageData[]) => {
     setFormData(prev => ({ ...prev, vehicleImages: images }));
   };
 

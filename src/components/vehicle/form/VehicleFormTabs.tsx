@@ -5,6 +5,11 @@ import VehicleBasicInfoForm from './VehicleBasicInfoForm';
 import VehicleDetailsForm from './VehicleDetailsForm';
 import VehicleDocumentsForm from './VehicleDocumentsForm';
 
+interface VehicleImageData {
+  url: string;
+  timing: 'Avant' | 'Pendant' | 'Après';
+}
+
 interface VehicleFormTabsProps {
   formData: any;
   isViewMode: boolean;
@@ -17,7 +22,7 @@ interface VehicleFormTabsProps {
   onRegistrationFrontUpload: (url: string) => void;
   onRegistrationBackUpload: (url: string) => void;
   onVehicleImageUpload: (url: string) => void;
-  onVehicleImagesUpdate: (images: string[]) => void;
+  onVehicleImagesUpdate: (images: VehicleImageData[]) => void;
   onFuelLevelChange: (value: number) => void;
   onAddWorkItem: () => void;
   onRemoveWorkItem: (index: number) => void;
