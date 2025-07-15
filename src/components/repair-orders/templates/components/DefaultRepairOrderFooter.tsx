@@ -6,23 +6,12 @@ interface DefaultRepairOrderFooterProps {
 
 const DefaultRepairOrderFooter = ({ companyData }: DefaultRepairOrderFooterProps) => {
   return (
-    <div className="flex justify-between items-end mt-auto pt-6">
-      <div className="text-sm text-gray-600">
-        <p className="mb-2 font-semibold">Conditions de paiement :</p>
-        <ul className="list-disc pl-4 space-y-1">
-          <li>Paiement comptant, sauf conditions particulières d'escompte.</li>
-          <li>En cas de retard de paiement, indemnité forfaitaire pour frais de recouvrement : 40 euros.</li>
-          <li>Pénalités de retard : 3 fois le taux de l'intérêt légal (taux BCE + 10%).</li>
-        </ul>
-      </div>
-      
-      <div className="text-right text-sm text-gray-600 ml-6">
-        <p className="font-semibold mb-1">Merci de votre confiance !</p>
-        <p>{companyData.name || 'KARROSSERIE'}</p>
-        <p>{companyData.address || 'Votre adresse'}</p>
-        <p>{companyData.zipcode || ''} {companyData.city || ''}</p>
-        <p>Téléphone : {companyData.phone || '+33 1 23 45 67 89'}</p>
-      </div>
+    <div className="mt-auto pt-4 text-[10px] text-gray-500 text-center">
+      <p>
+        {companyData.name || 'AUTO PAINT'} - {companyData.address || '25 rue sainte victoire'} {companyData.zipcode || '13006'} {companyData.city || 'MARSEILLE'} - 
+        SIRET {companyData.siret || '12345678900010'} - N° TVA : {companyData.tva || 'FR123456789'} - 
+        Tel : {companyData.phone || '+330646465242'} - Email : {companyData.email || 'autopaint@yopmail.com'}
+      </p>
     </div>
   );
 };

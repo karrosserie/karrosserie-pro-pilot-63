@@ -146,27 +146,6 @@ const AlternativeCreditPreview = ({ companyData, creditData, clientData, items, 
             </div>
           </div>
         </div>
-
-        {/* Notes */}
-        {creditData.notes && (
-          <div className="mb-8 bg-blue-50 rounded p-4">
-            <h3 className="font-semibold text-red-600 mb-2 text-lg">NOTES</h3>
-            <div className="text-sm text-gray-700">
-              <p>{creditData.notes}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Informations légales */}
-        <div className="bg-gray-50 rounded p-4 text-xs text-gray-600">
-          <p className="font-semibold mb-2 text-red-600">Informations importantes:</p>
-          <ul className="space-y-1 list-disc list-inside">
-            <li>Cet avoir est à déduire du montant de votre prochaine facture.</li>
-            <li>Avoir émis en application des conditions générales de vente.</li>
-            <li>Conservez ce document, il vous sera demandé pour tout remboursement.</li>
-            <li>Validité de l'avoir selon les conditions légales en vigueur.</li>
-          </ul>
-        </div>
       </div>
     </div>
   );
