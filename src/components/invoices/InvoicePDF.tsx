@@ -404,7 +404,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
           <View style={alternativeStyles.tableContainer}>
             <View style={alternativeStyles.tableHeader}>
               <Text style={[alternativeStyles.tableHeaderCell, { width: 30 }]}>Réf</Text>
-              <Text style={[alternativeStyles.tableHeaderCell, { width: 130 }]}>Description</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { width: 225 }]}>Description</Text>
               <Text style={[alternativeStyles.tableHeaderCell, { width: 50 }]}>Quantité</Text>
               <Text style={[alternativeStyles.tableHeaderCell, { width: 40 }]}>Remise</Text>
               <Text style={[alternativeStyles.tableHeaderCell, { width: 50 }]}>Prix HT</Text>
@@ -416,7 +416,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             {(clientData?.items || []).map((item: any, index: number) => (
               <View key={index} style={alternativeStyles.tableRow}>
                 <Text style={[alternativeStyles.tableCell, { width: 30 }]}>{item.ref || ''}</Text>
-                <Text style={[alternativeStyles.tableCell, { width: 130 }]}>{item.description || 'N/A'}</Text>
+                <Text style={[alternativeStyles.tableCell, { width: 225 }]}>{item.description || 'N/A'}</Text>
                 <Text style={[alternativeStyles.tableCell, alternativeStyles.tableCellCenter, { width: 50 }]}>
                   {item.quantity?.toString().replace('.', ',') || '0'}
                 </Text>
