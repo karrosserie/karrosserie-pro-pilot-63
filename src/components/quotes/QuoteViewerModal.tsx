@@ -162,10 +162,10 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
   })));
 
   const totalsData = {
-    subtotal: `${totals.subtotal.toFixed(2).replace('.', ',')} €`,
+    subtotal: `${totals.subTotal.toFixed(2).replace('.', ',')} €`,
     vat: `${totals.totalVat.toFixed(2).replace('.', ',')} €`,
     total: `${totals.total.toFixed(2).replace('.', ',')} €`,
-    totalHT: `${totals.subtotal.toFixed(2).replace('.', ',')} €`,
+    totalHT: `${totals.subTotal.toFixed(2).replace('.', ',')} €`,
     totalVAT: `${totals.totalVat.toFixed(2).replace('.', ',')} €`,
     totalDiscount: `${totals.totalDiscount.toFixed(2).replace('.', ',')} €`,
     totalTTC: `${totals.total.toFixed(2).replace('.', ',')} €`

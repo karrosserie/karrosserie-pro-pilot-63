@@ -11,6 +11,7 @@ import { Invoice } from '@/services/supabase/invoices';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
 import { useToast } from '@/hooks/use-toast';
+import RepairOrderViewerModal from '@/components/repair-orders/RepairOrderViewerModal';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +30,7 @@ const RepairOrders = () => {
   const [signatureDialogOpen, setSignatureDialogOpen] = useState(false);
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<RepairOrder | null>(null);
   const [selectedOrderForEmail, setSelectedOrderForEmail] = useState<RepairOrder | null>(null);
   const [selectedOrderForSignature, setSelectedOrderForSignature] = useState<RepairOrder | null>(null);
@@ -150,7 +152,7 @@ const RepairOrders = () => {
 
   const handleViewOrder = (order: RepairOrder) => {
     setSelectedOrder(order);
-    setDialogOpen(true);
+    setViewerModalOpen(true);
   };
 
   const confirmDeleteOrder = () => {
@@ -245,6 +247,12 @@ const RepairOrders = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <RepairOrderViewerModal
+        repairOrder={selectedOrder}
+        open={viewerModalOpen}
+        onOpenChange={setViewerModalOpen}
+      />
     </div>
   );
 };

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import CreditViewerModal from '@/components/credits/CreditViewerModal';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import {
   DropdownMenu,
@@ -80,6 +81,7 @@ const Credits = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [selectedCredit, setSelectedCredit] = useState<any>(null);
   const { toast } = useToast();
   const { confirm } = useConfirmation();
@@ -219,21 +221,8 @@ const Credits = () => {
   };
 
   const handleViewCredit = (credit: any) => {
-    // Parse items_data if it exists
-    let items = [];
-    if (credit.items_data) {
-      try {
-        items = JSON.parse(credit.items_data);
-      } catch (error) {
-        console.error('Error parsing items_data:', error);
-      }
-    }
-
-    setSelectedCredit({
-      ...credit,
-      items
-    });
-    setViewDialogOpen(true);
+    setSelectedCredit(credit);
+    setViewerModalOpen(true);
   };
 
   const handleEditCredit = (credit: any) => {
@@ -501,6 +490,12 @@ const Credits = () => {
           />
         </>
       )}
+
+      <CreditViewerModal
+        credit={selectedCredit}
+        open={viewerModalOpen}
+        onOpenChange={setViewerModalOpen}
+      />
     </div>
   );
 };
