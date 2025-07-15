@@ -104,47 +104,51 @@ export default function DocumentUploadStep({
 
         {/* Upload Buttons */}
         <div className="space-y-4">
-          <label htmlFor="camera-input">
-            <Button
-              type="button"
-              className="w-full bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
-              asChild
-            >
-              <span className="flex items-center justify-center gap-2 cursor-pointer">
-                <Camera className="w-4 h-4" />
-                Prendre une photo
-              </span>
-            </Button>
-          </label>
-          <input
-            id="camera-input"
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handleFileSelect}
-            className="hidden"
-          />
+          <div>
+            <label htmlFor="camera-input">
+              <Button
+                type="button"
+                className="w-full bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
+                asChild
+              >
+                <span className="flex items-center justify-center gap-2 cursor-pointer">
+                  <Camera className="w-4 h-4" />
+                  Prendre une photo
+                </span>
+              </Button>
+            </label>
+            <input
+              id="camera-input"
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+          </div>
 
-          <label htmlFor="gallery-input">
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full border-karrosserie-orange text-karrosserie-orange hover:bg-karrosserie-orange hover:text-white"
-              asChild
-            >
-              <span className="flex items-center justify-center gap-2 cursor-pointer">
-                <ImageIcon className="w-4 h-4" />
-                Choisir depuis la galerie
-              </span>
-            </Button>
-          </label>
-          <input
-            id="gallery-input"
-            type="file"
-            accept="image/*"
-            onChange={handleFileSelect}
-            className="hidden"
-          />
+          <div>
+            <label htmlFor="gallery-input">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full border-karrosserie-orange text-karrosserie-orange hover:bg-karrosserie-orange hover:text-white"
+                asChild
+              >
+                <span className="flex items-center justify-center gap-2 cursor-pointer">
+                  <ImageIcon className="w-4 h-4" />
+                  Choisir depuis la galerie
+                </span>
+              </Button>
+            </label>
+            <input
+              id="gallery-input"
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+          </div>
         </div>
       </div>
     </div>
