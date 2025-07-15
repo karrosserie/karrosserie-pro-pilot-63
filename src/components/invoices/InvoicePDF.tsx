@@ -36,7 +36,6 @@ const defaultStyles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
     backgroundColor: '#404348',
-    padding: 8,
     textAlign: 'center',
     marginBottom: 10,
   },
