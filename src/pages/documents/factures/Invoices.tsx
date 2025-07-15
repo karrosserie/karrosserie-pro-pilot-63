@@ -153,8 +153,11 @@ const Invoices = () => {
         description: "Génération du PDF en cours..."
       });
 
+      const { prepareInvoiceData } = await import('@/utils/invoiceDataPreparation');
+      const { clientData, vehicleData } = await prepareInvoiceData(invoice);
+
       const { generateInvoicePDF } = await import('@/utils/pdfGenerator');
-      const result = await generateInvoicePDF(invoice, companyData, receipts);
+      const result = await generateInvoicePDF(invoice, companyData, receipts, clientData, vehicleData);
       
       if (result.success) {
         toast({
@@ -174,11 +177,30 @@ const Invoices = () => {
     }
   };
 
-  const handlePrint = (invoice: Invoice) => {
-    toast({
-      title: "Impression",
-      description: `Impression de la facture ${invoice.reference}...`
-    });
+  const handlePrint = async (invoice: Invoice) => {
+    try {
+      toast({
+        title: "Ouverture pour impression",
+        description: `Ouverture de la facture ${invoice.reference} pour impression...`
+      });
+
+      const { prepareInvoiceData } = await import('@/utils/invoiceDataPreparation');
+      const { clientData, vehicleData } = await prepareInvoiceData(invoice);
+
+      const { printInvoicePDF } = await import('@/utils/printInvoicePDF');
+      const result = await printInvoicePDF(invoice, companyData, receipts, clientData, vehicleData);
+      
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'impression:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ouvrir le PDF pour impression. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSendEmail = (invoice: Invoice) => {

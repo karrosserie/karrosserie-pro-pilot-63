@@ -9,6 +9,8 @@ interface InvoicePDFProps {
   invoice: Invoice;
   companyData: any;
   receipts?: any[];
+  clientData?: any;
+  vehicleData?: any;
 }
 
 // Styles pour le PDF

@@ -2,7 +2,7 @@ import { pdf } from '@react-pdf/renderer';
 import { Invoice } from '@/services/supabase/invoices';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
 
-export const generateInvoicePDF = async (
+export const printInvoicePDF = async (
   invoice: Invoice, 
   companyData: any, 
   receipts: any[] = [],
@@ -17,22 +17,24 @@ export const generateInvoicePDF = async (
     const asPdf = pdf(doc);
     const blob = await asPdf.toBlob();
     
-    // Créer un nom de fichier unique
-    const filename = `Facture_${invoice.reference}_${new Date().toISOString().split('T')[0]}.pdf`;
-    
-    // Créer un lien de téléchargement
+    // Créer une URL pour le blob
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
     
-    // Nettoyer l'URL
-    URL.revokeObjectURL(url);
+    // Ouvrir le PDF dans un nouvel onglet pour impression
+    const printWindow = window.open(url, '_blank');
     
-    return { success: true, filename };
+    if (printWindow) {
+      printWindow.onload = () => {
+        // Nettoyer l'URL après un délai
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+        }, 1000);
+      };
+    }
+    
+    return { success: true };
   } catch (error) {
-    console.error('Erreur lors de la génération du PDF:', error);
+    console.error('Erreur lors de l\'ouverture du PDF pour impression:', error);
     return { success: false, error: error.message };
   }
 };
