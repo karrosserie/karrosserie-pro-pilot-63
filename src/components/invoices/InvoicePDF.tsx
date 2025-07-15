@@ -562,7 +562,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             {documentType === 'credit' && (
               <View style={defaultStyles.detailRow}>
                 <Text style={defaultStyles.detailLabel}>Facture associée</Text>
-                <Text style={defaultStyles.detailValue}>{clientData?.invoiceReference || invoice.reference || 'N/A'}</Text>
+                <Text style={defaultStyles.detailValue}>N° {clientData?.invoiceReference || invoice.reference || 'N/A'}</Text>
               </View>
             )}
             {clientData?.dueDate && (
