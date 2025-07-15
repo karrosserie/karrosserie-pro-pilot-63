@@ -86,6 +86,9 @@ const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
                           onValueChange={(value) => onImageTimingUpdate(index, value as 'Avant' | 'Pendant' | 'Après')}
                           disabled={isViewMode}
                         >
+                          <SelectTrigger className="w-28">
+                            <SelectValue placeholder="Timing" />
+                          </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="Avant">Avant</SelectItem>
                             <SelectItem value="Pendant">Pendant</SelectItem>
