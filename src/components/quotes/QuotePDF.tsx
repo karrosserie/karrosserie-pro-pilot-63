@@ -167,7 +167,7 @@ const defaultStyles = StyleSheet.create({
 // Styles pour le template alternatif - basé sur AlternativeQuotePreview
 const alternativeStyles = StyleSheet.create({
   page: {
-    fontFamily: 'Arial',
+    fontFamily: 'Helvetica',
     fontSize: 10,
     paddingTop: 30,
     paddingBottom: 60,
