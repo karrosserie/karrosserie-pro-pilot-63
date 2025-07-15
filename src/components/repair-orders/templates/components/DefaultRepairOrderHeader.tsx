@@ -106,7 +106,7 @@ const DefaultRepairOrderHeader = ({ companyData, orderData, clientData, vehicleD
         {/* Délai prévisionnel - affiché seulement si les deux dates sont renseignées */}
         {vehicleData?.start_date && vehicleData?.end_date && (
           <div className="mt-4">
-            <h4 className="text-base font-semibold mb-2 text-gray-800">Délai prévisionnel</h4>
+            <h4 className="text-lg font-semibold mb-2 text-gray-800">Délai prévisionnel</h4>
             <div className="text-base space-y-1">
               <div className="flex justify-between">
                 <span className="font-medium">Date de début</span>
