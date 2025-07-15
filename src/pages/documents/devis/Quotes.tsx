@@ -16,6 +16,7 @@ import {
 import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useToast } from '@/hooks/use-toast';
+import QuoteViewerModal from '@/components/quotes/QuoteViewerModal';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import QuoteEmailDialog from '@/components/quotes/QuoteEmailDialog';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
@@ -42,6 +43,7 @@ const Quotes = () => {
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [selectedQuoteForEmail, setSelectedQuoteForEmail] = useState<Quote | null>(null);
   const [prefilledRepairOrder, setPrefilledRepairOrder] = useState<Partial<RepairOrder> | null>(null);
+  const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const { toast } = useToast();
   
   const filteredQuotes = quotes?.filter(quote => 
@@ -192,7 +194,7 @@ const Quotes = () => {
 
   const handleViewQuote = (quote: Quote) => {
     setSelectedQuote(quote);
-    setEditDialogOpen(true);
+    setViewerModalOpen(true);
   };
 
   const handleRequestDocuments = (quote: Quote) => {
@@ -425,6 +427,12 @@ const Quotes = () => {
             setPrefilledRepairOrder(null);
           }
         }}
+      />
+
+      <QuoteViewerModal
+        quote={selectedQuote}
+        open={viewerModalOpen}
+        onOpenChange={setViewerModalOpen}
       />
     </div>
   );
