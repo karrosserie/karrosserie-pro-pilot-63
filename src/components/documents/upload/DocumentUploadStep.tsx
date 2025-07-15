@@ -103,7 +103,7 @@ export default function DocumentUploadStep({
         </div>
 
         {/* Upload Buttons */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <label htmlFor="camera-input">
             <Button
               type="button"
