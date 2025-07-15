@@ -32,7 +32,7 @@ const defaultStyles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   title: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     color: 'white',
     backgroundColor: '#404348',
@@ -604,7 +604,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             
             {/* Section Délai prévisionnel pour les ordres de réparation - placé dans la colonne client */}
             {documentType === 'repair_order' && vehicleData?.start_date && vehicleData?.end_date && (
-              <View style={{ marginTop: 5 }}>
+              <View style={{ marginTop: 15 }}>
                 <Text style={[defaultStyles.sectionTitle, { fontSize: 11, marginBottom: 6 }]}>Délai prévisionnel</Text>
                 <View style={defaultStyles.detailRow}>
                   <Text style={defaultStyles.detailLabel}>Date de début</Text>
