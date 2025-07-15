@@ -26,7 +26,7 @@ export default function DocumentUploadFlow() {
         {/* Start button */}
         <Button 
           onClick={handleStart}
-          className="btn-primary w-full max-w-sm mx-auto shadow-lg hover:shadow-xl transition-all duration-300"
+          className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white w-full max-w-sm mx-auto shadow-lg hover:shadow-xl transition-all duration-300"
           size="lg"
         >
           Commencer
@@ -58,22 +58,6 @@ export default function DocumentUploadFlow() {
               </span>
               <span className="text-muted-foreground">
                 Votre carte grise (recto-verso)
-              </span>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
-                3
-              </span>
-              <span className="text-muted-foreground">
-                Votre carte d'assurance
-              </span>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
-                4
-              </span>
-              <span className="text-muted-foreground">
-                Votre carte nationale d'identité (recto-verso)
               </span>
             </div>
           </div>
