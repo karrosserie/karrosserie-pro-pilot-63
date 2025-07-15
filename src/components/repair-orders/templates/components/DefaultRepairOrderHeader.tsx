@@ -103,20 +103,22 @@ const DefaultRepairOrderHeader = ({ companyData, orderData, clientData, vehicleD
           {clientData.email && <p>E-mail : {clientData.email}</p>}
         </div>
         
-        {/* Délai prévisionnel */}
-        <div className="mt-4">
-          <h4 className="text-base font-semibold mb-2 text-gray-800">Délai prévisionnel</h4>
-          <div className="text-base space-y-1">
-            <div className="flex justify-between">
-              <span className="font-medium">Date de début des travaux</span>
-              <span>{vehicleData?.start_date || '-'}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-medium">Date de fin des travaux</span>
-              <span>{vehicleData?.end_date || '-'}</span>
+        {/* Délai prévisionnel - affiché seulement si les deux dates sont renseignées */}
+        {vehicleData?.start_date && vehicleData?.end_date && (
+          <div className="mt-4">
+            <h4 className="text-base font-semibold mb-2 text-gray-800">Délai prévisionnel</h4>
+            <div className="text-base space-y-1">
+              <div className="flex justify-between">
+                <span className="font-medium">Date de début des travaux</span>
+                <span>{vehicleData.start_date}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Date de fin des travaux</span>
+                <span>{vehicleData.end_date}</span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
