@@ -166,77 +166,81 @@ const alternativeStyles = StyleSheet.create({
   page: {
     fontFamily: 'Helvetica',
     fontSize: 10,
-    paddingTop: 25,
-    paddingBottom: 50,
-    paddingHorizontal: 25,
+    paddingTop: 30,
+    paddingBottom: 60,
+    paddingHorizontal: 30,
+    backgroundColor: 'white',
     position: 'relative',
   },
-  header: {
+  mainHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 20,
+    marginBottom: 30,
   },
-  leftSection: {
+  companySection: {
     flex: 1,
   },
-  rightSection: {
-    flex: 1,
-    alignItems: 'flex-end',
-  },
-  companyNameRed: {
-    fontSize: 18,
+  companyName: {
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#dc2626',
-    marginBottom: 8,
+    marginBottom: 15,
   },
   companyInfo: {
     fontSize: 9,
     lineHeight: 1.4,
     marginBottom: 2,
   },
+  invoiceSection: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
   invoiceTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#000',
-    textAlign: 'right',
+    marginBottom: 15,
   },
-  clientBox: {
+  clientInfoSection: {
     marginTop: 4,
     width: 200,
   },
-  clientText: {
+  clientInfo: {
     fontSize: 8,
     lineHeight: 1.3,
     marginBottom: 1,
   },
-  dateBoxes: {
+  dateSection: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 150,
-    marginBottom: 20,
+    marginBottom: 30,
   },
   dateBox: {
     borderWidth: 2,
     borderColor: '#000',
-    borderRadius: 5,
-    padding: 12,
-    alignItems: 'center',
-    width: 120,
+    borderStyle: 'solid',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    backgroundColor: 'white',
   },
   dateLabel: {
-    fontSize: 8,
+    fontSize: 9,
     fontWeight: 'bold',
-    marginBottom: 2,
+    textAlign: 'center',
+    marginBottom: 3,
   },
   dateValue: {
-    fontSize: 8,
+    fontSize: 9,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   tableContainer: {
     borderWidth: 2,
     borderColor: '#000',
-    borderRadius: 5,
+    borderRadius: 8,
+    overflow: 'hidden',
     marginBottom: 15,
   },
   tableHeader: {
@@ -276,6 +280,14 @@ const alternativeStyles = StyleSheet.create({
   },
   tableCellCenter: {
     textAlign: 'center',
+  },
+  tableCellLeft: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    padding: 6,
+    textAlign: 'left',
+    borderRightWidth: 2,
+    borderRightColor: '#000',
   },
   totalsContainer: {
     flexDirection: 'row',
@@ -357,9 +369,9 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
       <Document>
         <Page size="A4" style={alternativeStyles.page}>
           {/* Header avec entreprise et facture */}
-          <View style={alternativeStyles.header}>
-            <View style={alternativeStyles.leftSection}>
-              <Text style={alternativeStyles.companyNameRed}>{companyData?.name || 'AUTO PAINT'}</Text>
+          <View style={alternativeStyles.mainHeader}>
+            <View style={alternativeStyles.companySection}>
+              <Text style={alternativeStyles.companyName}>{companyData?.name || 'AUTO PAINT'}</Text>
               <View>
                 <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>ADRESSE :</Text> {companyData?.address || '25 rue sainte victoire'}</Text>
                 <Text style={alternativeStyles.companyInfo}>{companyData?.zipcode || '13006'} {companyData?.city || 'MARSEILLE'}</Text>
@@ -370,34 +382,28 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
               </View>
             </View>
             
-            <View style={alternativeStyles.rightSection}>
+            <View style={alternativeStyles.invoiceSection}>
               <Text style={alternativeStyles.invoiceTitle}>FACTURE N° {clientData?.number || invoice.reference}</Text>
               
-              <View style={alternativeStyles.clientBox}>
-                <Text style={[alternativeStyles.clientText, { fontWeight: 'bold' }]}>{clientData?.name || 'Client'}</Text>
-                {clientData?.phone && <Text style={alternativeStyles.clientText}><Text style={{ fontWeight: 'bold' }}>EMAIL :</Text> {clientData.phone}</Text>}
-                {clientData?.email && <Text style={alternativeStyles.clientText}><Text style={{ fontWeight: 'bold' }}>EMAIL :</Text> {clientData.email}</Text>}
-                {clientData?.address && <Text style={alternativeStyles.clientText}><Text style={{ fontWeight: 'bold' }}>ADRESSE :</Text> {clientData.address}</Text>}
-                {clientData?.city && <Text style={alternativeStyles.clientText}>{clientData.city}</Text>}
-                {clientData?.licensePlate && <Text style={alternativeStyles.clientText}><Text style={{ fontWeight: 'bold' }}>Immatriculation :</Text> {clientData.licensePlate}</Text>}
-                {clientData?.mileage && <Text style={alternativeStyles.clientText}><Text style={{ fontWeight: 'bold' }}>Kilométrage :</Text> {clientData.mileage}</Text>}
-                {clientData?.vehicle && <Text style={alternativeStyles.clientText}><Text style={{ fontWeight: 'bold' }}>Véhicule :</Text> {clientData.vehicle}</Text>}
+              <View style={[alternativeStyles.clientInfoSection, { marginTop: 0 }]}>
+                <Text style={[alternativeStyles.clientInfo, { fontWeight: 'bold' }]}>{clientData?.name || 'Client'}</Text>
+                {clientData?.phone && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>TEL :</Text> {clientData.phone}</Text>}
+                {clientData?.email && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>EMAIL :</Text> {clientData.email}</Text>}
+                {clientData?.address && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>ADRESSE :</Text> {clientData.address}</Text>}
+                {clientData?.city && <Text style={alternativeStyles.clientInfo}>{clientData.city}</Text>}
+                {clientData?.licensePlate && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>Immatriculation :</Text> {clientData.licensePlate}</Text>}
+                {clientData?.mileage && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>Kilométrage :</Text> {clientData.mileage}</Text>}
+                {clientData?.vehicle && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>Véhicule :</Text> {clientData.vehicle}</Text>}
               </View>
             </View>
           </View>
 
-          {/* Dates */}
-          <View style={alternativeStyles.dateBoxes}>
+          {/* Date */}
+          <View style={alternativeStyles.dateSection}>
             <View style={alternativeStyles.dateBox}>
               <Text style={alternativeStyles.dateLabel}>DATE</Text>
               <Text style={alternativeStyles.dateValue}>{clientData?.billingDate || formatDate(invoice.date || invoice.created_at)}</Text>
             </View>
-            {clientData?.dueDate && (
-              <View style={alternativeStyles.dateBox}>
-                <Text style={alternativeStyles.dateLabel}>DATE D'ÉCHANCE</Text>
-                <Text style={alternativeStyles.dateValue}>{clientData.dueDate}</Text>
-              </View>
-            )}
           </View>
 
           {/* Tableau des articles */}
@@ -415,21 +421,21 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             
             {(clientData?.items || []).map((item: any, index: number) => (
               <View key={index} style={alternativeStyles.tableRow}>
-                <Text style={[alternativeStyles.tableCell, { width: 30 }]}>{item.ref || ''}</Text>
-                <Text style={[alternativeStyles.tableCell, { width: 225 }]}>{item.description || 'N/A'}</Text>
-                <Text style={[alternativeStyles.tableCell, alternativeStyles.tableCellCenter, { width: 50 }]}>
+                <Text style={[alternativeStyles.tableCellLeft, { width: 30 }]}>{item.ref || ''}</Text>
+                <Text style={[alternativeStyles.tableCellLeft, { width: 225 }]}>{item.description || 'N/A'}</Text>
+                <Text style={[alternativeStyles.tableCell, { width: 50 }]}>
                   {item.quantity?.toString().replace('.', ',') || '0'}
                 </Text>
-                <Text style={[alternativeStyles.tableCell, alternativeStyles.tableCellCenter, { width: 40 }]}>
+                <Text style={[alternativeStyles.tableCell, { width: 40 }]}>
                   {item.discount || 0}%
                 </Text>
-                <Text style={[alternativeStyles.tableCell, alternativeStyles.tableCellCenter, { width: 50 }]}>
+                <Text style={[alternativeStyles.tableCell, { width: 50 }]}>
                   {item.unitPrice?.toFixed(2).replace('.', ',') || '0,00'}€
                 </Text>
-                <Text style={[alternativeStyles.tableCell, alternativeStyles.tableCellCenter, { width: 35 }]}>
+                <Text style={[alternativeStyles.tableCell, { width: 35 }]}>
                   {item.vat || 20}%
                 </Text>
-                <Text style={[alternativeStyles.tableCell, alternativeStyles.tableCellCenter, { width: 50 }]}>
+                <Text style={[alternativeStyles.tableCell, { width: 50 }]}>
                   {item.totalHT?.toFixed(2).replace('.', ',') || '0,00'}€
                 </Text>
                 <Text style={[alternativeStyles.tableCellLast, { width: 50 }]}>
