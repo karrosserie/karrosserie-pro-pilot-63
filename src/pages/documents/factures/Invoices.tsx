@@ -26,6 +26,7 @@ import InvoiceViewerModal from '@/components/invoices/InvoiceViewerModal';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
+import { generateInvoicePDFWithTemplate, printInvoicePDFWithTemplate } from '@/utils/invoicePDFGeneration';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import {
   DropdownMenu,
@@ -153,7 +154,6 @@ const Invoices = () => {
         description: "Génération du PDF en cours..."
       });
 
-      const { generateInvoicePDFWithTemplate } = await import('@/utils/invoicePDFGeneration');
       const result = await generateInvoicePDFWithTemplate(invoice, companyData);
       
       if (result.success) {
@@ -181,7 +181,6 @@ const Invoices = () => {
         description: `Ouverture de la facture ${invoice.reference} pour impression...`
       });
 
-      const { printInvoicePDFWithTemplate } = await import('@/utils/invoicePDFGeneration');
       const result = await printInvoicePDFWithTemplate(invoice, companyData);
       
       if (!result.success) {
