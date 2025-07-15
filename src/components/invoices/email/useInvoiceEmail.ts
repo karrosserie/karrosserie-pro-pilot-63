@@ -4,6 +4,10 @@ import { useToast } from '@/hooks/use-toast';
 import { InvoiceEmailFormData } from './types';
 import { Invoice } from '@/services/supabase/invoices';
 import { clientsService } from '@/services/supabase/clients';
+import { prepareInvoiceDataForPDF } from '@/utils/invoicePDFGeneration';
+import { pdf } from '@react-pdf/renderer';
+import InvoicePDF from '@/components/invoices/InvoicePDF';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useInvoiceEmail = (invoice: Invoice | null) => {
   const { toast } = useToast();
@@ -53,19 +57,82 @@ AUTO PAINT`;
     };
   };
 
-  const sendEmail = async (data: InvoiceEmailFormData) => {
+  const sendEmail = async (emailData: InvoiceEmailFormData) => {
+    if (!invoice) {
+      toast({
+        title: "Erreur",
+        description: "Aucune facture sélectionnée",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     setIsLoading(true);
     try {
-      // Simuler l'envoi d'e-mail
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Préparer les données pour le PDF (comme dans generateInvoicePDFWithTemplate)
+      const data = await prepareInvoiceDataForPDF(invoice, {});
+      
+      // Adapter les données pour le composant PDF
+      const pdfData = {
+        ...data.clientData,
+        number: data.invoiceData.number,
+        billingDate: data.invoiceData.billingDate,
+        dueDate: data.invoiceData.dueDate,
+        claimNumber: data.invoiceData.claimNumber,
+        vehicle: data.invoiceData.vehicle,
+        licensePlate: data.invoiceData.licensePlate,
+        mileage: data.invoiceData.mileage,
+        items: data.items,
+        totals: data.totals
+      };
+      
+      const doc = InvoicePDF({ 
+        invoice, 
+        companyData: data.companyData, 
+        receipts: [],
+        clientData: pdfData,
+        vehicleData: null,
+        template: data.template
+      });
+      const asPdf = pdf(doc);
+      const blob = await asPdf.toBlob();
+      
+      // Convertir le blob en base64
+      const reader = new FileReader();
+      const pdfBase64 = await new Promise<string>((resolve, reject) => {
+        reader.onloadend = () => {
+          const result = reader.result as string;
+          // Supprimer le préfixe "data:application/pdf;base64,"
+          const base64 = result.split(',')[1];
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+
+      // Envoyer l'email avec le PDF en pièce jointe via l'edge function
+      const { error } = await supabase.functions.invoke('send-invoice-email', {
+        body: {
+          to: emailData.to,
+          subject: emailData.subject,
+          message: emailData.message,
+          pdfBase64: pdfBase64,
+          invoiceReference: invoice.reference
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
       
       toast({
         title: "E-mail envoyé",
-        description: `La facture ${invoice?.reference} a été envoyée à ${data.to}`,
+        description: `La facture ${invoice?.reference} a été envoyée à ${emailData.to}`,
       });
       
       return true;
     } catch (error) {
+      console.error('Error sending email:', error);
       toast({
         title: "Erreur",
         description: "Impossible d'envoyer l'e-mail. Veuillez réessayer.",
