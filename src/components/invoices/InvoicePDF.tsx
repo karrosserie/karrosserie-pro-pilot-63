@@ -182,7 +182,6 @@ const alternativeStyles = StyleSheet.create({
     textAlign: 'right',
   },
   clientBox: {
-    padding: 12,
     width: 200,
   },
   clientText: {
