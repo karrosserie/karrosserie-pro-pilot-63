@@ -517,7 +517,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
         <View style={defaultStyles.header}>
           <View style={defaultStyles.headerColumn}>
             <View style={defaultStyles.title}>
-              <Text style={documentType === 'repair_order' ? { fontSize: 14 } : undefined}>
+              <Text style={documentType === 'repair_order' ? { fontSize: 12 } : undefined}>
                 {documentType === 'repair_order' ? 'ORDRE DE RÉPARATION' : 
                  documentType === 'credit' ? 'AVOIR' : 
                  documentType === 'quote' ? 'DEVIS' : 'FACTURE'}
