@@ -176,7 +176,8 @@ export const generateCreditPDFWithTemplate = async (credit: any, companyData: an
       receipts: [],
       clientData: data.clientData,
       vehicleData: data.vehicleData,
-      template: data.template
+      template: data.template,
+      documentType: 'credit'
     });
     
     // Générer le blob PDF
@@ -224,7 +225,8 @@ export const printCreditPDFWithTemplate = async (credit: any, companyData: any) 
       receipts: [],
       clientData: data.clientData,
       vehicleData: data.vehicleData,
-      template: data.template
+      template: data.template,
+      documentType: 'credit'
     });
     
     // Générer le blob PDF
