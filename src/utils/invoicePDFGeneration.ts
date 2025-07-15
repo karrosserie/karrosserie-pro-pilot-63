@@ -11,7 +11,7 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
     let clientData = null;
     let vehicleData = null;
 
-    // Récupérer les données client
+    // Récupérer les données client - exactement comme dans InvoiceViewerModal
     if (invoice.client_id) {
       const { data: client } = await supabase
         .from('clients')
@@ -24,7 +24,7 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
       }
     }
 
-    // Récupérer les données véhicule avec les informations de marque et modèle
+    // Récupérer les données véhicule avec les informations de marque et modèle - exactement comme dans InvoiceViewerModal
     if (invoice.vehicle_id) {
       const { data: vehicle } = await supabase
         .from('vehicles')
@@ -50,7 +50,7 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
 
     const template = preferences?.invoice_template || 'default';
 
-    // Fonction pour formater les dates au format français dd/mm/yyyy
+    // Fonction pour formater les dates au format français dd/mm/yyyy - exactement comme dans InvoiceViewerModal
     const formatDateFr = (dateString: string | null | undefined) => {
       if (!dateString) return undefined;
       try {
@@ -61,7 +61,7 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
       }
     };
 
-    // Préparer les données pour les composants de template
+    // Préparer les données pour les composants de template - exactement comme dans InvoiceViewerModal
     const invoiceData = {
       number: invoice.reference,
       claimNumber: invoice.claim_number || undefined,
@@ -74,7 +74,7 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
       date: formatDateFr(invoice.date)
     };
 
-    // Préparer les données client pour le template
+    // Préparer les données client pour le template - exactement comme dans InvoiceViewerModal
     const clientDataForTemplate = {
       name: clientData ? `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim() : undefined,
       address: clientData?.address || undefined,
@@ -86,7 +86,7 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
       vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : undefined
     };
 
-    // Convertir les données des items
+    // Convertir les données des items - exactement comme dans InvoiceViewerModal
     const items = [];
     if (invoice.repairs_data) {
       const repairs = Array.isArray(invoice.repairs_data) ? invoice.repairs_data : [];
@@ -145,12 +145,26 @@ export const generateInvoicePDFWithTemplate = async (invoice: Invoice, companyDa
   try {
     const data = await prepareInvoiceDataForPDF(invoice, companyData);
     
+    // Adapter les données pour le composant PDF
+    const pdfData = {
+      ...data.clientData,
+      number: data.invoiceData.number,
+      billingDate: data.invoiceData.billingDate,
+      dueDate: data.invoiceData.dueDate,
+      claimNumber: data.invoiceData.claimNumber,
+      vehicle: data.invoiceData.vehicle,
+      licensePlate: data.invoiceData.licensePlate,
+      mileage: data.invoiceData.mileage,
+      items: data.items,
+      totals: data.totals
+    };
+    
     const doc = InvoicePDF({ 
       invoice, 
       companyData: data.companyData, 
       receipts: [],
-      clientData: data.clientData,
-      vehicleData: data.items.length > 0 ? { license_plate: data.clientData.licensePlate } : null,
+      clientData: pdfData,
+      vehicleData: null,
       template: data.template
     });
     
@@ -182,12 +196,26 @@ export const printInvoicePDFWithTemplate = async (invoice: Invoice, companyData:
   try {
     const data = await prepareInvoiceDataForPDF(invoice, companyData);
     
+    // Adapter les données pour le composant PDF
+    const pdfData = {
+      ...data.clientData,
+      number: data.invoiceData.number,
+      billingDate: data.invoiceData.billingDate,
+      dueDate: data.invoiceData.dueDate,
+      claimNumber: data.invoiceData.claimNumber,
+      vehicle: data.invoiceData.vehicle,
+      licensePlate: data.invoiceData.licensePlate,
+      mileage: data.invoiceData.mileage,
+      items: data.items,
+      totals: data.totals
+    };
+    
     const doc = InvoicePDF({ 
       invoice, 
       companyData: data.companyData, 
       receipts: [],
-      clientData: data.clientData,
-      vehicleData: data.items.length > 0 ? { license_plate: data.clientData.licensePlate } : null,
+      clientData: pdfData,
+      vehicleData: null,
       template: data.template
     });
     
