@@ -262,16 +262,18 @@ const Credits = () => {
   };
 
   const handleDownload = (credit: any) => {
+    setSelectedCredit(credit);
+    setViewerModalOpen(true);
     toast({
       title: "Téléchargement",
-      description: `Téléchargement de l'avoir ${credit.reference}...`
+      description: `L'avoir ${credit.reference} a été ouvert pour téléchargement.`
     });
   };
 
   const handlePrint = (credit: any) => {
     toast({
       title: "Impression",
-      description: `Impression de l'avoir ${credit.reference}...`
+      description: `L'avoir ${credit.reference} a été ouvert pour impression.`
     });
   };
 
