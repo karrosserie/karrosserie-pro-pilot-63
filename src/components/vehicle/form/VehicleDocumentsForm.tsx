@@ -36,7 +36,7 @@ const VehicleDocumentsForm: React.FC<VehicleDocumentsFormProps> = ({
 
   const handleImageAdd = (url: string) => {
     if (vehicleImages.length === 0 || vehicleImages[vehicleImages.length - 1].url !== '') {
-      // Ajouter une nouvelle image avec le timing par défaut
+      // Ajouter une nouvelle image avec le timing par défaut "Avant"
       const newImage: VehicleImageData = { url, timing: 'Avant' };
       onVehicleImagesUpdate([...vehicleImages, newImage]);
     } else {

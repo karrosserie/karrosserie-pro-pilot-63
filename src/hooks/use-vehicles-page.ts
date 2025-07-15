@@ -124,7 +124,11 @@ export function useVehiclesPage() {
         registration_document_front_url: data.registrationDocumentFrontUrl,
         registration_document_back_url: data.registrationDocumentBackUrl,
         vehicle_image_url: data.vehicleImageUrl,
-        vehicle_images: JSON.stringify(data.vehicleImages?.filter((img: string) => img.trim() !== '') || []),
+        vehicle_images: (() => {
+          const filteredImages = data.vehicleImages?.filter((img: any) => img.url && img.url.trim() !== '') || [];
+          console.log('DEBUG - vehicleImages before saving:', filteredImages);
+          return JSON.stringify(filteredImages);
+        })(),
         user_id: user.id
       };
 
