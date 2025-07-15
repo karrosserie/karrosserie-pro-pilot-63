@@ -1,5 +1,5 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { Invoice } from '@/services/supabase/invoices';
 
 interface InvoicePDFProps {
@@ -11,8 +11,8 @@ interface InvoicePDFProps {
   template?: string;
 }
 
-// Styles communs pour le PDF
-const commonStyles = StyleSheet.create({
+// Styles pour le template par défaut
+const defaultStyles = StyleSheet.create({
   page: {
     fontFamily: 'Helvetica',
     fontSize: 10,
@@ -144,44 +144,186 @@ const commonStyles = StyleSheet.create({
 
 // Styles spécifiques au template alternatif
 const alternativeStyles = StyleSheet.create({
+  page: {
+    fontFamily: 'Helvetica',
+    fontSize: 10,
+    paddingTop: 25,
+    paddingBottom: 50,
+    paddingHorizontal: 25,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 20,
-    paddingBottom: 15,
   },
   leftSection: {
     flex: 1,
   },
   rightSection: {
-    textAlign: 'right',
+    flex: 1,
+    alignItems: 'flex-end',
   },
-  alternativeTitle: {
-    fontSize: 24,
+  companyNameRed: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#dc2626',
+    marginBottom: 8,
+  },
+  companyInfo: {
+    fontSize: 9,
+    lineHeight: 1.4,
+    marginBottom: 2,
+  },
+  invoiceTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 10,
+    textAlign: 'right',
   },
-  redTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#dc2626',
-    marginBottom: 10,
-  },
-  clientInfoBox: {
+  clientBox: {
     backgroundColor: '#f8f9fa',
-    padding: 10,
-    marginTop: 15,
-    borderWidth: 1,
-    borderColor: '#e5e5e5',
-  },
-  vehicleInfoBox: {
-    backgroundColor: '#fff3cd',
     padding: 8,
     marginTop: 10,
     borderWidth: 1,
-    borderColor: '#ffc107',
+    borderColor: '#e5e5e5',
+    width: 200,
+  },
+  clientText: {
+    fontSize: 8,
+    lineHeight: 1.3,
+    marginBottom: 1,
+  },
+  dateBoxes: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 80,
+    marginBottom: 20,
+  },
+  dateBox: {
+    borderWidth: 2,
+    borderColor: '#000',
+    borderRadius: 5,
+    padding: 8,
+    alignItems: 'center',
+    width: 80,
+  },
+  dateLabel: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    marginBottom: 2,
+  },
+  dateValue: {
+    fontSize: 8,
+    fontWeight: 'bold',
+  },
+  tableContainer: {
+    borderWidth: 2,
+    borderColor: '#000',
+    borderRadius: 5,
+    marginBottom: 15,
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#f8f9fa',
+    borderBottomWidth: 2,
+    borderBottomColor: '#000',
+  },
+  tableHeaderCell: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    padding: 6,
+    textAlign: 'center',
+    borderRightWidth: 2,
+    borderRightColor: '#000',
+  },
+  tableHeaderCellLast: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    padding: 6,
+    textAlign: 'center',
+  },
+  tableRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e5e5',
+  },
+  tableCell: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    padding: 6,
+    borderRightWidth: 2,
+    borderRightColor: '#000',
+  },
+  tableCellLast: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    padding: 6,
+    textAlign: 'center',
+  },
+  tableCellCenter: {
+    textAlign: 'center',
+  },
+  totalsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 20,
+  },
+  totalsTable: {
+    borderWidth: 2,
+    borderColor: '#000',
+    borderRadius: 5,
+  },
+  totalsHeaderRow: {
+    flexDirection: 'row',
+    backgroundColor: '#f8f9fa',
+    borderBottomWidth: 2,
+    borderBottomColor: '#000',
+  },
+  totalsHeaderCell: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    padding: 6,
+    textAlign: 'center',
+    borderRightWidth: 2,
+    borderRightColor: '#000',
+    width: 60,
+  },
+  totalsHeaderCellLast: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    padding: 6,
+    textAlign: 'center',
+    width: 60,
+  },
+  totalsValueRow: {
+    flexDirection: 'row',
+  },
+  totalsValueCell: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    padding: 6,
+    textAlign: 'center',
+    borderRightWidth: 2,
+    borderRightColor: '#000',
+    width: 60,
+  },
+  totalsValueCellLast: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    padding: 6,
+    textAlign: 'center',
+    width: 60,
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 25,
+    right: 25,
+    textAlign: 'center',
+    fontSize: 6,
+    color: '#666',
   },
 });
 
@@ -199,186 +341,228 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
     return `${amount.toFixed(2).replace('.', ',')} €`;
   };
 
-  const renderAlternativeHeader = () => (
-    <View style={alternativeStyles.header}>
-      <View style={alternativeStyles.leftSection}>
-        <Text style={alternativeStyles.redTitle}>{companyData?.name || 'VOTRE ENTREPRISE'}</Text>
-        <View style={commonStyles.companyInfo}>
-          <Text><Text style={{ fontWeight: 'bold' }}>ADRESSE :</Text> {companyData?.address || 'Votre adresse'}</Text>
-          <Text>{companyData?.zipcode || ''} {companyData?.city || ''}</Text>
-          <Text><Text style={{ fontWeight: 'bold' }}>TEL :</Text> {companyData?.phone || '+33 1 23 45 67 89'}</Text>
-          <Text><Text style={{ fontWeight: 'bold' }}>EMAIL :</Text> {companyData?.email || 'contact@entreprise.com'}</Text>
-          <Text><Text style={{ fontWeight: 'bold' }}>SIRET :</Text> {companyData?.siret || '123 456 789 00123'}</Text>
-          <Text><Text style={{ fontWeight: 'bold' }}>TVA :</Text> {companyData?.tva || 'FR 12 123456789'}</Text>
-        </View>
-      </View>
-      <View style={alternativeStyles.rightSection}>
-        <Text style={alternativeStyles.alternativeTitle}>
-          FACTURE {clientData?.number || invoice.reference}
-        </Text>
-        <View style={commonStyles.companyInfo}>
-          <Text><Text style={{ fontWeight: 'bold' }}>Date :</Text> {clientData?.date || formatDate(invoice.date || invoice.created_at)}</Text>
-          {clientData?.dueDate && (
-            <Text><Text style={{ fontWeight: 'bold' }}>Échéance :</Text> {clientData.dueDate}</Text>
-          )}
-          {clientData?.claimNumber && (
-            <Text><Text style={{ fontWeight: 'bold' }}>N° Sinistre :</Text> {clientData.claimNumber}</Text>
-          )}
-        </View>
-      </View>
-    </View>
-  );
-
-  const renderDefaultHeader = () => (
-    <View style={commonStyles.header}>
-      {/* Colonne 1 - Informations entreprise */}
-      <View style={commonStyles.headerColumn}>
-        <View style={commonStyles.title}>
-          <Text>FACTURE</Text>
-        </View>
-        <Text style={commonStyles.companyName}>{companyData?.name || 'KARROSSERIE'}</Text>
-        <View style={commonStyles.companyInfo}>
-          <Text>{companyData?.address || 'Votre adresse'}</Text>
-          <Text>{companyData?.zipcode || ''} {companyData?.city || ''}</Text>
-          <Text>Téléphone : {companyData?.phone || '+33 1 23 45 67 89'}</Text>
-          <Text>E-mail : {companyData?.email || 'contact@karrosserie.fr'}</Text>
-          <Text>SIRET : {companyData?.siret || '123 456 789 00123'}</Text>
-          <Text>N° TVA : {companyData?.tva || 'FR 12 123456789'}</Text>
-        </View>
-      </View>
-
-      {/* Colonne 2 - Détails de la facture */}
-      <View style={commonStyles.headerColumn}>
-        <Text style={commonStyles.sectionTitle}>Détails de la facture</Text>
-        <View style={commonStyles.detailRow}>
-          <Text style={commonStyles.detailLabel}>Facture</Text>
-          <Text style={commonStyles.detailValue}>N° {clientData?.number || invoice.reference}</Text>
-        </View>
-        {clientData?.claimNumber && (
-          <View style={commonStyles.detailRow}>
-            <Text style={commonStyles.detailLabel}>N° de sinistre</Text>
-            <Text style={commonStyles.detailValue}>{clientData.claimNumber}</Text>
+  if (template === 'alternative') {
+    return (
+      <Document>
+        <Page size="A4" style={alternativeStyles.page}>
+          {/* Header avec entreprise et facture */}
+          <View style={alternativeStyles.header}>
+            <View style={alternativeStyles.leftSection}>
+              <Text style={alternativeStyles.companyNameRed}>{companyData?.name || 'AUTO PAINT'}</Text>
+              <View>
+                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>ADRESSE :</Text> {companyData?.address || '25 rue sainte victoire'}</Text>
+                <Text style={alternativeStyles.companyInfo}>{companyData?.zipcode || '13006'} {companyData?.city || 'MARSEILLE'}</Text>
+                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>TEL :</Text> {companyData?.phone || '+33064646524'}</Text>
+                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>EMAIL :</Text> {companyData?.email || 'autopaint@yopmail.com'}</Text>
+                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>SIRET :</Text> {companyData?.siret || '123456789000'}</Text>
+                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>TVA :</Text> {companyData?.tva || 'FR123456789'}</Text>
+              </View>
+            </View>
+            
+            <View style={alternativeStyles.rightSection}>
+              <Text style={alternativeStyles.invoiceTitle}>FACTURE {clientData?.number || invoice.reference}</Text>
+              
+              <View style={alternativeStyles.clientBox}>
+                <Text style={[alternativeStyles.clientText, { fontWeight: 'bold' }]}>{clientData?.name || 'Client'}</Text>
+                {clientData?.phone && <Text style={alternativeStyles.clientText}><Text style={{ fontWeight: 'bold' }}>EMAIL :</Text> {clientData.phone}</Text>}
+                {clientData?.email && <Text style={alternativeStyles.clientText}><Text style={{ fontWeight: 'bold' }}>EMAIL :</Text> {clientData.email}</Text>}
+                {clientData?.address && <Text style={alternativeStyles.clientText}><Text style={{ fontWeight: 'bold' }}>ADRESSE :</Text> {clientData.address}</Text>}
+                {clientData?.city && <Text style={alternativeStyles.clientText}>{clientData.city}</Text>}
+                {clientData?.licensePlate && <Text style={alternativeStyles.clientText}><Text style={{ fontWeight: 'bold' }}>Immatriculation :</Text> {clientData.licensePlate}</Text>}
+                {clientData?.mileage && <Text style={alternativeStyles.clientText}><Text style={{ fontWeight: 'bold' }}>Kilométrage :</Text> {clientData.mileage}</Text>}
+                {clientData?.vehicle && <Text style={alternativeStyles.clientText}><Text style={{ fontWeight: 'bold' }}>Véhicule :</Text> {clientData.vehicle}</Text>}
+              </View>
+            </View>
           </View>
-        )}
-        <View style={commonStyles.detailRow}>
-          <Text style={commonStyles.detailLabel}>Date de facturation</Text>
-          <Text style={commonStyles.detailValue}>{clientData?.billingDate || formatDate(invoice.date || invoice.created_at)}</Text>
-        </View>
-        {clientData?.dueDate && (
-          <View style={commonStyles.detailRow}>
-            <Text style={commonStyles.detailLabel}>Date d'échéance</Text>
-            <Text style={commonStyles.detailValue}>{clientData.dueDate}</Text>
-          </View>
-        )}
-      </View>
 
-      {/* Colonne 3 - Facture pour */}
-      <View style={commonStyles.headerColumn}>
-        <Text style={commonStyles.sectionTitle}>Facture pour</Text>
-        <View style={commonStyles.companyInfo}>
-          <Text style={commonStyles.companyName}>
-            {clientData?.name || 'Client non spécifié'}
+          {/* Dates */}
+          <View style={alternativeStyles.dateBoxes}>
+            <View style={alternativeStyles.dateBox}>
+              <Text style={alternativeStyles.dateLabel}>DATE</Text>
+              <Text style={alternativeStyles.dateValue}>{clientData?.billingDate || formatDate(invoice.date || invoice.created_at)}</Text>
+            </View>
+            {clientData?.dueDate && (
+              <View style={alternativeStyles.dateBox}>
+                <Text style={alternativeStyles.dateLabel}>DATE D'ÉCHANCE</Text>
+                <Text style={alternativeStyles.dateValue}>{clientData.dueDate}</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Tableau des articles */}
+          <View style={alternativeStyles.tableContainer}>
+            <View style={alternativeStyles.tableHeader}>
+              <Text style={[alternativeStyles.tableHeaderCell, { width: 30 }]}>Réf</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { width: 120 }]}>Description</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { width: 50 }]}>Quantité</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { width: 40 }]}>Remise</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { width: 50 }]}>Prix HT</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { width: 35 }]}>TVA</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { width: 50 }]}>Total HT</Text>
+              <Text style={[alternativeStyles.tableHeaderCellLast, { width: 50 }]}>Total TTC</Text>
+            </View>
+            
+            {(clientData?.items || []).map((item: any, index: number) => (
+              <View key={index} style={alternativeStyles.tableRow}>
+                <Text style={[alternativeStyles.tableCell, { width: 30 }]}>{item.ref || ''}</Text>
+                <Text style={[alternativeStyles.tableCell, { width: 120 }]}>{item.description || 'N/A'}</Text>
+                <Text style={[alternativeStyles.tableCell, alternativeStyles.tableCellCenter, { width: 50 }]}>
+                  {item.quantity?.toString().replace('.', ',') || '0'}
+                </Text>
+                <Text style={[alternativeStyles.tableCell, alternativeStyles.tableCellCenter, { width: 40 }]}>
+                  {item.discount || 0}%
+                </Text>
+                <Text style={[alternativeStyles.tableCell, alternativeStyles.tableCellCenter, { width: 50 }]}>
+                  {item.unitPrice?.toFixed(2).replace('.', ',') || '0,00'}€
+                </Text>
+                <Text style={[alternativeStyles.tableCell, alternativeStyles.tableCellCenter, { width: 35 }]}>
+                  {item.vat || 20}%
+                </Text>
+                <Text style={[alternativeStyles.tableCell, alternativeStyles.tableCellCenter, { width: 50 }]}>
+                  {item.totalHT?.toFixed(2).replace('.', ',') || '0,00'}€
+                </Text>
+                <Text style={[alternativeStyles.tableCellLast, { width: 50 }]}>
+                  {item.totalTTC?.toFixed(2).replace('.', ',') || '0,00'}€
+                </Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Totaux */}
+          <View style={alternativeStyles.totalsContainer}>
+            <View style={alternativeStyles.totalsTable}>
+              <View style={alternativeStyles.totalsHeaderRow}>
+                <Text style={alternativeStyles.totalsHeaderCell}>Total HT</Text>
+                <Text style={alternativeStyles.totalsHeaderCell}>Total TVA</Text>
+                <Text style={alternativeStyles.totalsHeaderCell}>Total Remise</Text>
+                <Text style={alternativeStyles.totalsHeaderCellLast}>Total TTC</Text>
+              </View>
+              <View style={alternativeStyles.totalsValueRow}>
+                <Text style={alternativeStyles.totalsValueCell}>{clientData?.totals?.totalHT || '0,00 €'}</Text>
+                <Text style={alternativeStyles.totalsValueCell}>{clientData?.totals?.totalVAT || '0,00 €'}</Text>
+                <Text style={alternativeStyles.totalsValueCell}>{clientData?.totals?.totalDiscount || '0,00 €'}</Text>
+                <Text style={alternativeStyles.totalsValueCellLast}>{clientData?.totals?.totalTTC || '0,00 €'}</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Footer */}
+          <Text style={alternativeStyles.footer}>
+            {companyData?.name || 'AUTO PAINT'} - {companyData?.address || '25 rue sainte victoire'} {companyData?.zipcode || '13006'} {companyData?.city || 'MARSEILLE'} - 
+            SIRET {companyData?.siret || '123456789000'} - N° TVA : {companyData?.tva || 'FR123456789'} - 
+            Tel : {companyData?.phone || '+33064646524'} - Email : {companyData?.email || 'autopaint@yopmail.com'}
           </Text>
-          <Text>{clientData?.address || 'Adresse non renseignée'}</Text>
-          <Text>{clientData?.city || 'Ville non renseignée'}</Text>
-          {clientData?.phone && (
-            <Text>Téléphone : {clientData.phone}</Text>
-          )}
-          {clientData?.email && (
-            <Text>E-mail : {clientData.email}</Text>
-          )}
-        </View>
-      </View>
-    </View>
-  );
+        </Page>
+      </Document>
+    );
+  }
 
-  const renderClientInfo = () => {
-    if (template === 'alternative') {
-      return (
-        <View style={alternativeStyles.clientInfoBox}>
-          <Text style={commonStyles.sectionTitle}>FACTURER À :</Text>
-          <Text style={commonStyles.companyName}>{clientData?.name || 'Client non spécifié'}</Text>
-          <Text>{clientData?.address || 'Adresse non renseignée'}</Text>
-          <Text>{clientData?.city || 'Ville non renseignée'}</Text>
-          {clientData?.phone && <Text>Tél : {clientData.phone}</Text>}
-          {clientData?.email && <Text>Email : {clientData.email}</Text>}
-        </View>
-      );
-    }
-    return null;
-  };
-
-  const renderVehicleInfo = () => {
-    if (template === 'alternative' && (clientData?.vehicle || clientData?.licensePlate || clientData?.mileage)) {
-      return (
-        <View style={alternativeStyles.vehicleInfoBox}>
-          <Text style={commonStyles.sectionTitle}>INFORMATIONS VÉHICULE :</Text>
-          {clientData?.vehicle && <Text>Véhicule : {clientData.vehicle}</Text>}
-          {clientData?.licensePlate && <Text>Immatriculation : {clientData.licensePlate}</Text>}
-          {clientData?.mileage && <Text>Kilométrage : {clientData.mileage}</Text>}
-        </View>
-      );
-    }
-    return null;
-  };
-
+  // Template par défaut
   return (
     <Document>
-      <Page size="A4" style={commonStyles.page}>
-        {template === 'alternative' ? renderAlternativeHeader() : renderDefaultHeader()}
-        
-        {renderClientInfo()}
-        {renderVehicleInfo()}
+      <Page size="A4" style={defaultStyles.page}>
+        {/* Header par défaut */}
+        <View style={defaultStyles.header}>
+          <View style={defaultStyles.headerColumn}>
+            <View style={defaultStyles.title}>
+              <Text>FACTURE</Text>
+            </View>
+            <Text style={defaultStyles.companyName}>{companyData?.name || 'KARROSSERIE'}</Text>
+            <View style={defaultStyles.companyInfo}>
+              <Text>{companyData?.address || 'Votre adresse'}</Text>
+              <Text>{companyData?.zipcode || ''} {companyData?.city || ''}</Text>
+              <Text>Téléphone : {companyData?.phone || '+33 1 23 45 67 89'}</Text>
+              <Text>E-mail : {companyData?.email || 'contact@karrosserie.fr'}</Text>
+              <Text>SIRET : {companyData?.siret || '123 456 789 00123'}</Text>
+              <Text>N° TVA : {companyData?.tva || 'FR 12 123456789'}</Text>
+            </View>
+          </View>
 
-        {/* Tableau des articles */}
-        <View style={commonStyles.table}>
-          <View style={commonStyles.tableHeader}>
-            <Text style={[commonStyles.tableHeaderText, { flex: 3 }]}>Description</Text>
-            <Text style={[commonStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>Qté</Text>
-            <Text style={[commonStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>Prix Unit.</Text>
-            <Text style={[commonStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>Remise</Text>
-            <Text style={[commonStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>TVA</Text>
-            <Text style={[commonStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>Total HT</Text>
+          <View style={defaultStyles.headerColumn}>
+            <Text style={defaultStyles.sectionTitle}>Détails de la facture</Text>
+            <View style={defaultStyles.detailRow}>
+              <Text style={defaultStyles.detailLabel}>Facture</Text>
+              <Text style={defaultStyles.detailValue}>N° {clientData?.number || invoice.reference}</Text>
+            </View>
+            {clientData?.claimNumber && (
+              <View style={defaultStyles.detailRow}>
+                <Text style={defaultStyles.detailLabel}>N° de sinistre</Text>
+                <Text style={defaultStyles.detailValue}>{clientData.claimNumber}</Text>
+              </View>
+            )}
+            <View style={defaultStyles.detailRow}>
+              <Text style={defaultStyles.detailLabel}>Date de facturation</Text>
+              <Text style={defaultStyles.detailValue}>{clientData?.billingDate || formatDate(invoice.date || invoice.created_at)}</Text>
+            </View>
+            {clientData?.dueDate && (
+              <View style={defaultStyles.detailRow}>
+                <Text style={defaultStyles.detailLabel}>Date d'échéance</Text>
+                <Text style={defaultStyles.detailValue}>{clientData.dueDate}</Text>
+              </View>
+            )}
+          </View>
+
+          <View style={defaultStyles.headerColumn}>
+            <Text style={defaultStyles.sectionTitle}>Facture pour</Text>
+            <View style={defaultStyles.companyInfo}>
+              <Text style={defaultStyles.companyName}>{clientData?.name || 'Client non spécifié'}</Text>
+              <Text>{clientData?.address || 'Adresse non renseignée'}</Text>
+              <Text>{clientData?.city || 'Ville non renseignée'}</Text>
+              {clientData?.phone && <Text>Téléphone : {clientData.phone}</Text>}
+              {clientData?.email && <Text>E-mail : {clientData.email}</Text>}
+            </View>
+          </View>
+        </View>
+
+        {/* Tableau des articles par défaut */}
+        <View style={defaultStyles.table}>
+          <View style={defaultStyles.tableHeader}>
+            <Text style={[defaultStyles.tableHeaderText, { flex: 3 }]}>Description</Text>
+            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>Qté</Text>
+            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>Prix Unit.</Text>
+            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>Remise</Text>
+            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>TVA</Text>
+            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>Total HT</Text>
           </View>
           
           {(clientData?.items || []).length > 0 ? (clientData?.items || []).map((item: any, index: number) => (
-            <View key={index} style={commonStyles.tableRow}>
-              <Text style={[commonStyles.tableCell, { flex: 3 }]}>{item.description || 'N/A'}</Text>
-              <Text style={[commonStyles.tableCellRight, { flex: 1 }]}>{item.quantity?.toString().replace('.', ',') || '0'}</Text>
-              <Text style={[commonStyles.tableCellRight, { flex: 1 }]}>{formatAmount(item.unitPrice || 0)}</Text>
-              <Text style={[commonStyles.tableCellRight, { flex: 1 }]}>{item.discount || 0}%</Text>
-              <Text style={[commonStyles.tableCellRight, { flex: 1 }]}>{item.vat || 20}%</Text>
-              <Text style={[commonStyles.tableCellRight, { flex: 1, fontWeight: 'bold' }]}>{formatAmount(item.totalHT || 0)}</Text>
+            <View key={index} style={defaultStyles.tableRow}>
+              <Text style={[defaultStyles.tableCell, { flex: 3 }]}>{item.description || 'N/A'}</Text>
+              <Text style={[defaultStyles.tableCellRight, { flex: 1 }]}>{item.quantity?.toString().replace('.', ',') || '0'}</Text>
+              <Text style={[defaultStyles.tableCellRight, { flex: 1 }]}>{formatAmount(item.unitPrice || 0)}</Text>
+              <Text style={[defaultStyles.tableCellRight, { flex: 1 }]}>{item.discount || 0}%</Text>
+              <Text style={[defaultStyles.tableCellRight, { flex: 1 }]}>{item.vat || 20}%</Text>
+              <Text style={[defaultStyles.tableCellRight, { flex: 1, fontWeight: 'bold' }]}>{formatAmount(item.totalHT || 0)}</Text>
             </View>
           )) : (
-            <View style={commonStyles.tableRow}>
-              <Text style={[commonStyles.tableCell, { flex: 6, textAlign: 'center' }]}>
+            <View style={defaultStyles.tableRow}>
+              <Text style={[defaultStyles.tableCell, { flex: 6, textAlign: 'center' }]}>
                 Aucun article dans cette facture
               </Text>
             </View>
           )}
         </View>
 
-        {/* Totaux */}
-        <View style={commonStyles.totalsSection}>
-          <View style={commonStyles.totalsBox}>
-            <View style={commonStyles.totalRowBold}>
+        {/* Totaux par défaut */}
+        <View style={defaultStyles.totalsSection}>
+          <View style={defaultStyles.totalsBox}>
+            <View style={defaultStyles.totalRowBold}>
               <Text>Sous-total HT</Text>
               <Text>{clientData?.totals?.totalHT || '0,00 €'}</Text>
             </View>
-            <View style={commonStyles.totalRow}>
+            <View style={defaultStyles.totalRow}>
               <Text>TVA</Text>
               <Text>{clientData?.totals?.totalVAT || clientData?.totals?.vat || '0,00 €'}</Text>
             </View>
-            <View style={commonStyles.finalTotal}>
+            <View style={defaultStyles.finalTotal}>
               <Text>TOTAL TTC</Text>
               <Text>{clientData?.totals?.totalTTC || clientData?.totals?.total || '0,00 €'}</Text>
             </View>
           </View>
         </View>
 
-        {/* Footer */}
-        <Text style={commonStyles.footer}>
+        {/* Footer par défaut */}
+        <Text style={defaultStyles.footer}>
           {companyData?.name || 'KARROSSERIE'} - {companyData?.address || ''} {companyData?.zipcode || ''} {companyData?.city || ''} - 
           SIRET {companyData?.siret || ''} - N° TVA : {companyData?.tva || ''} - 
           Tel : {companyData?.phone || ''} - Email : {companyData?.email || ''}
