@@ -458,7 +458,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
           </View>
 
           {/* Footer */}
-          <Text style={alternativeStyles.footer}>
+          <Text style={alternativeStyles.footer} fixed>
             {companyData?.name || 'AUTO PAINT'} - {companyData?.address || '25 rue sainte victoire'} {companyData?.zipcode || '13006'} {companyData?.city || 'MARSEILLE'} - 
             SIRET {companyData?.siret || '123456789000'} - N° TVA : {companyData?.tva || 'FR123456789'} - 
             Tel : {companyData?.phone || '+33064646524'} - Email : {companyData?.email || 'autopaint@yopmail.com'}
@@ -639,7 +639,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
         </View>
 
         {/* Footer par défaut */}
-        <Text style={defaultStyles.footer}>
+        <Text style={defaultStyles.footer} fixed>
           {companyData?.name || 'KARROSSERIE'} - {companyData?.address || ''} {companyData?.zipcode || ''} {companyData?.city || ''} - 
           SIRET {companyData?.siret || ''} - N° TVA : {companyData?.tva || ''} - 
           Tel : {companyData?.phone || ''} - Email : {companyData?.email || ''}
