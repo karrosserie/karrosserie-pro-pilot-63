@@ -516,7 +516,9 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
         <View style={defaultStyles.header}>
           <View style={defaultStyles.headerColumn}>
             <View style={defaultStyles.title}>
-              <Text>{documentType === 'repair_order' ? 'ORDRE DE RÉPARATION' : documentType === 'credit' ? 'AVOIR' : 'FACTURE'}</Text>
+              <Text style={documentType === 'repair_order' ? { fontSize: 14 } : undefined}>
+                {documentType === 'repair_order' ? 'ORDRE DE RÉPARATION' : documentType === 'credit' ? 'AVOIR' : 'FACTURE'}
+              </Text>
             </View>
             {companyData?.logo_url && (
               <Image src={companyData.logo_url} style={{ width: 80, height: 60, marginBottom: 8 }} />
