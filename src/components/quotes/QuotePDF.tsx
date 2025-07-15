@@ -444,7 +444,7 @@ const QuotePDF = ({ quote, companyData, receipts = [], clientData, vehicleData, 
             <View style={alternativeStyles.quoteSection}>
               <Text style={alternativeStyles.quoteTitle}>DEVIS N° {clientData?.number || quote.reference}</Text>
               
-              <View style={[alternativeStyles.clientInfoSection, { marginTop: 15 }]}>
+              <View style={[alternativeStyles.clientInfoSection, { marginTop: 0 }]}>
                 <Text style={[alternativeStyles.clientInfo, { fontWeight: 'bold' }]}>{clientData?.name || 'Client'}</Text>
                 {clientData?.phone && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>TEL :</Text> {clientData.phone}</Text>}
                 {clientData?.email && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>EMAIL :</Text> {clientData.email}</Text>}
