@@ -11,6 +11,7 @@ interface InvoicePDFProps {
   receipts?: any[];
   clientData?: any;
   vehicleData?: any;
+  template?: string;
 }
 
 // Styles pour le PDF
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const InvoicePDF = ({ invoice, companyData, receipts = [] }: InvoicePDFProps) => {
+const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleData, template = 'default' }: InvoicePDFProps) => {
   const totals = calculateInvoiceTotals(invoice.repairs_data, invoice.parts_data);
   
   // Calculer le total des encaissements pour cette facture

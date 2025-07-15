@@ -153,11 +153,8 @@ const Invoices = () => {
         description: "Génération du PDF en cours..."
       });
 
-      const { prepareInvoiceData } = await import('@/utils/invoiceDataPreparation');
-      const { clientData, vehicleData } = await prepareInvoiceData(invoice);
-
-      const { generateInvoicePDF } = await import('@/utils/pdfGenerator');
-      const result = await generateInvoicePDF(invoice, companyData, receipts, clientData, vehicleData);
+      const { generateInvoicePDFWithTemplate } = await import('@/utils/invoicePDFGeneration');
+      const result = await generateInvoicePDFWithTemplate(invoice, companyData);
       
       if (result.success) {
         toast({
@@ -184,11 +181,8 @@ const Invoices = () => {
         description: `Ouverture de la facture ${invoice.reference} pour impression...`
       });
 
-      const { prepareInvoiceData } = await import('@/utils/invoiceDataPreparation');
-      const { clientData, vehicleData } = await prepareInvoiceData(invoice);
-
-      const { printInvoicePDF } = await import('@/utils/printInvoicePDF');
-      const result = await printInvoicePDF(invoice, companyData, receipts, clientData, vehicleData);
+      const { printInvoicePDFWithTemplate } = await import('@/utils/invoicePDFGeneration');
+      const result = await printInvoicePDFWithTemplate(invoice, companyData);
       
       if (!result.success) {
         throw new Error(result.error);
