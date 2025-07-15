@@ -24,6 +24,7 @@ import {
 import { Printer, Mail } from 'lucide-react';
 import { CreditDialog } from '@/components/credits/CreditDialog';
 import { EditCreditDialog } from '@/components/credits/EditCreditDialog';
+import { CreditEmailDialog } from '@/components/credits/email/CreditEmailDialog';
 import { useCredits } from '@/hooks/use-credits';
 import { useInvoices } from '@/hooks/use-invoices';
 
@@ -83,6 +84,7 @@ const Credits = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [viewerModalOpen, setViewerModalOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [selectedCredit, setSelectedCredit] = useState<any>(null);
   const { toast } = useToast();
   const { confirm } = useConfirmation();
@@ -312,10 +314,8 @@ const Credits = () => {
   };
 
   const handleSendEmail = (credit: any) => {
-    toast({
-      title: "Envoi par e-mail",
-      description: `Envoi de l'avoir ${credit.reference} par e-mail...`
-    });
+    setSelectedCredit(credit);
+    setEmailDialogOpen(true);
   };
 
   const handleApplyToInvoice = (credit: any) => {
@@ -531,6 +531,12 @@ const Credits = () => {
         credit={selectedCredit}
         open={viewerModalOpen}
         onOpenChange={setViewerModalOpen}
+      />
+
+      <CreditEmailDialog
+        credit={selectedCredit}
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
       />
     </div>
   );
