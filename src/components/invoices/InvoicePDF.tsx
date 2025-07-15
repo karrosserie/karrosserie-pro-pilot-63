@@ -406,6 +406,10 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
               <Text style={alternativeStyles.dateLabel}>DATE</Text>
               <Text style={alternativeStyles.dateValue}>{clientData?.billingDate || formatDate(invoice.date || invoice.created_at)}</Text>
             </View>
+            <View style={[alternativeStyles.dateBox, { marginLeft: 20 }]}>
+              <Text style={alternativeStyles.dateLabel}>ÉCHÉANCE</Text>
+              <Text style={alternativeStyles.dateValue}>{formatDate(invoice.due_date)}</Text>
+            </View>
           </View>
 
           {/* Tableau des articles */}
