@@ -109,11 +109,11 @@ const DefaultRepairOrderHeader = ({ companyData, orderData, clientData, vehicleD
             <h4 className="text-base font-semibold mb-2 text-gray-800">Délai prévisionnel</h4>
             <div className="text-base space-y-1">
               <div className="flex justify-between">
-                <span className="font-medium">Date de début des travaux</span>
+                <span className="font-medium">Date de début</span>
                 <span>{vehicleData.start_date}</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-medium">Date de fin des travaux</span>
+                <span className="font-medium">Date de fin</span>
                 <span>{vehicleData.end_date}</span>
               </div>
             </div>
