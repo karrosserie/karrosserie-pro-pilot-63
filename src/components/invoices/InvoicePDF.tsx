@@ -179,7 +179,6 @@ const alternativeStyles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 10,
     textAlign: 'right',
   },
   clientBox: {
