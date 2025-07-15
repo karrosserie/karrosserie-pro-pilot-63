@@ -1,5 +1,5 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import { Invoice } from '@/services/supabase/invoices';
 
 interface InvoicePDFProps {
@@ -85,8 +85,6 @@ const defaultStyles = StyleSheet.create({
   tableRow: {
     flexDirection: 'row',
     padding: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
   },
   tableCell: {
     fontSize: 9,
@@ -127,6 +125,27 @@ const defaultStyles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 11,
     marginTop: 5,
+  },
+  amountDueBox: {
+    backgroundColor: '#2563eb',
+    color: 'white',
+    padding: 12,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
+    borderRadius: 5,
+  },
+  amountDueLabel: {
+    fontSize: 10,
+    fontWeight: 'normal',
+    color: 'white',
+    marginBottom: 2,
+  },
+  amountDueValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'white',
   },
   footer: {
     position: 'absolute',
@@ -458,6 +477,9 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             <View style={defaultStyles.title}>
               <Text>FACTURE</Text>
             </View>
+            {companyData?.logo_url && (
+              <Image src={companyData.logo_url} style={{ width: 80, height: 60, marginBottom: 8 }} />
+            )}
             <Text style={defaultStyles.companyName}>{companyData?.name || 'KARROSSERIE'}</Text>
             <View style={defaultStyles.companyInfo}>
               <Text>{companyData?.address || 'Votre adresse'}</Text>
@@ -515,9 +537,9 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             </View>
             
             {/* Encadré Montant dû */}
-            <View style={defaultStyles.finalTotal}>
-              <Text>Montant dû</Text>
-              <Text>{clientData?.amountDue || '719,78 €'}</Text>
+            <View style={defaultStyles.amountDueBox}>
+              <Text style={defaultStyles.amountDueLabel}>Montant dû</Text>
+              <Text style={defaultStyles.amountDueValue}>{clientData?.amountDue || '719,78 €'}</Text>
             </View>
           </View>
 
