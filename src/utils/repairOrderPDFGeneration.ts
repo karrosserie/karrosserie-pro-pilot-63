@@ -57,7 +57,9 @@ export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, com
           vehicleData = {
             vehicle: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim(),
             licensePlate: vehicle.license_plate || '',
-            mileage: vehicle.mileage ? vehicle.mileage.toLocaleString() + ' km' : ''
+            mileage: vehicle.mileage ? vehicle.mileage.toLocaleString() + ' km' : '',
+            start_date: vehicle.start_date,
+            end_date: vehicle.end_date
           };
         }
       } catch (error) {
@@ -195,7 +197,8 @@ export const generateRepairOrderPDFWithTemplate = async (repairOrder: RepairOrde
       receipts: [],
       clientData: data.clientData,
       vehicleData: data.vehicleData,
-      template: data.template
+      template: data.template,
+      documentType: 'repair_order'
     });
     
     // Générer le blob PDF
@@ -242,7 +245,8 @@ export const printRepairOrderPDFWithTemplate = async (repairOrder: RepairOrder, 
       receipts: [],
       clientData: data.clientData,
       vehicleData: data.vehicleData,
-      template: data.template
+      template: data.template,
+      documentType: 'repair_order'
     });
     
     // Générer le blob PDF

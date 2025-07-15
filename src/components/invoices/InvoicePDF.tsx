@@ -9,6 +9,7 @@ interface InvoicePDFProps {
   clientData?: any;
   vehicleData?: any;
   template?: string;
+  documentType?: 'invoice' | 'repair_order' | 'credit';
 }
 
 // Styles pour le template par défaut
@@ -352,7 +353,7 @@ const alternativeStyles = StyleSheet.create({
   },
 });
 
-const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleData, template = 'default' }: InvoicePDFProps) => {
+const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleData, template = 'default', documentType = 'invoice' }: InvoicePDFProps) => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
     try {
@@ -385,7 +386,10 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             </View>
             
             <View style={alternativeStyles.invoiceSection}>
-              <Text style={alternativeStyles.invoiceTitle}>FACTURE N° {clientData?.number || invoice.reference}</Text>
+              <Text style={alternativeStyles.invoiceTitle}>
+                {documentType === 'repair_order' ? 'ORDRE DE RÉPARATION N°' : 
+                 documentType === 'credit' ? 'AVOIR N°' : 'FACTURE N°'} {clientData?.number || invoice.reference}
+              </Text>
               
               <View style={[alternativeStyles.clientInfoSection, { marginTop: 0 }]}>
                 <Text style={[alternativeStyles.clientInfo, { fontWeight: 'bold' }]}>{clientData?.name || 'Client'}</Text>
@@ -406,10 +410,20 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
               <Text style={alternativeStyles.dateLabel}>DATE</Text>
               <Text style={alternativeStyles.dateValue}>{clientData?.billingDate || formatDate(invoice.date || invoice.created_at)}</Text>
             </View>
-            <View style={[alternativeStyles.dateBox, { marginLeft: 125 }]}>
-              <Text style={alternativeStyles.dateLabel}>DATE D'ÉCHÉANCE</Text>
-              <Text style={alternativeStyles.dateValue}>{formatDate(invoice.due_date)}</Text>
-            </View>
+            {documentType !== 'repair_order' && (
+              <View style={[alternativeStyles.dateBox, { marginLeft: 125 }]}>
+                <Text style={alternativeStyles.dateLabel}>DATE D'ÉCHÉANCE</Text>
+                <Text style={alternativeStyles.dateValue}>{formatDate(invoice.due_date)}</Text>
+              </View>
+            )}
+            {documentType === 'repair_order' && vehicleData?.start_date && vehicleData?.end_date && (
+              <View style={[alternativeStyles.dateBox, { marginLeft: 125 }]}>
+                <Text style={alternativeStyles.dateLabel}>DÉLAI PRÉVISIONNEL</Text>
+                <Text style={alternativeStyles.dateValue}>
+                  Du {formatDate(vehicleData.start_date)} au {formatDate(vehicleData.end_date)}
+                </Text>
+              </View>
+            )}
           </View>
 
           {/* Tableau des articles */}
