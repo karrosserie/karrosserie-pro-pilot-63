@@ -533,155 +533,136 @@ const QuotePDF = ({ quote, companyData, receipts = [], clientData, vehicleData, 
     );
   }
 
-  // Template par défaut
+  // Template par défaut - aligné sur le style des factures
   return (
     <Document>
       <Page size="A4" style={defaultStyles.page}>
-        {/* Header */}
+        {/* Header par défaut - 3 colonnes comme les factures */}
         <View style={defaultStyles.header}>
           <View style={defaultStyles.headerColumn}>
+            <View style={defaultStyles.title}>
+              <Text>DEVIS</Text>
+            </View>
             {companyData?.logo_url && (
-              <Image src={companyData.logo_url} style={defaultStyles.logo} />
+              <Image src={companyData.logo_url} style={{ width: 80, height: 60, marginBottom: 8 }} />
             )}
-            <Text style={defaultStyles.companyName}>
-              {companyData?.name || 'KARROSSERIE'}
-            </Text>
-            <Text style={defaultStyles.companyInfo}>
-              {companyData?.address || ''} {companyData?.zipcode || ''} {companyData?.city || ''}
-              {'\n'}SIRET: {companyData?.siret || ''} - N° TVA: {companyData?.tva || ''}
-              {'\n'}Tel: {companyData?.phone || ''} - Email: {companyData?.email || ''}
-            </Text>
+            <Text style={defaultStyles.companyName}>{companyData?.name || 'KARROSSERIE'}</Text>
+            <View style={defaultStyles.companyInfo}>
+              <Text>{companyData?.address || 'Votre adresse'}</Text>
+              <Text>{companyData?.zipcode || ''} {companyData?.city || ''}</Text>
+              <Text>Téléphone : {companyData?.phone || '+33 1 23 45 67 89'}</Text>
+              <Text>E-mail : {companyData?.email || 'contact@karrosserie.fr'}</Text>
+              <Text>SIRET : {companyData?.siret || '123 456 789 00123'}</Text>
+              <Text>N° TVA : {companyData?.tva || 'FR 12 123456789'}</Text>
+            </View>
           </View>
-          
+
           <View style={defaultStyles.headerColumn}>
-            <Text style={defaultStyles.title}>DEVIS N° {quote.reference}</Text>
-            <Text style={defaultStyles.companyInfo}>
-              Date: {formatDate(quote.created_at)}
-              {'\n'}Validité: {quote.valid_until ? formatDate(quote.valid_until) : 'Non définie'}
-            </Text>
+            <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8, color: '#404348' }}>Détails du devis</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3, fontSize: 9 }}>
+              <Text style={{ fontWeight: 'bold', fontSize: 9 }}>Devis</Text>
+              <Text style={{ fontSize: 9, textAlign: 'right' }}>N° {clientData?.number || quote.reference}</Text>
+            </View>
+            {clientData?.claimNumber && (
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3, fontSize: 9 }}>
+                <Text style={{ fontWeight: 'bold', fontSize: 9 }}>N° de sinistre</Text>
+                <Text style={{ fontSize: 9, textAlign: 'right' }}>{clientData.claimNumber}</Text>
+              </View>
+            )}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3, fontSize: 9 }}>
+              <Text style={{ fontWeight: 'bold', fontSize: 9 }}>Date de création</Text>
+              <Text style={{ fontSize: 9, textAlign: 'right' }}>{clientData?.billingDate || formatDate(quote.created_at)}</Text>
+            </View>
+            {quote.valid_until && (
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3, fontSize: 9 }}>
+                <Text style={{ fontWeight: 'bold', fontSize: 9 }}>Validité</Text>
+                <Text style={{ fontSize: 9, textAlign: 'right' }}>{formatDate(quote.valid_until)}</Text>
+              </View>
+            )}
+            {clientData?.vehicle && (
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3, fontSize: 9 }}>
+                <Text style={{ fontWeight: 'bold', fontSize: 9 }}>Véhicule</Text>
+                <Text style={{ fontSize: 9, textAlign: 'right' }}>{clientData.vehicle}</Text>
+              </View>
+            )}
+            {clientData?.licensePlate && (
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3, fontSize: 9 }}>
+                <Text style={{ fontWeight: 'bold', fontSize: 9 }}>Immatriculation</Text>
+                <Text style={{ fontSize: 9, textAlign: 'right' }}>{clientData.licensePlate}</Text>
+              </View>
+            )}
+            {clientData?.mileage && (
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3, fontSize: 9 }}>
+                <Text style={{ fontWeight: 'bold', fontSize: 9 }}>Kilométrage</Text>
+                <Text style={{ fontSize: 9, textAlign: 'right' }}>{clientData.mileage}</Text>
+              </View>
+            )}
+          </View>
+
+          <View style={defaultStyles.headerColumn}>
+            <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8, color: '#404348' }}>Devis pour</Text>
+            <View style={defaultStyles.companyInfo}>
+              <Text style={defaultStyles.companyName}>{clientData?.name || (quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : 'Client non spécifié')}</Text>
+              <Text>{clientData?.address || quote.clients?.address || 'Adresse non renseignée'}</Text>
+              <Text>{clientData?.city || quote.clients?.city || 'Ville non renseignée'}</Text>
+              {clientData?.phone && <Text>Téléphone : {clientData.phone}</Text>}
+              {clientData?.email && <Text>E-mail : {clientData.email}</Text>}
+            </View>
           </View>
         </View>
 
-        {/* Client */}
-        <View style={defaultStyles.clientSection}>
-          <Text style={defaultStyles.clientTitle}>Client</Text>
-          <Text style={defaultStyles.clientInfo}>
-            {clientData?.clientName || (quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '')}
-          </Text>
-          <Text style={defaultStyles.clientInfo}>
-            {clientData?.address || quote.clients?.address || ''}
-          </Text>
-          <Text style={defaultStyles.clientInfo}>
-            {clientData?.postalCode || quote.clients?.postal_code || ''} {clientData?.city || quote.clients?.city || ''}
-          </Text>
-        </View>
-
-        {/* Informations véhicule et sinistre */}
-        <View style={defaultStyles.infoGrid}>
-          <View style={defaultStyles.infoColumn}>
-            <Text style={defaultStyles.infoLabel}>Véhicule:</Text>
-            <Text style={defaultStyles.infoValue}>
-              {vehicleData?.vehicle || (quote.vehicles ? `${quote.vehicles.car_brands?.name || ''} ${quote.vehicles.car_models?.name || ''}` : '')}
-            </Text>
-            <Text style={defaultStyles.infoLabel}>Immatriculation:</Text>
-            <Text style={defaultStyles.infoValue}>
-              {vehicleData?.licensePlate || quote.vehicles?.license_plate || ''}
-            </Text>
-            {quote.vehicles?.mileage && (
-              <>
-                <Text style={defaultStyles.infoLabel}>Kilométrage:</Text>
-                <Text style={defaultStyles.infoValue}>{quote.vehicles.mileage.toLocaleString()} km</Text>
-              </>
-            )}
+        {/* Tableau des articles par défaut */}
+        <View style={defaultStyles.table}>
+          <View style={{ backgroundColor: '#404348', flexDirection: 'row', padding: 6 }}>
+            <Text style={[{ color: 'white', fontSize: 9, fontWeight: 'bold' }, { flex: 3 }]}>Description</Text>
+            <Text style={[{ color: 'white', fontSize: 9, fontWeight: 'bold' }, { flex: 1, textAlign: 'center' }]}>Quantité</Text>
+            <Text style={[{ color: 'white', fontSize: 9, fontWeight: 'bold' }, { flex: 1, textAlign: 'center' }]}>Remise</Text>
+            <Text style={[{ color: 'white', fontSize: 9, fontWeight: 'bold' }, { flex: 1, textAlign: 'center' }]}>Coût unitaire</Text>
+            <Text style={[{ color: 'white', fontSize: 9, fontWeight: 'bold' }, { flex: 1, textAlign: 'center' }]}>TVA</Text>
+            <Text style={[{ color: 'white', fontSize: 9, fontWeight: 'bold' }, { flex: 1, textAlign: 'center' }]}>Total HT</Text>
           </View>
           
-          <View style={defaultStyles.infoColumn}>
-            {quote.claim_number && (
-              <>
-                <Text style={defaultStyles.infoLabel}>N° Sinistre:</Text>
-                <Text style={defaultStyles.infoValue}>{quote.claim_number}</Text>
-              </>
-            )}
-            {quote.report_number && (
-              <>
-                <Text style={defaultStyles.infoLabel}>N° Rapport:</Text>
-                <Text style={defaultStyles.infoValue}>{quote.report_number}</Text>
-              </>
-            )}
-            {quote.expert_name && (
-              <>
-                <Text style={defaultStyles.infoLabel}>Expert:</Text>
-                <Text style={defaultStyles.infoValue}>{quote.expert_name}</Text>
-              </>
-            )}
-          </View>
+          {(clientData?.items || []).length > 0 ? (clientData?.items || []).map((item: any, index: number) => (
+            <View key={index} style={{ flexDirection: 'row', padding: 6 }}>
+              <Text style={[{ fontSize: 9 }, { flex: 3 }]}>{item.description || 'N/A'}</Text>
+              <Text style={[{ fontSize: 9 }, { flex: 1, textAlign: 'center' }]}>{item.quantity?.toString().replace('.', ',') || '0'}</Text>
+              <Text style={[{ fontSize: 9 }, { flex: 1, textAlign: 'center' }]}>{item.discount || 0}%</Text>
+              <Text style={[{ fontSize: 9 }, { flex: 1, textAlign: 'center' }]}>{item.unitPrice?.toFixed(2).replace('.', ',') || '0,00'}€</Text>
+              <Text style={[{ fontSize: 9 }, { flex: 1, textAlign: 'center' }]}>{item.vat || 20}%</Text>
+              <Text style={[{ fontSize: 9 }, { flex: 1, textAlign: 'center' }]}>{item.totalHT?.toFixed(2).replace('.', ',') || '0,00'}€</Text>
+            </View>
+          )) : (
+            <View style={{ flexDirection: 'row', padding: 6 }}>
+              <Text style={[{ fontSize: 9 }, { flex: 6, textAlign: 'center' }]}>
+                Aucun article dans ce devis
+              </Text>
+            </View>
+          )}
         </View>
 
-        {/* Réparations */}
-        {repairs.length > 0 && (
-          <View style={defaultStyles.table}>
-            <View style={defaultStyles.tableHeader}>
-              <Text style={defaultStyles.col1}>Réparations</Text>
-              <Text style={defaultStyles.col2}>Qté</Text>
-              <Text style={defaultStyles.col3}>Prix unit.</Text>
-              <Text style={defaultStyles.col4}>TVA</Text>
-              <Text style={defaultStyles.col5}>Total</Text>
+        {/* Totaux par défaut */}
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 15 }}>
+          <View style={{ width: 200 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4, fontSize: 10, fontWeight: 'bold', paddingVertical: 2 }}>
+              <Text>Sous-total</Text>
+              <Text>{clientData?.totals?.subtotal || formatCurrency(subtotalHT)}</Text>
             </View>
-            {repairs.map((repair: any, index: number) => (
-              <View key={index} style={defaultStyles.tableRow}>
-                <Text style={defaultStyles.col1}>{repair.description}</Text>
-                <Text style={defaultStyles.col2}>{repair.quantity}</Text>
-                <Text style={defaultStyles.col3}>{formatCurrency(repair.unitCost)}</Text>
-                <Text style={defaultStyles.col4}>{repair.vat}%</Text>
-                <Text style={defaultStyles.col5}>{formatCurrency(calculateItemTotal(repair))}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Pièces */}
-        {parts.length > 0 && (
-          <View style={defaultStyles.table}>
-            <View style={defaultStyles.tableHeader}>
-              <Text style={defaultStyles.col1}>Pièces</Text>
-              <Text style={defaultStyles.col2}>Qté</Text>
-              <Text style={defaultStyles.col3}>Prix unit.</Text>
-              <Text style={defaultStyles.col4}>TVA</Text>
-              <Text style={defaultStyles.col5}>Total</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4, fontSize: 9, paddingVertical: 2 }}>
+              <Text>TVA</Text>
+              <Text>{clientData?.totals?.vat || formatCurrency(totalTVA)}</Text>
             </View>
-            {parts.map((part: any, index: number) => (
-              <View key={index} style={defaultStyles.tableRow}>
-                <Text style={defaultStyles.col1}>{part.description}</Text>
-                <Text style={defaultStyles.col2}>{part.quantity}</Text>
-                <Text style={defaultStyles.col3}>{formatCurrency(part.unitCost)}</Text>
-                <Text style={defaultStyles.col4}>{part.vat}%</Text>
-                <Text style={defaultStyles.col5}>{formatCurrency(calculateItemTotal(part))}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Totaux */}
-        <View style={defaultStyles.totalsSection}>
-          <View style={defaultStyles.totalRow}>
-            <Text style={defaultStyles.totalLabel}>Sous-total HT:</Text>
-            <Text style={defaultStyles.totalValue}>{formatCurrency(subtotalHT)}</Text>
-          </View>
-          <View style={defaultStyles.totalRow}>
-            <Text style={defaultStyles.totalLabel}>TVA:</Text>
-            <Text style={defaultStyles.totalValue}>{formatCurrency(totalTVA)}</Text>
-          </View>
-          <View style={defaultStyles.totalRow}>
-            <Text style={defaultStyles.totalLabel}>Total TTC:</Text>
-            <Text style={defaultStyles.totalValue}>{formatCurrency(totalTTC)}</Text>
+            <View style={{ backgroundColor: '#2563eb', color: 'white', padding: 8, flexDirection: 'row', justifyContent: 'space-between', fontWeight: 'bold', fontSize: 11, marginTop: 5 }}>
+              <Text>TOTAL</Text>
+              <Text>{clientData?.totals?.total || formatCurrency(totalTTC)}</Text>
+            </View>
           </View>
         </View>
 
         {/* Notes */}
         {quote.notes && (
           <View style={{ marginTop: 20 }}>
-            <Text style={defaultStyles.infoLabel}>Notes:</Text>
-            <Text style={defaultStyles.infoValue}>{quote.notes}</Text>
+            <Text style={{ fontSize: 9, fontWeight: 'bold', marginBottom: 3 }}>Notes:</Text>
+            <Text style={{ fontSize: 9 }}>{quote.notes}</Text>
           </View>
         )}
 
