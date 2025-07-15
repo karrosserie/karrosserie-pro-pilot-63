@@ -9,13 +9,15 @@ interface DocumentDisplayProps {
   isViewMode: boolean;
   isDeleting: boolean;
   onDelete: () => void;
+  customContent?: React.ReactNode;
 }
 
 export const DocumentDisplay: React.FC<DocumentDisplayProps> = ({
   documentUrl,
   isViewMode,
   isDeleting,
-  onDelete
+  onDelete,
+  customContent
 }) => {
   const isImage = isImageFile(documentUrl);
 
@@ -31,7 +33,7 @@ export const DocumentDisplay: React.FC<DocumentDisplayProps> = ({
         </div>
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <p className="text-xs text-gray-500">Image téléchargée</p>
+            {customContent || <p className="text-xs text-gray-500">Image téléchargée</p>}
           </div>
           {!isViewMode && (
             <div className="flex space-x-2">

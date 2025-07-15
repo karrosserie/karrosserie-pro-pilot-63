@@ -79,6 +79,24 @@ const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
                     currentDocumentUrl={imageData.url}
                     onUploadComplete={(url) => handleImageUpload(index, url)}
                     isViewMode={isViewMode}
+                    customContent={
+                      imageData.url ? (
+                        <Select
+                          value={imageData.timing}
+                          onValueChange={(value) => onImageTimingUpdate(index, value as 'Avant' | 'Pendant' | 'Après')}
+                          disabled={isViewMode}
+                        >
+                          <SelectTrigger className="w-28">
+                            <SelectValue placeholder="Timing" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Avant">Avant</SelectItem>
+                            <SelectItem value="Pendant">Pendant</SelectItem>
+                            <SelectItem value="Après">Après</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : null
+                    }
                   />
                 </div>
                 {!isViewMode && vehicleImages.length > 1 && (
@@ -93,26 +111,6 @@ const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
                   </Button>
                 )}
               </div>
-              
-              {imageData.url && (
-                <div className="flex items-center gap-2">
-                  <Label className="text-sm font-medium">Timing:</Label>
-                  <Select
-                    value={imageData.timing}
-                    onValueChange={(value) => onImageTimingUpdate(index, value as 'Avant' | 'Pendant' | 'Après')}
-                    disabled={isViewMode}
-                  >
-                    <SelectTrigger className="w-32">
-                      <SelectValue placeholder="Sélectionner" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Avant">Avant</SelectItem>
-                      <SelectItem value="Pendant">Pendant</SelectItem>
-                      <SelectItem value="Après">Après</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
             </div>
           </div>
         ))}

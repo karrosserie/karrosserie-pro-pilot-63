@@ -14,6 +14,7 @@ interface DocumentUploaderProps {
   currentDocumentUrl?: string | null;
   onUploadComplete: (url: string) => void;
   isViewMode?: boolean;
+  customContent?: React.ReactNode;
 }
 
 export function DocumentUploader({
@@ -21,7 +22,8 @@ export function DocumentUploader({
   documentId,
   currentDocumentUrl,
   onUploadComplete,
-  isViewMode = false
+  isViewMode = false,
+  customContent
 }: DocumentUploaderProps) {
   const { isUploading, isDeleting, uploadFile, handleDelete } = useDocumentUpload({
     documentType,
@@ -52,6 +54,7 @@ export function DocumentUploader({
         isViewMode={isViewMode}
         isDeleting={isDeleting}
         onDelete={() => handleDelete(currentDocumentUrl)}
+        customContent={customContent}
       />
     );
   }
