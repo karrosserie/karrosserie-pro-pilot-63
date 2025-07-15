@@ -152,8 +152,9 @@ const defaultStyles = StyleSheet.create({
     fontSize: 8,
     textAlign: 'center',
     color: '#666',
-    borderTop: 1,
+    borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
+    borderTopStyle: 'solid',
     paddingTop: 10,
   },
   logo: {
