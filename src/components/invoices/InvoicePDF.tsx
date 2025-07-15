@@ -404,19 +404,19 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
           <View style={alternativeStyles.tableContainer}>
             <View style={alternativeStyles.tableHeader}>
               <Text style={[alternativeStyles.tableHeaderCell, { width: 30 }]}>Réf</Text>
-              <Text style={[alternativeStyles.tableHeaderCell, { width: 120 }]}>Description</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { width: 140 }]}>Description</Text>
               <Text style={[alternativeStyles.tableHeaderCell, { width: 50 }]}>Quantité</Text>
               <Text style={[alternativeStyles.tableHeaderCell, { width: 40 }]}>Remise</Text>
               <Text style={[alternativeStyles.tableHeaderCell, { width: 50 }]}>Prix HT</Text>
               <Text style={[alternativeStyles.tableHeaderCell, { width: 35 }]}>TVA</Text>
               <Text style={[alternativeStyles.tableHeaderCell, { width: 50 }]}>Total HT</Text>
-              <Text style={[alternativeStyles.tableHeaderCellLast, { width: 50 }]}>Total TTC</Text>
+              <Text style={[alternativeStyles.tableHeaderCellLast, { width: 40 }]}>Total TTC</Text>
             </View>
             
             {(clientData?.items || []).map((item: any, index: number) => (
               <View key={index} style={alternativeStyles.tableRow}>
                 <Text style={[alternativeStyles.tableCell, { width: 30 }]}>{item.ref || ''}</Text>
-                <Text style={[alternativeStyles.tableCell, { width: 120 }]}>{item.description || 'N/A'}</Text>
+                <Text style={[alternativeStyles.tableCell, { width: 140 }]}>{item.description || 'N/A'}</Text>
                 <Text style={[alternativeStyles.tableCell, alternativeStyles.tableCellCenter, { width: 50 }]}>
                   {item.quantity?.toString().replace('.', ',') || '0'}
                 </Text>
@@ -432,7 +432,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
                 <Text style={[alternativeStyles.tableCell, alternativeStyles.tableCellCenter, { width: 50 }]}>
                   {item.totalHT?.toFixed(2).replace('.', ',') || '0,00'}€
                 </Text>
-                <Text style={[alternativeStyles.tableCellLast, { width: 50 }]}>
+                <Text style={[alternativeStyles.tableCellLast, { width: 40 }]}>
                   {item.totalTTC?.toFixed(2).replace('.', ',') || '0,00'}€
                 </Text>
               </View>
