@@ -163,170 +163,199 @@ const defaultStyles = StyleSheet.create({
   },
 });
 
-// Styles pour le template alternatif
+// Styles pour le template alternatif - basé sur AlternativeQuotePreview
 const alternativeStyles = StyleSheet.create({
   page: {
-    fontFamily: 'Helvetica',
+    fontFamily: 'Arial',
     fontSize: 10,
-    paddingTop: 40,
-    paddingBottom: 80,
-    paddingHorizontal: 40,
-    backgroundColor: '#fafafa',
+    paddingTop: 30,
+    paddingBottom: 60,
+    paddingHorizontal: 30,
+    backgroundColor: 'white',
     position: 'relative',
   },
-  header: {
-    backgroundColor: 'white',
-    padding: 20,
-    marginBottom: 20,
-    borderRadius: 5,
-    borderLeft: 4,
-    borderLeftColor: '#ff6b35',
+  mainHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 30,
   },
   companySection: {
-    flexDirection: 'row',
-    marginBottom: 15,
-  },
-  logoSection: {
-    width: 80,
-    marginRight: 20,
-  },
-  companyDetails: {
     flex: 1,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#ff6b35',
-    marginBottom: 5,
-  },
   companyName: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 3,
+    color: '#dc2626',
+    marginBottom: 15,
   },
   companyInfo: {
     fontSize: 9,
-    color: '#666',
-    lineHeight: 1.3,
+    lineHeight: 1.4,
+    marginBottom: 2,
   },
-  quoteInfo: {
-    backgroundColor: '#ff6b35',
-    color: 'white',
-    padding: 15,
-    borderRadius: 5,
-    marginBottom: 20,
+  quoteSection: {
+    flex: 1,
+    alignItems: 'flex-end',
   },
   quoteTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 8,
+    color: '#000',
+    marginBottom: 15,
   },
-  quoteDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  quoteDetailItem: {
-    fontSize: 10,
-  },
-  clientCard: {
-    backgroundColor: 'white',
-    padding: 15,
-    marginBottom: 20,
-    borderRadius: 5,
-    borderLeft: 3,
-    borderLeftColor: '#ff6b35',
-  },
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-    borderBottom: 1,
-    borderBottomColor: '#e0e0e0',
-    paddingBottom: 3,
+  clientInfoSection: {
+    width: 200,
+    backgroundColor: '#f9f9f9',
+    padding: 10,
+    marginLeft: 'auto',
   },
   clientInfo: {
     fontSize: 9,
     lineHeight: 1.4,
     marginBottom: 2,
   },
-  table: {
+  dateSection: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 30,
+  },
+  dateBox: {
+    border: 2,
+    borderColor: '#000',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
     backgroundColor: 'white',
-    borderRadius: 5,
+  },
+  dateLabel: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 3,
+  },
+  dateValue: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  table: {
+    border: 2,
+    borderColor: '#000',
+    borderRadius: 8,
     overflow: 'hidden',
     marginBottom: 20,
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#333',
-    color: 'white',
-    padding: 10,
+    backgroundColor: 'white',
+    borderBottomWidth: 2,
+    borderBottomColor: '#000',
+  },
+  tableHeaderCell: {
     fontSize: 9,
     fontWeight: 'bold',
+    padding: 8,
+    textAlign: 'center',
+    borderRightWidth: 2,
+    borderRightColor: '#000',
+  },
+  tableHeaderCellLast: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    padding: 8,
+    textAlign: 'center',
   },
   tableRow: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-    padding: 8,
+    backgroundColor: 'white',
+  },
+  tableCell: {
     fontSize: 8,
+    fontWeight: 'bold',
+    padding: 8,
+    textAlign: 'center',
+    borderRightWidth: 2,
+    borderRightColor: '#000',
   },
-  col1: { flex: 3 },
-  col2: { flex: 1, textAlign: 'center' },
-  col3: { flex: 1, textAlign: 'right' },
-  col4: { flex: 1, textAlign: 'center' },
-  col5: { flex: 1, textAlign: 'right' },
-  totalsCard: {
-    backgroundColor: '#f8f9fa',
-    padding: 15,
-    borderRadius: 5,
-    marginTop: 10,
-    alignItems: 'flex-end',
+  tableCellLast: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    padding: 8,
+    textAlign: 'center',
   },
-  totalRow: {
+  tableCellLeft: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    padding: 8,
+    textAlign: 'left',
+    borderRightWidth: 2,
+    borderRightColor: '#000',
+  },
+  totalsSection: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginBottom: 5,
-    width: 250,
   },
-  totalLabel: {
-    fontSize: 10,
-    flex: 1,
-    textAlign: 'right',
-    paddingRight: 15,
+  totalsTable: {
+    border: 2,
+    borderColor: '#000',
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: 'white',
   },
-  totalValue: {
-    fontSize: 10,
+  totalsHeader: {
+    flexDirection: 'row',
+    borderBottomWidth: 2,
+    borderBottomColor: '#000',
+  },
+  totalsHeaderCell: {
+    fontSize: 9,
     fontWeight: 'bold',
+    padding: 8,
+    textAlign: 'center',
+    borderRightWidth: 2,
+    borderRightColor: '#000',
     width: 80,
-    textAlign: 'right',
   },
-  grandTotal: {
-    fontSize: 12,
+  totalsHeaderCellLast: {
+    fontSize: 9,
     fontWeight: 'bold',
-    color: '#ff6b35',
-    borderTop: 1,
-    borderTopColor: '#ccc',
-    paddingTop: 5,
+    padding: 8,
+    textAlign: 'center',
+    width: 80,
+  },
+  totalsRow: {
+    flexDirection: 'row',
+  },
+  totalsCell: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    padding: 8,
+    textAlign: 'center',
+    borderRightWidth: 2,
+    borderRightColor: '#000',
+    width: 80,
+  },
+  totalsCellLast: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    padding: 8,
+    textAlign: 'center',
+    width: 80,
   },
   footer: {
     position: 'absolute',
     bottom: 30,
-    left: 40,
-    right: 40,
+    left: 30,
+    right: 30,
     fontSize: 8,
     textAlign: 'center',
     color: '#666',
-    backgroundColor: 'white',
-    padding: 10,
-    borderRadius: 5,
   },
-  notes: {
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 5,
-    marginBottom: 20,
+  logo: {
+    width: 60,
+    height: 60,
+    marginBottom: 10,
   },
 });
 
@@ -395,145 +424,164 @@ const QuotePDF = ({ quote, companyData, receipts = [], clientData, vehicleData, 
     return (
       <Document>
         <Page size="A4" style={alternativeStyles.page}>
-          {/* Header avec informations de l'entreprise */}
-          <View style={alternativeStyles.header}>
+          {/* Header principal avec entreprise et devis */}
+          <View style={alternativeStyles.mainHeader}>
+            {/* Section entreprise */}
             <View style={alternativeStyles.companySection}>
-              <View style={alternativeStyles.logoSection}>
-                {companyData?.logo_url && (
-                  <Image src={companyData.logo_url} style={defaultStyles.logo} />
+              <Text style={alternativeStyles.companyName}>
+                {companyData?.name || 'VOTRE ENTREPRISE'}
+              </Text>
+              <Text style={alternativeStyles.companyInfo}>
+                <Text style={{ fontWeight: 'bold' }}>ADRESSE : </Text>
+                {companyData?.address || 'Votre adresse'}
+              </Text>
+              <Text style={alternativeStyles.companyInfo}>
+                {companyData?.zipcode || ''} {companyData?.city || ''}
+              </Text>
+              <Text style={alternativeStyles.companyInfo}>
+                <Text style={{ fontWeight: 'bold' }}>TEL : </Text>
+                {companyData?.phone || '+33 1 23 45 67 89'}
+              </Text>
+              <Text style={alternativeStyles.companyInfo}>
+                <Text style={{ fontWeight: 'bold' }}>EMAIL : </Text>
+                {companyData?.email || 'contact@entreprise.com'}
+              </Text>
+              <Text style={alternativeStyles.companyInfo}>
+                <Text style={{ fontWeight: 'bold' }}>SIRET : </Text>
+                {companyData?.siret || '123 456 789 00123'}
+              </Text>
+              <Text style={alternativeStyles.companyInfo}>
+                <Text style={{ fontWeight: 'bold' }}>TVA : </Text>
+                {companyData?.tva || 'FR 12 123456789'}
+              </Text>
+            </View>
+
+            {/* Section devis et client */}
+            <View style={alternativeStyles.quoteSection}>
+              <Text style={alternativeStyles.quoteTitle}>DEVIS N° {quote.reference}</Text>
+              
+              {/* Informations client dans un encadré */}
+              <View style={alternativeStyles.clientInfoSection}>
+                <Text style={[alternativeStyles.clientInfo, { fontWeight: 'bold' }]}>
+                  {clientData?.clientName || (quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '')}
+                </Text>
+                {clientData?.phone && (
+                  <Text style={alternativeStyles.clientInfo}>
+                    <Text style={{ fontWeight: 'bold' }}>TEL : </Text>
+                    {clientData?.phone}
+                  </Text>
                 )}
-              </View>
-              <View style={alternativeStyles.companyDetails}>
-                <Text style={alternativeStyles.companyName}>
-                  {companyData?.name || 'KARROSSERIE'}
-                </Text>
-                <Text style={alternativeStyles.companyInfo}>
-                  {companyData?.address || ''} {companyData?.zipcode || ''} {companyData?.city || ''}
-                  {'\n'}SIRET: {companyData?.siret || ''} - N° TVA: {companyData?.tva || ''}
-                  {'\n'}Tel: {companyData?.phone || ''} - Email: {companyData?.email || ''}
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Informations du devis */}
-          <View style={alternativeStyles.quoteInfo}>
-            <Text style={alternativeStyles.quoteTitle}>DEVIS N° {quote.reference}</Text>
-            <View style={alternativeStyles.quoteDetails}>
-              <Text style={alternativeStyles.quoteDetailItem}>
-                Date: {formatDate(quote.created_at)}
-              </Text>
-              <Text style={alternativeStyles.quoteDetailItem}>
-                Validité: {quote.valid_until ? formatDate(quote.valid_until) : 'Non définie'}
-              </Text>
-            </View>
-          </View>
-
-          {/* Informations client */}
-          <View style={alternativeStyles.clientCard}>
-            <Text style={alternativeStyles.sectionTitle}>Informations client</Text>
-            <Text style={alternativeStyles.clientInfo}>
-              {clientData?.clientName || (quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '')}
-            </Text>
-            <Text style={alternativeStyles.clientInfo}>
-              {clientData?.address || quote.clients?.address || ''}
-            </Text>
-            <Text style={alternativeStyles.clientInfo}>
-              {clientData?.postalCode || quote.clients?.postal_code || ''} {clientData?.city || quote.clients?.city || ''}
-            </Text>
-          </View>
-
-          {/* Informations véhicule */}
-          {(quote.vehicles || vehicleData) && (
-            <View style={alternativeStyles.clientCard}>
-              <Text style={alternativeStyles.sectionTitle}>Véhicule</Text>
-              <Text style={alternativeStyles.clientInfo}>
-                {vehicleData?.vehicle || (quote.vehicles ? `${quote.vehicles.car_brands?.name || ''} ${quote.vehicles.car_models?.name || ''}` : '')}
-              </Text>
-              <Text style={alternativeStyles.clientInfo}>
-                Immatriculation: {vehicleData?.licensePlate || quote.vehicles?.license_plate || ''}
-              </Text>
-              {quote.vehicles?.mileage && (
+                {clientData?.email && (
+                  <Text style={alternativeStyles.clientInfo}>
+                    <Text style={{ fontWeight: 'bold' }}>EMAIL : </Text>
+                    {clientData?.email}
+                  </Text>
+                )}
+                {(clientData?.address || quote.clients?.address) && (
+                  <Text style={alternativeStyles.clientInfo}>
+                    <Text style={{ fontWeight: 'bold' }}>ADRESSE : </Text>
+                    {clientData?.address || quote.clients?.address}
+                  </Text>
+                )}
+                {(clientData?.city || quote.clients?.city) && (
+                  <Text style={alternativeStyles.clientInfo}>
+                    {clientData?.city || quote.clients?.city}
+                  </Text>
+                )}
                 <Text style={alternativeStyles.clientInfo}>
-                  Kilométrage: {quote.vehicles.mileage.toLocaleString()} km
+                  <Text style={{ fontWeight: 'bold' }}>Immatriculation : </Text>
+                  {vehicleData?.licensePlate || quote.vehicles?.license_plate || ''}
                 </Text>
-              )}
-            </View>
-          )}
-
-          {/* Tableau des réparations */}
-          {repairs.length > 0 && (
-            <View style={alternativeStyles.table}>
-              <View style={alternativeStyles.tableHeader}>
-                <Text style={alternativeStyles.col1}>Réparations</Text>
-                <Text style={alternativeStyles.col2}>Qté</Text>
-                <Text style={alternativeStyles.col3}>Prix unit.</Text>
-                <Text style={alternativeStyles.col4}>TVA</Text>
-                <Text style={alternativeStyles.col5}>Total</Text>
+                <Text style={alternativeStyles.clientInfo}>
+                  <Text style={{ fontWeight: 'bold' }}>Kilométrage : </Text>
+                  {quote.vehicles?.mileage ? `${quote.vehicles.mileage.toLocaleString()} Km` : (vehicleData?.mileage || '')}
+                </Text>
+                <Text style={alternativeStyles.clientInfo}>
+                  <Text style={{ fontWeight: 'bold' }}>Véhicule : </Text>
+                  {vehicleData?.vehicle || (quote.vehicles ? `${quote.vehicles.car_brands?.name || ''} ${quote.vehicles.car_models?.name || ''}` : '')}
+                </Text>
               </View>
-              {repairs.map((repair: any, index: number) => (
-                <View key={index} style={alternativeStyles.tableRow}>
-                  <Text style={alternativeStyles.col1}>{repair.description}</Text>
-                  <Text style={alternativeStyles.col2}>{repair.quantity}</Text>
-                  <Text style={alternativeStyles.col3}>{formatCurrency(repair.unitCost)}</Text>
-                  <Text style={alternativeStyles.col4}>{repair.vat}%</Text>
-                  <Text style={alternativeStyles.col5}>{formatCurrency(calculateItemTotal(repair))}</Text>
-                </View>
-              ))}
-            </View>
-          )}
-
-          {/* Tableau des pièces */}
-          {parts.length > 0 && (
-            <View style={alternativeStyles.table}>
-              <View style={alternativeStyles.tableHeader}>
-                <Text style={alternativeStyles.col1}>Pièces</Text>
-                <Text style={alternativeStyles.col2}>Qté</Text>
-                <Text style={alternativeStyles.col3}>Prix unit.</Text>
-                <Text style={alternativeStyles.col4}>TVA</Text>
-                <Text style={alternativeStyles.col5}>Total</Text>
-              </View>
-              {parts.map((part: any, index: number) => (
-                <View key={index} style={alternativeStyles.tableRow}>
-                  <Text style={alternativeStyles.col1}>{part.description}</Text>
-                  <Text style={alternativeStyles.col2}>{part.quantity}</Text>
-                  <Text style={alternativeStyles.col3}>{formatCurrency(part.unitCost)}</Text>
-                  <Text style={alternativeStyles.col4}>{part.vat}%</Text>
-                  <Text style={alternativeStyles.col5}>{formatCurrency(calculateItemTotal(part))}</Text>
-                </View>
-              ))}
-            </View>
-          )}
-
-          {/* Totaux */}
-          <View style={alternativeStyles.totalsCard}>
-            <View style={alternativeStyles.totalRow}>
-              <Text style={alternativeStyles.totalLabel}>Sous-total HT:</Text>
-              <Text style={alternativeStyles.totalValue}>{formatCurrency(subtotalHT)}</Text>
-            </View>
-            <View style={alternativeStyles.totalRow}>
-              <Text style={alternativeStyles.totalLabel}>TVA:</Text>
-              <Text style={alternativeStyles.totalValue}>{formatCurrency(totalTVA)}</Text>
-            </View>
-            <View style={alternativeStyles.totalRow}>
-              <Text style={[alternativeStyles.totalLabel, alternativeStyles.grandTotal]}>Total TTC:</Text>
-              <Text style={[alternativeStyles.totalValue, alternativeStyles.grandTotal]}>{formatCurrency(totalTTC)}</Text>
             </View>
           </View>
 
-          {/* Notes */}
-          {quote.notes && (
-            <View style={alternativeStyles.notes}>
-              <Text style={alternativeStyles.sectionTitle}>Notes</Text>
-              <Text style={alternativeStyles.clientInfo}>{quote.notes}</Text>
+          {/* Section date centrée */}
+          <View style={alternativeStyles.dateSection}>
+            <View style={alternativeStyles.dateBox}>
+              <Text style={alternativeStyles.dateLabel}>DATE</Text>
+              <Text style={alternativeStyles.dateValue}>{formatDate(quote.created_at)}</Text>
             </View>
-          )}
+          </View>
+
+          {/* Tableau unique avec tous les articles */}
+          <View style={alternativeStyles.table}>
+            {/* En-tête du tableau */}
+            <View style={alternativeStyles.tableHeader}>
+              <Text style={[alternativeStyles.tableHeaderCell, { flex: 0.5 }]}>Réf</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { flex: 2 }]}>Description</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { flex: 1 }]}>Quantité</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { flex: 1 }]}>Remise</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { flex: 1 }]}>Prix HT</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { flex: 1 }]}>TVA</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { flex: 1 }]}>Total HT</Text>
+              <Text style={[alternativeStyles.tableHeaderCellLast, { flex: 1 }]}>Total TTC</Text>
+            </View>
+
+            {/* Lignes des réparations */}
+            {repairs.map((repair: any, index: number) => (
+              <View key={`repair-${index}`} style={alternativeStyles.tableRow}>
+                <Text style={[alternativeStyles.tableCellLeft, { flex: 0.5 }]}>{repair.ref || ''}</Text>
+                <Text style={[alternativeStyles.tableCellLeft, { flex: 2 }]}>{repair.description}</Text>
+                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{repair.quantity}</Text>
+                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{repair.discount || 0}%</Text>
+                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{formatCurrency(repair.unitCost)}</Text>
+                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{repair.vat || 20}%</Text>
+                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{formatCurrency((repair.unitCost * repair.quantity) - (repair.discount || 0))}</Text>
+                <Text style={[alternativeStyles.tableCellLast, { flex: 1 }]}>{formatCurrency(calculateItemTotal(repair))}</Text>
+              </View>
+            ))}
+
+            {/* Lignes des pièces */}
+            {parts.map((part: any, index: number) => (
+              <View key={`part-${index}`} style={alternativeStyles.tableRow}>
+                <Text style={[alternativeStyles.tableCellLeft, { flex: 0.5 }]}>{part.ref || ''}</Text>
+                <Text style={[alternativeStyles.tableCellLeft, { flex: 2 }]}>{part.description}</Text>
+                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{part.quantity}</Text>
+                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{part.discount || 0}%</Text>
+                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{formatCurrency(part.unitCost)}</Text>
+                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{part.vat || 20}%</Text>
+                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{formatCurrency((part.unitCost * part.quantity) - (part.discount || 0))}</Text>
+                <Text style={[alternativeStyles.tableCellLast, { flex: 1 }]}>{formatCurrency(calculateItemTotal(part))}</Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Section totaux */}
+          <View style={alternativeStyles.totalsSection}>
+            <View style={alternativeStyles.totalsTable}>
+              {/* En-tête des totaux */}
+              <View style={alternativeStyles.totalsHeader}>
+                <Text style={alternativeStyles.totalsHeaderCell}>Total HT</Text>
+                <Text style={alternativeStyles.totalsHeaderCell}>Total TVA</Text>
+                <Text style={alternativeStyles.totalsHeaderCell}>Total Remise</Text>
+                <Text style={alternativeStyles.totalsHeaderCellLast}>Total TTC</Text>
+              </View>
+              {/* Valeurs des totaux */}
+              <View style={alternativeStyles.totalsRow}>
+                <Text style={alternativeStyles.totalsCell}>{formatCurrency(subtotalHT)}</Text>
+                <Text style={alternativeStyles.totalsCell}>{formatCurrency(totalTVA)}</Text>
+                <Text style={alternativeStyles.totalsCell}>
+                  {formatCurrency([...repairs, ...parts].reduce((sum, item) => sum + (parseFloat(item.discount) || 0), 0))}
+                </Text>
+                <Text style={alternativeStyles.totalsCellLast}>{formatCurrency(totalTTC)}</Text>
+              </View>
+            </View>
+          </View>
 
           {/* Footer */}
           <Text style={alternativeStyles.footer} fixed>
             {companyData?.name || 'AUTO PAINT'} - {companyData?.address || '25 rue sainte victoire'} {companyData?.zipcode || '13006'} {companyData?.city || 'MARSEILLE'} - 
-            SIRET {companyData?.siret || '123456789000'} - N° TVA : {companyData?.tva || 'FR123456789'} - 
-            Tel : {companyData?.phone || '+33064646524'} - Email : {companyData?.email || 'autopaint@yopmail.com'}
+            SIRET {companyData?.siret || '12345678900010'} - N° TVA : {companyData?.tva || 'FR123456789'} - 
+            Tel : {companyData?.phone || '+330646465242'} - Email : {companyData?.email || 'autopaint@yopmail.com'}
           </Text>
         </Page>
       </Document>
