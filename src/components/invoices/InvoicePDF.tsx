@@ -428,7 +428,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             {documentType === 'credit' && (
               <View style={[alternativeStyles.dateBox, { marginLeft: 125 }]}>
                 <Text style={alternativeStyles.dateLabel}>FACTURE ASSOCIÉE</Text>
-                <Text style={alternativeStyles.dateValue}>{invoice.reference || 'N/A'}</Text>
+                <Text style={alternativeStyles.dateValue}>{clientData?.invoiceReference || invoice.reference || 'N/A'}</Text>
               </View>
             )}
             {documentType === 'invoice' && (

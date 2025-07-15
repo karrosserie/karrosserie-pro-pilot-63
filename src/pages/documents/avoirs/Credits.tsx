@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { generateCreditPDFWithTemplate, printCreditPDFWithTemplate } from '@/utils/creditPDFGeneration';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -268,7 +269,6 @@ const Credits = () => {
         description: "Génération du PDF en cours..."
       });
 
-      const { generateCreditPDFWithTemplate } = await import('@/utils/creditPDFGeneration');
       const result = await generateCreditPDFWithTemplate(credit, {});
       
       if (result.success) {
@@ -296,7 +296,6 @@ const Credits = () => {
         description: `Ouverture de l'avoir ${credit.reference} pour impression...`
       });
 
-      const { printCreditPDFWithTemplate } = await import('@/utils/creditPDFGeneration');
       const result = await printCreditPDFWithTemplate(credit, {});
       
       if (!result.success) {
