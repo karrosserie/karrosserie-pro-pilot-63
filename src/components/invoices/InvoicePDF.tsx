@@ -183,7 +183,6 @@ const alternativeStyles = StyleSheet.create({
   },
   clientBox: {
     padding: 12,
-    marginTop: 4,
     width: 200,
   },
   clientText: {
