@@ -23,6 +23,10 @@ interface DefaultRepairOrderPreviewProps {
     phone?: string;
     email?: string;
   };
+  vehicleData?: {
+    start_date?: string;
+    end_date?: string;
+  };
   items?: Array<{
     ref?: string;
     description?: string;
@@ -40,7 +44,7 @@ interface DefaultRepairOrderPreviewProps {
   };
 }
 
-const DefaultRepairOrderPreview = ({ companyData, orderData, clientData, items, totals }: DefaultRepairOrderPreviewProps) => {
+const DefaultRepairOrderPreview = ({ companyData, orderData, clientData, vehicleData, items, totals }: DefaultRepairOrderPreviewProps) => {
   // Données par défaut pour l'aperçu
   const defaultOrderData = {
     number: 'N° 5',
@@ -83,6 +87,7 @@ const DefaultRepairOrderPreview = ({ companyData, orderData, clientData, items, 
         companyData={companyData}
         orderData={defaultOrderData}
         clientData={defaultClientData}
+        vehicleData={vehicleData}
       />
       
       <DefaultRepairOrderItemsTable items={defaultItems} />

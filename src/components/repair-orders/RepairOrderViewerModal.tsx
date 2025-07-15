@@ -142,6 +142,12 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
     vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : undefined
   };
 
+  // Préparer les données véhicule pour le template
+  const vehicleDataForTemplate = {
+    start_date: formatDateFr(vehicleData?.start_date),
+    end_date: formatDateFr(vehicleData?.end_date)
+  };
+
   // Convertir les données des items
   const items = [];
   items.push(...repairs.map((repair: any) => ({
@@ -189,6 +195,7 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
               companyData={companyData}
               orderData={orderData}
               clientData={clientDataForTemplate}
+              vehicleData={vehicleDataForTemplate}
               items={items}
               totals={totalsData}
             />

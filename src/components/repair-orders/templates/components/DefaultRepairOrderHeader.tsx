@@ -19,9 +19,13 @@ interface DefaultRepairOrderHeaderProps {
     phone?: string;
     email?: string;
   };
+  vehicleData?: {
+    start_date?: string;
+    end_date?: string;
+  };
 }
 
-const DefaultRepairOrderHeader = ({ companyData, orderData, clientData }: DefaultRepairOrderHeaderProps) => {
+const DefaultRepairOrderHeader = ({ companyData, orderData, clientData, vehicleData }: DefaultRepairOrderHeaderProps) => {
   return (
     <div className="grid grid-cols-3 gap-6 mb-6">
       {/* Colonne 1 - Entreprise */}
@@ -97,6 +101,21 @@ const DefaultRepairOrderHeader = ({ companyData, orderData, clientData }: Defaul
           <p>{clientData.city}</p>
           {clientData.phone && <p>Téléphone : {clientData.phone}</p>}
           {clientData.email && <p>E-mail : {clientData.email}</p>}
+        </div>
+        
+        {/* Délai prévisionnel */}
+        <div className="mt-4">
+          <h4 className="text-base font-semibold mb-2 text-gray-800">Délai prévisionnel</h4>
+          <div className="text-base space-y-1">
+            <div className="flex justify-between">
+              <span className="font-medium">Date de début des travaux</span>
+              <span>{vehicleData?.start_date || '-'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-medium">Date de fin des travaux</span>
+              <span>{vehicleData?.end_date || '-'}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
