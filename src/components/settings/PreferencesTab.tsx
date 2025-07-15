@@ -181,7 +181,7 @@ const PreferencesTab = () => {
       {/* Modèles de factures */}
       <Card>
         <CardHeader>
-          <CardTitle>Modèles de factures</CardTitle>
+          <CardTitle>Modèle des documents</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
