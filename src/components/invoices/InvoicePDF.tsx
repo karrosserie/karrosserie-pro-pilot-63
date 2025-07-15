@@ -205,7 +205,7 @@ const alternativeStyles = StyleSheet.create({
   },
   clientInfoSection: {
     marginTop: 4,
-    width: 200,
+    width: 250,
   },
   clientInfo: {
     fontSize: 8,
@@ -416,15 +416,20 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
                 <Text style={alternativeStyles.dateValue}>{formatDate(invoice.due_date)}</Text>
               </View>
             )}
-            {documentType === 'repair_order' && vehicleData?.start_date && vehicleData?.end_date && (
-              <View style={[alternativeStyles.dateBox, { marginLeft: 125 }]}>
-                <Text style={alternativeStyles.dateLabel}>DÉLAI PRÉVISIONNEL</Text>
-                <Text style={alternativeStyles.dateValue}>
-                  Du {formatDate(vehicleData.start_date)} au {formatDate(vehicleData.end_date)}
-                </Text>
-              </View>
-            )}
           </View>
+
+          {/* Section Délai prévisionnel pour les ordres de réparation */}
+          {documentType === 'repair_order' && vehicleData?.start_date && vehicleData?.end_date && (
+            <View style={{ marginTop: 20, marginBottom: 20 }}>
+              <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8 }}>Délai prévisionnel</Text>
+              <Text style={{ fontSize: 10, marginBottom: 2 }}>
+                <Text style={{ fontWeight: 'bold' }}>Date de début :</Text> {formatDate(vehicleData.start_date)}
+              </Text>
+              <Text style={{ fontSize: 10 }}>
+                <Text style={{ fontWeight: 'bold' }}>Date de fin :</Text> {formatDate(vehicleData.end_date)}
+              </Text>
+            </View>
+          )}
 
           {/* Tableau des articles */}
           <View style={alternativeStyles.tableContainer}>
