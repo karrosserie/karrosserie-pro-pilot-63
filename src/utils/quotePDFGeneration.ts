@@ -137,7 +137,34 @@ export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => 
       companyData: finalCompanyData,
       template,
       quoteData,
-      clientData,
+      clientData: {
+        number: quote.reference,
+        name: clientData?.clientName || '',
+        phone: clientData?.phone || '',
+        email: clientData?.email || '',
+        address: clientData?.address || '',
+        city: `${clientData?.postalCode || ''} ${clientData?.city || ''}`.trim(),
+        licensePlate: vehicleData?.licensePlate || '',
+        mileage: vehicleData?.mileage || '',
+        vehicle: vehicleData?.vehicle || '',
+        billingDate: quote.created_at ? new Date(quote.created_at).toLocaleDateString('fr-FR') : '',
+        items: items.map(item => ({
+          ref: item.ref || '',
+          description: item.description || '',
+          quantity: item.quantity || 0,
+          discount: item.discount || 0,
+          unitPrice: parseFloat(item.unitCost) || 0,
+          vat: item.vat || 20,
+          totalHT: ((parseFloat(item.unitCost) || 0) * (item.quantity || 0)) - (item.discount || 0),
+          totalTTC: ((parseFloat(item.unitCost) || 0) * (item.quantity || 0)) - (item.discount || 0) + (((parseFloat(item.unitCost) || 0) * (item.quantity || 0) - (item.discount || 0)) * (item.vat || 20) / 100)
+        })),
+        totals: {
+          totalHT: `${totals.subtotalHT.toFixed(2).replace('.', ',')} €`,
+          totalVAT: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
+          totalDiscount: `${items.reduce((sum, item) => sum + (parseFloat(item.discount) || 0), 0).toFixed(2).replace('.', ',')} €`,
+          totalTTC: `${totals.total.toFixed(2).replace('.', ',')} €`
+        }
+      },
       vehicleData,
       items,
       totals

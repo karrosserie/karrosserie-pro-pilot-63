@@ -429,12 +429,6 @@ const QuotePDF = ({ quote, companyData, receipts = [], clientData, vehicleData, 
     return new Date(dateString).toLocaleDateString('fr-FR');
   };
 
-  console.log('QuotePDF - clientData:', clientData);
-  console.log('QuotePDF - quote.repairs_data:', quote.repairs_data);
-  console.log('QuotePDF - quote.parts_data:', quote.parts_data);
-  console.log('QuotePDF - repairs parsed:', repairs);
-  console.log('QuotePDF - parts parsed:', parts);
-
   if (template === 'alternative') {
     return (
       <Document>
