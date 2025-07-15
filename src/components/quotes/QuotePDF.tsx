@@ -242,7 +242,8 @@ const alternativeStyles = StyleSheet.create({
   tableContainer: {
     borderWidth: 2,
     borderColor: '#000',
-    borderRadius: 5,
+    borderRadius: 8,
+    overflow: 'hidden',
     marginBottom: 15,
   },
   tableHeader: {
@@ -298,8 +299,7 @@ const alternativeStyles = StyleSheet.create({
   totalsTable: {
     borderWidth: 2,
     borderColor: '#000',
-    borderStyle: 'solid',
-    borderRadius: 5,
+    borderRadius: 8,
     overflow: 'hidden',
     backgroundColor: 'white',
   },
