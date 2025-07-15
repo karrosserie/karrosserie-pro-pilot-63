@@ -17,7 +17,7 @@ const defaultStyles = StyleSheet.create({
     fontFamily: 'Helvetica',
     fontSize: 10,
     paddingTop: 30,
-    paddingBottom: 60,
+    paddingBottom: 80,
     paddingHorizontal: 30,
   },
   header: {
@@ -134,7 +134,6 @@ const defaultStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 10,
-    borderRadius: 5,
   },
   amountDueLabel: {
     fontSize: 10,
