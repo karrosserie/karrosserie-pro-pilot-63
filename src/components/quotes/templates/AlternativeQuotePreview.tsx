@@ -96,7 +96,7 @@ const AlternativeQuotePreview = ({ companyData, quoteData, clientData, items, to
           <h2 className="text-3xl font-bold text-black">DEVIS N° {defaultQuoteData.number}</h2>
           
           {/* Informations client déplacées ici */}
-          <div className="text-left p-4 w-2/3 ml-auto">
+          <div className="text-left w-2/3 ml-auto">
             <div className="text-sm text-gray-600 space-y-1">
               <p><strong>{defaultClientData.name}</strong></p>
               {defaultClientData.phone && <p><strong>TEL :</strong> {defaultClientData.phone}</p>}
