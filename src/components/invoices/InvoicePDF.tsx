@@ -9,7 +9,7 @@ interface InvoicePDFProps {
   clientData?: any;
   vehicleData?: any;
   template?: string;
-  documentType?: 'invoice' | 'repair_order' | 'credit';
+  documentType?: 'invoice' | 'repair_order' | 'credit' | 'quote';
 }
 
 // Styles pour le template par défaut
@@ -390,7 +390,8 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             <View style={alternativeStyles.invoiceSection}>
               <Text style={alternativeStyles.invoiceTitle}>
                 {documentType === 'repair_order' ? 'ORDRE DE RÉPARATION N°' : 
-                 documentType === 'credit' ? 'AVOIR N°' : 'FACTURE N°'} {clientData?.number || invoice.reference}
+                 documentType === 'credit' ? 'AVOIR N°' : 
+                 documentType === 'quote' ? 'DEVIS N°' : 'FACTURE N°'} {clientData?.number || invoice.reference}
               </Text>
               
               <View style={[alternativeStyles.clientInfoSection, { marginTop: 0 }]}>
@@ -517,7 +518,9 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
           <View style={defaultStyles.headerColumn}>
             <View style={defaultStyles.title}>
               <Text style={documentType === 'repair_order' ? { fontSize: 14 } : undefined}>
-                {documentType === 'repair_order' ? 'ORDRE DE RÉPARATION' : documentType === 'credit' ? 'AVOIR' : 'FACTURE'}
+                {documentType === 'repair_order' ? 'ORDRE DE RÉPARATION' : 
+                 documentType === 'credit' ? 'AVOIR' : 
+                 documentType === 'quote' ? 'DEVIS' : 'FACTURE'}
               </Text>
             </View>
             {companyData?.logo_url && (
@@ -535,9 +538,13 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
           </View>
 
           <View style={defaultStyles.headerColumn}>
-            <Text style={defaultStyles.sectionTitle}>{documentType === 'repair_order' ? 'Détails ordre réparation' : documentType === 'credit' ? 'Détails de l\'avoir' : 'Détails de la facture'}</Text>
+            <Text style={defaultStyles.sectionTitle}>{documentType === 'repair_order' ? 'Détails ordre réparation' : 
+                                                          documentType === 'credit' ? 'Détails de l\'avoir' : 
+                                                          documentType === 'quote' ? 'Détails du devis' : 'Détails de la facture'}</Text>
             <View style={defaultStyles.detailRow}>
-              <Text style={defaultStyles.detailLabel}>{documentType === 'repair_order' ? 'Ordre réparation' : documentType === 'credit' ? 'Avoir' : 'Facture'}</Text>
+              <Text style={defaultStyles.detailLabel}>{documentType === 'repair_order' ? 'Ordre réparation' : 
+                                                               documentType === 'credit' ? 'Avoir' : 
+                                                               documentType === 'quote' ? 'Devis' : 'Facture'}</Text>
               <Text style={defaultStyles.detailValue}>N° {clientData?.number || invoice.reference}</Text>
             </View>
             {clientData?.claimNumber && (
@@ -547,7 +554,9 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
               </View>
             )}
             <View style={defaultStyles.detailRow}>
-              <Text style={defaultStyles.detailLabel}>{documentType === 'repair_order' ? 'Date de création' : documentType === 'credit' ? 'Date de l\'avoir' : 'Date de facturation'}</Text>
+              <Text style={defaultStyles.detailLabel}>{documentType === 'repair_order' ? 'Date de création' : 
+                                                               documentType === 'credit' ? 'Date de l\'avoir' : 
+                                                               documentType === 'quote' ? 'Date du devis' : 'Date de facturation'}</Text>
               <Text style={defaultStyles.detailValue}>{clientData?.billingDate || formatDate(invoice.date || invoice.created_at)}</Text>
             </View>
             {clientData?.dueDate && (
@@ -586,7 +595,9 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             {/* Encadré Montant dû/total */}
             <View style={defaultStyles.amountDueBox}>
               <Text style={defaultStyles.amountDueLabel}>
-                {documentType === 'repair_order' ? 'Montant total' : documentType === 'credit' ? 'Montant de l\'avoir' : 'Montant dû'}
+                {documentType === 'repair_order' ? 'Montant total' : 
+                 documentType === 'credit' ? 'Montant de l\'avoir' : 
+                 documentType === 'quote' ? 'Montant total' : 'Montant dû'}
               </Text>
               <Text style={defaultStyles.amountDueValue}>{clientData?.amountDue || '719,78 €'}</Text>
             </View>
@@ -594,7 +605,9 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
 
           <View style={defaultStyles.headerColumn}>
             <Text style={defaultStyles.sectionTitle}>
-              {documentType === 'repair_order' ? 'Ordre réparation pour' : documentType === 'credit' ? 'Avoir pour' : 'Facture pour'}
+              {documentType === 'repair_order' ? 'Ordre réparation pour' : 
+               documentType === 'credit' ? 'Avoir pour' : 
+               documentType === 'quote' ? 'Devis pour' : 'Facture pour'}
             </Text>
             <View style={defaultStyles.companyInfo}>
               <Text style={defaultStyles.companyName}>{clientData?.name || 'Client non spécifié'}</Text>

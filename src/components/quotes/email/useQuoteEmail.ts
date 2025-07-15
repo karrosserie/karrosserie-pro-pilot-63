@@ -6,7 +6,7 @@ import { Quote } from '@/services/supabase/quotes';
 import { clientsService } from '@/services/supabase/clients';
 import { prepareQuoteDataForPDF } from '@/utils/quotePDFGeneration';
 import { pdf } from '@react-pdf/renderer';
-import QuotePDF from '@/components/quotes/QuotePDF';
+import InvoicePDF from '@/components/invoices/InvoicePDF';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useQuoteEmail = (quote: Quote | null) => {
@@ -82,13 +82,14 @@ AUTO PAINT`;
     try {
       // Générer le PDF du devis
       const data = await prepareQuoteDataForPDF(quote, {});
-      const doc = QuotePDF({ 
-        quote: data.quote, 
+      const doc = InvoicePDF({ 
+        invoice: data.quote as any, // Cast to invoice type since they have compatible structures
         companyData: data.companyData, 
         receipts: [],
         clientData: data.clientData,
         vehicleData: data.vehicleData,
-        template: data.template
+        template: data.template || 'default',
+        documentType: 'quote'
       });
       const asPdf = pdf(doc);
       const blob = await asPdf.toBlob();

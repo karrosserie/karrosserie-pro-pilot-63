@@ -1,6 +1,6 @@
 import { pdf } from '@react-pdf/renderer';
 import { Quote } from '@/services/supabase/quotes';
-import QuotePDF from '@/components/quotes/QuotePDF';
+import InvoicePDF from '@/components/invoices/InvoicePDF';
 import { supabase } from '@/integrations/supabase/client';
 import { clientsService } from '@/services/supabase/clients';
 
@@ -179,13 +179,14 @@ export const generateQuotePDFWithTemplate = async (quote: Quote, companyData: an
   try {
     const data = await prepareQuoteDataForPDF(quote, companyData);
     
-    const doc = QuotePDF({ 
-      quote: data.quote, 
+    const doc = InvoicePDF({ 
+      invoice: data.quote as any, // Cast to invoice type since they have compatible structures
       companyData: data.companyData, 
       receipts: [],
       clientData: data.clientData,
       vehicleData: data.vehicleData,
-      template: data.template
+      template: data.template || 'default',
+      documentType: 'quote'
     });
     
     // Générer le blob PDF
@@ -216,13 +217,14 @@ export const printQuotePDFWithTemplate = async (quote: Quote, companyData: any) 
   try {
     const data = await prepareQuoteDataForPDF(quote, companyData);
     
-    const doc = QuotePDF({ 
-      quote: data.quote, 
+    const doc = InvoicePDF({ 
+      invoice: data.quote as any, // Cast to invoice type since they have compatible structures
       companyData: data.companyData, 
       receipts: [],
       clientData: data.clientData,
       vehicleData: data.vehicleData,
-      template: data.template
+      template: data.template || 'default',
+      documentType: 'quote'
     });
     
     // Générer le blob PDF
