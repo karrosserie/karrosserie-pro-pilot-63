@@ -183,11 +183,8 @@ const alternativeStyles = StyleSheet.create({
     textAlign: 'right',
   },
   clientBox: {
-    backgroundColor: '#f8f9fa',
     padding: 8,
     marginTop: 10,
-    borderWidth: 1,
-    borderColor: '#e5e5e5',
     width: 200,
   },
   clientText: {
@@ -198,16 +195,16 @@ const alternativeStyles = StyleSheet.create({
   dateBoxes: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 80,
+    gap: 150,
     marginBottom: 20,
   },
   dateBox: {
     borderWidth: 2,
     borderColor: '#000',
     borderRadius: 5,
-    padding: 8,
+    padding: 12,
     alignItems: 'center',
-    width: 80,
+    width: 120,
   },
   dateLabel: {
     fontSize: 8,
@@ -226,7 +223,6 @@ const alternativeStyles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#f8f9fa',
     borderBottomWidth: 2,
     borderBottomColor: '#000',
   },
@@ -246,8 +242,6 @@ const alternativeStyles = StyleSheet.create({
   },
   tableRow: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
   },
   tableCell: {
     fontSize: 8,
@@ -277,7 +271,6 @@ const alternativeStyles = StyleSheet.create({
   },
   totalsHeaderRow: {
     flexDirection: 'row',
-    backgroundColor: '#f8f9fa',
     borderBottomWidth: 2,
     borderBottomColor: '#000',
   },
