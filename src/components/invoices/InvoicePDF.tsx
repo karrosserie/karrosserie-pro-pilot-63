@@ -202,7 +202,7 @@ const alternativeStyles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 15,
-    width: '100%',
+    width: 300,
     textAlign: 'right',
   },
   clientInfoSection: {
