@@ -533,9 +533,9 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
           </View>
 
           <View style={defaultStyles.headerColumn}>
-            <Text style={defaultStyles.sectionTitle}>{documentType === 'repair_order' ? 'Détails de l\'ordre de réparation' : documentType === 'credit' ? 'Détails de l\'avoir' : 'Détails de la facture'}</Text>
+            <Text style={defaultStyles.sectionTitle}>{documentType === 'repair_order' ? 'Détails ordre réparation' : documentType === 'credit' ? 'Détails de l\'avoir' : 'Détails de la facture'}</Text>
             <View style={defaultStyles.detailRow}>
-              <Text style={defaultStyles.detailLabel}>{documentType === 'repair_order' ? 'Ordre de réparation' : documentType === 'credit' ? 'Avoir' : 'Facture'}</Text>
+              <Text style={defaultStyles.detailLabel}>{documentType === 'repair_order' ? 'Ordre réparation' : documentType === 'credit' ? 'Avoir' : 'Facture'}</Text>
               <Text style={defaultStyles.detailValue}>N° {clientData?.number || invoice.reference}</Text>
             </View>
             {clientData?.claimNumber && (
@@ -573,21 +573,6 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
               </View>
             )}
             
-            {/* Section Délai prévisionnel pour les ordres de réparation */}
-            {documentType === 'repair_order' && vehicleData?.start_date && vehicleData?.end_date && (
-              <View style={{ marginTop: 15, backgroundColor: '#f8f9fa', padding: 8, borderRadius: 4 }}>
-                <Text style={[defaultStyles.detailLabel, { marginBottom: 5, fontSize: 10 }]}>Délai prévisionnel</Text>
-                <View style={defaultStyles.detailRow}>
-                  <Text style={defaultStyles.detailLabel}>Date de début</Text>
-                  <Text style={defaultStyles.detailValue}>{formatDate(vehicleData.start_date)}</Text>
-                </View>
-                <View style={defaultStyles.detailRow}>
-                  <Text style={defaultStyles.detailLabel}>Date de fin</Text>
-                  <Text style={defaultStyles.detailValue}>{formatDate(vehicleData.end_date)}</Text>
-                </View>
-              </View>
-            )}
-            
             {/* Montant payé seulement pour les factures */}
             {documentType === 'invoice' && (
               <View style={defaultStyles.detailRow}>
@@ -607,7 +592,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
 
           <View style={defaultStyles.headerColumn}>
             <Text style={defaultStyles.sectionTitle}>
-              {documentType === 'repair_order' ? 'Ordre de réparation pour' : documentType === 'credit' ? 'Avoir pour' : 'Facture pour'}
+              {documentType === 'repair_order' ? 'Ordre réparation pour' : documentType === 'credit' ? 'Avoir pour' : 'Facture pour'}
             </Text>
             <View style={defaultStyles.companyInfo}>
               <Text style={defaultStyles.companyName}>{clientData?.name || 'Client non spécifié'}</Text>
@@ -616,6 +601,21 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
               {clientData?.phone && <Text>Téléphone : {clientData.phone}</Text>}
               {clientData?.email && <Text>E-mail : {clientData.email}</Text>}
             </View>
+            
+            {/* Section Délai prévisionnel pour les ordres de réparation - placé dans la colonne client */}
+            {documentType === 'repair_order' && vehicleData?.start_date && vehicleData?.end_date && (
+              <View style={{ marginTop: 15 }}>
+                <Text style={[defaultStyles.sectionTitle, { fontSize: 11, marginBottom: 6 }]}>Délai prévisionnel</Text>
+                <View style={defaultStyles.detailRow}>
+                  <Text style={defaultStyles.detailLabel}>Date de début</Text>
+                  <Text style={defaultStyles.detailValue}>{formatDate(vehicleData.start_date)}</Text>
+                </View>
+                <View style={defaultStyles.detailRow}>
+                  <Text style={defaultStyles.detailLabel}>Date de fin</Text>
+                  <Text style={defaultStyles.detailValue}>{formatDate(vehicleData.end_date)}</Text>
+                </View>
+              </View>
+            )}
           </View>
         </View>
 
