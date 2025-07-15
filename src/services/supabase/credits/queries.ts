@@ -56,7 +56,7 @@ export const getCredits = async (): Promise<Credit[]> => {
                 try {
                   const { data: client, error: clientError } = await supabase
                     .from('clients')
-                    .select('id, first_name, last_name')
+                    .select('id, first_name, last_name, email')
                     .eq('id', invoice.client_id)
                     .maybeSingle();
                   
@@ -158,7 +158,7 @@ export const getCredit = async (id: string): Promise<Credit> => {
         if (invoice.client_id) {
           const { data: client } = await supabase
             .from('clients')
-            .select('id, first_name, last_name')
+            .select('id, first_name, last_name, email')
             .eq('id', invoice.client_id)
             .maybeSingle();
           if (client) clientData = client;
