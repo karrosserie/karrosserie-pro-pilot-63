@@ -6,6 +6,7 @@ import Quotes from "@/pages/documents/devis/Quotes";
 import RepairOrders from "@/pages/documents/ordres/RepairOrders";
 import Invoices from "@/pages/documents/factures/Invoices";
 import Credits from "@/pages/documents/avoirs/Credits";
+import DocumentUploadFlow from "@/pages/documents/upload/DocumentUploadFlow";
 
 export const documentRoutes = [
   {
@@ -53,6 +54,14 @@ export const documentRoutes = [
     element: (
       <ProtectedRoute>
         <Credits />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/documents/upload",
+    element: (
+      <ProtectedRoute>
+        <DocumentUploadFlow />
       </ProtectedRoute>
     )
   }
