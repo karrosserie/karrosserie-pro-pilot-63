@@ -166,17 +166,6 @@ const AlternativeQuotePreview = ({ companyData, quoteData, clientData, items, to
             </div>
           </div>
         </div>
-
-        {/* Conditions */}
-        <div className="bg-gray-50 rounded p-4 text-xs text-gray-600">
-          <p className="font-semibold mb-2 text-karrosserie-orange">Conditions générales:</p>
-          <ul className="space-y-1 list-disc list-inside">
-            <li>Ce devis est valable 30 jours à compter de sa date d'émission.</li>
-            <li>Les travaux seront exécutés selon les règles de l'art et les normes en vigueur.</li>
-            <li>Le paiement est exigible à la fin des travaux.</li>
-            <li>Toute modification du devis fera l'objet d'un avenant.</li>
-          </ul>
-        </div>
       </div>
     </div>
   );
