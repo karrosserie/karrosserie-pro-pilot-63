@@ -401,6 +401,18 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
                 {clientData?.licensePlate && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>Immatriculation :</Text> {clientData.licensePlate}</Text>}
                 {clientData?.mileage && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>Kilométrage :</Text> {clientData.mileage}</Text>}
                 {clientData?.vehicle && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>Véhicule :</Text> {clientData.vehicle}</Text>}
+                
+                {/* Section Délai prévisionnel pour les ordres de réparation */}
+                {documentType === 'repair_order' && vehicleData?.start_date && vehicleData?.end_date && (
+                  <View style={{ marginTop: 15 }}>
+                    <Text style={{ fontSize: 10, marginBottom: 2 }}>
+                      <Text style={{ fontWeight: 'bold' }}>Date de début :</Text> {formatDate(vehicleData.start_date)}
+                    </Text>
+                    <Text style={{ fontSize: 10 }}>
+                      <Text style={{ fontWeight: 'bold' }}>Date de fin :</Text> {formatDate(vehicleData.end_date)}
+                    </Text>
+                  </View>
+                )}
               </View>
             </View>
           </View>
@@ -419,18 +431,6 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             )}
           </View>
 
-          {/* Section Délai prévisionnel pour les ordres de réparation */}
-          {documentType === 'repair_order' && vehicleData?.start_date && vehicleData?.end_date && (
-            <View style={{ marginTop: 20, marginBottom: 20 }}>
-              <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8 }}>Délai prévisionnel</Text>
-              <Text style={{ fontSize: 10, marginBottom: 2 }}>
-                <Text style={{ fontWeight: 'bold' }}>Date de début :</Text> {formatDate(vehicleData.start_date)}
-              </Text>
-              <Text style={{ fontSize: 10 }}>
-                <Text style={{ fontWeight: 'bold' }}>Date de fin :</Text> {formatDate(vehicleData.end_date)}
-              </Text>
-            </View>
-          )}
 
           {/* Tableau des articles */}
           <View style={alternativeStyles.tableContainer}>
