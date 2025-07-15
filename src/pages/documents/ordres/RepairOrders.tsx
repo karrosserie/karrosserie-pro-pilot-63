@@ -79,14 +79,55 @@ const RepairOrders = () => {
     setDialogOpen(true);
   };
 
-  const handleDownload = (order: RepairOrder) => {
-    setSelectedOrder(order);
-    setViewerModalOpen(true);
+  const handleDownload = async (order: RepairOrder) => {
+    try {
+      toast({
+        title: "Génération du PDF",
+        description: "Génération du PDF en cours..."
+      });
+
+      const { generateRepairOrderPDFWithTemplate } = await import('@/utils/repairOrderPDFGeneration');
+      const result = await generateRepairOrderPDFWithTemplate(order, {});
+      
+      if (result.success) {
+        toast({
+          title: "Téléchargement réussi",
+          description: `L'ordre de réparation ${order.reference} a été téléchargé.`
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors du téléchargement:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer le PDF. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handlePrint = (order: RepairOrder) => {
-    setSelectedOrder(order);
-    setViewerModalOpen(true);
+  const handlePrint = async (order: RepairOrder) => {
+    try {
+      toast({
+        title: "Ouverture pour impression",
+        description: `Ouverture de l'ordre de réparation ${order.reference} pour impression...`
+      });
+
+      const { printRepairOrderPDFWithTemplate } = await import('@/utils/repairOrderPDFGeneration');
+      const result = await printRepairOrderPDFWithTemplate(order, {});
+      
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'impression:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ouvrir le PDF pour impression. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSendEmail = (order: RepairOrder) => {

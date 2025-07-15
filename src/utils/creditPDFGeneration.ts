@@ -1,0 +1,253 @@
+import { pdf } from '@react-pdf/renderer';
+import { supabase } from '@/integrations/supabase/client';
+import InvoicePDF from '@/components/invoices/InvoicePDF';
+
+export const prepareCreditDataForPDF = async (credit: any, companyData: any) => {
+  try {
+    // Récupérer les données de l'entreprise si nécessaire
+    let finalCompanyData = companyData;
+    if (!finalCompanyData || Object.keys(finalCompanyData).length === 0) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: company } = await supabase
+          .from('company_info')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+        
+        finalCompanyData = company || {};
+      }
+    }
+
+    // Récupérer la facture associée si elle existe
+    let invoiceData = null;
+    let clientData = null;
+    let vehicleData = null;
+
+    if (credit.invoice_id) {
+      try {
+        const { data: invoice } = await supabase
+          .from('invoices')
+          .select(`
+            *,
+            clients(*),
+            vehicles(
+              *,
+              car_brands(name),
+              car_models(name)
+            )
+          `)
+          .eq('id', credit.invoice_id)
+          .single();
+
+        if (invoice) {
+          invoiceData = invoice;
+          clientData = invoice.clients;
+          vehicleData = invoice.vehicles;
+        }
+      } catch (error) {
+        console.error('Error fetching invoice data:', error);
+      }
+    }
+
+    // Récupérer les préférences utilisateur pour le template
+    let template = 'default';
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: preferences } = await supabase
+          .from('user_preferences')
+          .select('invoice_template')
+          .eq('user_id', user.id)
+          .single();
+        
+        template = preferences?.invoice_template || 'default';
+      }
+    } catch (error) {
+      console.error('Error fetching user preferences:', error);
+    }
+
+    // Formater les dates
+    const creditData = {
+      ...credit,
+      date: credit.created_at ? new Date(credit.created_at).toLocaleDateString('fr-FR') : ''
+    };
+
+    // Parser les données des items
+    let items: any[] = [];
+    try {
+      if (credit.items_data) {
+        items = Array.isArray(credit.items_data) ? credit.items_data : JSON.parse(credit.items_data as string);
+      }
+    } catch (error) {
+      console.error('Error parsing credit items:', error);
+    }
+
+    // Calculer les totaux
+    const totals = items.reduce((acc, item) => {
+      const unitCost = parseFloat(item.unitCost) || 0;
+      const quantity = parseFloat(item.quantity) || 0;
+      const discount = parseFloat(item.discount) || 0;
+      const vat = parseFloat(item.vat) || 0;
+      
+      const subtotal = unitCost * quantity;
+      const afterDiscount = subtotal - discount;
+      const vatAmount = (afterDiscount * vat) / 100;
+      const total = afterDiscount + vatAmount;
+
+      acc.subtotalHT += afterDiscount;
+      acc.totalVAT += vatAmount;
+      acc.total += total;
+
+      return acc;
+    }, { subtotalHT: 0, totalVAT: 0, total: 0 });
+
+    return {
+      credit: {
+        ...credit,
+        clients: clientData,
+        vehicles: vehicleData,
+        invoice: invoiceData
+      },
+      companyData: finalCompanyData,
+      template,
+      creditData,
+      clientData: {
+        number: credit.reference,
+        name: clientData ? `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim() : '',
+        phone: clientData?.phone || '',
+        email: clientData?.email || '',
+        address: clientData?.address || '',
+        city: clientData ? `${clientData.postal_code || ''} ${clientData.city || ''}`.trim() : '',
+        licensePlate: vehicleData?.license_plate || '',
+        mileage: vehicleData?.mileage ? `${vehicleData.mileage.toLocaleString('fr-FR')} km` : '',
+        vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : '',
+        billingDate: credit.created_at ? new Date(credit.created_at).toLocaleDateString('fr-FR') : '',
+        items: items.map(item => ({
+          ref: item.ref || '',
+          description: item.description || '',
+          quantity: item.quantity || 0,
+          discount: item.discount || 0,
+          unitPrice: parseFloat(item.unitCost) || 0,
+          vat: item.vat || 20,
+          totalHT: ((parseFloat(item.unitCost) || 0) * (item.quantity || 0)) - (item.discount || 0),
+          totalTTC: ((parseFloat(item.unitCost) || 0) * (item.quantity || 0)) - (item.discount || 0) + (((parseFloat(item.unitCost) || 0) * (item.quantity || 0) - (item.discount || 0)) * (item.vat || 20) / 100)
+        })),
+        totals: {
+          totalHT: `${totals.subtotalHT.toFixed(2).replace('.', ',')} €`,
+          totalVAT: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
+          totalDiscount: `${items.reduce((sum, item) => sum + (parseFloat(item.discount) || 0), 0).toFixed(2).replace('.', ',')} €`,
+          totalTTC: `${totals.total.toFixed(2).replace('.', ',')} €`
+        }
+      },
+      vehicleData: vehicleData ? {
+        vehicle: `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim(),
+        licensePlate: vehicleData.license_plate || '',
+        mileage: vehicleData.mileage ? vehicleData.mileage.toLocaleString() + ' km' : ''
+      } : null,
+      items,
+      totals
+    };
+  } catch (error) {
+    console.error('Error preparing credit data for PDF:', error);
+    throw error;
+  }
+};
+
+export const generateCreditPDFWithTemplate = async (credit: any, companyData: any) => {
+  try {
+    const data = await prepareCreditDataForPDF(credit, companyData);
+    
+    // Adapter l'avoir au format Invoice pour le PDF
+    const invoiceData = {
+      ...data.credit,
+      amount: data.credit.amount || data.totals.total,
+      date: data.credit.created_at,
+      due_date: data.credit.created_at,
+      repairs_data: [],
+      parts_data: [],
+      reference: data.credit.reference
+    } as any;
+
+    const doc = InvoicePDF({ 
+      invoice: invoiceData, 
+      companyData: data.companyData, 
+      receipts: [],
+      clientData: data.clientData,
+      vehicleData: data.vehicleData,
+      template: data.template
+    });
+    
+    // Générer le blob PDF
+    const asPdf = pdf(doc);
+    const blob = await asPdf.toBlob();
+    
+    // Créer un nom de fichier unique
+    const filename = `Avoir_${credit.reference}_${new Date().toISOString().split('T')[0]}.pdf`;
+    
+    // Créer un lien de téléchargement
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    
+    // Nettoyer l'URL
+    URL.revokeObjectURL(url);
+    
+    return { success: true, filename };
+  } catch (error) {
+    console.error('Erreur lors de la génération du PDF:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const printCreditPDFWithTemplate = async (credit: any, companyData: any) => {
+  try {
+    const data = await prepareCreditDataForPDF(credit, companyData);
+    
+    // Adapter l'avoir au format Invoice pour le PDF
+    const invoiceData = {
+      ...data.credit,
+      amount: data.credit.amount || data.totals.total,
+      date: data.credit.created_at,
+      due_date: data.credit.created_at,
+      repairs_data: [],
+      parts_data: [],
+      reference: data.credit.reference
+    } as any;
+
+    const doc = InvoicePDF({ 
+      invoice: invoiceData, 
+      companyData: data.companyData, 
+      receipts: [],
+      clientData: data.clientData,
+      vehicleData: data.vehicleData,
+      template: data.template
+    });
+    
+    // Générer le blob PDF
+    const asPdf = pdf(doc);
+    const blob = await asPdf.toBlob();
+    
+    // Créer une URL pour le blob
+    const url = URL.createObjectURL(blob);
+    
+    // Ouvrir le PDF dans un nouvel onglet pour impression
+    const printWindow = window.open(url, '_blank');
+    
+    if (printWindow) {
+      printWindow.onload = () => {
+        // Nettoyer l'URL après un délai
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+        }, 1000);
+      };
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Erreur lors de l'ouverture du PDF pour impression:", error);
+    return { success: false, error: error.message };
+  }
+};

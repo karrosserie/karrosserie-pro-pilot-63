@@ -261,14 +261,55 @@ const Credits = () => {
     }
   };
 
-  const handleDownload = (credit: any) => {
-    setSelectedCredit(credit);
-    setViewerModalOpen(true);
+  const handleDownload = async (credit: any) => {
+    try {
+      toast({
+        title: "Génération du PDF",
+        description: "Génération du PDF en cours..."
+      });
+
+      const { generateCreditPDFWithTemplate } = await import('@/utils/creditPDFGeneration');
+      const result = await generateCreditPDFWithTemplate(credit, {});
+      
+      if (result.success) {
+        toast({
+          title: "Téléchargement réussi",
+          description: `L'avoir ${credit.reference} a été téléchargé.`
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors du téléchargement:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer le PDF. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handlePrint = (credit: any) => {
-    setSelectedCredit(credit);
-    setViewerModalOpen(true);
+  const handlePrint = async (credit: any) => {
+    try {
+      toast({
+        title: "Ouverture pour impression",
+        description: `Ouverture de l'avoir ${credit.reference} pour impression...`
+      });
+
+      const { printCreditPDFWithTemplate } = await import('@/utils/creditPDFGeneration');
+      const result = await printCreditPDFWithTemplate(credit, {});
+      
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'impression:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ouvrir le PDF pour impression. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSendEmail = (credit: any) => {
