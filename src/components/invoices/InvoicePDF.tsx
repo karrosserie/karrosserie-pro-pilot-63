@@ -305,39 +305,41 @@ const alternativeStyles = StyleSheet.create({
     borderBottomColor: '#000',
   },
   totalsHeaderCell: {
-    fontSize: 8,
+    fontSize: 9,
     fontWeight: 'bold',
-    padding: 6,
+    padding: 8,
     textAlign: 'center',
     borderRightWidth: 2,
     borderRightColor: '#000',
-    width: 60,
+    borderRightStyle: 'solid',
+    width: 80,
   },
   totalsHeaderCellLast: {
-    fontSize: 8,
+    fontSize: 9,
     fontWeight: 'bold',
-    padding: 6,
+    padding: 8,
     textAlign: 'center',
-    width: 60,
+    width: 80,
   },
   totalsValueRow: {
     flexDirection: 'row',
   },
-  totalsValueCell: {
-    fontSize: 8,
+  totalsCell: {
+    fontSize: 9,
     fontWeight: 'bold',
-    padding: 6,
+    padding: 8,
     textAlign: 'center',
     borderRightWidth: 2,
     borderRightColor: '#000',
-    width: 60,
+    borderRightStyle: 'solid',
+    width: 80,
   },
-  totalsValueCellLast: {
-    fontSize: 8,
+  totalsCellLast: {
+    fontSize: 9,
     fontWeight: 'bold',
-    padding: 6,
+    padding: 8,
     textAlign: 'center',
-    width: 60,
+    width: 80,
   },
   footer: {
     position: 'absolute',
@@ -455,10 +457,10 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
                 <Text style={alternativeStyles.totalsHeaderCellLast}>Total TTC</Text>
               </View>
               <View style={alternativeStyles.totalsValueRow}>
-                <Text style={alternativeStyles.totalsValueCell}>{clientData?.totals?.totalHT || '0,00 €'}</Text>
-                <Text style={alternativeStyles.totalsValueCell}>{clientData?.totals?.totalVAT || '0,00 €'}</Text>
-                <Text style={alternativeStyles.totalsValueCell}>{clientData?.totals?.totalDiscount || '0,00 €'}</Text>
-                <Text style={alternativeStyles.totalsValueCellLast}>{clientData?.totals?.totalTTC || '0,00 €'}</Text>
+                <Text style={alternativeStyles.totalsCell}>{clientData?.totals?.totalHT || '0,00 €'}</Text>
+                <Text style={alternativeStyles.totalsCell}>{clientData?.totals?.totalVAT || '0,00 €'}</Text>
+                <Text style={alternativeStyles.totalsCell}>{clientData?.totals?.totalDiscount || '0,00 €'}</Text>
+                <Text style={alternativeStyles.totalsCellLast}>{clientData?.totals?.totalTTC || '0,00 €'}</Text>
               </View>
             </View>
           </View>
