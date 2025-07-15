@@ -239,13 +239,11 @@ const alternativeStyles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  table: {
+  tableContainer: {
     borderWidth: 2,
     borderColor: '#000',
-    borderStyle: 'solid',
     borderRadius: 5,
-    overflow: 'hidden',
-    marginBottom: 20,
+    marginBottom: 15,
   },
   tableHeader: {
     flexDirection: 'row',
@@ -472,7 +470,7 @@ const QuotePDF = ({ quote, companyData, receipts = [], clientData, vehicleData, 
           </View>
 
           {/* Tableau des articles */}
-          <View style={alternativeStyles.table}>
+          <View style={alternativeStyles.tableContainer}>
             <View style={alternativeStyles.tableHeader}>
               <Text style={[alternativeStyles.tableHeaderCell, { width: 30 }]}>Réf</Text>
               <Text style={[alternativeStyles.tableHeaderCell, { width: 120 }]}>Description</Text>
