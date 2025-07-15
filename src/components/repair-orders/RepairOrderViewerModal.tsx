@@ -204,6 +204,7 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
               companyData={companyData}
               orderData={orderData}
               clientData={clientDataForTemplate}
+              vehicleData={vehicleDataForTemplate}
               items={items}
               totals={totalsData}
             />
