@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -7,10 +6,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { EmailFormFields } from '../invoices/email/EmailFormFields';
-import { EmailDialogActions } from '../invoices/email/EmailDialogActions';
-import { useQuoteEmail } from './email/useQuoteEmail';
-import { InvoiceEmailFormData } from '../invoices/email/types';
+import { EmailFormFields } from '../../invoices/email/EmailFormFields';
+import { EmailDialogActions } from '../../invoices/email/EmailDialogActions';
+import { useQuoteEmail } from './useQuoteEmail';
+import { InvoiceEmailFormData } from '../../invoices/email/types';
 import { Quote } from '@/services/supabase/quotes';
 
 interface QuoteEmailDialogProps {

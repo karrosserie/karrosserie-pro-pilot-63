@@ -151,18 +151,38 @@ const Quotes = () => {
     }
   }, [quotes, searchParams, setSearchParams]);
 
-  const handleDownload = (quote: Quote) => {
-    toast({
-      title: "Téléchargement",
-      description: `Téléchargement du devis ${quote.reference}...`
-    });
+  const handleDownload = async (quote: Quote) => {
+    const { generateQuotePDFWithTemplate } = await import('@/utils/quotePDFGeneration');
+    const result = await generateQuotePDFWithTemplate(quote, {});
+    if (result.success) {
+      toast({
+        title: "Téléchargement réussi",
+        description: `Le devis ${quote.reference} a été téléchargé.`
+      });
+    } else {
+      toast({
+        title: "Erreur",
+        description: "Impossible de télécharger le devis.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handlePrint = (quote: Quote) => {
-    toast({
-      title: "Impression",
-      description: `Impression du devis ${quote.reference}...`
-    });
+  const handlePrint = async (quote: Quote) => {
+    const { printQuotePDFWithTemplate } = await import('@/utils/quotePDFGeneration');
+    const result = await printQuotePDFWithTemplate(quote, {});
+    if (result.success) {
+      toast({
+        title: "Impression",
+        description: `Le devis ${quote.reference} a été ouvert pour impression.`
+      });
+    } else {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'imprimer le devis.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSendEmail = (quote: Quote) => {
