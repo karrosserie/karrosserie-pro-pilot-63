@@ -424,155 +424,97 @@ const QuotePDF = ({ quote, companyData, receipts = [], clientData, vehicleData, 
     return (
       <Document>
         <Page size="A4" style={alternativeStyles.page}>
-          {/* Header principal avec entreprise et devis */}
+          {/* Header avec entreprise et devis */}
           <View style={alternativeStyles.mainHeader}>
-            {/* Section entreprise */}
             <View style={alternativeStyles.companySection}>
-              <Text style={alternativeStyles.companyName}>
-                {companyData?.name || 'VOTRE ENTREPRISE'}
-              </Text>
-              <Text style={alternativeStyles.companyInfo}>
-                <Text style={{ fontWeight: 'bold' }}>ADRESSE : </Text>
-                {companyData?.address || 'Votre adresse'}
-              </Text>
-              <Text style={alternativeStyles.companyInfo}>
-                {companyData?.zipcode || ''} {companyData?.city || ''}
-              </Text>
-              <Text style={alternativeStyles.companyInfo}>
-                <Text style={{ fontWeight: 'bold' }}>TEL : </Text>
-                {companyData?.phone || '+33 1 23 45 67 89'}
-              </Text>
-              <Text style={alternativeStyles.companyInfo}>
-                <Text style={{ fontWeight: 'bold' }}>EMAIL : </Text>
-                {companyData?.email || 'contact@entreprise.com'}
-              </Text>
-              <Text style={alternativeStyles.companyInfo}>
-                <Text style={{ fontWeight: 'bold' }}>SIRET : </Text>
-                {companyData?.siret || '123 456 789 00123'}
-              </Text>
-              <Text style={alternativeStyles.companyInfo}>
-                <Text style={{ fontWeight: 'bold' }}>TVA : </Text>
-                {companyData?.tva || 'FR 12 123456789'}
-              </Text>
+              <Text style={alternativeStyles.companyName}>{companyData?.name || 'AUTO PAINT'}</Text>
+              <View>
+                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>ADRESSE :</Text> {companyData?.address || '25 rue sainte victoire'}</Text>
+                <Text style={alternativeStyles.companyInfo}>{companyData?.zipcode || '13006'} {companyData?.city || 'MARSEILLE'}</Text>
+                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>TEL :</Text> {companyData?.phone || '+33064646524'}</Text>
+                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>EMAIL :</Text> {companyData?.email || 'autopaint@yopmail.com'}</Text>
+                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>SIRET :</Text> {companyData?.siret || '123456789000'}</Text>
+                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>TVA :</Text> {companyData?.tva || 'FR123456789'}</Text>
+              </View>
             </View>
-
-            {/* Section devis et client */}
+            
             <View style={alternativeStyles.quoteSection}>
-              <Text style={alternativeStyles.quoteTitle}>DEVIS N° {quote.reference}</Text>
+              <Text style={alternativeStyles.quoteTitle}>DEVIS N° {clientData?.number || quote.reference}</Text>
               
-              {/* Informations client dans un encadré */}
               <View style={alternativeStyles.clientInfoSection}>
-                <Text style={[alternativeStyles.clientInfo, { fontWeight: 'bold' }]}>
-                  {clientData?.clientName || (quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '')}
-                </Text>
-                {clientData?.phone && (
-                  <Text style={alternativeStyles.clientInfo}>
-                    <Text style={{ fontWeight: 'bold' }}>TEL : </Text>
-                    {clientData?.phone}
-                  </Text>
-                )}
-                {clientData?.email && (
-                  <Text style={alternativeStyles.clientInfo}>
-                    <Text style={{ fontWeight: 'bold' }}>EMAIL : </Text>
-                    {clientData?.email}
-                  </Text>
-                )}
-                {(clientData?.address || quote.clients?.address) && (
-                  <Text style={alternativeStyles.clientInfo}>
-                    <Text style={{ fontWeight: 'bold' }}>ADRESSE : </Text>
-                    {clientData?.address || quote.clients?.address}
-                  </Text>
-                )}
-                {(clientData?.city || quote.clients?.city) && (
-                  <Text style={alternativeStyles.clientInfo}>
-                    {clientData?.city || quote.clients?.city}
-                  </Text>
-                )}
-                <Text style={alternativeStyles.clientInfo}>
-                  <Text style={{ fontWeight: 'bold' }}>Immatriculation : </Text>
-                  {vehicleData?.licensePlate || quote.vehicles?.license_plate || ''}
-                </Text>
-                <Text style={alternativeStyles.clientInfo}>
-                  <Text style={{ fontWeight: 'bold' }}>Kilométrage : </Text>
-                  {quote.vehicles?.mileage ? `${quote.vehicles.mileage.toLocaleString()} Km` : (vehicleData?.mileage || '')}
-                </Text>
-                <Text style={alternativeStyles.clientInfo}>
-                  <Text style={{ fontWeight: 'bold' }}>Véhicule : </Text>
-                  {vehicleData?.vehicle || (quote.vehicles ? `${quote.vehicles.car_brands?.name || ''} ${quote.vehicles.car_models?.name || ''}` : '')}
-                </Text>
+                <Text style={[alternativeStyles.clientInfo, { fontWeight: 'bold' }]}>{clientData?.name || 'Client'}</Text>
+                {clientData?.phone && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>TEL :</Text> {clientData.phone}</Text>}
+                {clientData?.email && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>EMAIL :</Text> {clientData.email}</Text>}
+                {clientData?.address && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>ADRESSE :</Text> {clientData.address}</Text>}
+                {clientData?.city && <Text style={alternativeStyles.clientInfo}>{clientData.city}</Text>}
+                {clientData?.licensePlate && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>Immatriculation :</Text> {clientData.licensePlate}</Text>}
+                {clientData?.mileage && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>Kilométrage :</Text> {clientData.mileage}</Text>}
+                {clientData?.vehicle && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>Véhicule :</Text> {clientData.vehicle}</Text>}
               </View>
             </View>
           </View>
 
-          {/* Section date centrée */}
+          {/* Date */}
           <View style={alternativeStyles.dateSection}>
             <View style={alternativeStyles.dateBox}>
               <Text style={alternativeStyles.dateLabel}>DATE</Text>
-              <Text style={alternativeStyles.dateValue}>{formatDate(quote.created_at)}</Text>
+              <Text style={alternativeStyles.dateValue}>{clientData?.billingDate || formatDate(quote.created_at)}</Text>
             </View>
           </View>
 
-          {/* Tableau unique avec tous les articles */}
+          {/* Tableau des articles */}
           <View style={alternativeStyles.table}>
-            {/* En-tête du tableau */}
             <View style={alternativeStyles.tableHeader}>
-              <Text style={[alternativeStyles.tableHeaderCell, { flex: 0.5 }]}>Réf</Text>
-              <Text style={[alternativeStyles.tableHeaderCell, { flex: 2 }]}>Description</Text>
-              <Text style={[alternativeStyles.tableHeaderCell, { flex: 1 }]}>Quantité</Text>
-              <Text style={[alternativeStyles.tableHeaderCell, { flex: 1 }]}>Remise</Text>
-              <Text style={[alternativeStyles.tableHeaderCell, { flex: 1 }]}>Prix HT</Text>
-              <Text style={[alternativeStyles.tableHeaderCell, { flex: 1 }]}>TVA</Text>
-              <Text style={[alternativeStyles.tableHeaderCell, { flex: 1 }]}>Total HT</Text>
-              <Text style={[alternativeStyles.tableHeaderCellLast, { flex: 1 }]}>Total TTC</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { width: 30 }]}>Réf</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { width: 120 }]}>Description</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { width: 50 }]}>Quantité</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { width: 40 }]}>Remise</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { width: 50 }]}>Prix HT</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { width: 35 }]}>TVA</Text>
+              <Text style={[alternativeStyles.tableHeaderCell, { width: 50 }]}>Total HT</Text>
+              <Text style={[alternativeStyles.tableHeaderCellLast, { width: 50 }]}>Total TTC</Text>
             </View>
-
-            {/* Lignes des réparations */}
-            {repairs.map((repair: any, index: number) => (
-              <View key={`repair-${index}`} style={alternativeStyles.tableRow}>
-                <Text style={[alternativeStyles.tableCellLeft, { flex: 0.5 }]}>{repair.ref || ''}</Text>
-                <Text style={[alternativeStyles.tableCellLeft, { flex: 2 }]}>{repair.description}</Text>
-                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{repair.quantity}</Text>
-                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{repair.discount || 0}%</Text>
-                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{formatCurrency(repair.unitCost)}</Text>
-                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{repair.vat || 20}%</Text>
-                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{formatCurrency((repair.unitCost * repair.quantity) - (repair.discount || 0))}</Text>
-                <Text style={[alternativeStyles.tableCellLast, { flex: 1 }]}>{formatCurrency(calculateItemTotal(repair))}</Text>
-              </View>
-            ))}
-
-            {/* Lignes des pièces */}
-            {parts.map((part: any, index: number) => (
-              <View key={`part-${index}`} style={alternativeStyles.tableRow}>
-                <Text style={[alternativeStyles.tableCellLeft, { flex: 0.5 }]}>{part.ref || ''}</Text>
-                <Text style={[alternativeStyles.tableCellLeft, { flex: 2 }]}>{part.description}</Text>
-                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{part.quantity}</Text>
-                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{part.discount || 0}%</Text>
-                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{formatCurrency(part.unitCost)}</Text>
-                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{part.vat || 20}%</Text>
-                <Text style={[alternativeStyles.tableCell, { flex: 1 }]}>{formatCurrency((part.unitCost * part.quantity) - (part.discount || 0))}</Text>
-                <Text style={[alternativeStyles.tableCellLast, { flex: 1 }]}>{formatCurrency(calculateItemTotal(part))}</Text>
+            
+            {(clientData?.items || []).map((item: any, index: number) => (
+              <View key={index} style={alternativeStyles.tableRow}>
+                <Text style={[alternativeStyles.tableCellLeft, { width: 30 }]}>{item.ref || ''}</Text>
+                <Text style={[alternativeStyles.tableCellLeft, { width: 120 }]}>{item.description || 'N/A'}</Text>
+                <Text style={[alternativeStyles.tableCell, { width: 50 }]}>
+                  {item.quantity?.toString().replace('.', ',') || '0'}
+                </Text>
+                <Text style={[alternativeStyles.tableCell, { width: 40 }]}>
+                  {item.discount || 0}%
+                </Text>
+                <Text style={[alternativeStyles.tableCell, { width: 50 }]}>
+                  {item.unitPrice?.toFixed(2).replace('.', ',') || '0,00'}€
+                </Text>
+                <Text style={[alternativeStyles.tableCell, { width: 35 }]}>
+                  {item.vat || 20}%
+                </Text>
+                <Text style={[alternativeStyles.tableCell, { width: 50 }]}>
+                  {item.totalHT?.toFixed(2).replace('.', ',') || '0,00'}€
+                </Text>
+                <Text style={[alternativeStyles.tableCellLast, { width: 50 }]}>
+                  {item.totalTTC?.toFixed(2).replace('.', ',') || '0,00'}€
+                </Text>
               </View>
             ))}
           </View>
 
-          {/* Section totaux */}
+          {/* Totaux */}
           <View style={alternativeStyles.totalsSection}>
             <View style={alternativeStyles.totalsTable}>
-              {/* En-tête des totaux */}
               <View style={alternativeStyles.totalsHeader}>
                 <Text style={alternativeStyles.totalsHeaderCell}>Total HT</Text>
                 <Text style={alternativeStyles.totalsHeaderCell}>Total TVA</Text>
                 <Text style={alternativeStyles.totalsHeaderCell}>Total Remise</Text>
                 <Text style={alternativeStyles.totalsHeaderCellLast}>Total TTC</Text>
               </View>
-              {/* Valeurs des totaux */}
               <View style={alternativeStyles.totalsRow}>
-                <Text style={alternativeStyles.totalsCell}>{formatCurrency(subtotalHT)}</Text>
-                <Text style={alternativeStyles.totalsCell}>{formatCurrency(totalTVA)}</Text>
-                <Text style={alternativeStyles.totalsCell}>
-                  {formatCurrency([...repairs, ...parts].reduce((sum, item) => sum + (parseFloat(item.discount) || 0), 0))}
-                </Text>
-                <Text style={alternativeStyles.totalsCellLast}>{formatCurrency(totalTTC)}</Text>
+                <Text style={alternativeStyles.totalsCell}>{clientData?.totals?.totalHT || '0,00 €'}</Text>
+                <Text style={alternativeStyles.totalsCell}>{clientData?.totals?.totalVAT || '0,00 €'}</Text>
+                <Text style={alternativeStyles.totalsCell}>{clientData?.totals?.totalDiscount || '0,00 €'}</Text>
+                <Text style={alternativeStyles.totalsCellLast}>{clientData?.totals?.totalTTC || '0,00 €'}</Text>
               </View>
             </View>
           </View>
