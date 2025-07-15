@@ -33,7 +33,7 @@ export const DocumentDisplay: React.FC<DocumentDisplayProps> = ({
         </div>
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            {customContent || <p className="text-xs text-gray-500">Image téléchargée</p>}
+            {customContent}
           </div>
           {!isViewMode && (
             <div className="flex space-x-2">
