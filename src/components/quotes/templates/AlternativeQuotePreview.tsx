@@ -111,15 +111,11 @@ const AlternativeQuotePreview = ({ companyData, quoteData, clientData, items, to
         </div>
       </div>
 
-      {/* Dates avec coins arrondis et plus d'espace */}
-      <div className="flex justify-center gap-48 mb-8">
+      {/* Date avec coins arrondis */}
+      <div className="flex justify-center mb-8">
         <div className="border-2 border-black rounded-lg px-4 py-2 text-center">
           <div className="font-bold text-sm mb-1">DATE</div>
           <div className="font-bold text-sm">{defaultQuoteData.date}</div>
-        </div>
-        <div className="border-2 border-black rounded-lg px-4 py-2 text-center">
-          <div className="font-bold text-sm mb-1">VALABLE JUSQU'AU</div>
-          <div className="font-bold text-sm">{defaultQuoteData.validUntil}</div>
         </div>
       </div>
 
