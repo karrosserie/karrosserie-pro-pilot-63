@@ -262,17 +262,13 @@ const Credits = () => {
   };
 
   const handleDownload = (credit: any) => {
-    toast({
-      title: "Téléchargement",
-      description: `Téléchargement de l'avoir ${credit.reference}...`
-    });
+    setSelectedCredit(credit);
+    setViewerModalOpen(true);
   };
 
   const handlePrint = (credit: any) => {
-    toast({
-      title: "Impression",
-      description: `Impression de l'avoir ${credit.reference}...`
-    });
+    setSelectedCredit(credit);
+    setViewerModalOpen(true);
   };
 
   const handleSendEmail = (credit: any) => {
