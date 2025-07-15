@@ -126,15 +126,11 @@ const AlternativeRepairOrderPreview = ({ companyData, orderData, clientData, veh
         </div>
       </div>
 
-      {/* Dates avec coins arrondis et plus d'espace */}
-      <div className="flex justify-center gap-48 mb-8">
+      {/* Date avec coins arrondis */}
+      <div className="flex justify-center mb-8">
         <div className="border-2 border-black rounded-lg px-4 py-2 text-center">
-          <div className="font-bold text-sm mb-1">DATE DE CRÉATION</div>
+          <div className="font-bold text-sm mb-1">DATE</div>
           <div className="font-bold text-sm">{defaultOrderData.date}</div>
-        </div>
-        <div className="border-2 border-black rounded-lg px-4 py-2 text-center">
-          <div className="font-bold text-sm mb-1">DATE D'ORDRE</div>
-          <div className="font-bold text-sm">{defaultOrderData.orderDate}</div>
         </div>
       </div>
 
