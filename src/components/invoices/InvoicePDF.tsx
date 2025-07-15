@@ -17,8 +17,9 @@ const defaultStyles = StyleSheet.create({
     fontFamily: 'Helvetica',
     fontSize: 10,
     paddingTop: 30,
-    paddingBottom: 80,
+    paddingBottom: 60,
     paddingHorizontal: 30,
+    position: 'relative',
   },
   header: {
     flexDirection: 'row',
@@ -148,7 +149,7 @@ const defaultStyles = StyleSheet.create({
   },
   footer: {
     position: 'absolute',
-    bottom: 25,
+    bottom: 20,
     left: 30,
     right: 30,
     textAlign: 'center',
@@ -168,6 +169,7 @@ const alternativeStyles = StyleSheet.create({
     paddingTop: 25,
     paddingBottom: 50,
     paddingHorizontal: 25,
+    position: 'relative',
   },
   header: {
     flexDirection: 'row',
@@ -327,7 +329,7 @@ const alternativeStyles = StyleSheet.create({
   },
   footer: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 15,
     left: 25,
     right: 25,
     textAlign: 'center',
