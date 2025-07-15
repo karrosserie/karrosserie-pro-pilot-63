@@ -11,8 +11,8 @@ const AppRouter = () => {
       <AuthProvider>
         <Routes>
           {routes.map((route, index) => {
-            // For the auth route, we don't want to wrap it in the AppLayout
-            if (route.path === "/auth") {
+            // For the auth route and document upload, we don't want to wrap it in the AppLayout
+            if (route.path === "/auth" || route.path === "/documents/upload") {
               return <Route key={index} path={route.path} element={route.element} />;
             }
             
