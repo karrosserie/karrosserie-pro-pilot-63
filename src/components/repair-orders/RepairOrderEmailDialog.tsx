@@ -54,6 +54,7 @@ const RepairOrderEmailDialog: React.FC<RepairOrderEmailDialogProps> = ({
           formData={formData}
           onUpdateFormData={updateFormData}
           disabled={isLoading}
+          repairOrderReference={repairOrder?.reference}
         />
         
         <EmailDialogActions
