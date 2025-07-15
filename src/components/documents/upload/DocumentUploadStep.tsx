@@ -2,12 +2,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Camera, Image as ImageIcon } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { ImageCropper } from "@/components/shared/ImageCropper";
+import { useImageCropping } from "@/components/shared/document-uploader/hooks/useImageCropping";
 
 interface DocumentUploadStepProps {
   step: number;
   totalSteps: number;
   title: string;
   description: string;
+  documentType: string;  // Type de document pour le crop (driver-license, vehicle-registration)
   onNext: (file: File) => void;
   onBack: () => void;
   onImageUpload: (file: File) => void;
@@ -18,6 +21,7 @@ export default function DocumentUploadStep({
   totalSteps,
   title,
   description,
+  documentType,
   onNext,
   onBack,
   onImageUpload
@@ -25,13 +29,28 @@ export default function DocumentUploadStep({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
+  // Hook pour gérer le système de crop
+  const {
+    imageToProcess,
+    cropDialogOpen,
+    isDriverLicense,
+    handleFileUpload,
+    handleCropComplete,
+    handleCropCancel
+  } = useImageCropping({
+    documentType,
+    onFileUpload: async (file: File) => {
       setSelectedFile(file);
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
       onImageUpload(file);
+    }
+  });
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      handleFileUpload(file); // Utilise le système de crop
     }
   };
 
@@ -150,6 +169,18 @@ export default function DocumentUploadStep({
             />
           </div>
         </div>
+
+        {/* Image Cropper Dialog */}
+        {imageToProcess && (
+          <ImageCropper
+            open={cropDialogOpen}
+            onClose={handleCropCancel}
+            imageUrl={imageToProcess.tempUrl}
+            onCropComplete={handleCropComplete}
+            aspectRatio={4 / 3}
+            allowHorizontalExpansion={isDriverLicense}
+          />
+        )}
       </div>
     </div>
   );

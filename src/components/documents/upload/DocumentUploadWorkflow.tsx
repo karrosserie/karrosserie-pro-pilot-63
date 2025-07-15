@@ -4,19 +4,23 @@ import DocumentUploadStep from "./DocumentUploadStep";
 const DOCUMENT_STEPS = [
   {
     title: "Permis de conduire (recto)",
-    description: "Veuillez photographier le recto de votre permis de conduire"
+    description: "Veuillez photographier le recto de votre permis de conduire",
+    documentType: "driver-license"
   },
   {
     title: "Permis de conduire (verso)",
-    description: "Veuillez photographier le verso de votre permis de conduire"
+    description: "Veuillez photographier le verso de votre permis de conduire",
+    documentType: "driver-license"
   },
   {
     title: "Carte grise (recto)",
-    description: "Veuillez photographier le recto de votre carte grise"
+    description: "Veuillez photographier le recto de votre carte grise",
+    documentType: "vehicle-registration"
   },
   {
     title: "Carte grise (verso)",
-    description: "Veuillez photographier le verso de votre carte grise"
+    description: "Veuillez photographier le verso de votre carte grise",
+    documentType: "vehicle-registration"
   }
 ];
 
@@ -60,6 +64,7 @@ export default function DocumentUploadWorkflow({ onBack, onComplete }: DocumentU
       totalSteps={DOCUMENT_STEPS.length}
       title={DOCUMENT_STEPS[currentStep].title}
       description={DOCUMENT_STEPS[currentStep].description}
+      documentType={DOCUMENT_STEPS[currentStep].documentType}
       onNext={handleNext}
       onBack={handleBack}
       onImageUpload={handleImageUpload}
