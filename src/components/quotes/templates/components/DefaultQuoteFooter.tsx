@@ -10,9 +10,9 @@ const DefaultQuoteFooter = ({ companyData }: DefaultQuoteFooterProps) => {
       <div className="text-sm text-gray-600">
         <p className="mb-2 font-semibold">Conditions de paiement :</p>
         <ul className="list-disc pl-4 space-y-1">
-          <li>Ce devis est valable 30 jours à compter de sa date d'émission.</li>
-          <li>Les travaux seront exécutés selon les règles de l'art et les normes en vigueur.</li>
-          <li>Le paiement est exigible à la fin des travaux.</li>
+          <li>Paiement comptant, sauf conditions particulières d'escompte.</li>
+          <li>En cas de retard de paiement, indemnité forfaitaire pour frais de recouvrement : 40 euros.</li>
+          <li>Pénalités de retard : 3 fois le taux de l'intérêt légal (taux BCE + 10%).</li>
         </ul>
       </div>
       

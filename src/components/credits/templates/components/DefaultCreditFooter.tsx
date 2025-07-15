@@ -8,11 +8,11 @@ const DefaultCreditFooter = ({ companyData }: DefaultCreditFooterProps) => {
   return (
     <div className="flex justify-between items-end mt-auto pt-6">
       <div className="text-sm text-gray-600">
-        <p className="mb-2 font-semibold">Informations :</p>
+        <p className="mb-2 font-semibold">Conditions de paiement :</p>
         <ul className="list-disc pl-4 space-y-1">
-          <li>Cet avoir est valable pour une durée illimitée.</li>
-          <li>L'avoir peut être utilisé pour de futurs achats ou travaux.</li>
-          <li>Pour toute question, contactez-nous.</li>
+          <li>Paiement comptant, sauf conditions particulières d'escompte.</li>
+          <li>En cas de retard de paiement, indemnité forfaitaire pour frais de recouvrement : 40 euros.</li>
+          <li>Pénalités de retard : 3 fois le taux de l'intérêt légal (taux BCE + 10%).</li>
         </ul>
       </div>
       

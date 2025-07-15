@@ -8,11 +8,11 @@ const DefaultRepairOrderFooter = ({ companyData }: DefaultRepairOrderFooterProps
   return (
     <div className="flex justify-between items-end mt-auto pt-6">
       <div className="text-sm text-gray-600">
-        <p className="mb-2 font-semibold">Conditions d'exécution :</p>
+        <p className="mb-2 font-semibold">Conditions de paiement :</p>
         <ul className="list-disc pl-4 space-y-1">
-          <li>Les travaux seront exécutés selon les règles de l'art et les normes en vigueur.</li>
-          <li>Le client reconnaît avoir pris connaissance des conditions générales.</li>
-          <li>Paiement à la fin des travaux.</li>
+          <li>Paiement comptant, sauf conditions particulières d'escompte.</li>
+          <li>En cas de retard de paiement, indemnité forfaitaire pour frais de recouvrement : 40 euros.</li>
+          <li>Pénalités de retard : 3 fois le taux de l'intérêt légal (taux BCE + 10%).</li>
         </ul>
       </div>
       
