@@ -203,6 +203,7 @@ const alternativeStyles = StyleSheet.create({
     color: '#000',
     marginBottom: 15,
     width: 300,
+    textAlign: 'text-right',
   },
   clientInfoSection: {
     marginTop: 4,
