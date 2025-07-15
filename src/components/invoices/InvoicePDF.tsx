@@ -202,11 +202,11 @@ const alternativeStyles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 15,
-    width: 250,
+    width: 275,
   },
   clientInfoSection: {
     marginTop: 4,
-    width: 200,
+    width: 175,
   },
   clientInfo: {
     fontSize: 8,
@@ -405,7 +405,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
                 {/* Section Délai prévisionnel pour les ordres de réparation */}
                 {documentType === 'repair_order' && vehicleData?.start_date && vehicleData?.end_date && (
                   <View style={{ marginTop: 15 }}>
-                    <Text style={[alternativeStyles.clientInfo, { fontWeight: 'bold', fontSize: 10 }]}>Délai prévisionnel</Text>
+                    <Text style={[alternativeStyles.clientInfo, { fontWeight: 'bold', fontSize: 12 }]}>Délai prévisionnel</Text>
                     <Text style={alternativeStyles.clientInfo}>
                       <Text style={{ fontWeight: 'bold' }}>Date de début :</Text> {formatDate(vehicleData.start_date)}
                     </Text>
