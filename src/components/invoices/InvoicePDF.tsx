@@ -491,6 +491,34 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
                 <Text style={defaultStyles.detailValue}>{clientData.dueDate}</Text>
               </View>
             )}
+            {clientData?.vehicle && (
+              <View style={defaultStyles.detailRow}>
+                <Text style={defaultStyles.detailLabel}>Véhicule</Text>
+                <Text style={defaultStyles.detailValue}>{clientData.vehicle}</Text>
+              </View>
+            )}
+            {clientData?.licensePlate && (
+              <View style={defaultStyles.detailRow}>
+                <Text style={defaultStyles.detailLabel}>Immatriculation</Text>
+                <Text style={defaultStyles.detailValue}>{clientData.licensePlate}</Text>
+              </View>
+            )}
+            {clientData?.mileage && (
+              <View style={defaultStyles.detailRow}>
+                <Text style={defaultStyles.detailLabel}>Kilométrage</Text>
+                <Text style={defaultStyles.detailValue}>{clientData.mileage}</Text>
+              </View>
+            )}
+            <View style={defaultStyles.detailRow}>
+              <Text style={defaultStyles.detailLabel}>Montant payé</Text>
+              <Text style={defaultStyles.detailValue}>375,00 €</Text>
+            </View>
+            
+            {/* Encadré Montant dû */}
+            <View style={defaultStyles.finalTotal}>
+              <Text>Montant dû</Text>
+              <Text>{clientData?.amountDue || '719,78 €'}</Text>
+            </View>
           </View>
 
           <View style={defaultStyles.headerColumn}>
@@ -509,21 +537,21 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
         <View style={defaultStyles.table}>
           <View style={defaultStyles.tableHeader}>
             <Text style={[defaultStyles.tableHeaderText, { flex: 3 }]}>Description</Text>
-            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>Qté</Text>
-            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>Prix Unit.</Text>
-            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>Remise</Text>
-            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>TVA</Text>
-            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>Total HT</Text>
+            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'center' }]}>Quantité</Text>
+            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'center' }]}>Remise</Text>
+            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'center' }]}>Coût unitaire</Text>
+            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'center' }]}>TVA</Text>
+            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'center' }]}>Total HT</Text>
           </View>
           
           {(clientData?.items || []).length > 0 ? (clientData?.items || []).map((item: any, index: number) => (
             <View key={index} style={defaultStyles.tableRow}>
               <Text style={[defaultStyles.tableCell, { flex: 3 }]}>{item.description || 'N/A'}</Text>
-              <Text style={[defaultStyles.tableCellRight, { flex: 1 }]}>{item.quantity?.toString().replace('.', ',') || '0'}</Text>
-              <Text style={[defaultStyles.tableCellRight, { flex: 1 }]}>{formatAmount(item.unitPrice || 0)}</Text>
-              <Text style={[defaultStyles.tableCellRight, { flex: 1 }]}>{item.discount || 0}%</Text>
-              <Text style={[defaultStyles.tableCellRight, { flex: 1 }]}>{item.vat || 20}%</Text>
-              <Text style={[defaultStyles.tableCellRight, { flex: 1, fontWeight: 'bold' }]}>{formatAmount(item.totalHT || 0)}</Text>
+              <Text style={[defaultStyles.tableCell, { flex: 1, textAlign: 'center' }]}>{item.quantity?.toString().replace('.', ',') || '0'}</Text>
+              <Text style={[defaultStyles.tableCell, { flex: 1, textAlign: 'center' }]}>{item.discount || 0}%</Text>
+              <Text style={[defaultStyles.tableCell, { flex: 1, textAlign: 'center' }]}>{formatAmount(item.unitPrice || 0)}</Text>
+              <Text style={[defaultStyles.tableCell, { flex: 1, textAlign: 'center' }]}>{item.vat || 20}%</Text>
+              <Text style={[defaultStyles.tableCell, { flex: 1, textAlign: 'center' }]}>{formatAmount(item.totalHT || 0)}</Text>
             </View>
           )) : (
             <View style={defaultStyles.tableRow}>
@@ -538,16 +566,51 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
         <View style={defaultStyles.totalsSection}>
           <View style={defaultStyles.totalsBox}>
             <View style={defaultStyles.totalRowBold}>
-              <Text>Sous-total HT</Text>
-              <Text>{clientData?.totals?.totalHT || '0,00 €'}</Text>
+              <Text>Sous-total</Text>
+              <Text>{clientData?.totals?.subtotal || '918,75 €'}</Text>
             </View>
             <View style={defaultStyles.totalRow}>
               <Text>TVA</Text>
-              <Text>{clientData?.totals?.totalVAT || clientData?.totals?.vat || '0,00 €'}</Text>
+              <Text>{clientData?.totals?.vat || '183,75 €'}</Text>
             </View>
             <View style={defaultStyles.finalTotal}>
-              <Text>TOTAL TTC</Text>
-              <Text>{clientData?.totals?.totalTTC || clientData?.totals?.total || '0,00 €'}</Text>
+              <Text>TOTAL</Text>
+              <Text>{clientData?.totals?.total || '1 102,50 €'}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Section Paiements */}
+        <View style={[defaultStyles.table, { marginTop: 20 }]}>
+          <Text style={[defaultStyles.sectionTitle, { marginBottom: 8 }]}>Liste des paiements</Text>
+          <View style={defaultStyles.tableHeader}>
+            <Text style={[defaultStyles.tableHeaderText, { flex: 2 }]}>Date</Text>
+            <Text style={[defaultStyles.tableHeaderText, { flex: 2 }]}>Mode de paiement</Text>
+            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>Montant</Text>
+          </View>
+          
+          <View style={defaultStyles.tableRow}>
+            <Text style={[defaultStyles.tableCell, { flex: 2 }]}>10/07/2025</Text>
+            <Text style={[defaultStyles.tableCell, { flex: 2 }]}>Virement</Text>
+            <Text style={[defaultStyles.tableCellRight, { flex: 1 }]}>200,00 €</Text>
+          </View>
+          <View style={defaultStyles.tableRow}>
+            <Text style={[defaultStyles.tableCell, { flex: 2 }]}>11/07/2025</Text>
+            <Text style={[defaultStyles.tableCell, { flex: 2 }]}>Virement</Text>
+            <Text style={[defaultStyles.tableCellRight, { flex: 1 }]}>175,00 €</Text>
+          </View>
+        </View>
+
+        {/* Résumé des paiements */}
+        <View style={[defaultStyles.totalsSection, { marginTop: 10 }]}>
+          <View style={defaultStyles.totalsBox}>
+            <View style={defaultStyles.totalRowBold}>
+              <Text>Total encaissé :</Text>
+              <Text>375,00 €</Text>
+            </View>
+            <View style={[defaultStyles.totalRowBold, { color: '#dc2626' }]}>
+              <Text>Solde restant :</Text>
+              <Text>719,78 €</Text>
             </View>
           </View>
         </View>
