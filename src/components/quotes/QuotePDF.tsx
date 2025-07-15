@@ -221,8 +221,9 @@ const alternativeStyles = StyleSheet.create({
     marginBottom: 30,
   },
   dateBox: {
-    border: 2,
+    borderWidth: 2,
     borderColor: '#000',
+    borderStyle: 'solid',
     borderRadius: 8,
     paddingHorizontal: 15,
     paddingVertical: 8,
@@ -240,8 +241,9 @@ const alternativeStyles = StyleSheet.create({
     textAlign: 'center',
   },
   table: {
-    border: 2,
+    borderWidth: 2,
     borderColor: '#000',
+    borderStyle: 'solid',
     borderRadius: 8,
     overflow: 'hidden',
     marginBottom: 20,
@@ -251,6 +253,7 @@ const alternativeStyles = StyleSheet.create({
     backgroundColor: 'white',
     borderBottomWidth: 2,
     borderBottomColor: '#000',
+    borderBottomStyle: 'solid',
   },
   tableHeaderCell: {
     fontSize: 9,
@@ -259,6 +262,7 @@ const alternativeStyles = StyleSheet.create({
     textAlign: 'center',
     borderRightWidth: 2,
     borderRightColor: '#000',
+    borderRightStyle: 'solid',
   },
   tableHeaderCellLast: {
     fontSize: 9,
@@ -277,6 +281,7 @@ const alternativeStyles = StyleSheet.create({
     textAlign: 'center',
     borderRightWidth: 2,
     borderRightColor: '#000',
+    borderRightStyle: 'solid',
   },
   tableCellLast: {
     fontSize: 8,
@@ -291,14 +296,16 @@ const alternativeStyles = StyleSheet.create({
     textAlign: 'left',
     borderRightWidth: 2,
     borderRightColor: '#000',
+    borderRightStyle: 'solid',
   },
   totalsSection: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
   },
   totalsTable: {
-    border: 2,
+    borderWidth: 2,
     borderColor: '#000',
+    borderStyle: 'solid',
     borderRadius: 8,
     overflow: 'hidden',
     backgroundColor: 'white',
@@ -307,6 +314,7 @@ const alternativeStyles = StyleSheet.create({
     flexDirection: 'row',
     borderBottomWidth: 2,
     borderBottomColor: '#000',
+    borderBottomStyle: 'solid',
   },
   totalsHeaderCell: {
     fontSize: 9,
@@ -315,6 +323,7 @@ const alternativeStyles = StyleSheet.create({
     textAlign: 'center',
     borderRightWidth: 2,
     borderRightColor: '#000',
+    borderRightStyle: 'solid',
     width: 80,
   },
   totalsHeaderCellLast: {
@@ -334,6 +343,7 @@ const alternativeStyles = StyleSheet.create({
     textAlign: 'center',
     borderRightWidth: 2,
     borderRightColor: '#000',
+    borderRightStyle: 'solid',
     width: 80,
   },
   totalsCellLast: {
