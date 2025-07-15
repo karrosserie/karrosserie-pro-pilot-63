@@ -202,10 +202,11 @@ const alternativeStyles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 15,
+    width: 250,
   },
   clientInfoSection: {
     marginTop: 4,
-    width: 250,
+    width: 200,
   },
   clientInfo: {
     fontSize: 8,
