@@ -32,7 +32,7 @@ const defaultStyles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   title: {
-    fontSize: 10,
+    fontSize: 16,
     fontWeight: 'bold',
     color: 'white',
     backgroundColor: '#404348',
