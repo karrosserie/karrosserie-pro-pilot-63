@@ -24,6 +24,11 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { to, subject, message, pdfBase64, invoiceReference }: InvoiceEmailRequest = await req.json();
 
+    console.log("=== DÉBUT ENVOI EMAIL ===");
+    console.log("Destinataire:", to);
+    console.log("Objet:", subject);
+    console.log("Référence facture:", invoiceReference);
+
     // Configuration SMTP à partir des secrets Supabase
     const smtpConfig = {
       hostname: Deno.env.get("SMTP_HOST")!,
@@ -33,6 +38,17 @@ const handler = async (req: Request): Promise<Response> => {
     };
 
     const fromEmail = Deno.env.get("SMTP_FROM_EMAIL")!;
+
+    console.log("Configuration SMTP:");
+    console.log("- Host:", smtpConfig.hostname);
+    console.log("- Port:", smtpConfig.port);
+    console.log("- Username:", smtpConfig.username);
+    console.log("- From email:", fromEmail);
+
+    // Vérifier que toutes les variables sont définies
+    if (!smtpConfig.hostname || !smtpConfig.username || !smtpConfig.password || !fromEmail) {
+      throw new Error("Configuration SMTP incomplète. Vérifiez vos secrets Supabase.");
+    }
 
     console.log("Connecting to SMTP server:", smtpConfig.hostname);
 
@@ -100,9 +116,18 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
   } catch (error: any) {
-    console.error("Error in send-invoice-email function:", error);
+    console.error("=== ERREUR DANS L'EDGE FUNCTION ===");
+    console.error("Type d'erreur:", typeof error);
+    console.error("Message d'erreur:", error.message);
+    console.error("Stack trace:", error.stack);
+    console.error("Erreur complète:", error);
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        type: typeof error,
+        details: error.toString()
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
