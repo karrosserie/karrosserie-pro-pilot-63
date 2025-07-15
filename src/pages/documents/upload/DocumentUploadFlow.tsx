@@ -12,8 +12,8 @@ export default function DocumentUploadFlow() {
       <div className="max-w-lg w-full space-y-8 text-center">
         {/* Header with icon and title */}
         <div className="space-y-4">
-          <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto">
-            <FileText className="w-8 h-8 text-primary-foreground" />
+          <div className="w-16 h-16 bg-karrosserie-orange rounded-full flex items-center justify-center mx-auto shadow-lg">
+            <FileText className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">
             Carrosserie Liguori
@@ -26,7 +26,7 @@ export default function DocumentUploadFlow() {
         {/* Start button */}
         <Button 
           onClick={handleStart}
-          className="w-full max-w-sm mx-auto"
+          className="btn-primary w-full max-w-sm mx-auto shadow-lg hover:shadow-xl transition-all duration-300"
           size="lg"
         >
           Commencer
@@ -45,7 +45,7 @@ export default function DocumentUploadFlow() {
           </h3>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
-              <span className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0">
+              <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
                 1
               </span>
               <span className="text-muted-foreground">
@@ -53,7 +53,7 @@ export default function DocumentUploadFlow() {
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <span className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0">
+              <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
                 2
               </span>
               <span className="text-muted-foreground">
@@ -61,7 +61,7 @@ export default function DocumentUploadFlow() {
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <span className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0">
+              <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
                 3
               </span>
               <span className="text-muted-foreground">
@@ -69,7 +69,7 @@ export default function DocumentUploadFlow() {
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <span className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0">
+              <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
                 4
               </span>
               <span className="text-muted-foreground">
