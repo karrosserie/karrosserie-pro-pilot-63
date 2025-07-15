@@ -23,11 +23,18 @@ const VehicleCardAdapter: React.FC<VehicleCardAdapterProps> = ({
   // Helper function to safely parse vehicle images
   const parseVehicleImages = (images: any): string[] => {
     if (!images) return [];
-    if (Array.isArray(images)) return images;
+    if (Array.isArray(images)) {
+      // Si c'est déjà un tableau d'objets VehicleImageData, extraire les URLs
+      if (images.length > 0 && typeof images[0] === 'object' && images[0].url) {
+        return images.map((img: any) => img.url).filter((url: string) => url && url.trim() !== '');
+      }
+      // Si c'est un tableau de strings (ancienne structure), retourner tel quel
+      return images.filter((img: any) => img && typeof img === 'string' && img.trim() !== '');
+    }
     if (typeof images === 'string') {
       try {
         const parsed = JSON.parse(images);
-        return Array.isArray(parsed) ? parsed : [];
+        return parseVehicleImages(parsed);
       } catch {
         return [];
       }
@@ -36,6 +43,8 @@ const VehicleCardAdapter: React.FC<VehicleCardAdapterProps> = ({
   };
 
   const vehicleImages = parseVehicleImages(vehicle.vehicle_images);
+  console.log('DEBUG - vehicle.vehicle_images:', vehicle.vehicle_images);
+  console.log('DEBUG - parsed vehicleImages:', vehicleImages);
 
   return (
     <VehicleCard

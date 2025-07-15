@@ -73,7 +73,15 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
         const parsed = Array.isArray(vehicle.vehicle_images) 
           ? vehicle.vehicle_images 
           : JSON.parse(vehicle.vehicle_images);
-        return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
+        
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Si c'est un tableau d'objets VehicleImageData, extraire l'URL
+          if (typeof parsed[0] === 'object' && parsed[0].url) {
+            return parsed[0].url;
+          }
+          // Si c'est un tableau de strings (ancienne structure), retourner tel quel
+          return typeof parsed[0] === 'string' ? parsed[0] : null;
+        }
       } catch {
         return null;
       }
