@@ -99,7 +99,7 @@ const AlternativeRepairOrderPreview = ({ companyData, orderData, clientData, veh
           </div>
         </div>
         <div className="text-right">
-          <h2 className="text-3xl font-bold text-black">ORDRE DE RÉPARATION {defaultOrderData.number}</h2>
+          <h2 className="text-3xl font-bold text-black">ORDRE DE RÉPARATION N° {defaultOrderData.number}</h2>
           
           {/* Informations client déplacées ici */}
           <div className="text-left p-4 w-2/3 ml-auto">
@@ -117,8 +117,8 @@ const AlternativeRepairOrderPreview = ({ companyData, orderData, clientData, veh
               {vehicleData?.start_date && vehicleData?.end_date && (
                 <div className="mt-3 pt-2 border-t border-gray-300">
                   <p className="text-lg font-semibold text-gray-800 mb-1">Délai prévisionnel</p>
-                  <p><strong>Date de début des travaux :</strong> {vehicleData.start_date}</p>
-                  <p><strong>Date de fin des travaux :</strong> {vehicleData.end_date}</p>
+                  <p><strong>Date de début :</strong> {vehicleData.start_date}</p>
+                  <p><strong>Date de fin :</strong> {vehicleData.end_date}</p>
                 </div>
               )}
             </div>

@@ -85,7 +85,7 @@ const AlternativeCreditPreview = ({ companyData, creditData, clientData, items, 
           </div>
         </div>
         <div className="text-right">
-          <h2 className="text-3xl font-bold text-black">AVOIR {defaultCreditData.number}</h2>
+          <h2 className="text-3xl font-bold text-black">AVOIR N° {defaultCreditData.number}</h2>
           
           {/* Informations client déplacées ici */}
           <div className="text-left p-4 w-2/3 ml-auto">
