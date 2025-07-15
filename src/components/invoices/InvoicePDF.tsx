@@ -351,7 +351,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             </View>
             
             <View style={alternativeStyles.rightSection}>
-              <Text style={alternativeStyles.invoiceTitle}>FACTURE {clientData?.number || invoice.reference}</Text>
+              <Text style={alternativeStyles.invoiceTitle}>FACTURE N° {clientData?.number || invoice.reference}</Text>
               
               <View style={alternativeStyles.clientBox}>
                 <Text style={[alternativeStyles.clientText, { fontWeight: 'bold' }]}>{clientData?.name || 'Client'}</Text>
