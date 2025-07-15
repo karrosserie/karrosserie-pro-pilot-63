@@ -80,20 +80,16 @@ const RepairOrders = () => {
   };
 
   const handleDownload = (order: RepairOrder) => {
-    setSelectedOrder(order);
-    setViewerModalOpen(true);
     toast({
       title: "Téléchargement",
-      description: `L'ordre de réparation ${order.reference} a été ouvert pour téléchargement.`
+      description: `Téléchargement de l'ordre de réparation ${order.reference}...`
     });
   };
 
   const handlePrint = (order: RepairOrder) => {
-    setSelectedOrder(order);
-    setViewerModalOpen(true);
     toast({
       title: "Impression",
-      description: `L'ordre de réparation ${order.reference} a été ouvert pour impression.`
+      description: `Impression de l'ordre de réparation ${order.reference}...`
     });
   };
 
