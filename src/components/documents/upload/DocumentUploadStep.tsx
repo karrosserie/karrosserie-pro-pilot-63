@@ -51,12 +51,12 @@ export default function DocumentUploadStep({
           <Button
             variant="ghost"
             onClick={onBack}
-            className="flex items-center gap-2 text-karrosserie-orange hover:text-karrosserie-orange/80"
+            className="flex items-center gap-2 text-karrosserie-orange hover:text-karrosserie-orange/80 hover:bg-karrosserie-orange/10"
           >
             <ArrowLeft className="w-4 h-4" />
             Retour
           </Button>
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm text-foreground font-medium">
             {step} sur {totalSteps}
           </span>
         </div>
@@ -64,7 +64,7 @@ export default function DocumentUploadStep({
         {/* Progress Bar */}
         <div className="mb-6">
           <Progress value={progress} className="h-2" />
-          <div className="text-right text-sm text-muted-foreground mt-1">
+          <div className="text-right text-sm text-foreground font-medium mt-1">
             {Math.round(progress)}%
           </div>
         </div>
@@ -79,13 +79,13 @@ export default function DocumentUploadStep({
         <Button
           onClick={handleNext}
           disabled={!selectedFile}
-          className="w-full mb-6 bg-blue-500 hover:bg-blue-600 text-white"
+          className="w-full mb-6 bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white disabled:bg-muted disabled:text-muted-foreground"
         >
           Suivant
         </Button>
 
         {/* Image Preview Area */}
-        <div className="bg-gray-50 rounded-lg p-8 mb-6 min-h-[200px] flex items-center justify-center">
+        <div className="bg-muted/30 rounded-lg p-8 mb-6 min-h-[200px] flex items-center justify-center border-2 border-dashed border-muted">
           {previewUrl ? (
             <img
               src={previewUrl}
@@ -94,7 +94,7 @@ export default function DocumentUploadStep({
             />
           ) : (
             <div className="text-center">
-              <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+              <Camera className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
               <p className="text-muted-foreground text-sm">
                 Aucune image sélectionnée
               </p>
@@ -107,7 +107,7 @@ export default function DocumentUploadStep({
           <label htmlFor="camera-input">
             <Button
               type="button"
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+              className="w-full bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
               asChild
             >
               <span className="flex items-center justify-center gap-2 cursor-pointer">
@@ -128,8 +128,8 @@ export default function DocumentUploadStep({
           <label htmlFor="gallery-input">
             <Button
               type="button"
-              variant="ghost"
-              className="w-full text-blue-600 hover:text-blue-700"
+              variant="outline"
+              className="w-full border-karrosserie-orange text-karrosserie-orange hover:bg-karrosserie-orange hover:text-white"
               asChild
             >
               <span className="flex items-center justify-center gap-2 cursor-pointer">
