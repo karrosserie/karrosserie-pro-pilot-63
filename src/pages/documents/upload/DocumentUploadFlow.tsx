@@ -42,7 +42,7 @@ export default function DocumentUploadFlow() {
             Carrosserie Liguori
           </h1>
           <h2 className="text-xl font-semibold text-foreground">
-            Téléversement de Documents
+            Téléversement de documents
           </h2>
         </div>
 
