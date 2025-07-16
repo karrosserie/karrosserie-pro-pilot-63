@@ -18,8 +18,7 @@ import {
   Wallet,
   Bot,
   X,
-  HelpCircle,
-  Calendar
+  HelpCircle
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -118,7 +117,6 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     { icon: <Bot className="app-icon" />, label: 'Assistant IA', path: '/ai-assistant' },
     { icon: <Users className="app-icon" />, label: 'Clients', path: '/clients' },
     { icon: <Car className="app-icon" />, label: 'Véhicules', path: '/vehicles' },
-    { icon: <Calendar className="app-icon" />, label: 'Planning', path: '/planning' },
     { 
       icon: <FileText className="app-icon" />, 
       label: 'Documents', 
