@@ -60,6 +60,7 @@ export default function DocumentUploadWorkflow({ onBack, onComplete }: DocumentU
 
   return (
     <DocumentUploadStep
+      key={currentStep}
       step={currentStep + 1}
       totalSteps={DOCUMENT_STEPS.length}
       title={DOCUMENT_STEPS[currentStep].title}
