@@ -18,7 +18,8 @@ import {
   Wallet,
   Bot,
   X,
-  HelpCircle
+  HelpCircle,
+  Calendar
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -132,6 +133,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     },
     { icon: <CreditCard className="app-icon" />, label: 'Cession de créance', path: '/cessions' },
     { icon: <Clock className="app-icon" />, label: 'Véhicules de courtoisie', path: '/fleet' },
+    { icon: <Calendar className="app-icon" />, label: 'Planning', path: '/planning' },
     { 
       icon: <DollarSign className="app-icon" />, 
       label: 'Paiements', 
