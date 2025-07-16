@@ -1,13 +1,10 @@
 import React from 'react';
-import { X, Clock, AlertTriangle, Wrench, User } from 'lucide-react';
+import { X, AlertTriangle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { usePlanning } from '@/contexts/PlanningContext';
 
 const WaitingVehiclesModal: React.FC = () => {
@@ -18,106 +15,75 @@ const WaitingVehiclesModal: React.FC = () => {
     step.vehicles.filter(vehicle => !vehicle.inProgress)
   );
 
-  const waitingReasons = {
-    parts: waitingVehicles.filter((_, i) => i % 3 === 0).length,
-    approvals: waitingVehicles.filter((_, i) => i % 3 === 1).length,
-    technicians: waitingVehicles.filter((_, i) => i % 3 === 2).length,
-  };
-
   const handleClose = () => {
     actions.closeWaitingVehiclesModal();
   };
 
+  const handlePlanify = (vehicleId: string) => {
+    const vehicle = waitingVehicles.find(v => v.id === vehicleId);
+    if (vehicle) {
+      actions.scheduleVehicle(vehicleId);
+      handleClose();
+    }
+  };
+
   return (
     <Dialog open={isWaitingVehiclesModalOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+      <DialogContent className="max-w-md p-0 bg-white rounded-lg shadow-lg">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <div className="flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-orange-500" />
-            Véhicules en attente
-          </DialogTitle>
-        </DialogHeader>
+            <h2 className="text-lg font-semibold text-gray-900">Véhicules en attente</h2>
+          </div>
+          <button 
+            onClick={handleClose}
+            className="p-1 hover:bg-gray-100 rounded"
+          >
+            <X className="w-5 h-5 text-gray-500" />
+          </button>
+        </div>
         
-        <div className="space-y-6">
-          {/* Summary */}
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-            <div className="flex items-center gap-2 text-orange-800 mb-2">
-              <AlertTriangle className="w-5 h-5" />
-              <span className="font-medium">{waitingVehicles.length} véhicules en attente</span>
-            </div>
-            <div className="text-sm text-orange-700 flex gap-4">
-              <span>Pièces: {waitingReasons.parts}</span>
-              <span>Approbations: {waitingReasons.approvals}</span>
-              <span>Techniciens: {waitingReasons.technicians}</span>
-            </div>
+        {/* Content */}
+        <div className="p-4 space-y-3">
+          <div className="text-sm text-gray-600 mb-4">
+            <strong>{waitingVehicles.length} véhicules</strong> nécessitent une attention :
           </div>
-
-          {/* Waiting vehicles list */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-gray-900">Liste des véhicules</h3>
-            {waitingVehicles.map((vehicle, index) => {
-              const reasonIndex = index % 3;
-              const reason = reasonIndex === 0 ? 'Pièces manquantes' : 
-                           reasonIndex === 1 ? 'Approbation en attente' : 
-                           'Technicien non assigné';
-              const reasonIcon = reasonIndex === 0 ? Wrench : 
-                               reasonIndex === 1 ? Clock : User;
-              const ReasonIcon = reasonIcon;
-
-              return (
-                <div key={vehicle.id} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h4 className="font-semibold">{vehicle.brand} {vehicle.model}</h4>
-                        <Badge variant="secondary">{vehicle.plate}</Badge>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-1">{vehicle.client}</p>
-                      <p className="text-sm text-gray-600 mb-2">{vehicle.status}</p>
-                      
-                      <div className="flex items-center gap-2 text-sm">
-                        <ReasonIcon className="w-4 h-4 text-orange-500" />
-                        <span className="text-orange-700">{reason}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="text-right">
-                      <div className="font-semibold text-green-600">{vehicle.price}€</div>
-                      <div className="text-sm text-gray-500">{vehicle.duration}h</div>
-                    </div>
+          
+          {waitingVehicles.map((vehicle, index) => {
+            const reasons = ['Pièces manquantes', 'Approbation client', 'Technicien disponible'];
+            const reason = reasons[index % 3];
+            
+            return (
+              <div key={vehicle.id} className="flex items-center justify-between p-3 bg-gray-50 rounded border">
+                <div className="flex-1">
+                  <div className="font-medium text-gray-900">
+                    {vehicle.brand} {vehicle.model}
                   </div>
-                  
-                  <div className="mt-3 flex gap-2">
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => {
-                        actions.openScheduleModal(vehicle);
-                        handleClose();
-                      }}
-                    >
-                      Planifier
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => {
-                        actions.openVehicleDetailModal(vehicle);
-                        handleClose();
-                      }}
-                    >
-                      Détails
-                    </Button>
-                  </div>
+                  <div className="text-sm text-gray-600">{vehicle.plate} - {vehicle.client}</div>
+                  <div className="text-xs text-orange-600 mt-1">{reason}</div>
                 </div>
-              );
-            })}
-          </div>
-
-          <div className="flex justify-end">
-            <Button variant="outline" onClick={handleClose}>
-              Fermer
-            </Button>
+                <div className="text-right ml-4">
+                  <div className="font-semibold text-green-600">{vehicle.price}€</div>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => handlePlanify(vehicle.id)}
+                    className="mt-1 text-xs"
+                  >
+                    Planifier
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+          
+          <div className="pt-3 border-t border-gray-200">
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>Pièces: {Math.floor(waitingVehicles.length / 3)}</span>
+              <span>Approbations: {Math.floor(waitingVehicles.length / 3)}</span>
+              <span>Techniciens: {waitingVehicles.length - 2 * Math.floor(waitingVehicles.length / 3)}</span>
+            </div>
           </div>
         </div>
       </DialogContent>
