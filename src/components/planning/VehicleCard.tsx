@@ -1,6 +1,5 @@
 import React from 'react';
 import { Clock, User, Calendar, AlertTriangle } from 'lucide-react';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Vehicle } from '@/types/planning';
@@ -17,77 +16,65 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
     actions.scheduleVehicle(vehicle.id);
   };
 
-  const handleMarkUrgent = () => {
-    actions.markUrgent(vehicle.id);
-  };
-
   const handleOpenScheduleModal = () => {
     actions.openScheduleModal(vehicle);
   };
 
   return (
-    <Card className={`p-4 transition-all hover:shadow-md ${vehicle.urgency ? 'border-red-500 bg-red-50' : ''}`}>
+    <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
       <div className="space-y-3">
+        {/* Vehicle Info */}
         <div className="flex items-start justify-between">
           <div>
-            <div className="flex items-center gap-2">
-              <h4 className="font-semibold">{vehicle.brand} {vehicle.model}</h4>
-              {vehicle.urgency && (
-                <AlertTriangle className="w-4 h-4 text-red-500" />
-              )}
-            </div>
-            <p className="text-sm text-muted-foreground">{vehicle.plate}</p>
-            <p className="text-sm text-muted-foreground">{vehicle.client}</p>
+            <h4 className="font-semibold text-gray-900">{vehicle.brand} {vehicle.model}</h4>
+            <p className="text-sm text-gray-500">{vehicle.plate}</p>
+            <p className="text-sm text-gray-500">{vehicle.client}</p>
           </div>
           <div className="text-right">
             <div className="font-semibold text-green-600">{vehicle.price}€</div>
-            <div className="text-sm text-muted-foreground flex items-center">
-              <Clock className="w-3 h-3 mr-1" />
-              {vehicle.duration}h
-            </div>
+            <div className="text-sm text-gray-500">{vehicle.duration}h</div>
           </div>
         </div>
         
-        <div className="text-sm text-muted-foreground cursor-pointer hover:text-primary" 
+        {/* Status */}
+        <div className="text-sm text-blue-600 cursor-pointer hover:text-blue-800" 
              onClick={handleOpenScheduleModal}>
           {vehicle.status}
         </div>
         
+        {/* Technician */}
         {vehicle.technician && (
-          <div className="flex items-center text-sm cursor-pointer hover:text-primary"
+          <div className="flex items-center text-sm text-gray-600 cursor-pointer hover:text-gray-800"
                onClick={handleOpenScheduleModal}>
             <User className="w-3 h-3 mr-1" />
             {vehicle.technician}
           </div>
         )}
         
+        {/* Status Badge and Actions */}
         <div className="flex items-center justify-between">
           {vehicle.inProgress ? (
-            <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+            <Badge variant="default" className="bg-blue-600 text-white">
               En cours
             </Badge>
           ) : (
-            <span className="text-sm text-muted-foreground">À planifier</span>
+            <span className="text-sm text-gray-500">À planifier</span>
           )}
           
-          <div className="flex gap-2">
-            {!vehicle.inProgress && (
-              <Button size="sm" variant="outline" onClick={handleSchedule}>
-                <Calendar className="w-3 h-3 mr-1" />
-                Planifier
-              </Button>
-            )}
+          {!vehicle.inProgress && (
             <Button 
               size="sm" 
-              variant={vehicle.urgency ? "destructive" : "outline"}
-              onClick={handleMarkUrgent}
+              variant="outline" 
+              onClick={handleSchedule}
+              className="text-xs"
             >
-              <AlertTriangle className="w-3 h-3" />
+              <Calendar className="w-3 h-3 mr-1" />
+              Planifier
             </Button>
-          </div>
+          )}
         </div>
       </div>
-    </Card>
+    </div>
   );
 };
 

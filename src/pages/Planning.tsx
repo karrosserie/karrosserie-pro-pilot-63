@@ -7,12 +7,10 @@ import ScheduleModal from '@/components/planning/ScheduleModal';
 const Planning: React.FC = () => {
   return (
     <PlanningProvider>
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <PlanningHeader />
-          <PlanningTabs />
-          <ScheduleModal />
-        </div>
+      <div className="min-h-screen bg-gray-50">
+        <PlanningHeader />
+        <PlanningTabs />
+        <ScheduleModal />
       </div>
     </PlanningProvider>
   );
