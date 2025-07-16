@@ -832,10 +832,346 @@ const Planning = () => {
         )}
 
         {currentTab === 'planning' && (
-          <div className="text-center py-20">
-            <Calendar className="h-24 w-24 text-gray-300 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-gray-500">Vue Planning</h2>
-            <p className="text-gray-400">Cette vue sera développée prochainement</p>
+          <div className="space-y-6">
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">Planning Détaillé</h1>
+              <p className="text-gray-600">Toutes les tâches par véhicule et jour par jour</p>
+            </div>
+
+            {/* Weekly Planning Grid */}
+            <div className="grid grid-cols-5 gap-4">
+              {/* Lundi */}
+              <div className="bg-white rounded-lg border p-4">
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-blue-600">Lundi</h3>
+                  <p className="text-sm text-gray-500">3 tâche(s)</p>
+                </div>
+                <div className="space-y-3">
+                  {/* Card 1 */}
+                  <div className="border-l-4 border-l-blue-500 bg-gray-50 rounded-r p-3">
+                    <div className="flex items-center text-xs text-blue-600 mb-1">
+                      <span className="mr-1">🕘</span>
+                      9h-10h
+                    </div>
+                    <div className="font-semibold text-sm mb-1">EZ-787-KL</div>
+                    <div className="text-xs text-gray-600 mb-1">Citroën C4</div>
+                    <div className="text-xs text-blue-600 font-medium mb-1">Accueil & Préparation</div>
+                    <div className="flex items-center text-xs text-gray-500 mb-1">
+                      <span className="mr-1">👤</span>
+                      Martin Dubois
+                    </div>
+                    <div className="text-xs text-gray-500">Client: M. Durand</div>
+                    <div className="mt-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded text-center">
+                      Accueil & Préparation du dossier
+                    </div>
+                  </div>
+
+                  {/* Card 2 */}
+                  <div className="border-l-4 border-l-green-500 bg-gray-50 rounded-r p-3">
+                    <div className="flex items-center text-xs text-blue-600 mb-1">
+                      <span className="mr-1">🕙</span>
+                      10h-12h
+                    </div>
+                    <div className="font-semibold text-sm mb-1">VS-901-AB</div>
+                    <div className="text-xs text-gray-600 mb-1">Audi A4</div>
+                    <div className="text-xs text-green-600 font-medium mb-1">Débosselage portière</div>
+                    <div className="flex items-center text-xs text-gray-500 mb-1">
+                      <span className="mr-1">👤</span>
+                      Sophie Martin
+                    </div>
+                    <div className="text-xs text-gray-500">Client: M. Bernard</div>
+                    <div className="mt-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded text-center">
+                      Remplacement ou débosselage
+                    </div>
+                  </div>
+
+                  {/* Card 3 */}
+                  <div className="border-l-4 border-l-yellow-500 bg-gray-50 rounded-r p-3">
+                    <div className="flex items-center text-xs text-blue-600 mb-1">
+                      <span className="mr-1">🕕</span>
+                      14h-16h30
+                    </div>
+                    <div className="font-semibold text-sm mb-1">AB-789-XY</div>
+                    <div className="text-xs text-gray-600 mb-1">Peugeot 308</div>
+                    <div className="text-xs text-yellow-600 font-medium mb-1">Ponçage aile avant</div>
+                    <div className="flex items-center text-xs text-gray-500 mb-1">
+                      <span className="mr-1">👤</span>
+                      Sophie Martin
+                    </div>
+                    <div className="text-xs text-gray-500">Client: Mme Moreau</div>
+                    <div className="mt-2 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded text-center">
+                      Préparation peinture
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mardi */}
+              <div className="bg-white rounded-lg border p-4">
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-blue-600">Mardi</h3>
+                  <p className="text-sm text-gray-500">3 tâche(s)</p>
+                </div>
+                <div className="space-y-3">
+                  {/* Card 1 */}
+                  <div className="border-l-4 border-l-blue-500 bg-gray-50 rounded-r p-3">
+                    <div className="flex items-center text-xs text-blue-600 mb-1">
+                      <span className="mr-1">🕗</span>
+                      8h-9h
+                    </div>
+                    <div className="font-semibold text-sm mb-1">QR-345-ST</div>
+                    <div className="text-xs text-gray-600 mb-1">Mercedes Classe C</div>
+                    <div className="text-xs text-blue-600 font-medium mb-1">Expertise assurance</div>
+                    <div className="flex items-center text-xs text-gray-500 mb-1">
+                      <span className="mr-1">👤</span>
+                      Martin Dubois
+                    </div>
+                    <div className="text-xs text-gray-500">Client: Mme Leclerc</div>
+                    <div className="mt-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded text-center">
+                      Accueil & Préparation du dossier
+                    </div>
+                  </div>
+
+                  {/* Card 2 */}
+                  <div className="border-l-4 border-l-red-500 bg-gray-50 rounded-r p-3">
+                    <div className="flex items-center text-xs text-blue-600 mb-1">
+                      <span className="mr-1">🕘</span>
+                      9h-13h
+                    </div>
+                    <div className="font-semibold text-sm mb-1">CD-123-ZW</div>
+                    <div className="text-xs text-gray-600 mb-1">Renault Clio</div>
+                    <div className="text-xs text-red-600 font-medium mb-1">Application base peinture</div>
+                    <div className="flex items-center text-xs text-gray-500 mb-1">
+                      <span className="mr-1">👤</span>
+                      Sophie Martin
+                    </div>
+                    <div className="text-xs text-gray-500">Client: M. Petit</div>
+                    <div className="mt-2 bg-red-100 text-red-800 text-xs px-2 py-1 rounded text-center">
+                      Mise en peinture
+                    </div>
+                  </div>
+
+                  {/* Card 3 */}
+                  <div className="border-l-4 border-l-orange-500 bg-gray-50 rounded-r p-3">
+                    <div className="flex items-center text-xs text-blue-600 mb-1">
+                      <span className="mr-1">🕔</span>
+                      14h-15h30
+                    </div>
+                    <div className="font-semibold text-sm mb-1">EF-456-UV</div>
+                    <div className="text-xs text-gray-600 mb-1">Volkswagen Golf</div>
+                    <div className="text-xs text-orange-600 font-medium mb-1">Polissage final</div>
+                    <div className="flex items-center text-xs text-gray-500 mb-1">
+                      <span className="mr-1">👤</span>
+                      Martin Dubois
+                    </div>
+                    <div className="text-xs text-gray-500">Client: Mme Blanc</div>
+                    <div className="mt-2 bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded text-center">
+                      Finitions & remontage
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mercredi */}
+              <div className="bg-white rounded-lg border p-4">
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-blue-600">Mercredi</h3>
+                  <p className="text-sm text-gray-500">3 tâche(s)</p>
+                </div>
+                <div className="space-y-3">
+                  {/* Card 1 */}
+                  <div className="border-l-4 border-l-green-500 bg-gray-50 rounded-r p-3">
+                    <div className="flex items-center text-xs text-blue-600 mb-1">
+                      <span className="mr-1">🕗</span>
+                      8h-11h
+                    </div>
+                    <div className="font-semibold text-sm mb-1">HT-556-GH</div>
+                    <div className="text-xs text-gray-600 mb-1">BMW Série 1</div>
+                    <div className="text-xs text-green-600 font-medium mb-1">Remplacement pare-chocs</div>
+                    <div className="flex items-center text-xs text-gray-500 mb-1">
+                      <span className="mr-1">👤</span>
+                      Sophie Martin
+                    </div>
+                    <div className="text-xs text-gray-500">Client: M. Rousseau</div>
+                    <div className="mt-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded text-center">
+                      Remplacement ou débosselage
+                    </div>
+                  </div>
+
+                  {/* Card 2 */}
+                  <div className="border-l-4 border-l-gray-500 bg-gray-50 rounded-r p-3">
+                    <div className="flex items-center text-xs text-blue-600 mb-1">
+                      <span className="mr-1">🕚</span>
+                      11h-11h30
+                    </div>
+                    <div className="font-semibold text-sm mb-1">GH-789-ST</div>
+                    <div className="text-xs text-gray-600 mb-1">Ford Focus</div>
+                    <div className="text-xs text-gray-600 font-medium mb-1">Contrôle qualité</div>
+                    <div className="flex items-center text-xs text-gray-500 mb-1">
+                      <span className="mr-1">👤</span>
+                      Martin Dubois
+                    </div>
+                    <div className="text-xs text-gray-500">Client: M. Roux</div>
+                    <div className="mt-2 bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded text-center">
+                      Clôture du dossier et livraison
+                    </div>
+                  </div>
+
+                  {/* Card 3 */}
+                  <div className="border-l-4 border-l-yellow-500 bg-gray-50 rounded-r p-3">
+                    <div className="flex items-center text-xs text-blue-600 mb-1">
+                      <span className="mr-1">🕑</span>
+                      14h-15h
+                    </div>
+                    <div className="font-semibold text-sm mb-1">CD-123-ZW</div>
+                    <div className="text-xs text-gray-600 mb-1">Renault Clio</div>
+                    <div className="text-xs text-yellow-600 font-medium mb-1">Finitions peinture</div>
+                    <div className="flex items-center text-xs text-gray-500 mb-1">
+                      <span className="mr-1">👤</span>
+                      Sophie Martin
+                    </div>
+                    <div className="text-xs text-gray-500">Client: M. Petit</div>
+                    <div className="mt-2 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded text-center">
+                      Finitions & remontage
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Jeudi */}
+              <div className="bg-white rounded-lg border p-4">
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-blue-600">Jeudi</h3>
+                  <p className="text-sm text-gray-500">2 tâche(s)</p>
+                </div>
+                <div className="space-y-3">
+                  {/* Card 1 */}
+                  <div className="border-l-4 border-l-red-500 bg-gray-50 rounded-r p-3">
+                    <div className="flex items-center text-xs text-blue-600 mb-1">
+                      <span className="mr-1">🕘</span>
+                      9h-12h
+                    </div>
+                    <div className="font-semibold text-sm mb-1">AB-789-XY</div>
+                    <div className="text-xs text-gray-600 mb-1">Peugeot 308</div>
+                    <div className="text-xs text-red-600 font-medium mb-1">Application peinture</div>
+                    <div className="flex items-center text-xs text-gray-500 mb-1">
+                      <span className="mr-1">👤</span>
+                      Sophie Martin
+                    </div>
+                    <div className="text-xs text-gray-500">Client: Mme Moreau</div>
+                    <div className="mt-2 bg-red-100 text-red-800 text-xs px-2 py-1 rounded text-center">
+                      Mise en peinture
+                    </div>
+                  </div>
+
+                  {/* Card 2 */}
+                  <div className="border-l-4 border-l-green-500 bg-gray-50 rounded-r p-3">
+                    <div className="flex items-center text-xs text-blue-600 mb-1">
+                      <span className="mr-1">🕔</span>
+                      14h-16h
+                    </div>
+                    <div className="font-semibold text-sm mb-1">EZ-787-KL</div>
+                    <div className="text-xs text-gray-600 mb-1">Citroën C4</div>
+                    <div className="text-xs text-green-600 font-medium mb-1">Débosselage léger</div>
+                    <div className="flex items-center text-xs text-gray-500 mb-1">
+                      <span className="mr-1">👤</span>
+                      Martin Dubois
+                    </div>
+                    <div className="text-xs text-gray-500">Client: M. Durand</div>
+                    <div className="mt-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded text-center">
+                      Remplacement ou débosselage
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Vendredi */}
+              <div className="bg-white rounded-lg border p-4">
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-blue-600">Vendredi</h3>
+                  <p className="text-sm text-gray-500">3 tâche(s)</p>
+                </div>
+                <div className="space-y-3">
+                  {/* Card 1 */}
+                  <div className="border-l-4 border-l-yellow-500 bg-gray-50 rounded-r p-3">
+                    <div className="flex items-center text-xs text-blue-600 mb-1">
+                      <span className="mr-1">🕗</span>
+                      8h-10h
+                    </div>
+                    <div className="font-semibold text-sm mb-1">HT-556-GH</div>
+                    <div className="text-xs text-gray-600 mb-1">BMW Série 1</div>
+                    <div className="text-xs text-yellow-600 font-medium mb-1">Préparation peinture</div>
+                    <div className="flex items-center text-xs text-gray-500 mb-1">
+                      <span className="mr-1">👤</span>
+                      Sophie Martin
+                    </div>
+                    <div className="text-xs text-gray-500">Client: M. Rousseau</div>
+                    <div className="mt-2 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded text-center">
+                      Préparation peinture
+                    </div>
+                  </div>
+
+                  {/* Card 2 */}
+                  <div className="border-l-4 border-l-orange-500 bg-gray-50 rounded-r p-3">
+                    <div className="flex items-center text-xs text-blue-600 mb-1">
+                      <span className="mr-1">🕙</span>
+                      10h-12h
+                    </div>
+                    <div className="font-semibold text-sm mb-1">AB-789-XY</div>
+                    <div className="text-xs text-gray-600 mb-1">Peugeot 308</div>
+                    <div className="text-xs text-orange-600 font-medium mb-1">Finitions & remontage</div>
+                    <div className="flex items-center text-xs text-gray-500 mb-1">
+                      <span className="mr-1">👤</span>
+                      Martin Dubois
+                    </div>
+                    <div className="text-xs text-gray-500">Client: Mme Moreau</div>
+                    <div className="mt-2 bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded text-center">
+                      Finitions & remontage
+                    </div>
+                  </div>
+
+                  {/* Card 3 */}
+                  <div className="border-l-4 border-l-gray-500 bg-gray-50 rounded-r p-3">
+                    <div className="flex items-center text-xs text-blue-600 mb-1">
+                      <span className="mr-1">🕑</span>
+                      14h-14h30
+                    </div>
+                    <div className="font-semibold text-sm mb-1">EZ-787-KL</div>
+                    <div className="text-xs text-gray-600 mb-1">Citroën C4</div>
+                    <div className="text-xs text-gray-600 font-medium mb-1">Livraison client</div>
+                    <div className="flex items-center text-xs text-gray-500 mb-1">
+                      <span className="mr-1">👤</span>
+                      Martin Dubois
+                    </div>
+                    <div className="text-xs text-gray-500">Client: M. Durand</div>
+                    <div className="mt-2 bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded text-center">
+                      Clôture du dossier et livraison
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Week Summary */}
+            <div className="mt-8">
+              <h3 className="flex items-center text-lg font-semibold text-gray-900 mb-4">
+                🗂️ Résumé de la semaine
+              </h3>
+              <div className="grid grid-cols-3 gap-6">
+                <div className="bg-blue-50 rounded-lg p-6 text-center">
+                  <div className="text-3xl font-bold text-blue-600 mb-2">14</div>
+                  <div className="text-sm text-gray-600">Tâches totales</div>
+                </div>
+                <div className="bg-green-50 rounded-lg p-6 text-center">
+                  <div className="text-3xl font-bold text-green-600 mb-2">8</div>
+                  <div className="text-sm text-gray-600">Véhicules traités</div>
+                </div>
+                <div className="bg-yellow-50 rounded-lg p-6 text-center">
+                  <div className="text-3xl font-bold text-yellow-600 mb-2">2</div>
+                  <div className="text-sm text-gray-600">Techniciens mobilisés</div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
