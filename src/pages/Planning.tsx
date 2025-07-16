@@ -209,20 +209,153 @@ const Planning = () => {
   const WaitingVehiclesModal = () => {
     if (!showWaitingModal) return null;
     
-    const waitingVehiclesList = vehicles.filter(v => v.status === 'À planifier');
+    const waitingVehicles = [
+      {
+        id: '1',
+        brand: 'Peugeot',
+        model: '308',
+        plate: 'AB-123-CD',
+        client: 'M. Dupont',
+        price: 2500,
+        blockedStage: 'Réparation carrosserie',
+        waitingDays: 196,
+        status: 'Normale',
+        reason: 'Attente pièces',
+        detail: 'Pare-chocs avant en commande - Délai 5-7 jours'
+      },
+      {
+        id: '2',
+        brand: 'Renault',
+        model: 'Clio',
+        plate: 'FG-456-GH',
+        client: 'Mme Martin',
+        price: 1200,
+        blockedStage: 'Expertise',
+        waitingDays: 197,
+        status: 'Urgent',
+        reason: 'Accord expert assurance',
+        detail: 'En attente validation devis par expert AXA'
+      },
+      {
+        id: '3',
+        brand: 'BMW',
+        model: 'Série 3',
+        plate: 'PQ-012-UV',
+        client: 'M. Leroy',
+        price: 3200,
+        blockedStage: 'Réparation',
+        waitingDays: 106,
+        status: 'Normale',
+        reason: 'Attente pièces',
+        detail: 'Optique avant droite en commande'
+      }
+    ];
     
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Véhicules en attente</h2>
-            <Button variant="ghost" onClick={() => setShowWaitingModal(false)}>×</Button>
+        <div className="bg-white rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
+          {/* Header */}
+          <div className="flex justify-between items-center p-6 border-b">
+            <div>
+              <h2 className="text-lg font-medium text-gray-900">Véhicules en Attente</h2>
+              <p className="text-sm text-gray-500">5 véhicule(s) bloqué(s) dans les étapes atelier</p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button variant="outline" size="sm">
+                ← Retour
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setShowWaitingModal(false)}>
+                ✕
+              </Button>
+            </div>
           </div>
-          
-          <div className="space-y-3">
-            {waitingVehiclesList.map(vehicle => (
-              <VehicleCard key={vehicle.id} vehicle={vehicle} />
+
+          {/* Vehicle List */}
+          <div className="p-6 space-y-6 overflow-y-auto max-h-[70vh]">
+            {waitingVehicles.map((vehicle) => (
+              <div key={vehicle.id} className="border rounded-lg p-4 bg-white">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center space-x-4">
+                    <h3 className="text-lg font-medium text-gray-900">
+                      {vehicle.brand} {vehicle.model}
+                    </h3>
+                    <span className="text-sm bg-gray-100 px-2 py-1 rounded">
+                      {vehicle.plate}
+                    </span>
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      vehicle.status === 'Urgent' 
+                        ? 'bg-red-100 text-red-700' 
+                        : 'bg-blue-100 text-blue-700'
+                    }`}>
+                      ● {vehicle.status}
+                    </span>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                      ✓ Débloquer
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      📅 Planifier
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      ✏️ Modifier
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-600">Client :</span>
+                    <p className="font-medium">{vehicle.client}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Prix :</span>
+                    <p className="font-medium text-green-600">{vehicle.price}€</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Étape bloquée :</span>
+                    <p className="font-medium">{vehicle.blockedStage}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">En attente depuis :</span>
+                    <p className="font-medium text-red-600">{vehicle.waitingDays} jour(s)</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 bg-orange-50 border border-orange-200 rounded p-3">
+                  <div className="flex items-start space-x-2">
+                    <span className="text-orange-600">⚠️</span>
+                    <div>
+                      <p className="font-medium text-orange-800">
+                        Raison du blocage : {vehicle.reason}
+                      </p>
+                      <p className="text-sm text-orange-700 mt-1">
+                        {vehicle.detail}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             ))}
+          </div>
+
+          {/* Footer */}
+          <div className="border-t p-4 bg-gray-50 flex justify-between items-center">
+            <div className="text-sm text-gray-600">
+              <span className="font-medium">Répartition des blocages :</span>
+              <span className="ml-2 bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Pièces: 2</span>
+              <span className="ml-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Expertise: 1</span>
+              <span className="ml-1 bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Technicien: 1</span>
+              <span className="ml-1 bg-red-100 text-red-800 px-2 py-1 rounded text-xs">Problèmes: 1</span>
+            </div>
+            <div className="flex space-x-2">
+              <Button variant="outline" size="sm">
+                📊 Exporter
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setShowWaitingModal(false)}>
+                Fermer
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -232,46 +365,241 @@ const Planning = () => {
   const VehicleDetailModal = () => {
     if (!selectedVehicle) return null;
     
+    const workshopSteps = [
+      { name: 'Accueil & Préparation', progress: 100, status: 'completed' },
+      { name: 'Remplacement ou débosselage', progress: 60, status: 'in-progress' },
+      { name: 'Préparation peinture', progress: 0, status: 'pending' },
+      { name: 'Mise en peinture', progress: 0, status: 'pending' },
+      { name: 'Finitions & remontage', progress: 0, status: 'pending' },
+      { name: 'Clôture & livraison', progress: 0, status: 'pending' }
+    ];
+
+    const repairs = [
+      { name: 'Pare-chocs avant', type: 'Remplacement', price: 450, status: 'Terminé' },
+      { name: 'Aile avant droite', type: 'Débosselage + peinture', price: 680, status: 'En cours' },
+      { name: 'Optique avant', type: 'Remplacement', price: 220, status: 'À planifier' }
+    ];
+
+    const parts = [
+      { name: 'Pare-chocs avant', ref: 'PC-AV-001', price: 180, status: 'disponible' },
+      { name: 'Optique avant droite', ref: 'OPT-AV-R', price: 95, status: 'commande' },
+      { name: 'Peinture RAL 9003', ref: 'PEIN-RAL', price: 45, status: 'disponible' }
+    ];
+
+    const history = [
+      { date: '08/01/2025 09:00', user: 'Martin Dubois', action: 'Réception véhicule' },
+      { date: '08/01/2025 10:30', user: 'Martin Dubois', action: 'Début démontage pare-chocs' },
+      { date: '08/01/2025 14:00', user: 'Martin Dubois', action: 'Démontage terminé' },
+      { date: '09/01/2025 08:00', user: 'Sophie Martin', action: 'Début débosselage aile' }
+    ];
+    
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">
-              {selectedVehicle.brand} {selectedVehicle.model} - {selectedVehicle.plate}
+        <div className="bg-white rounded-lg max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden">
+          {/* Header */}
+          <div className="flex justify-between items-center p-6 border-b">
+            <h2 className="text-lg font-medium text-gray-900">
+              Détail du véhicule - {selectedVehicle.plate}
             </h2>
-            <Button variant="ghost" onClick={() => setSelectedVehicle(null)}>×</Button>
+            <div className="flex items-center space-x-3">
+              <Button className="bg-blue-600 hover:bg-blue-700" size="sm">
+                En cours
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setSelectedVehicle(null)}>
+                ✕
+              </Button>
+            </div>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-medium mb-2">Informations véhicule</h3>
-              <div className="space-y-2 text-sm">
-                <p><strong>Propriétaire:</strong> {selectedVehicle.owner}</p>
-                <p><strong>Plaque:</strong> {selectedVehicle.plate}</p>
-                <p><strong>Montant:</strong> {selectedVehicle.amount}€</p>
-                <p><strong>Durée estimée:</strong> {selectedVehicle.duration}</p>
-                <p><strong>Description:</strong> {selectedVehicle.description}</p>
-                <p><strong>Étape:</strong> {selectedVehicle.step}</p>
-                {selectedVehicle.technician && (
-                  <p><strong>Technicien:</strong> {selectedVehicle.technician}</p>
-                )}
-                <p><strong>Statut:</strong> {selectedVehicle.status}</p>
+
+          <div className="overflow-y-auto max-h-[80vh]">
+            {/* Vehicle and Client Info */}
+            <div className="p-6 grid grid-cols-2 gap-8 border-b">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="flex items-center text-sm font-medium text-gray-900 mb-3">
+                  📄 Informations véhicule
+                </h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Modèle:</span>
+                    <span className="font-medium">{selectedVehicle.brand} {selectedVehicle.model}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Plaque:</span>
+                    <span className="font-medium">{selectedVehicle.plate}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Étape actuelle:</span>
+                    <span className="font-medium text-blue-600">{selectedVehicle.step}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Temps estimé:</span>
+                    <span className="font-medium">{selectedVehicle.duration}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Prix total:</span>
+                    <span className="font-medium text-blue-600">{selectedVehicle.amount}€</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="flex items-center text-sm font-medium text-gray-900 mb-3">
+                  👤 Informations client
+                </h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-600">👤</span>
+                    <span className="font-medium">{selectedVehicle.owner}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-600">📞</span>
+                    <span>06.12.34.56.78</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-600">✉️</span>
+                    <span>client@example.com</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-600">📍</span>
+                    <span>123 Rue de la République, 75001 Paris</span>
+                  </div>
+                </div>
               </div>
             </div>
-            
-            <div>
-              <h3 className="font-medium mb-2">Actions</h3>
-              <div className="space-y-2">
-                <Button className="w-full" variant="default">
-                  Modifier le planning
-                </Button>
-                <Button className="w-full" variant="outline">
-                  Voir les détails complets
-                </Button>
-                <Button className="w-full" variant="outline">
-                  Historique des interventions
-                </Button>
+
+            {/* Workshop Progress */}
+            <div className="p-6 border-b">
+              <h3 className="flex items-center text-sm font-medium text-gray-900 mb-4">
+                ✅ Progression des étapes atelier (27%)
+              </h3>
+              <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
+                <div className="bg-blue-600 h-2 rounded-full" style={{ width: '27%' }}></div>
               </div>
+              
+              <div className="space-y-4">
+                {workshopSteps.map((step, index) => (
+                  <div key={index} className="flex items-center justify-between py-2">
+                    <span className="text-sm text-gray-700">{step.name}</span>
+                    <div className="flex items-center space-x-3">
+                      <span className="text-sm font-medium">{step.progress}%</span>
+                      {step.status === 'completed' && (
+                        <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded">100% ✓</span>
+                      )}
+                      {step.status === 'in-progress' && (
+                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">60% ⏱️</span>
+                      )}
+                      {step.status === 'pending' && (
+                        <span className="text-gray-400 text-xs">0%</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Insurance and Repairs sections */}
+            <div className="p-6 grid grid-cols-2 gap-8 border-b">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="flex items-center text-sm font-medium text-gray-900 mb-3">
+                  🛡️ Assurance
+                </h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Compagnie:</span>
+                    <span className="font-medium">AXA Assurance</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">N° Sinistre:</span>
+                    <span className="font-medium">SIN-2025-001234</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Expert:</span>
+                    <span className="font-medium">M. Dupont</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Franchise:</span>
+                    <span className="font-medium">300€</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="flex items-center text-sm font-medium text-gray-900 mb-3">
+                  🔧 Réparations
+                </h3>
+                <div className="space-y-2">
+                  {repairs.map((repair, index) => (
+                    <div key={index} className="flex justify-between items-center">
+                      <div>
+                        <p className="text-sm font-medium">{repair.name}</p>
+                        <p className="text-xs text-gray-500">{repair.type}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium">{repair.price}€</p>
+                        <span className={`text-xs px-2 py-1 rounded ${
+                          repair.status === 'Terminé' ? 'bg-green-100 text-green-800' :
+                          repair.status === 'En cours' ? 'bg-blue-100 text-blue-800' :
+                          'bg-gray-100 text-gray-600'
+                        }`}>
+                          {repair.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Parts and History sections */}
+            <div className="p-6 grid grid-cols-2 gap-8">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="flex items-center text-sm font-medium text-gray-900 mb-3">
+                  ⚠️ Pièces
+                </h3>
+                <div className="space-y-2">
+                  {parts.map((part, index) => (
+                    <div key={index} className="flex justify-between items-center">
+                      <div>
+                        <p className="text-sm font-medium">{part.name}</p>
+                        <p className="text-xs text-gray-500">{part.ref}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium">{part.price}€</p>
+                        <span className={`text-xs px-2 py-1 rounded ${
+                          part.status === 'disponible' ? 'bg-green-100 text-green-800' :
+                          'bg-blue-100 text-blue-800'
+                        }`}>
+                          {part.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="flex items-center text-sm font-medium text-gray-900 mb-3">
+                  📅 Historique
+                </h3>
+                <div className="space-y-2">
+                  {history.map((entry, index) => (
+                    <div key={index} className="border-l-2 border-blue-200 pl-3">
+                      <p className="text-sm font-medium">{entry.action}</p>
+                      <p className="text-xs text-gray-500">{entry.date} - {entry.user}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="border-t p-4 bg-gray-50 flex justify-end">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600">👤 Technicien: {selectedVehicle.technician || 'Martin Dubois'}</span>
+              <Button variant="outline" size="sm" onClick={() => setSelectedVehicle(null)}>
+                Fermer
+              </Button>
             </div>
           </div>
         </div>
