@@ -45,7 +45,10 @@ export interface PlanningState {
   steps: WorkshopStep[];
   alerts: PlanningAlert[];
   selectedVehicle?: Vehicle;
+  selectedVehicleDetail?: Vehicle;
   isScheduleModalOpen: boolean;
+  isWaitingVehiclesModalOpen: boolean;
+  isVehicleDetailModalOpen: boolean;
 }
 
 export interface PlanningActions {
@@ -57,4 +60,8 @@ export interface PlanningActions {
   markUrgent: (vehicleId: string) => void;
   openScheduleModal: (vehicle: Vehicle) => void;
   closeScheduleModal: () => void;
+  openWaitingVehiclesModal: () => void;
+  closeWaitingVehiclesModal: () => void;
+  openVehicleDetailModal: (vehicle: Vehicle) => void;
+  closeVehicleDetailModal: () => void;
 }

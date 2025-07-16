@@ -176,7 +176,9 @@ const initialState: PlanningState = {
       details: 'Pièces: 2 • Approbations: 1 • Techniciens: 1'
     }
   ],
-  isScheduleModalOpen: false
+  isScheduleModalOpen: false,
+  isWaitingVehiclesModalOpen: false,
+  isVehicleDetailModalOpen: false
 };
 
 // Types d'actions
@@ -188,7 +190,11 @@ type PlanningActionType =
   | { type: 'ASSIGN_TECHNICIAN'; payload: { vehicleId: string; technician: string } }
   | { type: 'MARK_URGENT'; payload: string }
   | { type: 'OPEN_SCHEDULE_MODAL'; payload: Vehicle }
-  | { type: 'CLOSE_SCHEDULE_MODAL' };
+  | { type: 'CLOSE_SCHEDULE_MODAL' }
+  | { type: 'OPEN_WAITING_VEHICLES_MODAL' }
+  | { type: 'CLOSE_WAITING_VEHICLES_MODAL' }
+  | { type: 'OPEN_VEHICLE_DETAIL_MODAL'; payload: Vehicle }
+  | { type: 'CLOSE_VEHICLE_DETAIL_MODAL' };
 
 // Reducer
 const planningReducer = (state: PlanningState, action: PlanningActionType): PlanningState => {
@@ -256,6 +262,18 @@ const planningReducer = (state: PlanningState, action: PlanningActionType): Plan
     
     case 'CLOSE_SCHEDULE_MODAL':
       return { ...state, selectedVehicle: undefined, isScheduleModalOpen: false };
+
+    case 'OPEN_WAITING_VEHICLES_MODAL':
+      return { ...state, isWaitingVehiclesModalOpen: true };
+    
+    case 'CLOSE_WAITING_VEHICLES_MODAL':
+      return { ...state, isWaitingVehiclesModalOpen: false };
+
+    case 'OPEN_VEHICLE_DETAIL_MODAL':
+      return { ...state, selectedVehicleDetail: action.payload, isVehicleDetailModalOpen: true };
+    
+    case 'CLOSE_VEHICLE_DETAIL_MODAL':
+      return { ...state, selectedVehicleDetail: undefined, isVehicleDetailModalOpen: false };
     
     default:
       return state;
@@ -282,7 +300,11 @@ export const PlanningProvider: React.FC<{ children: ReactNode }> = ({ children }
       dispatch({ type: 'ASSIGN_TECHNICIAN', payload: { vehicleId, technician } }),
     markUrgent: (vehicleId: string) => dispatch({ type: 'MARK_URGENT', payload: vehicleId }),
     openScheduleModal: (vehicle: Vehicle) => dispatch({ type: 'OPEN_SCHEDULE_MODAL', payload: vehicle }),
-    closeScheduleModal: () => dispatch({ type: 'CLOSE_SCHEDULE_MODAL' })
+    closeScheduleModal: () => dispatch({ type: 'CLOSE_SCHEDULE_MODAL' }),
+    openWaitingVehiclesModal: () => dispatch({ type: 'OPEN_WAITING_VEHICLES_MODAL' }),
+    closeWaitingVehiclesModal: () => dispatch({ type: 'CLOSE_WAITING_VEHICLES_MODAL' }),
+    openVehicleDetailModal: (vehicle: Vehicle) => dispatch({ type: 'OPEN_VEHICLE_DETAIL_MODAL', payload: vehicle }),
+    closeVehicleDetailModal: () => dispatch({ type: 'CLOSE_VEHICLE_DETAIL_MODAL' })
   };
 
   return (

@@ -20,8 +20,15 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
     actions.openScheduleModal(vehicle);
   };
 
+  const handleOpenDetail = () => {
+    actions.openVehicleDetailModal(vehicle);
+  };
+
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+    <div 
+      className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+      onClick={handleOpenDetail}
+    >
       <div className="space-y-3">
         {/* Vehicle Info */}
         <div className="flex items-start justify-between">
@@ -38,14 +45,20 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
         
         {/* Status */}
         <div className="text-sm text-blue-600 cursor-pointer hover:text-blue-800" 
-             onClick={handleOpenScheduleModal}>
+             onClick={(e) => {
+               e.stopPropagation();
+               handleOpenScheduleModal();
+             }}>
           {vehicle.status}
         </div>
         
         {/* Technician */}
         {vehicle.technician && (
           <div className="flex items-center text-sm text-gray-600 cursor-pointer hover:text-gray-800"
-               onClick={handleOpenScheduleModal}>
+               onClick={(e) => {
+                 e.stopPropagation();
+                 handleOpenScheduleModal();
+               }}>
             <User className="w-3 h-3 mr-1" />
             {vehicle.technician}
           </div>
@@ -65,7 +78,10 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
             <Button 
               size="sm" 
               variant="outline" 
-              onClick={handleSchedule}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSchedule();
+              }}
               className="text-xs"
             >
               <Calendar className="w-3 h-3 mr-1" />
