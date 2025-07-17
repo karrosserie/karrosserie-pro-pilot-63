@@ -53,6 +53,12 @@ const DefaultInvoicePaymentsTable = ({ clientData }: DefaultInvoicePaymentsTable
           <p>{clientData.notes}</p>
         </div>
       )}
+      {clientData?.payment_details && (
+        <div className="mt-4">
+          <p className="font-medium">Détails de paiement</p>
+          <p>{clientData.payment_details}</p>
+        </div>
+      )}
     </>
   );
 };
