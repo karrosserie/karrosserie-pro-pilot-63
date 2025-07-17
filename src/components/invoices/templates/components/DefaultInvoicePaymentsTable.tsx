@@ -1,6 +1,12 @@
 import React from 'react';
 
-const DefaultInvoicePaymentsTable = () => {
+interface DefaultInvoicePaymentsTableProps {
+  clientData?: {
+    notes?: string;
+  };
+}
+
+const DefaultInvoicePaymentsTable = ({ clientData }: DefaultInvoicePaymentsTableProps) => {
   return (
     <>
       <div>
