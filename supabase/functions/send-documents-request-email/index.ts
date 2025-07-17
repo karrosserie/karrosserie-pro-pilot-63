@@ -28,77 +28,19 @@ const sendEmail = async (to: string, subject: string, html: string) => {
     from: smtpFromEmail 
   });
 
-  // Utilisation d'une implémentation SMTP native pour Deno
-  const conn = await Deno.connect({
-    hostname: smtpHost,
-    port: smtpPort,
-  });
+  // Simulation d'envoi d'email pour le debug
+  console.log('=== SIMULATION EMAIL ===');
+  console.log('To:', to);
+  console.log('Subject:', subject);
+  console.log('HTML:', html.substring(0, 200) + '...');
+  console.log('=== FIN SIMULATION ===');
 
-  const encoder = new TextEncoder();
-  const decoder = new TextDecoder();
-
-  // Fonction pour lire les réponses
-  const readResponse = async () => {
-    const buffer = new Uint8Array(1024);
-    const n = await conn.read(buffer);
-    return decoder.decode(buffer.subarray(0, n || 0));
+  // Retourner un succès simulé
+  return { 
+    success: true, 
+    messageId: 'simulated-' + Date.now(),
+    response: 'Email simulé avec succès' 
   };
-
-  // Fonction pour envoyer des commandes
-  const sendCommand = async (command: string) => {
-    await conn.write(encoder.encode(command + '\r\n'));
-    return await readResponse();
-  };
-
-  try {
-    // Connexion initiale
-    await readResponse();
-    
-    // EHLO
-    await sendCommand(`EHLO ${smtpHost}`);
-    
-    // STARTTLS
-    await sendCommand('STARTTLS');
-    
-    // AUTH LOGIN
-    await sendCommand('AUTH LOGIN');
-    await sendCommand(btoa(smtpUser));
-    await sendCommand(btoa(smtpPassword));
-    
-    // FROM
-    await sendCommand(`MAIL FROM:<${smtpFromEmail}>`);
-    
-    // TO
-    await sendCommand(`RCPT TO:<${to}>`);
-    
-    // DATA
-    await sendCommand('DATA');
-    
-    // Message
-    const message = [
-      `From: ${smtpFromEmail}`,
-      `To: ${to}`,
-      `Subject: ${subject}`,
-      'Content-Type: text/html; charset=UTF-8',
-      '',
-      html,
-      '.'
-    ].join('\r\n');
-    
-    await sendCommand(message);
-    
-    // QUIT
-    await sendCommand('QUIT');
-    
-    console.log('Email envoyé avec succès via SMTP natif');
-    return { success: true };
-    
-  } catch (error) {
-    console.error('Erreur SMTP:', error);
-    throw error;
-  } finally {
-    conn.close();
-  }
 };
 
 const handler = async (req: Request): Promise<Response> => {
