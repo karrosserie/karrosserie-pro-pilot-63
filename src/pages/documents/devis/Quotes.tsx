@@ -203,7 +203,6 @@ const Quotes = () => {
       
       await tokensService.createToken({
         user_id: quote.user_id!,
-        company_id: null,
         client_id: quote.client_id,
         vehicule_id: quote.vehicle_id
       });

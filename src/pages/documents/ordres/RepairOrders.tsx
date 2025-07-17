@@ -146,7 +146,6 @@ const RepairOrders = () => {
       
       await tokensService.createToken({
         user_id: order.user_id!,
-        company_id: null,
         client_id: order.client_id,
         vehicule_id: order.vehicle_id
       });
