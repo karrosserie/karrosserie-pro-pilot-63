@@ -381,14 +381,14 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
           {/* Header avec entreprise et facture */}
           <View style={alternativeStyles.mainHeader}>
             <View style={alternativeStyles.companySection}>
-              <Text style={alternativeStyles.companyName}>{companyData?.name || 'AUTO PAINT'}</Text>
+              <Text style={alternativeStyles.companyName}>{companyData?.name || ''}</Text>
               <View>
-                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>ADRESSE :</Text> {companyData?.address || '25 rue sainte victoire'}</Text>
-                <Text style={alternativeStyles.companyInfo}>{companyData?.zipcode || '13006'} {companyData?.city || 'MARSEILLE'}</Text>
-                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>TEL :</Text> {companyData?.phone || '+33064646524'}</Text>
-                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>EMAIL :</Text> {companyData?.email || 'autopaint@yopmail.com'}</Text>
-                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>SIRET :</Text> {companyData?.siret || '123456789000'}</Text>
-                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>TVA :</Text> {companyData?.tva || 'FR123456789'}</Text>
+                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>ADRESSE :</Text> {companyData?.address || ''}</Text>
+                <Text style={alternativeStyles.companyInfo}>{companyData?.zipcode || ''} {companyData?.city || ''}</Text>
+                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>TEL :</Text> {companyData?.phone || ''}</Text>
+                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>EMAIL :</Text> {companyData?.email || ''}</Text>
+                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>SIRET :</Text> {companyData?.siret || ''}</Text>
+                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>TVA :</Text> {companyData?.tva || ''}</Text>
               </View>
             </View>
             
@@ -520,9 +520,9 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
 
           {/* Footer */}
           <Text style={alternativeStyles.footer} fixed>
-            {companyData?.name || 'AUTO PAINT'} - {companyData?.address || '25 rue sainte victoire'} {companyData?.zipcode || '13006'} {companyData?.city || 'MARSEILLE'} - 
-            SIRET {companyData?.siret || '123456789000'} - N° TVA : {companyData?.tva || 'FR123456789'} - 
-            Tel : {companyData?.phone || '+33064646524'} - Email : {companyData?.email || 'autopaint@yopmail.com'}
+            {companyData?.name || ''} - {companyData?.address || ''} {companyData?.zipcode || ''} {companyData?.city || ''} - 
+            SIRET {companyData?.siret || ''} - N° TVA : {companyData?.tva || ''} - 
+            Tel : {companyData?.phone || ''} - Email : {companyData?.email || ''}
           </Text>
         </Page>
       </Document>
@@ -546,14 +546,14 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             {companyData?.logo_url && (
               <Image src={companyData.logo_url} style={{ width: 80, height: 60, marginBottom: 8 }} />
             )}
-            <Text style={defaultStyles.companyName}>{companyData?.name || 'KARROSSERIE'}</Text>
+            <Text style={defaultStyles.companyName}>{companyData?.name || ''}</Text>
             <View style={defaultStyles.companyInfo}>
-              <Text>{companyData?.address || 'Votre adresse'}</Text>
+              <Text>{companyData?.address || ''}</Text>
               <Text>{companyData?.zipcode || ''} {companyData?.city || ''}</Text>
-              <Text>Téléphone : {companyData?.phone || '+33 1 23 45 67 89'}</Text>
-              <Text>E-mail : {companyData?.email || 'contact@karrosserie.fr'}</Text>
-              <Text>SIRET : {companyData?.siret || '123 456 789 00123'}</Text>
-              <Text>N° TVA : {companyData?.tva || 'FR 12 123456789'}</Text>
+              <Text>Téléphone : {companyData?.phone || ''}</Text>
+              <Text>E-mail : {companyData?.email || ''}</Text>
+              <Text>SIRET : {companyData?.siret || ''}</Text>
+              <Text>N° TVA : {companyData?.tva || ''}</Text>
             </View>
           </View>
 
@@ -696,15 +696,15 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
           <View style={defaultStyles.totalsBox}>
             <View style={defaultStyles.totalRowBold}>
               <Text>Sous-total</Text>
-              <Text>{clientData?.totals?.subtotal || '918,75 €'}</Text>
+              <Text>{clientData?.totals?.subtotal || '0,00 €'}</Text>
             </View>
             <View style={defaultStyles.totalRow}>
               <Text>TVA</Text>
-              <Text>{clientData?.totals?.vat || '183,75 €'}</Text>
+              <Text>{clientData?.totals?.vat || '0,00 €'}</Text>
             </View>
             <View style={defaultStyles.finalTotal}>
               <Text>TOTAL</Text>
-              <Text>{clientData?.totals?.total || '1 102,50 €'}</Text>
+              <Text>{clientData?.totals?.total || '0,00 €'}</Text>
             </View>
           </View>
         </View>
@@ -736,7 +736,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
 
         {/* Footer par défaut */}
         <Text style={defaultStyles.footer} fixed>
-          {companyData?.name || 'KARROSSERIE'} - {companyData?.address || ''} {companyData?.zipcode || ''} {companyData?.city || ''} - 
+          {companyData?.name || ''} - {companyData?.address || ''} {companyData?.zipcode || ''} {companyData?.city || ''} - 
           SIRET {companyData?.siret || ''} - N° TVA : {companyData?.tva || ''} - 
           Tel : {companyData?.phone || ''} - Email : {companyData?.email || ''}
         </Text>
