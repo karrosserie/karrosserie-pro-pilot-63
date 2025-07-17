@@ -95,18 +95,18 @@ export const coreRoutes = [
     )
   },
   {
-    path: "/planning",
-    element: (
-      <ProtectedRoute>
-        <Planning />
-      </ProtectedRoute>
-    )
-  },
-  {
     path: "/help",
     element: (
       <ProtectedRoute>
         <Help />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/planning",
+    element: (
+      <ProtectedRoute>
+        <Planning />
       </ProtectedRoute>
     )
   }

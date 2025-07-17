@@ -118,6 +118,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     { icon: <Bot className="app-icon" />, label: 'Assistant IA', path: '/ai-assistant' },
     { icon: <Users className="app-icon" />, label: 'Clients', path: '/clients' },
     { icon: <Car className="app-icon" />, label: 'Véhicules', path: '/vehicles' },
+    { icon: <Calendar className="app-icon" />, label: 'Planning', path: '/planning' },
     { 
       icon: <FileText className="app-icon" />, 
       label: 'Documents', 
@@ -133,7 +134,6 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     },
     { icon: <CreditCard className="app-icon" />, label: 'Cession de créance', path: '/cessions' },
     { icon: <Clock className="app-icon" />, label: 'Véhicules de courtoisie', path: '/fleet' },
-    { icon: <Calendar className="app-icon" />, label: 'Planning', path: '/planning' },
     { 
       icon: <DollarSign className="app-icon" />, 
       label: 'Paiements', 
