@@ -17,6 +17,7 @@ interface DefaultInvoicePreviewProps {
     mileage?: string;
     amountDue?: string;
     notes?: string;
+    paymentDetails?: string;
   };
   clientData?: {
     name?: string;
@@ -88,7 +89,13 @@ const DefaultInvoicePreview = ({ companyData, invoiceData, clientData, items, to
       />
       
       <DefaultInvoiceItemsTable items={defaultItems} />
-      <DefaultInvoiceTotals totals={defaultTotals} clientData={{ notes: defaultInvoiceData.notes }} />
+      <DefaultInvoiceTotals 
+        totals={defaultTotals} 
+        clientData={{ 
+          notes: invoiceData?.notes || defaultInvoiceData.notes,
+          paymentDetails: invoiceData?.paymentDetails 
+        }} 
+      />
       <DefaultInvoicePaymentsTable clientData={{ notes: defaultInvoiceData.notes }} />
 
       <DefaultInvoiceFooter companyData={companyData} />

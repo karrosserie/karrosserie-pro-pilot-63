@@ -71,7 +71,9 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
       licensePlate: vehicleData?.license_plate || undefined,
       mileage: vehicleData?.mileage ? `${vehicleData.mileage.toLocaleString('fr-FR')} km` : undefined,
       amountDue: `${invoice.amount.toFixed(2).replace('.', ',')} €`,
-      date: formatDateFr(invoice.date)
+      date: formatDateFr(invoice.date),
+      notes: invoice.notes || undefined,
+      paymentDetails: invoice.payment_details || undefined
     };
 
     // Préparer les données client pour le template - exactement comme dans InvoiceViewerModal
