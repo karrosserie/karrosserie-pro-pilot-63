@@ -1235,6 +1235,36 @@ export type Database = {
           },
         ]
       }
+      tokens: {
+        Row: {
+          client_id: string | null
+          company_id: string | null
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+          vehicule_id: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          vehicule_id?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          vehicule_id?: string | null
+        }
+        Relationships: []
+      }
       user_preferences: {
         Row: {
           created_at: string
