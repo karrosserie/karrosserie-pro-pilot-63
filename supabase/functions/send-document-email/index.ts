@@ -100,7 +100,8 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Données reçues:");
     console.log("- Destinataire:", to);
     console.log("- Objet:", subject);
-    console.log("- Référence facture:", invoiceReference);
+    console.log("- Référence document:", invoiceReference);
+    console.log("- Type de document:", documentType);
     console.log("- Taille PDF (caractères):", pdfBase64?.length || 0);
 
     // Récupération des secrets SMTP
@@ -148,7 +149,9 @@ const handler = async (req: Request): Promise<Response> => {
       }
     };
     const docTypeLabel = getDocTypeLabel(documentType);
+    console.log("- Label du document généré:", docTypeLabel);
     const filename = `${docTypeLabel}_${invoiceReference}.pdf`;
+    console.log("- Nom de fichier final:", filename);
     
     console.log("=== TENTATIVE D'ENVOI VIA SMTP ===");
 
