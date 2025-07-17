@@ -32,40 +32,37 @@ const sendEmail = async (to: string, subject: string, html: string) => {
       throw new Error('Configuration SMTP manquante');
     }
 
-    // Utilisation d'une approche SMTP plus simple avec la librairie deno-smtp
-    console.log('📩 Tentative d\'envoi email via deno-smtp');
+    // Approche alternative: utiliser nodemailer via npm
+    console.log('📩 Tentative d\'envoi email via nodemailer npm');
     
-    const { SMTPClient } = await import("https://deno.land/x/denomailer@1.6.0/mod.ts");
+    const nodemailer = await import("npm:nodemailer@6.9.13");
     
-    const client = new SMTPClient({
-      connection: {
-        hostname: smtpHost,
-        port: smtpPort,
-        tls: true,
-        auth: {
-          username: smtpUser,
-          password: smtpPassword,
-        },
+    const transporter = nodemailer.createTransporter({
+      host: smtpHost,
+      port: smtpPort,
+      secure: false, // true pour port 465, false pour autres ports
+      auth: {
+        user: smtpUser,
+        pass: smtpPassword,
       },
+      tls: {
+        rejectUnauthorized: false
+      }
     });
 
     console.log('📤 Envoi de l\'email...');
     
-    await client.send({
+    const info = await transporter.sendMail({
       from: smtpFromEmail,
       to: to,
       subject: subject,
-      content: html,
       html: html,
     });
     
-    console.log('🔌 Fermeture de la connexion...');
-    await client.close();
-    
-    console.log('✅ Email envoyé avec succès via deno-smtp');
+    console.log('✅ Email envoyé avec succès:', info.messageId);
     return { 
       success: true, 
-      messageId: 'denomailer-' + Date.now(),
+      messageId: info.messageId,
       message: 'Email envoyé avec succès'
     };
     
