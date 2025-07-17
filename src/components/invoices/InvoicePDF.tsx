@@ -440,7 +440,6 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             )}
           </View>
 
-
           {/* Tableau des articles */}
           <View style={alternativeStyles.tableContainer}>
             <View style={alternativeStyles.tableHeader}>
@@ -497,6 +496,14 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
               </View>
             </View>
           </View>
+
+          {/* Section Notes */}
+          {clientData?.notes && (
+            <View style={{ marginTop: 20, marginBottom: 15 }}>
+              <Text style={{ fontSize: 10, fontWeight: 'bold', marginBottom: 8 }}>Notes :</Text>
+              <Text style={{ fontSize: 9, lineHeight: 1.4 }}>{clientData.notes}</Text>
+            </View>
+          )}
 
           {/* Footer */}
           <Text style={alternativeStyles.footer} fixed>
@@ -686,6 +693,14 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             </View>
           </View>
         </View>
+
+        {/* Section Notes - affichage dans le template par défaut */}
+        {clientData?.notes && (
+          <View style={{ marginTop: 20, marginBottom: 15 }}>
+            <Text style={[defaultStyles.sectionTitle, { marginBottom: 8 }]}>Notes et observations :</Text>
+            <Text style={{ fontSize: 9, lineHeight: 1.4 }}>{clientData.notes}</Text>
+          </View>
+        )}
 
         {/* Section Paiements - seulement pour les factures */}
         {documentType === 'invoice' && (
