@@ -633,6 +633,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fleet_reservations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_statistics"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       fleet_returns: {
@@ -721,6 +728,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_returns_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_statistics"
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -1387,7 +1401,35 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_statistics: {
+        Row: {
+          company_name: string | null
+          email: string | null
+          first_name: string | null
+          last_name: string | null
+          montant_total_avoirs: number | null
+          montant_total_cessions: number | null
+          montant_total_factures: number | null
+          montant_total_frais: number | null
+          nombre_avoirs: number | null
+          nombre_cessions: number | null
+          nombre_clients: number | null
+          nombre_devis: number | null
+          nombre_factures: number | null
+          nombre_notes_frais: number | null
+          nombre_ordres_reparation: number | null
+          nombre_rapports_expertise: number | null
+          nombre_recus: number | null
+          nombre_reservations: number | null
+          nombre_vehicules: number | null
+          nombre_vehicules_courtoisie: number | null
+          nombre_vehicules_total: number | null
+          role: string | null
+          user_created_at: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
