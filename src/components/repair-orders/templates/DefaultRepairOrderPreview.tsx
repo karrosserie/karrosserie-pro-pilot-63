@@ -15,6 +15,7 @@ interface DefaultRepairOrderPreviewProps {
     licensePlate?: string;
     mileage?: string;
     amountDue?: string;
+    notes?: string;
   };
   clientData?: {
     name?: string;
@@ -91,7 +92,7 @@ const DefaultRepairOrderPreview = ({ companyData, orderData, clientData, vehicle
       />
       
       <DefaultRepairOrderItemsTable items={defaultItems} />
-      <DefaultRepairOrderTotals totals={defaultTotals} />
+      <DefaultRepairOrderTotals totals={defaultTotals} clientData={{ notes: defaultOrderData.notes }} />
 
       <DefaultRepairOrderFooter companyData={companyData} />
     </div>

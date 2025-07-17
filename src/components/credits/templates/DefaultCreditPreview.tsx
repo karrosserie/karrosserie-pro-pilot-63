@@ -15,6 +15,7 @@ interface DefaultCreditPreviewProps {
     licensePlate?: string;
     mileage?: string;
     amountDue?: string;
+    notes?: string;
   };
   clientData?: {
     name?: string;
@@ -84,7 +85,7 @@ const DefaultCreditPreview = ({ companyData, creditData, clientData, items, tota
       />
       
       <DefaultCreditItemsTable items={defaultItems} />
-      <DefaultCreditTotals totals={defaultTotals} />
+      <DefaultCreditTotals totals={defaultTotals} clientData={{ notes: defaultCreditData.notes }} />
 
       <DefaultCreditFooter companyData={companyData} />
     </div>
