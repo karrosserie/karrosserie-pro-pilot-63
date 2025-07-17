@@ -3,6 +3,7 @@ import React from 'react';
 interface DefaultInvoicePaymentsTableProps {
   clientData?: {
     notes?: string;
+    payment_details?: string;
   };
 }
 
