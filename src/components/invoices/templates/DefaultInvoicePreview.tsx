@@ -41,9 +41,12 @@ interface DefaultInvoicePreviewProps {
     vat?: string;
     total?: string;
   };
+  payments?: any[];
+  totalPaidAmount?: number;
+  remainingAmount?: number;
 }
 
-const DefaultInvoicePreview = ({ companyData, invoiceData, clientData, items, totals }: DefaultInvoicePreviewProps) => {
+const DefaultInvoicePreview = ({ companyData, invoiceData, clientData, items, totals, payments, totalPaidAmount, remainingAmount }: DefaultInvoicePreviewProps) => {
   // Données par défaut pour l'aperçu
   const defaultInvoiceData = {
     number: 'N° 5',
@@ -93,6 +96,9 @@ const DefaultInvoicePreview = ({ companyData, invoiceData, clientData, items, to
       <DefaultInvoicePaymentsTable 
         clientData={{ notes: defaultInvoiceData.notes }} 
         invoiceData={{ payment_details: defaultInvoiceData.payment_details }}
+        payments={payments}
+        totalPaidAmount={totalPaidAmount}
+        remainingAmount={remainingAmount}
       />
 
       <DefaultInvoiceFooter companyData={companyData} />

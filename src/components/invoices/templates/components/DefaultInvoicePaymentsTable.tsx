@@ -1,4 +1,7 @@
 import React from 'react';
+import { formatAmount } from '@/utils/invoiceCalculations';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface DefaultInvoicePaymentsTableProps {
   clientData?: {
@@ -7,9 +10,41 @@ interface DefaultInvoicePaymentsTableProps {
   invoiceData?: {
     payment_details?: string;
   };
+  payments?: any[];
+  totalPaidAmount?: number;
+  remainingAmount?: number;
 }
 
-const DefaultInvoicePaymentsTable = ({ clientData, invoiceData }: DefaultInvoicePaymentsTableProps) => {
+const DefaultInvoicePaymentsTable = ({ 
+  clientData, 
+  invoiceData, 
+  payments = [], 
+  totalPaidAmount = 0, 
+  remainingAmount = 0 
+}: DefaultInvoicePaymentsTableProps) => {
+  if (payments.length === 0) {
+    return (
+      <>
+        <div>
+          <h3 className="text-lg font-semibold mb-1 text-gray-800">Liste des paiements</h3>
+          <p className="text-gray-500 text-sm">Aucun paiement enregistré pour cette facture.</p>
+        </div>
+        {clientData?.notes && (
+          <div className="mt-4">
+            <p className="font-medium">Notes</p>
+            <p>{clientData.notes}</p>
+          </div>
+        )}
+        {invoiceData?.payment_details && (
+          <div className="mt-4">
+            <p className="font-medium">Détails de paiement</p>
+            <p>{invoiceData.payment_details}</p>
+          </div>
+        )}
+      </>
+    );
+  }
+
   return (
     <>
       <div>
@@ -23,16 +58,15 @@ const DefaultInvoicePaymentsTable = ({ clientData, invoiceData }: DefaultInvoice
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td className="p-3">10/07/2025</td>
-              <td className="p-3">Virement</td>
-              <td className="p-3 text-right">200,00 €</td>
-            </tr>
-            <tr>
-              <td className="p-3">11/07/2025</td>
-              <td className="p-3">Virement</td>
-              <td className="p-3 text-right">175,00 €</td>
-            </tr>
+            {payments.map((payment, index) => (
+              <tr key={payment.id || index}>
+                <td className="p-3">
+                  {payment.date ? format(new Date(payment.date), 'dd/MM/yyyy', { locale: fr }) : '-'}
+                </td>
+                <td className="p-3">{payment.payment_method || '-'}</td>
+                <td className="p-3 text-right">{formatAmount(payment.amount || 0)}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
         <div className="mt-2 mr-2 flex justify-end">
@@ -40,11 +74,11 @@ const DefaultInvoicePaymentsTable = ({ clientData, invoiceData }: DefaultInvoice
             <div className="space-y-1 text-base">
               <div className="flex justify-between font-bold">
                 <span>Total encaissé :</span>
-                <span>375,00 €</span>
+                <span>{formatAmount(totalPaidAmount)}</span>
               </div>
               <div className="flex justify-between font-bold text-red-600">
                 <span>Solde restant :</span>
-                <span>719,78 €</span>
+                <span>{formatAmount(remainingAmount)}</span>
               </div>
             </div>
           </div>

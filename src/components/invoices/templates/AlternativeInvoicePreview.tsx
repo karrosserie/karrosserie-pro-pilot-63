@@ -35,9 +35,12 @@ interface AlternativeInvoicePreviewProps {
     totalDiscount?: string;
     totalTTC?: string;
   };
+  payments?: any[];
+  totalPaidAmount?: number;
+  remainingAmount?: number;
 }
 
-const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items, totals }: AlternativeInvoicePreviewProps) => {
+const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items, totals, payments, totalPaidAmount, remainingAmount }: AlternativeInvoicePreviewProps) => {
   // Données par défaut pour l'aperçu
   const defaultInvoiceData = {
     number: 'N°5',

@@ -21,6 +21,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
   const { preferences } = useUserPreferences();
   const [clientData, setClientData] = useState<any>(null);
   const [vehicleData, setVehicleData] = useState<any>(null);
+  const [receiptsData, setReceiptsData] = useState<any[]>([]);
   
   // Récupérer les données client et véhicule depuis la base de données
   useEffect(() => {
@@ -56,6 +57,17 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
           if (vehicle) {
             setVehicleData(vehicle);
           }
+        }
+
+        // Récupérer les encaissements liés à cette facture
+        const { data: receipts } = await supabase
+          .from('receipts')
+          .select('*')
+          .eq('invoice_id', invoice.id)
+          .order('date', { ascending: true });
+        
+        if (receipts) {
+          setReceiptsData(receipts);
         }
       } catch (error) {
         console.error('Erreur lors de la récupération des données:', error);
@@ -150,6 +162,10 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
     totalTTC: `${totals.finalTotal.toFixed(2).replace('.', ',')} €`
   };
 
+  // Calculer les montants de paiement
+  const totalPaidAmount = receiptsData.reduce((sum, receipt) => sum + receipt.amount, 0);
+  const remainingAmount = invoice.amount - totalPaidAmount;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
@@ -161,6 +177,9 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
               clientData={clientDataForTemplate}
               items={items}
               totals={totalsData}
+              payments={receiptsData}
+              totalPaidAmount={totalPaidAmount}
+              remainingAmount={remainingAmount}
             />
           ) : (
             <AlternativeInvoicePreview 
@@ -169,6 +188,9 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
               clientData={clientDataForTemplate}
               items={items}
               totals={totalsData}
+              payments={receiptsData}
+              totalPaidAmount={totalPaidAmount}
+              remainingAmount={remainingAmount}
             />
           )}
         </div>

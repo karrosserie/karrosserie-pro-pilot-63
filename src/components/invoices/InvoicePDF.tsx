@@ -1,6 +1,7 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import { Invoice } from '@/services/supabase/invoices';
+import InvoicePDFPaymentsTable from './pdf/InvoicePDFPaymentsTable';
 
 interface InvoicePDFProps {
   invoice: Invoice;
@@ -369,6 +370,10 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
     return `${amount.toFixed(2).replace('.', ',')} €`;
   };
 
+  // Calculer les montants de paiement
+  const totalPaidAmount = receipts.reduce((sum, receipt) => sum + receipt.amount, 0);
+  const remainingAmount = invoice.amount - totalPaidAmount;
+
   if (template === 'alternative') {
     return (
       <Document>
@@ -609,7 +614,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             {documentType === 'invoice' && (
               <View style={defaultStyles.detailRow}>
                 <Text style={defaultStyles.detailLabel}>Montant payé</Text>
-                <Text style={defaultStyles.detailValue}>375,00 €</Text>
+                <Text style={defaultStyles.detailValue}>{formatAmount(totalPaidAmount)}</Text>
               </View>
             )}
             
@@ -620,7 +625,9 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
                  documentType === 'credit' ? 'Montant de l\'avoir' : 
                  documentType === 'quote' ? 'Montant total' : 'Montant dû'}
               </Text>
-              <Text style={defaultStyles.amountDueValue}>{clientData?.amountDue || '719,78 €'}</Text>
+              <Text style={defaultStyles.amountDueValue}>
+                {documentType === 'invoice' ? formatAmount(remainingAmount) : clientData?.amountDue || formatAmount(invoice.amount)}
+              </Text>
             </View>
           </View>
 
@@ -704,41 +711,11 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
 
         {/* Section Paiements - seulement pour les factures */}
         {documentType === 'invoice' && (
-          <>
-            <View style={[defaultStyles.table, { marginTop: 20 }]}>
-              <Text style={[defaultStyles.sectionTitle, { marginBottom: 8 }]}>Liste des paiements</Text>
-              <View style={defaultStyles.tableHeader}>
-                <Text style={[defaultStyles.tableHeaderText, { flex: 2 }]}>Date</Text>
-                <Text style={[defaultStyles.tableHeaderText, { flex: 2 }]}>Mode de paiement</Text>
-                <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>Montant</Text>
-              </View>
-              
-              <View style={defaultStyles.tableRow}>
-                <Text style={[defaultStyles.tableCell, { flex: 2 }]}>10/07/2025</Text>
-                <Text style={[defaultStyles.tableCell, { flex: 2 }]}>Virement</Text>
-                <Text style={[defaultStyles.tableCellRight, { flex: 1 }]}>200,00 €</Text>
-              </View>
-              <View style={defaultStyles.tableRow}>
-                <Text style={[defaultStyles.tableCell, { flex: 2 }]}>11/07/2025</Text>
-                <Text style={[defaultStyles.tableCell, { flex: 2 }]}>Virement</Text>
-                <Text style={[defaultStyles.tableCellRight, { flex: 1 }]}>175,00 €</Text>
-              </View>
-            </View>
-
-            {/* Résumé des paiements */}
-            <View style={[defaultStyles.totalsSection, { marginTop: 10 }]}>
-              <View style={defaultStyles.totalsBox}>
-                <View style={defaultStyles.totalRowBold}>
-                  <Text>Total encaissé :</Text>
-                  <Text>375,00 €</Text>
-                </View>
-                <View style={[defaultStyles.totalRowBold, { color: '#dc2626' }]}>
-                  <Text>Solde restant :</Text>
-                  <Text>719,78 €</Text>
-                </View>
-              </View>
-            </View>
-          </>
+          <InvoicePDFPaymentsTable 
+            payments={receipts} 
+            totalPaidAmount={totalPaidAmount} 
+            remainingAmount={remainingAmount} 
+          />
         )}
 
         {/* Section Notes - affichage dans le template par défaut */}

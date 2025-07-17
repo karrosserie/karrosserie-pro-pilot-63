@@ -10,6 +10,7 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
   try {
     let clientData = null;
     let vehicleData = null;
+    let receiptsData = [];
 
     // Récupérer les données client - exactement comme dans InvoiceViewerModal
     if (invoice.client_id) {
@@ -39,6 +40,17 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
       if (vehicle) {
         vehicleData = vehicle;
       }
+    }
+
+    // Récupérer les encaissements liés à cette facture
+    const { data: receipts } = await supabase
+      .from('receipts')
+      .select('*')
+      .eq('invoice_id', invoice.id)
+      .order('date', { ascending: true });
+    
+    if (receipts) {
+      receiptsData = receipts;
     }
 
     // Récupérer les préférences utilisateur pour le template
@@ -118,6 +130,11 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
     }
 
     const totals = calculateInvoiceTotals(invoice.repairs_data, invoice.parts_data);
+    
+    // Calculer le montant total payé
+    const totalPaidAmount = receiptsData.reduce((sum, receipt) => sum + receipt.amount, 0);
+    const remainingAmount = invoice.amount - totalPaidAmount;
+    
     const totalsData = {
       subtotal: `${totals.subtotalAfterDiscount.toFixed(2).replace('.', ',')} €`,
       vat: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
@@ -134,7 +151,10 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
       invoiceData,
       clientData: clientDataForTemplate,
       items,
-      totals: totalsData
+      totals: totalsData,
+      receipts: receiptsData,
+      totalPaidAmount,
+      remainingAmount
     };
   } catch (error) {
     console.error('Erreur lors de la préparation des données:', error);
@@ -158,13 +178,14 @@ export const generateInvoicePDFWithTemplate = async (invoice: Invoice, companyDa
       mileage: data.invoiceData.mileage,
       notes: invoice.notes || '',
       items: data.items,
-      totals: data.totals
+      totals: data.totals,
+      amountDue: `${data.remainingAmount.toFixed(2).replace('.', ',')} €`
     };
     
     const doc = InvoicePDF({ 
       invoice, 
       companyData: data.companyData, 
-      receipts: [],
+      receipts: data.receipts,
       clientData: pdfData,
       vehicleData: null,
       template: data.template
@@ -210,13 +231,14 @@ export const printInvoicePDFWithTemplate = async (invoice: Invoice, companyData:
       mileage: data.invoiceData.mileage,
       notes: invoice.notes || '',
       items: data.items,
-      totals: data.totals
+      totals: data.totals,
+      amountDue: `${data.remainingAmount.toFixed(2).replace('.', ',')} €`
     };
     
     const doc = InvoicePDF({ 
       invoice, 
       companyData: data.companyData, 
-      receipts: [],
+      receipts: data.receipts,
       clientData: pdfData,
       vehicleData: null,
       template: data.template
