@@ -291,46 +291,36 @@ export default function DocumentUploadFlow() {
               Veuillez préparer :
             </h3>
             <div className="space-y-3">
-              {missingDocuments.includes('driver_license_front') && (
-                <div className="flex items-start gap-3">
-                  <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
-                    {missingDocuments.indexOf('driver_license_front') + 1}
-                  </span>
-                  <span className="text-muted-foreground">
-                    Votre permis de conduire (recto)
-                  </span>
-                </div>
-              )}
-              {missingDocuments.includes('driver_license_back') && (
-                <div className="flex items-start gap-3">
-                  <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
-                    {missingDocuments.indexOf('driver_license_back') + 1}
-                  </span>
-                  <span className="text-muted-foreground">
-                    Votre permis de conduire (verso)
-                  </span>
-                </div>
-              )}
-              {missingDocuments.includes('registration_front') && (
-                <div className="flex items-start gap-3">
-                  <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
-                    {missingDocuments.indexOf('registration_front') + 1}
-                  </span>
-                  <span className="text-muted-foreground">
-                    Votre carte grise (recto)
-                  </span>
-                </div>
-              )}
-              {missingDocuments.includes('registration_back') && (
-                <div className="flex items-start gap-3">
-                  <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
-                    {missingDocuments.indexOf('registration_back') + 1}
-                  </span>
-                  <span className="text-muted-foreground">
-                    Votre carte grise (verso)
-                  </span>
-                </div>
-              )}
+              {(() => {
+                const needsDriverLicense = missingDocuments.includes('driver_license_front') || missingDocuments.includes('driver_license_back');
+                const needsRegistration = missingDocuments.includes('registration_front') || missingDocuments.includes('registration_back');
+                let counter = 0;
+                
+                return (
+                  <>
+                    {needsDriverLicense && (
+                      <div className="flex items-start gap-3">
+                        <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
+                          {++counter}
+                        </span>
+                        <span className="text-muted-foreground">
+                          Votre permis de conduire
+                        </span>
+                      </div>
+                    )}
+                    {needsRegistration && (
+                      <div className="flex items-start gap-3">
+                        <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
+                          {++counter}
+                        </span>
+                        <span className="text-muted-foreground">
+                          Votre carte grise
+                        </span>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </div>
         )}
