@@ -332,7 +332,149 @@ const Documents = () => {
     setDisplayCount(10);
   }, [searchTerm, activeFilters]);
 
-  const handleViewDocument = (document) => {
+  const handleViewDocument = async (document) => {
+    try {
+      switch (document.type) {
+        case 'expertise':
+          const expertiseReport = expertiseReports?.find(r => r.id === document.originalId);
+          if (expertiseReport?.document_url) {
+            window.open(expertiseReport.document_url, '_blank');
+          }
+          break;
+        case 'quote':
+          const quote = quotes?.find(q => q.id === document.originalId);
+          if (quote) {
+            await openPDFInNewTab('quote', quote);
+          }
+          break;
+        case 'order':
+          const order = repairOrders?.find(o => o.id === document.originalId);
+          if (order) {
+            await openPDFInNewTab('order', order);
+          }
+          break;
+        case 'invoice':
+          const invoice = invoices?.find(i => i.id === document.originalId);
+          if (invoice) {
+            await openPDFInNewTab('invoice', invoice);
+          }
+          break;
+        case 'credit':
+          const credit = credits?.find(c => c.id === document.originalId);
+          if (credit) {
+            await openPDFInNewTab('credit', credit);
+          }
+          break;
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'ouverture du PDF:', error);
+    }
+  };
+
+  const openPDFInNewTab = async (type: string, data: any) => {
+    try {
+      let doc;
+      
+      switch (type) {
+        case 'quote': {
+          const { prepareQuoteDataForPDF } = await import('@/utils/quotePDFGeneration');
+          const preparedData = await prepareQuoteDataForPDF(data, {});
+          const { default: InvoicePDF } = await import('@/components/invoices/InvoicePDF');
+          doc = InvoicePDF({ 
+            invoice: preparedData.quote as any,
+            companyData: preparedData.companyData, 
+            receipts: [],
+            clientData: preparedData.clientData,
+            vehicleData: preparedData.vehicleData,
+            template: preparedData.template || 'default',
+            documentType: 'quote'
+          });
+          break;
+        }
+        case 'order': {
+          const { prepareRepairOrderDataForPDF } = await import('@/utils/repairOrderPDFGeneration');
+          const preparedData = await prepareRepairOrderDataForPDF(data, {});
+          const { default: InvoicePDF } = await import('@/components/invoices/InvoicePDF');
+          doc = InvoicePDF({ 
+            invoice: preparedData.repairOrder as any,
+            companyData: preparedData.companyData, 
+            receipts: [],
+            clientData: preparedData.clientData,
+            vehicleData: preparedData.vehicleData,
+            template: preparedData.template || 'default',
+            documentType: 'repair_order'
+          });
+          break;
+        }
+        case 'invoice': {
+          const { prepareInvoiceDataForPDF } = await import('@/utils/invoicePDFGeneration');
+          const preparedData = await prepareInvoiceDataForPDF(data, {});
+          const { default: InvoicePDF } = await import('@/components/invoices/InvoicePDF');
+          
+          // Adapter les données comme dans generateInvoicePDFWithTemplate
+          const pdfData = {
+            ...preparedData.clientData,
+            number: preparedData.invoiceData.number,
+            billingDate: preparedData.invoiceData.billingDate,
+            dueDate: preparedData.invoiceData.dueDate,
+            claimNumber: preparedData.invoiceData.claimNumber,
+            vehicle: preparedData.invoiceData.vehicle,
+            licensePlate: preparedData.invoiceData.licensePlate,
+            mileage: preparedData.invoiceData.mileage,
+            items: preparedData.items,
+            totals: preparedData.totals
+          };
+          
+          doc = InvoicePDF({ 
+            invoice: data,
+            companyData: preparedData.companyData, 
+            receipts: [],
+            clientData: pdfData,
+            vehicleData: null,
+            template: preparedData.template || 'default',
+            documentType: 'invoice'
+          });
+          break;
+        }
+        case 'credit': {
+          const { prepareCreditDataForPDF } = await import('@/utils/creditPDFGeneration');
+          const preparedData = await prepareCreditDataForPDF(data, {});
+          const { default: InvoicePDF } = await import('@/components/invoices/InvoicePDF');
+          doc = InvoicePDF({ 
+            invoice: preparedData.credit as any,
+            companyData: preparedData.companyData, 
+            receipts: [],
+            clientData: preparedData.clientData,
+            vehicleData: preparedData.vehicleData,
+            template: preparedData.template || 'default',
+            documentType: 'credit'
+          });
+          break;
+        }
+        default:
+          return;
+      }
+
+      // Générer le blob PDF
+      const { pdf } = await import('@react-pdf/renderer');
+      const asPdf = pdf(doc);
+      const blob = await asPdf.toBlob();
+      
+      // Créer une URL pour le blob et l'ouvrir dans un nouvel onglet
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      
+      // Nettoyer l'URL après un délai pour permettre l'ouverture
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Erreur lors de la génération du PDF:', error);
+    }
+  };
+
+  const handleEditDocument = (document) => {
     switch (document.type) {
       case 'expertise':
         const expertiseReport = expertiseReports?.find(r => r.id === document.originalId);
@@ -360,11 +502,6 @@ const Documents = () => {
         setIsCreditDialogOpen(true);
         break;
     }
-  };
-
-  const handleEditDocument = (document) => {
-    // Même logique que pour la visualisation, mais en mode édition
-    handleViewDocument(document);
   };
 
   const handleFilterChange = (filterType: string, checked: boolean) => {
