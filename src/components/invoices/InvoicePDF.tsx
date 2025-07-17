@@ -505,6 +505,14 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             </View>
           )}
 
+          {/* Section Détails de paiement - uniquement pour les factures */}
+          {documentType === 'invoice' && invoice?.payment_details && (
+            <View style={{ marginTop: 15, marginBottom: 15 }}>
+              <Text style={{ fontSize: 10, fontWeight: 'bold', marginBottom: 8 }}>Détails de paiement :</Text>
+              <Text style={{ fontSize: 9, lineHeight: 1.4 }}>{invoice.payment_details}</Text>
+            </View>
+          )}
+
           {/* Footer */}
           <Text style={alternativeStyles.footer} fixed>
             {companyData?.name || 'AUTO PAINT'} - {companyData?.address || '25 rue sainte victoire'} {companyData?.zipcode || '13006'} {companyData?.city || 'MARSEILLE'} - 
@@ -699,6 +707,14 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
           <View style={{ marginTop: 20, marginBottom: 15 }}>
             <Text style={[defaultStyles.sectionTitle, { marginBottom: 8 }]}>Notes</Text>
             <Text style={{ fontSize: 9, lineHeight: 1.4 }}>{clientData.notes}</Text>
+          </View>
+        )}
+
+        {/* Section Détails de paiement - uniquement pour les factures */}
+        {documentType === 'invoice' && invoice?.payment_details && (
+          <View style={{ marginTop: 15, marginBottom: 15 }}>
+            <Text style={[defaultStyles.sectionTitle, { marginBottom: 8 }]}>Détails de paiement</Text>
+            <Text style={{ fontSize: 9, lineHeight: 1.4 }}>{invoice.payment_details}</Text>
           </View>
         )}
 
