@@ -216,8 +216,8 @@ export default function DocumentUploadFlow() {
       console.log("Documents sauvegardés avec succès");
       setShowWorkflow(false);
       
-      // Recharger les documents manquants pour mettre à jour l'interface
-      window.location.reload();
+      // Mettre à jour l'état pour afficher directement l'écran de confirmation
+      setMissingDocuments([]);
       
     } catch (error) {
       console.error("Erreur lors de la sauvegarde des documents:", error);
