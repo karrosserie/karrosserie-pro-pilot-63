@@ -113,6 +113,24 @@ ${companyName}`
         };
       }
 
+      
+      // Récupérer le template des préférences utilisateur
+      let template = 'default';
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: preferences } = await supabase
+            .from('user_preferences')
+            .select('invoice_template')
+            .eq('user_id', user.id)
+            .single();
+          
+          template = preferences?.invoice_template || 'default';
+        }
+      } catch (error) {
+        console.error('Error fetching user preferences:', error);
+      }
+
       // Générer le PDF de l'ordre de réparation
       const doc = InvoicePDF({ 
         invoice: fullRepairOrder as any,
@@ -120,7 +138,7 @@ ${companyName}`
         receipts: [],
         clientData: clientData,
         vehicleData: vehicleData,
-        template: 'default',
+        template: template,
         documentType: 'repair_order'
       });
 
