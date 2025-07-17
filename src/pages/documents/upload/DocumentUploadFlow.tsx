@@ -1,10 +1,60 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
 import DocumentUploadWorkflow from "@/components/documents/upload/DocumentUploadWorkflow";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function DocumentUploadFlow() {
+  const { token } = useParams<{ token: string }>();
   const [showWorkflow, setShowWorkflow] = useState(false);
+  const [companyName, setCompanyName] = useState("Carrosserie Liguori");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCompanyName = async () => {
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Récupérer le token depuis la table tokens
+        const { data: tokenData, error: tokenError } = await supabase
+          .from('tokens')
+          .select('company_id')
+          .eq('id', token)
+          .single();
+
+        if (tokenError || !tokenData?.company_id) {
+          console.error('Erreur lors de la récupération du token:', tokenError);
+          setLoading(false);
+          return;
+        }
+
+        // Récupérer le nom de l'entreprise depuis la table company_info
+        const { data: companyData, error: companyError } = await supabase
+          .from('company_info')
+          .select('name')
+          .eq('id', tokenData.company_id)
+          .single();
+
+        if (companyError || !companyData) {
+          console.error('Erreur lors de la récupération de l\'entreprise:', companyError);
+          setLoading(false);
+          return;
+        }
+
+        setCompanyName(companyData.name);
+      } catch (error) {
+        console.error('Erreur:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCompanyName();
+  }, [token]);
 
   const handleStart = () => {
     setShowWorkflow(true);
@@ -30,6 +80,19 @@ export default function DocumentUploadFlow() {
     );
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="max-w-lg w-full text-center">
+          <div className="w-16 h-16 bg-karrosserie-orange rounded-full flex items-center justify-center mx-auto shadow-lg">
+            <FileText className="w-8 h-8 text-white" />
+          </div>
+          <p className="mt-4 text-muted-foreground">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="max-w-lg w-full space-y-8 text-center">
@@ -39,7 +102,7 @@ export default function DocumentUploadFlow() {
             <FileText className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">
-            Carrosserie Liguori
+            {companyName}
           </h1>
           <h2 className="text-xl font-semibold text-foreground">
             Téléversement de documents

@@ -58,11 +58,7 @@ export const documentRoutes = [
     )
   },
   {
-    path: "/documents/upload",
-    element: (
-      <ProtectedRoute>
-        <DocumentUploadFlow />
-      </ProtectedRoute>
-    )
+    path: "/documents/upload/:token",
+    element: <DocumentUploadFlow />
   }
 ];
