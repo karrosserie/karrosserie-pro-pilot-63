@@ -21,48 +21,20 @@ const sendEmail = async (to: string, subject: string, html: string) => {
     throw new Error('Configuration SMTP manquante');
   }
 
-  // Utilisation de l'API Email externe ou SMTP direct
-  // Pour Deno, nous utilisons une approche via fetch vers un service SMTP
-  const emailData = {
-    from: smtpFromEmail,
-    to: to,
-    subject: subject,
-    html: html,
-    smtp: {
-      host: smtpHost,
-      port: smtpPort,
-      user: smtpUser,
-      password: smtpPassword
-    }
-  };
-
-  // Utilisation d'un service SMTP simple via HTTP
-  const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      service_id: 'smtp_service',
-      template_id: 'template_custom',
-      user_id: smtpUser,
-      template_params: {
-        to_email: to,
-        from_email: smtpFromEmail,
-        subject: subject,
-        message_html: html
-      },
-      accessToken: smtpPassword
-    })
+  console.log('Configuration SMTP:', { 
+    host: smtpHost, 
+    port: smtpPort, 
+    user: smtpUser, 
+    from: smtpFromEmail 
   });
 
-  // Alternative: utilisation directe de nodemailer via Deno
+  // Utilisation de nodemailer via Deno
   const nodemailer = await import('https://deno.land/x/nodemailer@1.11.0/mod.ts');
   
   const transporter = nodemailer.createTransporter({
     host: smtpHost,
     port: smtpPort,
-    secure: smtpPort === 465,
+    secure: smtpPort === 465, // true pour 465, false pour 587
     auth: {
       user: smtpUser,
       pass: smtpPassword,
@@ -75,6 +47,8 @@ const sendEmail = async (to: string, subject: string, html: string) => {
     subject: subject,
     html: html,
   };
+
+  console.log('Options email:', mailOptions);
 
   return await transporter.sendMail(mailOptions);
 };
@@ -101,35 +75,10 @@ const handler = async (req: Request): Promise<Response> => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Récupérer les informations du token avec les données associées
+    // Récupérer les informations du token
     const { data: tokenData, error: tokenError } = await supabase
       .from('tokens')
-      .select(`
-        id,
-        client_id,
-        vehicule_id,
-        company_id,
-        clients (
-          id,
-          first_name,
-          last_name,
-          email
-        ),
-        vehicles (
-          id,
-          license_plate,
-          car_brands (
-            name
-          ),
-          car_models (
-            name
-          )
-        ),
-        company_info (
-          id,
-          name
-        )
-      `)
+      .select('*')
       .eq('id', tokenId)
       .single();
 
@@ -140,28 +89,77 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('Données du token récupérées:', tokenData);
 
-    const client = tokenData.clients;
-    const vehicle = tokenData.vehicles;
-    const company = tokenData.company_info;
+    // Récupérer les informations du client
+    const { data: clientData, error: clientError } = await supabase
+      .from('clients')
+      .select('id, first_name, last_name, email')
+      .eq('id', tokenData.client_id)
+      .single();
 
-    if (!client || !client.email) {
-      throw new Error('Email du client non trouvé');
+    if (clientError || !clientData) {
+      console.error('Erreur lors de la récupération du client:', clientError);
+      throw new Error('Client non trouvé');
     }
 
-    if (!vehicle) {
+    // Récupérer les informations du véhicule avec marque et modèle
+    const { data: vehicleData, error: vehicleError } = await supabase
+      .from('vehicles')
+      .select(`
+        id,
+        license_plate,
+        brand_id,
+        model_id
+      `)
+      .eq('id', tokenData.vehicule_id)
+      .single();
+
+    if (vehicleError || !vehicleData) {
+      console.error('Erreur lors de la récupération du véhicule:', vehicleError);
       throw new Error('Véhicule non trouvé');
     }
 
-    if (!company) {
+    // Récupérer la marque du véhicule
+    const { data: brandData, error: brandError } = await supabase
+      .from('car_brands')
+      .select('name')
+      .eq('id', vehicleData.brand_id)
+      .single();
+
+    // Récupérer le modèle du véhicule
+    const { data: modelData, error: modelError } = await supabase
+      .from('car_models')
+      .select('name')
+      .eq('id', vehicleData.model_id)
+      .single();
+
+    // Récupérer les informations de l'entreprise
+    const { data: companyData, error: companyError } = await supabase
+      .from('company_info')
+      .select('id, name')
+      .eq('id', tokenData.company_id)
+      .single();
+
+    if (companyError || !companyData) {
+      console.error('Erreur lors de la récupération de l\'entreprise:', companyError);
       throw new Error('Informations de l\'entreprise non trouvées');
     }
 
+    console.log('Client:', clientData);
+    console.log('Véhicule:', vehicleData);
+    console.log('Marque:', brandData);
+    console.log('Modèle:', modelData);
+    console.log('Entreprise:', companyData);
+
+    if (!clientData.email) {
+      throw new Error('Email du client non trouvé');
+    }
+
     // Construire le contenu de l'email
-    const prenom = client.first_name || 'Client';
-    const marque = vehicle.car_brands?.name || 'Marque inconnue';
-    const modele = vehicle.car_models?.name || 'Modèle inconnu';
-    const immatriculation = vehicle.license_plate || 'Immatriculation inconnue';
-    const nomEntreprise = company.name || 'Notre entreprise';
+    const prenom = clientData.first_name || 'Client';
+    const marque = brandData?.name || 'Marque inconnue';
+    const modele = modelData?.name || 'Modèle inconnu';
+    const immatriculation = vehicleData.license_plate || 'Immatriculation inconnue';
+    const nomEntreprise = companyData.name || 'Notre entreprise';
 
     const subject = 'Justificatifs manquants - Réparation véhicule';
     const emailContent = `
@@ -195,10 +193,10 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
-    console.log('Envoi de l\'email à:', client.email);
+    console.log('Envoi de l\'email à:', clientData.email);
     
     // Envoyer l'email
-    await sendEmail(client.email, subject, emailContent);
+    await sendEmail(clientData.email, subject, emailContent);
 
     console.log('Email envoyé avec succès');
 
@@ -206,7 +204,7 @@ const handler = async (req: Request): Promise<Response> => {
       JSON.stringify({ 
         success: true, 
         message: 'Email envoyé avec succès',
-        recipient: client.email
+        recipient: clientData.email
       }),
       {
         status: 200,
