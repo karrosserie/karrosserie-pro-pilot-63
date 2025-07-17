@@ -27,8 +27,6 @@ const DocumentItem = ({
   date, 
   customer, 
   vehicle, 
-  status, 
-  statusColor,
   onView,
   onEdit
 }: { 
@@ -37,8 +35,6 @@ const DocumentItem = ({
   date: string; 
   customer: string; 
   vehicle: string; 
-  status: string; 
-  statusColor: string; 
   onView: () => void;
   onEdit: () => void;
 }) => {
@@ -51,9 +47,6 @@ const DocumentItem = ({
       <div className="flex-1">
         <div className="flex justify-between items-start">
           <h3 className="font-medium text-gray-800">{title}</h3>
-          <span className={`text-xs font-medium px-2 py-1 rounded-full ${statusColor}`}>
-            {status}
-          </span>
         </div>
         
         <p className="text-sm text-gray-600 mt-1">
@@ -589,8 +582,6 @@ const Documents = () => {
                 date={document.date}
                 customer={document.customer}
                 vehicle={document.vehicle}
-                status={document.status}
-                statusColor={document.statusColor}
                 onView={() => handleViewDocument(document)}
                 onEdit={() => handleEditDocument(document)}
               />
