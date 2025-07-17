@@ -11,36 +11,46 @@ interface EmailRequest {
 }
 
 const sendEmail = async (to: string, subject: string, html: string) => {
-  const smtpHost = Deno.env.get('SMTP_HOST');
-  const smtpPort = parseInt(Deno.env.get('SMTP_PORT') || '587');
-  const smtpUser = Deno.env.get('SMTP_USER');
-  const smtpPassword = Deno.env.get('SMTP_PASSWORD');
+  const resendApiKey = Deno.env.get('RESEND_API_KEY');
   const smtpFromEmail = Deno.env.get('SMTP_FROM_EMAIL');
 
-  if (!smtpHost || !smtpUser || !smtpPassword || !smtpFromEmail) {
-    throw new Error('Configuration SMTP manquante');
+  if (!resendApiKey) {
+    throw new Error('Clé API Resend manquante');
   }
 
-  console.log('Configuration SMTP:', { 
-    host: smtpHost, 
-    port: smtpPort, 
-    user: smtpUser, 
-    from: smtpFromEmail 
+  if (!smtpFromEmail) {
+    throw new Error('Email expéditeur manquant');
+  }
+
+  console.log('Envoi email via Resend:', { 
+    to, 
+    from: smtpFromEmail,
+    subject 
   });
 
-  // Simulation d'envoi d'email pour le debug
-  console.log('=== SIMULATION EMAIL ===');
-  console.log('To:', to);
-  console.log('Subject:', subject);
-  console.log('HTML:', html.substring(0, 200) + '...');
-  console.log('=== FIN SIMULATION ===');
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${resendApiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: smtpFromEmail,
+      to: [to],
+      subject: subject,
+      html: html,
+    }),
+  });
 
-  // Retourner un succès simulé
-  return { 
-    success: true, 
-    messageId: 'simulated-' + Date.now(),
-    response: 'Email simulé avec succès' 
-  };
+  if (!response.ok) {
+    const error = await response.text();
+    console.error('Erreur Resend:', error);
+    throw new Error(`Erreur envoi email: ${response.status} - ${error}`);
+  }
+
+  const result = await response.json();
+  console.log('Email envoyé avec succès:', result);
+  return result;
 };
 
 const handler = async (req: Request): Promise<Response> => {
