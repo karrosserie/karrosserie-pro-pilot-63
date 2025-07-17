@@ -118,7 +118,8 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
     policyNumber: quote.policy_number || undefined,
     expertName: quote.expert_name || undefined,
     incidentDate: formatDateFr(quote.incident_date),
-    reportDate: formatDateFr(quote.report_date)
+    reportDate: formatDateFr(quote.report_date),
+    notes: quote.notes || undefined
   };
 
   const clientDataForTemplate = {
