@@ -12,6 +12,7 @@ interface InvoiceEmailRequest {
   message: string;
   pdfBase64: string;
   invoiceReference: string;
+  documentType?: string;
 }
 
 // Fonction pour envoyer l'email avec nodemailer
@@ -94,7 +95,7 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     console.log("=== DÉBUT EDGE FUNCTION ===");
     
-    const { to, subject, message, pdfBase64, invoiceReference }: InvoiceEmailRequest = await req.json();
+    const { to, subject, message, pdfBase64, invoiceReference, documentType = "facture" }: InvoiceEmailRequest = await req.json();
 
     console.log("Données reçues:");
     console.log("- Destinataire:", to);
@@ -128,13 +129,17 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Créer le message MIME avec la pièce jointe
+    // Remplacer les sauts de ligne par des <br> pour un meilleur rendu HTML
+    const formattedMessage = message.replace(/\n/g, '<br>');
     const htmlBody = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <div style="white-space: pre-line;">${message}</div>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+        <div>${formattedMessage}</div>
       </div>
     `;
 
-    const filename = `Facture_${invoiceReference}.pdf`;
+    // Déterminer le nom du fichier en fonction du type de document
+    const docTypeLabel = documentType === 'quote' ? 'Devis' : 'Facture';
+    const filename = `${docTypeLabel}_${invoiceReference}.pdf`;
     
     console.log("=== TENTATIVE D'ENVOI VIA SMTP ===");
 

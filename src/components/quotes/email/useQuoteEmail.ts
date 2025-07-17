@@ -114,7 +114,8 @@ AUTO PAINT`;
           subject: emailData.subject,
           message: emailData.message,
           pdfBase64: pdfBase64,
-          invoiceReference: quote.reference
+          invoiceReference: quote.reference,
+          documentType: 'quote'
         }
       });
 
