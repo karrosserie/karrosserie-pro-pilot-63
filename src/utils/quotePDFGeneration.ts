@@ -148,6 +148,7 @@ export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => 
         mileage: vehicleData?.mileage || '',
         vehicle: vehicleData?.vehicle || '',
         billingDate: quote.created_at ? new Date(quote.created_at).toLocaleDateString('fr-FR') : '',
+        notes: quote.notes || '',
         items: items.map(item => ({
           ref: item.ref || '',
           description: item.description || '',
