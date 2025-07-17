@@ -10,9 +10,14 @@ export default function DocumentUploadFlow() {
   const [showWorkflow, setShowWorkflow] = useState(false);
   const [companyName, setCompanyName] = useState("Carrosserie Liguori");
   const [loading, setLoading] = useState(true);
+  const [tokenData, setTokenData] = useState<{
+    client_id: string | null;
+    vehicule_id: string | null;
+  } | null>(null);
+  const [missingDocuments, setMissingDocuments] = useState<string[]>([]);
 
   useEffect(() => {
-    const fetchCompanyName = async () => {
+    const fetchTokenDataAndCheckDocuments = async () => {
       if (!token) {
         setLoading(false);
         return;
@@ -20,23 +25,28 @@ export default function DocumentUploadFlow() {
 
       try {
         // Récupérer le token depuis la table tokens
-        const { data: tokenData, error: tokenError } = await supabase
+        const { data: tokenResult, error: tokenError } = await supabase
           .from('tokens')
-          .select('company_id')
+          .select('company_id, client_id, vehicule_id')
           .eq('id', token)
           .single();
 
-        if (tokenError || !tokenData?.company_id) {
+        if (tokenError || !tokenResult?.company_id) {
           console.error('Erreur lors de la récupération du token:', tokenError);
           setLoading(false);
           return;
         }
 
+        setTokenData({
+          client_id: tokenResult.client_id,
+          vehicule_id: tokenResult.vehicule_id
+        });
+
         // Récupérer le nom de l'entreprise depuis la table company_info
         const { data: companyData, error: companyError } = await supabase
           .from('company_info')
           .select('name')
-          .eq('id', tokenData.company_id)
+          .eq('id', tokenResult.company_id)
           .single();
 
         if (companyError || !companyData) {
@@ -46,6 +56,53 @@ export default function DocumentUploadFlow() {
         }
 
         setCompanyName(companyData.name);
+
+        // Vérifier les documents manquants
+        const missing: string[] = [];
+
+        // Vérifier les documents du client (permis de conduire)
+        if (tokenResult.client_id) {
+          const { data: clientData, error: clientError } = await supabase
+            .from('clients')
+            .select('driver_license_front_url, driver_license_back_url')
+            .eq('id', tokenResult.client_id)
+            .single();
+
+          if (!clientError && clientData) {
+            if (!clientData.driver_license_front_url) {
+              missing.push('driver_license_front');
+            }
+            if (!clientData.driver_license_back_url) {
+              missing.push('driver_license_back');
+            }
+          } else {
+            // Si erreur ou pas de client, on considère que les deux documents manquent
+            missing.push('driver_license_front', 'driver_license_back');
+          }
+        }
+
+        // Vérifier les documents du véhicule (carte grise)
+        if (tokenResult.vehicule_id) {
+          const { data: vehicleData, error: vehicleError } = await supabase
+            .from('vehicles')
+            .select('registration_document_front_url, registration_document_back_url')
+            .eq('id', tokenResult.vehicule_id)
+            .single();
+
+          if (!vehicleError && vehicleData) {
+            if (!vehicleData.registration_document_front_url) {
+              missing.push('registration_front');
+            }
+            if (!vehicleData.registration_document_back_url) {
+              missing.push('registration_back');
+            }
+          } else {
+            // Si erreur ou pas de véhicule, on considère que les deux documents manquent
+            missing.push('registration_front', 'registration_back');
+          }
+        }
+
+        setMissingDocuments(missing);
       } catch (error) {
         console.error('Erreur:', error);
       } finally {
@@ -53,7 +110,7 @@ export default function DocumentUploadFlow() {
       }
     };
 
-    fetchCompanyName();
+    fetchTokenDataAndCheckDocuments();
   }, [token]);
 
   const handleStart = () => {
@@ -76,6 +133,8 @@ export default function DocumentUploadFlow() {
       <DocumentUploadWorkflow
         onBack={handleBackToStart}
         onComplete={handleComplete}
+        missingDocuments={missingDocuments}
+        tokenData={tokenData}
       />
     );
   }
@@ -114,45 +173,85 @@ export default function DocumentUploadFlow() {
           onClick={handleStart}
           className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white w-full max-w-sm mx-auto shadow-lg hover:shadow-xl transition-all duration-300"
           size="lg"
+          disabled={missingDocuments.length === 0}
         >
-          Commencer
+          {missingDocuments.length === 0 ? 'Tous les documents sont présents' : 'Commencer'}
         </Button>
 
         {/* Description */}
         <p className="text-muted-foreground text-sm leading-relaxed">
-          Afin de traiter votre dossier rapidement,<br />
-          nous avons besoin de quelques documents.
+          {missingDocuments.length === 0 
+            ? 'Tous vos documents sont déjà enregistrés dans notre système.'
+            : 'Afin de traiter votre dossier rapidement, nous avons besoin de quelques documents.'
+          }
         </p>
 
-        {/* Document list */}
-        <div className="space-y-4 text-left">
-          <h3 className="font-semibold text-foreground">
-            Veuillez préparer :
-          </h3>
-          <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
-                1
-              </span>
-              <span className="text-muted-foreground">
-                Votre permis de conduire (recto-verso)
-              </span>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
-                2
-              </span>
-              <span className="text-muted-foreground">
-                Votre carte grise (recto-verso)
-              </span>
+        {/* Document list - Only show if there are missing documents */}
+        {missingDocuments.length > 0 && (
+          <div className="space-y-4 text-left">
+            <h3 className="font-semibold text-foreground">
+              Veuillez préparer :
+            </h3>
+            <div className="space-y-3">
+              {missingDocuments.includes('driver_license_front') && (
+                <div className="flex items-start gap-3">
+                  <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
+                    {missingDocuments.indexOf('driver_license_front') + 1}
+                  </span>
+                  <span className="text-muted-foreground">
+                    Votre permis de conduire (recto)
+                  </span>
+                </div>
+              )}
+              {missingDocuments.includes('driver_license_back') && (
+                <div className="flex items-start gap-3">
+                  <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
+                    {missingDocuments.indexOf('driver_license_back') + 1}
+                  </span>
+                  <span className="text-muted-foreground">
+                    Votre permis de conduire (verso)
+                  </span>
+                </div>
+              )}
+              {missingDocuments.includes('registration_front') && (
+                <div className="flex items-start gap-3">
+                  <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
+                    {missingDocuments.indexOf('registration_front') + 1}
+                  </span>
+                  <span className="text-muted-foreground">
+                    Votre carte grise (recto)
+                  </span>
+                </div>
+              )}
+              {missingDocuments.includes('registration_back') && (
+                <div className="flex items-start gap-3">
+                  <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
+                    {missingDocuments.indexOf('registration_back') + 1}
+                  </span>
+                  <span className="text-muted-foreground">
+                    Votre carte grise (verso)
+                  </span>
+                </div>
+              )}
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Footer note */}
-        <p className="text-muted-foreground text-sm italic">
-          Assurez-vous d'être dans un endroit bien éclairé pour prendre des photos nettes.
-        </p>
+        {/* Footer note - Only show if there are missing documents */}
+        {missingDocuments.length > 0 && (
+          <p className="text-muted-foreground text-sm italic">
+            Assurez-vous d'être dans un endroit bien éclairé pour prendre des photos nettes.
+          </p>
+        )}
+
+        {/* Success message if no documents are missing */}
+        {missingDocuments.length === 0 && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <p className="text-green-800 text-sm">
+              ✅ Tous vos documents sont déjà enregistrés dans notre système. Aucune action supplémentaire n'est requise.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
