@@ -45,11 +45,11 @@ const DocumentItem = ({
   const vehicleDisplay = (vehicle: any) => {
     if (!vehicle) return 'Aucun véhicule';
     
-    const brand = vehicle.car_brands?.name || 'Marque inconnue';
-    const model = vehicle.car_models?.name || 'Modèle inconnu';
+    const brand = vehicle.car_brands?.name || vehicle.brand || 'Marque inconnue';
+    const model = vehicle.car_models?.name || vehicle.model || 'Modèle inconnu';
     const plate = vehicle.license_plate || 'Plaque inconnue';
     
-    return `${brand} ${model} - ${plate}`;
+    return `${brand} ${model} - ${plate}`.replace(/^Marque inconnue Modèle inconnu - /, '').replace(/Marque inconnue |Modèle inconnu/, '').trim();
   };
 
   return (
@@ -144,11 +144,11 @@ const Documents = () => {
     const vehicleDisplay = (vehicle: any) => {
       if (!vehicle) return 'Aucun véhicule';
       
-      const brand = vehicle.car_brands?.name || 'Marque inconnue';
-      const model = vehicle.car_models?.name || 'Modèle inconnu';
+      const brand = vehicle.car_brands?.name || vehicle.brand || 'Marque inconnue';
+      const model = vehicle.car_models?.name || vehicle.model || 'Modèle inconnu';
       const plate = vehicle.license_plate || 'Plaque inconnue';
       
-      return `${brand} ${model} - ${plate}`;
+      return `${brand} ${model} - ${plate}`.replace(/^Marque inconnue Modèle inconnu - /, '').replace(/Marque inconnue |Modèle inconnu/, '').trim();
     };
 
     // Ajouter les rapports d'expertise
