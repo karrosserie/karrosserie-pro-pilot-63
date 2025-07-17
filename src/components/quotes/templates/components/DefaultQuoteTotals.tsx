@@ -32,7 +32,7 @@ const DefaultQuoteTotals = ({ totals }: DefaultQuoteTotalsProps) => {
       </div>
       <div className="mt-4">
         <p><strong>Notes</strong></p>
-        <p>Notes</p>
+        <p>{clientData.notes}</p>
       </div>
     </>
   );
