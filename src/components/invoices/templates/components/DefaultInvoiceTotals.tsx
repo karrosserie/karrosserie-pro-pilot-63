@@ -8,35 +8,12 @@ interface DefaultInvoiceTotalsProps {
   };
   clientData?: {
     notes?: string;
-    paymentDetails?: string;
   };
 }
 
 const DefaultInvoiceTotals = ({ totals, clientData }: DefaultInvoiceTotalsProps) => {
   return (
-    <div className="mt-4">
-      {/* Notes section */}
-      {clientData?.notes && (
-        <div className="mb-4">
-          <h3 className="font-bold text-sm mb-2">Notes :</h3>
-          <div className="text-sm whitespace-pre-wrap border p-2 bg-gray-50">
-            {clientData.notes}
-          </div>
-        </div>
-      )}
-
-      {/* Détails de paiement section */}
-      {clientData?.paymentDetails && (
-        <div className="mb-4">
-          <h3 className="font-bold text-sm mb-2">Détails de paiement :</h3>
-          <div className="text-sm whitespace-pre-wrap border p-2 bg-gray-50">
-            {clientData.paymentDetails}
-          </div>
-        </div>
-      )}
-
-      {/* Totals section */}
-      <div className="mr-2 flex justify-end">
+      <div className="mt-4 mr-2 flex justify-end">
         <div className="w-56">
           <div className="space-y-1 text-base">
             <div className="flex justify-between font-bold">
@@ -54,7 +31,6 @@ const DefaultInvoiceTotals = ({ totals, clientData }: DefaultInvoiceTotalsProps)
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
