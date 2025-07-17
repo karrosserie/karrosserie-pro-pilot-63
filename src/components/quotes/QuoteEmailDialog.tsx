@@ -58,6 +58,7 @@ export const QuoteEmailDialog = ({ quote, open, onOpenChange }: QuoteEmailDialog
           onChange={handleFieldChange}
           isLoading={isLoading}
           invoiceReference={quote?.reference}
+          documentType="quote"
         />
 
         <EmailDialogActions

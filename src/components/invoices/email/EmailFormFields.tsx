@@ -11,9 +11,10 @@ interface EmailFormFieldsProps {
   onChange: (field: keyof InvoiceEmailFormData, value: string) => void;
   isLoading: boolean;
   invoiceReference?: string;
+  documentType?: 'invoice' | 'quote' | 'credit' | 'repair_order';
 }
 
-export const EmailFormFields = ({ data, onChange, isLoading, invoiceReference }: EmailFormFieldsProps) => {
+export const EmailFormFields = ({ data, onChange, isLoading, invoiceReference, documentType = 'invoice' }: EmailFormFieldsProps) => {
   return (
     <div className="space-y-4">
       <div>
@@ -62,7 +63,16 @@ export const EmailFormFields = ({ data, onChange, isLoading, invoiceReference }:
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <FileText className="h-4 w-4" />
-          <span>Facture_{invoiceReference || 'XXX'}.pdf</span>
+          <span>
+            {(() => {
+              switch (documentType) {
+                case 'quote': return 'Devis';
+                case 'credit': return 'Avoir';
+                case 'repair_order': return 'Ordre_de_reparation';
+                default: return 'Facture';
+              }
+            })()}_{invoiceReference || 'XXX'}.pdf
+          </span>
           <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
             Générée automatiquement
           </span>

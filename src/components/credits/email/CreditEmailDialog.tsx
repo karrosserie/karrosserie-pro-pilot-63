@@ -56,6 +56,7 @@ export const CreditEmailDialog = ({ credit, open, onOpenChange }: CreditEmailDia
           onChange={handleFieldChange}
           isLoading={isLoading}
           invoiceReference={credit?.reference}
+          documentType="credit"
         />
 
         <EmailDialogActions
