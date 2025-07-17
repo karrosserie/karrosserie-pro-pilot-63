@@ -190,9 +190,7 @@ const AlternativeQuotePreview = ({ companyData, quoteData, clientData, items, to
       {quoteData?.notes && (
         <div className="mt-6">
           <h3 className="text-lg font-bold mb-2">Notes</h3>
-          <div className="p-4">
-            <p className="text-sm">{quoteData.notes}</p>
-          </div>
+          <p className="text-sm">{quoteData.notes}</p>
         </div>
       )}
 

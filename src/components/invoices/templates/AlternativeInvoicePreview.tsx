@@ -188,9 +188,7 @@ const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items
       {defaultInvoiceData?.notes && (
         <div className="mt-6">
           <h3 className="text-lg font-bold mb-2">Notes</h3>
-          <div className="p-4">
-            <p className="text-sm">{defaultInvoiceData.notes}</p>
-          </div>
+          <p className="text-sm">{defaultInvoiceData.notes}</p>
         </div>
       )}
 
@@ -198,9 +196,7 @@ const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items
       {defaultInvoiceData?.payment_details && (
         <div className="mt-6">
           <h3 className="text-lg font-bold mb-2">Détails de paiement</h3>
-          <div className="p-4">
-            <p className="text-sm">{defaultInvoiceData.payment_details}</p>
-          </div>
+          <p className="text-sm">{defaultInvoiceData.payment_details}</p>
         </div>
       )}
 

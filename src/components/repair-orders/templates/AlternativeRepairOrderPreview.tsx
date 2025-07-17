@@ -205,9 +205,7 @@ const AlternativeRepairOrderPreview = ({ companyData, orderData, clientData, veh
       {orderData?.notes && (
         <div className="mt-6">
           <h3 className="text-lg font-bold mb-2">Notes</h3>
-          <div className="p-4">
-            <p className="text-sm">{orderData.notes}</p>
-          </div>
+          <p className="text-sm">{orderData.notes}</p>
         </div>
       )}
 

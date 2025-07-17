@@ -188,9 +188,7 @@ const AlternativeCreditPreview = ({ companyData, creditData, clientData, items, 
       {creditData?.notes && (
         <div className="mt-6">
           <h3 className="text-lg font-bold mb-2">Notes</h3>
-          <div className="p-4">
-            <p className="text-sm">{creditData.notes}</p>
-          </div>
+          <p className="text-sm">{creditData.notes}</p>
         </div>
       )}
 
