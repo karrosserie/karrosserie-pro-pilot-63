@@ -183,6 +183,16 @@ const AlternativeCreditPreview = ({ companyData, creditData, clientData, items, 
         </div>
       </div>
 
+      {/* Notes */}
+      {defaultInvoiceData?.notes && (
+        <div className="mt-6">
+          <h3 className="text-lg font-bold mb-2">Notes</h3>
+          <div className="p-4">
+            <p className="text-sm">{defaultInvoiceData.notes}</p>
+          </div>
+        </div>
+      )}
+
       {/* Footer */}
       <div className="mt-8 text-xs text-center text-gray-500">
         <p>{companyData.name || 'AUTO PAINT'} - {companyData.address || '25 rue sainte victoire'} {companyData.zipcode || '13006'} {companyData.city || 'MARSEILLE'} - 
