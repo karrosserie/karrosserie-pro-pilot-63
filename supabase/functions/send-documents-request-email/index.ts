@@ -196,7 +196,9 @@ const handler = async (req: Request): Promise<Response> => {
     console.log('Envoi de l\'email à:', clientData.email);
     
     // Envoyer l'email
-    await sendEmail(clientData.email, subject, emailContent);
+    console.log('Tentative d\'envoi de l\'email...');
+    const emailResult = await sendEmail(clientData.email, subject, emailContent);
+    console.log('Résultat de l\'envoi email:', emailResult);
 
     console.log('Email envoyé avec succès');
 
