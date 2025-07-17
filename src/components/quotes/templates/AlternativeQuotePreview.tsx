@@ -15,6 +15,7 @@ interface AlternativeQuotePreviewProps {
     expertName?: string;
     incidentDate?: string;
     reportDate?: string;
+    notes?: string;
   };
   clientData?: {
     name?: string;
@@ -186,11 +187,11 @@ const AlternativeQuotePreview = ({ companyData, quoteData, clientData, items, to
       </div>
 
       {/* Notes */}
-      {defaultInvoiceData?.notes && (
+      {quoteData?.notes && (
         <div className="mt-6">
           <h3 className="text-lg font-bold mb-2">Notes</h3>
           <div className="p-4">
-            <p className="text-sm">{defaultInvoiceData.notes}</p>
+            <p className="text-sm">{quoteData.notes}</p>
           </div>
         </div>
       )}

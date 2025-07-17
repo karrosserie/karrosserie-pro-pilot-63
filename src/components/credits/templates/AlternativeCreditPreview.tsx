@@ -9,6 +9,7 @@ interface AlternativeCreditPreviewProps {
     vehicle?: string;
     licensePlate?: string;
     mileage?: string;
+    notes?: string;
   };
   clientData?: {
     name?: string;
@@ -184,11 +185,11 @@ const AlternativeCreditPreview = ({ companyData, creditData, clientData, items, 
       </div>
 
       {/* Notes */}
-      {defaultInvoiceData?.notes && (
+      {creditData?.notes && (
         <div className="mt-6">
           <h3 className="text-lg font-bold mb-2">Notes</h3>
           <div className="p-4">
-            <p className="text-sm">{defaultInvoiceData.notes}</p>
+            <p className="text-sm">{creditData.notes}</p>
           </div>
         </div>
       )}

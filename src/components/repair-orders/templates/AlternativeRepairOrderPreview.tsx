@@ -16,6 +16,7 @@ interface AlternativeRepairOrderPreviewProps {
     incidentDate?: string;
     reportDate?: string;
     amountDue?: string;
+    notes?: string;
   };
   clientData?: {
     name?: string;
@@ -201,11 +202,11 @@ const AlternativeRepairOrderPreview = ({ companyData, orderData, clientData, veh
       </div>
 
       {/* Notes */}
-      {defaultInvoiceData?.notes && (
+      {orderData?.notes && (
         <div className="mt-6">
           <h3 className="text-lg font-bold mb-2">Notes</h3>
           <div className="p-4">
-            <p className="text-sm">{defaultInvoiceData.notes}</p>
+            <p className="text-sm">{orderData.notes}</p>
           </div>
         </div>
       )}
