@@ -189,7 +189,7 @@ const handler = async (req: Request): Promise<Response> => {
             
             <p>Bonjour ${prenom},</p>
             
-            <p>Des justificatifs nous manquent dans le cadre des travaux sur votre véhicule <strong>${marque} ${modele}</strong> immatriculé <strong>${immatriculation}</strong>.</p>
+            <p>Des justificatifs manquent dans le cadre des travaux sur votre véhicule <strong>${marque} ${modele}</strong> immatriculé <strong>${immatriculation}</strong>.</p>
             
             <p>Vous pouvez nous les fournir en vous rendant sur cette page :</p>
             

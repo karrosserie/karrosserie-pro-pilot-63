@@ -40,7 +40,7 @@ const sendEmail = async (to: string, subject: string, htmlBody: string, pdfBase6
     
     const nodemailer = await import("npm:nodemailer@6.9.13");
     
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       host: smtpHost,
       port: smtpPort,
       secure: false,
