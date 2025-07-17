@@ -28,29 +28,77 @@ const sendEmail = async (to: string, subject: string, html: string) => {
     from: smtpFromEmail 
   });
 
-  // Utilisation de nodemailer via Deno
-  const nodemailer = await import('https://deno.land/x/nodemailer@1.11.0/mod.ts');
-  
-  const transporter = nodemailer.createTransporter({
-    host: smtpHost,
+  // Utilisation d'une implémentation SMTP native pour Deno
+  const conn = await Deno.connect({
+    hostname: smtpHost,
     port: smtpPort,
-    secure: smtpPort === 465, // true pour 465, false pour 587
-    auth: {
-      user: smtpUser,
-      pass: smtpPassword,
-    },
   });
 
-  const mailOptions = {
-    from: smtpFromEmail,
-    to: to,
-    subject: subject,
-    html: html,
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+
+  // Fonction pour lire les réponses
+  const readResponse = async () => {
+    const buffer = new Uint8Array(1024);
+    const n = await conn.read(buffer);
+    return decoder.decode(buffer.subarray(0, n || 0));
   };
 
-  console.log('Options email:', mailOptions);
+  // Fonction pour envoyer des commandes
+  const sendCommand = async (command: string) => {
+    await conn.write(encoder.encode(command + '\r\n'));
+    return await readResponse();
+  };
 
-  return await transporter.sendMail(mailOptions);
+  try {
+    // Connexion initiale
+    await readResponse();
+    
+    // EHLO
+    await sendCommand(`EHLO ${smtpHost}`);
+    
+    // STARTTLS
+    await sendCommand('STARTTLS');
+    
+    // AUTH LOGIN
+    await sendCommand('AUTH LOGIN');
+    await sendCommand(btoa(smtpUser));
+    await sendCommand(btoa(smtpPassword));
+    
+    // FROM
+    await sendCommand(`MAIL FROM:<${smtpFromEmail}>`);
+    
+    // TO
+    await sendCommand(`RCPT TO:<${to}>`);
+    
+    // DATA
+    await sendCommand('DATA');
+    
+    // Message
+    const message = [
+      `From: ${smtpFromEmail}`,
+      `To: ${to}`,
+      `Subject: ${subject}`,
+      'Content-Type: text/html; charset=UTF-8',
+      '',
+      html,
+      '.'
+    ].join('\r\n');
+    
+    await sendCommand(message);
+    
+    // QUIT
+    await sendCommand('QUIT');
+    
+    console.log('Email envoyé avec succès via SMTP natif');
+    return { success: true };
+    
+  } catch (error) {
+    console.error('Erreur SMTP:', error);
+    throw error;
+  } finally {
+    conn.close();
+  }
 };
 
 const handler = async (req: Request): Promise<Response> => {
