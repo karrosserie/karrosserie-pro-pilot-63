@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Search, Filter, Eye, Pencil } from 'lucide-react';
@@ -15,6 +14,7 @@ import { useInvoices } from '@/hooks/use-invoices';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useCredits } from '@/hooks/use-credits';
+import { useVehicles } from '@/hooks/use-vehicles';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
@@ -42,16 +42,6 @@ const DocumentItem = ({
   onView: () => void;
   onEdit: () => void;
 }) => {
-  const vehicleDisplay = (vehicle: any) => {
-    if (!vehicle) return 'Aucun véhicule';
-    
-    const brand = vehicle.car_brands?.name || vehicle.brand || 'Marque inconnue';
-    const model = vehicle.car_models?.name || vehicle.model || 'Modèle inconnu';
-    const plate = vehicle.license_plate || 'Plaque inconnue';
-    
-    return `${brand} ${model} - ${plate}`.replace(/^Marque inconnue Modèle inconnu - /, '').replace(/Marque inconnue |Modèle inconnu/, '').trim();
-  };
-
   return (
     <div className="flex items-start p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow bg-white">
       <div className="bg-gray-100 p-3 rounded-lg mr-4">
@@ -67,7 +57,7 @@ const DocumentItem = ({
         </div>
         
         <p className="text-sm text-gray-600 mt-1">
-          Client: {customer} | Véhicule: {vehicleDisplay(vehicle)}
+          Client: {customer} | Véhicule: {vehicle}
         </p>
         
         <p className="text-xs text-gray-400 mt-2">{date}</p>
@@ -125,6 +115,7 @@ const Documents = () => {
   const { orders: repairOrders, isLoading: ordersLoading } = useRepairOrders();
   const { invoices, isLoading: invoicesLoading } = useInvoices();
   const { credits, isLoading: creditsLoading } = useCredits();
+  const { vehicles } = useVehicles();
 
   // Compter les documents et gérer le pluriel
   const expertiseCount = expertiseReports?.length || 0;
@@ -137,18 +128,18 @@ const Documents = () => {
     return count <= 1 ? 'document' : 'documents';
   };
 
-  // Créer une liste de tous les documents avec le vehicleDisplay mis à jour
+  // Créer une liste de tous les documents avec la logique de véhicule du tableau de bord
   const allDocuments = React.useMemo(() => {
     const documents = [];
 
-    const vehicleDisplay = (vehicle: any) => {
-      if (!vehicle) return 'Aucun véhicule';
+    // Fonction pour obtenir les informations du véhicule comme dans le tableau de bord
+    const getVehicleInfo = (vehicleId: string) => {
+      if (!vehicleId || !vehicles) return 'Véhicule non spécifié';
       
-      const brand = vehicle.car_brands?.name || vehicle.brand || 'Marque inconnue';
-      const model = vehicle.car_models?.name || vehicle.model || 'Modèle inconnu';
-      const plate = vehicle.license_plate || 'Plaque inconnue';
+      const vehicle = vehicles.find(v => v.id === vehicleId);
+      if (!vehicle) return 'Véhicule non spécifié';
       
-      return `${brand} ${model} - ${plate}`.replace(/^Marque inconnue Modèle inconnu - /, '').replace(/Marque inconnue |Modèle inconnu/, '').trim();
+      return `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''} - ${vehicle.license_plate || ''}`.replace(/^\s*-\s*/, '').replace(/\s*-\s*$/, '');
     };
 
     // Ajouter les rapports d'expertise
@@ -162,7 +153,7 @@ const Documents = () => {
           title: `Rapport d'expertise`,
           date: `Créé le ${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
           customer: report.clients ? `${report.clients.first_name} ${report.clients.last_name}` : 'Client non spécifié',
-          vehicle: report.vehicles ? vehicleDisplay(report.vehicles) : 'Aucun véhicule',
+          vehicle: getVehicleInfo(report.vehicle_id),
           status: 'Importé',
           statusColor: 'bg-blue-100 text-blue-800',
           timestamp: new Date(report.created_at).getTime(),
@@ -182,7 +173,7 @@ const Documents = () => {
           title: `Devis`,
           date: `Créé le ${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
           customer: quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : 'Client non spécifié',
-          vehicle: quote.vehicles ? vehicleDisplay(quote.vehicles) : 'Aucun véhicule',
+          vehicle: getVehicleInfo(quote.vehicle_id),
           status: quote.status === 'draft' ? 'En attente' : 'Validé',
           statusColor: quote.status === 'draft' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800',
           timestamp: new Date(quote.created_at).getTime(),
@@ -202,7 +193,7 @@ const Documents = () => {
           title: `Ordre de réparation`,
           date: `Créé le ${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
           customer: order.clients ? `${order.clients.first_name} ${order.clients.last_name}` : 'Client non spécifié',
-          vehicle: order.vehicles ? vehicleDisplay(order.vehicles) : 'Aucun véhicule',
+          vehicle: getVehicleInfo(order.vehicle_id),
           status: order.status === 'signed' ? 'Signé' : 'En attente',
           statusColor: order.status === 'signed' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800',
           timestamp: new Date(order.created_at).getTime(),
@@ -222,7 +213,7 @@ const Documents = () => {
           title: `Facture`,
           date: `Créé le ${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
           customer: invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client non spécifié',
-          vehicle: invoice.vehicles ? vehicleDisplay(invoice.vehicles) : 'Aucun véhicule',
+          vehicle: getVehicleInfo(invoice.vehicle_id),
           status: 'Payé',
           statusColor: 'bg-purple-100 text-purple-800',
           timestamp: new Date(invoice.created_at).getTime(),
@@ -242,7 +233,7 @@ const Documents = () => {
           title: `Avoir`,
           date: `Créé le ${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
           customer: credit.clients ? `${credit.clients.first_name} ${credit.clients.last_name}` : 'Client non spécifié',
-          vehicle: credit.vehicles ? vehicleDisplay(credit.vehicles) : 'Aucun véhicule',
+          vehicle: getVehicleInfo(credit.vehicle_id),
           status: 'Émis',
           statusColor: 'bg-red-100 text-red-800',
           timestamp: new Date(credit.created_at).getTime(),
@@ -261,7 +252,7 @@ const Documents = () => {
 
     // Trier par date (plus récent en premier)
     return filtered.sort((a, b) => b.timestamp - a.timestamp);
-  }, [expertiseReports, quotes, repairOrders, invoices, credits, searchTerm, activeFilters]);
+  }, [expertiseReports, quotes, repairOrders, invoices, credits, vehicles, searchTerm, activeFilters]);
 
   // Documents à afficher (avec pagination)
   const displayedDocuments = allDocuments.slice(0, displayCount);
