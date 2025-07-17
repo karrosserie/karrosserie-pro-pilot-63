@@ -7,9 +7,12 @@ interface DefaultQuoteTotalsProps {
     vat?: string;
     total?: string;
   };
+  clientData?: {
+    notes?: string;
+  };
 }
 
-const DefaultQuoteTotals = ({ totals }: DefaultQuoteTotalsProps) => {
+const DefaultQuoteTotals = ({ totals, clientData }: DefaultQuoteTotalsProps) => {
   return (
     <>
       <div className="mt-2 mr-2 flex justify-end">
@@ -30,10 +33,12 @@ const DefaultQuoteTotals = ({ totals }: DefaultQuoteTotalsProps) => {
           </div>
         </div>
       </div>
-      <div className="mt-4">
-        <p><strong>Notes</strong></p>
-        <p>{clientData.notes}</p>
-      </div>
+      {clientData?.notes && (
+        <div className="mt-4">
+          <p><strong>Notes</strong></p>
+          <p>{clientData.notes}</p>
+        </div>
+      )}
     </>
   );
 };

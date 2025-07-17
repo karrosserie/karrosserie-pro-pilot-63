@@ -1,3 +1,4 @@
+
 import React from 'react';
 import DefaultQuoteHeader from './components/DefaultQuoteHeader';
 import DefaultQuoteItemsTable from './components/DefaultQuoteItemsTable';
@@ -22,6 +23,7 @@ interface DefaultQuotePreviewProps {
     city?: string;
     phone?: string;
     email?: string;
+    notes?: string;
   };
   items?: Array<{
     ref?: string;
@@ -86,7 +88,7 @@ const DefaultQuotePreview = ({ companyData, quoteData, clientData, items, totals
       />
       
       <DefaultQuoteItemsTable items={defaultItems} />
-      <DefaultQuoteTotals totals={defaultTotals} />
+      <DefaultQuoteTotals totals={defaultTotals} clientData={defaultClientData} />
 
       <DefaultQuoteFooter companyData={companyData} />
     </div>
