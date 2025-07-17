@@ -22,7 +22,6 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
   const [clientData, setClientData] = useState<any>(null);
   const [vehicleData, setVehicleData] = useState<any>(null);
   
-  // Récupérer les données client et véhicule depuis la base de données
   useEffect(() => {
     const fetchRelatedData = async () => {
       if (!quote) return;
@@ -71,7 +70,6 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
 
   const template = preferences?.invoice_template || 'default';
 
-  // Fonction pour formater les dates au format français dd/mm/yyyy
   const formatDateFr = (dateString: string | null | undefined) => {
     if (!dateString) return undefined;
     try {
@@ -82,7 +80,6 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
     }
   };
 
-  // Parser les données JSON du devis
   let repairs = [];
   let parts = [];
   let discounts = [];
@@ -107,7 +104,6 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
 
   const totals = calculateGlobalTotals(repairs, parts, discounts);
 
-  // Préparer les données pour les composants de template
   const quoteData = {
     number: quote.reference,
     claimNumber: quote.claim_number || undefined,
@@ -125,7 +121,6 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
     reportDate: formatDateFr(quote.report_date)
   };
 
-  // Préparer les données client pour le template
   const clientDataForTemplate = {
     name: clientData ? `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim() : undefined,
     address: clientData?.address || undefined,
@@ -134,10 +129,10 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
     email: clientData?.email || undefined,
     licensePlate: vehicleData?.license_plate || undefined,
     mileage: vehicleData?.mileage ? `${vehicleData.mileage.toLocaleString('fr-FR')} km` : undefined,
-    vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : undefined
+    vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : undefined,
+    notes: quote.notes || undefined
   };
 
-  // Convertir les données des items
   const items = [];
   items.push(...repairs.map((repair: any) => ({
     ref: repair.ref || '',
