@@ -28,19 +28,29 @@ const sendEmail = async (to: string, subject: string, html: string) => {
     from: smtpFromEmail 
   });
 
-  // Utilisation d'une approche simplifiée avec une API externe
-  // Ou simulation pour tester le flow
-  console.log('Email qui serait envoyé:');
-  console.log('To:', to);
-  console.log('Subject:', subject);
-  console.log('HTML:', html.substring(0, 200) + '...');
+  // Utilisation de nodemailer via Deno
+  const nodemailer = await import('https://deno.land/x/nodemailer@1.11.0/mod.ts');
   
-  // Pour l'instant, on simule l'envoi réussi
-  // TODO: Implémenter l'envoi réel avec votre fournisseur SMTP
-  return {
-    success: true,
-    messageId: 'simulated-' + Date.now()
+  const transporter = nodemailer.createTransporter({
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpPort === 465, // true pour 465, false pour 587
+    auth: {
+      user: smtpUser,
+      pass: smtpPassword,
+    },
+  });
+
+  const mailOptions = {
+    from: smtpFromEmail,
+    to: to,
+    subject: subject,
+    html: html,
   };
+
+  console.log('Options email:', mailOptions);
+
+  return await transporter.sendMail(mailOptions);
 };
 
 const handler = async (req: Request): Promise<Response> => {
