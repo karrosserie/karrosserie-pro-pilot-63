@@ -28,6 +28,10 @@ const DefaultQuoteTotals = ({ totals }: DefaultQuoteTotalsProps) => {
         </div>
       </div>
     </div>
+    <div className="mt-4">
+      <p><strong>Notes</strong></p>
+      <p>Notes</p>
+    </div>
   );
 };
 
