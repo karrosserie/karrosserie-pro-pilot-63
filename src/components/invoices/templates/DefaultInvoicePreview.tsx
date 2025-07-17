@@ -3,7 +3,6 @@ import DefaultInvoiceHeader from './components/DefaultInvoiceHeader';
 import DefaultInvoiceItemsTable from './components/DefaultInvoiceItemsTable';
 import DefaultInvoiceTotals from './components/DefaultInvoiceTotals';
 import DefaultInvoicePaymentsTable from './components/DefaultInvoicePaymentsTable';
-import InvoicePaymentsTable from '../InvoicePaymentsTable';
 import DefaultInvoiceFooter from './components/DefaultInvoiceFooter';
 
 interface DefaultInvoicePreviewProps {
@@ -41,11 +40,9 @@ interface DefaultInvoicePreviewProps {
     vat?: string;
     total?: string;
   };
-  invoiceId?: string;
-  invoiceTotal?: number;
 }
 
-const DefaultInvoicePreview = ({ companyData, invoiceData, clientData, items, totals, invoiceId, invoiceTotal }: DefaultInvoicePreviewProps) => {
+const DefaultInvoicePreview = ({ companyData, invoiceData, clientData, items, totals }: DefaultInvoicePreviewProps) => {
   // Données par défaut pour l'aperçu
   const defaultInvoiceData = {
     number: 'N° 5',
@@ -92,11 +89,7 @@ const DefaultInvoicePreview = ({ companyData, invoiceData, clientData, items, to
       
       <DefaultInvoiceItemsTable items={defaultItems} />
       <DefaultInvoiceTotals totals={defaultTotals} clientData={{ notes: defaultInvoiceData.notes }} />
-      {invoiceId ? (
-        <InvoicePaymentsTable invoiceId={invoiceId} invoiceTotal={invoiceTotal || 0} />
-      ) : (
-        <DefaultInvoicePaymentsTable clientData={{ notes: defaultInvoiceData.notes }} />
-      )}
+      <DefaultInvoicePaymentsTable clientData={{ notes: defaultInvoiceData.notes }} />
 
       <DefaultInvoiceFooter companyData={companyData} />
     </div>

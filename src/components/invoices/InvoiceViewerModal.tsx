@@ -160,8 +160,6 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
               clientData={clientDataForTemplate}
               items={items}
               totals={totalsData}
-              invoiceId={invoice.id}
-              invoiceTotal={totals.finalTotal}
             />
           ) : (
             <AlternativeInvoicePreview 
