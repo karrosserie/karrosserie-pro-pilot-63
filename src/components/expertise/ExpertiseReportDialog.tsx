@@ -17,12 +17,14 @@ interface ExpertiseReportDialogProps {
   report?: ExpertiseReport | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  isViewMode?: boolean;
 }
 
 const ExpertiseReportDialog = ({
   report,
   open,
-  onOpenChange
+  onOpenChange,
+  isViewMode = false
 }: ExpertiseReportDialogProps) => {
   const { toast } = useToast();
   const { updateReport, createReport } = useExpertiseReports();
@@ -64,12 +66,19 @@ const ExpertiseReportDialog = ({
       } overflow-hidden`}>
         <DialogHeader className={isMobile ? 'px-2' : ''}>
           <DialogTitle className={`${isMobile ? 'text-lg' : 'text-xl'}`}>
-            {report ? "Modifier le rapport d'expertise" : "Créer un nouveau rapport d'expertise"}
+            {isViewMode
+              ? "Visualiser le rapport d'expertise"
+              : report 
+                ? "Modifier le rapport d'expertise" 
+                : "Créer un nouveau rapport d'expertise"
+            }
           </DialogTitle>
           <DialogDescription className={`${isMobile ? 'text-sm' : ''}`}>
-            {report
-              ? "Modifiez les détails du rapport d'expertise."
-              : "Créez un nouveau rapport d'expertise en remplissant les informations ci-dessous."
+            {isViewMode
+              ? "Consultez les détails du rapport d'expertise."
+              : report
+                ? "Modifiez les détails du rapport d'expertise."
+                : "Créez un nouveau rapport d'expertise en remplissant les informations ci-dessous."
             }
           </DialogDescription>
         </DialogHeader>

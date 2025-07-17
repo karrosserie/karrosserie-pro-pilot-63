@@ -17,13 +17,15 @@ interface QuoteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   prefillData?: any;
+  isViewMode?: boolean;
 }
 
 const QuoteDialog = ({
   quote,
   open,
   onOpenChange,
-  prefillData
+  prefillData,
+  isViewMode = false
 }: QuoteDialogProps) => {
   const { toast } = useToast();
   const { updateQuote, createQuote } = useQuotes();
@@ -55,23 +57,30 @@ const QuoteDialog = ({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {quote ? "Modifier le devis" : "Créer un nouveau devis"}
+            {isViewMode 
+              ? "Visualiser le devis"
+              : quote 
+                ? "Modifier le devis" 
+                : "Créer un nouveau devis"
+            }
           </DialogTitle>
           <DialogDescription>
-            {quote
-              ? "Modifiez les détails du devis."
-              : "Créez un nouveau devis en remplissant les informations ci-dessous."
+            {isViewMode
+              ? "Consultez les détails du devis."
+              : quote
+                ? "Modifiez les détails du devis."
+                : "Créez un nouveau devis en remplissant les informations ci-dessous."
             }
           </DialogDescription>
         </DialogHeader>
         
-        <QuoteForm
-          quote={quote}
-          onSubmit={handleSubmit}
-          onCancel={() => onOpenChange(false)}
-          isSubmitting={isSubmitting}
-          prefillData={prefillData}
-        />
+          <QuoteForm
+            quote={quote}
+            onSubmit={handleSubmit}
+            onCancel={() => onOpenChange(false)}
+            isSubmitting={isSubmitting}
+            prefillData={prefillData}
+          />
       </DialogContent>
     </Dialog>
   );
