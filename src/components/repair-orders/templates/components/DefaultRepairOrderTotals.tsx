@@ -10,7 +10,7 @@ interface DefaultRepairOrderTotalsProps {
 
 const DefaultRepairOrderTotals = ({ totals }: DefaultRepairOrderTotalsProps) => {
   return (
-    <div className="mt-2 mr-2 flex justify-end">
+    <div className="mt-4 mr-2 flex justify-end">
       <div className="w-56">
         <div className="space-y-1 text-base">
           <div className="flex justify-between font-bold">
@@ -28,6 +28,12 @@ const DefaultRepairOrderTotals = ({ totals }: DefaultRepairOrderTotalsProps) => 
         </div>
       </div>
     </div>
+    {clientData?.notes && (
+      <div className="mt-4">
+        <p className="font-medium">Notes</p>
+        <p>{clientData.notes}</p>
+      </div>
+    )}
   );
 };
 
