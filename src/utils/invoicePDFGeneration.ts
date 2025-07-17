@@ -155,6 +155,7 @@ export const generateInvoicePDFWithTemplate = async (invoice: Invoice, companyDa
       vehicle: data.invoiceData.vehicle,
       licensePlate: data.invoiceData.licensePlate,
       mileage: data.invoiceData.mileage,
+      notes: invoice.notes || '',
       items: data.items,
       totals: data.totals
     };
@@ -206,6 +207,7 @@ export const printInvoicePDFWithTemplate = async (invoice: Invoice, companyData:
       vehicle: data.invoiceData.vehicle,
       licensePlate: data.invoiceData.licensePlate,
       mileage: data.invoiceData.mileage,
+      notes: invoice.notes || '',
       items: data.items,
       totals: data.totals
     };

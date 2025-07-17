@@ -124,6 +124,7 @@ export const prepareCreditDataForPDF = async (credit: any, companyData: any) => 
         vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : '',
         billingDate: credit.created_at ? new Date(credit.created_at).toLocaleDateString('fr-FR') : '',
         invoiceReference: invoiceData?.reference || 'N/A',
+        notes: credit.notes || '',
         items: items.map(item => ({
           ref: item.ref || '',
           description: item.description || '',

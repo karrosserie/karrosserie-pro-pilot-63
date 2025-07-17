@@ -150,6 +150,7 @@ export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, com
         mileage: vehicleData?.mileage || '',
         vehicle: vehicleData?.vehicle || '',
         billingDate: repairOrder.created_at ? new Date(repairOrder.created_at).toLocaleDateString('fr-FR') : '',
+        notes: repairOrder.notes || '',
         items: items.map(item => ({
           ref: item.ref || '',
           description: item.description || '',
