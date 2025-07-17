@@ -6,6 +6,8 @@ interface AlternativeInvoicePreviewProps {
     number?: string;
     date?: string;
     dueDate?: string;
+    notes?: string;
+    payment_details?: string;
   };
   clientData?: {
     name?: string;
@@ -181,6 +183,26 @@ const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items
           </table>
         </div>
       </div>
+
+      {/* Notes */}
+      {defaultInvoiceData?.notes && (
+        <div className="mt-6">
+          <h3 className="text-lg font-bold mb-2">Notes</h3>
+          <div className="border-2 border-black rounded-lg p-4">
+            <p className="text-sm">{defaultInvoiceData.notes}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Détails de paiement */}
+      {defaultInvoiceData?.payment_details && (
+        <div className="mt-6">
+          <h3 className="text-lg font-bold mb-2">Détails de paiement</h3>
+          <div className="border-2 border-black rounded-lg p-4">
+            <p className="text-sm">{defaultInvoiceData.payment_details}</p>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <div className="mt-8 text-xs text-center text-gray-500">
