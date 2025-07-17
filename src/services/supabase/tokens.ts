@@ -26,6 +26,21 @@ export const tokensService = {
       .single();
 
     if (error) throw error;
+
+    // Envoyer l'email de demande de justificatifs
+    try {
+      const { error: emailError } = await supabase.functions.invoke('send-documents-request-email', {
+        body: { tokenId: data.id }
+      });
+
+      if (emailError) {
+        console.error('Erreur lors de l\'envoi de l\'email:', emailError);
+        // Ne pas faire échouer la création du token si l'email échoue
+      }
+    } catch (emailError) {
+      console.error('Erreur lors de l\'envoi de l\'email:', emailError);
+    }
+
     return data;
   },
 
