@@ -138,7 +138,16 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     // Déterminer le nom du fichier en fonction du type de document
-    const docTypeLabel = documentType === 'quote' ? 'Devis' : 'Facture';
+    const getDocTypeLabel = (type: string) => {
+      switch (type) {
+        case 'quote': return 'Devis';
+        case 'invoice': return 'Facture';
+        case 'repair_order': return 'Ordre_de_reparation';
+        case 'credit': return 'Avoir';
+        default: return 'Document';
+      }
+    };
+    const docTypeLabel = getDocTypeLabel(documentType);
     const filename = `${docTypeLabel}_${invoiceReference}.pdf`;
     
     console.log("=== TENTATIVE D'ENVOI VIA SMTP ===");
