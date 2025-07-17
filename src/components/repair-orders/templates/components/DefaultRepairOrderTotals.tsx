@@ -6,9 +6,12 @@ interface DefaultRepairOrderTotalsProps {
     vat?: string;
     total?: string;
   };
+  clientData?: {
+    notes?: string;
+  };
 }
 
-const DefaultRepairOrderTotals = ({ totals }: DefaultRepairOrderTotalsProps) => {
+const DefaultRepairOrderTotals = ({ totals, clientData }: DefaultRepairOrderTotalsProps) => {
   return (
     <div className="mt-4 mr-2 flex justify-end">
       <div className="w-56">
@@ -27,13 +30,13 @@ const DefaultRepairOrderTotals = ({ totals }: DefaultRepairOrderTotalsProps) => 
           </div>
         </div>
       </div>
+      {clientData?.notes && (
+        <div className="mt-4">
+          <p className="font-medium">Notes</p>
+          <p>{clientData.notes}</p>
+        </div>
+      )}
     </div>
-    {clientData?.notes && (
-      <div className="mt-4">
-        <p className="font-medium">Notes</p>
-        <p>{clientData.notes}</p>
-      </div>
-    )}
   );
 };
 

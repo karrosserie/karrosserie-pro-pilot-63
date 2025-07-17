@@ -6,9 +6,12 @@ interface DefaultInvoiceTotalsProps {
     vat?: string;
     total?: string;
   };
+  clientData?: {
+    notes?: string;
+  };
 }
 
-const DefaultInvoiceTotals = ({ totals }: DefaultInvoiceTotalsProps) => {
+const DefaultInvoiceTotals = ({ totals, clientData }: DefaultInvoiceTotalsProps) => {
   return (
     <div className="mt-4 mr-2 flex justify-end">
       <div className="w-56">
@@ -27,13 +30,13 @@ const DefaultInvoiceTotals = ({ totals }: DefaultInvoiceTotalsProps) => {
           </div>
         </div>
       </div>
-    </div>    
-    {clientData?.notes && (
-      <div className="mt-4">
-        <p className="font-medium">Notes</p>
-        <p>{clientData.notes}</p>
-      </div>
-    )}
+      {clientData?.notes && (
+        <div className="mt-4">
+          <p className="font-medium">Notes</p>
+          <p>{clientData.notes}</p>
+        </div>
+      )}
+    </div>
   );
 };
 
