@@ -37,7 +37,7 @@ const sendEmail = async (to: string, subject: string, html: string) => {
     
     const nodemailer = await import("npm:nodemailer@6.9.13");
     
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       host: smtpHost,
       port: smtpPort,
       secure: false, // true pour port 465, false pour autres ports
