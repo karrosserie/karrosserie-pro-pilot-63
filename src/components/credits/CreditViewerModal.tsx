@@ -115,7 +115,8 @@ const CreditViewerModal = ({ credit, open, onOpenChange }: CreditViewerModalProp
     email: clientData?.email || undefined,
     licensePlate: vehicleData?.license_plate || undefined,
     mileage: vehicleData?.mileage ? `${vehicleData.mileage.toLocaleString('fr-FR')} km` : undefined,
-    vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : undefined
+    vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : undefined,
+    notes: credit.notes || ''
   };
 
   // Convertir les données des items
