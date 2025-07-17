@@ -122,8 +122,7 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
     policyNumber: quote.policy_number || undefined,
     expertName: quote.expert_name || undefined,
     incidentDate: formatDateFr(quote.incident_date),
-    reportDate: formatDateFr(quote.report_date),
-    notes: quote.notes || undefined
+    reportDate: formatDateFr(quote.report_date)
   };
 
   // Préparer les données client pour le template
@@ -135,8 +134,7 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
     email: clientData?.email || undefined,
     licensePlate: vehicleData?.license_plate || undefined,
     mileage: vehicleData?.mileage ? `${vehicleData.mileage.toLocaleString('fr-FR')} km` : undefined,
-    vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : undefined,
-    notes: quote.notes || undefined
+    vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : undefined
   };
 
   // Convertir les données des items
