@@ -702,22 +702,6 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
           </View>
         </View>
 
-        {/* Section Notes - affichage dans le template par défaut */}
-        {clientData?.notes && (
-          <View style={{ marginTop: 20, marginBottom: 15 }}>
-            <Text style={[defaultStyles.sectionTitle, { marginBottom: 8 }]}>Notes</Text>
-            <Text style={{ fontSize: 9, lineHeight: 1.4 }}>{clientData.notes}</Text>
-          </View>
-        )}
-
-        {/* Section Détails de paiement - uniquement pour les factures */}
-        {documentType === 'invoice' && invoice?.payment_details && (
-          <View style={{ marginTop: 15, marginBottom: 15 }}>
-            <Text style={[defaultStyles.sectionTitle, { marginBottom: 8 }]}>Détails de paiement</Text>
-            <Text style={{ fontSize: 9, lineHeight: 1.4 }}>{invoice.payment_details}</Text>
-          </View>
-        )}
-
         {/* Section Paiements - seulement pour les factures */}
         {documentType === 'invoice' && (
           <>
@@ -755,6 +739,22 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
               </View>
             </View>
           </>
+        )}
+
+        {/* Section Notes - affichage dans le template par défaut */}
+        {clientData?.notes && (
+          <View style={{ marginTop: 20, marginBottom: 15 }}>
+            <Text style={[defaultStyles.sectionTitle, { marginBottom: 8 }]}>Notes</Text>
+            <Text style={{ fontSize: 9, lineHeight: 1.4 }}>{clientData.notes}</Text>
+          </View>
+        )}
+
+        {/* Section Détails de paiement - uniquement pour les factures */}
+        {documentType === 'invoice' && invoice?.payment_details && (
+          <View style={{ marginTop: 15, marginBottom: 15 }}>
+            <Text style={[defaultStyles.sectionTitle, { marginBottom: 8 }]}>Détails de paiement</Text>
+            <Text style={{ fontSize: 9, lineHeight: 1.4 }}>{invoice.payment_details}</Text>
+          </View>
         )}
 
         {/* Footer par défaut */}
