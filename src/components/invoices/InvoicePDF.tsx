@@ -697,7 +697,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
         {/* Section Notes - affichage dans le template par défaut */}
         {clientData?.notes && (
           <View style={{ marginTop: 20, marginBottom: 15 }}>
-            <Text style={[defaultStyles.sectionTitle, { marginBottom: 8 }]}>Notes :</Text>
+            <Text style={[defaultStyles.sectionTitle, { marginBottom: 8 }]}>Notes</Text>
             <Text style={{ fontSize: 9, lineHeight: 1.4 }}>{clientData.notes}</Text>
           </View>
         )}
