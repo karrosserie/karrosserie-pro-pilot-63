@@ -94,11 +94,29 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
     setEmailDialogOpen(true);
   };
 
-  const handleRequestDocuments = (quote: Quote) => {
-    toast({
-      title: "Demande de justificatifs",
-      description: `Demande de justificatifs envoyée pour le devis ${quote.reference}`
-    });
+  const handleRequestDocuments = async (quote: Quote) => {
+    try {
+      const { tokensService } = await import('@/services/supabase/tokens');
+      
+      await tokensService.createToken({
+        user_id: quote.user_id!,
+        company_id: null,
+        client_id: quote.client_id,
+        vehicule_id: quote.vehicle_id
+      });
+
+      toast({
+        title: "Demande de justificatifs",
+        description: `Demande de justificatifs envoyée pour le devis ${quote.reference}. Token créé avec succès.`
+      });
+    } catch (error) {
+      console.error('Erreur lors de la création du token:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer le token pour la demande de justificatifs.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleConvertToRepairOrder = (quote: Quote) => {

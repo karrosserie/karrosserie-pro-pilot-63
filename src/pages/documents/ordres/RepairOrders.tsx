@@ -140,11 +140,29 @@ const RepairOrders = () => {
     setSignatureDialogOpen(true);
   };
 
-  const handleRequestDocuments = (order: RepairOrder) => {
-    toast({
-      title: "Demande de justificatifs",
-      description: `Demande de justificatifs envoyée pour l'ordre de réparation ${order.reference}`
-    });
+  const handleRequestDocuments = async (order: RepairOrder) => {
+    try {
+      const { tokensService } = await import('@/services/supabase/tokens');
+      
+      await tokensService.createToken({
+        user_id: order.user_id!,
+        company_id: null,
+        client_id: order.client_id,
+        vehicule_id: order.vehicle_id
+      });
+
+      toast({
+        title: "Demande de justificatifs",
+        description: `Demande de justificatifs envoyée pour l'ordre de réparation ${order.reference}. Token créé avec succès.`
+      });
+    } catch (error) {
+      console.error('Erreur lors de la création du token:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer le token pour la demande de justificatifs.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleConvertToInvoice = (order: RepairOrder) => {
