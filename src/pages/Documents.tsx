@@ -53,7 +53,7 @@ const DocumentItem = ({
   };
 
   return (
-    <div className="flex items-start p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
+    <div className="flex items-start p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow bg-white">
       <div className="bg-gray-100 p-3 rounded-lg mr-4">
         {icon}
       </div>
