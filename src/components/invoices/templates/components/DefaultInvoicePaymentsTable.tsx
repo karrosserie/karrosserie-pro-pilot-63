@@ -4,9 +4,12 @@ interface DefaultInvoicePaymentsTableProps {
   clientData?: {
     notes?: string;
   };
+  invoiceData?: {
+    payment_details?: string;
+  };
 }
 
-const DefaultInvoicePaymentsTable = ({ clientData }: DefaultInvoicePaymentsTableProps) => {
+const DefaultInvoicePaymentsTable = ({ clientData, invoiceData }: DefaultInvoicePaymentsTableProps) => {
   return (
     <>
       <div>
