@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useCompany } from '@/hooks/use-company';
-import { RepairOrder, EmailFormData } from './types';
+import { EmailFormData } from './types';
+import { RepairOrder as SimpleRepairOrder } from './types';
+import { RepairOrder } from '@/services/supabase/repair-orders';
 import { supabase } from '@/integrations/supabase/client';
 import { pdf } from '@react-pdf/renderer';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
-import { clientsService } from '@/services/supabase/clients';
+import { prepareRepairOrderDataForPDF } from '@/utils/repairOrderPDFGeneration';
 
-export const useRepairOrderEmail = (repairOrder: RepairOrder | null, open: boolean) => {
+export const useRepairOrderEmail = (repairOrder: SimpleRepairOrder | null, open: boolean) => {
   const { toast } = useToast();
   const { companyData } = useCompany();
   const [isLoading, setIsLoading] = useState(false);
@@ -78,11 +80,7 @@ ${companyName}`
       // Récupérer l'ordre de réparation complet depuis la base de données
       const { data: fullRepairOrder } = await supabase
         .from('repair_orders')
-        .select(`
-          *,
-          clients(*),
-          vehicles(*, car_brands(name), car_models(name))
-        `)
+        .select('*')
         .eq('id', repairOrder.id)
         .single();
 
@@ -90,55 +88,27 @@ ${companyName}`
         throw new Error('Impossible de récupérer les détails de l\'ordre de réparation');
       }
 
-      // Préparer les données du client
-      let clientData = null;
-      if (fullRepairOrder.clients) {
-        clientData = {
-          clientName: `${fullRepairOrder.clients.first_name} ${fullRepairOrder.clients.last_name}`,
-          address: fullRepairOrder.clients.address || '',
-          postalCode: fullRepairOrder.clients.postal_code || '',
-          city: fullRepairOrder.clients.city || '',
-          email: fullRepairOrder.clients.email || '',
-          phone: fullRepairOrder.clients.phone || ''
-        };
-      }
-
-      // Préparer les données du véhicule
-      let vehicleData = null;
-      if (fullRepairOrder.vehicles) {
-        vehicleData = {
-          vehicle: `${fullRepairOrder.vehicles.car_brands?.name || ''} ${fullRepairOrder.vehicles.car_models?.name || ''}`.trim(),
-          licensePlate: fullRepairOrder.vehicles.license_plate || '',
-          mileage: fullRepairOrder.vehicles.mileage ? fullRepairOrder.vehicles.mileage.toLocaleString() + ' km' : ''
-        };
-      }
-
+      // Utiliser la même fonction que pour le téléchargement/impression
+      const data = await prepareRepairOrderDataForPDF(fullRepairOrder as RepairOrder, companyData || {});
       
-      // Récupérer le template des préférences utilisateur
-      let template = 'default';
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          const { data: preferences } = await supabase
-            .from('user_preferences')
-            .select('invoice_template')
-            .eq('user_id', user.id)
-            .single();
-          
-          template = preferences?.invoice_template || 'default';
-        }
-      } catch (error) {
-        console.error('Error fetching user preferences:', error);
-      }
+      // Adapter l'ordre de réparation au format Invoice pour le PDF (même logique que generateRepairOrderPDFWithTemplate)
+      const invoiceData = {
+        ...data.repairOrder,
+        amount: data.totals.total,
+        date: data.repairOrder.created_at,
+        due_date: data.repairOrder.created_at,
+        repairs_data: Array.isArray(data.repairOrder.repairs_data) ? data.repairOrder.repairs_data : [],
+        parts_data: Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data : []
+      } as any;
 
-      // Générer le PDF de l'ordre de réparation
+      // Générer le PDF de l'ordre de réparation avec exactement les mêmes données que téléchargement/impression
       const doc = InvoicePDF({ 
-        invoice: fullRepairOrder as any,
-        companyData: companyData || {}, 
+        invoice: invoiceData,
+        companyData: data.companyData, 
         receipts: [],
-        clientData: clientData,
-        vehicleData: vehicleData,
-        template: template,
+        clientData: data.clientData,
+        vehicleData: data.vehicleData,
+        template: data.template,
         documentType: 'repair_order'
       });
 
