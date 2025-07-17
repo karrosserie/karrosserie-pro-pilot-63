@@ -118,7 +118,7 @@ AUTO PAINT`;
       });
 
       // Envoyer l'email avec le PDF en pièce jointe via l'edge function
-      const { error } = await supabase.functions.invoke('send-invoice-email', {
+      const { error } = await supabase.functions.invoke('send-document-email', {
         body: {
           to: emailData.to,
           subject: emailData.subject,
