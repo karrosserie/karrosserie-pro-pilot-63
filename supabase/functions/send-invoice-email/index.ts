@@ -14,47 +14,76 @@ interface InvoiceEmailRequest {
   invoiceReference: string;
 }
 
-// Fonction pour encoder en base64
-function encodeBase64(str: string): string {
-  return btoa(unescape(encodeURIComponent(str)));
-}
+// Fonction pour envoyer l'email avec nodemailer
+const sendEmail = async (to: string, subject: string, htmlBody: string, pdfBase64: string, filename: string, fromEmail: string) => {
+  try {
+    console.log('🚀 Début de sendEmail');
+    
+    const smtpHost = Deno.env.get('SMTP_HOST');
+    const smtpPort = parseInt(Deno.env.get('SMTP_PORT') || '587');
+    const smtpUser = Deno.env.get('SMTP_USER');
+    const smtpPassword = Deno.env.get('SMTP_PASSWORD');
 
-// Fonction pour créer l'email au format MIME
-function createMimeMessage(
-  from: string,
-  to: string,
-  subject: string,
-  htmlBody: string,
-  pdfBase64: string,
-  filename: string
-): string {
-  const boundary = "boundary-" + Math.random().toString(36).substring(2);
-  
-  const mime = [
-    `From: ${from}`,
-    `To: ${to}`,
-    `Subject: ${subject}`,
-    "MIME-Version: 1.0",
-    `Content-Type: multipart/mixed; boundary="${boundary}"`,
-    "",
-    `--${boundary}`,
-    "Content-Type: text/html; charset=UTF-8",
-    "Content-Transfer-Encoding: 7bit",
-    "",
-    htmlBody,
-    "",
-    `--${boundary}`,
-    `Content-Type: application/pdf; name="${filename}"`,
-    "Content-Transfer-Encoding: base64",
-    `Content-Disposition: attachment; filename="${filename}"`,
-    "",
-    pdfBase64,
-    "",
-    `--${boundary}--`
-  ].join("\r\n");
+    console.log('📧 Configuration email:', {
+      host: smtpHost,
+      port: smtpPort,
+      user: smtpUser,
+      from: fromEmail,
+      to: to
+    });
 
-  return mime;
-}
+    if (!smtpHost || !smtpUser || !smtpPassword || !fromEmail) {
+      throw new Error('Configuration SMTP manquante');
+    }
+
+    console.log('📩 Tentative d\'envoi email via nodemailer npm');
+    
+    const nodemailer = await import("npm:nodemailer@6.9.13");
+    
+    const transporter = nodemailer.createTransporter({
+      host: smtpHost,
+      port: smtpPort,
+      secure: false,
+      auth: {
+        user: smtpUser,
+        pass: smtpPassword,
+      },
+      tls: {
+        rejectUnauthorized: false
+      }
+    });
+
+    console.log('📤 Envoi de l\'email avec pièce jointe...');
+    
+    // Convertir le base64 en buffer pour la pièce jointe
+    const pdfBuffer = Uint8Array.from(atob(pdfBase64), c => c.charCodeAt(0));
+    
+    const info = await transporter.sendMail({
+      from: fromEmail,
+      to: to,
+      subject: subject,
+      html: htmlBody,
+      attachments: [
+        {
+          filename: filename,
+          content: pdfBuffer,
+          contentType: 'application/pdf'
+        }
+      ]
+    });
+    
+    console.log('✅ Email envoyé avec succès:', info.messageId);
+    return { 
+      success: true, 
+      messageId: info.messageId,
+      message: 'Email envoyé avec succès'
+    };
+    
+  } catch (error) {
+    console.error('❌ Erreur dans sendEmail:', error);
+    throw error;
+  }
+};
 
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
@@ -106,24 +135,16 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     const filename = `Facture_${invoiceReference}.pdf`;
-    const mimeMessage = createMimeMessage(fromEmail, to, subject, htmlBody, pdfBase64, filename);
-
-    console.log("Message MIME créé, taille:", mimeMessage.length);
-
-    // Encoder le message en base64 pour l'envoi
-    const encodedMessage = encodeBase64(mimeMessage);
-
+    
     console.log("=== TENTATIVE D'ENVOI VIA SMTP ===");
 
-    // Utiliser une approche simplifiée avec curl via un service externe
-    // Pour l'instant, simulons l'envoi et retournons un succès
-    console.log("SIMULATION: Email envoyé avec succès");
-    console.log("- Destinataire:", to);
-    console.log("- Pièce jointe:", filename);
+    // Envoyer l'email réellement avec nodemailer
+    const emailResult = await sendEmail(to, subject, htmlBody, pdfBase64, filename, fromEmail);
+    console.log('Résultat de l\'envoi email:', emailResult);
 
     return new Response(JSON.stringify({ 
       success: true, 
-      message: "Email envoyé avec succès (simulation)",
+      message: "Email envoyé avec succès",
       recipient: to,
       attachment: filename
     }), {
