@@ -15,7 +15,7 @@ interface DefaultQuoteTotalsProps {
 const DefaultQuoteTotals = ({ totals, clientData }: DefaultQuoteTotalsProps) => {
   return (
     <>
-      <div className="mt-2 mr-2 flex justify-end">
+      <div className="mt-4 mr-2 flex justify-end">
         <div className="w-56">
           <div className="space-y-1 text-base">
             <div className="flex justify-between font-bold">
@@ -35,7 +35,7 @@ const DefaultQuoteTotals = ({ totals, clientData }: DefaultQuoteTotalsProps) => 
       </div>
       {clientData?.notes && (
         <div className="mt-4">
-          <p><strong>Notes</strong></p>
+          <p className="font-medium">Notes</p>
           <p>{clientData.notes}</p>
         </div>
       )}
