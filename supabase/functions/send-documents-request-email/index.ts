@@ -32,47 +32,42 @@ const sendEmail = async (to: string, subject: string, html: string) => {
       throw new Error('Configuration SMTP manquante');
     }
 
-    // Envoi réel d'email via SMTP
-    console.log('📩 Tentative d\'envoi email réel via SMTP');
+    // Utilisation d'une approche SMTP plus simple avec la librairie deno-smtp
+    console.log('📩 Tentative d\'envoi email via deno-smtp');
     
-    // Utilisation d'une librairie SMTP compatible Deno
-    const { SmtpClient } = await import("https://deno.land/x/smtp@v0.7.0/mod.ts");
+    const { SMTPClient } = await import("https://deno.land/x/denomailer@1.6.0/mod.ts");
     
-    const client = new SmtpClient();
-
-    try {
-      console.log('🔗 Connexion au serveur SMTP...');
-      await client.connectTLS({
+    const client = new SMTPClient({
+      connection: {
         hostname: smtpHost,
         port: smtpPort,
-        username: smtpUser,
-        password: smtpPassword,
-      });
+        tls: true,
+        auth: {
+          username: smtpUser,
+          password: smtpPassword,
+        },
+      },
+    });
 
-      console.log('📤 Envoi de l\'email...');
-      await client.send({
-        from: smtpFromEmail,
-        to: to,
-        subject: subject,
-        content: html,
-        html: html,
-      });
-
-      console.log('🔌 Fermeture de la connexion SMTP...');
-      await client.close();
-      
-      console.log('✅ Email envoyé avec succès via SMTP');
-      return { 
-        success: true, 
-        messageId: 'smtp-' + Date.now(),
-        message: 'Email envoyé avec succès'
-      };
-      
-    } catch (smtpError) {
-      console.error('❌ Erreur SMTP:', smtpError);
-      await client.close();
-      throw smtpError;
-    }
+    console.log('📤 Envoi de l\'email...');
+    
+    await client.send({
+      from: smtpFromEmail,
+      to: to,
+      subject: subject,
+      content: html,
+      html: html,
+    });
+    
+    console.log('🔌 Fermeture de la connexion...');
+    await client.close();
+    
+    console.log('✅ Email envoyé avec succès via deno-smtp');
+    return { 
+      success: true, 
+      messageId: 'denomailer-' + Date.now(),
+      message: 'Email envoyé avec succès'
+    };
     
   } catch (error) {
     console.error('❌ Erreur dans sendEmail:', error);
