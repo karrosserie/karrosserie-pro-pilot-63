@@ -93,7 +93,8 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
     mileage: vehicleData?.mileage ? `${vehicleData.mileage.toLocaleString('fr-FR')} km` : undefined,
     amountDue: `${invoice.amount.toFixed(2).replace('.', ',')} €`,
     date: formatDateFr(invoice.date),
-    notes: invoice.notes || undefined
+    notes: invoice.notes || undefined,
+    payment_details: invoice.payment_details || undefined
   };
 
   // Préparer les données client pour le template
