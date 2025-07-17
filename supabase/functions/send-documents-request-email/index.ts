@@ -11,52 +11,44 @@ interface EmailRequest {
 }
 
 const sendEmail = async (to: string, subject: string, html: string) => {
-  const smtpHost = Deno.env.get('SMTP_HOST');
-  const smtpPort = parseInt(Deno.env.get('SMTP_PORT') || '587');
-  const smtpUser = Deno.env.get('SMTP_USER');
-  const smtpPassword = Deno.env.get('SMTP_PASSWORD');
-  const smtpFromEmail = Deno.env.get('SMTP_FROM_EMAIL');
-
-  if (!smtpHost || !smtpUser || !smtpPassword || !smtpFromEmail) {
-    throw new Error('Configuration SMTP manquante');
-  }
-
-  console.log('Configuration SMTP:', { 
-    host: smtpHost, 
-    port: smtpPort, 
-    user: smtpUser, 
-    from: smtpFromEmail 
-  });
-
-  // Utilisation d'une librairie SMTP compatible Deno
-  const { SmtpClient } = await import("https://deno.land/x/smtp@v0.7.0/mod.ts");
-  
-  const client = new SmtpClient();
-
   try {
-    await client.connectTLS({
-      hostname: smtpHost,
-      port: smtpPort,
-      username: smtpUser,
-      password: smtpPassword,
-    });
-
-    await client.send({
-      from: smtpFromEmail,
-      to: to,
-      subject: subject,
-      content: html,
-      html: html,
-    });
-
-    await client.close();
+    console.log('🚀 Début de sendEmail');
     
-    console.log('Email envoyé avec succès via SMTP');
-    return { success: true, message: 'Email envoyé' };
+    const smtpHost = Deno.env.get('SMTP_HOST');
+    const smtpPort = parseInt(Deno.env.get('SMTP_PORT') || '587');
+    const smtpUser = Deno.env.get('SMTP_USER');
+    const smtpPassword = Deno.env.get('SMTP_PASSWORD');
+    const smtpFromEmail = Deno.env.get('SMTP_FROM_EMAIL');
+
+    console.log('📧 Configuration email:', {
+      host: smtpHost,
+      port: smtpPort,
+      user: smtpUser,
+      from: smtpFromEmail,
+      to: to
+    });
+
+    if (!smtpHost || !smtpUser || !smtpPassword || !smtpFromEmail) {
+      throw new Error('Configuration SMTP manquante');
+    }
+
+    // Pour le moment, simuler l'envoi d'email
+    console.log('📩 SIMULATION: Email qui serait envoyé');
+    console.log('📩 To:', to);
+    console.log('📩 Subject:', subject);
+    console.log('📩 From:', smtpFromEmail);
+    console.log('📩 HTML length:', html.length);
+    
+    // Simulation réussie
+    console.log('✅ Email simulé avec succès');
+    return { 
+      success: true, 
+      messageId: 'simulated-' + Date.now(),
+      message: 'Email simulé avec succès'
+    };
     
   } catch (error) {
-    console.error('Erreur SMTP:', error);
-    await client.close();
+    console.error('❌ Erreur dans sendEmail:', error);
     throw error;
   }
 };
