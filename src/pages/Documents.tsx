@@ -226,6 +226,27 @@ const Documents = () => {
     if (credits && activeFilters.credits) {
       credits.forEach(credit => {
         const createdDate = new Date(credit.created_at);
+        
+        // Pour les avoirs, utiliser directement les données de véhicule récupérées
+        let vehicleDisplay = 'Véhicule non spécifié';
+        if (credit.vehicles) {
+          const vehicle = credit.vehicles as any; // Cast pour éviter les erreurs TypeScript
+          const brand = vehicle.car_brands?.name || '';
+          const model = vehicle.car_models?.name || '';
+          const licensePlate = vehicle.license_plate || '';
+          
+          if (brand || model || licensePlate) {
+            const parts = [];
+            if (brand || model) {
+              parts.push(`${brand} ${model}`.trim());
+            }
+            if (licensePlate) {
+              parts.push(licensePlate);
+            }
+            vehicleDisplay = parts.join(' - ');
+          }
+        }
+        
         documents.push({
           id: `credit-${credit.id}`,
           originalId: credit.id,
@@ -233,7 +254,7 @@ const Documents = () => {
           title: `Avoir`,
           date: `Créé le ${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
           customer: credit.clients ? `${credit.clients.first_name} ${credit.clients.last_name}` : 'Client non spécifié',
-          vehicle: getVehicleInfo(credit.vehicle_id),
+          vehicle: vehicleDisplay,
           status: 'Émis',
           statusColor: 'bg-red-100 text-red-800',
           timestamp: new Date(credit.created_at).getTime(),
