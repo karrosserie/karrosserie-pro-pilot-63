@@ -13,20 +13,16 @@ interface CreditDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   credit?: { invoice_id: string; reference: string; status: string; amount: number; notes: string } | null;
-  isViewMode?: boolean;
 }
 
-export const CreditDialog = ({ open, onOpenChange, credit, isViewMode = false }: CreditDialogProps) => {
+export const CreditDialog = ({ open, onOpenChange, credit }: CreditDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isViewMode ? 'Voir l\'avoir' : 'Créer un avoir'}</DialogTitle>
+          <DialogTitle>Créer un avoir</DialogTitle>
           <DialogDescription>
-            {isViewMode
-              ? "Consultez les détails de l'avoir."
-              : "Créez un nouvel avoir en remplissant les informations ci-dessous."
-            }
+            Créez un nouvel avoir en remplissant les informations ci-dessous.
           </DialogDescription>
         </DialogHeader>
         

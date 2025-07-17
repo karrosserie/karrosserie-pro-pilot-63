@@ -15,14 +15,12 @@ interface RepairOrderDialogProps {
   order?: RepairOrder | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  isViewMode?: boolean;
 }
 
 const RepairOrderDialog = ({
   order,
   open,
-  onOpenChange,
-  isViewMode = false
+  onOpenChange
 }: RepairOrderDialogProps) => {
   const { updateOrder, createOrder } = useRepairOrders();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,19 +52,12 @@ const RepairOrderDialog = ({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle>
-            {isViewMode 
-              ? "Visualiser l'ordre de réparation"
-              : isExistingOrder 
-                ? "Modifier l'ordre de réparation" 
-                : "Créer un nouvel ordre de réparation"
-            }
+            {isExistingOrder ? "Modifier l'ordre de réparation" : "Créer un nouvel ordre de réparation"}
           </DialogTitle>
           <DialogDescription>
-            {isViewMode
-              ? "Consultez les détails de l'ordre de réparation."
-              : isExistingOrder
-                ? "Modifiez les détails de l'ordre de réparation."
-                : "Créez un nouvel ordre de réparation en remplissant les informations ci-dessous."
+            {isExistingOrder
+              ? "Modifiez les détails de l'ordre de réparation."
+              : "Créez un nouvel ordre de réparation en remplissant les informations ci-dessous."
             }
           </DialogDescription>
         </DialogHeader>

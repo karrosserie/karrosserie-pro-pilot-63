@@ -15,14 +15,12 @@ interface InvoiceDialogProps {
   invoice?: any;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  isViewMode?: boolean;
 }
 
 const InvoiceDialog = ({
   invoice,
   open,
-  onOpenChange,
-  isViewMode = false
+  onOpenChange
 }: InvoiceDialogProps) => {
   const { toast } = useToast();
   const { updateInvoice, createInvoice } = useInvoices();
@@ -52,29 +50,22 @@ const InvoiceDialog = ({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {isViewMode 
-              ? "Visualiser la facture"
-              : invoice && invoice.id 
-                ? "Modifier la facture" 
-                : "Créer une nouvelle facture"
-            }
+            {invoice && invoice.id ? "Modifier la facture" : "Créer une nouvelle facture"}
           </DialogTitle>
           <DialogDescription>
-            {isViewMode
-              ? "Consultez les détails de la facture."
-              : invoice && invoice.id
-                ? "Modifiez les détails de la facture."
-                : "Créez une nouvelle facture en remplissant les informations ci-dessous."
+            {invoice && invoice.id
+              ? "Modifiez les détails de la facture."
+              : "Créez une nouvelle facture en remplissant les informations ci-dessous."
             }
           </DialogDescription>
         </DialogHeader>
         
-          <InvoiceForm
-            invoice={invoice}
-            onSubmit={handleSubmit}
-            onCancel={() => onOpenChange(false)}
-            isSubmitting={isSubmitting}
-          />
+        <InvoiceForm
+          invoice={invoice}
+          onSubmit={handleSubmit}
+          onCancel={() => onOpenChange(false)}
+          isSubmitting={isSubmitting}
+        />
       </DialogContent>
     </Dialog>
   );

@@ -104,9 +104,6 @@ const Documents = () => {
   const [selectedExpertiseReport, setSelectedExpertiseReport] = useState(null);
   const [selectedCredit, setSelectedCredit] = useState(null);
 
-  // États pour le mode de visualisation
-  const [isViewMode, setIsViewMode] = useState(false);
-
   // États pour les filtres et la recherche
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -331,7 +328,6 @@ const Documents = () => {
   }, [searchTerm, activeFilters]);
 
   const handleViewDocument = (document) => {
-    setIsViewMode(true); // Mode visualisation
     switch (document.type) {
       case 'expertise':
         const expertiseReport = expertiseReports?.find(r => r.id === document.originalId);
@@ -362,34 +358,8 @@ const Documents = () => {
   };
 
   const handleEditDocument = (document) => {
-    setIsViewMode(false); // Mode édition
-    switch (document.type) {
-      case 'expertise':
-        const expertiseReport = expertiseReports?.find(r => r.id === document.originalId);
-        setSelectedExpertiseReport(expertiseReport);
-        setIsExpertiseDialogOpen(true);
-        break;
-      case 'quote':
-        const quote = quotes?.find(q => q.id === document.originalId);
-        setSelectedQuote(quote);
-        setIsQuoteDialogOpen(true);
-        break;
-      case 'order':
-        const order = repairOrders?.find(o => o.id === document.originalId);
-        setSelectedRepairOrder(order);
-        setIsRepairOrderDialogOpen(true);
-        break;
-      case 'invoice':
-        const invoice = invoices?.find(i => i.id === document.originalId);
-        setSelectedInvoice(invoice);
-        setIsInvoiceDialogOpen(true);
-        break;
-      case 'credit':
-        const credit = credits?.find(c => c.id === document.originalId);
-        setSelectedCredit(credit);
-        setIsCreditDialogOpen(true);
-        break;
-    }
+    // Même logique que pour la visualisation, mais en mode édition
+    handleViewDocument(document);
   };
 
   const handleFilterChange = (filterType: string, checked: boolean) => {
@@ -571,23 +541,23 @@ const Documents = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem onClick={() => { setSelectedExpertiseReport(null); setIsViewMode(false); setIsExpertiseDialogOpen(true); }}>
+              <DropdownMenuItem onClick={() => { setSelectedExpertiseReport(null); setIsExpertiseDialogOpen(true); }}>
                 <FileText className="mr-2 h-4 w-4" />
                 Rapport d'expertise
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { setSelectedQuote(null); setIsViewMode(false); setIsQuoteDialogOpen(true); }}>
+              <DropdownMenuItem onClick={() => { setSelectedQuote(null); setIsQuoteDialogOpen(true); }}>
                 <FileText className="mr-2 h-4 w-4" />
                 Devis
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { setSelectedRepairOrder(null); setIsViewMode(false); setIsRepairOrderDialogOpen(true); }}>
+              <DropdownMenuItem onClick={() => { setSelectedRepairOrder(null); setIsRepairOrderDialogOpen(true); }}>
                 <FileText className="mr-2 h-4 w-4" />
                 Ordre de réparation
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { setSelectedInvoice(null); setIsViewMode(false); setIsInvoiceDialogOpen(true); }}>
+              <DropdownMenuItem onClick={() => { setSelectedInvoice(null); setIsInvoiceDialogOpen(true); }}>
                 <FileText className="mr-2 h-4 w-4" />
                 Facture
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { setSelectedCredit(null); setIsViewMode(false); setIsCreditDialogOpen(true); }}>
+              <DropdownMenuItem onClick={() => { setSelectedCredit(null); setIsCreditDialogOpen(true); }}>
                 <FileText className="mr-2 h-4 w-4" />
                 Avoir
               </DropdownMenuItem>
@@ -662,35 +632,30 @@ const Documents = () => {
         report={selectedExpertiseReport}
         open={isExpertiseDialogOpen}
         onOpenChange={setIsExpertiseDialogOpen}
-        isViewMode={isViewMode}
       />
 
       <QuoteDialog
         quote={selectedQuote}
         open={isQuoteDialogOpen}
         onOpenChange={setIsQuoteDialogOpen}
-        isViewMode={isViewMode}
       />
 
       <RepairOrderDialog
         order={selectedRepairOrder}
         open={isRepairOrderDialogOpen}
         onOpenChange={setIsRepairOrderDialogOpen}
-        isViewMode={isViewMode}
       />
 
       <InvoiceDialog
         invoice={selectedInvoice}
         open={isInvoiceDialogOpen}
         onOpenChange={setIsInvoiceDialogOpen}
-        isViewMode={isViewMode}
       />
 
       <CreditDialog
         credit={selectedCredit}
         open={isCreditDialogOpen}
         onOpenChange={setIsCreditDialogOpen}
-        isViewMode={isViewMode}
       />
     </div>
   );
