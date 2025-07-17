@@ -121,11 +121,109 @@ export default function DocumentUploadFlow() {
     setShowWorkflow(false);
   };
 
-  const handleComplete = (documents: { [key: string]: File }) => {
+  const handleComplete = async (documents: { [key: string]: File }) => {
     console.log("Documents uploaded:", documents);
-    // TODO: Handle document submission
-    // For now, redirect back to start
-    setShowWorkflow(false);
+    
+    if (!tokenData) {
+      console.error("Token data not available");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const updatePromises = [];
+
+      // Upload et mise à jour des documents du permis de conduire
+      if (tokenData.client_id) {
+        const clientUpdates: { driver_license_front_url?: string; driver_license_back_url?: string } = {};
+
+        if (documents.driver_license_front) {
+          const { data: frontUrl } = supabase.storage
+            .from('documents')
+            .getPublicUrl(`${tokenData.client_id}/driver-license/front_${Date.now()}.jpg`);
+          
+          await supabase.storage
+            .from('documents')
+            .upload(`${tokenData.client_id}/driver-license/front_${Date.now()}.jpg`, documents.driver_license_front);
+          
+          clientUpdates.driver_license_front_url = frontUrl.publicUrl;
+        }
+
+        if (documents.driver_license_back) {
+          const { data: backUrl } = supabase.storage
+            .from('documents')
+            .getPublicUrl(`${tokenData.client_id}/driver-license/back_${Date.now()}.jpg`);
+          
+          await supabase.storage
+            .from('documents')
+            .upload(`${tokenData.client_id}/driver-license/back_${Date.now()}.jpg`, documents.driver_license_back);
+          
+          clientUpdates.driver_license_back_url = backUrl.publicUrl;
+        }
+
+        if (Object.keys(clientUpdates).length > 0) {
+          updatePromises.push(
+            supabase
+              .from('clients')
+              .update(clientUpdates)
+              .eq('id', tokenData.client_id)
+          );
+        }
+      }
+
+      // Upload et mise à jour des documents du véhicule
+      if (tokenData.vehicule_id) {
+        const vehicleUpdates: { registration_document_front_url?: string; registration_document_back_url?: string } = {};
+
+        if (documents.registration_front) {
+          const { data: frontUrl } = supabase.storage
+            .from('documents')
+            .getPublicUrl(`${tokenData.vehicule_id}/registration/front_${Date.now()}.jpg`);
+          
+          await supabase.storage
+            .from('documents')
+            .upload(`${tokenData.vehicule_id}/registration/front_${Date.now()}.jpg`, documents.registration_front);
+          
+          vehicleUpdates.registration_document_front_url = frontUrl.publicUrl;
+        }
+
+        if (documents.registration_back) {
+          const { data: backUrl } = supabase.storage
+            .from('documents')
+            .getPublicUrl(`${tokenData.vehicule_id}/registration/back_${Date.now()}.jpg`);
+          
+          await supabase.storage
+            .from('documents')
+            .upload(`${tokenData.vehicule_id}/registration/back_${Date.now()}.jpg`, documents.registration_back);
+          
+          vehicleUpdates.registration_document_back_url = backUrl.publicUrl;
+        }
+
+        if (Object.keys(vehicleUpdates).length > 0) {
+          updatePromises.push(
+            supabase
+              .from('vehicles')
+              .update(vehicleUpdates)
+              .eq('id', tokenData.vehicule_id)
+          );
+        }
+      }
+
+      // Exécuter toutes les mises à jour
+      await Promise.all(updatePromises);
+
+      console.log("Documents sauvegardés avec succès");
+      setShowWorkflow(false);
+      
+      // Recharger les documents manquants pour mettre à jour l'interface
+      window.location.reload();
+      
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde des documents:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (showWorkflow) {
