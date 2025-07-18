@@ -21,9 +21,11 @@ interface DefaultInvoiceHeaderProps {
     email?: string;
   };
   remainingAmount?: number;
+  totalPaidAmount?: number;
+  payments?: any[];
 }
 
-const DefaultInvoiceHeader = ({ companyData, invoiceData, clientData, remainingAmount }: DefaultInvoiceHeaderProps) => {
+const DefaultInvoiceHeader = ({ companyData, invoiceData, clientData, remainingAmount, totalPaidAmount, payments }: DefaultInvoiceHeaderProps) => {
   return (
     <div className="grid grid-cols-3 gap-6 mb-6">
       {/* Colonne 1 - Entreprise */}
@@ -81,10 +83,12 @@ const DefaultInvoiceHeader = ({ companyData, invoiceData, clientData, remainingA
             <span className="font-medium">Kilométrage</span>
             <span>{invoiceData.mileage}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="font-medium">Montant payé</span>
-            <span>1000,00 €</span>
-          </div>
+          {payments && payments.length > 0 && (
+            <div className="flex justify-between">
+              <span className="font-medium">Montant payé</span>
+              <span>{totalPaidAmount ? `${totalPaidAmount.toFixed(2).replace('.', ',')} €` : '0,00 €'}</span>
+            </div>
+          )}
         </div>
         
         {/* Encadré Montant dû */}
