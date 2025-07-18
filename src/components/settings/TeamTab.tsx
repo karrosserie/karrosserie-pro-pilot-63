@@ -196,43 +196,40 @@ const TeamTab = () => {
         newData: data
       });
 
-      // Mettre à jour le profil (l'email sera géré via une fonction edge ou reste inchangé)
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          first_name: data.firstName,
-          last_name: data.lastName,
-          phone_number: data.phoneNumber
-          // Note: l'email ne peut pas être modifié directement ici
-        })
-        .eq('id', editingMember.user_id);
-
-      console.log('Résultat mise à jour profil:', { profileError });
-
-      if (profileError) {
-        console.error('Profile update error:', profileError);
-        toast.error('Erreur lors de la mise à jour du profil: ' + profileError.message);
-        return;
-      }
-
-      // Mettre à jour le rôle et le statut
-      const { error: roleError } = await supabase
-        .from('user_companies')
-        .update({ 
+      // Utiliser la edge function pour mettre à jour l'utilisateur
+      const { data: session } = await supabase.auth.getSession();
+      
+      const response = await fetch(`https://jukdsypvuehnniskgpfd.supabase.co/functions/v1/update-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.session?.access_token}`,
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1a2RzeXB2dWVobm5pc2tncGZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc5OTA5MTIsImV4cCI6MjA2MzU2NjkxMn0.fJcqL0Sg_x7AXacC6lhqic-VWhvI46D3tFgRcpgchxo',
+        },
+        body: JSON.stringify({
+          userId: editingMember.user_id,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phoneNumber: data.phoneNumber,
           role: data.role,
-          active: data.active
-        })
-        .eq('id', editingMember.id);
+          active: data.active,
+          userCompanyId: editingMember.id
+        }),
+      });
 
-      if (roleError) {
-        toast.error('Erreur lors de la mise à jour du membre');
-      } else {
-        toast.success('Membre mis à jour avec succès');
-        setIsEditDialogOpen(false);
-        setEditingMember(null);
-        editForm.reset();
-        fetchTeamMembers();
+      const result = await response.json();
+      console.log('Résultat edge function:', result);
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Erreur lors de la mise à jour');
       }
+
+      toast.success('Membre mis à jour avec succès');
+      setIsEditDialogOpen(false);
+      setEditingMember(null);
+      editForm.reset();
+      fetchTeamMembers();
     } catch (error) {
       console.error('Error updating member:', error);
       toast.error('Erreur lors de la mise à jour du membre');
