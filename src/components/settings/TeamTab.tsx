@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
-import { Plus, Pencil, UserX, Crown, User, Trash, Users } from 'lucide-react';
+import { Plus, Pencil, UserX, Crown, User, Trash, Users, UserPlus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from 'react-hook-form';
@@ -352,7 +352,7 @@ const TeamTab = () => {
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
-              <Plus className="h-4 w-4 mr-2" />
+              <UserPlus className="h-4 w-4 mr-2" />
               Ajouter un membre
             </Button>
           </DialogTrigger>
