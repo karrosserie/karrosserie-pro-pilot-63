@@ -30,7 +30,7 @@ const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={!isUploading ? onOpenChange : undefined}>
-      <DialogContent>
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Importer un rapport d'expertise</DialogTitle>
           <DialogDescription>
