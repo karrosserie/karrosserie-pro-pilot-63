@@ -35,7 +35,7 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
     }
   }, [cession]);
 
-  // Effect to validate repair order data when all data is loaded
+  // Effect to validate repair order data and pre-fill form when all data is loaded
   useEffect(() => {
     if (formData.repair_order_id && !isLoadingOrder && !isLoadingClient && !isLoadingVehicles) {
       console.log('Validating repair order data:', {
@@ -53,13 +53,25 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
         // Clear any previous errors
         setValidationErrorMessage(null);
         setValidationBlocked(false);
+        
+        // Pre-fill form with repair order data if not editing existing cession
+        if (order && !cession) {
+          setFormData(prev => ({
+            ...prev,
+            incident_number: order.claim_number || prev.incident_number,
+            incident_date: order.incident_date || prev.incident_date,
+            policy_number: order.policy_number || prev.policy_number,
+            report_number: order.report_number || prev.report_number,
+            expert_name: order.expert_name || prev.expert_name
+          }));
+        }
       }
     } else if (!formData.repair_order_id) {
       // Clear errors and unblock validation when no repair order is selected
       setValidationErrorMessage(null);
       setValidationBlocked(false);
     }
-  }, [formData.repair_order_id, order, client, repairOrderVehicle, isLoadingOrder, isLoadingClient, isLoadingVehicles]);
+  }, [formData.repair_order_id, order, client, repairOrderVehicle, isLoadingOrder, isLoadingClient, isLoadingVehicles, cession]);
 
   const handleChange = (field: keyof CessionFormData, value: any) => {
     console.log(`Field changed: ${field} = ${value}`);
