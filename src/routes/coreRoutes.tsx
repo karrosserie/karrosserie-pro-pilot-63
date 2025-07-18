@@ -1,5 +1,6 @@
 
 import { ProtectedRoute } from "@/components/router/ProtectedRoute";
+import AppLayout from "@/components/layout/AppLayout";
 import Index from "@/pages/Index";
 import Activity from "@/pages/Activity";
 import AIAssistant from "@/pages/AIAssistant";
@@ -18,7 +19,9 @@ export const coreRoutes = [
     path: "/",
     element: (
       <ProtectedRoute>
-        <Index />
+        <AppLayout>
+          <Index />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
@@ -26,7 +29,9 @@ export const coreRoutes = [
     path: "/activity",
     element: (
       <ProtectedRoute>
-        <Activity />
+        <AppLayout>
+          <Activity />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
@@ -34,7 +39,9 @@ export const coreRoutes = [
     path: "/ai-assistant",
     element: (
       <ProtectedRoute>
-        <AIAssistant />
+        <AppLayout>
+          <AIAssistant />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
@@ -42,7 +49,9 @@ export const coreRoutes = [
     path: "/profile",
     element: (
       <ProtectedRoute>
-        <Profile />
+        <AppLayout>
+          <Profile />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
@@ -50,7 +59,9 @@ export const coreRoutes = [
     path: "/clients",
     element: (
       <ProtectedRoute>
-        <Clients />
+        <AppLayout>
+          <Clients />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
@@ -58,7 +69,9 @@ export const coreRoutes = [
     path: "/vehicles",
     element: (
       <ProtectedRoute>
-        <Vehicles />
+        <AppLayout>
+          <Vehicles />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
@@ -66,7 +79,9 @@ export const coreRoutes = [
     path: "/fleet",
     element: (
       <ProtectedRoute>
-        <Fleet />
+        <AppLayout>
+          <Fleet />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
@@ -74,7 +89,9 @@ export const coreRoutes = [
     path: "/accounting",
     element: (
       <ProtectedRoute>
-        <Accounting />
+        <AppLayout>
+          <Accounting />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
@@ -82,7 +99,9 @@ export const coreRoutes = [
     path: "/cessions",
     element: (
       <ProtectedRoute>
-        <Cessions />
+        <AppLayout>
+          <Cessions />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
@@ -90,7 +109,9 @@ export const coreRoutes = [
     path: "/settings",
     element: (
       <ProtectedRoute>
-        <Settings />
+        <AppLayout>
+          <Settings />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
@@ -98,7 +119,9 @@ export const coreRoutes = [
     path: "/help",
     element: (
       <ProtectedRoute>
-        <Help />
+        <AppLayout>
+          <Help />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
@@ -106,7 +129,9 @@ export const coreRoutes = [
     path: "/planning",
     element: (
       <ProtectedRoute>
-        <Planning />
+        <AppLayout>
+          <Planning />
+        </AppLayout>
       </ProtectedRoute>
     )
   }
