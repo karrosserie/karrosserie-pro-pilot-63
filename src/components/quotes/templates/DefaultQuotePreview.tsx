@@ -43,52 +43,17 @@ interface DefaultQuotePreviewProps {
 }
 
 const DefaultQuotePreview = ({ companyData, quoteData, clientData, items, totals }: DefaultQuotePreviewProps) => {
-  // Données par défaut pour l'aperçu
-  const defaultQuoteData = {
-    number: 'N° 5',
-    claimNumber: 'SIN-2024-001',
-    billingDate: '11/07/2025',
-    validUntil: '10/08/2025',
-    vehicle: 'Peugeot 308',
-    licensePlate: 'AB-123-CD',
-    mileage: '85 679 km',
-    amountDue: '1 250,00 €',
-    ...quoteData
-  };
-
-  const defaultClientData = {
-    name: 'Jean Dupont',
-    address: '134 Boulevard Michelet',
-    city: '13008 MARSEILLE',
-    phone: '+33 6 12 34 56 78',
-    email: 'jean.dupont@email.com',
-    ...clientData
-  };
-
-  const defaultItems = items || [
-    { ref: '', description: 'T1', quantity: 2, discount: 0, unitPrice: 110.00, vat: 20, totalHT: 220.00, totalTTC: 264.00 },
-    { ref: '', description: 'T2', quantity: 2, discount: 0, unitPrice: 110.00, vat: 20, totalHT: 220.00, totalTTC: 264.00 },
-    { ref: '', description: 'GRILLE DE PARE-CHOCS AV', quantity: 1, discount: 5, unitPrice: 95.00, vat: 20, totalHT: 90.25, totalTTC: 108.30 },
-    { ref: '', description: 'CONDENSEUR DE CLIMATISATION MOTRIO', quantity: 5, discount: 0, unitPrice: 0.00, vat: 20, totalHT: 0.00, totalTTC: 0.00 }
-  ];
-
-  const defaultTotals = {
-    subtotal: '918,75 €',
-    vat: '183,75 €',
-    total: '1 102,50 €',
-    ...totals
-  };
 
   return (
     <div className="bg-white p-4 rounded shadow-sm w-full flex flex-col" style={{ minHeight: '100vh', height: 'auto', backgroundColor: 'white' }}>
       <DefaultQuoteHeader 
         companyData={companyData}
-        quoteData={defaultQuoteData}
-        clientData={defaultClientData}
+        quoteData={quoteData}
+        clientData={clientData}
       />
       
-      <DefaultQuoteItemsTable items={defaultItems} />
-      <DefaultQuoteTotals totals={defaultTotals} clientData={defaultClientData} />
+      <DefaultQuoteItemsTable items={items} />
+      <DefaultQuoteTotals totals={totals} clientData={clientData} />
 
       <DefaultQuoteFooter companyData={companyData} />
     </div>

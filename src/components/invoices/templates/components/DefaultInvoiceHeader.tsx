@@ -10,6 +10,7 @@ interface DefaultInvoiceHeaderProps {
     vehicle?: string;
     licensePlate?: string;
     mileage?: string;
+    amountPaid?: string;
     amountDue?: string;
   };
   clientData: {
@@ -79,16 +80,18 @@ const DefaultInvoiceHeader = ({ companyData, invoiceData, clientData }: DefaultI
             <span className="font-medium">Kilométrage</span>
             <span>{invoiceData.mileage}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="font-medium">Montant payé</span>
-            <span>375,00 €</span>
-          </div>
+          {invoiceData.amountPaid && (
+            <div className="flex justify-between">
+              <span className="font-medium">Montant payé</span>
+              <span>{invoiceData.amountPaid}</span>
+            </div>
+          )}
         </div>
         
         {/* Encadré Montant dû */}
         <div className="bg-blue-600 text-white p-2 text-center mt-3">
           <p className="text-base mb-1">Montant dû</p>
-          <p className="text-lg font-bold">719,78 €</p>
+          <p className="text-lg font-bold">{invoiceData.amountDue}</p>
         </div>
       </div>
 

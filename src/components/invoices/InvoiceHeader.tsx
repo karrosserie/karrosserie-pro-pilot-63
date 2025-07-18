@@ -49,7 +49,7 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
               <p>{companyData.address || ''}</p>
               <p>{companyData.zipcode || ''} {companyData.city || ''}</p>
               <p>Téléphone : {companyData.phone || ''}</p>
-              <p>E-mail : {companyData.email || '}</p>
+              <p>E-mail : {companyData.email || ''}</p>
               <p>SIRET : {companyData.siret || ''}</p>
               <p>N° TVA : {companyData.tva || ''}</p>
             </div>
