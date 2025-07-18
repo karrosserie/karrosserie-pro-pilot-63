@@ -12,6 +12,7 @@ import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
 import { Plus, Pencil, UserX, Crown, User, Trash, Users, UserPlus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
+import { useConfirmation } from '@/hooks/use-confirmation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -66,6 +67,7 @@ const TeamTab = () => {
   const { companyInfo, isLoading } = useCompany();
   const { signUp } = useAuth();
   const { toast } = useToast();
+  const { confirm } = useConfirmation();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -272,7 +274,15 @@ const TeamTab = () => {
   };
 
   const handleRemoveMember = async (memberId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce membre de l\'équipe ?')) {
+    const confirmed = await confirm({
+      title: 'Confirmation',
+      description: 'Êtes-vous sûr de vouloir supprimer ce membre de l\'équipe ?',
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+    
+    if (!confirmed) {
       return;
     }
 
