@@ -189,34 +189,29 @@ const TeamTab = () => {
     setIsSubmitting(true);
 
     try {
-      // Mettre à jour l'email via l'API Auth si l'email a changé
-      if (data.email !== editingMember.profiles?.email) {
-        const { error: emailError } = await supabase.auth.admin.updateUserById(
-          editingMember.user_id,
-          { email: data.email }
-        );
+      console.log('Tentative de mise à jour du membre:', {
+        memberId: editingMember.id,
+        userId: editingMember.user_id,
+        currentData: editingMember.profiles,
+        newData: data
+      });
 
-        if (emailError) {
-          console.error('Email update error:', emailError);
-          toast.error('Erreur lors de la mise à jour de l\'email');
-          return;
-        }
-      }
-
-      // Mettre à jour le profil
+      // Mettre à jour le profil (l'email sera géré via une fonction edge ou reste inchangé)
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
           first_name: data.firstName,
           last_name: data.lastName,
-          phone_number: data.phoneNumber,
-          email: data.email // Synchroniser l'email dans profiles aussi
+          phone_number: data.phoneNumber
+          // Note: l'email ne peut pas être modifié directement ici
         })
         .eq('id', editingMember.user_id);
 
+      console.log('Résultat mise à jour profil:', { profileError });
+
       if (profileError) {
         console.error('Profile update error:', profileError);
-        toast.error('Erreur lors de la mise à jour du profil');
+        toast.error('Erreur lors de la mise à jour du profil: ' + profileError.message);
         return;
       }
 
