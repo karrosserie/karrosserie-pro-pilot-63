@@ -202,6 +202,16 @@ const TeamTab = () => {
   const handleEditMember = async (data: EditMemberFormValues) => {
     if (!editingMember) return;
 
+    // Empêcher la désactivation d'un propriétaire
+    if (editingMember.role === 'Propriétaire' && !data.active) {
+      toast({
+        title: "Erreur",
+        description: "Un propriétaire ne peut pas être désactivé",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -653,13 +663,17 @@ const TeamTab = () => {
                         Membre actif
                       </FormLabel>
                       <div className="text-sm text-muted-foreground">
-                        Activez ou désactivez ce membre
+                        {editingMember?.role === 'Propriétaire' 
+                          ? 'Un propriétaire ne peut pas être désactivé'
+                          : 'Activez ou désactivez ce membre'
+                        }
                       </div>
                     </div>
                     <FormControl>
                       <Switch
                         checked={field.value}
-                        onCheckedChange={field.onChange}
+                        onCheckedChange={editingMember?.role === 'Propriétaire' ? undefined : field.onChange}
+                        disabled={editingMember?.role === 'Propriétaire'}
                       />
                     </FormControl>
                   </FormItem>
