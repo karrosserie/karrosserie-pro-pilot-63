@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '@/services/supabase/auth';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useAuthActions = (setLoading: (loading: boolean) => void) => {
   const navigate = useNavigate();
@@ -22,6 +23,25 @@ export const useAuthActions = (setLoading: (loading: boolean) => void) => {
         const customError = new Error('Email not confirmed');
         customError.name = 'EmailNotConfirmed';
         throw customError;
+      }
+      
+      // Check if user is active in any company
+      const { data: userCompanies, error } = await supabase
+        .from('user_companies')
+        .select('active')
+        .eq('user_id', newUser.id);
+      
+      if (error) {
+        console.error('Error checking user company status:', error);
+      }
+      
+      // If user has no companies or all companies have active = false, block login
+      const hasActiveCompany = userCompanies && userCompanies.some(uc => uc.active === true);
+      
+      if (!hasActiveCompany) {
+        // Sign out the user immediately
+        await authService.signOut();
+        throw new Error('Votre compte a été désactivé. Veuillez contacter votre administrateur.');
       }
       
       toast({
