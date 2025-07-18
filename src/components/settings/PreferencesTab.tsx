@@ -197,16 +197,167 @@ const PreferencesTab = () => {
             </Select>
           </div>
 
-          <div>
-            <h3 className="text-lg font-medium mb-4">Aperçu du modèle sélectionné</h3>
-            <div className="border rounded-lg h-[48rem] overflow-auto bg-white">
-              {selectedTemplate === 'default' ? (
-                <DefaultInvoicePreview companyData={companyData} />
-              ) : (
-                <AlternativeInvoicePreview companyData={companyData} />
-              )}
-            </div>
-          </div>
+           <div>
+             <h3 className="text-lg font-medium mb-4">Aperçu du modèle sélectionné</h3>
+             <div className="border rounded-lg h-[48rem] overflow-auto bg-white">
+               {selectedTemplate === 'default' ? (
+                 <DefaultInvoicePreview 
+                   companyData={companyData}
+                   invoiceData={{
+                     number: "F-2024-001",
+                     claimNumber: "SIN-2024-12345",
+                     billingDate: "15/01/2024",
+                     dueDate: "15/02/2024",
+                     vehicle: "Peugeot 308",
+                     licensePlate: "AB-123-CD",
+                     mileage: "45 320 km",
+                     amountDue: "2 458,75",
+                     notes: "Réparation suite à sinistre - Impact avant droit",
+                     payment_details: "Paiement par virement bancaire sous 30 jours"
+                   }}
+                   clientData={{
+                     name: "Martin Dubois",
+                     address: "25 rue de la République",
+                     city: "75001 Paris",
+                     phone: "01 23 45 67 89",
+                     email: "martin.dubois@email.com"
+                   }}
+                   items={[
+                     {
+                       ref: "REP001",
+                       description: "Remplacement pare-chocs avant",
+                       quantity: 1,
+                       discount: 0,
+                       unitPrice: 450.00,
+                       vat: 20,
+                       totalHT: 450.00,
+                       totalTTC: 540.00
+                     },
+                     {
+                       ref: "REP002", 
+                       description: "Peinture et finition",
+                       quantity: 1,
+                       discount: 10,
+                       unitPrice: 380.00,
+                       vat: 20,
+                       totalHT: 342.00,
+                       totalTTC: 410.40
+                     },
+                     {
+                       ref: "MO001",
+                       description: "Main d'œuvre (8h)",
+                       quantity: 8,
+                       discount: 0,
+                       unitPrice: 65.00,
+                       vat: 20,
+                       totalHT: 520.00,
+                       totalTTC: 624.00
+                     }
+                   ]}
+                   totals={{
+                     subtotal: "1 312,00 €",
+                     vat: "262,40 €", 
+                     total: "1 574,40 €"
+                   }}
+                   payments={[
+                     {
+                       id: "1",
+                       date: "16/01/2024",
+                       amount: 500.00,
+                       payment_method: "Virement",
+                       reference: "VIR-001"
+                     },
+                     {
+                       id: "2", 
+                       date: "30/01/2024",
+                       amount: 1074.40,
+                       payment_method: "Chèque",
+                       reference: "CHQ-002"
+                     }
+                   ]}
+                   totalPaidAmount={1574.40}
+                   remainingAmount={0}
+                 />
+               ) : (
+                 <AlternativeInvoicePreview 
+                   companyData={companyData}
+                   invoiceData={{
+                     number: "F-2024-001",
+                     date: "15/01/2024",
+                     dueDate: "15/02/2024",
+                     notes: "Réparation suite à sinistre - Impact avant droit",
+                     payment_details: "Paiement par virement bancaire sous 30 jours"
+                   }}
+                   clientData={{
+                     name: "Martin Dubois",
+                     address: "25 rue de la République",
+                     city: "75001 Paris",
+                     phone: "01 23 45 67 89",
+                     email: "martin.dubois@email.com",
+                     licensePlate: "AB-123-CD",
+                     mileage: "45 320 km",
+                     vehicle: "Peugeot 308"
+                   }}
+                   items={[
+                     {
+                       ref: "REP001",
+                       description: "Remplacement pare-chocs avant",
+                       quantity: 1,
+                       discount: 0,
+                       unitPrice: 450.00,
+                       vat: 20,
+                       totalHT: 450.00,
+                       totalTTC: 540.00
+                     },
+                     {
+                       ref: "REP002",
+                       description: "Peinture et finition", 
+                       quantity: 1,
+                       discount: 10,
+                       unitPrice: 380.00,
+                       vat: 20,
+                       totalHT: 342.00,
+                       totalTTC: 410.40
+                     },
+                     {
+                       ref: "MO001",
+                       description: "Main d'œuvre (8h)",
+                       quantity: 8,
+                       discount: 0,
+                       unitPrice: 65.00,
+                       vat: 20,
+                       totalHT: 520.00,
+                       totalTTC: 624.00
+                     }
+                   ]}
+                   totals={{
+                     totalHT: "1 312,00 €",
+                     totalVAT: "262,40 €",
+                     totalDiscount: "38,00 €",
+                     totalTTC: "1 574,40 €"
+                   }}
+                   payments={[
+                     {
+                       id: "1",
+                       date: "16/01/2024", 
+                       amount: 500.00,
+                       payment_method: "Virement",
+                       reference: "VIR-001"
+                     },
+                     {
+                       id: "2",
+                       date: "30/01/2024",
+                       amount: 1074.40,
+                       payment_method: "Chèque", 
+                       reference: "CHQ-002"
+                     }
+                   ]}
+                   totalPaidAmount={1574.40}
+                   remainingAmount={0}
+                 />
+               )}
+             </div>
+           </div>
         </CardContent>
       </Card>
 
