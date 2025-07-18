@@ -73,9 +73,9 @@ const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items
               {clientDataToUse.email && <p><strong>EMAIL :</strong> {clientDataToUse.email}</p>}
               {clientDataToUse.address && <p><strong>ADRESSE :</strong> {clientDataToUse.address}</p>}
               {clientDataToUse.city && <p>{clientDataToUse.city}</p>}
-              {quoteDataToUse.licensePlate && <p><strong>Immatriculation :</strong> {quoteDataToUse.licensePlate}</p>}
-              {quoteDataToUse.mileage && <p><strong>Kilométrage :</strong> {quoteDataToUse.mileage}</p>}
-              {quoteDataToUse.vehicle && <p><strong>Véhicule :</strong> {quoteDataToUse.vehicle}</p>}
+              {clientDataToUse.licensePlate && <p><strong>Immatriculation :</strong> {clientDataToUse.licensePlate}</p>}
+              {clientDataToUse.mileage && <p><strong>Kilométrage :</strong> {clientDataToUse.mileage}</p>}
+              {clientDataToUse.vehicle && <p><strong>Véhicule :</strong> {clientDataToUse.vehicle}</p>}
             </div>
           </div>
         </div>
