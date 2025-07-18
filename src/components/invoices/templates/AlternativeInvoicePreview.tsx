@@ -66,7 +66,7 @@ const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items
           <h2 className="text-3xl font-bold text-black">FACTURE N° {invoiceDataToUse.number || ''}</h2>
           
           {/* Informations client déplacées ici */}
-          <div className="text-left p-4 w-full ml-auto">
+          <div className="text-left p-4 ml-auto max-w-[220px]">
             <div className="text-sm text-gray-600 space-y-1">
               {clientDataToUse.name && <p><strong>{clientDataToUse.name}</strong></p>}
               {clientDataToUse.phone && <p><strong>TEL :</strong> {clientDataToUse.phone}</p>}
