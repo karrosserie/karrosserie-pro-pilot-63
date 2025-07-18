@@ -194,6 +194,7 @@ export const ExpertiseReportUploader = ({
             <Button 
               onClick={uploadExpertiseReport}
               disabled={isUploading}
+              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
             >
               {isUploading ? (
                 <>
