@@ -73,7 +73,7 @@ const AlternativeRepairOrderPreview = ({ companyData, orderData, clientData, veh
           <h2 className="text-3xl font-bold text-black">ORDRE DE RÉPARATION N° {orderDataToUse.number || ''}</h2>
           
           {/* Informations client déplacées ici */}
-          <div className="text-left p-4 w-2/3 ml-auto">
+          <div className="text-left p-4 w-2/3 max-w-[300px]">
             <div className="text-sm text-gray-600 space-y-1">
               {clientDataToUse.name && <p><strong>{clientDataToUse.name}</strong></p>}
               {clientDataToUse.phone && <p><strong>TEL :</strong> {clientDataToUse.phone}</p>}
