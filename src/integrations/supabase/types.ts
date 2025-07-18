@@ -1497,7 +1497,14 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      user_belongs_to_company: {
+        Args: { p_user_id: string; p_company_id: string }
+        Returns: boolean
+      }
+      user_is_company_owner: {
+        Args: { p_user_id: string; p_company_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
