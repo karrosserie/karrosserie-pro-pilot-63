@@ -34,6 +34,8 @@ export const companyService = {
       .eq('active', true)
       .single();
 
+    console.log('Requête user_companies:', { userId, userCompany, userCompanyError });
+
     if (userCompanyError || !userCompany) {
       console.log('Aucune entreprise trouvée pour cet utilisateur');
       return null;
