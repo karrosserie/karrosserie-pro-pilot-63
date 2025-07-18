@@ -20,9 +20,10 @@ interface DefaultInvoiceHeaderProps {
     phone?: string;
     email?: string;
   };
+  remainingAmount?: number;
 }
 
-const DefaultInvoiceHeader = ({ companyData, invoiceData, clientData }: DefaultInvoiceHeaderProps) => {
+const DefaultInvoiceHeader = ({ companyData, invoiceData, clientData, remainingAmount }: DefaultInvoiceHeaderProps) => {
   return (
     <div className="grid grid-cols-3 gap-6 mb-6">
       {/* Colonne 1 - Entreprise */}
@@ -80,18 +81,12 @@ const DefaultInvoiceHeader = ({ companyData, invoiceData, clientData }: DefaultI
             <span className="font-medium">Kilométrage</span>
             <span>{invoiceData.mileage}</span>
           </div>
-          {invoiceData.amountPaid && (
-            <div className="flex justify-between">
-              <span className="font-medium">Montant payé</span>
-              <span>{invoiceData.amountPaid}</span>
-            </div>
-          )}
         </div>
         
         {/* Encadré Montant dû */}
         <div className="bg-blue-600 text-white p-2 text-center mt-3">
           <p className="text-base mb-1">Montant dû</p>
-          <p className="text-lg font-bold">{invoiceData.amountDue}</p>
+          <p className="text-lg font-bold">{remainingAmount ? `${remainingAmount.toFixed(2).replace('.', ',')} €` : '0,00 €'}</p>
         </div>
       </div>
 

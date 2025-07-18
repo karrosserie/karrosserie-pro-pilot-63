@@ -59,6 +59,7 @@ const DefaultInvoicePreview = ({ companyData, invoiceData, clientData, items, to
         companyData={companyData}
         invoiceData={invoiceDataToUse}
         clientData={clientDataToUse}
+        remainingAmount={remainingAmount}
       />
       
       <DefaultInvoiceItemsTable items={itemsToUse} />
