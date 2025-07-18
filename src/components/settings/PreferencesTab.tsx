@@ -204,7 +204,7 @@ const PreferencesTab = () => {
                  <DefaultInvoicePreview 
                    companyData={companyData}
                    invoiceData={{
-                     number: "F-2024-001",
+                      number: "1",
                      claimNumber: "SIN-2024-12345",
                      billingDate: "15/01/2024",
                      dueDate: "15/02/2024",
@@ -225,8 +225,8 @@ const PreferencesTab = () => {
                    items={[
                      {
                        ref: "REP001",
-                       description: "Remplacement pare-chocs avant",
-                       quantity: 1,
+                        description: "T1",
+                        quantity: 7.5,
                        discount: 0,
                        unitPrice: 450.00,
                        vat: 20,
@@ -235,7 +235,7 @@ const PreferencesTab = () => {
                      },
                      {
                        ref: "REP002", 
-                       description: "Peinture et finition",
+                        description: "AILE AVG",
                        quantity: 1,
                        discount: 10,
                        unitPrice: 380.00,
@@ -245,7 +245,7 @@ const PreferencesTab = () => {
                      },
                      {
                        ref: "MO001",
-                       description: "Main d'œuvre (8h)",
+                        description: "PEINTURE",
                        quantity: 8,
                        discount: 0,
                        unitPrice: 65.00,
@@ -267,13 +267,6 @@ const PreferencesTab = () => {
                        payment_method: "Virement",
                        reference: "VIR-001"
                      },
-                     {
-                       id: "2", 
-                       date: "2024-01-30",
-                       amount: 1074.40,
-                       payment_method: "Chèque",
-                       reference: "CHQ-002"
-                     }
                    ]}
                    totalPaidAmount={1574.40}
                    remainingAmount={0}
@@ -282,7 +275,7 @@ const PreferencesTab = () => {
                  <AlternativeInvoicePreview 
                    companyData={companyData}
                    invoiceData={{
-                     number: "F-2024-001",
+                     number: "1",
                      date: "15/01/2024",
                      dueDate: "15/02/2024",
                      notes: "Réparation suite à sinistre - Impact avant droit",
@@ -301,8 +294,8 @@ const PreferencesTab = () => {
                    items={[
                      {
                        ref: "REP001",
-                       description: "Remplacement pare-chocs avant",
-                       quantity: 1,
+                        description: "T1",
+                        quantity: 7.5,
                        discount: 0,
                        unitPrice: 450.00,
                        vat: 20,
@@ -311,7 +304,7 @@ const PreferencesTab = () => {
                      },
                      {
                        ref: "REP002",
-                       description: "Peinture et finition", 
+                       description: "AILE AVG", 
                        quantity: 1,
                        discount: 10,
                        unitPrice: 380.00,
@@ -321,7 +314,7 @@ const PreferencesTab = () => {
                      },
                      {
                        ref: "MO001",
-                       description: "Main d'œuvre (8h)",
+                       description: "PEINTURE",
                        quantity: 8,
                        discount: 0,
                        unitPrice: 65.00,
@@ -344,13 +337,6 @@ const PreferencesTab = () => {
                        payment_method: "Virement",
                        reference: "VIR-001"
                      },
-                     {
-                       id: "2",
-                       date: "2024-01-30",
-                       amount: 1074.40,
-                       payment_method: "Chèque", 
-                       reference: "CHQ-002"
-                     }
                    ]}
                    totalPaidAmount={1574.40}
                    remainingAmount={0}
