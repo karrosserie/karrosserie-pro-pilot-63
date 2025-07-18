@@ -262,14 +262,14 @@ const PreferencesTab = () => {
                    payments={[
                      {
                        id: "1",
-                       date: "16/01/2024",
+                       date: "2024-01-16",
                        amount: 500.00,
                        payment_method: "Virement",
                        reference: "VIR-001"
                      },
                      {
                        id: "2", 
-                       date: "30/01/2024",
+                       date: "2024-01-30",
                        amount: 1074.40,
                        payment_method: "Chèque",
                        reference: "CHQ-002"
@@ -339,14 +339,14 @@ const PreferencesTab = () => {
                    payments={[
                      {
                        id: "1",
-                       date: "16/01/2024", 
+                       date: "2024-01-16", 
                        amount: 500.00,
                        payment_method: "Virement",
                        reference: "VIR-001"
                      },
                      {
                        id: "2",
-                       date: "30/01/2024",
+                       date: "2024-01-30",
                        amount: 1074.40,
                        payment_method: "Chèque", 
                        reference: "CHQ-002"
