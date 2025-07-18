@@ -502,14 +502,16 @@ const TeamTab = () => {
                     <p className="font-medium">
                       {member.profiles?.first_name && member.profiles?.last_name
                         ? `${member.profiles.first_name} ${member.profiles.last_name}`
-                        : member.profiles?.email || 'Utilisateur sans profil'}
+                        : member.profiles?.email || 'Utilisateur'}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {member.profiles?.email || 'Email non disponible'}
+                      {member.profiles?.email}
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      {member.profiles?.phone_number || 'Téléphone non disponible'}
-                    </p>
+                    {member.profiles?.phone_number && (
+                      <p className="text-sm text-muted-foreground">
+                        {member.profiles.phone_number}
+                      </p>
+                    )}
                   </div>
                   <Badge variant={getRoleBadgeVariant(member.role)}>
                     {getRoleLabel(member.role)}
