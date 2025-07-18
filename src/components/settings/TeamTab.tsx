@@ -105,6 +105,8 @@ const TeamTab = () => {
   const fetchTeamMembers = async () => {
     if (!companyInfo?.id) return;
 
+    console.log('Fetching team members for company:', companyInfo.id);
+
     const { data, error } = await supabase
       .from('user_companies')
       .select(`
@@ -116,6 +118,8 @@ const TeamTab = () => {
       `)
       .eq('company_id', companyInfo.id);
 
+    console.log('User companies data:', { data, error });
+
     if (error) {
       console.error('Error fetching team members:', error);
       toast.error('Erreur lors du chargement de l\'équipe');
@@ -123,18 +127,23 @@ const TeamTab = () => {
       // Fetch profile data separately for each user
       const membersWithProfiles = await Promise.all(
         (data || []).map(async (member) => {
-          const { data: profile } = await supabase
+          console.log('Fetching profile for user:', member.user_id);
+          const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('first_name, last_name, email, phone_number')
             .eq('id', member.user_id)
             .single();
           
+          console.log('Profile data for', member.user_id, ':', { profile, profileError });
+          
           return {
             ...member,
-            profiles: profile
+            profiles: profile || null
           };
         })
       );
+      
+      console.log('Final team members with profiles:', membersWithProfiles);
       setTeamMembers(membersWithProfiles);
     }
   };
