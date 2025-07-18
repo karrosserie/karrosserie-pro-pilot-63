@@ -189,18 +189,18 @@ const TeamTab = () => {
     setIsSubmitting(true);
 
     try {
-      // Mettre à jour le profil
+      // Mettre à jour le profil (sans l'email qui est géré par auth.users)
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
           first_name: data.firstName,
           last_name: data.lastName,
-          email: data.email,
           phone_number: data.phoneNumber
         })
         .eq('id', editingMember.user_id);
 
       if (profileError) {
+        console.error('Profile update error:', profileError);
         toast.error('Erreur lors de la mise à jour du profil');
         return;
       }
