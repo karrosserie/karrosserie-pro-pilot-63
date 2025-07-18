@@ -642,53 +642,53 @@ const TeamTab = () => {
                 )}
               />
               
-              <FormField
-                control={editForm.control}
-                name="role"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Rôle</FormLabel>
-                    <FormControl>
-                       <select
-                         {...field}
-                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                       >
-                         <option value="Responsable">Responsable</option>
-                         <option value="Gestionnaire de réservation">Gestionnaire de réservation</option>
-                         <option value="Gestionnaire d'inventaire">Gestionnaire d'inventaire</option>
-                       </select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {editingMember?.role !== 'Propriétaire' && (
+                <FormField
+                  control={editForm.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Rôle</FormLabel>
+                      <FormControl>
+                         <select
+                           {...field}
+                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                         >
+                           <option value="Responsable">Responsable</option>
+                           <option value="Gestionnaire de réservation">Gestionnaire de réservation</option>
+                           <option value="Gestionnaire d'inventaire">Gestionnaire d'inventaire</option>
+                         </select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               
-              <FormField
-                control={editForm.control}
-                name="active"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">
-                        Membre actif
-                      </FormLabel>
-                      <div className="text-sm text-muted-foreground">
-                        {editingMember?.role === 'Propriétaire' 
-                          ? 'Un propriétaire ne peut pas être désactivé'
-                          : 'Activez ou désactivez ce membre'
-                        }
+              {editingMember?.role !== 'Propriétaire' && (
+                <FormField
+                  control={editForm.control}
+                  name="active"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">
+                          Membre actif
+                        </FormLabel>
+                        <div className="text-sm text-muted-foreground">
+                          Activez ou désactivez ce membre
+                        </div>
                       </div>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={editingMember?.role === 'Propriétaire' ? undefined : field.onChange}
-                        disabled={editingMember?.role === 'Propriétaire'}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              )}
               
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
