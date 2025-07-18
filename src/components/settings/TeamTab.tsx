@@ -41,7 +41,7 @@ const addMemberSchema = z.object({
     return isValidPhoneNumber(phone);
   }, "Veuillez entrer un numéro de téléphone valide"),
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
-  role: z.enum(['owner', 'manager', 'reservation_manager', 'inventory_manager']),
+  role: z.enum(['Propriétaire', 'Responsable', 'Gestionnaire de réservation', 'Gestionnaire d\'inventaire']),
   active: z.boolean().default(true)
 });
 
@@ -56,7 +56,7 @@ const editMemberSchema = z.object({
     if (!phone) return false;
     return isValidPhoneNumber(phone);
   }, "Veuillez entrer un numéro de téléphone valide"),
-  role: z.enum(['owner', 'manager', 'reservation_manager', 'inventory_manager']),
+  role: z.enum(['Propriétaire', 'Responsable', 'Gestionnaire de réservation', 'Gestionnaire d\'inventaire']),
   active: z.boolean()
 });
 
@@ -79,7 +79,7 @@ const TeamTab = () => {
       email: "",
       phoneNumber: "",
       password: "",
-      role: "manager",
+      role: "Responsable",
       active: true
     }
   });
@@ -91,7 +91,7 @@ const TeamTab = () => {
       lastName: "",
       email: "",
       phoneNumber: "",
-      role: "manager",
+      role: "Responsable",
       active: true
     }
   });
@@ -247,7 +247,7 @@ const TeamTab = () => {
       lastName: member.profiles?.last_name || '',
       email: member.profiles?.email || '',
       phoneNumber: member.profiles?.phone_number || '',
-      role: member.role as 'owner' | 'manager' | 'reservation_manager' | 'inventory_manager',
+      role: member.role as 'Propriétaire' | 'Responsable' | 'Gestionnaire de réservation' | 'Gestionnaire d\'inventaire',
       active: member.active
     });
     setIsEditDialogOpen(true);
@@ -255,24 +255,21 @@ const TeamTab = () => {
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'owner': return <Crown className="h-4 w-4" />;
-      case 'manager': return <Users className="h-4 w-4" />;
+      case 'Propriétaire': return <Crown className="h-4 w-4" />;
+      case 'Responsable': return <Users className="h-4 w-4" />;
+      case 'Gestionnaire de réservation': return <User className="h-4 w-4" />;
+      case 'Gestionnaire d\'inventaire': return <User className="h-4 w-4" />;
       default: return <User className="h-4 w-4" />;
     }
   };
 
   const getRoleLabel = (role: string) => {
-    switch (role) {
-      case 'owner': return 'Propriétaire';
-      case 'manager': return 'Responsable';
-      case 'reservation_manager': return 'Gestionnaire de réservation';
-      case 'inventory_manager': return 'Gestionnaire d\'inventaire';
-      default: return role;
-    }
+    // Les rôles sont déjà dans le bon format
+    return role;
   };
 
   const getRoleBadgeVariant = (role: string) => {
-    return role === 'owner' ? 'default' : 'secondary';
+    return role === 'Propriétaire' ? 'default' : 'secondary';
   };
 
   if (isLoading) {
@@ -395,9 +392,9 @@ const TeamTab = () => {
                           {...field}
                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
                         >
-                          <option value="manager">Responsable</option>
-                          <option value="reservation_manager">Gestionnaire de réservation</option>
-                          <option value="inventory_manager">Gestionnaire d'inventaire</option>
+                          <option value="Responsable">Responsable</option>
+                          <option value="Gestionnaire de réservation">Gestionnaire de réservation</option>
+                          <option value="Gestionnaire d'inventaire">Gestionnaire d'inventaire</option>
                         </select>
                       </FormControl>
                       <FormMessage />
@@ -487,7 +484,7 @@ const TeamTab = () => {
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
-                  {member.role !== 'owner' && (
+                  {member.role !== 'Propriétaire' && (
                     <Button
                       variant="outline"
                       size="sm"
@@ -585,14 +582,14 @@ const TeamTab = () => {
                   <FormItem>
                     <FormLabel>Rôle</FormLabel>
                     <FormControl>
-                      <select
-                        {...field}
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                      >
-                        <option value="manager">Responsable</option>
-                        <option value="reservation_manager">Gestionnaire de réservation</option>
-                        <option value="inventory_manager">Gestionnaire d'inventaire</option>
-                      </select>
+                       <select
+                         {...field}
+                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                       >
+                         <option value="Responsable">Responsable</option>
+                         <option value="Gestionnaire de réservation">Gestionnaire de réservation</option>
+                         <option value="Gestionnaire d'inventaire">Gestionnaire d'inventaire</option>
+                       </select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
