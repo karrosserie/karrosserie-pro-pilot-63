@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
-import { Plus, Edit, UserX, Crown, User, Trash, Users } from 'lucide-react';
+import { Plus, Pencil, UserX, Crown, User, Trash, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
@@ -492,7 +492,7 @@ const TeamTab = () => {
                     onClick={() => openEditDialog(member)}
                     className="hover:bg-muted"
                   >
-                    <Edit className="h-4 w-4" />
+                    <Pencil className="h-4 w-4" />
                   </Button>
                   {member.role !== 'Propriétaire' && (
                     <Button
