@@ -1,9 +1,10 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CreditCard, Settings as SettingsIcon, User, Bell, Sliders } from 'lucide-react';
+import { CreditCard, Settings as SettingsIcon, User, Bell, Sliders, Users } from 'lucide-react';
 import CompanyTab from '@/components/settings/CompanyTab';
 import PreferencesTab from '@/components/settings/PreferencesTab';
+import TeamTab from '@/components/settings/TeamTab';
 import AppearanceTab from '@/components/settings/AppearanceTab';
 import NotificationsTab from '@/components/settings/NotificationsTab';
 import SubscriptionTab from '@/components/settings/SubscriptionTab';
@@ -33,7 +34,7 @@ const Settings = () => {
       </div>
       
       <Tabs defaultValue="account" className="w-full">
-        <TabsList className="grid grid-cols-2 md:grid-cols-5 mb-6">
+        <TabsList className="grid grid-cols-2 md:grid-cols-6 mb-6">
           <TabsTrigger value="account">
             <User className="h-4 w-4 mr-2" />
             Entreprise
@@ -41,6 +42,10 @@ const Settings = () => {
           <TabsTrigger value="preferences">
             <Sliders className="h-4 w-4 mr-2" />
             Préférences
+          </TabsTrigger>
+          <TabsTrigger value="team">
+            <Users className="h-4 w-4 mr-2" />
+            Équipe
           </TabsTrigger>
           <TabsTrigger value="appearance">
             <SettingsIcon className="h-4 w-4 mr-2" />
@@ -62,6 +67,10 @@ const Settings = () => {
         
         <TabsContent value="preferences" className="space-y-4">
           <PreferencesTab />
+        </TabsContent>
+        
+        <TabsContent value="team" className="space-y-4">
+          <TeamTab />
         </TabsContent>
         
         <TabsContent value="appearance">

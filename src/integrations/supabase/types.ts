@@ -1235,6 +1235,47 @@ export type Database = {
           },
         ]
       }
+      team_invitations: {
+        Row: {
+          company_id: string
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          role: string
+          status: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_by: string
+          role?: string
+          status?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          role?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_invitations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tokens: {
         Row: {
           client_id: string | null
@@ -1264,6 +1305,41 @@ export type Database = {
           vehicule_id?: string | null
         }
         Relationships: []
+      }
+      user_companies: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          role?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_companies_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_preferences: {
         Row: {

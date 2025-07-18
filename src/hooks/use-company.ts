@@ -99,6 +99,7 @@ export function useCompany() {
 
   return {
     companyData,
+    companyInfo: companyData, // Add alias for backward compatibility
     isLoading,
     isSaving,
     updateCompanyData,
