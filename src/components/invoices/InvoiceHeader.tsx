@@ -41,17 +41,17 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
               </div>
             ) : (
               <div className="bg-orange-500 rounded-full p-3 w-fit my-5">
-                <span className="text-white font-bold text-xl">KR</span>
+                <span className="text-white font-bold text-xl">LOGO</span>
               </div>
             )}
-            <p className="text-gray-600 font-bold">{companyData.name || 'KARROSSERIE'}</p>
+            <p className="text-gray-600 font-bold">{companyData.name || ''}</p>
             <div className="text-sm text-gray-600">
-              <p>{companyData.address || 'Votre adresse'}</p>
+              <p>{companyData.address || ''}</p>
               <p>{companyData.zipcode || ''} {companyData.city || ''}</p>
-              <p>Téléphone : {companyData.phone || '+33 1 23 45 67 89'}</p>
-              <p>E-mail : {companyData.email || 'contact@karrosserie.fr'}</p>
-              <p>SIRET : {companyData.siret || '123 456 789 00123'}</p>
-              <p>N° TVA : {companyData.tva || 'FR 12 123456789'}</p>
+              <p>Téléphone : {companyData.phone || ''}</p>
+              <p>E-mail : {companyData.email || '}</p>
+              <p>SIRET : {companyData.siret || ''}</p>
+              <p>N° TVA : {companyData.tva || ''}</p>
             </div>
           </div>
         </div>

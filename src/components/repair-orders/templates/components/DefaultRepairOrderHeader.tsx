@@ -37,17 +37,17 @@ const DefaultRepairOrderHeader = ({ companyData, orderData, clientData, vehicleD
           </div>
         ) : (
           <div className="bg-orange-500 rounded-full p-2 w-fit mb-3">
-            <span className="text-white font-bold text-base">KR</span>
+            <span className="text-white font-bold text-base">LOGO</span>
           </div>
         )}
-        <p className="text-gray-600 font-bold mb-2">{companyData.name || 'KARROSSERIE'}</p>
+        <p className="text-gray-600 font-bold mb-2">{companyData.name || ''}</p>
         <div className="text-base text-gray-600 space-y-1">
-          <p>{companyData.address || 'Votre adresse'}</p>
+          <p>{companyData.address || ''}</p>
           <p>{companyData.zipcode || ''} {companyData.city || ''}</p>
-          <p>Téléphone : {companyData.phone || '+33 1 23 45 67 89'}</p>
-          <p>E-mail : {companyData.email || 'contact@karrosserie.fr'}</p>
-          <p>SIRET : {companyData.siret || '123 456 789 00123'}</p>
-          <p>N° TVA : {companyData.tva || 'FR 12 123456789'}</p>
+          <p>Téléphone : {companyData.phone || ''}</p>
+          <p>E-mail : {companyData.email || ''}</p>
+          <p>SIRET : {companyData.siret || ''}</p>
+          <p>N° TVA : {companyData.tva || ''}</p>
         </div>
       </div>
 
