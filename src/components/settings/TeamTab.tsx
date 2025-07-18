@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
 import { Plus, Pencil, UserX, Crown, User, Trash, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useToast } from "@/hooks/use-toast";
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -65,6 +65,7 @@ type EditMemberFormValues = z.infer<typeof editMemberSchema>;
 const TeamTab = () => {
   const { companyInfo, isLoading } = useCompany();
   const { signUp } = useAuth();
+  const { toast } = useToast();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -122,7 +123,11 @@ const TeamTab = () => {
 
     if (error) {
       console.error('Error fetching team members:', error);
-      toast.error('Erreur lors du chargement de l\'équipe');
+      toast({
+        title: "Erreur",
+        description: "Erreur lors du chargement de l'équipe",
+        variant: "destructive"
+      });
     } else {
       // Fetch profile data separately for each user
       const membersWithProfiles = await Promise.all(
@@ -168,16 +173,27 @@ const TeamTab = () => {
         });
 
       if (error) {
-        toast.error('Erreur lors de l\'ajout du membre à l\'équipe');
+        toast({
+          title: "Erreur",
+          description: "Erreur lors de l'ajout du membre à l'équipe",
+          variant: "destructive"
+        });
       } else {
-        toast.success('Membre ajouté avec succès');
+        toast({
+          title: "Succès",
+          description: "Membre ajouté avec succès"
+        });
         setIsAddDialogOpen(false);
         addForm.reset();
         fetchTeamMembers();
       }
     } catch (error: any) {
       console.error('Error adding member:', error);
-      toast.error('Erreur lors de la création du membre');
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la création du membre",
+        variant: "destructive"
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -225,14 +241,21 @@ const TeamTab = () => {
         throw new Error(result.error || 'Erreur lors de la mise à jour');
       }
 
-      toast.success('Membre mis à jour avec succès');
+      toast({
+        title: "Succès",
+        description: "Membre mis à jour avec succès"
+      });
       setIsEditDialogOpen(false);
       setEditingMember(null);
       editForm.reset();
       fetchTeamMembers();
     } catch (error) {
       console.error('Error updating member:', error);
-      toast.error('Erreur lors de la mise à jour du membre');
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la mise à jour du membre",
+        variant: "destructive"
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -249,9 +272,16 @@ const TeamTab = () => {
       .eq('id', memberId);
 
     if (error) {
-      toast.error('Erreur lors de la suppression du membre');
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la suppression du membre",
+        variant: "destructive"
+      });
     } else {
-      toast.success('Membre supprimé de l\'équipe');
+      toast({
+        title: "Succès",
+        description: "Membre supprimé de l'équipe"
+      });
       fetchTeamMembers();
     }
   };
