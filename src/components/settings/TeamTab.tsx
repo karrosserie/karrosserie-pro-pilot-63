@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
-import { Plus, Edit, UserX, Crown, User, Trash2 } from 'lucide-react';
+import { Plus, Edit, UserX, Crown, User, Trash2, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
@@ -20,6 +21,7 @@ interface TeamMember {
   id: string;
   user_id: string;
   role: string;
+  active: boolean;
   created_at: string;
   profiles?: {
     first_name?: string;
@@ -39,7 +41,8 @@ const addMemberSchema = z.object({
     return isValidPhoneNumber(phone);
   }, "Veuillez entrer un numéro de téléphone valide"),
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
-  role: z.enum(['member', 'admin'])
+  role: z.enum(['owner', 'manager', 'reservation_manager', 'inventory_manager']),
+  active: z.boolean().default(true)
 });
 
 type AddMemberFormValues = z.infer<typeof addMemberSchema>;
@@ -53,7 +56,8 @@ const editMemberSchema = z.object({
     if (!phone) return false;
     return isValidPhoneNumber(phone);
   }, "Veuillez entrer un numéro de téléphone valide"),
-  role: z.enum(['member', 'admin'])
+  role: z.enum(['owner', 'manager', 'reservation_manager', 'inventory_manager']),
+  active: z.boolean()
 });
 
 type EditMemberFormValues = z.infer<typeof editMemberSchema>;
@@ -75,7 +79,8 @@ const TeamTab = () => {
       email: "",
       phoneNumber: "",
       password: "",
-      role: "member"
+      role: "manager",
+      active: true
     }
   });
 
@@ -86,7 +91,8 @@ const TeamTab = () => {
       lastName: "",
       email: "",
       phoneNumber: "",
-      role: "member"
+      role: "manager",
+      active: true
     }
   });
 
@@ -105,6 +111,7 @@ const TeamTab = () => {
         id,
         user_id,
         role,
+        active,
         created_at
       `)
       .eq('company_id', companyInfo.id);
@@ -147,7 +154,8 @@ const TeamTab = () => {
         .insert({
           user_id: user.id,
           company_id: companyInfo.id,
-          role: data.role
+          role: data.role,
+          active: data.active
         });
 
       if (error) {
@@ -188,14 +196,17 @@ const TeamTab = () => {
         return;
       }
 
-      // Mettre à jour le rôle
+      // Mettre à jour le rôle et le statut
       const { error: roleError } = await supabase
         .from('user_companies')
-        .update({ role: data.role })
+        .update({ 
+          role: data.role,
+          active: data.active
+        })
         .eq('id', editingMember.id);
 
       if (roleError) {
-        toast.error('Erreur lors de la mise à jour du rôle');
+        toast.error('Erreur lors de la mise à jour du membre');
       } else {
         toast.success('Membre mis à jour avec succès');
         setIsEditDialogOpen(false);
@@ -236,13 +247,28 @@ const TeamTab = () => {
       lastName: member.profiles?.last_name || '',
       email: member.profiles?.email || '',
       phoneNumber: member.profiles?.phone_number || '',
-      role: member.role as 'member' | 'admin'
+      role: member.role as 'owner' | 'manager' | 'reservation_manager' | 'inventory_manager',
+      active: member.active
     });
     setIsEditDialogOpen(true);
   };
 
   const getRoleIcon = (role: string) => {
-    return role === 'owner' ? <Crown className="h-4 w-4" /> : <User className="h-4 w-4" />;
+    switch (role) {
+      case 'owner': return <Crown className="h-4 w-4" />;
+      case 'manager': return <Users className="h-4 w-4" />;
+      default: return <User className="h-4 w-4" />;
+    }
+  };
+
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case 'owner': return 'Propriétaire';
+      case 'manager': return 'Responsable';
+      case 'reservation_manager': return 'Gestionnaire de réservation';
+      case 'inventory_manager': return 'Gestionnaire d\'inventaire';
+      default: return role;
+    }
   };
 
   const getRoleBadgeVariant = (role: string) => {
@@ -272,7 +298,7 @@ const TeamTab = () => {
         
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
               <Plus className="h-4 w-4 mr-2" />
               Ajouter un membre
             </Button>
@@ -369,11 +395,35 @@ const TeamTab = () => {
                           {...field}
                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
                         >
-                          <option value="member">Membre</option>
-                          <option value="admin">Administrateur</option>
+                          <option value="manager">Responsable</option>
+                          <option value="reservation_manager">Gestionnaire de réservation</option>
+                          <option value="inventory_manager">Gestionnaire d'inventaire</option>
                         </select>
                       </FormControl>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={addForm.control}
+                  name="active"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">
+                          Membre actif
+                        </FormLabel>
+                        <div className="text-sm text-muted-foreground">
+                          Activez ou désactivez ce membre
+                        </div>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
                     </FormItem>
                   )}
                 />
@@ -382,7 +432,7 @@ const TeamTab = () => {
                   <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                     Annuler
                   </Button>
-                  <Button type="submit" disabled={isSubmitting}>
+                  <Button type="submit" disabled={isSubmitting} className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
                     {isSubmitting ? 'Ajout...' : 'Ajouter'}
                   </Button>
                 </div>
@@ -421,9 +471,13 @@ const TeamTab = () => {
                     )}
                   </div>
                   <Badge variant={getRoleBadgeVariant(member.role)}>
-                    {member.role === 'owner' ? 'Propriétaire' : 
-                     member.role === 'admin' ? 'Administrateur' : 'Membre'}
+                    {getRoleLabel(member.role)}
                   </Badge>
+                  {!member.active && (
+                    <Badge variant="destructive">
+                      Désactivé
+                    </Badge>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <Button
@@ -535,11 +589,35 @@ const TeamTab = () => {
                         {...field}
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
                       >
-                        <option value="member">Membre</option>
-                        <option value="admin">Administrateur</option>
+                        <option value="manager">Responsable</option>
+                        <option value="reservation_manager">Gestionnaire de réservation</option>
+                        <option value="inventory_manager">Gestionnaire d'inventaire</option>
                       </select>
                     </FormControl>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={editForm.control}
+                name="active"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">
+                        Membre actif
+                      </FormLabel>
+                      <div className="text-sm text-muted-foreground">
+                        Activez ou désactivez ce membre
+                      </div>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
                   </FormItem>
                 )}
               />
@@ -548,7 +626,7 @@ const TeamTab = () => {
                 <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
                   Annuler
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting} className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
                   {isSubmitting ? 'Modification...' : 'Modifier'}
                 </Button>
               </div>
