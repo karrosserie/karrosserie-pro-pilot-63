@@ -81,6 +81,10 @@ const DefaultInvoiceHeader = ({ companyData, invoiceData, clientData, remainingA
             <span className="font-medium">Kilométrage</span>
             <span>{invoiceData.mileage}</span>
           </div>
+          <div className="flex justify-between">
+            <span className="font-medium">Montant payé</span>
+            <span>1000,00 €</span>
+          </div>
         </div>
         
         {/* Encadré Montant dû */}
