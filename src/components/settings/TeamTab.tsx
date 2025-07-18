@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import { useCompany } from '@/hooks/use-company';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Mail, UserX, Crown, User } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
+import { Plus, Edit, UserX, Crown, User, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { isValidPhoneNumber } from 'react-phone-number-input';
 
 interface TeamMember {
   id: string;
@@ -17,30 +25,74 @@ interface TeamMember {
     first_name?: string;
     last_name?: string;
     email?: string;
+    phone_number?: string;
   };
 }
 
-interface TeamInvitation {
-  id: string;
-  email: string;
-  role: string;
-  status: string;
-  created_at: string;
-  expires_at: string;
-}
+// Schema pour ajouter un nouveau membre
+const addMemberSchema = z.object({
+  firstName: z.string().min(2, "Le prénom doit contenir au moins 2 caractères"),
+  lastName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
+  email: z.string().email("Veuillez entrer une adresse email valide"),
+  phoneNumber: z.string().refine((phone) => {
+    if (!phone) return false;
+    return isValidPhoneNumber(phone);
+  }, "Veuillez entrer un numéro de téléphone valide"),
+  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+  role: z.enum(['member', 'admin'])
+});
+
+type AddMemberFormValues = z.infer<typeof addMemberSchema>;
+
+// Schema pour modifier un membre existant
+const editMemberSchema = z.object({
+  firstName: z.string().min(2, "Le prénom doit contenir au moins 2 caractères"),
+  lastName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
+  email: z.string().email("Veuillez entrer une adresse email valide"),
+  phoneNumber: z.string().refine((phone) => {
+    if (!phone) return false;
+    return isValidPhoneNumber(phone);
+  }, "Veuillez entrer un numéro de téléphone valide"),
+  role: z.enum(['member', 'admin'])
+});
+
+type EditMemberFormValues = z.infer<typeof editMemberSchema>;
 
 const TeamTab = () => {
   const { companyInfo, isLoading } = useCompany();
+  const { signUp } = useAuth();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [invitations, setInvitations] = useState<TeamInvitation[]>([]);
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState('member');
-  const [isInviting, setIsInviting] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const addForm = useForm<AddMemberFormValues>({
+    resolver: zodResolver(addMemberSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phoneNumber: "",
+      password: "",
+      role: "member"
+    }
+  });
+
+  const editForm = useForm<EditMemberFormValues>({
+    resolver: zodResolver(editMemberSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phoneNumber: "",
+      role: "member"
+    }
+  });
 
   React.useEffect(() => {
     if (companyInfo?.id) {
       fetchTeamMembers();
-      fetchInvitations();
     }
   }, [companyInfo?.id]);
 
@@ -66,7 +118,7 @@ const TeamTab = () => {
         (data || []).map(async (member) => {
           const { data: profile } = await supabase
             .from('profiles')
-            .select('first_name, last_name, email')
+            .select('first_name, last_name, email, phone_number')
             .eq('id', member.user_id)
             .single();
           
@@ -80,52 +132,90 @@ const TeamTab = () => {
     }
   };
 
-  const fetchInvitations = async () => {
+  const handleAddMember = async (data: AddMemberFormValues) => {
     if (!companyInfo?.id) return;
 
-    const { data, error } = await supabase
-      .from('team_invitations')
-      .select('*')
-      .eq('company_id', companyInfo.id)
-      .eq('status', 'pending');
-
-    if (error) {
-      console.error('Error fetching invitations:', error);
-    } else {
-      setInvitations(data || []);
-    }
-  };
-
-  const handleInviteUser = async () => {
-    if (!inviteEmail || !companyInfo?.id) return;
-
-    setIsInviting(true);
+    setIsSubmitting(true);
 
     try {
+      // Créer l'utilisateur avec Supabase Auth
+      const { user } = await signUp(data.email, data.password, data.firstName, data.lastName, data.phoneNumber);
+      
+      // Ajouter l'utilisateur à l'équipe
       const { error } = await supabase
-        .from('team_invitations')
+        .from('user_companies')
         .insert({
-          email: inviteEmail,
+          user_id: user.id,
           company_id: companyInfo.id,
-          invited_by: (await supabase.auth.getUser()).data.user?.id,
-          role: inviteRole
+          role: data.role
         });
 
       if (error) {
-        toast.error('Erreur lors de l\'envoi de l\'invitation');
+        toast.error('Erreur lors de l\'ajout du membre à l\'équipe');
       } else {
-        toast.success('Invitation envoyée avec succès');
-        setInviteEmail('');
-        fetchInvitations();
+        toast.success('Membre ajouté avec succès');
+        setIsAddDialogOpen(false);
+        addForm.reset();
+        fetchTeamMembers();
+      }
+    } catch (error: any) {
+      console.error('Error adding member:', error);
+      toast.error('Erreur lors de la création du membre');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEditMember = async (data: EditMemberFormValues) => {
+    if (!editingMember) return;
+
+    setIsSubmitting(true);
+
+    try {
+      // Mettre à jour le profil
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          first_name: data.firstName,
+          last_name: data.lastName,
+          email: data.email,
+          phone_number: data.phoneNumber
+        })
+        .eq('id', editingMember.user_id);
+
+      if (profileError) {
+        toast.error('Erreur lors de la mise à jour du profil');
+        return;
+      }
+
+      // Mettre à jour le rôle
+      const { error: roleError } = await supabase
+        .from('user_companies')
+        .update({ role: data.role })
+        .eq('id', editingMember.id);
+
+      if (roleError) {
+        toast.error('Erreur lors de la mise à jour du rôle');
+      } else {
+        toast.success('Membre mis à jour avec succès');
+        setIsEditDialogOpen(false);
+        setEditingMember(null);
+        editForm.reset();
+        fetchTeamMembers();
       }
     } catch (error) {
-      toast.error('Erreur lors de l\'envoi de l\'invitation');
+      console.error('Error updating member:', error);
+      toast.error('Erreur lors de la mise à jour du membre');
     } finally {
-      setIsInviting(false);
+      setIsSubmitting(false);
     }
   };
 
   const handleRemoveMember = async (memberId: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce membre de l\'équipe ?')) {
+      return;
+    }
+
     const { error } = await supabase
       .from('user_companies')
       .delete()
@@ -139,18 +229,16 @@ const TeamTab = () => {
     }
   };
 
-  const handleCancelInvitation = async (invitationId: string) => {
-    const { error } = await supabase
-      .from('team_invitations')
-      .update({ status: 'cancelled' })
-      .eq('id', invitationId);
-
-    if (error) {
-      toast.error('Erreur lors de l\'annulation de l\'invitation');
-    } else {
-      toast.success('Invitation annulée');
-      fetchInvitations();
-    }
+  const openEditDialog = (member: TeamMember) => {
+    setEditingMember(member);
+    editForm.reset({
+      firstName: member.profiles?.first_name || '',
+      lastName: member.profiles?.last_name || '',
+      email: member.profiles?.email || '',
+      phoneNumber: member.profiles?.phone_number || '',
+      role: member.role as 'member' | 'admin'
+    });
+    setIsEditDialogOpen(true);
   };
 
   const getRoleIcon = (role: string) => {
@@ -174,51 +262,135 @@ const TeamTab = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-medium">Gestion de l'équipe</h3>
-        <p className="text-sm text-muted-foreground">
-          Gérez les membres de votre équipe et leurs accès.
-        </p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h3 className="text-lg font-medium">Gestion de l'équipe</h3>
+          <p className="text-sm text-muted-foreground">
+            Gérez les membres de votre équipe et leurs accès.
+          </p>
+        </div>
+        
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Ajouter un membre
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Ajouter un nouveau membre</DialogTitle>
+            </DialogHeader>
+            <Form {...addForm}>
+              <form onSubmit={addForm.handleSubmit(handleAddMember)} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={addForm.control}
+                    name="firstName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Prénom</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Prénom" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={addForm.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nom</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nom" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <FormField
+                  control={addForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="email@exemple.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={addForm.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Numéro de téléphone</FormLabel>
+                      <FormControl>
+                        <CustomPhoneInput
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Numéro de téléphone"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={addForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mot de passe</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="Mot de passe" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={addForm.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Rôle</FormLabel>
+                      <FormControl>
+                        <select
+                          {...field}
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                        >
+                          <option value="member">Membre</option>
+                          <option value="admin">Administrateur</option>
+                        </select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="flex justify-end gap-2">
+                  <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                    Annuler
+                  </Button>
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? 'Ajout...' : 'Ajouter'}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
       </div>
-
-      {/* Invitation Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Plus className="h-5 w-5" />
-            Inviter un nouveau membre
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-2">
-              <Input
-                type="email"
-                placeholder="adresse@exemple.com"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-              />
-            </div>
-            <div className="flex gap-2">
-              <select
-                value={inviteRole}
-                onChange={(e) => setInviteRole(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-              >
-                <option value="member">Membre</option>
-                <option value="admin">Administrateur</option>
-              </select>
-              <Button 
-                onClick={handleInviteUser}
-                disabled={!inviteEmail || isInviting}
-                className="whitespace-nowrap"
-              >
-                {isInviting ? 'Envoi...' : 'Inviter'}
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Current Team Members */}
       <Card>
@@ -242,22 +414,36 @@ const TeamTab = () => {
                     <p className="text-sm text-muted-foreground">
                       {member.profiles?.email}
                     </p>
+                    {member.profiles?.phone_number && (
+                      <p className="text-sm text-muted-foreground">
+                        {member.profiles.phone_number}
+                      </p>
+                    )}
                   </div>
                   <Badge variant={getRoleBadgeVariant(member.role)}>
                     {member.role === 'owner' ? 'Propriétaire' : 
                      member.role === 'admin' ? 'Administrateur' : 'Membre'}
                   </Badge>
                 </div>
-                {member.role !== 'owner' && (
+                <div className="flex gap-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleRemoveMember(member.id)}
-                    className="text-destructive hover:text-destructive"
+                    onClick={() => openEditDialog(member)}
                   >
-                    <UserX className="h-4 w-4" />
+                    <Edit className="h-4 w-4" />
                   </Button>
-                )}
+                  {member.role !== 'owner' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleRemoveMember(member.id)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
             ))}
             {teamMembers.length === 0 && (
@@ -269,47 +455,107 @@ const TeamTab = () => {
         </CardContent>
       </Card>
 
-      {/* Pending Invitations */}
-      {invitations.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Mail className="h-5 w-5" />
-              Invitations en attente ({invitations.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {invitations.map((invitation) => (
-                <div key={invitation.id} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 bg-orange-100 rounded-full flex items-center justify-center">
-                      <Mail className="h-4 w-4 text-orange-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{invitation.email}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Invité le {new Date(invitation.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <Badge variant="outline">
-                      {invitation.role === 'admin' ? 'Administrateur' : 'Membre'}
-                    </Badge>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleCancelInvitation(invitation.id)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    Annuler
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Edit Member Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Modifier le membre</DialogTitle>
+          </DialogHeader>
+          <Form {...editForm}>
+            <form onSubmit={editForm.handleSubmit(handleEditMember)} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={editForm.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Prénom</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Prénom" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nom</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nom" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <FormField
+                control={editForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="email@exemple.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={editForm.control}
+                name="phoneNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Numéro de téléphone</FormLabel>
+                    <FormControl>
+                      <CustomPhoneInput
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Numéro de téléphone"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={editForm.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Rôle</FormLabel>
+                    <FormControl>
+                      <select
+                        {...field}
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                      >
+                        <option value="member">Membre</option>
+                        <option value="admin">Administrateur</option>
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                  Annuler
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? 'Modification...' : 'Modifier'}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
