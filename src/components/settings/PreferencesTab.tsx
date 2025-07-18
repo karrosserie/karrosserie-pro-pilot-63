@@ -268,7 +268,7 @@ const PreferencesTab = () => {
                        reference: "VIR-001"
                      },
                    ]}
-                   totalPaidAmount={1574.40}
+                   totalPaidAmount={500.00}
                    remainingAmount={0}
                  />
                ) : (
@@ -338,7 +338,7 @@ const PreferencesTab = () => {
                        reference: "VIR-001"
                      },
                    ]}
-                   totalPaidAmount={1574.40}
+                   totalPaidAmount={500.00}
                    remainingAmount={0}
                  />
                )}
