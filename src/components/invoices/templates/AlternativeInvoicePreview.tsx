@@ -66,16 +66,16 @@ const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items
           <h2 className="text-3xl font-bold text-black">FACTURE N° {invoiceDataToUse.number || ''}</h2>
           
           {/* Informations client déplacées ici */}
-          <div className="text-left p-4 w-full ml-auto">
+          <div className="text-left p-4 w-2/3 ml-auto">
             <div className="text-sm text-gray-600 space-y-1">
               {clientDataToUse.name && <p><strong>{clientDataToUse.name}</strong></p>}
               {clientDataToUse.phone && <p><strong>TEL :</strong> {clientDataToUse.phone}</p>}
               {clientDataToUse.email && <p><strong>EMAIL :</strong> {clientDataToUse.email}</p>}
               {clientDataToUse.address && <p><strong>ADRESSE :</strong> {clientDataToUse.address}</p>}
               {clientDataToUse.city && <p>{clientDataToUse.city}</p>}
-              {clientDataToUse.licensePlate && <p><strong>Immatriculation :</strong> {clientDataToUse.licensePlate}</p>}
-              {clientDataToUse.mileage && <p><strong>Kilométrage :</strong> {clientDataToUse.mileage}</p>}
-              {clientDataToUse.vehicle && <p><strong>Véhicule :</strong> {clientDataToUse.vehicle}</p>}
+              {quoteDataToUse.licensePlate && <p><strong>Immatriculation :</strong> {quoteDataToUse.licensePlate}</p>}
+              {quoteDataToUse.mileage && <p><strong>Kilométrage :</strong> {quoteDataToUse.mileage}</p>}
+              {quoteDataToUse.vehicle && <p><strong>Véhicule :</strong> {quoteDataToUse.vehicle}</p>}
             </div>
           </div>
         </div>
