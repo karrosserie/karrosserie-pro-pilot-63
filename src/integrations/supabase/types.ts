@@ -279,7 +279,6 @@ export type Database = {
           siret: string
           tva: string
           updated_at: string
-          user_id: string
           zipcode: string
         }
         Insert: {
@@ -296,7 +295,6 @@ export type Database = {
           siret?: string
           tva?: string
           updated_at?: string
-          user_id: string
           zipcode?: string
         }
         Update: {
@@ -313,7 +311,6 @@ export type Database = {
           siret?: string
           tva?: string
           updated_at?: string
-          user_id?: string
           zipcode?: string
         }
         Relationships: []

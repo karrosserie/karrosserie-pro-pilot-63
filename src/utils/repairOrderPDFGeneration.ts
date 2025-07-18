@@ -11,11 +11,23 @@ export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, com
     if (!finalCompanyData || Object.keys(finalCompanyData).length === 0) {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { data: company } = await supabase
-          .from('company_info')
-          .select('*')
+        // Get company through user_companies relationship
+        const { data: userCompany } = await supabase
+          .from('user_companies')
+          .select('company_id')
           .eq('user_id', user.id)
+          .eq('active', true)
           .single();
+
+        let company = null;
+        if (userCompany) {
+          const { data } = await supabase
+            .from('company_info')
+            .select('*')
+            .eq('id', userCompany.company_id)
+            .single();
+          company = data;
+        }
         
         finalCompanyData = company || {};
       }

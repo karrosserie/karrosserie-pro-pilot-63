@@ -6,21 +6,21 @@ export type TokenInsert = TablesInsert<'tokens'>;
 
 export const tokensService = {
   async createToken(tokenData: Omit<TokenInsert, 'id' | 'created_at' | 'updated_at' | 'company_id'>) {
-    // Récupérer l'ID de l'entreprise depuis company_info
-    const { data: companyData, error: companyError } = await supabase
-      .from('company_info')
-      .select('id')
+    // Récupérer l'ID de l'entreprise depuis user_companies
+    const { data: userCompany, error: companyError } = await supabase
+      .from('user_companies')
+      .select('company_id')
       .eq('user_id', tokenData.user_id)
+      .eq('active', true)
       .single();
 
-    if (companyError) throw companyError;
-    if (!companyData) throw new Error('Aucune information d\'entreprise trouvée pour cet utilisateur');
+    if (companyError || !userCompany) throw new Error('Aucune entreprise trouvée pour cet utilisateur');
 
     const { data, error } = await supabase
       .from('tokens')
       .insert([{
         ...tokenData,
-        company_id: companyData.id
+        company_id: userCompany.company_id
       }])
       .select()
       .single();

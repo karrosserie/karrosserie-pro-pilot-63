@@ -3,7 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 
 export interface CompanyInfo {
   id: string;
-  user_id: string;
   name: string;
   email: string;
   address: string;
@@ -27,10 +26,23 @@ export const companyService = {
   async getCompanyInfo(userId: string): Promise<CompanyInfo | null> {
     console.log('Chargement des données entreprise pour userId:', userId);
     
+    // Get company through user_companies relationship
+    const { data: userCompany, error: userCompanyError } = await supabase
+      .from('user_companies')
+      .select('company_id')
+      .eq('user_id', userId)
+      .eq('active', true)
+      .single();
+
+    if (userCompanyError || !userCompany) {
+      console.log('Aucune entreprise trouvée pour cet utilisateur');
+      return null;
+    }
+
     const { data, error } = await supabase
       .from('company_info')
       .select('*')
-      .eq('user_id', userId)
+      .eq('id', userCompany.company_id)
       .single();
 
     if (error) {
@@ -63,8 +75,19 @@ export const companyService = {
   async updateCompanyInfo(userId: string, companyData: Partial<CompanyInfo>): Promise<CompanyInfo> {
     console.log('Sauvegarde des données entreprise:', { userId, companyData });
     
+    // Get company through user_companies relationship
+    const { data: userCompany, error: userCompanyError } = await supabase
+      .from('user_companies')
+      .select('company_id')
+      .eq('user_id', userId)
+      .eq('active', true)
+      .single();
+
+    if (userCompanyError || !userCompany) {
+      throw new Error('Aucune entreprise trouvée pour cet utilisateur');
+    }
+
     const dataToUpdate = {
-      user_id: userId,
       name: companyData.name || '',
       email: companyData.email || '',
       address: companyData.address || '',
@@ -83,7 +106,8 @@ export const companyService = {
 
     const { data, error } = await supabase
       .from('company_info')
-      .upsert(dataToUpdate, { onConflict: 'user_id' })
+      .update(dataToUpdate)
+      .eq('id', userCompany.company_id)
       .select()
       .single();
 
@@ -107,10 +131,22 @@ export const companyService = {
   },
 
   async deleteCompanyInfo(userId: string): Promise<void> {
+    // Get company through user_companies relationship
+    const { data: userCompany, error: userCompanyError } = await supabase
+      .from('user_companies')
+      .select('company_id')
+      .eq('user_id', userId)
+      .eq('active', true)
+      .single();
+
+    if (userCompanyError || !userCompany) {
+      throw new Error('Aucune entreprise trouvée pour cet utilisateur');
+    }
+
     const { error } = await supabase
       .from('company_info')
       .delete()
-      .eq('user_id', userId);
+      .eq('id', userCompany.company_id);
 
     if (error) {
       throw new Error(error.message);
