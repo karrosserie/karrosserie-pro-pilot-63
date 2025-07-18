@@ -315,6 +315,48 @@ export type Database = {
         }
         Relationships: []
       }
+      company_preferences: {
+        Row: {
+          company_id: string
+          created_at: string
+          currency: string
+          id: string
+          invoice_template: string
+          language: string
+          show_client_signature: boolean
+          show_repair_order_details: boolean
+          show_zero_price_products: boolean
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          currency?: string
+          id?: string
+          invoice_template?: string
+          language?: string
+          show_client_signature?: boolean
+          show_repair_order_details?: boolean
+          show_zero_price_products?: boolean
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          invoice_template?: string
+          language?: string
+          show_client_signature?: boolean
+          show_repair_order_details?: boolean
+          show_zero_price_products?: boolean
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       credits: {
         Row: {
           amount: number
@@ -1299,48 +1341,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      user_preferences: {
-        Row: {
-          created_at: string
-          currency: string
-          id: string
-          invoice_template: string
-          language: string
-          show_client_signature: boolean
-          show_repair_order_details: boolean
-          show_zero_price_products: boolean
-          timezone: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          currency?: string
-          id?: string
-          invoice_template?: string
-          language?: string
-          show_client_signature?: boolean
-          show_repair_order_details?: boolean
-          show_zero_price_products?: boolean
-          timezone?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          currency?: string
-          id?: string
-          invoice_template?: string
-          language?: string
-          show_client_signature?: boolean
-          show_repair_order_details?: boolean
-          show_zero_price_products?: boolean
-          timezone?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
       }
       vehicles: {
         Row: {

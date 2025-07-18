@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Credit } from '@/services/supabase/credits';
 import { useCompany } from '@/hooks/use-company';
-import { useUserPreferences } from '@/hooks/use-user-preferences';
+import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -17,7 +17,7 @@ interface CreditViewerModalProps {
 
 const CreditViewerModal = ({ credit, open, onOpenChange }: CreditViewerModalProps) => {
   const { companyData } = useCompany();
-  const { preferences } = useUserPreferences();
+  const { preferences } = useCompanyPreferences();
   const [clientData, setClientData] = useState<any>(null);
   const [vehicleData, setVehicleData] = useState<any>(null);
   const [invoiceData, setInvoiceData] = useState<any>(null);

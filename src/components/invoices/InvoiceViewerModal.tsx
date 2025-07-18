@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Invoice } from '@/services/supabase/invoices';
 import { useCompany } from '@/hooks/use-company';
-import { useUserPreferences } from '@/hooks/use-user-preferences';
+import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 import { calculateInvoiceTotals } from '@/utils/invoiceCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
@@ -18,7 +18,7 @@ interface InvoiceViewerModalProps {
 
 const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalProps) => {
   const { companyData } = useCompany();
-  const { preferences } = useUserPreferences();
+  const { preferences } = useCompanyPreferences();
   const [clientData, setClientData] = useState<any>(null);
   const [vehicleData, setVehicleData] = useState<any>(null);
   const [receiptsData, setReceiptsData] = useState<any[]>([]);

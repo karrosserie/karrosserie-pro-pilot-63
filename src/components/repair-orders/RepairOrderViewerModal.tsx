@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { useCompany } from '@/hooks/use-company';
-import { useUserPreferences } from '@/hooks/use-user-preferences';
+import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 import { calculateOrderAmount } from './utils/orderCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
@@ -18,7 +18,7 @@ interface RepairOrderViewerModalProps {
 
 const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrderViewerModalProps) => {
   const { companyData } = useCompany();
-  const { preferences } = useUserPreferences();
+  const { preferences } = useCompanyPreferences();
   const [clientData, setClientData] = useState<any>(null);
   const [vehicleData, setVehicleData] = useState<any>(null);
   

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Quote } from '@/services/supabase/quotes';
 import { useCompany } from '@/hooks/use-company';
-import { useUserPreferences } from '@/hooks/use-user-preferences';
+import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 import { calculateGlobalTotals } from '@/components/quotes/form/utils/calculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
@@ -18,7 +18,7 @@ interface QuoteViewerModalProps {
 
 const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) => {
   const { companyData } = useCompany();
-  const { preferences } = useUserPreferences();
+  const { preferences } = useCompanyPreferences();
   const [clientData, setClientData] = useState<any>(null);
   const [vehicleData, setVehicleData] = useState<any>(null);
   

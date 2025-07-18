@@ -79,21 +79,31 @@ export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, com
       }
     }
 
-    // Récupérer les préférences utilisateur pour le template
+    // Récupérer les préférences d'entreprise pour le template
     let template = 'default';
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { data: preferences } = await supabase
-          .from('user_preferences')
-          .select('invoice_template')
+        // D'abord récupérer l'ID de l'entreprise de l'utilisateur
+        const { data: userCompany } = await supabase
+          .from('user_companies')
+          .select('company_id')
           .eq('user_id', user.id)
+          .eq('active', true)
           .single();
-        
-        template = preferences?.invoice_template || 'default';
+
+        if (userCompany?.company_id) {
+          const { data: preferences } = await supabase
+            .from('company_preferences')
+            .select('invoice_template')
+            .eq('company_id', userCompany.company_id)
+            .single();
+          
+          template = preferences?.invoice_template || 'default';
+        }
       }
     } catch (error) {
-      console.error('Error fetching user preferences:', error);
+      console.error('Error fetching company preferences:', error);
     }
 
     // Formater les dates

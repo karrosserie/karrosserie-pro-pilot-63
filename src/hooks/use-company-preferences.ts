@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCompany } from '@/hooks/use-company';
 import { supabase } from '@/integrations/supabase/client';
 
-interface UserPreferences {
+interface CompanyPreferences {
   id?: string;
-  user_id: string;
+  company_id: string;
   language: string;
   timezone: string;
   currency: string;
@@ -14,21 +15,22 @@ interface UserPreferences {
   show_zero_price_products: boolean;
 }
 
-export function useUserPreferences() {
+export function useCompanyPreferences() {
   const { user } = useAuth();
-  const [preferences, setPreferences] = useState<UserPreferences | null>(null);
+  const { companyData } = useCompany();
+  const [preferences, setPreferences] = useState<CompanyPreferences | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const loadPreferences = async () => {
-      if (!user) return;
+      if (!user || !companyData?.id) return;
       
       setIsLoading(true);
       try {
         const { data, error } = await supabase
-          .from('user_preferences')
+          .from('company_preferences')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('company_id', companyData.id)
           .single();
 
         if (error && error.code !== 'PGRST116') {
@@ -41,7 +43,7 @@ export function useUserPreferences() {
         } else {
           // Créer des préférences par défaut si elles n'existent pas
           const defaultPreferences = {
-            user_id: user.id,
+            company_id: companyData.id,
             language: 'fr',
             timezone: 'Europe/Paris',
             currency: 'EUR',
@@ -52,7 +54,7 @@ export function useUserPreferences() {
           };
 
           const { data: newData, error: insertError } = await supabase
-            .from('user_preferences')
+            .from('company_preferences')
             .insert(defaultPreferences)
             .select()
             .single();
@@ -71,7 +73,7 @@ export function useUserPreferences() {
     };
 
     loadPreferences();
-  }, [user?.id]);
+  }, [user?.id, companyData?.id]);
 
   return {
     preferences,

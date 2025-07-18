@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useCompany } from '@/hooks/use-company';
-import { useUserPreferences } from '@/hooks/use-user-preferences';
+import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,7 +15,7 @@ import AlternativeInvoicePreview from '@/components/invoices/templates/Alternati
 const PreferencesTab = () => {
   const { user } = useAuth();
   const { companyData } = useCompany();
-  const { preferences } = useUserPreferences();
+  const { preferences, isLoading } = useCompanyPreferences();
   const { toast } = useToast();
   const [selectedTemplate, setSelectedTemplate] = useState('default');
   const [language, setLanguage] = useState('fr');
@@ -38,11 +38,11 @@ const PreferencesTab = () => {
   }, [preferences]);
 
   const handleSavePreferences = async () => {
-    if (!user) return;
+    if (!user || !companyData?.id) return;
 
     try {
       const updatedPreferences = {
-        user_id: user.id,
+        company_id: companyData.id,
         language: language,
         timezone: timezone,
         currency: currency,
@@ -53,9 +53,9 @@ const PreferencesTab = () => {
       };
 
       const { error } = await supabase
-        .from('user_preferences')
+        .from('company_preferences')
         .upsert(updatedPreferences, { 
-          onConflict: 'user_id' 
+          onConflict: 'company_id' 
         });
 
       if (error) {
