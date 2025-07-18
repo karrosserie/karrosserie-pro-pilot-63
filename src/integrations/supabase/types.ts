@@ -1235,47 +1235,6 @@ export type Database = {
           },
         ]
       }
-      team_invitations: {
-        Row: {
-          company_id: string
-          created_at: string
-          email: string
-          expires_at: string
-          id: string
-          invited_by: string
-          role: string
-          status: string
-        }
-        Insert: {
-          company_id: string
-          created_at?: string
-          email: string
-          expires_at?: string
-          id?: string
-          invited_by: string
-          role?: string
-          status?: string
-        }
-        Update: {
-          company_id?: string
-          created_at?: string
-          email?: string
-          expires_at?: string
-          id?: string
-          invited_by?: string
-          role?: string
-          status?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "team_invitations_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "company_info"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       tokens: {
         Row: {
           client_id: string | null
