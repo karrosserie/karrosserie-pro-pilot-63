@@ -487,18 +487,19 @@ const TeamTab = () => {
                 </div>
                 <div className="flex gap-2">
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
                     onClick={() => openEditDialog(member)}
+                    className="hover:bg-muted"
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
                   {member.role !== 'Propriétaire' && (
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       onClick={() => handleRemoveMember(member.id)}
-                      className="text-destructive hover:text-destructive"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
