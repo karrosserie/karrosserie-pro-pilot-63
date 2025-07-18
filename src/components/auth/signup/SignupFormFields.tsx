@@ -9,7 +9,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Phone } from 'lucide-react';
+import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
 import { SignupFormValues } from './signup-schema';
 
 interface SignupFormFieldsProps {
@@ -82,14 +82,11 @@ const SignupFormFields = ({ control }: SignupFormFieldsProps) => {
           <FormItem className="space-y-2">
             <FormLabel>Numéro de téléphone</FormLabel>
             <FormControl>
-              <div className="flex items-center">
-                <Phone className="mr-2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="tel"
-                  placeholder="0123456789"
-                  {...field}
-                />
-              </div>
+              <CustomPhoneInput
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Numéro de téléphone"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
