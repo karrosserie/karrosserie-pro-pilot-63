@@ -268,8 +268,8 @@ const PreferencesTab = () => {
                        reference: "VIR-001"
                      },
                    ]}
-                   totalPaidAmount={500.00}
-                   remainingAmount={0}
+                    totalPaidAmount={500.00}
+                    remainingAmount={1074.40}
                  />
                ) : (
                  <AlternativeInvoicePreview 
@@ -338,8 +338,8 @@ const PreferencesTab = () => {
                        reference: "VIR-001"
                      },
                    ]}
-                   totalPaidAmount={500.00}
-                   remainingAmount={0}
+                    totalPaidAmount={500.00}
+                    remainingAmount={1074.40}
                  />
                )}
              </div>
