@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { expertiseReportsService } from '@/services/supabase/expertise-reports';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { Upload, FileText, X, Loader2 } from 'lucide-react';
+import { MovingCar } from '@/components/ui/moving-car';
 import { Button } from '@/components/ui/button';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -153,7 +154,7 @@ export const ExpertiseReportUploader = ({
       {isUploading && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
-            <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
+            <MovingCar className="mx-auto mb-4" size={48} />
             <h3 className="text-lg font-semibold mb-2">Analyse en cours</h3>
             <p className="text-muted-foreground">
               Veuillez patienter pendant que notre IA analyse votre rapport d'expertise...
@@ -196,7 +197,7 @@ export const ExpertiseReportUploader = ({
             >
               {isUploading ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <MovingCar className="mr-2" size={16} />
                   Analyse en cours...
                 </>
               ) : (
