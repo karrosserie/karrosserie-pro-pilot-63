@@ -9,6 +9,7 @@ import { Cession } from '@/services/supabase/cessions';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useCompany } from '@/hooks/use-company';
+import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
 
 interface CessionPreviewProps {
   cession: Cession | null;
@@ -20,6 +21,11 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
   if (!cession) return null;
 
   const { companyData } = useCompany();
+  const { insuranceCompanies } = useInsuranceCompanies();
+  
+  const selectedInsuranceCompany = insuranceCompanies.find(
+    company => company.id === cession.insurance_company_id
+  );
 
   const formatDate = (date: string) => {
     return format(new Date(date), 'dd/MM/yyyy', { locale: fr });
@@ -58,10 +64,11 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
                 
           <div className="text-right mb-8">
             <div className="font-bold">
-              {cession.insurance_companies?.name || 'ASSURANCE'}
+              {selectedInsuranceCompany?.name || 'ASSURANCE'}
             </div>
-            <div>8-10 RUE DE LA FERME</div>
-            <div>92100 BOULOGNE-BILLANCOURT</div>
+            {selectedInsuranceCompany?.address && <div>{selectedInsuranceCompany.address}</div>}
+            {selectedInsuranceCompany?.address2 && <div>{selectedInsuranceCompany.address2}</div>}
+            <div>{selectedInsuranceCompany?.zipcode || ''} {selectedInsuranceCompany?.city || ''}</div>
           </div>
 
           {/* Document details */}
@@ -190,9 +197,10 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               </div>
               
               <div className="text-right">
-                <div className="font-bold">ACTIVE ASSURANCES</div>
-                <div>8-10 RUE DE LA FERME</div>
-                <div>92100 BOULOGNE-BILLANCOURT</div>
+                <div className="font-bold">{selectedInsuranceCompany?.name || 'ASSURANCE'}</div>
+                {selectedInsuranceCompany?.address && <div>{selectedInsuranceCompany.address}</div>}
+                {selectedInsuranceCompany?.address2 && <div>{selectedInsuranceCompany.address2}</div>}
+                <div>{selectedInsuranceCompany?.zipcode || ''} {selectedInsuranceCompany?.city || ''}</div>
               </div>
             </div>
 
@@ -301,7 +309,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
             <div className="mb-8">
               <h3 className="font-bold text-lg mb-4">IDENTIFICATION DU SINISTRE</h3>
               
-              <div className="mb-2"><strong>Compagnie d'assurance :</strong> {cession.insurance_companies?.name || 'ACTIVE ASSURANCES'}</div>
+              <div className="mb-2"><strong>Compagnie d'assurance :</strong> {selectedInsuranceCompany?.name || 'ASSURANCE'}</div>
               <div className="mb-2"><strong>N° de contrat :</strong> {cession.policy_number || '7718265A'}</div>
               <div className="mb-2"><strong>Référence sinistre :</strong> {cession.incident_number || '00125A'} du {cession.incident_date ? formatDate(cession.incident_date) : '17/07/2025'}</div>
               <div className="mb-2"><strong>Expert mandaté :</strong> {cession.expert_name || 'DEVAUX MATTHIEU'}</div>

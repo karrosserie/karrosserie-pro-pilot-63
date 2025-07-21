@@ -4,6 +4,12 @@ import { supabase } from '@/integrations/supabase/client';
 export type InsuranceCompany = {
   id: string;
   name: string;
+  address?: string;
+  address2?: string;
+  city?: string;
+  zipcode?: string;
+  phone?: string;
+  email?: string;
   created_at: string;
   updated_at: string;
 };
