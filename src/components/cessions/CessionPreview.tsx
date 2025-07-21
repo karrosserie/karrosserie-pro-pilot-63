@@ -606,7 +606,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
             <div className="mb-8">
               <div className="mb-6">Fait à {companyData.city}, le {formatDate(cession.created_at)}</div>
               
-              <div className="mb-4 font-bold">{companyData.name?.toUpperCase()}</div>
+              <div className="font-bold mb-4">{companyData.name?.toUpperCase()}</div>
               <div>[Signature1/]</div>
             </div>
           </div>
