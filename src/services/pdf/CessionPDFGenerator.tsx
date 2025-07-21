@@ -360,7 +360,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
 
           {/* Subject */}
           <View style={styles.section}>
-            <Text></Text><Text style={styles.boldText}>Objet :</Text> Confirmation de cession de créance - Dossier sinistre n°{cession.incident_number || ''}</Text>
+            <Text><Text style={styles.boldText}>Objet :</Text> Confirmation de cession de créance - Dossier sinistre n°{cession.incident_number || ''}</Text>
           </View>
 
           {/* Greeting */}
