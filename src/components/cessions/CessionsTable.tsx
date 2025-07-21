@@ -12,6 +12,9 @@ import { FileText, Download, Eye, Pencil, Trash, Play } from 'lucide-react';
 import { Cession } from '@/services/supabase/cessions';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { toast } from '@/hooks/use-toast';
+import { repairOrdersService } from '@/services/supabase/repair-orders';
+import { validateRepairOrderData } from '@/components/cessions/form/utils/dataValidation';
 
 interface CessionsTableProps {
   cessions: Cession[];
@@ -100,9 +103,56 @@ export const CessionsTable = ({
     return `Ordre n°${order.reference} du ${orderDate} - ${clientName} - ${vehicleInfo}`;
   };
 
-  const handleInitializeProcedure = (cession: Cession) => {
+  const handleInitializeProcedure = async (cession: Cession) => {
     console.log('Initializing procedure for cession:', cession.id);
-    // TODO: Implement procedure initialization logic
+    
+    // Vérifier qu'il y a un repair_order_id
+    if (!cession.repair_order_id) {
+      toast({
+        title: "Erreur",
+        description: "Aucun ordre de réparation n'est associé à cette cession.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Récupérer les données complètes de l'ordre de réparation avec client et véhicule
+      const repairOrderData = await repairOrdersService.getById(cession.repair_order_id);
+      
+      // Valider que toutes les photos sont présentes
+      const validationError = validateRepairOrderData(
+        repairOrderData,
+        repairOrderData.clients,
+        repairOrderData.vehicles
+      );
+      
+      if (validationError) {
+        toast({
+          title: "Documents manquants",
+          description: validationError,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Si toutes les validations passent, procéder à l'initialisation
+      toast({
+        title: "Validation réussie",
+        description: "Tous les documents requis sont présents. Procédure en cours d'initialisation...",
+      });
+      
+      // TODO: Implement procedure initialization logic
+      console.log('All validations passed, proceeding with initialization...');
+      
+    } catch (error) {
+      console.error('Error validating repair order data:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de récupérer les données de l'ordre de réparation.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (isLoading) {
