@@ -52,7 +52,12 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
           item.description.toUpperCase().includes('PEINTURE')
         )
       );
-      return filtered.reduce((total: number, item: any) => total + (parseFloat(item.total) || 0), 0);
+      return filtered.reduce((total: number, item: any) => {
+        const totalTTC = parseFloat(item.total) || 0;
+        const vatRate = parseFloat(item.vat) || 20;
+        const htAmount = totalTTC / (1 + vatRate / 100);
+        return total + htAmount;
+      }, 0);
     } catch (error) {
       console.error('Error parsing repairs_data:', error);
       return 0;
@@ -73,7 +78,12 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
           item.description.includes('T3')
         )
       );
-      return filtered.reduce((total: number, item: any) => total + (parseFloat(item.total) || 0), 0);
+      return filtered.reduce((total: number, item: any) => {
+        const totalTTC = parseFloat(item.total) || 0;
+        const vatRate = parseFloat(item.vat) || 20;
+        const htAmount = totalTTC / (1 + vatRate / 100);
+        return total + htAmount;
+      }, 0);
     } catch (error) {
       console.error('Error parsing repairs_data:', error);
       return 0;
@@ -87,7 +97,12 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
         ? JSON.parse(cession.repair_orders.parts_data)
         : cession.repair_orders.parts_data;
       if (!Array.isArray(parts)) return 0;
-      return parts.reduce((total: number, item: any) => total + (parseFloat(item.total) || 0), 0);
+      return parts.reduce((total: number, item: any) => {
+        const totalTTC = parseFloat(item.total) || 0;
+        const vatRate = parseFloat(item.vat) || 20;
+        const htAmount = totalTTC / (1 + vatRate / 100);
+        return total + htAmount;
+      }, 0);
     } catch (error) {
       console.error('Error parsing parts_data:', error);
       return 0;
