@@ -8,6 +8,7 @@ import {
 import { Cession } from '@/services/supabase/cessions';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useCompany } from '@/hooks/use-company';
 
 interface CessionPreviewProps {
   cession: Cession | null;
@@ -17,6 +18,8 @@ interface CessionPreviewProps {
 
 export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewProps) => {
   if (!cession) return null;
+
+  const { companyData } = useCompany();
 
   const formatDate = (date: string) => {
     return format(new Date(date), 'dd/MM/yyyy', { locale: fr });
@@ -46,11 +49,11 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
           {/* Company info and destination */}
           <div>
-            <div className="font-bold mb-2">KORPORATE</div>
-            <div>25 COURS PIERRE PUGET</div>
-            <div>13006 MARSEILLE</div>
-            <div>ggobeyn@outlook.fr</div>
-            <div>+33646465242</div>
+            <div className="font-bold mb-2">{companyData.name?.toUpperCase() || 'ENTREPRISE'}</div>
+            <div>{companyData.address || ''}</div>
+            <div>{companyData.zipcode || ''} {companyData.city || ''}</div>
+            <div>{companyData.email || ''}</div>
+            <div>{companyData.phone || ''}</div>
           </div>
                 
           <div className="text-right">
@@ -111,11 +114,11 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
           {/* Cessionnaire info */}
           <div className="mb-8">
             <div className="font-bold mb-2">CESSIONNAIRE</div>
-            <div className="font-bold">KORPORATE</div>
-            <div>25 COURS PIERRE PUGET</div>
-            <div>13006 MARSEILLE</div>
-            <div>ggobeyn@outlook.fr</div>
-            <div>+33646465242</div>
+            <div className="font-bold">{companyData.name?.toUpperCase() || 'ENTREPRISE'}</div>
+            <div>{companyData.address || ''}</div>
+            <div>{companyData.zipcode || ''} {companyData.city || ''}</div>
+            <div>{companyData.email || ''}</div>
+            <div>{companyData.phone || ''}</div>
           </div>
 
           {/* Vehicle details section */}
@@ -205,8 +208,8 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
             {/* Main confirmation text */}
             <div className="mb-6 text-justify">
-              Je soussigné(e) MUSSO DORIAN, assuré(e) sous le contrat n°{cession.policy_number || '7718265A'}, vous confirme avoir cédé ma 
-              créance d'indemnisation à KORPORATE concernant les réparations de mon véhicule {cession.repair_orders?.vehicles?.car_brands?.name || 'PEUGEOT'} {cession.repair_orders?.vehicles?.car_models?.name || '308'} 
+              Je soussigné(e) {clientName.toUpperCase()}, assuré(e) sous le contrat n°{cession.policy_number || '7718265A'}, vous confirme avoir cédé ma 
+              créance d'indemnisation à {companyData.name?.toUpperCase() || 'ENTREPRISE'} concernant les réparations de mon véhicule {cession.repair_orders?.vehicles?.car_brands?.name || 'PEUGEOT'} {cession.repair_orders?.vehicles?.car_models?.name || '308'} 
               immatriculé {cession.repair_orders?.vehicles?.license_plate || 'ED-684-JH'}.
             </div>
 
@@ -231,7 +234,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
                 <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-2">
                   <div className="text-white text-xs font-bold">∞</div>
                 </div>
-                <div className="text-xs">Approuvé par KORPORATE Entreprise</div>
+                <div className="text-xs">Approuvé par {companyData.name || 'ENTREPRISE'} Entreprise</div>
               </div>
             </div>
           </div>
@@ -271,11 +274,11 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
             {/* Le Cessionnaire */}
             <div className="mb-8">
               <div className="font-bold mb-2">LE CESSIONNAIRE</div>
-              <div className="font-bold">KORPORATE</div>
-              <div>25 COURS PIERRE PUGET</div>
-              <div>13006 MARSEILLE</div>
-              <div>ggobeyn@outlook.fr</div>
-              <div>+33646465242</div>
+              <div className="font-bold">{companyData.name?.toUpperCase() || 'ENTREPRISE'}</div>
+              <div>{companyData.address || ''}</div>
+              <div>{companyData.zipcode || ''} {companyData.city || ''}</div>
+              <div>{companyData.email || ''}</div>
+              <div>{companyData.phone || ''}</div>
               <div className="mt-2">Ci-après dénommé "Le Réparateur professionnel"</div>
             </div>
 
