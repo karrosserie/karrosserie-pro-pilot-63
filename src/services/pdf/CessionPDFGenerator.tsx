@@ -301,7 +301,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
         </Text>
 
         {/* Legal basis */}
-        <View style={styles.sectionLarge}>
+        <View style={styles.sectionLarge} break>
           <Text style={styles.section}>Cette cession est effectuée en vertu :</Text>
           <Text style={styles.listItem}>- De l'article L.121-13 du Code des assurances</Text>
           <Text style={styles.listItem}>- Des articles 1321 à 1326 du Code civil</Text>
