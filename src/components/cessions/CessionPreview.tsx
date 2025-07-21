@@ -65,7 +65,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
             <div>{companyData.phone || ''}</div>
           </div>
                 
-          <div className="ml-64 mb-8">
+          <div className="ml-10 mb-8">
             <div className="font-bold">
               {selectedInsuranceCompany?.name || ''}
             </div>
@@ -186,6 +186,11 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
           <div className="mb-8 text-justify">
             Dans l'attente du règlement dans les délais légaux prescrits par l'article L.211-5-1 du Code des assurances, nous vous prions d'agréer, Madame, Monsieur, l'expression de notre considération distinguée.
           </div>
+          
+          {/* Signature section */}
+          <div className="flex justify-center items-center mb-8">
+            [Signature1/]
+          </div>
 
           {/* Additional cession confirmation section */}
           <div className="mb-8 border-t border-gray-300 pt-8">
@@ -218,8 +223,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
             {/* Main confirmation text */}
             <div className="mb-6 text-justify">
               Je soussigné(e) {clientName.toUpperCase()}, assuré(e) sous le contrat n°{cession.policy_number || ''}, vous confirme avoir cédé ma 
-              créance d'indemnisation à {companyData.name?.toUpperCase() || ''} concernant les réparations de mon véhicule {cession.repair_orders?.vehicles?.car_brands?.name || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''} 
-              immatriculé {cession.repair_orders?.vehicles?.license_plate || ''}.
+              créance d'indemnisation à {companyData.name?.toUpperCase() || ''} concernant les réparations de mon véhicule {cession.repair_orders?.vehicles?.car_brands?.name || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''} immatriculé {cession.repair_orders?.vehicles?.license_plate || ''}.
             </div>
 
             {/* Legal reference */}
@@ -239,12 +243,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
             {/* Signature section */}
             <div className="flex justify-center items-center mb-8">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <div className="text-white text-xs font-bold">∞</div>
-                </div>
-                <div className="text-xs">Approuvé par {companyData.name || ''} Entreprise</div>
-              </div>
+              [Signature2/]
             </div>
           </div>
           
