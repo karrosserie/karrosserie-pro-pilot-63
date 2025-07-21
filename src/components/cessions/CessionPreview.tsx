@@ -376,7 +376,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
               {/* Article 4 */}
               <div className="mb-6">
-                <div className="font-bold mb-2">Article 4 : Obligations spécifiques de l'Assuré</div>
+                <div className="mb-2">Article 4 : Obligations spécifiques de l'Assuré</div>
                 
                 <div className="mb-2">Le Client/Assuré s'engage irrévocablement à :</div>
                 <div className="mb-1">4.1 Ne pas révoquer la présente cession</div>
@@ -438,7 +438,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
                     <div>[Signature1/]</div>
                     <div className="text-sm">Lu et approuvé,</div>
                     <div className="text-sm">Bon pour cession irrévocable de créance</div>
-                    <div className="text-sm">d'un montant de 1 094,79 € TTC</div>
+                    <div className="text-sm">d'un montant de {cession.repair_orders?.amount ? `${cession.repair_orders.amount.toFixed(2)} €` : '0,00 €'} TTC</div>
                   </div>
                   
                   {/* Le Cessionnaire */}
@@ -453,10 +453,10 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
               {/* Pièces jointes */}
               <div className="mb-8">
-                <div className="font-bold mb-4">Vous trouverez ci-joint :</div>
-                <div className="mb-1">1. La copie du rapport d'expertise</div>
-                <div className="mb-1">2. La copie de la carte grise du véhicule72</div>
-                <div className="mb-1">3. La copie du permis de conduire de l'assuré72</div>
+                <div className="mb-4">Vous trouverez ci-joint :</div>
+                <div>1. La copie du rapport d'expertise</div>
+                <div>2. La copie de la carte grise du véhicule72</div>
+                <div>3. La copie du permis de conduire de l'assuré72</div>
               </div>
             </div>
           </div>
@@ -475,24 +475,28 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               (Conformément à l'article L. 441-7 du Code de commerce)
             </div>
 
-            {/* Company and destination */}
+            {/* Company info and destination */}   
             <div className="grid grid-cols-2 gap-8 mb-8">
               <div>
-                <div className="font-bold">KORPORATE</div>
-                <div>25 COURS PIERRE PUGET</div>
-                <div>13006 MARSEILLE</div>
-                <div>ggobeyn@outlook.fr</div>
-                <div>+33646465242</div>
+                <div className="font-bold">{companyData.name?.toUpperCase() || ''}</div>
+                <div>{companyData.address || ''}</div>
+                <div>{companyData.zipcode || ''} {companyData.city || ''}</div>
+                <div>{companyData.email || ''}</div>
+                <div>{companyData.phone || ''}</div>
               </div>
-              
-              <div className="text-right">
-                <div className="mb-4">A l'attention de :</div>
-                <div className="font-bold">{cession.insurance_companies?.name || 'ACTIVE ASSURANCES'}</div>
-                <div>8-10 RUE DE LA FERME</div>
-                <div>92100 BOULOGNE-BILLANCOURT</div>
+              <div></div>
+              <div></div>
+              <div>
+                <div>A l'attention de :</div>
+                <div className="font-bold">
+                  {selectedInsuranceCompany?.name || ''}
+                </div>
+                {selectedInsuranceCompany?.address && <div>{selectedInsuranceCompany.address}</div>}
+                {selectedInsuranceCompany?.address2 && <div>{selectedInsuranceCompany.address2}</div>}
+                <div>{selectedInsuranceCompany?.zipcode || ''} {selectedInsuranceCompany?.city || ''}</div>
               </div>
             </div>
-
+            
             {/* Object */}
             <div className="mb-8">
               <strong>Objet :</strong> Attestation sur l'honneur certifiant l'absence de surfacturation
@@ -512,7 +516,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               
               <div className="mb-6">
                 <div className="mb-4">
-                  <strong>1.</strong> Les travaux de réparation effectués sur le véhicule {cession.repair_orders?.vehicles?.car_brands?.name || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''} (immatriculation {cession.repair_orders?.vehicles?.license_plate || ''}, n° 
+                  1. Les travaux de réparation effectués sur le véhicule {cession.repair_orders?.vehicles?.car_brands?.name || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''} (immatriculation {cession.repair_orders?.vehicles?.license_plate || ''}, n° 
                   série ) dans le cadre du sinistre survenu le {cession.incident_date ? formatDate(cession.incident_date) : ''}, référencé sous le n°{cession.incident_number || ''}, ont été facturés en 
                   stricte conformité avec :
                 </div>
@@ -524,7 +528,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
               <div className="mb-6">
                 <div className="mb-4">
-                  <strong>2.</strong> Aucune majoration abusive, surcoût injustifié ou pratique commerciale déloyale n'a été appliquée. Les 
+                  2. Aucune majoration abusive, surcoût injustifié ou pratique commerciale déloyale n'a été appliquée. Les 
                   montants facturés correspondent intégralement :
                 </div>
                 <div className="ml-8 mb-2">o Au coût des pièces détachées (neuves ou d'occasion selon accord) ;</div>
@@ -533,7 +537,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               </div>
 
               <div className="mb-8">
-                <strong>3.</strong> Cette attestation est délivrée en toute honnêteté, sous réserve des sanctions pénales prévues par les 
+                3. Cette attestation est délivrée en toute honnêteté, sous réserve des sanctions pénales prévues par les 
                 articles L. 441-7 et L. 454-1 du Code de commerce en cas de déclaration frauduleuse.
               </div>
             </div>
