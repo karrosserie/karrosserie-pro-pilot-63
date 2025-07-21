@@ -176,13 +176,66 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
             Dans l'attente du règlement dans les délais légaux prescrits par l'article L.211-5-1 du Code des assurances, nous vous prions d'agréer, Madame, Monsieur, l'expression de notre considération distinguée.
           </div>
 
-          {/* Signature */}
-          <div className="mb-8">
-            <div className="font-bold mb-4">KORPORATE</div>
-            <div className="mt-16 mb-4">
-              <div className="font-bold text-2xl mb-2" style={{ fontFamily: 'cursive' }}>MUSSO DORIAN</div>
+          {/* Additional cession confirmation section */}
+          <div className="mb-8 border-t border-gray-300 pt-8">
+            {/* Cedant and Insurance details */}
+            <div className="grid grid-cols-2 gap-8 mb-8">
+              <div>
+                <div className="font-bold">MUSSO DORIAN</div>
+                <div>6 B PLACE FONTAINE DU TEMPLE RESIDENCE LES SYLPHIDES</div>
+                <div>06100 NICE</div>
+                <div>ggobeyn@outlook.fr</div>
+                <div>0646465242</div>
+              </div>
+              
+              <div className="text-right">
+                <div className="font-bold">ACTIVE ASSURANCES</div>
+                <div>8-10 RUE DE LA FERME</div>
+                <div>92100 BOULOGNE-BILLANCOURT</div>
+              </div>
             </div>
-            <div className="text-sm">Approuvé par MUSSO DORIAN</div>
+
+            {/* Subject */}
+            <div className="mb-6">
+              <strong>Objet :</strong> Confirmation de cession de créance - Dossier sinistre n°{cession.incident_number || '00125A'}
+            </div>
+
+            {/* Greeting */}
+            <div className="mb-4">
+              Madame, Monsieur,
+            </div>
+
+            {/* Main confirmation text */}
+            <div className="mb-6 text-justify">
+              Je soussigné(e) MUSSO DORIAN, assuré(e) sous le contrat n°{cession.policy_number || '7718265A'}, vous confirme avoir cédé ma 
+              créance d'indemnisation à KORPORATE concernant les réparations de mon véhicule {cession.repair_orders?.vehicles?.car_brands?.name || 'PEUGEOT'} {cession.repair_orders?.vehicles?.car_models?.name || '308'} 
+              immatriculé {cession.repair_orders?.vehicles?.license_plate || 'ED-684-JH'}.
+            </div>
+
+            {/* Legal reference */}
+            <div className="mb-6 text-justify">
+              En application de l'article L.121-13 du Code des assurances, je vous demande expressément de verser 
+              l'indemnité directement au réparateur.
+            </div>
+
+            <div className="mb-8 text-justify">
+              Veuillez agréer, Madame, Monsieur, l'expression de mes salutations distinguées.
+            </div>
+
+            {/* Date and place */}
+            <div className="mb-8">
+              Fait à MARSEILLE, le {formatDate(cession.created_at)}
+            </div>
+
+            {/* Signature section */}
+            <div className="flex justify-center items-center mb-8">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <div className="text-white text-xs font-bold">∞</div>
+                </div>
+                <div className="text-xs">Approuvé par KORPORATE Entreprise</div>
+              </div>
+            </div>
           </div>
         </div>
       </DialogContent>
