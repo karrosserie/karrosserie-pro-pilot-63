@@ -53,7 +53,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
           {/* Header text */}
           <p className="mb-8 text-justify">
             Conformément à l'article 1369-4 du Code civil, cette notification est également valablement effectuée par 
-            courrier à l'adresse suivante : {selectedInsuranceCompany?.email || 'email@assurance.fr'}, avec accusé de réception électronique.
+            courrier à l'adresse suivante : {selectedInsuranceCompany?.email || ''}, avec accusé de réception électronique.
           </p>
 
           {/* Company info and destination */}
@@ -137,7 +137,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               Concernant l'indemnisation des réparations du véhicule :
             </div>
             <div>
-              <strong>{cession.repair_orders?.vehicles?.car_brands?.name?.toUpperCase() || 'VÉHICULE'} {cession.repair_orders?.vehicles?.car_models?.name || ''}</strong>
+              <strong>{cession.repair_orders?.vehicles?.car_brands?.name?.toUpperCase() || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''}</strong>
             </div>
             <div>
               Immatriculation : {cession.repair_orders?.vehicles?.license_plate || 'N/A'}
@@ -283,7 +283,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
             {/* Le Cessionnaire */}
             <div className="mb-8">
               <div className="font-bold mb-2">LE CESSIONNAIRE</div>
-              <div className="font-bold">{companyData.name?.toUpperCase() || 'ENTREPRISE'}</div>
+              <div className="font-bold">{companyData.name?.toUpperCase() || ''}</div>
               <div>{companyData.address || ''}</div>
               <div>{companyData.zipcode || ''} {companyData.city || ''}</div>
               <div>{companyData.email || ''}</div>
