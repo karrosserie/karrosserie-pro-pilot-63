@@ -95,10 +95,47 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
   };
 
   const calculateTaxAmount = () => {
-    const paintAmount = calculatePaintAmount();
-    const laborAmount = calculateLaborAmount();
-    const partsAmount = calculatePartsAmount();
-    return (paintAmount + laborAmount + partsAmount) * 0.20; // 20% TVA
+    let totalTax = 0;
+    
+    // Calculate tax from repairs
+    if (cession.repair_orders?.repairs_data) {
+      try {
+        const repairs = typeof cession.repair_orders.repairs_data === 'string' 
+          ? JSON.parse(cession.repair_orders.repairs_data)
+          : cession.repair_orders.repairs_data;
+        if (Array.isArray(repairs)) {
+          totalTax += repairs.reduce((tax: number, item: any) => {
+            const total = parseFloat(item.total) || 0;
+            const vatRate = parseFloat(item.vat) || 20;
+            const taxAmount = total - (total / (1 + vatRate / 100));
+            return tax + taxAmount;
+          }, 0);
+        }
+      } catch (error) {
+        console.error('Error parsing repairs_data for tax:', error);
+      }
+    }
+    
+    // Calculate tax from parts
+    if (cession.repair_orders?.parts_data) {
+      try {
+        const parts = typeof cession.repair_orders.parts_data === 'string' 
+          ? JSON.parse(cession.repair_orders.parts_data)
+          : cession.repair_orders.parts_data;
+        if (Array.isArray(parts)) {
+          totalTax += parts.reduce((tax: number, item: any) => {
+            const total = parseFloat(item.total) || 0;
+            const vatRate = parseFloat(item.vat) || 20;
+            const taxAmount = total - (total / (1 + vatRate / 100));
+            return tax + taxAmount;
+          }, 0);
+        }
+      } catch (error) {
+        console.error('Error parsing parts_data for tax:', error);
+      }
+    }
+    
+    return totalTax;
   };
 
   const paintAmount = calculatePaintAmount();
@@ -434,7 +471,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
                 <div className="mb-1">- Pièces détachées : {formatEuro(partsAmount)} € HT</div>
                 <div className="mb-1">- Main d'œuvre : {formatEuro(laborAmount)} € HT</div>
                 <div className="mb-1">- Peinture et ingrédients : {formatEuro(paintAmount)} € HT</div>
-                <div className="mb-2">- TVA : {formatEuro(taxAmount)} € HT</div>
+                <div className="mb-2">- TVA : {formatEuro(taxAmount)} €</div>
               </div>
 
               {/* Article 3 */}
