@@ -41,36 +41,57 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
   // Calculate specific amounts from repair order data
   const calculatePaintAmount = () => {
     if (!cession.repair_orders?.repairs_data) return 0;
-    const repairs = cession.repair_orders.repairs_data;
-    if (!Array.isArray(repairs)) return 0;
-    const filtered = repairs.filter((item: any) => 
-      item.description && (
-        item.description.toUpperCase().includes('INGR') || 
-        item.description.toUpperCase().includes('PEINTURE')
-      )
-    );
-    return filtered.reduce((total: number, item: any) => total + (parseFloat(item.total) || 0), 0);
+    try {
+      const repairs = typeof cession.repair_orders.repairs_data === 'string' 
+        ? JSON.parse(cession.repair_orders.repairs_data)
+        : cession.repair_orders.repairs_data;
+      if (!Array.isArray(repairs)) return 0;
+      const filtered = repairs.filter((item: any) => 
+        item.description && (
+          item.description.toUpperCase().includes('INGR') || 
+          item.description.toUpperCase().includes('PEINTURE')
+        )
+      );
+      return filtered.reduce((total: number, item: any) => total + (parseFloat(item.total) || 0), 0);
+    } catch (error) {
+      console.error('Error parsing repairs_data:', error);
+      return 0;
+    }
   };
 
   const calculateLaborAmount = () => {
     if (!cession.repair_orders?.repairs_data) return 0;
-    const repairs = cession.repair_orders.repairs_data;
-    if (!Array.isArray(repairs)) return 0;
-    const filtered = repairs.filter((item: any) => 
-      item.description && (
-        item.description.includes('T1') || 
-        item.description.includes('T2') || 
-        item.description.includes('T3')
-      )
-    );
-    return filtered.reduce((total: number, item: any) => total + (parseFloat(item.total) || 0), 0);
+    try {
+      const repairs = typeof cession.repair_orders.repairs_data === 'string' 
+        ? JSON.parse(cession.repair_orders.repairs_data)
+        : cession.repair_orders.repairs_data;
+      if (!Array.isArray(repairs)) return 0;
+      const filtered = repairs.filter((item: any) => 
+        item.description && (
+          item.description.includes('T1') || 
+          item.description.includes('T2') || 
+          item.description.includes('T3')
+        )
+      );
+      return filtered.reduce((total: number, item: any) => total + (parseFloat(item.total) || 0), 0);
+    } catch (error) {
+      console.error('Error parsing repairs_data:', error);
+      return 0;
+    }
   };
 
   const calculatePartsAmount = () => {
     if (!cession.repair_orders?.parts_data) return 0;
-    const parts = cession.repair_orders.parts_data;
-    if (!Array.isArray(parts)) return 0;
-    return parts.reduce((total: number, item: any) => total + (parseFloat(item.total) || 0), 0);
+    try {
+      const parts = typeof cession.repair_orders.parts_data === 'string' 
+        ? JSON.parse(cession.repair_orders.parts_data)
+        : cession.repair_orders.parts_data;
+      if (!Array.isArray(parts)) return 0;
+      return parts.reduce((total: number, item: any) => total + (parseFloat(item.total) || 0), 0);
+    } catch (error) {
+      console.error('Error parsing parts_data:', error);
+      return 0;
+    }
   };
 
   const calculateTaxAmount = () => {
