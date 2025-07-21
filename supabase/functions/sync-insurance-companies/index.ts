@@ -62,22 +62,23 @@ Deno.serve(async (req) => {
     for (let i = 0; i < dataLines.length; i++) {
       try {
         const line = dataLines[i];
-        // Split by double semicolon since that's the CSV format
-        const columns = line.split(';;').map(col => col.trim());
+        // Split by single semicolon since that's the CSV format
+        const columns = line.split(';').map(col => col.trim());
         
         console.log(`Processing line ${i + 2}: ${line}`);
         console.log(`Columns:`, columns);
         
-        // Assuming CSV structure: name;;address;;address2;;zipcode;;city;;phone;;email
-        if (columns.length >= 1 && columns[0]) {
+        // CSV structure: name;fonction_service;address;address2;zipcode;city;phone;email
+        // We ignore the "fonction_service" column (index 1)
+        if (columns.length >= 8 && columns[0]) {
           const company: InsuranceCompanyRow = {
             name: columns[0] || '',
-            address: columns[1] || '',
-            address2: columns[2] || '',
-            zipcode: columns[3] || '',
-            city: columns[4] || '',
-            phone: columns[5] || '',
-            email: columns[6] || '',
+            address: columns[2] || '',
+            address2: columns[3] || '',
+            zipcode: columns[4] || '',
+            city: columns[5] || '',
+            phone: columns[6] || '',
+            email: columns[7] || '',
           };
           
           console.log(`Parsed company:`, company);
