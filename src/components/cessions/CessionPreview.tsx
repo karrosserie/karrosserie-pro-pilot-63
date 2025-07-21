@@ -31,6 +31,65 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
     return format(new Date(date), 'dd/MM/yyyy', { locale: fr });
   };
 
+  const formatEuro = (amount: number) => {
+    return new Intl.NumberFormat('fr-FR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount);
+  };
+
+  // Calculate specific amounts from repair order data
+  const calculatePaintAmount = () => {
+    if (!cession.repair_orders?.repairs_data) return 0;
+    const repairs = Array.isArray(cession.repair_orders.repairs_data) 
+      ? cession.repair_orders.repairs_data 
+      : [];
+    return repairs
+      .filter((item: any) => 
+        item.designation && (
+          item.designation.toUpperCase().includes('INGR') || 
+          item.designation.toUpperCase().includes('PEINTURE')
+        )
+      )
+      .reduce((total: number, item: any) => total + (parseFloat(item.total_price) || 0), 0);
+  };
+
+  const calculateLaborAmount = () => {
+    if (!cession.repair_orders?.repairs_data) return 0;
+    const repairs = Array.isArray(cession.repair_orders.repairs_data) 
+      ? cession.repair_orders.repairs_data 
+      : [];
+    return repairs
+      .filter((item: any) => 
+        item.designation && (
+          item.designation.includes('T1') || 
+          item.designation.includes('T2') || 
+          item.designation.includes('T3')
+        )
+      )
+      .reduce((total: number, item: any) => total + (parseFloat(item.total_price) || 0), 0);
+  };
+
+  const calculatePartsAmount = () => {
+    if (!cession.repair_orders?.parts_data) return 0;
+    const parts = Array.isArray(cession.repair_orders.parts_data) 
+      ? cession.repair_orders.parts_data 
+      : [];
+    return parts.reduce((total: number, item: any) => total + (parseFloat(item.total_price) || 0), 0);
+  };
+
+  const calculateTaxAmount = () => {
+    const paintAmount = calculatePaintAmount();
+    const laborAmount = calculateLaborAmount();
+    const partsAmount = calculatePartsAmount();
+    return (paintAmount + laborAmount + partsAmount) * 0.20; // 20% TVA
+  };
+
+  const paintAmount = calculatePaintAmount();
+  const laborAmount = calculateLaborAmount();
+  const partsAmount = calculatePartsAmount();
+  const taxAmount = calculateTaxAmount();
+
   const clientName = cession.repair_orders?.clients 
     ? `${cession.repair_orders.clients.first_name} ${cession.repair_orders.clients.last_name}`
     : 'Client non assigné';
@@ -167,9 +226,9 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
           </div>
 
           {/* Payment request */}
-          <div className="mb-8 text-justify">
-            En conséquence, nous vous demandons de procéder au règlement de l'indemnité d'un montant de {cession.repair_orders?.amount ? `${cession.repair_orders.amount.toFixed(2)} €` : '0,00 €'} TTC directement sur notre compte bancaire :
-          </div>
+            <div className="mb-8 text-justify">
+              En conséquence, nous vous demandons de procéder au règlement de l'indemnité d'un montant de {cession.repair_orders?.amount ? `${formatEuro(cession.repair_orders.amount)} €` : '0,00 €'} TTC directement sur notre compte bancaire :
+            </div>
 
           {/* Bank details */}
           <div className="mb-8">
@@ -332,7 +391,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               
               <div><strong>Véhicule :</strong> {cession.repair_orders?.vehicles?.car_brands?.name || 'PEUGEOT'} {cession.repair_orders?.vehicles?.car_models?.name || '308'}</div>
               <div><strong>N° d'enregistrement :</strong> {cession.repair_orders?.vehicles?.license_plate || 'ED-684-JH'}</div>
-              <div><strong>Kilométrage :</strong> 94090 Km</div>
+              <div><strong>Kilométrage :</strong> {cession.repair_orders?.vehicles?.mileage || 'N/A'} Km</div>
             </div>
 
             {/* Convention */}
@@ -354,11 +413,11 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               <div className="mb-6">
                 <div className="mb-2">Article 2 : Montant et composition de la créance cédée</div>
                 
-                <div className="mb-2">La créance cédée correspond au montant total de {cession.repair_orders?.amount ? `${cession.repair_orders.amount.toFixed(2)} €` : '0,00 €'} TTC, comprenant :</div>
-                <div className="mb-1">- Pièces détachées : 24,50 € HT</div>
-                <div className="mb-1">- Main d'œuvre : 443,94 € HT</div>
-                <div className="mb-1">- Peinture et ingrédients : 443,88 € HT</div>
-                <div className="mb-2">- TVA : 182,47 € HT</div>
+                <div className="mb-2">La créance cédée correspond au montant total de {cession.repair_orders?.amount ? `${formatEuro(cession.repair_orders.amount)} €` : '0,00 €'} TTC, comprenant :</div>
+                <div className="mb-1">- Pièces détachées : {formatEuro(partsAmount)} € HT</div>
+                <div className="mb-1">- Main d'œuvre : {formatEuro(laborAmount)} € HT</div>
+                <div className="mb-1">- Peinture et ingrédients : {formatEuro(paintAmount)} € HT</div>
+                <div className="mb-2">- TVA : {formatEuro(taxAmount)} € HT</div>
               </div>
 
               {/* Article 3 */}

@@ -62,6 +62,7 @@ export const getAllCessions = async (): Promise<Cession[]> => {
                 .select(`
                   license_plate,
                   vin,
+                  mileage,
                   car_brands(name),
                   car_models(name)
                 `)
@@ -70,8 +71,10 @@ export const getAllCessions = async (): Promise<Cession[]> => {
               vehicleData = vehicle;
             }
             
-            // Get invoice amount for this repair order
+            // Get invoice amount and items for this repair order
             let invoiceAmount = 0;
+            let repairOrderItems = { parts_data: null, repairs_data: null };
+            
             const { data: invoice } = await supabase
               .from('invoices')
               .select('amount')
@@ -82,12 +85,25 @@ export const getAllCessions = async (): Promise<Cession[]> => {
               invoiceAmount = invoice.amount || 0;
             }
             
+            // Get repair order items for calculations
+            const { data: repairOrderWithItems } = await supabase
+              .from('repair_orders')
+              .select('parts_data, repairs_data')
+              .eq('id', cession.repair_order_id)
+              .single();
+              
+            if (repairOrderWithItems) {
+              repairOrderItems = repairOrderWithItems;
+            }
+            
             repairOrderData = {
               reference: repairOrder.reference,
               created_at: repairOrder.created_at,
               amount: invoiceAmount,
               clients: clientData,
-              vehicles: vehicleData
+              vehicles: vehicleData,
+              parts_data: repairOrderItems.parts_data,
+              repairs_data: repairOrderItems.repairs_data
             };
           }
         } catch (error) {
@@ -145,10 +161,13 @@ export const getCessionById = async (id: string): Promise<Cession> => {
       .select(`
         reference,
         created_at,
+        parts_data,
+        repairs_data,
         clients(first_name, last_name, address, city, postal_code, email, phone),
         vehicles(
           license_plate,
           vin,
+          mileage,
           car_brands(name),
           car_models(name)
         )

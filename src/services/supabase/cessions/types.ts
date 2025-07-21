@@ -30,6 +30,8 @@ export interface Cession {
     reference: string;
     created_at: string;
     amount: number;
+    parts_data?: any | null;
+    repairs_data?: any | null;
     clients: { 
       first_name: string; 
       last_name: string; 
@@ -42,6 +44,7 @@ export interface Cession {
     vehicles: {
       license_plate: string;
       vin: string | null;
+      mileage: number | null;
       car_brands: { name: string; } | null;
       car_models: { name: string; } | null;
     } | null;
