@@ -311,7 +311,8 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
             {/* Signature section */}
             <div className="flex items-center mb-8">
-              [Signature2/]
+              <div className="font-bold">{clientName.toUpperCase()}</div>
+              <div>[Signature2/]</div>
             </div>
           </div>
           
