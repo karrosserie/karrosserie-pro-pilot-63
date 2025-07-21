@@ -237,7 +237,78 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               </div>
             </div>
           </div>
-        </div>
+          </div>
+
+          {/* Convention de cession section */}
+          <div className="mb-8 border-t-2 border-black pt-8">
+            {/* Title */}
+            <div className="text-center mb-6">
+              <div className="border-t-2 border-black pt-4 pb-4 border-b-2">
+                <h2 className="font-bold text-lg">CONVENTION DE CESSION DE CRÉANCE D'INDEMNITÉ D'ASSURANCE</h2>
+              </div>
+            </div>
+
+            {/* Legal references */}
+            <div className="mb-6">
+              <div>(Articles 1321 et suivants du Code Civil)</div>
+              <div>(Article L.121-13 du Code des assurances)</div>
+            </div>
+
+            <div className="mb-4">
+              Entre les soussignés:
+            </div>
+
+            {/* Le Cédant */}
+            <div className="mb-6">
+              <div className="font-bold mb-2">LE CÉDANT</div>
+              <div className="font-bold">{clientName.toUpperCase()}</div>
+              <div>6 B PLACE FONTAINE DU TEMPLE RESIDENCE LES SYLPHIDES</div>
+              <div>06100 NICE</div>
+              <div>ggobeyn@outlook.fr</div>
+              <div>0646465242</div>
+              <div className="mt-2">Ci-après dénommé "Le Client/Assuré"</div>
+            </div>
+
+            <div className="mb-4 font-bold">ET</div>
+
+            {/* Le Cessionnaire */}
+            <div className="mb-8">
+              <div className="font-bold mb-2">LE CESSIONNAIRE</div>
+              <div className="font-bold">KORPORATE</div>
+              <div>25 COURS PIERRE PUGET</div>
+              <div>13006 MARSEILLE</div>
+              <div>ggobeyn@outlook.fr</div>
+              <div>+33646465242</div>
+              <div className="mt-2">Ci-après dénommé "Le Réparateur professionnel"</div>
+            </div>
+
+            {/* Exposé préalable */}
+            <div className="mb-8">
+              <h3 className="font-bold text-lg mb-4">EXPOSÉ PRÉALABLE</h3>
+              
+              <div className="mb-4">Conformément aux dispositions :</div>
+              
+              <div className="mb-2">- De l'article 1321 du Code civil établissant le principe et les effets de la cession de créance</div>
+              <div className="mb-2">- De l'article L.121-13 du Code des assurances imposant le versement de l'indemnité pour la remise en état effective du bien assuré</div>
+              <div className="mb-2">- De l'article R.121-5 du Code des assurances relatif aux modalités de règlement des indemnités d'assurance</div>
+              <div className="mb-2">- De l'arrêt de la Cour de cassation du 13 juin 2019 (n°18-17.907) confirmant l'opposabilité de la cession de créance d'indemnité d'assurance</div>
+              <div className="mb-6">- De l'arrêt de la Cour de cassation du 17 février 2015 (n°13-27.080) sur l'obligation de l'assureur de régler l'indemnité au réparateur cessionnaire</div>
+              
+              <div className="mb-8">Le Client/Assuré entend céder sa créance d'indemnité d'assurance au Réparateur professionnel.</div>
+            </div>
+
+            {/* Identification du sinistre */}
+            <div className="mb-8">
+              <h3 className="font-bold text-lg mb-4">IDENTIFICATION DU SINISTRE</h3>
+              
+              <div className="mb-2"><strong>Compagnie d'assurance :</strong> {cession.insurance_companies?.name || 'ACTIVE ASSURANCES'}</div>
+              <div className="mb-2"><strong>N° de contrat :</strong> {cession.policy_number || '7718265A'}</div>
+              <div className="mb-2"><strong>Référence sinistre :</strong> {cession.incident_number || '00125A'} du {cession.incident_date ? formatDate(cession.incident_date) : '17/07/2025'}</div>
+              <div className="mb-2"><strong>Expert mandaté :</strong> {cession.expert_name || 'DEVAUX MATTHIEU'}</div>
+              <div className="mb-2"><strong>Rapport d'expertise n° :</strong> {cession.report_number || 'AE25008924'}</div>
+              <div className="mb-2"><strong>Montant validé :</strong> 1 094,79 € TTC</div>
+            </div>
+          </div>
       </DialogContent>
     </Dialog>
   );
