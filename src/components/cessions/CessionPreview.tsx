@@ -191,7 +191,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
           </div>
           
           {/* Signature section */}
-          <div className="flex items-center mb-8">
+          <div className="mb-8">
             <div className="font-bold">{companyData.name?.toUpperCase() || ''}</div>
             <div>[Signature1/]</div>
           </div>
