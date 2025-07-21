@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCessions } from '@/hooks/use-cessions';
 import { CessionDialog } from '@/components/cessions/CessionDialog';
 import { CessionsHeader } from '@/components/cessions/CessionsHeader';
@@ -6,6 +6,7 @@ import { CessionsFilters } from '@/components/cessions/CessionsFilters';
 import { CessionsTable } from '@/components/cessions/CessionsTable';
 import { Cession } from '@/services/supabase/cessions';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Cessions = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,6 +16,37 @@ const Cessions = () => {
 
   const { cessions, isLoading, createCession, updateCession, deleteCession } = useCessions();
   const { toast } = useToast();
+
+  // Sync insurance companies on component mount
+  useEffect(() => {
+    const syncInsuranceCompanies = async () => {
+      try {
+        console.log('Syncing insurance companies...');
+        const { data, error } = await supabase.functions.invoke('sync-insurance-companies');
+        
+        if (error) {
+          console.error('Error syncing insurance companies:', error);
+          toast({
+            title: "Erreur de synchronisation",
+            description: "Impossible de synchroniser les compagnies d'assurance",
+            variant: "destructive",
+          });
+        } else {
+          console.log('Insurance companies sync result:', data);
+          if (data?.stats?.inserted > 0 || data?.stats?.updated > 0) {
+            toast({
+              title: "Synchronisation réussie",
+              description: `${data.stats.inserted} ajoutées, ${data.stats.updated} mises à jour`,
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error calling sync function:', error);
+      }
+    };
+
+    syncInsuranceCompanies();
+  }, []); // Run only on mount
 
   const filteredCessions = (cessions || []).filter(cession => {
     const matchesSearch = 
