@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   sectionLarge: {
-    marginBottom: 25,
+    marginBottom: 15,
   },
   headerRow: {
     flexDirection: 'row',
@@ -448,24 +448,24 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
         </View>
 
         {/* Identification du sinistre */}
-        <View style={styles.sectionLarge}>
+        <View style={styles.sectionLarge} break>
           <Text style={styles.subtitle}>IDENTIFICATION DU SINISTRE</Text>
           
-          <Text>Compagnie d'assurance : {selectedInsuranceCompany?.name || ''}</Text>
-          <Text>N° de contrat : {cession.policy_number || ''}</Text>
-          <Text>Référence sinistre : {cession.incident_number || ''} du {cession.incident_date ? formatDate(cession.incident_date) : ''}</Text>
-          <Text>Expert mandaté : {cession.expert_name || ''}</Text>
-          <Text>Rapport d'expertise n° : {cession.report_number || ''}</Text>
-          <Text>Montant validé : {cession.repair_orders?.amount ? `${formatEuro(cession.repair_orders.amount)} €` : '0,00 €'} TTC</Text>
+          <Text><Text style={styles.boldText}>Compagnie d'assurance :</Text> {selectedInsuranceCompany?.name || ''}</Text>
+          <Text><Text style={styles.boldText}>N° de contrat :</Text> {cession.policy_number || ''}</Text>
+          <Text><Text style={styles.boldText}>Référence sinistre :</Text> {cession.incident_number || ''} du {cession.incident_date ? formatDate(cession.incident_date) : ''}</Text>
+          <Text><Text style={styles.boldText}>Expert mandaté :</Text> {cession.expert_name || ''}</Text>
+          <Text><Text style={styles.boldText}>Rapport d'expertise n° :</Text> {cession.report_number || ''}</Text>
+          <Text><Text style={styles.boldText}>Montant validé :</Text> {cession.repair_orders?.amount ? `${formatEuro(cession.repair_orders.amount)} €` : '0,00 €'} TTC</Text>
         </View>
 
         {/* Identification du véhicule */}
         <View style={styles.sectionLarge}>
           <Text style={styles.subtitle}>IDENTIFICATION DU VÉHICULE</Text>
           
-          <Text>Véhicule : {cession.repair_orders?.vehicles?.car_brands?.name || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''}</Text>
-          <Text>N° d'enregistrement : {cession.repair_orders?.vehicles?.license_plate || ''}</Text>
-          <Text>Kilométrage : {cession.repair_orders?.vehicles?.mileage || 'N/A'} Km</Text>
+          <Text><Text style={styles.boldText}>Véhicule :</Text> {cession.repair_orders?.vehicles?.car_brands?.name || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''}</Text>
+          <Text><Text style={styles.boldText}>N° d'enregistrement :</Text> {cession.repair_orders?.vehicles?.license_plate || ''}</Text>
+          <Text><Text style={styles.boldText}>Kilométrage :</Text> {cession.repair_orders?.vehicles?.mileage || 'N/A'} Km</Text>
         </View>
 
         {/* Convention */}
@@ -497,7 +497,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
       </Page>
 
       {/* Page 3: Suite de la convention + signatures */}
-      <Page size="A4" style={styles.page} break>
+      <Page size="A4" style={styles.page}>
         {/* Article 3 */}
         <View style={styles.section}>
           <Text style={styles.text}>Article 3 : Garanties du Cédant</Text>
@@ -616,7 +616,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
             <Text>{companyData.email || ''}</Text>
             <Text>{companyData.phone || ''}</Text>
           </View>
-          <View style={styles.rightColumn}>
+          <View style={[styles.rightColumn, { marginTop: 100 }]}>
             <Text>A l'attention de :</Text>
             <Text style={styles.boldText}>{selectedInsuranceCompany?.name || ''}</Text>
             {selectedInsuranceCompany?.address && <Text>{selectedInsuranceCompany.address}</Text>}
@@ -627,15 +627,15 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
         
         {/* Object */}
         <View style={styles.sectionLarge}>
-          <Text style={styles.boldText}>Objet : Attestation sur l'honneur certifiant l'absence de surfacturation</Text>
+          <Text><Text style={styles.boldText}>Objet :</Text> Attestation sur l'honneur certifiant l'absence de surfacturation</Text>
         </View>
 
         {/* Claim details */}
         <View style={styles.sectionLarge}>
-          <Text>N° sinistre : {cession.incident_number || ''}</Text>
-          <Text>N° contrat : {cession.policy_number || ''}</Text>
-          <Text>PV expertise : {cession.report_number || ''}</Text>
-          <Text>Véhicule : {cession.repair_orders?.vehicles?.license_plate || ''}</Text>
+          <Text><Text style={styles.boldText}>N° sinistre :</Text> {cession.incident_number || ''}</Text>
+          <Text><Text style={styles.boldText}>N° contrat :</Text> {cession.policy_number || ''}</Text>
+          <Text><Text style={styles.boldText}>PV expertise :</Text> {cession.report_number || ''}</Text>
+          <Text><Text style={styles.boldText}>Véhicule :</Text> {cession.repair_orders?.vehicles?.license_plate || ''}</Text>
         </View>
 
         {/* Attestation text */}
