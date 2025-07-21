@@ -76,13 +76,13 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
             <div className="mb-4">
               <strong>Objet :</strong> Notification de cession de créance (Article 1324 du Code civil)
             </div>
-            <div className="mb-2">
+            <div>
               <strong>N° sinistre :</strong> {cession.incident_number || 'N/A'}
             </div>
-            <div className="mb-2">
+            <div>
               <strong>N° contrat :</strong> {cession.policy_number || 'N/A'}
             </div>
-            <div className="mb-2">
+            <div>
               <strong>PV expertise :</strong> {cession.report_number || 'N/A'}
             </div>
           </div>
@@ -130,16 +130,16 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
           {/* Vehicle details section */}
           <div className="mb-8">
-            <div className="mb-4">
-              <strong>Concernant l'indemnisation des réparations du véhicule :</strong>
-            </div>
             <div className="mb-2">
+              Concernant l'indemnisation des réparations du véhicule :
+            </div>
+            <div>
               <strong>{cession.repair_orders?.vehicles?.car_brands?.name?.toUpperCase() || 'VÉHICULE'} {cession.repair_orders?.vehicles?.car_models?.name || ''}</strong>
             </div>
-            <div className="mb-2">
+            <div>
               Immatriculation : {cession.repair_orders?.vehicles?.license_plate || 'N/A'}
             </div>
-            <div className="mb-2">
+            <div>
               N° Série :
             </div>
           </div>
