@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   section: {
-    marginBottom: 15,
+    marginBottom: 10,
   },
   sectionLarge: {
     marginBottom: 15,
@@ -56,12 +56,6 @@ const styles = StyleSheet.create({
   rightColumn: {
     flex: 1,
     paddingLeft: 20,
-  },
-  separator: {
-    borderTop: 1,
-    borderColor: '#cccccc',
-    marginVertical: 25,
-    paddingTop: 25,
   },
   centerText: {
     textAlign: 'center',
@@ -340,7 +334,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
         </View>
 
         {/* Section de confirmation de cession avec séparateur */}
-        <View style={styles.separator} break>
+        <View style={[styles.headerRow, { marginBottom: 40 }]} break>
           {/* Company info and destination repeated */}   
           <View style={styles.headerRow}>
             <View style={styles.leftColumn}>
@@ -448,7 +442,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
         </View>
 
         {/* Identification du sinistre */}
-        <View style={styles.sectionLarge} break>
+        <View style={styles.sectionLarge}>
           <Text style={styles.subtitle}>IDENTIFICATION DU SINISTRE</Text>
           
           <Text><Text style={styles.boldText}>Compagnie d'assurance :</Text> {selectedInsuranceCompany?.name || ''}</Text>
@@ -460,7 +454,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
         </View>
 
         {/* Identification du véhicule */}
-        <View style={styles.sectionLarge}>
+        <View style={styles.sectionLarge} break>
           <Text style={styles.subtitle}>IDENTIFICATION DU VÉHICULE</Text>
           
           <Text><Text style={styles.boldText}>Véhicule :</Text> {cession.repair_orders?.vehicles?.car_brands?.name || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''}</Text>
@@ -494,10 +488,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
             <Text style={styles.text}>- TVA : {formatEuro(taxAmount)} €</Text>
           </View>
         </View>
-      </Page>
 
-      {/* Page 3: Suite de la convention + signatures */}
-      <Page size="A4" style={styles.page}>
         {/* Article 3 */}
         <View style={styles.section}>
           <Text style={styles.text}>Article 3 : Garanties du Cédant</Text>
