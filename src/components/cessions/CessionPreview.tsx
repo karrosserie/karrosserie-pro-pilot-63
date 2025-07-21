@@ -232,9 +232,9 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
           {/* Bank details */}
           <div className="mb-8">
-            <div><strong>BANQUE : {cession.bank_accounts?.bank || ''}</strong></div>
-            <div><strong>IBAN : {cession.bank_accounts?.iban || ''}</strong></div>
-            <div><strong>BIC : {cession.bank_accounts?.bic || ''}</strong></div>
+            <div><strong>BANQUE :</strong> {cession.bank_accounts?.bank || ''}</div>
+            <div><strong>IBAN :</strong> {cession.bank_accounts?.iban || ''}</div>
+            <div><strong>BIC :</strong> {cession.bank_accounts?.bic || ''}</div>
           </div>
 
           {/* Attachments */}
