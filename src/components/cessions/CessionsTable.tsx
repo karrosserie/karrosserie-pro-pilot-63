@@ -17,7 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { FileText, Download, Eye, Pencil, Trash, Play } from 'lucide-react';
+import { FileText, Download, Eye, Pencil, Trash, Play, Loader2 } from 'lucide-react';
 import { Cession } from '@/services/supabase/cessions';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -25,6 +25,10 @@ import { toast } from '@/hooks/use-toast';
 import { repairOrdersService } from '@/services/supabase/repair-orders';
 import { validateRepairOrderData } from '@/components/cessions/form/utils/dataValidation';
 import { CessionPreview } from './CessionPreview';
+import { generateAndUploadCessionPDF } from '@/services/pdf/pdfService';
+import { updateCession } from '@/services/supabase/cessions';
+import { useCompany } from '@/hooks/use-company';
+import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
 
 interface CessionsTableProps {
   cessions: Cession[];
@@ -43,6 +47,10 @@ export const CessionsTable = ({
   const [errorMessage, setErrorMessage] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
   const [selectedCession, setSelectedCession] = useState<Cession | null>(null);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  
+  const { companyData } = useCompany();
+  const { insuranceCompanies } = useInsuranceCompanies();
   
   const parseValidationError = (validationError: string) => {
     const lines = validationError.split('\n').filter(line => line.trim() !== '');
@@ -153,6 +161,8 @@ export const CessionsTable = ({
       return;
     }
 
+    setIsGeneratingPDF(true);
+
     try {
       // Récupérer les données complètes de l'ordre de réparation avec client et véhicule
       const repairOrderData = await repairOrdersService.getById(cession.repair_order_id);
@@ -170,22 +180,54 @@ export const CessionsTable = ({
         return;
       }
       
-      // Si toutes les validations passent, procéder à l'initialisation
+      // Si toutes les validations passent, procéder à la génération du PDF
       toast({
         title: "Validation réussie",
-        description: "Tous les documents requis sont présents. Procédure en cours d'initialisation...",
+        description: "Génération du PDF en cours...",
       });
-      
-      // TODO: Implement procedure initialization logic
-      console.log('All validations passed, proceeding with initialization...');
+
+      // Trouver la compagnie d'assurance sélectionnée
+      const selectedInsuranceCompany = insuranceCompanies.find(
+        company => company.id === cession.insurance_company_id
+      );
+
+      if (!selectedInsuranceCompany) {
+        toast({
+          title: "Erreur",
+          description: "Compagnie d'assurance introuvable.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Générer et uploader le PDF
+      const pdfUrl = await generateAndUploadCessionPDF(
+        cession,
+        companyData,
+        selectedInsuranceCompany
+      );
+
+      // Mettre à jour la cession avec l'URL du PDF
+      await updateCession(cession.id, {
+        document_url: pdfUrl
+      });
+
+      toast({
+        title: "PDF généré avec succès",
+        description: "Le document de cession a été généré et sauvegardé.",
+      });
+
+      console.log('PDF generated and saved:', pdfUrl);
       
     } catch (error) {
-      console.error('Error validating repair order data:', error);
+      console.error('Error during procedure initialization:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de récupérer les données de l'ordre de réparation.",
+        description: `Erreur lors de la génération du PDF: ${error.message}`,
         variant: "destructive",
       });
+    } finally {
+      setIsGeneratingPDF(false);
     }
   };
 
@@ -269,8 +311,13 @@ export const CessionsTable = ({
                       size="icon"
                       onClick={() => handleInitializeProcedure(cession)}
                       title="Initialiser la procédure"
+                      disabled={isGeneratingPDF}
                     >
-                      <Play className="h-4 w-4" />
+                      {isGeneratingPDF ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Play className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                 </TableCell>
