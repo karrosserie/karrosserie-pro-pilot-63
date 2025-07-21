@@ -210,6 +210,44 @@ export const CessionsTable = ({
     }
   };
 
+  const handleDownloadDocument = (cession: Cession) => {
+    if (!cession.document_url) {
+      toast({
+        title: "Erreur",
+        description: "Aucun document n'est disponible pour cette cession.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Create a temporary link to download the file
+    const link = document.createElement('a');
+    link.href = cession.document_url;
+    link.download = `cession-${cession.reference}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "Téléchargement",
+      description: "Le téléchargement du document a commencé.",
+    });
+  };
+
+  const handleViewDocument = (cession: Cession) => {
+    if (!cession.document_url) {
+      toast({
+        title: "Erreur",
+        description: "Aucun document n'est disponible pour cette cession.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Open the document in a new tab
+    window.open(cession.document_url, '_blank');
+  };
+
   if (isLoading) {
     return (
       <div className="card-container">
@@ -257,10 +295,22 @@ export const CessionsTable = ({
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-1">
-                    <Button variant="ghost" size="icon">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => handleViewDocument(cession)}
+                      disabled={!cession.document_url}
+                      title="Visualiser le document"
+                    >
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => handleDownloadDocument(cession)}
+                      disabled={!cession.document_url}
+                      title="Télécharger le document"
+                    >
                       <Download className="h-4 w-4" />
                     </Button>
                     <Button 
