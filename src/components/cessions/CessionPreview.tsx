@@ -645,7 +645,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               <div className="mb-6">
                 <div className="mb-4">
                   1. Les travaux de réparation effectués sur le véhicule {cession.repair_orders?.vehicles?.car_brands?.name || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''} (immatriculation {cession.repair_orders?.vehicles?.license_plate || ''}, n° 
-                  série ) dans le cadre du sinistre survenu le {cession.incident_date ? formatDate(cession.incident_date) : ''}, référencé sous le n°{cession.incident_number || ''}, ont été facturés en 
+                  série {cession.repair_orders?.vehicles?.vin || ''}) dans le cadre du sinistre survenu le {cession.incident_date ? formatDate(cession.incident_date) : ''}, référencé sous le n°{cession.incident_number || ''}, ont été facturés en 
                   stricte conformité avec :
                 </div>
                 <div className="ml-8 mb-2">o Les tarifs professionnels habituellement pratiqués par notre établissement ;</div>
