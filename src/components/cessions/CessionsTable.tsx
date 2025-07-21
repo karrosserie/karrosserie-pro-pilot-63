@@ -128,9 +128,17 @@ export const CessionsTable = ({
       );
       
       if (validationError) {
+        // Formater le message pour le toast en utilisant des puces
+        const formattedMessage = validationError
+          .replace(/\n\n/g, ' ')
+          .replace(/\n/g, ' ')
+          .replace(/Fiche client :/g, '• Fiche client:')
+          .replace(/Fiche véhicule :/g, '• Fiche véhicule:')
+          .replace(/    - /g, ' - ');
+        
         toast({
           title: "Documents manquants",
-          description: validationError,
+          description: formattedMessage,
           variant: "destructive",
         });
         return;
