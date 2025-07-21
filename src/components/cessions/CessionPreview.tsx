@@ -39,6 +39,9 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
     ? `${cession.repair_orders.vehicles.car_brands?.name || 'Marque inconnue'} ${cession.repair_orders.vehicles.car_models?.name || 'Modèle inconnu'} - ${cession.repair_orders.vehicles.license_plate}`
     : 'Véhicule non assigné';
 
+  const clientData = cession.repair_orders?.clients;
+  const vehicleData = cession.repair_orders?.vehicles;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -107,10 +110,10 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
           <div className="mb-8">
             <div>CÉDANT</div>
             <div className="font-bold">{clientName.toUpperCase()}</div>
-            <div>6 B PLACE FONTAINE DU TEMPLE RESIDENCE LES SYLPHIDES</div>
-            <div>06100 NICE</div>
-            <div>ggobeyn@outlook.fr</div>
-            <div>0646465242</div>
+            {clientData?.address && <div>{clientData.address}</div>}
+            {clientData?.postal_code && clientData?.city && <div>{clientData.postal_code} {clientData.city}</div>}
+            {clientData?.email && <div>{clientData.email}</div>}
+            {clientData?.phone && <div>{clientData.phone}</div>}
           </div>
 
           {/* Au profit de */}
@@ -140,7 +143,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               Immatriculation : {cession.repair_orders?.vehicles?.license_plate || 'N/A'}
             </div>
             <div>
-              N° Série :
+              N° Série : {vehicleData?.vin || 'N/A'}
             </div>
           </div>
 
@@ -189,11 +192,11 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
             {/* Cedant and Insurance details */}
             <div className="grid grid-cols-2 gap-8 mb-8">
               <div>
-                <div className="font-bold">MUSSO DORIAN</div>
-                <div>6 B PLACE FONTAINE DU TEMPLE RESIDENCE LES SYLPHIDES</div>
-                <div>06100 NICE</div>
-                <div>ggobeyn@outlook.fr</div>
-                <div>0646465242</div>
+                <div className="font-bold">{clientName.toUpperCase()}</div>
+                {clientData?.address && <div>{clientData.address}</div>}
+                {clientData?.postal_code && clientData?.city && <div>{clientData.postal_code} {clientData.city}</div>}
+                {clientData?.email && <div>{clientData.email}</div>}
+                {clientData?.phone && <div>{clientData.phone}</div>}
               </div>
               
               <div className="text-right">
@@ -270,10 +273,10 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
             <div className="mb-6">
               <div className="font-bold mb-2">LE CÉDANT</div>
               <div className="font-bold">{clientName.toUpperCase()}</div>
-              <div>6 B PLACE FONTAINE DU TEMPLE RESIDENCE LES SYLPHIDES</div>
-              <div>06100 NICE</div>
-              <div>ggobeyn@outlook.fr</div>
-              <div>0646465242</div>
+              {clientData?.address && <div>{clientData.address}</div>}
+              {clientData?.postal_code && clientData?.city && <div>{clientData.postal_code} {clientData.city}</div>}
+              {clientData?.email && <div>{clientData.email}</div>}
+              {clientData?.phone && <div>{clientData.phone}</div>}
               <div className="mt-2">Ci-après dénommé "Le Client/Assuré"</div>
             </div>
 

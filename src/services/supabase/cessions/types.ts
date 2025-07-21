@@ -29,9 +29,18 @@ export interface Cession {
   repair_orders?: {
     reference: string;
     created_at: string;
-    clients: { first_name: string; last_name: string; } | null;
+    clients: { 
+      first_name: string; 
+      last_name: string; 
+      address: string | null;
+      city: string | null;
+      postal_code: string | null;
+      email: string | null;
+      phone: string | null;
+    } | null;
     vehicles: {
       license_plate: string;
+      vin: string | null;
       car_brands: { name: string; } | null;
       car_models: { name: string; } | null;
     } | null;
