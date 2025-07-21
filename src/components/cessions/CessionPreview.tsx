@@ -45,22 +45,20 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
           </p>
 
           {/* Company info and destination */}
-          <div className="grid grid-cols-2 gap-8 mb-8">
-            <div>
-              <div className="font-bold mb-2">KORPORATE</div>
-              <div>25 COURS PIERRE PUGET</div>
-              <div>13006 MARSEILLE</div>
-              <div>ggobeyn@outlook.fr</div>
-              <div>+33646465242</div>
+          <div>
+            <div className="font-bold mb-2">KORPORATE</div>
+            <div>25 COURS PIERRE PUGET</div>
+            <div>13006 MARSEILLE</div>
+            <div>ggobeyn@outlook.fr</div>
+            <div>+33646465242</div>
+          </div>
+                
+          <div className="text-right">
+            <div className="font-bold mb-2">
+              {cession.insurance_companies?.name || 'ASSURANCE'}
             </div>
-            
-            <div className="text-right">
-              <div className="font-bold mb-2">
-                {cession.insurance_companies?.name || 'ASSURANCE'}
-              </div>
-              <div>8-10 RUE DE LA FERME</div>
-              <div>92100 BOULOGNE-BILLANCOURT</div>
-            </div>
+            <div>8-10 RUE DE LA FERME</div>
+            <div>92100 BOULOGNE-BILLANCOURT</div>
           </div>
 
           {/* Document details */}
