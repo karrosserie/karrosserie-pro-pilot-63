@@ -40,47 +40,34 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
   // Calculate specific amounts from repair order data
   const calculatePaintAmount = () => {
-    console.log('Debug calculatePaintAmount - repairs_data:', cession.repair_orders?.repairs_data);
     if (!cession.repair_orders?.repairs_data) return 0;
-    const repairs = Array.isArray(cession.repair_orders.repairs_data) 
-      ? cession.repair_orders.repairs_data 
-      : [];
-    console.log('Debug calculatePaintAmount - repairs array:', repairs);
+    const repairs = cession.repair_orders.repairs_data;
     const filtered = repairs.filter((item: any) => 
-      item.designation && (
-        item.designation.toUpperCase().includes('INGR') || 
-        item.designation.toUpperCase().includes('PEINTURE')
+      item.description && (
+        item.description.toUpperCase().includes('INGR') || 
+        item.description.toUpperCase().includes('PEINTURE')
       )
     );
-    console.log('Debug calculatePaintAmount - filtered items:', filtered);
-    return filtered.reduce((total: number, item: any) => total + (parseFloat(item.total_price) || 0), 0);
+    return filtered.reduce((total: number, item: any) => total + (parseFloat(item.total) || 0), 0);
   };
 
   const calculateLaborAmount = () => {
-    console.log('Debug calculateLaborAmount - repairs_data:', cession.repair_orders?.repairs_data);
     if (!cession.repair_orders?.repairs_data) return 0;
-    const repairs = Array.isArray(cession.repair_orders.repairs_data) 
-      ? cession.repair_orders.repairs_data 
-      : [];
+    const repairs = cession.repair_orders.repairs_data;
     const filtered = repairs.filter((item: any) => 
-      item.designation && (
-        item.designation.includes('T1') || 
-        item.designation.includes('T2') || 
-        item.designation.includes('T3')
+      item.description && (
+        item.description.includes('T1') || 
+        item.description.includes('T2') || 
+        item.description.includes('T3')
       )
     );
-    console.log('Debug calculateLaborAmount - filtered items:', filtered);
-    return filtered.reduce((total: number, item: any) => total + (parseFloat(item.total_price) || 0), 0);
+    return filtered.reduce((total: number, item: any) => total + (parseFloat(item.total) || 0), 0);
   };
 
   const calculatePartsAmount = () => {
-    console.log('Debug calculatePartsAmount - parts_data:', cession.repair_orders?.parts_data);
     if (!cession.repair_orders?.parts_data) return 0;
-    const parts = Array.isArray(cession.repair_orders.parts_data) 
-      ? cession.repair_orders.parts_data 
-      : [];
-    console.log('Debug calculatePartsAmount - parts array:', parts);
-    return parts.reduce((total: number, item: any) => total + (parseFloat(item.total_price) || 0), 0);
+    const parts = cession.repair_orders.parts_data;
+    return parts.reduce((total: number, item: any) => total + (parseFloat(item.total) || 0), 0);
   };
 
   const calculateTaxAmount = () => {
