@@ -238,7 +238,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
           {/* Cedant info */}
           <div className="mb-8">
-            <div>CÉDANT</div>
+            <div>LE CÉDANT</div>
             <div className="font-bold">{clientName.toUpperCase()}</div>
             {clientData?.address && <div>{clientData.address}</div>}
             {clientData?.postal_code && clientData?.city && <div>{clientData.postal_code} {clientData.city}</div>}
@@ -253,7 +253,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
           {/* Cessionnaire info */}
           <div className="mb-8">
-            <div>CESSIONNAIRE</div>
+            <div>LE CESSIONNAIRE</div>
             <div className="font-bold">{companyData.name?.toUpperCase() || ''}</div>
             <div>{companyData.address || ''}</div>
             <div>{companyData.zipcode || ''} {companyData.city || ''}</div>
