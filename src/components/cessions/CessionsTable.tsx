@@ -24,6 +24,7 @@ import { fr } from 'date-fns/locale';
 import { toast } from '@/hooks/use-toast';
 import { repairOrdersService } from '@/services/supabase/repair-orders';
 import { validateRepairOrderData } from '@/components/cessions/form/utils/dataValidation';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CessionsTableProps {
   cessions: Cession[];
@@ -167,20 +168,43 @@ export const CessionsTable = ({
         return;
       }
       
-      // Si toutes les validations passent, procéder à l'initialisation
+      // Si toutes les validations passent, générer le PDF
       toast({
         title: "Validation réussie",
-        description: "Tous les documents requis sont présents. Procédure en cours d'initialisation...",
+        description: "Génération du PDF de cession en cours...",
       });
-      
-      // TODO: Implement procedure initialization logic
-      console.log('All validations passed, proceeding with initialization...');
+
+      // Appeler l'edge function pour générer le PDF
+      const { data, error } = await supabase.functions.invoke('generate-cession-pdf', {
+        body: {
+          cessionId: cession.id,
+          repairOrderData,
+          clientData: repairOrderData.clients,
+          vehicleData: repairOrderData.vehicles
+        }
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (data.success) {
+        toast({
+          title: "PDF généré",
+          description: "Le PDF de cession de créance a été généré avec succès.",
+        });
+        
+        // Recharger les données pour afficher le nouveau statut
+        window.location.reload();
+      } else {
+        throw new Error(data.error || 'Erreur lors de la génération du PDF');
+      }
       
     } catch (error) {
-      console.error('Error validating repair order data:', error);
+      console.error('Error generating cession PDF:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de récupérer les données de l'ordre de réparation.",
+        description: error.message || "Impossible de générer le PDF de cession.",
         variant: "destructive",
       });
     }
