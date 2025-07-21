@@ -308,7 +308,9 @@ export const CessionsTable = ({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction>Compris</AlertDialogAction>
+            <AlertDialogAction className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
+              Compris
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
