@@ -377,11 +377,11 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
             <div className="mb-8">
               <h3 className="font-bold text-lg mb-4">IDENTIFICATION DU SINISTRE</h3>
               
-              <div><strong>Compagnie d'assurance :</strong> {selectedInsuranceCompany?.name || 'ASSURANCE'}</div>
-              <div><strong>N° de contrat :</strong> {cession.policy_number || '7718265A'}</div>
-              <div><strong>Référence sinistre :</strong> {cession.incident_number || '00125A'} du {cession.incident_date ? formatDate(cession.incident_date) : '17/07/2025'}</div>
-              <div><strong>Expert mandaté :</strong> {cession.expert_name || 'DEVAUX MATTHIEU'}</div>
-              <div><strong>Rapport d'expertise n° :</strong> {cession.report_number || 'AE25008924'}</div>
+              <div><strong>Compagnie d'assurance :</strong> {selectedInsuranceCompany?.name || ''}</div>
+              <div><strong>N° de contrat :</strong> {cession.policy_number || ''}</div>
+              <div><strong>Référence sinistre :</strong> {cession.incident_number || ''} du {cession.incident_date ? formatDate(cession.incident_date) : ''}</div>
+              <div><strong>Expert mandaté :</strong> {cession.expert_name || ''}</div>
+              <div><strong>Rapport d'expertise n° :</strong> {cession.report_number || ''}</div>
               <div><strong>Montant validé :</strong> {cession.repair_orders?.amount ? `${cession.repair_orders.amount.toFixed(2)} €` : '0,00 €'} TTC</div>
             </div>
 
@@ -389,8 +389,8 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
             <div className="mb-8">
               <h3 className="font-bold text-lg mb-4">IDENTIFICATION DU VÉHICULE</h3>
               
-              <div><strong>Véhicule :</strong> {cession.repair_orders?.vehicles?.car_brands?.name || 'PEUGEOT'} {cession.repair_orders?.vehicles?.car_models?.name || '308'}</div>
-              <div><strong>N° d'enregistrement :</strong> {cession.repair_orders?.vehicles?.license_plate || 'ED-684-JH'}</div>
+              <div><strong>Véhicule :</strong> {cession.repair_orders?.vehicles?.car_brands?.name || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''}</div>
+              <div><strong>N° d'enregistrement :</strong> {cession.repair_orders?.vehicles?.license_plate || ''}</div>
               <div><strong>Kilométrage :</strong> {cession.repair_orders?.vehicles?.mileage || 'N/A'} Km</div>
             </div>
 
@@ -404,7 +404,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
                 
                 <div className="mb-2">1.1 Le Client/Assuré déclare céder, sans réserve et de manière irrévocable, au Réparateur professionnel qui accepte, la créance d'indemnisation qu'il détient sur la compagnie d'assurance susvisée.</div>
                 
-                <div className="mb-2">1.2 Cette cession est consentie en application des articles 1321 et suivants du Code civil et L.121-13 du Code des assurances, pour garantir le paiement des réparations conformes au rapport d'expertise n°{cession.report_number || 'AE25008924'}.</div>
+                <div className="mb-2">1.2 Cette cession est consentie en application des articles 1321 et suivants du Code civil et L.121-13 du Code des assurances, pour garantir le paiement des réparations conformes au rapport d'expertise n°{cession.report_number || ''}.</div>
                 
                 <div className="mb-2">1.3 Le Réparateur professionnel est subrogé dans tous les droits, actions et privilèges du Cédant vis-à-vis de la compagnie d'assurance.</div>
               </div>
