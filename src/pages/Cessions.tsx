@@ -19,7 +19,6 @@ const Cessions = () => {
   const filteredCessions = (cessions || []).filter(cession => {
     const matchesSearch = 
       cession.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cession.buyer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       cession.repair_orders?.vehicles?.car_brands?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       cession.repair_orders?.vehicles?.car_models?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       cession.repair_orders?.vehicles?.license_plate?.toLowerCase().includes(searchTerm.toLowerCase());

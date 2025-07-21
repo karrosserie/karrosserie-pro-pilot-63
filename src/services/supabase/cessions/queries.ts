@@ -12,7 +12,7 @@ export const getAllCessions = async (): Promise<Cession[]> => {
       *,
       insurance_companies(name)
     `)
-    .order('sale_date', { ascending: false });
+    .order('created_at', { ascending: false });
 
   if (error) {
     console.error('Error fetching cessions:', error);
@@ -87,10 +87,6 @@ export const getAllCessions = async (): Promise<Cession[]> => {
         reference: cession.reference || '',
         status: cession.status || 'en_attente',
         repair_orders: repairOrderData,
-        sale_date: cession.sale_date || new Date().toISOString().split('T')[0],
-        sale_price: cessionData.sale_price ?? 0,
-        buyer_name: cession.buyer_name || '',
-        buyer_contact: cession.buyer_contact || '',
         expertise_date: cessionData.expertise_date ?? null,
         expertise_amount: cessionData.expertise_amount ?? null,
         salvage_value: cessionData.salvage_value ?? null
@@ -152,10 +148,6 @@ export const getCessionById = async (id: string): Promise<Cession> => {
     reference: basicCession.reference || '',
     status: basicCession.status || 'en_attente',
     repair_orders: repairOrderData,
-    sale_date: basicCession.sale_date || new Date().toISOString().split('T')[0],
-    sale_price: cessionData.sale_price ?? 0,
-    buyer_name: basicCession.buyer_name || '',
-    buyer_contact: basicCession.buyer_contact || '',
     expertise_date: cessionData.expertise_date ?? null,
     expertise_amount: cessionData.expertise_amount ?? null,
     salvage_value: cessionData.salvage_value ?? null

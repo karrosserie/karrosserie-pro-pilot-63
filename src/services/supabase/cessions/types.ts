@@ -5,7 +5,7 @@ export interface Cession {
   status: 'en_attente' | 'en_attente_signature' | 'signee' | 'signature_refusee' | 'lettre_recommandee_envoyee' | 'lettre_recommandee_recue' | 'lettre_recommandee_non_recuperee' | 'lettre_recommandee_refusee' | 'lettre_recommandee_presentee' | 'payee';
   user_id: string;
   
-  // New required fields for cession form
+  // Required fields for cession form
   repair_order_id: string | null;
   bank_account_id: string | null;
   incident_number: string | null;
@@ -15,12 +15,7 @@ export interface Cession {
   expert_name: string | null;
   insurance_company_id: string | null;
   
-  // Legacy fields (for backward compatibility)
-  buyer_name: string | null;
-  buyer_contact: string | null;
-  sale_price: number | null;
-  sale_date: string | null;
-  notes: string | null;
+  // Optional fields
   document_url: string | null;
   
   // Timestamps
@@ -47,7 +42,7 @@ export interface NewCession {
   reference?: string;
   status?: 'en_attente' | 'en_attente_signature' | 'signee' | 'signature_refusee' | 'lettre_recommandee_envoyee' | 'lettre_recommandee_recue' | 'lettre_recommandee_non_recuperee' | 'lettre_recommandee_refusee' | 'lettre_recommandee_presentee' | 'payee';
   
-  // New required fields for cession form
+  // Required fields for cession form
   repair_order_id?: string | null;
   bank_account_id?: string | null;
   incident_number?: string | null;
@@ -57,12 +52,7 @@ export interface NewCession {
   expert_name?: string | null;
   insurance_company_id?: string | null;
   
-  // Legacy fields (for backward compatibility)
-  buyer_name?: string | null;
-  buyer_contact?: string | null;
-  sale_price?: number | null;
-  sale_date?: string | null;
-  notes?: string | null;
+  // Optional fields
   document_url?: string | null;
 }
 
@@ -70,7 +60,7 @@ export interface UpdateCession {
   reference?: string;
   status?: 'en_attente' | 'en_attente_signature' | 'signee' | 'signature_refusee' | 'lettre_recommandee_envoyee' | 'lettre_recommandee_recue' | 'lettre_recommandee_non_recuperee' | 'lettre_recommandee_refusee' | 'lettre_recommandee_presentee' | 'payee';
   
-  // New required fields for cession form
+  // Required fields for cession form
   repair_order_id?: string | null;
   bank_account_id?: string | null;
   incident_number?: string | null;
@@ -80,11 +70,6 @@ export interface UpdateCession {
   expert_name?: string | null;
   insurance_company_id?: string | null;
   
-  // Legacy fields (for backward compatibility)  
-  buyer_name?: string | null;
-  buyer_contact?: string | null;
-  sale_price?: number | null;
-  sale_date?: string | null;
-  notes?: string | null;
+  // Optional fields
   document_url?: string | null;
 }

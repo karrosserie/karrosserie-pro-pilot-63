@@ -28,12 +28,6 @@ export const createCession = async (cession: NewCession): Promise<Cession> => {
     report_number: cession.report_number || null,
     expert_name: cession.expert_name || null,
     insurance_company_id: cession.insurance_company_id || null,
-    // Legacy fields for backward compatibility
-    buyer_name: cession.buyer_name || '',
-    buyer_contact: cession.buyer_contact || null,
-    sale_price: cession.sale_price || 0,
-    sale_date: cession.sale_date || new Date().toISOString().split('T')[0],
-    notes: cession.notes || null,
     document_url: cession.document_url || null
   };
   
@@ -66,12 +60,6 @@ export const updateCession = async (id: string, cession: UpdateCession): Promise
     report_number: cession.report_number,
     expert_name: cession.expert_name,
     insurance_company_id: cession.insurance_company_id,
-    // Legacy fields for backward compatibility
-    buyer_name: cession.buyer_name,
-    buyer_contact: cession.buyer_contact,
-    sale_price: cession.sale_price,
-    sale_date: cession.sale_date,
-    notes: cession.notes,
     document_url: cession.document_url
   };
 

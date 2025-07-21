@@ -584,8 +584,6 @@ export type Database = {
       cessions: {
         Row: {
           bank_account_id: string | null
-          buyer_contact: string | null
-          buyer_name: string | null
           created_at: string
           document_url: string | null
           expert_name: string | null
@@ -593,23 +591,16 @@ export type Database = {
           incident_date: string | null
           incident_number: string | null
           insurance_company_id: string | null
-          notes: string | null
           policy_number: string | null
           reference: string
           repair_order_id: string | null
           report_number: string | null
-          sale_amount: number | null
-          sale_date: string | null
-          sale_price: number | null
           status: string | null
           updated_at: string
           user_id: string
-          vehicle_id: string | null
         }
         Insert: {
           bank_account_id?: string | null
-          buyer_contact?: string | null
-          buyer_name?: string | null
           created_at?: string
           document_url?: string | null
           expert_name?: string | null
@@ -617,23 +608,16 @@ export type Database = {
           incident_date?: string | null
           incident_number?: string | null
           insurance_company_id?: string | null
-          notes?: string | null
           policy_number?: string | null
           reference?: string
           repair_order_id?: string | null
           report_number?: string | null
-          sale_amount?: number | null
-          sale_date?: string | null
-          sale_price?: number | null
           status?: string | null
           updated_at?: string
           user_id: string
-          vehicle_id?: string | null
         }
         Update: {
           bank_account_id?: string | null
-          buyer_contact?: string | null
-          buyer_name?: string | null
           created_at?: string
           document_url?: string | null
           expert_name?: string | null
@@ -641,18 +625,13 @@ export type Database = {
           incident_date?: string | null
           incident_number?: string | null
           insurance_company_id?: string | null
-          notes?: string | null
           policy_number?: string | null
           reference?: string
           repair_order_id?: string | null
           report_number?: string | null
-          sale_amount?: number | null
-          sale_date?: string | null
-          sale_price?: number | null
           status?: string | null
           updated_at?: string
           user_id?: string
-          vehicle_id?: string | null
         }
         Relationships: [
           {
@@ -674,13 +653,6 @@ export type Database = {
             columns: ["repair_order_id"]
             isOneToOne: false
             referencedRelation: "repair_orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cessions_vehicle_id_fkey"
-            columns: ["vehicle_id"]
-            isOneToOne: false
-            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -1141,13 +1113,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "fleet_reservations_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_statistics"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       fleet_returns: {
@@ -1236,13 +1201,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fleet_returns_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_statistics"
-            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -2490,35 +2448,6 @@ export type Database = {
           movements_last_30_days: number | null
           total_accounts: number | null
           total_balance: number | null
-          user_id: string | null
-        }
-        Relationships: []
-      }
-      user_statistics: {
-        Row: {
-          company_name: string | null
-          email: string | null
-          first_name: string | null
-          last_name: string | null
-          montant_total_avoirs: number | null
-          montant_total_cessions: number | null
-          montant_total_factures: number | null
-          montant_total_frais: number | null
-          nombre_avoirs: number | null
-          nombre_cessions: number | null
-          nombre_clients: number | null
-          nombre_devis: number | null
-          nombre_factures: number | null
-          nombre_notes_frais: number | null
-          nombre_ordres_reparation: number | null
-          nombre_rapports_expertise: number | null
-          nombre_recus: number | null
-          nombre_reservations: number | null
-          nombre_vehicules: number | null
-          nombre_vehicules_courtoisie: number | null
-          nombre_vehicules_total: number | null
-          role: string | null
-          user_created_at: string | null
           user_id: string | null
         }
         Relationships: []

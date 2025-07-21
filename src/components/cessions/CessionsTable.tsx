@@ -134,10 +134,7 @@ export const CessionsTable = ({
             cessions.map((cession) => (
               <TableRow key={cession.id}>
                 <TableCell>
-                  {cession.sale_date ? 
-                    format(new Date(cession.sale_date), 'dd/MM/yyyy', { locale: fr })
-                    : '-'
-                  }
+                  {format(new Date(cession.created_at), 'dd/MM/yyyy', { locale: fr })}
                 </TableCell>
                 <TableCell>
                   {formatRepairOrderDisplay(cession)}

@@ -21,9 +21,6 @@ export function useCessions() {
       // Ensure required fields are present
       const cessionData: NewCession = {
         reference: newCession.reference || '',
-        buyer_name: newCession.buyer_name || '',
-        sale_price: newCession.sale_price || 0,
-        sale_date: newCession.sale_date || new Date().toISOString().split('T')[0],
         ...newCession
       } as NewCession;
       
