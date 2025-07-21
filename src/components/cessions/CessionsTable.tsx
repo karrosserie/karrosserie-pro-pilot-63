@@ -24,7 +24,6 @@ import { fr } from 'date-fns/locale';
 import { toast } from '@/hooks/use-toast';
 import { repairOrdersService } from '@/services/supabase/repair-orders';
 import { validateRepairOrderData } from '@/components/cessions/form/utils/dataValidation';
-import { supabase } from '@/integrations/supabase/client';
 
 interface CessionsTableProps {
   cessions: Cession[];
@@ -168,84 +167,23 @@ export const CessionsTable = ({
         return;
       }
       
-      // Si toutes les validations passent, générer le PDF
+      // Si toutes les validations passent, procéder à l'initialisation
       toast({
         title: "Validation réussie",
-        description: "Génération du PDF de cession en cours...",
+        description: "Tous les documents requis sont présents. Procédure en cours d'initialisation...",
       });
-
-      // Appeler l'edge function pour générer le PDF
-      const { data, error } = await supabase.functions.invoke('generate-cession-pdf', {
-        body: {
-          cessionId: cession.id,
-          repairOrderData,
-          clientData: repairOrderData.clients,
-          vehicleData: repairOrderData.vehicles
-        }
-      });
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      if (data.success) {
-        toast({
-          title: "PDF généré",
-          description: "Le PDF de cession de créance a été généré avec succès.",
-        });
-        
-        // Recharger les données pour afficher le nouveau statut
-        window.location.reload();
-      } else {
-        throw new Error(data.error || 'Erreur lors de la génération du PDF');
-      }
+      
+      // TODO: Implement procedure initialization logic
+      console.log('All validations passed, proceeding with initialization...');
       
     } catch (error) {
-      console.error('Error generating cession PDF:', error);
+      console.error('Error validating repair order data:', error);
       toast({
         title: "Erreur",
-        description: error.message || "Impossible de générer le PDF de cession.",
+        description: "Impossible de récupérer les données de l'ordre de réparation.",
         variant: "destructive",
       });
     }
-  };
-
-  const handleDownloadDocument = (cession: Cession) => {
-    if (!cession.document_url) {
-      toast({
-        title: "Erreur",
-        description: "Aucun document n'est disponible pour cette cession.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Create a temporary link to download the file
-    const link = document.createElement('a');
-    link.href = cession.document_url;
-    link.download = `cession-${cession.reference}.pdf`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    toast({
-      title: "Téléchargement",
-      description: "Le téléchargement du document a commencé.",
-    });
-  };
-
-  const handleViewDocument = (cession: Cession) => {
-    if (!cession.document_url) {
-      toast({
-        title: "Erreur",
-        description: "Aucun document n'est disponible pour cette cession.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Open the document in a new tab
-    window.open(cession.document_url, '_blank');
   };
 
   if (isLoading) {
@@ -295,22 +233,10 @@ export const CessionsTable = ({
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-1">
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => handleViewDocument(cession)}
-                      disabled={!cession.document_url}
-                      title="Visualiser le document"
-                    >
+                    <Button variant="ghost" size="icon">
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => handleDownloadDocument(cession)}
-                      disabled={!cession.document_url}
-                      title="Télécharger le document"
-                    >
+                    <Button variant="ghost" size="icon">
                       <Download className="h-4 w-4" />
                     </Button>
                     <Button 
