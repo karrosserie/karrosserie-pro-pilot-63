@@ -89,7 +89,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
           {/* Date and place */}
           <div className="mb-8">
-            <strong>MARSEILLE</strong>, le {formatDate(cession.created_at)}
+            MARSEILLE, le {formatDate(cession.created_at)}
           </div>
 
           {/* Greeting */}
@@ -105,7 +105,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
           {/* Cedant info */}
           <div className="mb-8">
-            <div className="font-bold mb-2">CÉDANT</div>
+            <div>CÉDANT</div>
             <div className="font-bold">{clientName.toUpperCase()}</div>
             <div>6 B PLACE FONTAINE DU TEMPLE RESIDENCE LES SYLPHIDES</div>
             <div>06100 NICE</div>
@@ -120,7 +120,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
           {/* Cessionnaire info */}
           <div className="mb-8">
-            <div className="font-bold mb-2">CESSIONNAIRE</div>
+            <div>CESSIONNAIRE</div>
             <div className="font-bold">{companyData.name?.toUpperCase() || 'ENTREPRISE'}</div>
             <div>{companyData.address || ''}</div>
             <div>{companyData.zipcode || ''} {companyData.city || ''}</div>
