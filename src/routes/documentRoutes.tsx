@@ -1,5 +1,6 @@
 
 import { ProtectedRoute } from "@/components/router/ProtectedRoute";
+import AppLayout from "@/components/layout/AppLayout";
 import Documents from "@/pages/Documents";
 import ExpertiseReports from "@/pages/documents/expertise/ExpertiseReports";
 import Quotes from "@/pages/documents/devis/Quotes";
@@ -13,7 +14,9 @@ export const documentRoutes = [
     path: "/documents",
     element: (
       <ProtectedRoute>
-        <Documents />
+        <AppLayout>
+          <Documents />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
@@ -21,7 +24,9 @@ export const documentRoutes = [
     path: "/documents/expertise",
     element: (
       <ProtectedRoute>
-        <ExpertiseReports />
+        <AppLayout>
+          <ExpertiseReports />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
@@ -29,7 +34,9 @@ export const documentRoutes = [
     path: "/documents/devis",
     element: (
       <ProtectedRoute>
-        <Quotes />
+        <AppLayout>
+          <Quotes />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
@@ -37,7 +44,9 @@ export const documentRoutes = [
     path: "/documents/ordres",
     element: (
       <ProtectedRoute>
-        <RepairOrders />
+        <AppLayout>
+          <RepairOrders />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
@@ -45,7 +54,9 @@ export const documentRoutes = [
     path: "/documents/factures",
     element: (
       <ProtectedRoute>
-        <Invoices />
+        <AppLayout>
+          <Invoices />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
@@ -53,7 +64,9 @@ export const documentRoutes = [
     path: "/documents/avoirs",
     element: (
       <ProtectedRoute>
-        <Credits />
+        <AppLayout>
+          <Credits />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
