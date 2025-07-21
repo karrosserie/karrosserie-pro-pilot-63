@@ -37,7 +37,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
           <DialogTitle>Aperçu du document de cession</DialogTitle>
         </DialogHeader>
         
-        <div className="bg-white p-8 text-black font-serif text-sm leading-relaxed">
+        <div className="bg-white p-8 text-black text-sm leading-relaxed">
           {/* Header text */}
           <p className="mb-8 text-justify">
             Conformément à l'article 1369-4 du Code civil, cette notification est également valablement effectuée par 
