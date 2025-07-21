@@ -65,7 +65,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
             <div>{companyData.phone || ''}</div>
           </div>
                 
-          <div className="ml-10 mb-8">
+          <div className="ml-64 mb-8">
             <div className="font-bold">
               {selectedInsuranceCompany?.name || ''}
             </div>
@@ -188,7 +188,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
           </div>
           
           {/* Signature section */}
-          <div className="flex justify-center items-center mb-8">
+          <div className="flex items-center mb-8">
             [Signature1/]
           </div>
 
@@ -242,7 +242,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
             </div>
 
             {/* Signature section */}
-            <div className="flex justify-center items-center mb-8">
+            <div className="flex items-center mb-8">
               [Signature2/]
             </div>
           </div>
