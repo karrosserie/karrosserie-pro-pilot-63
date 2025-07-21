@@ -234,7 +234,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
             <Text>{companyData.email || ''}</Text>
             <Text>{companyData.phone || ''}</Text>
           </View>
-          <View style={[styles.rightColumn, { marginTop: 20 }]}>
+          <View style={[styles.rightColumn, { marginTop: 100 }]}>
             <Text style={styles.boldText}>{selectedInsuranceCompany?.name || ''}</Text>
             {selectedInsuranceCompany?.address && <Text>{selectedInsuranceCompany.address}</Text>}
             {selectedInsuranceCompany?.address2 && <Text>{selectedInsuranceCompany.address2}</Text>}
