@@ -24,6 +24,7 @@ import { fr } from 'date-fns/locale';
 import { toast } from '@/hooks/use-toast';
 import { repairOrdersService } from '@/services/supabase/repair-orders';
 import { validateRepairOrderData } from '@/components/cessions/form/utils/dataValidation';
+import { CessionPreview } from './CessionPreview';
 
 interface CessionsTableProps {
   cessions: Cession[];
@@ -40,6 +41,8 @@ export const CessionsTable = ({
 }: CessionsTableProps) => {
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const [selectedCession, setSelectedCession] = useState<Cession | null>(null);
   
   const parseValidationError = (validationError: string) => {
     const lines = validationError.split('\n').filter(line => line.trim() !== '');
@@ -233,7 +236,14 @@ export const CessionsTable = ({
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-1">
-                    <Button variant="ghost" size="icon">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => {
+                        setSelectedCession(cession);
+                        setPreviewDialogOpen(true);
+                      }}
+                    >
                       <Eye className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="icon">
@@ -314,6 +324,12 @@ export const CessionsTable = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      <CessionPreview 
+        cession={selectedCession}
+        isOpen={previewDialogOpen}
+        onOpenChange={setPreviewDialogOpen}
+      />
     </div>
   );
 };
