@@ -29,6 +29,46 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Check if there's at least one entry older than 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    const { data: oldEntries, error: checkError } = await supabase
+      .from('insurance_companies')
+      .select('id, updated_at')
+      .lt('updated_at', sevenDaysAgo.toISOString())
+      .limit(1);
+
+    if (checkError) {
+      console.error('Error checking for old entries:', checkError);
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: 'Error checking database entries: ' + checkError.message 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      });
+    }
+
+    if (!oldEntries || oldEntries.length === 0) {
+      console.log('No entries older than 7 days found, skipping sync');
+      return new Response(JSON.stringify({ 
+        success: true, 
+        message: 'Sync skipped: No entries older than 7 days found',
+        stats: {
+          totalProcessed: 0,
+          inserted: 0,
+          updated: 0,
+          errors: 0
+        }
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      });
+    }
+
+    console.log(`Found ${oldEntries.length} entries older than 7 days, proceeding with sync...`);
+
     // Fetch CSV data from the URL
     console.log('Fetching CSV data from Clearbus...');
     const csvResponse = await fetch('https://www.clearbus.fr/Misc/Karrosserie.pro/Karrosserie.csv');
