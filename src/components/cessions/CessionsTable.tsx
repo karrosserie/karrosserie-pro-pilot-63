@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Table, 
@@ -8,6 +8,15 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { FileText, Download, Eye, Pencil, Trash, Play } from 'lucide-react';
 import { Cession } from '@/services/supabase/cessions';
 import { format } from 'date-fns';
@@ -29,6 +38,31 @@ export const CessionsTable = ({
   onEditCession,
   onDeleteCession
 }: CessionsTableProps) => {
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  
+  const parseValidationError = (validationError: string) => {
+    const lines = validationError.split('\n').filter(line => line.trim() !== '');
+    const sections: { title: string; items: string[] }[] = [];
+    let currentSection: { title: string; items: string[] } | null = null;
+    
+    lines.forEach(line => {
+      if (line.includes('Fiche client :')) {
+        if (currentSection) sections.push(currentSection);
+        currentSection = { title: 'Fiche client', items: [] };
+      } else if (line.includes('Fiche véhicule :')) {
+        if (currentSection) sections.push(currentSection);
+        currentSection = { title: 'Fiche véhicule', items: [] };
+      } else if (line.trim().startsWith('- ')) {
+        if (currentSection) {
+          currentSection.items.push(line.trim().substring(2));
+        }
+      }
+    });
+    
+    if (currentSection) sections.push(currentSection);
+    return sections;
+  };
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'en_attente':
@@ -128,19 +162,8 @@ export const CessionsTable = ({
       );
       
       if (validationError) {
-        // Formater le message pour le toast en utilisant des puces
-        const formattedMessage = validationError
-          .replace(/\n\n/g, ' ')
-          .replace(/\n/g, ' ')
-          .replace(/Fiche client :/g, '• Fiche client:')
-          .replace(/Fiche véhicule :/g, '• Fiche véhicule:')
-          .replace(/    - /g, ' - ');
-        
-        toast({
-          title: "Documents manquants",
-          description: formattedMessage,
-          variant: "destructive",
-        });
+        setErrorMessage(validationError);
+        setErrorDialogOpen(true);
         return;
       }
       
@@ -258,6 +281,37 @@ export const CessionsTable = ({
           )}
         </TableBody>
       </Table>
+      
+      <AlertDialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Documents manquants</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-4">
+                <p>Des informations obligatoires sont manquantes :</p>
+                {parseValidationError(errorMessage).map((section, index) => (
+                  <div key={index}>
+                    <h4 className="font-medium text-sm">{section.title} :</h4>
+                    <ul className="list-disc list-inside ml-4 space-y-1">
+                      {section.items.map((item, itemIndex) => (
+                        <li key={itemIndex} className="text-sm text-muted-foreground">
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+                <p className="text-sm text-muted-foreground">
+                  Veuillez compléter ces informations avant de pouvoir créer une cession de créance.
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>Compris</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
