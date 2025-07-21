@@ -228,7 +228,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
             <Text>{companyData.email || ''}</Text>
             <Text>{companyData.phone || ''}</Text>
           </View>
-          <View style={[styles.rightColumn, { marginTop: 100 }]}>
+          <View style={[styles.rightColumn, { marginTop: 80 }]}>
             <Text style={styles.boldText}>{selectedInsuranceCompany?.name || ''}</Text>
             {selectedInsuranceCompany?.address && <Text>{selectedInsuranceCompany.address}</Text>}
             {selectedInsuranceCompany?.address2 && <Text>{selectedInsuranceCompany.address2}</Text>}
@@ -334,56 +334,54 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
         </View>
 
         {/* Section de confirmation de cession avec séparateur */}
-        <View style={[styles.headerRow, { marginBottom: 40 }]} break>
           {/* Company info and destination repeated */}   
-          <View style={styles.headerRow}>
-            <View style={styles.leftColumn}>
-              <Text style={styles.boldText}>{companyData.name?.toUpperCase() || ''}</Text>
-              <Text>{companyData.address || ''}</Text>
-              <Text>{companyData.zipcode || ''} {companyData.city || ''}</Text>
-              <Text>{companyData.email || ''}</Text>
-              <Text>{companyData.phone || ''}</Text>
-            </View>
-            <View style={[styles.rightColumn, { marginTop: 100 }]}>
-              <Text style={styles.boldText}>{selectedInsuranceCompany?.name || ''}</Text>
+        <View style={[styles.headerRow, { marginBottom: 40 }]} break>
+          <View style={styles.leftColumn}>
+            <Text style={styles.boldText}>{companyData.name?.toUpperCase() || ''}</Text>
+            <Text>{companyData.address || ''}</Text>
+            <Text>{companyData.zipcode || ''} {companyData.city || ''}</Text>
+            <Text>{companyData.email || ''}</Text>
+            <Text>{companyData.phone || ''}</Text>
+          </View>
+          <View style={[styles.rightColumn, { marginTop: 80 }]}>
+            <Text style={styles.boldText}>{selectedInsuranceCompany?.name || ''}</Text>
               {selectedInsuranceCompany?.address && <Text>{selectedInsuranceCompany.address}</Text>}
               {selectedInsuranceCompany?.address2 && <Text>{selectedInsuranceCompany.address2}</Text>}
-              <Text>{selectedInsuranceCompany?.zipcode || ''} {selectedInsuranceCompany?.city || ''}</Text>
-            </View>
+            <Text>{selectedInsuranceCompany?.zipcode || ''} {selectedInsuranceCompany?.city || ''}</Text>
           </View>
+        </View>
 
-          {/* Subject */}
-          <View style={styles.section}>
-            <Text><Text style={styles.boldText}>Objet :</Text> Confirmation de cession de créance - Dossier sinistre n°{cession.incident_number || ''}</Text>
-          </View>
+        {/* Subject */}
+        <View style={styles.section}>
+          <Text><Text style={styles.boldText}>Objet :</Text> Confirmation de cession de créance - Dossier sinistre n°{cession.incident_number || ''}</Text>
+        </View>
 
-          {/* Greeting */}
-          <Text style={styles.section}>Madame, Monsieur,</Text>
+        {/* Greeting */}
+        <Text style={styles.section}>Madame, Monsieur,</Text>
 
-          {/* Main confirmation text */}
-          <Text style={[styles.section, styles.justifyText]}>
-            Je soussigné(e) {clientName.toUpperCase()}, assuré(e) sous le contrat n°{cession.policy_number || ''}, vous confirme avoir cédé ma 
-            créance d'indemnisation à {companyData.name?.toUpperCase() || ''} concernant les réparations de mon véhicule {cession.repair_orders?.vehicles?.car_brands?.name || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''} immatriculé {cession.repair_orders?.vehicles?.license_plate || ''}.
-          </Text>
+        {/* Main confirmation text */}
+        <Text style={[styles.section, styles.justifyText]}>
+          Je soussigné(e) {clientName.toUpperCase()}, assuré(e) sous le contrat n°{cession.policy_number || ''}, vous confirme avoir cédé ma 
+          créance d'indemnisation à {companyData.name?.toUpperCase() || ''} concernant les réparations de mon véhicule {cession.repair_orders?.vehicles?.car_brands?.name || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''} immatriculé {cession.repair_orders?.vehicles?.license_plate || ''}.
+        </Text>
 
-          {/* Legal reference */}
-          <Text style={[styles.section, styles.justifyText]}>
-            En application de l'article L.121-13 du Code des assurances, je vous demande expressément de verser 
-            l'indemnité directement au réparateur.
-          </Text>
+        {/* Legal reference */}
+        <Text style={[styles.section, styles.justifyText]}>
+          En application de l'article L.121-13 du Code des assurances, je vous demande expressément de verser 
+          l'indemnité directement au réparateur.
+        </Text>
 
-          <Text style={[styles.textLarge, styles.justifyText]}>
-            Veuillez agréer, Madame, Monsieur, l'expression de mes salutations distinguées.
-          </Text>
+        <Text style={[styles.textLarge, styles.justifyText]}>
+          Veuillez agréer, Madame, Monsieur, l'expression de mes salutations distinguées.
+        </Text>
 
-          {/* Date and place */}
-          <Text style={styles.sectionLarge}>Fait à {companyData.city}, le {formatDate(cession.created_at)}</Text>
+        {/* Date and place */}
+        <Text style={styles.sectionLarge}>Fait à {companyData.city}, le {formatDate(cession.created_at)}</Text>
 
-          {/* Signature section */}
-          <View style={styles.sectionLarge}>
-            <Text style={styles.boldText}>{clientName.toUpperCase()}</Text>
-            <Text>[Signature2/]</Text>
-          </View>
+        {/* Signature section */}
+        <View style={styles.sectionLarge}>
+          <Text style={styles.boldText}>{clientName.toUpperCase()}</Text>
+          <Text>[Signature2/]</Text>
         </View>
       </Page>
 
@@ -607,7 +605,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
             <Text>{companyData.email || ''}</Text>
             <Text>{companyData.phone || ''}</Text>
           </View>
-          <View style={[styles.rightColumn, { marginTop: 100 }]}>
+          <View style={[styles.rightColumn, { marginTop: 80 }]}>
             <Text>A l'attention de :</Text>
             <Text style={styles.boldText}>{selectedInsuranceCompany?.name || ''}</Text>
             {selectedInsuranceCompany?.address && <Text>{selectedInsuranceCompany.address}</Text>}
