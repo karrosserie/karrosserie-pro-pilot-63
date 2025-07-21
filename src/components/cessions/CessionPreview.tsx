@@ -198,20 +198,25 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
           {/* Additional cession confirmation section */}
           <div className="mb-8 border-t border-gray-300 pt-8">
             {/* Cedant and Insurance details */}
-            <div>
-              <div className="font-bold">{clientName.toUpperCase()}</div>
-              {clientData?.address && <div>{clientData.address}</div>}
-              {clientData?.postal_code && clientData?.city && <div>{clientData.postal_code} {clientData.city}</div>}
-              {clientData?.email && <div>{clientData.email}</div>}
-              {clientData?.phone && <div>{clientData.phone}</div>}
-            </div>
-              
-            <div className="mb-8">
-              <div className="font-bold">{selectedInsuranceCompany?.name || ''}</div>
-              {selectedInsuranceCompany?.address && <div>{selectedInsuranceCompany.address}</div>}
-              {selectedInsuranceCompany?.address2 && <div>{selectedInsuranceCompany.address2}</div>}
-              <div>{selectedInsuranceCompany?.zipcode || ''} {selectedInsuranceCompany?.city || ''}</div>
-            </div>
+            <div className="grid grid-cols-2 gap-8 mb-8">
+              <div>
+                <div className="font-bold">{companyData.name?.toUpperCase() || ''}</div>
+                <div>{companyData.address || ''}</div>
+                <div>{companyData.zipcode || ''} {companyData.city || ''}</div>
+                <div>{companyData.email || ''}</div>
+                <div>{companyData.phone || ''}</div>
+              </div>
+              <div></div>
+              <div></div>
+              <div>
+                <div className="font-bold">
+                  {selectedInsuranceCompany?.name || ''}
+                </div>
+                {selectedInsuranceCompany?.address && <div>{selectedInsuranceCompany.address}</div>}
+                {selectedInsuranceCompany?.address2 && <div>{selectedInsuranceCompany.address2}</div>}
+                <div>{selectedInsuranceCompany?.zipcode || ''} {selectedInsuranceCompany?.city || ''}</div>
+              </div>
+            </div>       
 
             {/* Subject */}
             <div className="mb-6">
