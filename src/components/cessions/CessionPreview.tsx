@@ -42,6 +42,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
   const calculatePaintAmount = () => {
     if (!cession.repair_orders?.repairs_data) return 0;
     const repairs = cession.repair_orders.repairs_data;
+    if (!Array.isArray(repairs)) return 0;
     const filtered = repairs.filter((item: any) => 
       item.description && (
         item.description.toUpperCase().includes('INGR') || 
@@ -54,6 +55,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
   const calculateLaborAmount = () => {
     if (!cession.repair_orders?.repairs_data) return 0;
     const repairs = cession.repair_orders.repairs_data;
+    if (!Array.isArray(repairs)) return 0;
     const filtered = repairs.filter((item: any) => 
       item.description && (
         item.description.includes('T1') || 
@@ -67,6 +69,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
   const calculatePartsAmount = () => {
     if (!cession.repair_orders?.parts_data) return 0;
     const parts = cession.repair_orders.parts_data;
+    if (!Array.isArray(parts)) return 0;
     return parts.reduce((total: number, item: any) => total + (parseFloat(item.total) || 0), 0);
   };
 
