@@ -1278,22 +1278,40 @@ export type Database = {
       }
       insurance_companies: {
         Row: {
+          address: string | null
+          address2: string | null
+          city: string | null
           created_at: string
+          email: string | null
           id: string
           name: string
+          phone: string | null
           updated_at: string
+          zipcode: string | null
         }
         Insert: {
+          address?: string | null
+          address2?: string | null
+          city?: string | null
           created_at?: string
+          email?: string | null
           id?: string
           name: string
+          phone?: string | null
           updated_at?: string
+          zipcode?: string | null
         }
         Update: {
+          address?: string | null
+          address2?: string | null
+          city?: string | null
           created_at?: string
+          email?: string | null
           id?: string
           name?: string
+          phone?: string | null
           updated_at?: string
+          zipcode?: string | null
         }
         Relationships: []
       }
