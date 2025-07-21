@@ -56,23 +56,26 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
             courrier à l'adresse suivante : {selectedInsuranceCompany?.email || ''}, avec accusé de réception électronique.
           </p>
 
-          {/* Company info and destination */}
-          <div className="mb-2">
-            <div className="font-bold">{companyData.name?.toUpperCase() || ''}</div>
-            <div>{companyData.address || ''}</div>
-            <div>{companyData.zipcode || ''} {companyData.city || ''}</div>
-            <div>{companyData.email || ''}</div>
-            <div>{companyData.phone || ''}</div>
-          </div>
-                
-          <div className="mb-8">
-            <div className="font-bold">
-              {selectedInsuranceCompany?.name || ''}
+          {/* Company info and destination */}   
+          <div className="grid grid-cols-2 gap-8 mb-8">
+            <div>
+              <div className="font-bold">{companyData.name?.toUpperCase() || ''}</div>
+              <div>{companyData.address || ''}</div>
+              <div>{companyData.zipcode || ''} {companyData.city || ''}</div>
+              <div>{companyData.email || ''}</div>
+              <div>{companyData.phone || ''}</div>
             </div>
-            {selectedInsuranceCompany?.address && <div>{selectedInsuranceCompany.address}</div>}
-            {selectedInsuranceCompany?.address2 && <div>{selectedInsuranceCompany.address2}</div>}
-            <div>{selectedInsuranceCompany?.zipcode || ''} {selectedInsuranceCompany?.city || ''}</div>
-          </div>
+            <div></div>
+            <div></div>
+            <div>
+              <div className="font-bold">
+                {selectedInsuranceCompany?.name || ''}
+              </div>
+              {selectedInsuranceCompany?.address && <div>{selectedInsuranceCompany.address}</div>}
+              {selectedInsuranceCompany?.address2 && <div>{selectedInsuranceCompany.address2}</div>}
+              <div>{selectedInsuranceCompany?.zipcode || ''} {selectedInsuranceCompany?.city || ''}</div>
+            </div>
+          </div>                
 
           {/* Document details */}
           <div className="mb-8">
