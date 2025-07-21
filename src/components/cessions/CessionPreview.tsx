@@ -448,6 +448,96 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               </div>
             </div>
           </div>
+
+          {/* Attestation sur l'honneur section */}
+          <div className="mb-8 border-t-2 border-black pt-8">
+            {/* Title */}
+            <div className="text-center mb-6">
+              <div className="border-t-2 border-black pt-4 pb-4 border-b-2">
+                <h2 className="font-bold text-lg">ATTESTATION SUR L'HONNEUR D'ABSENCE DE SURFACTURATION</h2>
+              </div>
+            </div>
+
+            {/* Legal reference */}
+            <div className="text-center mb-8">
+              (Conformément à l'article L. 441-7 du Code de commerce)
+            </div>
+
+            {/* Company and destination */}
+            <div className="grid grid-cols-2 gap-8 mb-8">
+              <div>
+                <div className="font-bold">KORPORATE</div>
+                <div>25 COURS PIERRE PUGET</div>
+                <div>13006 MARSEILLE</div>
+                <div>ggobeyn@outlook.fr</div>
+                <div>+33646465242</div>
+              </div>
+              
+              <div className="text-right">
+                <div className="mb-4">A l'attention de :</div>
+                <div className="font-bold">{cession.insurance_companies?.name || 'ACTIVE ASSURANCES'}</div>
+                <div>8-10 RUE DE LA FERME</div>
+                <div>92100 BOULOGNE-BILLANCOURT</div>
+              </div>
+            </div>
+
+            {/* Object */}
+            <div className="mb-8">
+              <strong>Objet :</strong> Attestation sur l'honneur certifiant l'absence de surfacturation
+            </div>
+
+            {/* Claim details */}
+            <div className="mb-8">
+              <div className="mb-2"><strong>N° sinistre :</strong> {cession.incident_number || '00125A'}</div>
+              <div className="mb-2"><strong>N° contrat :</strong> {cession.policy_number || '7718265A'}</div>
+              <div className="mb-2"><strong>PV expertise :</strong> {cession.report_number || 'AE25008924'}</div>
+              <div className="mb-2"><strong>Véhicule :</strong> {cession.repair_orders?.vehicles?.license_plate || 'ED-684-JH'}</div>
+            </div>
+
+            {/* Attestation text */}
+            <div className="mb-8">
+              <p className="mb-6">Nous attestons par la présente, conformément à l'article L. 441-7 du Code de commerce, que :</p>
+              
+              <div className="mb-6">
+                <div className="mb-4">
+                  <strong>1.</strong> Les travaux de réparation effectués sur le véhicule {cession.repair_orders?.vehicles?.car_brands?.name || 'PEUGEOT'} {cession.repair_orders?.vehicles?.car_models?.name || '308'} (immatriculation {cession.repair_orders?.vehicles?.license_plate || 'ED-684-JH'}, n° 
+                  série ) dans le cadre du sinistre survenu le {cession.incident_date ? formatDate(cession.incident_date) : '17/07/2025'}, référencé sous le n°{cession.incident_number || '00125A'}, ont été facturés en 
+                  stricte conformité avec :
+                </div>
+                <div className="ml-8 mb-2">o Les tarifs professionnels habituellement pratiqués par notre établissement ;</div>
+                <div className="ml-8 mb-2">o Les préconisations techniques du constructeur {cession.repair_orders?.vehicles?.car_brands?.name || 'PEUGEOT'} ;</div>
+                <div className="ml-8 mb-2">o Les dispositions du rapport d'expertise n° {cession.report_number || 'AE25008924'} ;</div>
+                <div className="ml-8 mb-4">o Les règles de l'art en vigueur dans le secteur de la réparation automobile.</div>
+              </div>
+
+              <div className="mb-6">
+                <div className="mb-4">
+                  <strong>2.</strong> Aucune majoration abusive, surcoût injustifié ou pratique commerciale déloyale n'a été appliquée. Les 
+                  montants facturés correspondent intégralement :
+                </div>
+                <div className="ml-8 mb-2">o Au coût des pièces détachées (neuves ou d'occasion selon accord) ;</div>
+                <div className="ml-8 mb-2">o Au temps de main d'œuvre réellement consacré ;</div>
+                <div className="ml-8 mb-4">o Aux prestations annexes nécessaires à la remise en état du véhicule.</div>
+              </div>
+
+              <div className="mb-8">
+                <strong>3.</strong> Cette attestation est délivrée en toute honnêteté, sous réserve des sanctions pénales prévues par les 
+                articles L. 441-7 et L. 454-1 du Code de commerce en cas de déclaration frauduleuse.
+              </div>
+            </div>
+
+            {/* Date and signature */}
+            <div className="mb-8">
+              <div className="mb-6">Fait à MARSEILLE, le {formatDate(cession.created_at)}</div>
+              
+              <div className="mb-4 font-bold">KORPORATE</div>
+              
+              <div className="text-center mb-4">
+                <div className="font-bold text-2xl mb-2" style={{ fontFamily: 'cursive' }}>MUSSO DORIAN</div>
+              </div>
+              <div className="text-xs text-center">Approuvé par MUSSO DORIAN</div>
+            </div>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
