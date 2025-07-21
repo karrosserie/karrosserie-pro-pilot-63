@@ -58,7 +58,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
           {/* Company info and destination */}
           <div className="mb-2">
-            <div className="font-bold">{companyData.name?.toUpperCase() || 'ENTREPRISE'}</div>
+            <div className="font-bold">{companyData.name?.toUpperCase() || ''}</div>
             <div>{companyData.address || ''}</div>
             <div>{companyData.zipcode || ''} {companyData.city || ''}</div>
             <div>{companyData.email || ''}</div>
@@ -124,7 +124,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
           {/* Cessionnaire info */}
           <div className="mb-8">
             <div>CESSIONNAIRE</div>
-            <div className="font-bold">{companyData.name?.toUpperCase() || 'ENTREPRISE'}</div>
+            <div className="font-bold">{companyData.name?.toUpperCase() || ''}</div>
             <div>{companyData.address || ''}</div>
             <div>{companyData.zipcode || ''} {companyData.city || ''}</div>
             <div>{companyData.email || ''}</div>
@@ -179,7 +179,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
           <div className="mb-8">
             <div className="mb-4"><strong>Vous trouverez ci-joint :</strong></div>
             <div className="mb-2">1. Le contrat de cession de créance original</div>
-            <div className="mb-2">2. L'ordre de réparation n°72</div>
+            <div className="mb-2">2. L'ordre de réparation</div>
           </div>
 
           {/* Closing text */}
@@ -190,26 +190,24 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
           {/* Additional cession confirmation section */}
           <div className="mb-8 border-t border-gray-300 pt-8">
             {/* Cedant and Insurance details */}
-            <div className="grid grid-cols-2 gap-8 mb-8">
-              <div>
-                <div className="font-bold">{clientName.toUpperCase()}</div>
-                {clientData?.address && <div>{clientData.address}</div>}
-                {clientData?.postal_code && clientData?.city && <div>{clientData.postal_code} {clientData.city}</div>}
-                {clientData?.email && <div>{clientData.email}</div>}
-                {clientData?.phone && <div>{clientData.phone}</div>}
-              </div>
+            <div>
+              <div className="font-bold">{clientName.toUpperCase()}</div>
+              {clientData?.address && <div>{clientData.address}</div>}
+              {clientData?.postal_code && clientData?.city && <div>{clientData.postal_code} {clientData.city}</div>}
+              {clientData?.email && <div>{clientData.email}</div>}
+              {clientData?.phone && <div>{clientData.phone}</div>}
+            </div>
               
-              <div className="text-right">
-                <div className="font-bold">{selectedInsuranceCompany?.name || 'ASSURANCE'}</div>
-                {selectedInsuranceCompany?.address && <div>{selectedInsuranceCompany.address}</div>}
-                {selectedInsuranceCompany?.address2 && <div>{selectedInsuranceCompany.address2}</div>}
-                <div>{selectedInsuranceCompany?.zipcode || ''} {selectedInsuranceCompany?.city || ''}</div>
-              </div>
+            <div className="text-right mb-8">
+              <div className="font-bold">{selectedInsuranceCompany?.name || ''}</div>
+              {selectedInsuranceCompany?.address && <div>{selectedInsuranceCompany.address}</div>}
+              {selectedInsuranceCompany?.address2 && <div>{selectedInsuranceCompany.address2}</div>}
+              <div>{selectedInsuranceCompany?.zipcode || ''} {selectedInsuranceCompany?.city || ''}</div>
             </div>
 
             {/* Subject */}
             <div className="mb-6">
-              <strong>Objet :</strong> Confirmation de cession de créance - Dossier sinistre n°{cession.incident_number || '00125A'}
+              <strong>Objet :</strong> Confirmation de cession de créance - Dossier sinistre n°{cession.incident_number || ''}
             </div>
 
             {/* Greeting */}
@@ -219,9 +217,9 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
             {/* Main confirmation text */}
             <div className="mb-6 text-justify">
-              Je soussigné(e) {clientName.toUpperCase()}, assuré(e) sous le contrat n°{cession.policy_number || '7718265A'}, vous confirme avoir cédé ma 
-              créance d'indemnisation à {companyData.name?.toUpperCase() || 'ENTREPRISE'} concernant les réparations de mon véhicule {cession.repair_orders?.vehicles?.car_brands?.name || 'PEUGEOT'} {cession.repair_orders?.vehicles?.car_models?.name || '308'} 
-              immatriculé {cession.repair_orders?.vehicles?.license_plate || 'ED-684-JH'}.
+              Je soussigné(e) {clientName.toUpperCase()}, assuré(e) sous le contrat n°{cession.policy_number || ''}, vous confirme avoir cédé ma 
+              créance d'indemnisation à {companyData.name?.toUpperCase() || ''} concernant les réparations de mon véhicule {cession.repair_orders?.vehicles?.car_brands?.name || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''} 
+              immatriculé {cession.repair_orders?.vehicles?.license_plate || ''}.
             </div>
 
             {/* Legal reference */}
@@ -245,7 +243,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
                 <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-2">
                   <div className="text-white text-xs font-bold">∞</div>
                 </div>
-                <div className="text-xs">Approuvé par {companyData.name || 'ENTREPRISE'} Entreprise</div>
+                <div className="text-xs">Approuvé par {companyData.name || ''} Entreprise</div>
               </div>
             </div>
           </div>
