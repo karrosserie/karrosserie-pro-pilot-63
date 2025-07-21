@@ -48,16 +48,16 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
           </p>
 
           {/* Company info and destination */}
-          <div>
-            <div className="font-bold mb-2">{companyData.name?.toUpperCase() || 'ENTREPRISE'}</div>
+          <div className="mb-2">
+            <div className="font-bold">{companyData.name?.toUpperCase() || 'ENTREPRISE'}</div>
             <div>{companyData.address || ''}</div>
             <div>{companyData.zipcode || ''} {companyData.city || ''}</div>
             <div>{companyData.email || ''}</div>
             <div>{companyData.phone || ''}</div>
           </div>
                 
-          <div className="text-right">
-            <div className="font-bold mb-2">
+          <div className="text-right mb-8">
+            <div className="font-bold">
               {cession.insurance_companies?.name || 'ASSURANCE'}
             </div>
             <div>8-10 RUE DE LA FERME</div>
