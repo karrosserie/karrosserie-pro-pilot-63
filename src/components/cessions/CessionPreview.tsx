@@ -282,6 +282,76 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               <div className="mt-2">Ci-après dénommé "Le Réparateur professionnel"</div>
             </div>
 
+            {/* Identification du véhicule */}
+            <div className="mb-8">
+              <h3 className="font-bold text-lg mb-4">IDENTIFICATION DU VÉHICULE</h3>
+              
+              <div className="mb-2"><strong>Véhicule</strong> {cession.repair_orders?.vehicles?.car_brands?.name || 'PEUGEOT'} {cession.repair_orders?.vehicles?.car_models?.name || '308'}</div>
+              <div className="mb-2"><strong>N° d'enregistrement</strong> {cession.repair_orders?.vehicles?.license_plate || 'ED-684-JH'}</div>
+              <div className="mb-2"><strong>Kilométrage</strong> 94090 Km</div>
+            </div>
+
+            {/* Convention */}
+            <div className="mb-8">
+              <h3 className="font-bold text-lg mb-6">CONVENTION</h3>
+              
+              {/* Article 1 */}
+              <div className="mb-6">
+                <div className="font-bold mb-2">Article 1 : Objet et portée de la cession</div>
+                
+                <div className="mb-2">1.1 Le Client/Assuré déclare céder, sans réserve et de manière irrévocable, au Réparateur professionnel qui accepte, la créance d'indemnisation qu'il détient sur la compagnie d'assurance susvisée.</div>
+                
+                <div className="mb-2">1.2 Cette cession est consentie en application des articles 1321 et suivants du Code civil et L.121-13 du Code des assurances, pour garantir le paiement des réparations conformes au rapport d'expertise n°{cession.report_number || 'AE25008924'}.</div>
+                
+                <div className="mb-2">1.3 Le Réparateur professionnel est subrogé dans tous les droits, actions et privilèges du Cédant vis-à-vis de la compagnie d'assurance.</div>
+              </div>
+
+              {/* Article 2 */}
+              <div className="mb-6">
+                <div className="font-bold mb-2">Article 2 : Montant et composition de la créance cédée</div>
+                
+                <div className="mb-2">La créance cédée correspond au montant total de 1 094,79 € TTC, comprenant :</div>
+                <div className="mb-1">- Pièces détachées : 24,50 € HT</div>
+                <div className="mb-1">- Main d'œuvre : 443,94 € HT</div>
+                <div className="mb-1">- Peinture et ingrédients : 443,88 € HT</div>
+                <div className="mb-2">- TVA : 182,47 € HT</div>
+              </div>
+
+              {/* Article 3 */}
+              <div className="mb-6">
+                <div className="font-bold mb-2">Article 3 : Garanties du Cédant</div>
+                
+                <div className="mb-2">Le Cédant garantit expressément, sous sa responsabilité :</div>
+                <div className="mb-1">3.1 L'existence et la disponibilité de la créance cédée</div>
+                <div className="mb-1">3.2 Sa qualité de titulaire légitime du contrat d'assurance</div>
+                <div className="mb-1">3.3 L'absence de toute cession ou délégation antérieure</div>
+                <div className="mb-1">3.4 L'absence de cause de déchéance de garantie</div>
+                <div className="mb-1">3.5 La validité et le maintien des garanties d'assurance</div>
+                <div className="mb-2">3.6 L'absence de contestation sur le montant de l'indemnité</div>
+              </div>
+
+              {/* Article 4 */}
+              <div className="mb-6">
+                <div className="font-bold mb-2">Article 4 : Obligations spécifiques de l'Assuré</div>
+                
+                <div className="mb-2">Le Client/Assuré s'engage irrévocablement à :</div>
+                <div className="mb-1">4.1 Ne pas révoquer la présente cession</div>
+                <div className="mb-1">4.2 Ne pas percevoir directement l'indemnité d'assurance</div>
+                <div className="mb-1">4.3 Informer immédiatement le Réparateur de toute notification de l'assurance</div>
+                <div className="mb-2">4.4 Coopérer pour la bonne exécution de la présente convention</div>
+              </div>
+
+              {/* Article 5 */}
+              <div className="mb-6">
+                <div className="font-bold mb-2">Article 5 : Notification et opposabilité</div>
+                
+                <div className="mb-2">5.1 La présente cession sera notifiée à la compagnie d'assurance par :</div>
+                <div className="mb-1">- Lettre recommandée avec accusé de réception</div>
+                <div className="mb-1">- Courriel avec accusé de réception</div>
+                <div className="mb-1">- Télécopie avec accusé de réception</div>
+              </div>
+            </div>
+
             {/* Exposé préalable */}
             <div className="mb-8">
               <h3 className="font-bold text-lg mb-4">EXPOSÉ PRÉALABLE</h3>
