@@ -120,11 +120,69 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
             <div>+33646465242</div>
           </div>
 
-          {/* Additional vehicle info */}
-          <div className="mt-8 pt-8 border-t border-gray-300 text-xs text-gray-600">
-            <div><strong>Véhicule concerné :</strong> {vehicleInfo}</div>
-            <div><strong>Date de l'incident :</strong> {cession.incident_date ? formatDate(cession.incident_date) : 'N/A'}</div>
-            <div><strong>Expert :</strong> {cession.expert_name || 'N/A'}</div>
+          {/* Vehicle details section */}
+          <div className="mb-8">
+            <div className="mb-4">
+              <strong>Concernant l'indemnisation des réparations du véhicule :</strong>
+            </div>
+            <div className="mb-2">
+              <strong>{cession.repair_orders?.vehicles?.car_brands?.name?.toUpperCase() || 'VÉHICULE'} {cession.repair_orders?.vehicles?.car_models?.name || ''}</strong>
+            </div>
+            <div className="mb-2">
+              Immatriculation : {cession.repair_orders?.vehicles?.license_plate || 'N/A'}
+            </div>
+            <div className="mb-2">
+              N° Série :
+            </div>
+          </div>
+
+          {/* Incident date */}
+          <div className="mb-8">
+            Suite au sinistre survenu le {cession.incident_date ? formatDate(cession.incident_date) : 'N/A'}.
+          </div>
+
+          {/* Legal basis */}
+          <div className="mb-8">
+            <div className="mb-4">
+              <strong>Cette cession est effectuée en vertu :</strong>
+            </div>
+            <div className="mb-2">- De l'article L.121-13 du Code des assurances</div>
+            <div className="mb-2">- Des articles 1321 à 1326 du Code civil</div>
+            <div className="mb-2">- Du PV d'expertise n°{cession.report_number || 'N/A'}</div>
+            <div className="mb-2">- Du privilège du garagiste (article 2332, 3° du Code civil)</div>
+          </div>
+
+          {/* Payment request */}
+          <div className="mb-8 text-justify">
+            En conséquence, nous vous demandons de procéder au règlement de l'indemnité d'un montant de 1 094,79 € TTC directement sur notre compte bancaire :
+          </div>
+
+          {/* Bank details */}
+          <div className="mb-8">
+            <div className="mb-2"><strong>BANQUE : CIC</strong></div>
+            <div className="mb-2"><strong>IBAN : FR76 0123 4567 8901 2345 6789 123</strong></div>
+            <div className="mb-2"><strong>BIC : CICFRPP</strong></div>
+          </div>
+
+          {/* Attachments */}
+          <div className="mb-8">
+            <div className="mb-4"><strong>Vous trouverez ci-joint :</strong></div>
+            <div className="mb-2">1. Le contrat de cession de créance original</div>
+            <div className="mb-2">2. L'ordre de réparation n°72</div>
+          </div>
+
+          {/* Closing text */}
+          <div className="mb-8 text-justify">
+            Dans l'attente du règlement dans les délais légaux prescrits par l'article L.211-5-1 du Code des assurances, nous vous prions d'agréer, Madame, Monsieur, l'expression de notre considération distinguée.
+          </div>
+
+          {/* Signature */}
+          <div className="mb-8">
+            <div className="font-bold mb-4">KORPORATE</div>
+            <div className="mt-16 mb-4">
+              <div className="font-bold text-2xl mb-2" style={{ fontFamily: 'cursive' }}>MUSSO DORIAN</div>
+            </div>
+            <div className="text-sm">Approuvé par MUSSO DORIAN</div>
           </div>
         </div>
       </DialogContent>
