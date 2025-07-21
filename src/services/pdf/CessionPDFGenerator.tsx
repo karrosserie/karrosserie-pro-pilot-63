@@ -226,7 +226,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
         </Text>
 
         {/* Company info and destination */}   
-        <View style={styles.headerRow}>
+        <View style={[styles.headerRow, { marginBottom: 40 }]}>
           <View style={styles.leftColumn}>
             <Text style={styles.boldText}>{companyData.name?.toUpperCase() || ''}</Text>
             <Text>{companyData.address || ''}</Text>
@@ -234,7 +234,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
             <Text>{companyData.email || ''}</Text>
             <Text>{companyData.phone || ''}</Text>
           </View>
-          <View style={styles.rightColumn}>
+          <View style={[styles.rightColumn, { marginTop: 20 }]}>
             <Text style={styles.boldText}>{selectedInsuranceCompany?.name || ''}</Text>
             {selectedInsuranceCompany?.address && <Text>{selectedInsuranceCompany.address}</Text>}
             {selectedInsuranceCompany?.address2 && <Text>{selectedInsuranceCompany.address2}</Text>}
@@ -245,11 +245,11 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
         {/* Document details */}
         <View style={styles.sectionLarge}>
           <View style={styles.section}>
-            <Text style={styles.boldText}>Objet : Notification de cession de créance (Article 1324 du Code civil)</Text>
+            <Text><Text style={styles.boldText}>Objet :</Text> Notification de cession de créance (Article 1324 du Code civil)</Text>
           </View>
-          <Text>N° sinistre : {cession.incident_number || 'N/A'}</Text>
-          <Text>N° contrat : {cession.policy_number || 'N/A'}</Text>
-          <Text>PV expertise : {cession.report_number || 'N/A'}</Text>
+          <Text><Text style={styles.boldText}>N° sinistre :</Text> {cession.incident_number || 'N/A'}</Text>
+          <Text><Text style={styles.boldText}>N° contrat :</Text> {cession.policy_number || 'N/A'}</Text>
+          <Text><Text style={styles.boldText}>PV expertise :</Text> {cession.report_number || 'N/A'}</Text>
         </View>
 
         {/* Date and place */}
