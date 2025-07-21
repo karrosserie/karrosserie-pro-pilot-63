@@ -237,8 +237,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               </div>
             </div>
           </div>
-          </div>
-
+          
           {/* Convention de cession section */}
           <div className="mb-8 border-t-2 border-black pt-8">
             {/* Title */}
@@ -280,6 +279,33 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               <div>ggobeyn@outlook.fr</div>
               <div>+33646465242</div>
               <div className="mt-2">Ci-après dénommé "Le Réparateur professionnel"</div>
+            </div>
+
+            {/* Exposé préalable */}
+            <div className="mb-8">
+              <h3 className="font-bold text-lg mb-4">EXPOSÉ PRÉALABLE</h3>
+              
+              <div className="mb-4">Conformément aux dispositions :</div>
+              
+              <div className="mb-2">- De l'article 1321 du Code civil établissant le principe et les effets de la cession de créance</div>
+              <div className="mb-2">- De l'article L.121-13 du Code des assurances imposant le versement de l'indemnité pour la remise en état effective du bien assuré</div>
+              <div className="mb-2">- De l'article R.121-5 du Code des assurances relatif aux modalités de règlement des indemnités d'assurance</div>
+              <div className="mb-2">- De l'arrêt de la Cour de cassation du 13 juin 2019 (n°18-17.907) confirmant l'opposabilité de la cession de créance d'indemnité d'assurance</div>
+              <div className="mb-6">- De l'arrêt de la Cour de cassation du 17 février 2015 (n°13-27.080) sur l'obligation de l'assureur de régler l'indemnité au réparateur cessionnaire</div>
+              
+              <div className="mb-8">Le Client/Assuré entend céder sa créance d'indemnité d'assurance au Réparateur professionnel.</div>
+            </div>
+
+            {/* Identification du sinistre */}
+            <div className="mb-8">
+              <h3 className="font-bold text-lg mb-4">IDENTIFICATION DU SINISTRE</h3>
+              
+              <div className="mb-2"><strong>Compagnie d'assurance :</strong> {cession.insurance_companies?.name || 'ACTIVE ASSURANCES'}</div>
+              <div className="mb-2"><strong>N° de contrat :</strong> {cession.policy_number || '7718265A'}</div>
+              <div className="mb-2"><strong>Référence sinistre :</strong> {cession.incident_number || '00125A'} du {cession.incident_date ? formatDate(cession.incident_date) : '17/07/2025'}</div>
+              <div className="mb-2"><strong>Expert mandaté :</strong> {cession.expert_name || 'DEVAUX MATTHIEU'}</div>
+              <div className="mb-2"><strong>Rapport d'expertise n° :</strong> {cession.report_number || 'AE25008924'}</div>
+              <div className="mb-2"><strong>Montant validé :</strong> 1 094,79 € TTC</div>
             </div>
 
             {/* Identification du véhicule */}
@@ -349,36 +375,80 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
                 <div className="mb-1">- Lettre recommandée avec accusé de réception</div>
                 <div className="mb-1">- Courriel avec accusé de réception</div>
                 <div className="mb-1">- Télécopie avec accusé de réception</div>
+                
+                <div className="mb-2">5.2 Le Réparateur professionnel est expressément mandaté pour effectuer cette notification.</div>
+                
+                <div className="mb-2">5.3 La notification mentionnera :</div>
+                <div className="mb-1">- La référence du sinistre</div>
+                <div className="mb-1">- Le montant de la créance cédée</div>
+                <div className="mb-1">- Les coordonnées bancaires du Réparateur</div>
+                <div className="mb-2">- La mention expresse de l'article L.121-13 du Code des assurances</div>
+              </div>
+
+              {/* Article 6 */}
+              <div className="mb-6">
+                <div className="font-bold mb-2">Article 6 : Privilège et droit de rétention</div>
+                
+                <div className="mb-1">6.1 Le Réparateur bénéficie du privilège spécial mobilier prévu par l'article 2332 3° du Code civil.</div>
+                <div className="mb-2">6.2 Le Réparateur pourra exercer son droit de rétention jusqu'au complet paiement.</div>
+              </div>
+
+              {/* Article 7 */}
+              <div className="mb-6">
+                <div className="font-bold mb-2">Article 7 : Clause de substitution</div>
+                
+                <div className="mb-2">En cas d'invalidité d'une clause, celle-ci sera réputée non écrite sans affecter la validité des autres dispositions.</div>
+              </div>
+
+              {/* Article 8 */}
+              <div className="mb-8">
+                <div className="font-bold mb-2">Article 8 : Attribution de compétence</div>
+                
+                <div className="mb-2">Tout litige relèvera de la compétence exclusive du Tribunal Judiciaire de MARSEILLE.</div>
+              </div>
+
+              {/* Date et signatures */}
+              <div className="mb-8">
+                <div className="mb-4">Fait à MARSEILLE, le {formatDate(cession.created_at)}</div>
+                <div className="mb-8">En trois exemplaires originaux</div>
+                
+                <div className="grid grid-cols-2 gap-8 mb-8">
+                  {/* Le Cédant */}
+                  <div>
+                    <div className="font-bold mb-4">Le Cédant</div>
+                    <div className="flex justify-center items-center mb-4">
+                      <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center">
+                        <div className="text-white text-xs font-bold">∞</div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-center mb-2">Approuvé par KORPORATE Entreprise</div>
+                    <div className="text-sm">Lu et approuvé,</div>
+                    <div className="text-sm">Bon pour cession irrévocable de créance</div>
+                    <div className="text-sm">d'un montant de 1 094,79 € TTC</div>
+                  </div>
+                  
+                  {/* Le Cessionnaire */}
+                  <div>
+                    <div className="font-bold mb-4">Le Cessionnaire</div>
+                    <div className="text-center mb-4">
+                      <div className="font-bold text-2xl mb-2" style={{ fontFamily: 'cursive' }}>MUSSO DORIAN</div>
+                    </div>
+                    <div className="text-xs text-center mb-2">Approuvé par MUSSO DORIAN</div>
+                    <div className="text-sm">Bon pour acceptation de cession</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pièces jointes */}
+              <div className="mb-8">
+                <div className="font-bold mb-4">Vous trouverez ci-joint :</div>
+                <div className="mb-1">1. La copie du rapport d'expertise</div>
+                <div className="mb-1">2. La copie de la carte grise du véhicule72</div>
+                <div className="mb-1">3. La copie du permis de conduire de l'assuré72</div>
               </div>
             </div>
-
-            {/* Exposé préalable */}
-            <div className="mb-8">
-              <h3 className="font-bold text-lg mb-4">EXPOSÉ PRÉALABLE</h3>
-              
-              <div className="mb-4">Conformément aux dispositions :</div>
-              
-              <div className="mb-2">- De l'article 1321 du Code civil établissant le principe et les effets de la cession de créance</div>
-              <div className="mb-2">- De l'article L.121-13 du Code des assurances imposant le versement de l'indemnité pour la remise en état effective du bien assuré</div>
-              <div className="mb-2">- De l'article R.121-5 du Code des assurances relatif aux modalités de règlement des indemnités d'assurance</div>
-              <div className="mb-2">- De l'arrêt de la Cour de cassation du 13 juin 2019 (n°18-17.907) confirmant l'opposabilité de la cession de créance d'indemnité d'assurance</div>
-              <div className="mb-6">- De l'arrêt de la Cour de cassation du 17 février 2015 (n°13-27.080) sur l'obligation de l'assureur de régler l'indemnité au réparateur cessionnaire</div>
-              
-              <div className="mb-8">Le Client/Assuré entend céder sa créance d'indemnité d'assurance au Réparateur professionnel.</div>
-            </div>
-
-            {/* Identification du sinistre */}
-            <div className="mb-8">
-              <h3 className="font-bold text-lg mb-4">IDENTIFICATION DU SINISTRE</h3>
-              
-              <div className="mb-2"><strong>Compagnie d'assurance :</strong> {cession.insurance_companies?.name || 'ACTIVE ASSURANCES'}</div>
-              <div className="mb-2"><strong>N° de contrat :</strong> {cession.policy_number || '7718265A'}</div>
-              <div className="mb-2"><strong>Référence sinistre :</strong> {cession.incident_number || '00125A'} du {cession.incident_date ? formatDate(cession.incident_date) : '17/07/2025'}</div>
-              <div className="mb-2"><strong>Expert mandaté :</strong> {cession.expert_name || 'DEVAUX MATTHIEU'}</div>
-              <div className="mb-2"><strong>Rapport d'expertise n° :</strong> {cession.report_number || 'AE25008924'}</div>
-              <div className="mb-2"><strong>Montant validé :</strong> 1 094,79 € TTC</div>
-            </div>
           </div>
+        </div>
       </DialogContent>
     </Dialog>
   );
