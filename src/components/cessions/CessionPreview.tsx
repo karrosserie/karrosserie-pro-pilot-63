@@ -433,13 +433,9 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
                 <div className="grid grid-cols-2 gap-8 mb-8">
                   {/* Le Cédant */}
                   <div>
-                    <div className="font-bold mb-4">Le Cédant</div>
-                    <div className="flex justify-center items-center mb-4">
-                      <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center">
-                        <div className="text-white text-xs font-bold">∞</div>
-                      </div>
-                    </div>
-                    <div className="text-xs text-center mb-2">Approuvé par KORPORATE Entreprise</div>
+                    <div>Le Cédant</div>
+                    <div className="font-bold mb-4">{clientName.toUpperCase()}</div>
+                    <div>[Signature1/]</div>
                     <div className="text-sm">Lu et approuvé,</div>
                     <div className="text-sm">Bon pour cession irrévocable de créance</div>
                     <div className="text-sm">d'un montant de 1 094,79 € TTC</div>
@@ -447,11 +443,9 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
                   
                   {/* Le Cessionnaire */}
                   <div>
-                    <div className="font-bold mb-4">Le Cessionnaire</div>
-                    <div className="text-center mb-4">
-                      <div className="font-bold text-2xl mb-2" style={{ fontFamily: 'cursive' }}>MUSSO DORIAN</div>
-                    </div>
-                    <div className="text-xs text-center mb-2">Approuvé par MUSSO DORIAN</div>
+                    <div>Le Cessionnaire</div>
+                    <div className="font-bold mb-4">{companyData.name?.toUpperCase()}</div>
+                    <div>[Signature2/]</div>
                     <div className="text-sm">Bon pour acceptation de cession</div>
                   </div>
                 </div>
@@ -506,10 +500,10 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
             {/* Claim details */}
             <div className="mb-8">
-              <div className="mb-2"><strong>N° sinistre :</strong> {cession.incident_number || '00125A'}</div>
-              <div className="mb-2"><strong>N° contrat :</strong> {cession.policy_number || '7718265A'}</div>
-              <div className="mb-2"><strong>PV expertise :</strong> {cession.report_number || 'AE25008924'}</div>
-              <div className="mb-2"><strong>Véhicule :</strong> {cession.repair_orders?.vehicles?.license_plate || 'ED-684-JH'}</div>
+              <div><strong>N° sinistre :</strong> {cession.incident_number || ''}</div>
+              <div><strong>N° contrat :</strong> {cession.policy_number || ''}</div>
+              <div><strong>PV expertise :</strong> {cession.report_number || ''}</div>
+              <div><strong>Véhicule :</strong> {cession.repair_orders?.vehicles?.license_plate || ''}</div>
             </div>
 
             {/* Attestation text */}
@@ -518,13 +512,13 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               
               <div className="mb-6">
                 <div className="mb-4">
-                  <strong>1.</strong> Les travaux de réparation effectués sur le véhicule {cession.repair_orders?.vehicles?.car_brands?.name || 'PEUGEOT'} {cession.repair_orders?.vehicles?.car_models?.name || '308'} (immatriculation {cession.repair_orders?.vehicles?.license_plate || 'ED-684-JH'}, n° 
-                  série ) dans le cadre du sinistre survenu le {cession.incident_date ? formatDate(cession.incident_date) : '17/07/2025'}, référencé sous le n°{cession.incident_number || '00125A'}, ont été facturés en 
+                  <strong>1.</strong> Les travaux de réparation effectués sur le véhicule {cession.repair_orders?.vehicles?.car_brands?.name || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''} (immatriculation {cession.repair_orders?.vehicles?.license_plate || ''}, n° 
+                  série ) dans le cadre du sinistre survenu le {cession.incident_date ? formatDate(cession.incident_date) : ''}, référencé sous le n°{cession.incident_number || ''}, ont été facturés en 
                   stricte conformité avec :
                 </div>
                 <div className="ml-8 mb-2">o Les tarifs professionnels habituellement pratiqués par notre établissement ;</div>
-                <div className="ml-8 mb-2">o Les préconisations techniques du constructeur {cession.repair_orders?.vehicles?.car_brands?.name || 'PEUGEOT'} ;</div>
-                <div className="ml-8 mb-2">o Les dispositions du rapport d'expertise n° {cession.report_number || 'AE25008924'} ;</div>
+                <div className="ml-8 mb-2">o Les préconisations techniques du constructeur {cession.repair_orders?.vehicles?.car_brands?.name || ''} ;</div>
+                <div className="ml-8 mb-2">o Les dispositions du rapport d'expertise n° {cession.report_number || ''} ;</div>
                 <div className="ml-8 mb-4">o Les règles de l'art en vigueur dans le secteur de la réparation automobile.</div>
               </div>
 
@@ -546,14 +540,10 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
             {/* Date and signature */}
             <div className="mb-8">
-              <div className="mb-6">Fait à MARSEILLE, le {formatDate(cession.created_at)}</div>
+              <div className="mb-6">Fait à {companyData.city}, le {formatDate(cession.created_at)}</div>
               
-              <div className="mb-4 font-bold">KORPORATE</div>
-              
-              <div className="text-center mb-4">
-                <div className="font-bold text-2xl mb-2" style={{ fontFamily: 'cursive' }}>MUSSO DORIAN</div>
-              </div>
-              <div className="text-xs text-center">Approuvé par MUSSO DORIAN</div>
+              <div className="mb-4 font-bold">{companyData.name?.toUpperCase()}</div>
+              <div>[Signature1/]</div>
             </div>
           </div>
         </div>
