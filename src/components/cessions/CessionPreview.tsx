@@ -53,7 +53,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
           {/* Header text */}
           <p className="mb-8 text-justify">
             Conformément à l'article 1369-4 du Code civil, cette notification est également valablement effectuée par 
-            courrier à l'adresse suivante : ffc@clearbus.fr, avec accusé de réception électronique.
+            courrier à l'adresse suivante : {selectedInsuranceCompany?.email || 'email@assurance.fr'}, avec accusé de réception électronique.
           </p>
 
           {/* Company info and destination */}
@@ -165,14 +165,14 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
           {/* Payment request */}
           <div className="mb-8 text-justify">
-            En conséquence, nous vous demandons de procéder au règlement de l'indemnité d'un montant de 1 094,79 € TTC directement sur notre compte bancaire :
+            En conséquence, nous vous demandons de procéder au règlement de l'indemnité d'un montant de {cession.repair_orders?.amount ? `${cession.repair_orders.amount.toFixed(2)} €` : '0,00 €'} TTC directement sur notre compte bancaire :
           </div>
 
           {/* Bank details */}
           <div className="mb-8">
-            <div className="mb-2"><strong>BANQUE : CIC</strong></div>
-            <div className="mb-2"><strong>IBAN : FR76 0123 4567 8901 2345 6789 123</strong></div>
-            <div className="mb-2"><strong>BIC : CICFRPP</strong></div>
+            <div className="mb-2"><strong>BANQUE : {cession.bank_accounts?.bank || 'Banque'}</strong></div>
+            <div className="mb-2"><strong>IBAN : {cession.bank_accounts?.iban || 'FR00 0000 0000 0000 0000 0000 000'}</strong></div>
+            <div className="mb-2"><strong>BIC : {cession.bank_accounts?.bic || 'BANKFRPP'}</strong></div>
           </div>
 
           {/* Attachments */}
@@ -315,7 +315,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               <div className="mb-2"><strong>Référence sinistre :</strong> {cession.incident_number || '00125A'} du {cession.incident_date ? formatDate(cession.incident_date) : '17/07/2025'}</div>
               <div className="mb-2"><strong>Expert mandaté :</strong> {cession.expert_name || 'DEVAUX MATTHIEU'}</div>
               <div className="mb-2"><strong>Rapport d'expertise n° :</strong> {cession.report_number || 'AE25008924'}</div>
-              <div className="mb-2"><strong>Montant validé :</strong> 1 094,79 € TTC</div>
+              <div className="mb-2"><strong>Montant validé :</strong> {cession.repair_orders?.amount ? `${cession.repair_orders.amount.toFixed(2)} €` : '0,00 €'} TTC</div>
             </div>
 
             {/* Identification du véhicule */}
@@ -346,7 +346,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               <div className="mb-6">
                 <div className="font-bold mb-2">Article 2 : Montant et composition de la créance cédée</div>
                 
-                <div className="mb-2">La créance cédée correspond au montant total de 1 094,79 € TTC, comprenant :</div>
+                <div className="mb-2">La créance cédée correspond au montant total de {cession.repair_orders?.amount ? `${cession.repair_orders.amount.toFixed(2)} €` : '0,00 €'} TTC, comprenant :</div>
                 <div className="mb-1">- Pièces détachées : 24,50 € HT</div>
                 <div className="mb-1">- Main d'œuvre : 443,94 € HT</div>
                 <div className="mb-1">- Peinture et ingrédients : 443,88 € HT</div>

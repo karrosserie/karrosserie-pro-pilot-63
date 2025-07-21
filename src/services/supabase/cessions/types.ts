@@ -29,6 +29,7 @@ export interface Cession {
   repair_orders?: {
     reference: string;
     created_at: string;
+    amount: number;
     clients: { 
       first_name: string; 
       last_name: string; 
@@ -44,6 +45,11 @@ export interface Cession {
       car_brands: { name: string; } | null;
       car_models: { name: string; } | null;
     } | null;
+  } | null;
+  bank_accounts?: {
+    bank: string;
+    iban: string;
+    bic: string;
   } | null;
 }
 
