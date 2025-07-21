@@ -148,6 +148,20 @@ export const CessionsTable = ({
     return `Ordre n°${order.reference} du ${orderDate} - ${clientName} - ${vehicleInfo}`;
   };
 
+  const handleDownloadPDF = (cession: Cession) => {
+    if (!cession.document_url) {
+      toast({
+        title: "PDF non disponible",
+        description: "Aucun PDF n'a été généré pour cette cession. Veuillez d'abord initialiser la procédure.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Ouvrir le PDF dans un nouvel onglet
+    window.open(cession.document_url, '_blank');
+  };
+
   const handleInitializeProcedure = async (cession: Cession) => {
     console.log('Initializing procedure for cession:', cession.id);
     
@@ -288,7 +302,12 @@ export const CessionsTable = ({
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => handleDownloadPDF(cession)}
+                      title="Télécharger le PDF"
+                    >
                       <Download className="h-4 w-4" />
                     </Button>
                     <Button 
