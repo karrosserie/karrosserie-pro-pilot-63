@@ -65,9 +65,9 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
             <div>{companyData.phone || ''}</div>
           </div>
                 
-          <div className="text-right mb-8">
+          <div className="ml-10 mb-8">
             <div className="font-bold">
-              {selectedInsuranceCompany?.name || 'ASSURANCE'}
+              {selectedInsuranceCompany?.name || ''}
             </div>
             {selectedInsuranceCompany?.address && <div>{selectedInsuranceCompany.address}</div>}
             {selectedInsuranceCompany?.address2 && <div>{selectedInsuranceCompany.address2}</div>}
@@ -170,15 +170,15 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
 
           {/* Bank details */}
           <div className="mb-8">
-            <div className="mb-2"><strong>BANQUE : {cession.bank_accounts?.bank || 'Banque'}</strong></div>
-            <div className="mb-2"><strong>IBAN : {cession.bank_accounts?.iban || 'FR00 0000 0000 0000 0000 0000 000'}</strong></div>
-            <div className="mb-2"><strong>BIC : {cession.bank_accounts?.bic || 'BANKFRPP'}</strong></div>
+            <div><strong>BANQUE : {cession.bank_accounts?.bank || ''}</strong></div>
+            <div><strong>IBAN : {cession.bank_accounts?.iban || ''}</strong></div>
+            <div><strong>BIC : {cession.bank_accounts?.bic || ''}</strong></div>
           </div>
 
           {/* Attachments */}
           <div className="mb-8">
             <div className="mb-4"><strong>Vous trouverez ci-joint :</strong></div>
-            <div className="mb-2">1. Le contrat de cession de créance original</div>
+            <div>1. Le contrat de cession de créance original</div>
             <div className="mb-2">2. L'ordre de réparation</div>
           </div>
 
