@@ -383,7 +383,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               <div><strong>Référence sinistre :</strong> {cession.incident_number || ''} du {cession.incident_date ? formatDate(cession.incident_date) : ''}</div>
               <div><strong>Expert mandaté :</strong> {cession.expert_name || ''}</div>
               <div><strong>Rapport d'expertise n° :</strong> {cession.report_number || ''}</div>
-              <div><strong>Montant validé :</strong> {cession.repair_orders?.amount ? `${cession.repair_orders.amount.toFixed(2)} €` : '0,00 €'} TTC</div>
+              <div><strong>Montant validé :</strong> {cession.repair_orders?.amount ? `{cession.repair_orders?.amount ? `${formatEuro(cession.repair_orders.amount)} €` : '0,00 €'} TTC</div>
             </div>
 
             {/* Identification du véhicule */}
@@ -498,7 +498,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
                     <div>[Signature1/]</div>
                     <div className="text-sm">Lu et approuvé,</div>
                     <div className="text-sm">Bon pour cession irrévocable de créance</div>
-                    <div className="text-sm">d'un montant de {cession.repair_orders?.amount ? `${cession.repair_orders.amount.toFixed(2)} €` : '0,00 €'} TTC</div>
+                    <div className="text-sm">d'un montant de {cession.repair_orders?.amount ? `${formatEuro(cession.repair_orders.amount)} €` : '0,00 €'} TTC</div>
                   </div>
                   
                   {/* Le Cessionnaire */}
@@ -515,8 +515,8 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               <div className="mb-8">
                 <div className="mb-4">Vous trouverez ci-joint :</div>
                 <div>1. La copie du rapport d'expertise</div>
-                <div>2. La copie de la carte grise du véhicule72</div>
-                <div>3. La copie du permis de conduire de l'assuré72</div>
+                <div>2. La copie de la carte grise du véhicule</div>
+                <div>3. La copie du permis de conduire de l'assuré</div>
               </div>
             </div>
           </div>
