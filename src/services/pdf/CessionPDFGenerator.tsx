@@ -288,7 +288,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
         </View>
 
         {/* Vehicle details section */}
-        <View style={styles.sectionLarge}>
+        <View style={styles.sectionLarge} break>
           <Text style={styles.text}>Concernant l'indemnisation des réparations du véhicule :</Text>
           <Text>{cession.repair_orders?.vehicles?.car_brands?.name?.toUpperCase() || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''}</Text>
           <Text>Immatriculation : {cession.repair_orders?.vehicles?.license_plate || 'N/A'}</Text>
@@ -301,7 +301,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
         </Text>
 
         {/* Legal basis */}
-        <View style={styles.sectionLarge} break>
+        <View style={styles.sectionLarge}>
           <Text style={styles.section}>Cette cession est effectuée en vertu :</Text>
           <Text style={styles.listItem}>- De l'article L.121-13 du Code des assurances</Text>
           <Text style={styles.listItem}>- Des articles 1321 à 1326 du Code civil</Text>
@@ -316,9 +316,9 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
 
         {/* Bank details */}
         <View style={styles.sectionLarge}>
-          <Text style={styles.boldText}>BANQUE : {cession.bank_accounts?.bank || ''}</Text>
-          <Text style={styles.boldText}>IBAN : {cession.bank_accounts?.iban || ''}</Text>
-          <Text style={styles.boldText}>BIC : {cession.bank_accounts?.bic || ''}</Text>
+          <Text><Text style={styles.boldText}>BANQUE :</Text> {cession.bank_accounts?.bank || ''}</Text>
+          <Text><Text style={styles.boldText}>IBAN :</Text> {cession.bank_accounts?.iban || ''}</Text>
+          <Text><Text style={styles.boldText}>BIC :</Text> {cession.bank_accounts?.bic || ''}</Text>
         </View>
 
         {/* Attachments */}
@@ -340,7 +340,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
         </View>
 
         {/* Section de confirmation de cession avec séparateur */}
-        <View style={styles.separator}>
+        <View style={styles.separator} break>
           {/* Company info and destination repeated */}   
           <View style={styles.headerRow}>
             <View style={styles.leftColumn}>
@@ -350,7 +350,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
               <Text>{companyData.email || ''}</Text>
               <Text>{companyData.phone || ''}</Text>
             </View>
-            <View style={styles.rightColumn}>
+            <View style={[styles.rightColumn, { marginTop: 100 }]}>
               <Text style={styles.boldText}>{selectedInsuranceCompany?.name || ''}</Text>
               {selectedInsuranceCompany?.address && <Text>{selectedInsuranceCompany.address}</Text>}
               {selectedInsuranceCompany?.address2 && <Text>{selectedInsuranceCompany.address2}</Text>}
@@ -360,7 +360,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
 
           {/* Subject */}
           <View style={styles.section}>
-            <Text style={styles.boldText}>Objet : Confirmation de cession de créance - Dossier sinistre n°{cession.incident_number || ''}</Text>
+            <Text></Text><Text style={styles.boldText}>Objet :</Text> Confirmation de cession de créance - Dossier sinistre n°{cession.incident_number || ''}</Text>
           </View>
 
           {/* Greeting */}
