@@ -383,7 +383,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
               <div><strong>Référence sinistre :</strong> {cession.incident_number || ''} du {cession.incident_date ? formatDate(cession.incident_date) : ''}</div>
               <div><strong>Expert mandaté :</strong> {cession.expert_name || ''}</div>
               <div><strong>Rapport d'expertise n° :</strong> {cession.report_number || ''}</div>
-              <div><strong>Montant validé :</strong> {cession.repair_orders?.amount ? `{cession.repair_orders?.amount ? `${formatEuro(cession.repair_orders.amount)} €` : '0,00 €'} TTC</div>
+              <div><strong>Montant validé :</strong> {cession.repair_orders?.amount ? `${formatEuro(cession.repair_orders.amount)} €` : '0,00 €'} TTC</div>
             </div>
 
             {/* Identification du véhicule */}
