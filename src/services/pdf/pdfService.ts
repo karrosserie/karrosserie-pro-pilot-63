@@ -46,6 +46,10 @@ export const generateAndUploadCessionPDF = async (
         console.log('Prepared repair order data from function:', JSON.stringify(data, null, 2));
         
         // Surcharger les données client et véhicule avec celles de la cession si elles ne sont pas présentes
+        console.log('=== CLIENT DATA DEBUGGING ===');
+        console.log('data.clientData from prepareRepairOrderDataForPDF:', JSON.stringify(data.clientData, null, 2));
+        console.log('cession.repair_orders.clients:', JSON.stringify(cession.repair_orders.clients, null, 2));
+        
         const finalClientData = data.clientData || (cession.repair_orders.clients ? {
           name: `${cession.repair_orders.clients.first_name} ${cession.repair_orders.clients.last_name}`,
           address: `${cession.repair_orders.clients.address || ''} ${cession.repair_orders.clients.postal_code || ''} ${cession.repair_orders.clients.city || ''}`.trim(),
@@ -53,6 +57,8 @@ export const generateAndUploadCessionPDF = async (
           email: cession.repair_orders.clients.email || '',
           phone: cession.repair_orders.clients.phone || ''
         } : null);
+        
+        console.log('finalClientData après traitement:', JSON.stringify(finalClientData, null, 2));
         
         const finalVehicleData = data.vehicleData || (cession.repair_orders.vehicles ? {
           licensePlate: cession.repair_orders.vehicles.license_plate,
