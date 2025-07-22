@@ -1,1 +1,4 @@
-project_id = "yyujmjdkcftjoadytlao"
+project_id = "jukdsypvuehnniskgpfd"
+
+[functions.update-user]
+verify_jwt = true

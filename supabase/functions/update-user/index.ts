@@ -1,143 +1,139 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.6";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.6'
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
-
-interface UpdateUserRequest {
-  userId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  role: string;
-  active: boolean;
-  userCompanyId: string;
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const handler = async (req: Request): Promise<Response> => {
+interface UpdateUserRequest {
+  userId?: string;
+  profileData?: {
+    first_name?: string;
+    last_name?: string;
+    phone_number?: string;
+    company_name?: string;
+    avatar_url?: string;
+  };
+}
+
+Deno.serve(async (req) => {
   // Handle CORS preflight requests
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const authHeader = req.headers.get("Authorization");
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    );
+
+    // Get the authorization header
+    const authHeader = req.headers.get('authorization');
     if (!authHeader) {
+      console.error('No authorization header provided');
       return new Response(
-        JSON.stringify({ error: "Missing authorization header" }),
-        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
-
-    // Create Supabase client with service role key for admin operations
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    );
-
-    // Verify the user is authenticated
-    const token = authHeader.replace("Bearer ", "");
-    const { data: user, error: userError } = await supabaseAdmin.auth.getUser(token);
-    
-    if (userError || !user.user) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
-
-    const { 
-      userId, 
-      firstName, 
-      lastName, 
-      email, 
-      phoneNumber, 
-      role, 
-      active, 
-      userCompanyId 
-    }: UpdateUserRequest = await req.json();
-
-    console.log("Updating user:", { userId, firstName, lastName, email, role, active });
-
-    // Update user email in auth.users if it has changed
-    const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(
-      userId,
-      { 
-        email,
-        user_metadata: {
-          first_name: firstName,
-          last_name: lastName,
-          phone_number: phoneNumber
+        JSON.stringify({ error: 'No authorization header' }),
+        { 
+          status: 401, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
-      }
-    );
-
-    if (authError) {
-      console.error("Auth update error:", authError);
-      return new Response(
-        JSON.stringify({ error: "Failed to update user authentication data: " + authError.message }),
-        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    // Update profile in profiles table
-    const { error: profileError } = await supabaseAdmin
+    // Verify the user's token
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
+    
+    if (authError || !user) {
+      console.error('Authentication failed:', authError);
+      return new Response(
+        JSON.stringify({ error: 'Authentication failed' }),
+        { 
+          status: 401, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    console.log('Authenticated user:', user.id);
+
+    const { userId, profileData }: UpdateUserRequest = await req.json();
+    
+    // Use the authenticated user's ID if no userId is provided, or verify the user has permission
+    const targetUserId = userId || user.id;
+    
+    // For security, only allow users to update their own profile unless they have admin permissions
+    if (targetUserId !== user.id) {
+      console.error('User attempting to update different user profile:', { requestingUser: user.id, targetUser: targetUserId });
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized to update this user' }),
+        { 
+          status: 403, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    if (!profileData) {
+      return new Response(
+        JSON.stringify({ error: 'No profile data provided' }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    console.log('Updating profile for user:', targetUserId, 'with data:', profileData);
+
+    // Update the user's profile
+    const { data, error } = await supabaseClient
       .from('profiles')
       .update({
-        first_name: firstName,
-        last_name: lastName,
-        email: email,
-        phone_number: phoneNumber
+        ...profileData,
+        updated_at: new Date().toISOString(),
       })
-      .eq('id', userId);
+      .eq('id', targetUserId)
+      .select()
+      .single();
 
-    if (profileError) {
-      console.error("Profile update error:", profileError);
+    if (error) {
+      console.error('Error updating profile:', error);
       return new Response(
-        JSON.stringify({ error: "Failed to update profile: " + profileError.message }),
-        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        JSON.stringify({ error: 'Failed to update profile', details: error.message }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
       );
     }
 
-    // Update role and status in user_companies table
-    const { error: roleError } = await supabaseAdmin
-      .from('user_companies')
-      .update({ 
-        role: role,
-        active: active
-      })
-      .eq('id', userCompanyId);
-
-    if (roleError) {
-      console.error("Role update error:", roleError);
-      return new Response(
-        JSON.stringify({ error: "Failed to update user role: " + roleError.message }),
-        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
+    console.log('Profile updated successfully:', data);
 
     return new Response(
-      JSON.stringify({ success: true, message: "User updated successfully" }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
+      JSON.stringify({ 
+        success: true, 
+        message: 'Profile updated successfully',
+        data 
+      }),
+      { 
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     );
 
-  } catch (error: any) {
-    console.error("Error in update-user function:", error);
+  } catch (error) {
+    console.error('Unexpected error in update-user function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
+      JSON.stringify({ 
+        error: 'Internal server error', 
+        details: error.message 
+      }),
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     );
   }
-};
-
-serve(handler);
+});
