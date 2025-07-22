@@ -66,8 +66,8 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
             <div className="mb-4">
               <div className="font-bold">L'Emprunteur :</div>
               <div>Nom et prénom : {loanData.client}</div>
-              <div>Adresse : {/* TODO: récupérer depuis la fiche client */}</div>
-              <div>Téléphone : +33646465242</div>
+              <div>Adresse : {/* Récupérer depuis client.address + client.postal_code + client.city */}</div>
+              <div>Téléphone : {/* Récupérer depuis client.phone si renseigné */}</div>
             </div>
           </div>
 
@@ -86,11 +86,11 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               Le garage met gratuitement à disposition de l'Emprunteur le véhicule suivant :
             </div>
             <div className="ml-4">
-              <div>Marque : {loanData.vehicle.split(' ')[0] || ""}</div>
-              <div>Modèle : {loanData.vehicle.split(' ').slice(1, -1).join(' ') || ""}</div>
-              <div>N° d'immatriculation : AC-426-FB</div>
-              <div>Carburant : 92 %</div>
-              <div>Kilométrage : 23679 Km</div>
+              <div>Marque : {/* Récupérer depuis vehicle.brand.name */}</div>
+              <div>Modèle : {/* Récupérer depuis vehicle.model.name */}</div>
+              <div>N° d'immatriculation : {/* Récupérer depuis vehicle.license_plate */}</div>
+              <div>Carburant : {/* Récupérer depuis reservation.fuel_level_start */}%</div>
+              <div>Kilométrage : {/* Récupérer depuis reservation.start_mileage */} Km</div>
             </div>
           </div>
 
