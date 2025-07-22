@@ -77,9 +77,7 @@ export const generateAndUploadCessionPDF = async (
           mileage: repairOrderVehicle?.mileage ? repairOrderVehicle.mileage.toLocaleString() + ' km' : '',
           vehicle: repairOrderVehicle ? `${repairOrderVehicle.car_brands?.name || ''} ${repairOrderVehicle.car_models?.name || ''}`.trim() : '',
           billingDate: cession.repair_orders.created_at ? new Date(cession.repair_orders.created_at).toLocaleDateString('fr-FR') : '',
-          notes: '',  // Notes non disponibles dans les données
-          expectedDelay: '',  // Délai non disponible dans les données
-          customFooterText: '[Signature2/]',
+          notes: 'Observations et remarques concernant cette réparation [Signature2/]',  // Notes avec texte par défaut et signature
           items: formattedItems,
           totals: {
             // Format pour le template par défaut
@@ -95,12 +93,16 @@ export const generateAndUploadCessionPDF = async (
         } : null;
 
         // Formater les données véhicule comme attendu par InvoicePDF
+        const today = new Date();
+        const futureDate = new Date();
+        futureDate.setDate(today.getDate() + 7); // Délai de 7 jours par défaut
+        
         const formattedVehicleData = repairOrderVehicle ? {
           vehicle: `${repairOrderVehicle.car_brands?.name || ''} ${repairOrderVehicle.car_models?.name || ''}`.trim(),
           licensePlate: repairOrderVehicle.license_plate || '',
           mileage: repairOrderVehicle.mileage ? repairOrderVehicle.mileage.toLocaleString() + ' km' : '',
-          start_date: null, // Ces données ne sont pas disponibles dans la cession
-          end_date: null,   // Ces données ne sont pas disponibles dans la cession
+          start_date: today.toISOString(),     // Date de début = aujourd'hui
+          end_date: futureDate.toISOString(),  // Date de fin = dans 7 jours
         } : null;
 
         const invoiceData = {
