@@ -23,7 +23,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
 }) => {
   const { companyData } = useCompany();
 
-  const currentDate = formatDate(new Date().toISOString());
+  const loanCreationDate = loanData?.created_at ? formatDate(loanData.created_at) : formatDate(new Date().toISOString());
 
   if (!loanData) return null;
   
@@ -49,25 +49,25 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
           </div>
 
           {/* ENTRE LES SOUSSIGNÉS */}
-          <div className="mb-6">
-            <h2 className="font-bold text-lg mb-4">ENTRE LES SOUSSIGNÉS :</h2>
-            
-            <div className="mb-4">
-              <div className="font-bold">Le Prêteur :</div>
-              <div>Nom du garage : {companyData.name?.toUpperCase() || ""}</div>
-              <div>Adresse : {companyData.address || ""} {companyData.zipcode || ""} {companyData.city || ""}</div>
-              <div>N° SIRET : {companyData.siret || ""}</div>
-            </div>
+      <div className="mb-6">
+        <h2 className="font-bold text-lg mb-4">ENTRE LES SOUSSIGNÉS :</h2>
+        
+        <div className="mb-4">
+          <div className="font-bold">Le Prêteur :</div>
+          <div>Nom du garage : {companyData.name?.toUpperCase() || ""}</div>
+          <div>Adresse : {companyData.address || ""} {companyData.zipcode || ""} {companyData.city || ""}</div>
+          <div>N° SIRET : {companyData.siret || ""}</div>
+        </div>
 
-            <div className="font-bold mb-2">ET</div>
+        <div className="font-bold mb-2">ET</div>
 
-            <div className="mb-4">
-              <div className="font-bold">L'Emprunteur :</div>
-              <div>Nom et prénom : {loanData?.clients?.first_name} {loanData?.clients?.last_name}</div>
-              <div>Adresse : {[loanData?.clients?.address, loanData?.clients?.postal_code, loanData?.clients?.city].filter(Boolean).join(' ')}</div>
-              {loanData?.clients?.phone && <div>Téléphone : {loanData.clients.phone}</div>}
-            </div>
-          </div>
+        <div className="mb-4">
+          <div className="font-bold">L'Emprunteur :</div>
+          <div>Nom et prénom : {loanData?.clients?.first_name} {loanData?.clients?.last_name}</div>
+          <div>Adresse : {[loanData?.clients?.address, loanData?.clients?.postal_code, loanData?.clients?.city].filter(Boolean).join(' ')}</div>
+          {loanData?.clients?.phone && <div>Téléphone : {loanData.clients.phone}</div>}
+        </div>
+      </div>
 
           {/* PRÉAMBULE */}
           <div className="mb-6">
@@ -422,12 +422,16 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
           <div className="mb-6">
             <h2 className="font-bold text-lg mb-4">Signature de l'assuré</h2>
             <div className="text-center">
-              <div className="text-4xl font-bold mb-2" style={{ fontFamily: 'cursive' }}>
-                ∅
-              </div>
-              <div className="font-bold">Monsieur BOUCIE Ahmed</div>
-              <div className="text-sm">Signé le {formatDate(new Date().toISOString())} à {new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</div>
-              <div className="text-xs text-gray-600">À la latitude/longitude : 43.266749,5.3944581</div>
+              {loanData?.client_signature ? (
+                <img src={loanData.client_signature} alt="Signature du client" className="max-w-xs mx-auto mb-2" />
+              ) : (
+                <div className="text-4xl font-bold mb-2" style={{ fontFamily: 'cursive' }}>
+                  ∅
+                </div>
+              )}
+              <div className="font-bold">{loanData?.clients?.first_name} {loanData?.clients?.last_name}</div>
+              <div className="text-sm">Signé le {loanCreationDate} à {new Date(loanData?.created_at || new Date()).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</div>
+              <div className="text-xs text-gray-600">À la latitude/longitude : [position à obtenir]</div>
             </div>
           </div>
         </div>
