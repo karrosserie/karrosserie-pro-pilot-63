@@ -440,7 +440,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
           {/* Signature de l'assuré */}
           <div className="mb-6">
             <h2 className="font-bold text-lg mb-4">Signature de l'assuré</h2>
-            <div className="text-center">
+            <div>
               {loanData?.client_signature ? (
                 <img src={loanData.client_signature} alt="Signature du client" className="max-w-xs mx-auto mb-2" />
               ) : (
