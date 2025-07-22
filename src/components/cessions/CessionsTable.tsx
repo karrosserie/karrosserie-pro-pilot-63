@@ -445,21 +445,25 @@ export const CessionsTable = ({
                         <Download className="h-4 w-4" />
                       </Button>
                     )}
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => onEditCession(cession)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="text-red-500 hover:text-red-700"
-                      onClick={() => onDeleteCession(cession.id)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
+                    {cession.status === 'en_attente' && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => onEditCession(cession)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {cession.status === 'en_attente' && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => onDeleteCession(cession.id)}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                    )}
                     {cession.status === 'en_attente' && (
                       <Button 
                         variant="ghost" 
