@@ -101,6 +101,26 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
                 <span className="font-medium">Immatriculation</span>
                 <span>{loanData?.fleet_vehicles?.license_plate || ''}</span>
               </div>
+              
+              {/* Informations de départ */}
+              <div className="mt-3">
+                <div className="font-semibold text-gray-800 mb-1">Départ :</div>
+                <div className="ml-2 space-y-1">
+                  <div>Le : {loanData?.start_date ? formatDate(loanData.start_date) : ''}</div>
+                  <div>Kilométrage : {loanData?.start_mileage || ''} Km</div>
+                  <div>Carburant : {loanData?.fuel_level_start || ''}%</div>
+                </div>
+              </div>
+              
+              {/* Informations de retour */}
+              <div className="mt-3">
+                <div className="font-semibold text-gray-800 mb-1">Retour :</div>
+                <div className="ml-2 space-y-1">
+                  <div>Le : {loanData?.expected_return_date ? formatDate(loanData.expected_return_date) : ''}</div>
+                  <div>Kilométrage : - - - Km</div>
+                  <div>Carburant : - - - %</div>
+                </div>
+              </div>
             </div>
           </div>
     
