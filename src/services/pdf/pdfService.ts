@@ -88,7 +88,17 @@ export const generateAndUploadCessionPDF = async (
           invoice: invoiceData, 
           companyData: data.companyData, 
           receipts: [],
-          clientData: finalClientData,
+          clientData: {
+            name: finalClientData?.name || 'Client non spécifié',
+            address: finalClientData?.address || 'Adresse non renseignée',
+            city: finalClientData?.city || 'Ville non renseignée',
+            phone: finalClientData?.phone || '',
+            email: finalClientData?.email || '',
+            // Ajouter les éléments et totaux pour l'affichage dans le PDF
+            items: [...(Array.isArray(data.repairOrder.repairs_data) ? data.repairOrder.repairs_data : []), ...(Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data : [])],
+            totals: data.totals,
+            amountDue: `${data.totals.total.toFixed(2).replace('.', ',')} €`
+          },
           vehicleData: finalVehicleData,
           template: data.template,
           documentType: 'repair_order'
