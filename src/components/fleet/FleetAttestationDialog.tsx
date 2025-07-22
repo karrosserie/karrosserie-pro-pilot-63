@@ -74,8 +74,8 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
                 <span className="text-white font-bold text-base">LOGO</span>
               </div>
             )}
-            <p className="text-gray-600 font-bold mb-2 text-sm">{companyData.name || ''}</p>
-            <div className="text-sm text-gray-600 space-y-1">
+            <p className="text-black font-bold mb-2 text-sm">{companyData.name || ''}</p>
+            <div className="text-sm text-black space-y-1">
               <p>{companyData.address || ''}</p>
               <p>{companyData.zipcode || ''} {companyData.city || ''}</p>
               <p>Téléphone : {companyData.phone || ''}</p>
