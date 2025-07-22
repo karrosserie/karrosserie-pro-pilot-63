@@ -40,100 +40,115 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
         </DialogHeader>
         
         <div className="bg-white p-8 text-black text-sm leading-relaxed">
-          {/* En-tête de l'entreprise */}
-          <div className="text-center mb-8">
-            <div className="font-bold text-lg mb-2">{companyData.name?.toUpperCase() || ''}</div>
-            <div>{companyData.address || ''}</div>
-            <div>{companyData.zipcode || ''} {companyData.city || ''}</div>
-            <div>{companyData.phone || ''}</div>
-            <div>{companyData.email || ''}</div>
-            {companyData.siret && <div>SIRET: {companyData.siret}</div>}
-          </div>
-
           {/* Titre du document */}
           <div className="text-center mb-8">
-            <h2 className="font-bold text-xl border-b-2 border-black inline-block pb-2">
-              ATTESTATION DE PRÊT DE VÉHICULE
-            </h2>
+            <h1 className="text-blue-600 font-bold text-xl mb-2">
+              CONTRAT DE PRÊT DE VÉHICULE DE COURTOISIE
+            </h1>
+            <div className="text-blue-600 text-sm italic">
+              (Version amendée, complétée et renforcée)
+            </div>
           </div>
 
-          {/* Date et lieu */}
-          <div className="mb-8 text-right">
-            {companyData.city}, le {currentDate}
+          {/* ENTRE LES SOUSSIGNÉS */}
+          <div className="mb-6">
+            <h2 className="text-blue-600 font-bold text-lg mb-4">ENTRE LES SOUSSIGNÉS :</h2>
+            
+            <div className="mb-4">
+              <div className="font-bold">Le Prêteur :</div>
+              <div>Nom du garage : {companyData.name?.toUpperCase() || "KORPORATE"}</div>
+              <div>Adresse : {companyData.address || "25 COURS PIERRE PUGET 13006"}</div>
+              <div>N° SIRET : {companyData.siret || "917 775 835 00015"}</div>
+              <div>Représenté par : {companyData.name?.toUpperCase() || "KORPORATE"}</div>
+            </div>
+
+            <div className="font-bold mb-2">ET</div>
+
+            <div className="mb-4">
+              <div className="font-bold">L'Emprunteur :</div>
+              <div>Raison sociale : {loanData.client}</div>
+              <div>Adresse : 36 AV DE FRAIS VALLON 13013 MARSEILLE 13</div>
+              <div>Nom et prénom de l'employeur : Monsieur BOUCIE Ahmad</div>
+              <div>Téléphone : +33646465242</div>
+            </div>
           </div>
 
-          {/* Corps de l'attestation */}
-          <div className="mb-8 space-y-6">
+          {/* PRÉAMBULE */}
+          <div className="mb-6">
+            <h2 className="text-blue-600 font-bold text-lg mb-4">PRÉAMBULE</h2>
             <div className="text-justify">
-              Je soussigné(e), {companyData.name || ''}, représenté(e) par son dirigeant, 
-              atteste par la présente que nous avons mis à disposition de :
+              Le présent contrat est conclu à titre exceptionnel et gracieux, dans le seul but de faciliter la mobilité temporaire de l'Emprunteur pendant l'immobilisation de son véhicule. Cette mise à disposition n'entraine aucune relation commerciale de location et ne saurait créer une quelconque obligation de résultat à l'égard du Prêteur quant aux performances, au confort ou à l'adaptation du véhicule aux besoins spécifiques de l'Emprunteur.
             </div>
+          </div>
 
-            {/* Informations du bénéficiaire */}
-            <div className="bg-gray-50 p-4 rounded border">
-              <div className="font-bold text-center mb-3">BÉNÉFICIAIRE DU PRÊT</div>
-              <div className="font-bold">{loanData.client.toUpperCase()}</div>
-              {/* TODO: Ajouter plus d'informations client si disponibles */}
+          {/* 1. OBJET DU CONTRAT */}
+          <div className="mb-6">
+            <h2 className="text-blue-600 font-bold text-lg mb-4">1. OBJET DU CONTRAT</h2>
+            <div className="mb-2">
+              Le garage met gratuitement à disposition de l'Emprunteur le véhicule suivant :
             </div>
-
-            {/* Informations du véhicule */}
-            <div className="bg-gray-50 p-4 rounded border">
-              <div className="font-bold text-center mb-3">VÉHICULE PRÊTÉ</div>
-              <div>{loanData.vehicle}</div>
-              {/* TODO: Ajouter plus d'informations véhicule si disponibles */}
+            <div className="ml-4">
+              <div>Marque : {loanData.vehicle.split(' ')[0] || "AUDI"}</div>
+              <div>Modèle : {loanData.vehicle.split(' ').slice(1).join(' ') || "Q2"}</div>
+              <div>N° d'immatriculation : AC-426-FB</div>
+              <div>Carburant : 92 %</div>
+              <div>Kilométrage : 234567 Km</div>
             </div>
+          </div>
 
-            {/* Période de prêt */}
-            <div className="text-justify">
-              Ce véhicule a été mis à disposition pour la période suivante :
+          {/* 2. DURÉE DU PRÊT */}
+          <div className="mb-6">
+            <h2 className="text-blue-600 font-bold text-lg mb-4">2. DURÉE DU PRÊT</h2>
+            <div>Période initiale : du {formatDate(loanData.startDate)} au {formatDate(loanData.expectedReturnDate)}</div>
+            <div className="font-bold mt-2">Restitution anticipée obligatoire.</div>
+            <div className="mt-2">
+              L'emprunteur s'engage expressément à restituer le véhicule sans délai dès que son véhicule personnel est prêt, même si cette disponibilité intervient avant la date de fin prévue initialement.
             </div>
-
-            <div className="bg-gray-50 p-4 rounded border text-center">
-              <div className="font-bold">PÉRIODE DE PRÊT</div>
-              <div className="mt-2">
-                Du <span className="font-bold">{formatDate(loanData.startDate)}</span> 
-                {' '}au <span className="font-bold">{formatDate(loanData.expectedReturnDate)}</span>
+            
+            <div className="mt-4">
+              <div className="font-bold">2.3. Prolongation</div>
+              <div>
+                Toute demande de prolongation doit être formulée par écrit 24 heures avant l'échéance et reste soumise à l'acceptation discrétionnaire du Prêteur qui se réserve le droit de refuser sans avoir à justifier sa décision.
               </div>
             </div>
 
-            {/* Conditions du prêt */}
-            <div className="text-justify">
-              Ce prêt de véhicule est effectué à titre gratuit dans le cadre de nos prestations de service. 
-              Le bénéficiaire s'engage à :
+            <div className="mt-4">
+              <div className="font-bold">2.4. Pénalités de retard</div>
+              <div>
+                Tout retard non justifié et préalablement accepté par écrit par le Prêteur entraînera une pénalité forfaitaire de 150€ par jour de retard entamé, sans préjudice de toute action en justice que le Prêteur pourrait intenter pour obtenir la restitution du véhicule.
+              </div>
+            </div>
+          </div>
+
+          {/* 3. UTILISATION DU VÉHICULE */}
+          <div className="mb-6">
+            <h2 className="text-blue-600 font-bold text-lg mb-4">3. UTILISATION DU VÉHICULE</h2>
+            
+            <div className="mb-4">
+              <div className="font-bold">3.1. Conducteurs autorisés</div>
+              <div>L'utilisation du véhicule est strictement limitée à :</div>
+              <div className="ml-4 mt-2">
+                <div>L'Emprunteur nommément désigné dans ce contrat</div>
+                <div>Les employés de l'Emprunteur expressément listés dans l'annexe, titulaires d'un permis de conduire valide depuis plus de 3 ans, et dont copie du permis a été fournie au Prêteur avant la signature du présent contrat</div>
+                <div>Tout prêt, cession ou mise à disposition du véhicule à une tierce personne entraîne:</div>
+              </div>
             </div>
 
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Utiliser le véhicule avec soin et en bon père de famille</li>
-              <li>Respecter le Code de la route et toutes les réglementations en vigueur</li>
-              <li>Restituer le véhicule dans l'état où il a été confié</li>
-              <li>Signaler immédiatement tout sinistre ou dommage</li>
-              <li>Ne pas sous-louer ou prêter le véhicule à un tiers</li>
-            </ul>
-
-            {/* Assurance */}
-            <div className="text-justify">
-              Le véhicule est assuré par nos soins pour la durée du prêt. 
-              Toute franchise éventuelle reste à la charge du bénéficiaire en cas de sinistre responsable.
-            </div>
-
-            {/* Finalisation */}
-            <div className="text-justify">
-              Cette attestation est établie pour servir et valoir ce que de droit.
-            </div>
+            <div className="font-bold">1. La résiliation immédiate du contrat</div>
           </div>
 
           {/* Signature */}
           <div className="mt-12">
             <div className="grid grid-cols-2 gap-8">
               <div className="text-center">
-                <div className="mb-4">Le bénéficiaire</div>
+                <div className="mb-4">L'Emprunteur</div>
                 <div className="font-bold">{loanData.client.toUpperCase()}</div>
                 <div className="mt-8 border-t border-gray-400 pt-2">Signature</div>
               </div>
               
               <div className="text-center">
-                <div className="mb-4">Le prêteur</div>
-                <div className="font-bold">{companyData.name?.toUpperCase() || ''}</div>
+                <div className="mb-4">Le Prêteur</div>
+                <div className="font-bold">{companyData.name?.toUpperCase() || "KORPORATE"}</div>
                 <div className="mt-8 border-t border-gray-400 pt-2">Signature et cachet</div>
               </div>
             </div>
