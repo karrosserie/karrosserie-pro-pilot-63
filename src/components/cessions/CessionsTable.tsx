@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -32,7 +31,7 @@ import { useCompany } from '@/hooks/use-company';
 import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
 import { sendForSignature } from '@/services/api/signatureService';
 import { companyService } from '@/services/supabase/company';
-import { clientsService } from '@/services/supabase/clients';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CessionsTableProps {
   cessions: Cession[];
@@ -293,14 +292,22 @@ export const CessionsTable = ({
             }
 
             // Sauvegarder l'ID du second recipient (client) dans clients
+            // Utiliser une mise à jour directe via Supabase pour préserver tous les champs existants
             if (repairOrderData.clients?.id) {
               console.log('Updating client with recipient ID:', signatureResponse.recipients[1].id);
               try {
-                await clientsService.update(repairOrderData.clients.id, {
-                  ...repairOrderData.clients,
-                  oodrive_recipient_id: signatureResponse.recipients[1].id.toString()
-                });
-                console.log('Client updated successfully');
+                const { error } = await supabase
+                  .from('clients')
+                  .update({ 
+                    oodrive_recipient_id: signatureResponse.recipients[1].id.toString() 
+                  })
+                  .eq('id', repairOrderData.clients.id);
+
+                if (error) {
+                  console.error('Error updating client via Supabase:', error);
+                } else {
+                  console.log('Client updated successfully via Supabase');
+                }
               } catch (clientError) {
                 console.error('Error updating client:', clientError);
               }
