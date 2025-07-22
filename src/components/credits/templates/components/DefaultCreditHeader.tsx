@@ -14,8 +14,11 @@ interface DefaultCreditHeaderProps {
   };
   clientData: {
     name?: string;
+    first_name?: string;
+    last_name?: string;
     address?: string;
     city?: string;
+    postal_code?: string;
     phone?: string;
     email?: string;
   };
@@ -92,9 +95,9 @@ const DefaultCreditHeader = ({ companyData, creditData, clientData }: DefaultCre
       <div>
         <h3 className="text-lg font-semibold mb-3 text-gray-800">Avoir pour</h3>
         <div className="text-base space-y-1">
-          <p className="font-medium">{clientData.name}</p>
+          <p className="font-medium">{clientData.name || `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim()}</p>
           <p>{clientData.address}</p>
-          <p>{clientData.city}</p>
+          <p>{clientData.postal_code} {clientData.city}</p>
           {clientData.phone && <p>Téléphone : {clientData.phone}</p>}
           {clientData.email && <p>E-mail : {clientData.email}</p>}
         </div>
