@@ -46,10 +46,6 @@ export const generateAndUploadCessionPDF = async (
         console.log('Prepared repair order data from function:', JSON.stringify(data, null, 2));
         
         // Surcharger les données client et véhicule avec celles de la cession si elles ne sont pas présentes
-        console.log('=== CLIENT DATA DEBUGGING ===');
-        console.log('data.clientData from prepareRepairOrderDataForPDF:', JSON.stringify(data.clientData, null, 2));
-        console.log('cession.repair_orders.clients:', JSON.stringify(cession.repair_orders.clients, null, 2));
-        
         const finalClientData = data.clientData || (cession.repair_orders.clients ? {
           name: `${cession.repair_orders.clients.first_name} ${cession.repair_orders.clients.last_name}`,
           address: `${cession.repair_orders.clients.address || ''} ${cession.repair_orders.clients.postal_code || ''} ${cession.repair_orders.clients.city || ''}`.trim(),
@@ -57,8 +53,6 @@ export const generateAndUploadCessionPDF = async (
           email: cession.repair_orders.clients.email || '',
           phone: cession.repair_orders.clients.phone || ''
         } : null);
-        
-        console.log('finalClientData après traitement:', JSON.stringify(finalClientData, null, 2));
 
         const finalVehicleData = data.vehicleData || (cession.repair_orders.vehicles ? {
           licensePlate: cession.repair_orders.vehicles.license_plate,
@@ -68,12 +62,6 @@ export const generateAndUploadCessionPDF = async (
           year: null,
           mileage: cession.repair_orders.vehicles.mileage
         } : null);
-
-        console.log('Final client data for PDF:', JSON.stringify(finalClientData, null, 2));
-        console.log('Final vehicle data for PDF:', JSON.stringify(finalVehicleData, null, 2));
-        console.log('Repair order repairs_data:', JSON.stringify(data.repairOrder.repairs_data, null, 2));
-        console.log('Repair order parts_data:', JSON.stringify(data.repairOrder.parts_data, null, 2));
-        console.log('Totals:', JSON.stringify(data.totals, null, 2));
         
         const invoiceData = {
           ...data.repairOrder,
@@ -86,7 +74,7 @@ export const generateAndUploadCessionPDF = async (
 
         console.log('Invoice data for PDF:', JSON.stringify(invoiceData, null, 2));
 
-        // Créer le composant InvoicePDF pour l'ordre de réparation
+        // Créer le composant InvoicePDF pour l'ordre de réparation avec la structure de données attendue
         repairOrderPDFComponent = InvoicePDF({ 
           invoice: invoiceData, 
           companyData: data.companyData, 
@@ -97,9 +85,30 @@ export const generateAndUploadCessionPDF = async (
             city: finalClientData?.city || 'Ville non renseignée',
             phone: finalClientData?.phone || '',
             email: finalClientData?.email || '',
-            // Ajouter les éléments et totaux pour l'affichage dans le PDF
-            items: [...(Array.isArray(data.repairOrder.repairs_data) ? data.repairOrder.repairs_data : []), ...(Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data : [])],
-            totals: data.totals,
+            // Transformer les données des réparations et pièces pour l'affichage
+            items: [
+              ...(Array.isArray(data.repairOrder.repairs_data) ? data.repairOrder.repairs_data.map((repair: any) => ({
+                description: repair.description || 'N/A',
+                quantity: parseFloat(repair.quantity) || 0,
+                discount: parseFloat(repair.discount) || 0,
+                unitPrice: parseFloat(repair.unitCost) || 0,
+                vat: parseFloat(repair.vat) || 20,
+                totalHT: parseFloat(repair.total) || 0
+              })) : []),
+              ...(Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data.map((part: any) => ({
+                description: part.description || 'N/A',
+                quantity: parseFloat(part.quantity) || 0,
+                discount: parseFloat(part.discount) || 0,
+                unitPrice: parseFloat(part.unitCost) || 0,
+                vat: parseFloat(part.vat) || 20,
+                totalHT: parseFloat(part.total) || 0
+              })) : [])
+            ],
+            totals: {
+              subtotal: `${data.totals.subtotal.toFixed(2).replace('.', ',')} €`,
+              total: `${data.totals.total.toFixed(2).replace('.', ',')} €`,
+              totalVAT: `${data.totals.totalVAT.toFixed(2).replace('.', ',')} €`
+            },
             amountDue: `${data.totals.total.toFixed(2).replace('.', ',')} €`
           },
           vehicleData: finalVehicleData,
