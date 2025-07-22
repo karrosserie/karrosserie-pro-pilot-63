@@ -12,12 +12,7 @@ interface FleetAttestationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   loanId: string | null;
-  loanData?: {
-    vehicle: string;
-    client: string;
-    startDate: string;
-    expectedReturnDate: string;
-  };
+  loanData?: any; // Données complètes de la réservation
 }
 
 const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
@@ -65,9 +60,9 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
 
             <div className="mb-4">
               <div className="font-bold">L'Emprunteur :</div>
-              <div>Nom et prénom : {loanData.client}</div>
-              <div>Adresse : {/* Récupérer depuis client.address + client.postal_code + client.city */}</div>
-              <div>Téléphone : {/* Récupérer depuis client.phone si renseigné */}</div>
+              <div>Nom et prénom : {loanData?.clients?.first_name} {loanData?.clients?.last_name}</div>
+              <div>Adresse : {loanData?.clients?.address || ''} {loanData?.clients?.postal_code || ''} {loanData?.clients?.city || ''}</div>
+              {loanData?.clients?.phone && <div>Téléphone : {loanData.clients.phone}</div>}
             </div>
           </div>
 
@@ -86,18 +81,18 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               Le garage met gratuitement à disposition de l'Emprunteur le véhicule suivant :
             </div>
             <div className="ml-4">
-              <div>Marque : {/* Récupérer depuis vehicle.brand.name */}</div>
-              <div>Modèle : {/* Récupérer depuis vehicle.model.name */}</div>
-              <div>N° d'immatriculation : {/* Récupérer depuis vehicle.license_plate */}</div>
-              <div>Carburant : {/* Récupérer depuis reservation.fuel_level_start */}%</div>
-              <div>Kilométrage : {/* Récupérer depuis reservation.start_mileage */} Km</div>
+              <div>Marque : {loanData?.fleet_vehicles?.car_brands?.name || ''}</div>
+              <div>Modèle : {loanData?.fleet_vehicles?.car_models?.name || ''}</div>
+              <div>N° d'immatriculation : {loanData?.fleet_vehicles?.license_plate || ''}</div>
+              <div>Carburant : {loanData?.fuel_level_start || ''}%</div>
+              <div>Kilométrage : {loanData?.start_mileage || ''} Km</div>
             </div>
           </div>
 
           {/* 2. DURÉE DU PRÊT */}
           <div className="mb-6">
             <h2 className="font-bold text-lg mb-4">2. DURÉE DU PRÊT</h2>
-            <div>Période initiale : du {formatDate(loanData.startDate)} au {formatDate(loanData.expectedReturnDate)}</div>
+            <div>Période initiale : du {loanData?.start_date ? formatDate(loanData.start_date) : ''} au {loanData?.expected_return_date ? formatDate(loanData.expected_return_date) : ''}</div>
             <div className="font-bold mt-2">Restitution anticipée obligatoire.</div>
             <div className="mt-2">
               L'emprunteur s'engage expressément à restituer le véhicule sans délai dès que son véhicule personnel est prêt, même si cette disponibilité intervient avant la date de fin prévue initialement.
