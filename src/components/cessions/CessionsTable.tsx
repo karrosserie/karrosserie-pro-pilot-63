@@ -435,14 +435,16 @@ export const CessionsTable = ({
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => handleDownloadPDF(cession)}
-                      title="Télécharger le PDF"
-                    >
-                      <Download className="h-4 w-4" />
-                    </Button>
+                    {cession.status !== 'en_attente' && cession.status !== 'en_attente_signature' && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleDownloadPDF(cession)}
+                        title="Télécharger le PDF"
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button 
                       variant="ghost" 
                       size="icon"
@@ -458,19 +460,21 @@ export const CessionsTable = ({
                     >
                       <Trash className="h-4 w-4" />
                     </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => handleInitializeProcedure(cession)}
-                      title="Initialiser la procédure"
-                      disabled={isGeneratingPDF}
-                    >
-                      {isGeneratingPDF ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Play className="h-4 w-4" />
-                      )}
-                    </Button>
+                    {cession.status === 'en_attente' && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleInitializeProcedure(cession)}
+                        title="Initialiser la procédure"
+                        disabled={isGeneratingPDF}
+                      >
+                        {isGeneratingPDF ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Play className="h-4 w-4" />
+                        )}
+                      </Button>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>
