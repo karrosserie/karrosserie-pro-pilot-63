@@ -30,6 +30,8 @@ import { updateCession } from '@/services/supabase/cessions';
 import { useCompany } from '@/hooks/use-company';
 import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
 import { sendForSignature } from '@/services/api/signatureService';
+import { companyService } from '@/services/supabase/company';
+import { clientsService } from '@/services/supabase/clients';
 
 interface CessionsTableProps {
   cessions: Cession[];
@@ -75,6 +77,7 @@ export const CessionsTable = ({
     if (currentSection) sections.push(currentSection);
     return sections;
   };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'en_attente':
@@ -243,22 +246,50 @@ export const CessionsTable = ({
           description: "Envoi du document pour signature en cours...",
         });
 
-        await sendForSignature(
+        const signatureResponse = await sendForSignature(
           cession.id,
           pdfUrl,
           companyData,
           repairOrderData.clients
         );
 
-        toast({
-          title: "Document envoyé",
-          description: "Le document a été envoyé pour signature avec succès.",
-        });
+        console.log('Signature response received:', signatureResponse);
 
-        // Mettre à jour le statut de la cession
-        await updateCession(cession.id, {
-          status: 'en_attente_signature'
-        });
+        // Sauvegarder les identifiants Oodrive
+        if (signatureResponse.contract_id && signatureResponse.recipients?.length >= 2) {
+          // Sauvegarder l'ID du contrat dans la cession
+          await updateCession(cession.id, {
+            oodrive_contract_id: signatureResponse.contract_id,
+            status: 'en_attente_signature'
+          });
+
+          // Sauvegarder l'ID du premier recipient (entreprise) dans company_info
+          if (companyData?.id) {
+            await companyService.updateCompanyInfo(repairOrderData.user_id, {
+              ...companyData,
+              oodrive_recipient_id: signatureResponse.recipients[0].id
+            });
+          }
+
+          // Sauvegarder l'ID du second recipient (client) dans clients
+          if (repairOrderData.clients?.id) {
+            await clientsService.update(repairOrderData.clients.id, {
+              ...repairOrderData.clients,
+              oodrive_recipient_id: signatureResponse.recipients[1].id
+            });
+          }
+
+          toast({
+            title: "Document envoyé",
+            description: "Le document a été envoyé pour signature avec succès et les identifiants ont été sauvegardés.",
+          });
+        } else {
+          toast({
+            title: "Avertissement",
+            description: "Le document a été envoyé mais certains identifiants n'ont pas pu être sauvegardés.",
+            variant: "destructive",
+          });
+        }
 
       } catch (signatureError) {
         console.error('Error sending for signature:', signatureError);

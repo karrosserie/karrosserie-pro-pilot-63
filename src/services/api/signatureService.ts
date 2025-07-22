@@ -21,12 +21,20 @@ interface SignatureRequest {
   data: SignatureData[];
 }
 
+interface SignatureResponse {
+  contract_id: string;
+  recipients: Array<{
+    id: string;
+    email: string;
+  }>;
+}
+
 export const sendForSignature = async (
   cessionId: string,
   documentUrl: string,
   companyData: any,
   clientData: any
-): Promise<boolean> => {
+): Promise<SignatureResponse> => {
   try {
     console.log('Sending cession for signature:', { cessionId, documentUrl, companyData, clientData });
 
@@ -89,10 +97,10 @@ export const sendForSignature = async (
       throw new Error(`API request failed: ${response.status} ${response.statusText}`);
     }
 
-    const responseData = await response.json();
+    const responseData: SignatureResponse = await response.json();
     console.log('Signature API response:', responseData);
 
-    return true;
+    return responseData;
   } catch (error) {
     console.error('Error sending for signature:', error);
     throw error;
