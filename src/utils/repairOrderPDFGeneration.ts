@@ -119,16 +119,19 @@ export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, com
       const repairs = repairOrder.repairs_data ? JSON.parse(repairOrder.repairs_data as string) : [];
       const parts = repairOrder.parts_data ? JSON.parse(repairOrder.parts_data as string) : [];
       items = [...repairs, ...parts];
+      console.log('Repair order items parsed:', items);
     } catch (error) {
       console.error('Error parsing repair order items:', error);
     }
 
     // Calculer les totaux
     const totals = items.reduce((acc, item) => {
-      const unitCost = parseFloat(item.unitCost) || 0;
-      const quantity = parseFloat(item.quantity) || 0;
+      const unitCost = parseFloat(item.unitCost || item.total) || 0;
+      const quantity = parseFloat(item.quantity) || 1;
       const discount = parseFloat(item.discount) || 0;
-      const vat = parseFloat(item.vat) || 0;
+      const vat = parseFloat(item.vat) || 20;
+      
+      console.log('Processing repair order item:', item, { unitCost, quantity, discount, vat });
       
       const subtotal = unitCost * quantity;
       const afterDiscount = subtotal - discount;
@@ -141,6 +144,8 @@ export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, com
 
       return acc;
     }, { subtotalHT: 0, totalVAT: 0, total: 0 });
+    
+    console.log('Repair order totals calculated:', totals);
 
     return {
       repairOrder: {
@@ -173,16 +178,27 @@ export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, com
         vehicle: vehicleData?.vehicle || '',
         billingDate: repairOrder.created_at ? new Date(repairOrder.created_at).toLocaleDateString('fr-FR') : '',
         notes: repairOrder.notes || '',
-        items: items.map(item => ({
-          ref: item.ref || '',
-          description: item.description || '',
-          quantity: item.quantity || 0,
-          discount: item.discount || 0,
-          unitPrice: parseFloat(item.unitCost) || 0,
-          vat: item.vat || 20,
-          totalHT: ((parseFloat(item.unitCost) || 0) * (item.quantity || 0)) - (item.discount || 0),
-          totalTTC: ((parseFloat(item.unitCost) || 0) * (item.quantity || 0)) - (item.discount || 0) + (((parseFloat(item.unitCost) || 0) * (item.quantity || 0) - (item.discount || 0)) * (item.vat || 20) / 100)
-        })),
+        items: items.map(item => {
+          const unitPrice = parseFloat(item.unitCost || item.total) || 0;
+          const quantity = parseFloat(item.quantity) || 1;
+          const discount = parseFloat(item.discount) || 0;
+          const vat = parseFloat(item.vat) || 20;
+          
+          const subtotal = unitPrice * quantity;
+          const afterDiscount = subtotal - discount;
+          const totalTTC = afterDiscount + (afterDiscount * vat / 100);
+          
+          return {
+            ref: item.ref || '',
+            description: item.description || '',
+            quantity: quantity,
+            discount: discount,
+            unitPrice: unitPrice,
+            vat: vat,
+            totalHT: afterDiscount,
+            totalTTC: totalTTC
+          };
+        }),
         totals: {
           totalHT: `${totals.subtotalHT.toFixed(2).replace('.', ',')} €`,
           totalVAT: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,

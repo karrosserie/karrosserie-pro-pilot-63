@@ -117,16 +117,19 @@ export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => 
       const repairs = quote.repairs_data ? JSON.parse(quote.repairs_data as string) : [];
       const parts = quote.parts_data ? JSON.parse(quote.parts_data as string) : [];
       items = [...repairs, ...parts];
+      console.log('Quote items parsed:', items);
     } catch (error) {
       console.error('Error parsing quote items:', error);
     }
 
     // Calculer les totaux
     const totals = items.reduce((acc, item) => {
-      const unitCost = parseFloat(item.unitCost) || 0;
-      const quantity = parseFloat(item.quantity) || 0;
+      const unitCost = parseFloat(item.unitCost || item.total) || 0;
+      const quantity = parseFloat(item.quantity) || 1;
       const discount = parseFloat(item.discount) || 0;
-      const vat = parseFloat(item.vat) || 0;
+      const vat = parseFloat(item.vat) || 20;
+      
+      console.log('Processing item:', item, { unitCost, quantity, discount, vat });
       
       const subtotal = unitCost * quantity;
       const afterDiscount = subtotal - discount;
@@ -139,6 +142,8 @@ export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => 
 
       return acc;
     }, { subtotalHT: 0, totalVAT: 0, total: 0 });
+    
+    console.log('Quote totals calculated:', totals);
 
     return {
       quote: {
@@ -171,16 +176,27 @@ export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => 
         vehicle: vehicleData?.vehicle || '',
         billingDate: quote.created_at ? new Date(quote.created_at).toLocaleDateString('fr-FR') : '',
         notes: quote.notes || '',
-        items: items.map(item => ({
-          ref: item.ref || '',
-          description: item.description || '',
-          quantity: item.quantity || 0,
-          discount: item.discount || 0,
-          unitPrice: parseFloat(item.unitCost) || 0,
-          vat: item.vat || 20,
-          totalHT: ((parseFloat(item.unitCost) || 0) * (item.quantity || 0)) - (item.discount || 0),
-          totalTTC: ((parseFloat(item.unitCost) || 0) * (item.quantity || 0)) - (item.discount || 0) + (((parseFloat(item.unitCost) || 0) * (item.quantity || 0) - (item.discount || 0)) * (item.vat || 20) / 100)
-        })),
+        items: items.map(item => {
+          const unitPrice = parseFloat(item.unitCost || item.total) || 0;
+          const quantity = parseFloat(item.quantity) || 1;
+          const discount = parseFloat(item.discount) || 0;
+          const vat = parseFloat(item.vat) || 20;
+          
+          const subtotal = unitPrice * quantity;
+          const afterDiscount = subtotal - discount;
+          const totalTTC = afterDiscount + (afterDiscount * vat / 100);
+          
+          return {
+            ref: item.ref || '',
+            description: item.description || '',
+            quantity: quantity,
+            discount: discount,
+            unitPrice: unitPrice,
+            vat: vat,
+            totalHT: afterDiscount,
+            totalTTC: totalTTC
+          };
+        }),
         totals: {
           totalHT: `${totals.subtotalHT.toFixed(2).replace('.', ',')} €`,
           totalVAT: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
