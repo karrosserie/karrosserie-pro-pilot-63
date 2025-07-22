@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Cession, NewCession, UpdateCession } from './types';
 
@@ -28,7 +27,8 @@ export const createCession = async (cession: NewCession): Promise<Cession> => {
     report_number: cession.report_number || null,
     expert_name: cession.expert_name || null,
     insurance_company_id: cession.insurance_company_id || null,
-    document_url: cession.document_url || null
+    document_url: cession.document_url || null,
+    oodrive_contract_id: cession.oodrive_contract_id || null
   };
   
   console.log('Processed cession data:', processedCession);
@@ -60,7 +60,8 @@ export const updateCession = async (id: string, cession: UpdateCession): Promise
     report_number: cession.report_number,
     expert_name: cession.expert_name,
     insurance_company_id: cession.insurance_company_id,
-    document_url: cession.document_url
+    document_url: cession.document_url,
+    oodrive_contract_id: cession.oodrive_contract_id
   };
 
   const { data, error } = await supabase

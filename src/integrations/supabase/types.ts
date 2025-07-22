@@ -122,6 +122,7 @@ export type Database = {
           incident_date: string | null
           incident_number: string | null
           insurance_company_id: string | null
+          oodrive_contract_id: string | null
           policy_number: string | null
           reference: string
           repair_order_id: string | null
@@ -139,6 +140,7 @@ export type Database = {
           incident_date?: string | null
           incident_number?: string | null
           insurance_company_id?: string | null
+          oodrive_contract_id?: string | null
           policy_number?: string | null
           reference?: string
           repair_order_id?: string | null
@@ -156,6 +158,7 @@ export type Database = {
           incident_date?: string | null
           incident_number?: string | null
           insurance_company_id?: string | null
+          oodrive_contract_id?: string | null
           policy_number?: string | null
           reference?: string
           repair_order_id?: string | null
@@ -192,6 +195,7 @@ export type Database = {
           first_name: string
           id: string
           last_name: string
+          oodrive_recipient_id: string | null
           phone: string | null
           postal_code: string | null
           updated_at: string
@@ -207,6 +211,7 @@ export type Database = {
           first_name: string
           id?: string
           last_name: string
+          oodrive_recipient_id?: string | null
           phone?: string | null
           postal_code?: string | null
           updated_at?: string
@@ -222,6 +227,7 @@ export type Database = {
           first_name?: string
           id?: string
           last_name?: string
+          oodrive_recipient_id?: string | null
           phone?: string | null
           postal_code?: string | null
           updated_at?: string
@@ -239,6 +245,7 @@ export type Database = {
           logo_url: string | null
           name: string
           notifications: Json
+          oodrive_recipient_id: string | null
           phone: string
           siren: string
           siret: string
@@ -255,6 +262,7 @@ export type Database = {
           logo_url?: string | null
           name?: string
           notifications?: Json
+          oodrive_recipient_id?: string | null
           phone?: string
           siren?: string
           siret?: string
@@ -271,6 +279,7 @@ export type Database = {
           logo_url?: string | null
           name?: string
           notifications?: Json
+          oodrive_recipient_id?: string | null
           phone?: string
           siren?: string
           siret?: string
@@ -1462,48 +1471,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      workflow_events: {
-        Row: {
-          building_id: string | null
-          created_at: string
-          event_type: string
-          id: string
-          lot: string | null
-          n8n_execution_id: string | null
-          payload: Json
-          processed_at: string | null
-          source_app: string | null
-          status: string
-          user_id: string
-        }
-        Insert: {
-          building_id?: string | null
-          created_at?: string
-          event_type: string
-          id?: string
-          lot?: string | null
-          n8n_execution_id?: string | null
-          payload: Json
-          processed_at?: string | null
-          source_app?: string | null
-          status?: string
-          user_id: string
-        }
-        Update: {
-          building_id?: string | null
-          created_at?: string
-          event_type?: string
-          id?: string
-          lot?: string | null
-          n8n_execution_id?: string | null
-          payload?: Json
-          processed_at?: string | null
-          source_app?: string | null
-          status?: string
-          user_id?: string
-        }
-        Relationships: []
       }
     }
     Views: {

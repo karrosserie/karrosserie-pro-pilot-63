@@ -17,6 +17,7 @@ export interface Cession {
   
   // Optional fields
   document_url: string | null;
+  oodrive_contract_id: string | null;
   
   // Timestamps
   created_at: string;
@@ -40,6 +41,7 @@ export interface Cession {
       postal_code: string | null;
       email: string | null;
       phone: string | null;
+      oodrive_recipient_id: string | null;
     } | null;
     vehicles: {
       license_plate: string;
@@ -72,6 +74,7 @@ export interface NewCession {
   
   // Optional fields
   document_url?: string | null;
+  oodrive_contract_id?: string | null;
 }
 
 export interface UpdateCession {
@@ -90,4 +93,5 @@ export interface UpdateCession {
   
   // Optional fields
   document_url?: string | null;
+  oodrive_contract_id?: string | null;
 }

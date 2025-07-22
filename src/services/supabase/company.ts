@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface CompanyInfo {
@@ -13,6 +12,7 @@ export interface CompanyInfo {
   siret: string;
   tva: string;
   logo_url?: string;
+  oodrive_recipient_id?: string | null;
   notifications: {
     email: boolean;
     push: boolean;
@@ -63,6 +63,7 @@ export const companyService = {
     const transformedData = {
       ...data,
       zipcode: data.zipcode || '', // Use only zipcode since that's what exists in DB
+      oodrive_recipient_id: data.oodrive_recipient_id || null,
       notifications: data.notifications as {
         email: boolean;
         push: boolean;
@@ -100,6 +101,7 @@ export const companyService = {
       siret: companyData.siret || '',
       tva: companyData.tva || '',
       logo_url: companyData.logo_url,
+      oodrive_recipient_id: companyData.oodrive_recipient_id,
       notifications: companyData.notifications || { email: true, push: true, sms: false },
       updated_at: new Date().toISOString()
     };
@@ -124,6 +126,7 @@ export const companyService = {
     return {
       ...data,
       zipcode: data.zipcode || '', // Use only zipcode since that's what exists in DB
+      oodrive_recipient_id: data.oodrive_recipient_id || null,
       notifications: data.notifications as {
         email: boolean;
         push: boolean;

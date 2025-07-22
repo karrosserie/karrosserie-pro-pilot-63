@@ -1,15 +1,17 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
 export type Client = Database['public']['Tables']['clients']['Row'] & {
   company?: string;
+  oodrive_recipient_id?: string | null;
 };
 export type NewClient = Database['public']['Tables']['clients']['Insert'] & {
   company?: string;
+  oodrive_recipient_id?: string | null;
 };
 export type UpdateClient = Database['public']['Tables']['clients']['Update'] & {
   company?: string;
+  oodrive_recipient_id?: string | null;
 };
 
 export const clientsService = {
@@ -59,7 +61,8 @@ export const clientsService = {
       postal_code: client.zipCode,
       user_id: client.user_id,
       driver_license_front_url: client.driverLicenseFrontUrl || null,
-      driver_license_back_url: client.driverLicenseBackUrl || null
+      driver_license_back_url: client.driverLicenseBackUrl || null,
+      oodrive_recipient_id: client.oodrive_recipient_id || null
     };
 
     console.log('Creating client with data:', clientData);
@@ -104,7 +107,8 @@ export const clientsService = {
       city: client.city,
       postal_code: client.zipCode,
       driver_license_front_url: client.driverLicenseFrontUrl || null,
-      driver_license_back_url: client.driverLicenseBackUrl || null
+      driver_license_back_url: client.driverLicenseBackUrl || null,
+      oodrive_recipient_id: client.oodrive_recipient_id || null
     };
 
     console.log('Updating client with data:', clientData);
