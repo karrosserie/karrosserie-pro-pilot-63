@@ -17,23 +17,61 @@ export const generateAndUploadCessionPDF = async (
     let repairOrderPDFDocument = null;
     if (cession.repair_orders) {
       try {
-        const data = await prepareRepairOrderDataForPDF(cession.repair_orders as any, companyData);
+        // Préparer les données client depuis la cession
+        const repairOrderClient = cession.repair_orders.clients;
+        const repairOrderVehicle = cession.repair_orders.vehicles;
+        
+        // Formater les données client comme attendu par InvoicePDF
+        const formattedClientData = repairOrderClient ? {
+          number: cession.repair_orders.reference,
+          name: `${repairOrderClient.first_name} ${repairOrderClient.last_name}`,
+          phone: repairOrderClient.phone || '',
+          email: repairOrderClient.email || '',
+          address: repairOrderClient.address || '',
+          city: `${repairOrderClient.postal_code || ''} ${repairOrderClient.city || ''}`.trim(),
+        } : null;
+
+        // Formater les données véhicule comme attendu par InvoicePDF
+        const formattedVehicleData = repairOrderVehicle ? {
+          vehicle: `${repairOrderVehicle.car_brands?.name || ''} ${repairOrderVehicle.car_models?.name || ''}`.trim(),
+          licensePlate: repairOrderVehicle.license_plate || '',
+          mileage: repairOrderVehicle.mileage ? repairOrderVehicle.mileage.toLocaleString() + ' km' : '',
+        } : null;
+
+        // Parser les données des réparations et pièces
+        let repairs = [];
+        let parts = [];
+        try {
+          repairs = cession.repair_orders.repairs_data ? JSON.parse(cession.repair_orders.repairs_data as string) : [];
+          parts = cession.repair_orders.parts_data ? JSON.parse(cession.repair_orders.parts_data as string) : [];
+        } catch (error) {
+          console.error('Error parsing repair/parts data:', error);
+        }
+
+        // Calculer les totaux
+        const allItems = [...repairs, ...parts];
+        const totals = allItems.reduce((acc, item) => {
+          const total = parseFloat(item.total) || 0;
+          acc.total += total;
+          return acc;
+        }, { total: 0 });
+
         const invoiceData = {
-          ...data.repairOrder,
-          amount: data.totals.total,
-          date: data.repairOrder.created_at,
-          due_date: data.repairOrder.created_at,
-          repairs_data: Array.isArray(data.repairOrder.repairs_data) ? data.repairOrder.repairs_data : [],
-          parts_data: Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data : []
+          ...cession.repair_orders,
+          amount: totals.total,
+          date: cession.repair_orders.created_at,
+          due_date: cession.repair_orders.created_at,
+          repairs_data: repairs,
+          parts_data: parts
         } as any;
 
         repairOrderPDFDocument = InvoicePDF({ 
           invoice: invoiceData, 
-          companyData: data.companyData, 
+          companyData: companyData, 
           receipts: [],
-          clientData: data.clientData,
-          vehicleData: data.vehicleData,
-          template: data.template,
+          clientData: formattedClientData,
+          vehicleData: formattedVehicleData,
+          template: 'default',
           documentType: 'repair_order'
         });
       } catch (error) {
