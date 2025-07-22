@@ -126,7 +126,7 @@ export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, com
 
     // Calculer les totaux
     const totals = items.reduce((acc, item) => {
-      const unitCost = parseFloat(item.unit_price || item.unitCost || item.total) || 0;
+      const unitCost = parseFloat(item.unitCost || item.unit_price || item.total) || 0;
       const quantity = parseFloat(item.quantity) || 1;
       const discount = parseFloat(item.discount) || 0;
       const vat = parseFloat(item.vat) || 20;
@@ -179,7 +179,7 @@ export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, com
         billingDate: repairOrder.created_at ? new Date(repairOrder.created_at).toLocaleDateString('fr-FR') : '',
         notes: repairOrder.notes || '',
         items: items.map(item => {
-          const unitPrice = parseFloat(item.unit_price || item.unitCost || item.total) || 0;
+          const unitPrice = parseFloat(item.unitCost || item.unit_price || item.total) || 0;
           const quantity = parseFloat(item.quantity) || 1;
           const discount = parseFloat(item.discount) || 0;
           const vat = parseFloat(item.vat) || 20;

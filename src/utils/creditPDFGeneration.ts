@@ -107,7 +107,7 @@ export const prepareCreditDataForPDF = async (credit: any, companyData: any) => 
 
     // Calculer les totaux
     const totals = items.reduce((acc, item) => {
-      const unitCost = parseFloat(item.unit_price || item.unitCost || item.total) || 0;
+      const unitCost = parseFloat(item.unitCost || item.unit_price || item.total) || 0;
       const quantity = parseFloat(item.quantity) || 1;
       const discount = parseFloat(item.discount) || 0;
       const vat = parseFloat(item.vat) || 20;
@@ -152,7 +152,7 @@ export const prepareCreditDataForPDF = async (credit: any, companyData: any) => 
         invoiceReference: invoiceData?.reference || 'N/A',
         notes: credit.notes || '',
         items: items.map(item => {
-          const unitPrice = parseFloat(item.unit_price || item.unitCost || item.total) || 0;
+          const unitPrice = parseFloat(item.unitCost || item.unit_price || item.total) || 0;
           const quantity = parseFloat(item.quantity) || 1;
           const discount = parseFloat(item.discount) || 0;
           const vat = parseFloat(item.vat) || 20;
