@@ -29,6 +29,7 @@ import { generateAndUploadCessionPDF } from '@/services/pdf/pdfService';
 import { updateCession } from '@/services/supabase/cessions';
 import { useCompany } from '@/hooks/use-company';
 import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
+import { sendForSignature } from '@/services/api/signatureService';
 
 interface CessionsTableProps {
   cessions: Cession[];
@@ -234,6 +235,39 @@ export const CessionsTable = ({
       });
 
       console.log('PDF generated and saved:', pdfUrl);
+
+      // Appeler l'API de signature après la génération du PDF
+      try {
+        toast({
+          title: "Envoi pour signature",
+          description: "Envoi du document pour signature en cours...",
+        });
+
+        await sendForSignature(
+          cession.id,
+          pdfUrl,
+          companyData,
+          repairOrderData.clients
+        );
+
+        toast({
+          title: "Document envoyé",
+          description: "Le document a été envoyé pour signature avec succès.",
+        });
+
+        // Mettre à jour le statut de la cession
+        await updateCession(cession.id, {
+          status: 'en_attente_signature'
+        });
+
+      } catch (signatureError) {
+        console.error('Error sending for signature:', signatureError);
+        toast({
+          title: "Erreur d'envoi",
+          description: `Erreur lors de l'envoi pour signature: ${signatureError.message}`,
+          variant: "destructive",
+        });
+      }
       
     } catch (error) {
       console.error('Error during procedure initialization:', error);
