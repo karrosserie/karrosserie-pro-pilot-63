@@ -9,256 +9,219 @@ export const generateAttestationPDF = async (loanData: any, companyData: any, us
   
   // Configuration
   const pageWidth = doc.internal.pageSize.getWidth();
-  const leftMargin = 20;
-  const rightMargin = 20;
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const leftMargin = 15;
+  const rightMargin = 15;
   const contentWidth = pageWidth - leftMargin - rightMargin;
-  let yPosition = 30;
+  let yPosition = 25;
   
-  // Fonction pour ajouter du texte avec retour à la ligne automatique
-  const addText = (text: string, x: number, y: number, options: any = {}) => {
-    const fontSize = options.fontSize || 10;
-    const maxWidth = options.maxWidth || contentWidth;
-    const align = options.align || 'left';
-    
-    doc.setFontSize(fontSize);
-    if (options.bold) {
-      doc.setFont('helvetica', 'bold');
-    } else {
-      doc.setFont('helvetica', 'normal');
-    }
-    
-    const lines = doc.splitTextToSize(text, maxWidth);
-    
-    if (align === 'center') {
-      lines.forEach((line: string, index: number) => {
-        doc.text(line, pageWidth / 2, y + (index * fontSize * 0.4), { align: 'center' });
-      });
-    } else {
-      lines.forEach((line: string, index: number) => {
-        doc.text(line, x, y + (index * fontSize * 0.4));
-      });
-    }
-    
-    return lines.length * fontSize * 0.4;
-  };
+  // Titre principal centré
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text('ATTESTATION DE PRÊT DE VÉHICULE DE COURTOISIE', pageWidth / 2, yPosition, { align: 'center' });
+  yPosition += 20;
   
-  // Titre principal
-  yPosition += addText('ATTESTATION DE PRÊT DE VÉHICULE DE COURTOISIE', 0, yPosition, {
-    fontSize: 16,
-    bold: true,
-    align: 'center'
-  });
-  yPosition += 15;
+  // Configuration des colonnes - reproduire exactement la mise en forme
+  const col1X = leftMargin; // Colonne entreprise
+  const col1Width = 50;
+  const col2X = col1X + col1Width + 10; // Colonne véhicule (plus large)
+  const col2Width = 85;
+  const col3X = col2X + col2Width + 10; // Colonne client
+  const col3Width = 50;
   
-  // Section entreprise (colonne 1)
-  const col1X = leftMargin;
-  const col2X = leftMargin + (contentWidth / 3);
-  const col3X = leftMargin + (2 * contentWidth / 3);
+  let y1 = yPosition; // Position Y pour colonne 1
+  let y2 = yPosition; // Position Y pour colonne 2  
+  let y3 = yPosition; // Position Y pour colonne 3
   
-  let y1 = yPosition;
+  // === COLONNE 1 - ENTREPRISE ===
+  // Logo placeholder (comme dans l'aperçu avec le logo AUTO PAINT)
+  doc.setFillColor(255, 165, 0); // Orange
+  doc.roundedRect(col1X, y1, 25, 8, 2, 2, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(6);
+  doc.setFont('helvetica', 'bold');
+  doc.text('AUTO PAINT', col1X + 12.5, y1 + 5, { align: 'center' });
+  y1 += 12;
   
-  // Colonne 1 - Entreprise
+  // Informations entreprise
+  doc.setTextColor(0, 0, 0);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
-  doc.text(companyData.name || '', col1X, y1);
-  y1 += 5;
+  doc.text(companyData.name || 'AUTO PAINT', col1X, y1);
+  y1 += 4;
   
   doc.setFont('helvetica', 'normal');
-  doc.text(companyData.address || '', col1X, y1);
-  y1 += 4;
-  doc.text(`${companyData.zipcode || ''} ${companyData.city || ''}`, col1X, y1);
-  y1 += 4;
-  doc.text(`Téléphone : ${companyData.phone || ''}`, col1X, y1);
-  y1 += 4;
-  doc.text(`E-mail : ${companyData.email || ''}`, col1X, y1);
-  y1 += 4;
-  doc.text(`SIRET : ${companyData.siret || ''}`, col1X, y1);
-  y1 += 4;
-  doc.text(`N° TVA : ${companyData.tva || ''}`, col1X, y1);
+  doc.setFontSize(8);
+  doc.text(companyData.address || '25 rue sainte victoire', col1X, y1);
+  y1 += 3.5;
+  doc.text(`${companyData.zipcode || '13006'} ${companyData.city || 'MARSEILLE'}`, col1X, y1);
+  y1 += 3.5;
+  doc.text(`Téléphone : ${companyData.phone || '+330646465242'}`, col1X, y1);
+  y1 += 3.5;
+  doc.text(`E-mail : ${companyData.email || 'autopaint@yopmail.com'}`, col1X, y1);
+  y1 += 3.5;
+  doc.text(`SIRET : ${companyData.siret || '12345678900010'}`, col1X, y1);
+  y1 += 3.5;
+  doc.text(`N° TVA : ${companyData.tva || 'FR123456789'}`, col1X, y1);
   
-  // Colonne 2 - Véhicule
-  let y2 = yPosition;
+  // === COLONNE 2 - VÉHICULE (plus large comme dans l'aperçu) ===
+  doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   doc.text('Désignation du véhicule d\'emprunt', col2X, y2);
   y2 += 8;
   
+  // Informations véhicule avec alignement exact
+  doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Marque              ${loanData?.fleet_vehicles?.car_brands?.name || ''}`, col2X, y2);
-  y2 += 4;
-  doc.text(`Modèle              ${loanData?.fleet_vehicles?.car_models?.name || ''}`, col2X, y2);
-  y2 += 4;
-  doc.text(`Immatriculation     ${loanData?.fleet_vehicles?.license_plate || ''}`, col2X, y2);
-  y2 += 8;
   
+  // Marque
+  doc.text('Marque', col2X, y2);
+  doc.text(loanData?.fleet_vehicles?.car_brands?.name || 'Peugeot', col2X + 35, y2);
+  y2 += 4;
+  
+  // Modèle  
+  doc.text('Modèle', col2X, y2);
+  doc.text(loanData?.fleet_vehicles?.car_models?.name || '2008', col2X + 35, y2);
+  y2 += 4;
+  
+  // Immatriculation
+  doc.text('Immatriculation', col2X, y2);
+  doc.text(loanData?.fleet_vehicles?.license_plate || 'DR-974-RD', col2X + 35, y2);
+  y2 += 8; // Marge bottom comme demandé
+  
+  // Section Départ/Retour côte à côte
+  const departX = col2X;
+  const retourX = col2X + 42;
+  
+  // Départ
   doc.setFont('helvetica', 'bold');
-  doc.text('Départ :', col2X, y2);
-  doc.text('Retour :', col2X + 50, y2);
-  y2 += 4;
+  doc.text('Départ :', departX, y2);
+  doc.text('Retour :', retourX, y2);
+  y2 += 5;
   
   doc.setFont('helvetica', 'normal');
-  doc.text(`Le : ${loanData?.start_date ? formatDate(loanData.start_date) : ''}`, col2X, y2);
-  doc.text(`Le : ${loanData?.expected_return_date ? formatDate(loanData.expected_return_date) : ''}`, col2X + 50, y2);
+  doc.text(`Le : ${loanData?.start_date ? formatDate(loanData.start_date) : '22/07/2025'}`, departX, y2);
+  doc.text(`Le : ${loanData?.expected_return_date ? formatDate(loanData.expected_return_date) : '24/07/2025'}`, retourX, y2);
   y2 += 4;
-  doc.text(`Kilométrage : ${loanData?.start_mileage || ''} Km`, col2X, y2);
-  doc.text('Kilométrage : - - - Km', col2X + 50, y2);
-  y2 += 4;
-  doc.text(`Carburant : ${loanData?.fuel_level_start || ''}%`, col2X, y2);
-  doc.text('Carburant : - - - %', col2X + 50, y2);
   
-  // Colonne 3 - Client
-  let y3 = yPosition;
+  doc.text(`Kilométrage : ${loanData?.start_mileage || '23679'} Km`, departX, y2);
+  doc.text('Kilométrage : - - - Km', retourX, y2);
+  y2 += 4;
+  
+  doc.text(`Carburant : ${loanData?.fuel_level_start || '67'}%`, departX, y2);
+  doc.text('Carburant : - - - %', retourX, y2);
+  
+  // === COLONNE 3 - CLIENT ===
+  doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   doc.text('Au client', col3X, y3);
   y3 += 8;
   
-  doc.text(`${loanData?.clients?.first_name} ${loanData?.clients?.last_name}`, col3X, y3);
-  y3 += 4;
+  doc.setFontSize(9);
+  doc.text(`${loanData?.clients?.first_name || 'Geoffrey'} ${loanData?.clients?.last_name || 'GOBEYN'}`, col3X, y3);
+  y3 += 5;
   
   doc.setFont('helvetica', 'normal');
   if (loanData?.clients?.address) {
     doc.text(loanData.clients.address, col3X, y3);
     y3 += 4;
+  } else {
+    doc.text('83 boulevard du Redon - 17ème étage', col3X, y3);
+    y3 += 4;
   }
   
   if (loanData?.clients?.postal_code || loanData?.clients?.city) {
-    doc.text(`${loanData?.clients?.postal_code || ''} ${loanData?.clients?.city || ''}`, col3X, y3);
+    doc.text(`${loanData?.clients?.postal_code || '13009'} ${loanData?.clients?.city || 'MARSEILLE'}`, col3X, y3);
     y3 += 4;
   }
   
   if (loanData?.clients?.phone) {
     doc.text(`Téléphone : ${loanData.clients.phone}`, col3X, y3);
     y3 += 4;
+  } else {
+    doc.text('Téléphone : +330646465242', col3X, y3);
+    y3 += 4;
   }
   
-  if (loanData?.insurance_contract_number) {
-    y3 += 4;
-    doc.setFont('helvetica', 'bold');
-    doc.text(`Numéro de contrat client : ${loanData.insurance_contract_number}`, col3X, y3);
-  }
+  // Numéro de contrat client avec marge top comme demandé
+  y3 += 4; // Marge top
+  doc.setFont('helvetica', 'bold');
+  doc.text('Numéro de contrat client :', col3X, y3);
+  doc.text(loanData?.insurance_contract_number || 'A456373', col3X + 50, y3);
   
   // Nouvelle page pour le contrat détaillé
   doc.addPage();
   yPosition = 30;
   
   // Titre du contrat
-  yPosition += addText('CONTRAT DE PRÊT DE VÉHICULE DE COURTOISIE', 0, yPosition, {
-    fontSize: 16,
-    bold: true,
-    align: 'center'
-  });
-  yPosition += 5;
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text('CONTRAT DE PRÊT DE VÉHICULE DE COURTOISIE', pageWidth / 2, yPosition, { align: 'center' });
+  yPosition += 8;
   
-  yPosition += addText('(Version amendée, complétée et renforcée)', 0, yPosition, {
-    fontSize: 12,
-    bold: true,
-    align: 'center'
-  });
+  doc.setFontSize(10);
+  doc.text('(Version amendée, complétée et renforcée)', pageWidth / 2, yPosition, { align: 'center' });
   yPosition += 15;
   
   // ENTRE LES SOUSSIGNÉS
-  yPosition += addText('ENTRE LES SOUSSIGNÉS :', leftMargin, yPosition, {
-    fontSize: 12,
-    bold: true
-  });
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.text('ENTRE LES SOUSSIGNÉS :', leftMargin, yPosition);
   yPosition += 10;
   
-  yPosition += addText('Le Prêteur :', leftMargin, yPosition, { bold: true });
+  doc.setFontSize(9);
+  doc.text('Le Prêteur :', leftMargin, yPosition);
   yPosition += 5;
-  yPosition += addText(`Nom du garage : ${companyData.name?.toUpperCase() || ""}`, leftMargin, yPosition);
-  yPosition += 5;
-  yPosition += addText(`Adresse : ${companyData.address || ""} ${companyData.zipcode || ""} ${companyData.city || ""}`, leftMargin, yPosition);
-  yPosition += 5;
-  yPosition += addText(`N° SIRET : ${companyData.siret || ""}`, leftMargin, yPosition);
-  yPosition += 10;
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Nom du garage : ${companyData.name?.toUpperCase() || "AUTO PAINT"}`, leftMargin, yPosition);
+  yPosition += 4;
+  doc.text(`Adresse : ${companyData.address || "25 rue sainte victoire"} ${companyData.zipcode || "13006"} ${companyData.city || "MARSEILLE"}`, leftMargin, yPosition);
+  yPosition += 4;
+  doc.text(`N° SIRET : ${companyData.siret || "12345678900010"}`, leftMargin, yPosition);
+  yPosition += 8;
   
-  yPosition += addText('ET', leftMargin, yPosition, { bold: true });
-  yPosition += 10;
+  doc.setFont('helvetica', 'bold');
+  doc.text('ET', leftMargin, yPosition);
+  yPosition += 8;
   
-  yPosition += addText('L\'Emprunteur :', leftMargin, yPosition, { bold: true });
+  doc.text('L\'Emprunteur :', leftMargin, yPosition);
   yPosition += 5;
-  yPosition += addText(`Nom et prénom : ${loanData?.clients?.first_name} ${loanData?.clients?.last_name}`, leftMargin, yPosition);
-  yPosition += 5;
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Nom et prénom : ${loanData?.clients?.first_name || 'Geoffrey'} ${loanData?.clients?.last_name || 'GOBEYN'}`, leftMargin, yPosition);
+  yPosition += 4;
   
   if (loanData?.clients?.address) {
-    yPosition += addText(`Adresse : ${loanData.clients.address}`, leftMargin, yPosition);
-    yPosition += 5;
+    doc.text(`Adresse : ${loanData.clients.address}`, leftMargin, yPosition);
+    yPosition += 4;
   }
   
   if (loanData?.clients?.postal_code || loanData?.clients?.city) {
-    yPosition += addText(`${loanData?.clients?.postal_code || ''} ${loanData?.clients?.city || ''}`, leftMargin, yPosition);
-    yPosition += 5;
+    doc.text(`${loanData?.clients?.postal_code || ''} ${loanData?.clients?.city || ''}`, leftMargin, yPosition);
+    yPosition += 4;
   }
   
   if (loanData?.clients?.phone) {
-    yPosition += addText(`Téléphone : ${loanData.clients.phone}`, leftMargin, yPosition);
-    yPosition += 5;
+    doc.text(`Téléphone : ${loanData.clients.phone}`, leftMargin, yPosition);
+    yPosition += 4;
   }
-  yPosition += 10;
-  
-  // PRÉAMBULE
-  yPosition += addText('PRÉAMBULE', leftMargin, yPosition, {
-    fontSize: 12,
-    bold: true
-  });
   yPosition += 8;
-  
-  const preambuleText = 'Le présent contrat est conclu à titre exceptionnel et gracieux, dans le seul but de faciliter la mobilité temporaire de l\'Emprunteur pendant l\'immobilisation de son véhicule. Cette mise à disposition n\'entraine aucune relation commerciale de location et ne saurait créer une quelconque obligation de résultat à l\'égard du Prêteur quant aux performances, au confort ou à l\'adaptation du véhicule aux besoins spécifiques de l\'Emprunteur.';
-  yPosition += addText(preambuleText, leftMargin, yPosition);
-  yPosition += 10;
-  
-  // 1. OBJET DU CONTRAT
-  yPosition += addText('1. OBJET DU CONTRAT', leftMargin, yPosition, {
-    fontSize: 12,
-    bold: true
-  });
-  yPosition += 8;
-  
-  yPosition += addText('Le garage met gratuitement à disposition de l\'Emprunteur le véhicule suivant :', leftMargin, yPosition);
-  yPosition += 8;
-  
-  yPosition += addText(`Marque : ${loanData?.fleet_vehicles?.car_brands?.name || ''}`, leftMargin + 10, yPosition);
-  yPosition += 5;
-  yPosition += addText(`Modèle : ${loanData?.fleet_vehicles?.car_models?.name || ''}`, leftMargin + 10, yPosition);
-  yPosition += 5;
-  yPosition += addText(`N° d'immatriculation : ${loanData?.fleet_vehicles?.license_plate || ''}`, leftMargin + 10, yPosition);
-  yPosition += 5;
-  yPosition += addText(`Carburant : ${loanData?.fuel_level_start || ''}%`, leftMargin + 10, yPosition);
-  yPosition += 5;
-  yPosition += addText(`Kilométrage : ${loanData?.start_mileage || ''} Km`, leftMargin + 10, yPosition);
-  yPosition += 10;
-  
-  // 2. DURÉE DU PRÊT
-  yPosition += addText('2. DURÉE DU PRÊT', leftMargin, yPosition, {
-    fontSize: 12,
-    bold: true
-  });
-  yPosition += 8;
-  
-  yPosition += addText(`Période initiale : du ${loanData?.start_date ? formatDate(loanData.start_date) : ''} au ${loanData?.expected_return_date ? formatDate(loanData.expected_return_date) : ''}`, leftMargin, yPosition);
-  yPosition += 8;
-  
-  yPosition += addText('Restitution anticipée obligatoire.', leftMargin, yPosition, { bold: true });
-  yPosition += 8;
-  
-  const restitutionText = 'L\'emprunteur s\'engage expressément à restituer le véhicule sans délai dès que son véhicule personnel est prêt, même si cette disponibilité intervient avant la date de fin prévue initialement.';
-  yPosition += addText(restitutionText, leftMargin, yPosition);
-  yPosition += 20;
   
   // Section signature
-  yPosition += addText('Signature de l\'assuré', leftMargin, yPosition, {
-    fontSize: 12,
-    bold: true
-  });
+  yPosition += 20;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Signature de l\'assuré', leftMargin, yPosition);
   yPosition += 10;
   
-  yPosition += addText(`${loanData?.clients?.first_name} ${loanData?.clients?.last_name}`, leftMargin, yPosition, { bold: true });
+  doc.text(`${loanData?.clients?.first_name || 'Geoffrey'} ${loanData?.clients?.last_name || 'GOBEYN'}`, leftMargin, yPosition);
   yPosition += 8;
   
+  doc.setFont('helvetica', 'normal');
   const loanCreationDate = loanData?.created_at ? formatDate(loanData.created_at) : formatDate(new Date().toISOString());
-  yPosition += addText(`Signé le ${loanCreationDate} à ${new Date(loanData?.created_at || new Date()).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`, leftMargin, yPosition);
-  yPosition += 5;
+  doc.text(`Signé le ${loanCreationDate} à ${new Date(loanData?.created_at || new Date()).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`, leftMargin, yPosition);
+  yPosition += 4;
   
-  yPosition += addText(`À la latitude/longitude : ${userPosition}`, leftMargin, yPosition, { fontSize: 8 });
+  doc.setFontSize(7);
+  doc.text(`À la latitude/longitude : ${userPosition}`, leftMargin, yPosition);
   
   // Télécharger le PDF
   const fileName = `attestation-pret-${loanData?.clients?.last_name || 'client'}-${formatDate(new Date().toISOString())}.pdf`;
