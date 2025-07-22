@@ -59,7 +59,7 @@ export const generateAndUploadCessionPDF = async (
         } : null);
         
         console.log('finalClientData après traitement:', JSON.stringify(finalClientData, null, 2));
-        
+
         const finalVehicleData = data.vehicleData || (cession.repair_orders.vehicles ? {
           licensePlate: cession.repair_orders.vehicles.license_plate,
           vin: cession.repair_orders.vehicles.vin,
@@ -68,9 +68,12 @@ export const generateAndUploadCessionPDF = async (
           year: null,
           mileage: cession.repair_orders.vehicles.mileage
         } : null);
-        
+
         console.log('Final client data for PDF:', JSON.stringify(finalClientData, null, 2));
         console.log('Final vehicle data for PDF:', JSON.stringify(finalVehicleData, null, 2));
+        console.log('Repair order repairs_data:', JSON.stringify(data.repairOrder.repairs_data, null, 2));
+        console.log('Repair order parts_data:', JSON.stringify(data.repairOrder.parts_data, null, 2));
+        console.log('Totals:', JSON.stringify(data.totals, null, 2));
         
         const invoiceData = {
           ...data.repairOrder,
