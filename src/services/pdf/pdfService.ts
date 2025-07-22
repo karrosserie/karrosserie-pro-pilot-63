@@ -29,6 +29,10 @@ export const generateAndUploadCessionPDF = async (
           email: repairOrderClient.email || '',
           address: repairOrderClient.address || '',
           city: `${repairOrderClient.postal_code || ''} ${repairOrderClient.city || ''}`.trim(),
+          licensePlate: repairOrderVehicle?.license_plate || '',
+          mileage: repairOrderVehicle?.mileage ? repairOrderVehicle.mileage.toLocaleString() + ' km' : '',
+          vehicle: repairOrderVehicle ? `${repairOrderVehicle.car_brands?.name || ''} ${repairOrderVehicle.car_models?.name || ''}`.trim() : '',
+          billingDate: cession.repair_orders.created_at ? new Date(cession.repair_orders.created_at).toLocaleDateString('fr-FR') : '',
         } : null;
 
         // Formater les données véhicule comme attendu par InvoicePDF
@@ -36,6 +40,8 @@ export const generateAndUploadCessionPDF = async (
           vehicle: `${repairOrderVehicle.car_brands?.name || ''} ${repairOrderVehicle.car_models?.name || ''}`.trim(),
           licensePlate: repairOrderVehicle.license_plate || '',
           mileage: repairOrderVehicle.mileage ? repairOrderVehicle.mileage.toLocaleString() + ' km' : '',
+          start_date: null, // Ces données ne sont pas disponibles dans la cession
+          end_date: null,   // Ces données ne sont pas disponibles dans la cession
         } : null;
 
         // Parser les données des réparations et pièces
