@@ -5,13 +5,12 @@ import { Cession } from './types';
 export const getAllCessions = async (): Promise<Cession[]> => {
   console.log('Fetching cessions...');
   
-  // Get cessions with insurance companies and bank accounts
+  // Get cessions with insurance companies only (removing bank_accounts join)
   const { data: cessions, error } = await supabase
     .from('cessions')
     .select(`
       *,
-      insurance_companies(name),
-      bank_accounts(bank, iban, bic)
+      insurance_companies(name)
     `)
     .order('created_at', { ascending: false });
 
@@ -121,7 +120,7 @@ export const getAllCessions = async (): Promise<Cession[]> => {
         reference: cession.reference || '',
         status: cession.status || 'en_attente',
         repair_orders: repairOrderData,
-        bank_accounts: cessionData.bank_accounts,
+        bank_accounts: null, // Set to null since we removed the join
         expertise_date: cessionData.expertise_date ?? null,
         expertise_amount: cessionData.expertise_amount ?? null,
         salvage_value: cessionData.salvage_value ?? null
@@ -145,8 +144,7 @@ export const getCessionById = async (id: string): Promise<Cession> => {
         car_brands(name),
         car_models(name)
       ),
-      insurance_companies(name),
-      bank_accounts(bank, iban, bic)
+      insurance_companies(name)
     `)
     .eq('id', id)
     .single();
@@ -209,7 +207,7 @@ export const getCessionById = async (id: string): Promise<Cession> => {
     reference: basicCession.reference || '',
     status: basicCession.status || 'en_attente',
     repair_orders: repairOrderData,
-    bank_accounts: cessionData.bank_accounts,
+    bank_accounts: null, // Set to null since we removed the join
     expertise_date: cessionData.expertise_date ?? null,
     expertise_amount: cessionData.expertise_amount ?? null,
     salvage_value: cessionData.salvage_value ?? null
