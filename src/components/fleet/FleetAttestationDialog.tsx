@@ -138,7 +138,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               {loanData?.clients?.phone && <p>Téléphone : {loanData.clients.phone}</p>}              
             </div>
             {loanData?.insurance_contract_number && 
-              <div className="mt-3">              
+              <div className="text-sm space-y-1 text-black mt-3">              
                 <div className="flex">
                   <span className="font-medium w-32">Numéro de contrat client :</span>
                   <span>{loanData.insurance_contract_number}</span>
