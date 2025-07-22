@@ -46,14 +46,14 @@ const Cessions = () => {
           console.log(`=== APPEL API POUR CESSION ${cession.id} ===`);
           console.log(`Contract ID: ${cession.oodrive_contract_id}`);
           
-          const response = await fetch('https://n8n.karrosserie.pro/webhook/e6854e25-9a51-4362-b9d2-9a18af911863', {
+          const url = `https://n8n.karrosserie.pro/webhook/e6854e25-9a51-4362-b9d2-9a18af911863?contractId=${cession.oodrive_contract_id}`;
+          console.log('URL de l\'appel API:', url);
+          
+          const response = await fetch(url, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              contractId: parseInt(cession.oodrive_contract_id!)
-            })
+            }
           });
 
           console.log('Réponse API statut:', response.status);
