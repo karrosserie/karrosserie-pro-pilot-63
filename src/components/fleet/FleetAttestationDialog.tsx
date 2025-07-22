@@ -103,7 +103,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               </div>
               
               {/* Informations de départ */}
-              <div className="grid grid-cols-2 mt-5">
+              <div className="grid grid-cols-2 mt-3">
                 <div>
                   <div className="font-semibold text-gray-800 mb-1">Départ :</div>
                   <div className="space-y-1">
@@ -136,7 +136,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
                 <p>{[loanData?.clients?.postal_code, loanData?.clients?.city].filter(Boolean).join(' ')}</p>
               )}
               {loanData?.clients?.phone && <p>Téléphone : {loanData.clients.phone}</p>}
-              {loanData?.insurance_contract_number && <p><span className="font-medium mt-5">Numéro de contrat client :</span> {loanData.insurance_contract_number}</p>}
+              {loanData?.insurance_contract_number && <p>Numéro de contrat client : {loanData.insurance_contract_number}</p>}
             </div>
           </div>
         </div>
