@@ -1,5 +1,5 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import { Cession } from '@/services/supabase/cessions';
 
 const styles = StyleSheet.create({
@@ -66,6 +66,22 @@ const styles = StyleSheet.create({
   listItem: {
     marginBottom: 3,
     marginLeft: 0,
+  },
+  imageSection: {
+    marginBottom: 20,
+    paddingTop: 20,
+  },
+  imageTitle: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  documentImage: {
+    width: '100%',
+    maxHeight: 400,
+    objectFit: 'contain',
+    marginBottom: 10,
   },
 });
 
@@ -667,6 +683,92 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
           <Text>[Signature1/]</Text>
         </View>
       </Page>
+
+      {/* Documents annexes */}
+      
+      {/* Permis de conduire recto */}
+      {(clientData as any)?.driver_license_front_url && (
+        <Page size="A4" style={styles.page} break>
+          <View style={styles.imageSection}>
+            <Text style={styles.imageTitle}>PERMIS DE CONDUIRE - RECTO</Text>
+            <Image 
+              style={styles.documentImage} 
+              src={(clientData as any).driver_license_front_url} 
+            />
+          </View>
+        </Page>
+      )}
+
+      {/* Permis de conduire verso */}
+      {(clientData as any)?.driver_license_back_url && (
+        <Page size="A4" style={styles.page} break>
+          <View style={styles.imageSection}>
+            <Text style={styles.imageTitle}>PERMIS DE CONDUIRE - VERSO</Text>
+            <Image 
+              style={styles.documentImage} 
+              src={(clientData as any).driver_license_back_url} 
+            />
+          </View>
+        </Page>
+      )}
+
+      {/* Images du véhicule */}
+      {(vehicleData as any)?.vehicle_images && (() => {
+        try {
+          const vehicleImages = typeof (vehicleData as any).vehicle_images === 'string' 
+            ? JSON.parse((vehicleData as any).vehicle_images) 
+            : (vehicleData as any).vehicle_images;
+          
+          if (Array.isArray(vehicleImages) && vehicleImages.length > 0) {
+            return vehicleImages.map((imageData: any, index: number) => {
+              const imageUrl = typeof imageData === 'string' ? imageData : imageData?.url;
+              const timing = imageData?.timing || 'Véhicule';
+              
+              if (imageUrl) {
+                return (
+                  <Page key={index} size="A4" style={styles.page} break>
+                    <View style={styles.imageSection}>
+                      <Text style={styles.imageTitle}>VÉHICULE - {timing.toUpperCase()}</Text>
+                      <Image 
+                        style={styles.documentImage} 
+                        src={imageUrl} 
+                      />
+                    </View>
+                  </Page>
+                );
+              }
+              return null;
+            }).filter(Boolean);
+          }
+        } catch (error) {
+          console.error('Erreur lors du parsing des images véhicule:', error);
+        }
+        return null;
+      })()}
+
+      {/* Ordre de réparation PDF */}
+      {(cession.repair_orders as any)?.document_url && (
+        <Page size="A4" style={styles.page} break>
+          <View style={styles.imageSection}>
+            <Text style={styles.imageTitle}>ORDRE DE RÉPARATION</Text>
+            <Text style={styles.text}>
+              Document disponible à l'adresse : {(cession.repair_orders as any).document_url}
+            </Text>
+          </View>
+        </Page>
+      )}
+
+      {/* Rapport d'expertise original */}
+      {cession.document_url && (
+        <Page size="A4" style={styles.page} break>
+          <View style={styles.imageSection}>
+            <Text style={styles.imageTitle}>RAPPORT D'EXPERTISE ORIGINAL</Text>
+            <Text style={styles.text}>
+              Document disponible à l'adresse : {cession.document_url}
+            </Text>
+          </View>
+        </Page>
+      )}
     </Document>
   );
 };
