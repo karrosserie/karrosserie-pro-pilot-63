@@ -63,8 +63,8 @@ export const getAllCessions = async (): Promise<Cession[]> => {
                   license_plate,
                   vin,
                   mileage,
-                  registration_front_url,
-                  registration_back_url,
+                  registration_document_front_url,
+                  registration_document_back_url,
                   vehicle_images,
                   car_brands(name),
                   car_models(name)
@@ -171,8 +171,8 @@ export const getCessionById = async (id: string): Promise<Cession> => {
           license_plate,
           vin,
           mileage,
-          registration_front_url,
-          registration_back_url,
+          registration_document_front_url,
+          registration_document_back_url,
           vehicle_images,
           car_brands(name),
           car_models(name)

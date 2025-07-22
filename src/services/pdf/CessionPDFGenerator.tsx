@@ -749,6 +749,32 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
         }
         return null;
       })()}
+      
+      {/* Certificat d'immatriculation recto */}
+      {finalVehicleData?.registration_document_front_url && (
+        <Page size="A4" style={styles.page} break>
+          <View style={styles.imageSection}>
+            <Text style={styles.imageTitle}>CERTIFICAT D'IMMATRICULATION - RECTO</Text>
+            <Image 
+              style={styles.documentImage} 
+              src={finalVehicleData.registration_document_front_url} 
+            />
+          </View>
+        </Page>
+      )}
+      
+      {/* Certificat d'immatriculation verso */}
+      {finalVehicleData?.registration_document_back_url && (
+        <Page size="A4" style={styles.page} break>
+          <View style={styles.imageSection}>
+            <Text style={styles.imageTitle}>CERTIFICAT D'IMMATRICULATION - VERSO</Text>
+            <Image 
+              style={styles.documentImage} 
+              src={finalVehicleData.registration_document_back_url} 
+            />
+          </View>
+        </Page>
+      )}
 
       {/* Ordre de réparation PDF */}
       {cession.repair_order_id && repairOrderPDFBlob && (
