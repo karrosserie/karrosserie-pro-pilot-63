@@ -67,10 +67,8 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
                 variant="outline" 
                 size="sm"
                 onClick={() => onViewAttestation?.(loan.id)}
-                className="flex items-center gap-1"
               >
                 <FileText className="h-4 w-4" />
-                Attestation
               </Button>
               <Button 
                 className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
