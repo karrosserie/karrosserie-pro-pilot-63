@@ -9,6 +9,33 @@ import { quotesService } from '@/services/supabase/quotes';
 import { expertiseReportsService } from '@/services/supabase/expertise-reports';
 import { PDFDocument } from 'pdf-lib';
 
+// Fonction pour vérifier que le fichier est accessible
+const verifyFileAccessibility = async (url: string, maxRetries: number = 5): Promise<void> => {
+  console.log('Vérification de l\'accessibilité du fichier:', url);
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, { method: 'HEAD' });
+      if (response.ok) {
+        console.log(`Fichier accessible après ${attempt} tentative(s)`);
+        return;
+      }
+      console.log(`Tentative ${attempt}/${maxRetries} échouée: ${response.status}`);
+    } catch (error) {
+      console.log(`Tentative ${attempt}/${maxRetries} échouée:`, error);
+    }
+    
+    // Attendre avant la prochaine tentative (délai progressif)
+    if (attempt < maxRetries) {
+      const delay = attempt * 1000; // 1s, 2s, 3s, 4s, 5s
+      console.log(`Attente de ${delay}ms avant la prochaine tentative...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  
+  throw new Error(`Le fichier n'est pas accessible après ${maxRetries} tentatives`);
+};
+
 export const generateAndUploadCessionPDF = async (
   cession: Cession,
   companyData: any,
@@ -260,6 +287,11 @@ export const generateAndUploadCessionPDF = async (
     const { data: { publicUrl } } = supabase.storage
       .from('documents')
       .getPublicUrl(filePath);
+
+    console.log('PDF uploadé avec succès, URL publique:', publicUrl);
+
+    // Vérifier que le fichier est accessible avant de retourner l'URL
+    await verifyFileAccessibility(publicUrl);
 
     return publicUrl;
   } catch (error) {
