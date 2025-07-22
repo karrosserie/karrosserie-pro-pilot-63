@@ -135,6 +135,87 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
             </div>
 
             <div className="font-bold">1. La résiliation immédiate du contrat</div>
+            <div className="font-bold">2. L'exigibilité d'une indemnité forfaitaire de 1000€</div>
+            <div className="font-bold">3. La responsabilité illimitée de l'Emprunteur pour tout dommage qui surviendrait</div>
+
+            <div className="mt-4">
+              <div className="font-bold">3.2. Garde d'utilisation autorisée</div>
+              <div>L'Emprunteur garantit que:</div>
+              <div className="ml-4 mt-2">
+                <div>• Le véhicule est utilisé exclusivement dans le cadre de son activité professionnelle déclarée, conformément à l'article L. 3121-1 du Code du travail.</div>
+                <div>• L'usage du véhicule est strictement limité au département des Bouches-du-Rhône (13) et aux départements limitrophes.</div>
+                <div>• Le kilométrage journalier n'excède pas 100 km, sauf autorisation écrite préalable du Prêteur.</div>
+                <div>• Le véhicule n'est jamais utilisé:</div>
+                <div className="ml-4">
+                  <div>- Pour le transport de marchandises ou de marchandises dangereuses</div>
+                  <div>- Pour la traction ou le remorquage de tout véhicule</div>
+                  <div>- Pour l'apprentissage de la conduite</div>
+                  <div>- Pour des compétitions, essais ou reconnaissances de rallyes</div>
+                  <div>- Sur des chemins non carrossables ou en dehors des voies de circulation autorisées</div>
+                  <div>- À toute fin illicite ou contraire aux bonnes mœurs</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <div className="font-bold">3.3. Sécurité routière et obligations légales</div>
+              <div>L'Emprunteur s'engage formellement à:</div>
+              <div className="ml-4 mt-2">
+                <div>• Respecter scrupuleusement toutes les dispositions du Code de la route</div>
+                <div>• Veiller à ce que tout occupant du véhicule soit systématiquement attaché par une ceinture de sécurité, en application de l'article R. 412-1 du Code de la route</div>
+                <div>• Ne jamais conduire sous l'emprise d'alcool (taux supérieur à 0,0 g/l) ou de stupéfiants</div>
+                <div>• Ne jamais utiliser un téléphone tenu en main pendant la conduite</div>
+                <div>• Signaler immédiatement au Prêteur tout dysfonctionnement constaté sur le véhicule</div>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <div className="font-bold">3.4. Sécurisation du matériel transporté</div>
+              <div className="font-bold mt-2">3.4.1. Séparation physique et compartimentage</div>
+              <div className="ml-4">
+                <div>• Le chargement de matériel professionnel doit être rigoureusement séparé de l'espace réservé aux passagers par une cloison rigide ou un filet de séparation homologué, conformément aux points d'ancrage, prévu à cet effet, 4ᵐ de l'article L. 3311-1 du Code des transports et aux dispositions de cassation (Ch. crim., 5 janvier 2016, n° 15-81.859).</div>
+                <div>• Pour les véhicules de tourisme sans cloison dédiée:</div>
+                <div className="ml-4">
+                  <div>- L'utilisation exclusive du coffre est obligatoire pour tout équipement professionnel</div>
+                  <div>- Aucun objet ne doit être placé sur le siège arrière ou les sièges arrières</div>
+                  <div>- Le chargement ne doit jamais dépasser la hauteur des dossiers des sièges arrière</div>
+                </div>
+              </div>
+
+              <div className="font-bold mt-2">3.4.2. Fixation et arrimage du chargement</div>
+              <div className="ml-4">
+                <div>Les objets transportés doivent être arrimés conformément à l'article R. 312-17 du Code de la route, avec:</div>
+                <div>• Utilisation obligatoire de sangles, cordes, fixation homologués CE</div>
+                <div>• Double arrimage croisé pour tout chargement dépassant 25 kg</div>
+                <div>• Arrimage en trois points pour tout chargement dépassant 50 kg</div>
+                <div>• Calage des objets par des dispositifs appropriés pour éviter tout glissement</div>
+                <div>• Répartition uniforme de la charge pour maintenir l'équilibre du véhicule et sa stabilité en conduite</div>
+                <div>• Vérification de l'arrimage avant chaque départ et après chaque arrêt</div>
+              </div>
+
+              <div className="font-bold mt-2">3.4.3. Restrictions de chargement</div>
+              <div className="ml-4">
+                <div>Il est formellement interdit de transporter:</div>
+                <div>• Des matières dangereuses au sens de l'ADR (inflammables, corrosives, toxiques, explosives)</div>
+                <div>• Des produits liquides de nettoyage industriel, même dilués</div>
+                <div>• Des objets dont la dimension excède la longueur intérieure du véhicule ou qui dépasseraient de l'habitacle</div>
+                <div>• Des charges supérieures à 50% de la charge utile maximale indiquée sur la carte grise</div>
+                <div>• Des objets tranchants ou susceptibles d'endommager les revêtements intérieurs</div>
+                <div>• Des matériaux salissants sans protection adéquate du véhicule</div>
+              </div>
+
+              <div className="font-bold mt-2">3.4.4. Signalisation et visibilité</div>
+              <div className="ml-4">
+                <div>• Tout chargement dépassant l'arrière du véhicule doit être signalé par un dispositif réfléchissant homologué conforme à l'article R. 313-20 du Code de la route</div>
+                <div>• Le chargement ne doit en aucun cas obstruer, même partiellement:</div>
+                <div className="ml-4">
+                  <div>- La visibilité directe ou indirecte (rétroviseurs), du conducteur</div>
+                  <div>- L'accès aux commandes et dispositifs de sécurité du véhicule</div>
+                  <div>- Les feux, clignotants ou plaques d'immatriculation</div>
+                  <div>- Les issues de secours</div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Signature */}
