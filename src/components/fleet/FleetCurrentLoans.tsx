@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Car, Calendar, User, Trash, FileText } from 'lucide-react';
+import { Car, Calendar, User, Trash, FileText, Download } from 'lucide-react';
 
 interface CurrentLoan {
   id: string;
@@ -64,6 +64,13 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
                 Détails
               </Button>
               <Button 
+                className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
+                size="sm"
+                onClick={() => onReturnVehicle?.(loan.id)}
+              >
+                Retour
+              </Button>
+              <Button 
                 variant="outline" 
                 size="sm"
                 onClick={() => onViewAttestation?.(loan.id)}
@@ -71,11 +78,11 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
                 <FileText className="h-4 w-4" />
               </Button>
               <Button 
-                className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
+                variant="outline" 
                 size="sm"
-                onClick={() => onReturnVehicle?.(loan.id)}
+                onClick={() => console.log('Télécharger attestation', loan.id)}
               >
-                Retour
+                <Download className="h-4 w-4" />
               </Button>
               <Button 
                 variant="outline"
