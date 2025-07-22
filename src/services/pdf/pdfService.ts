@@ -74,6 +74,26 @@ export const generateAndUploadCessionPDF = async (
 
         console.log('Invoice data for PDF:', JSON.stringify(invoiceData, null, 2));
 
+        // Préparer les items pour l'affichage (combinaison des réparations et pièces)
+        const allItems = [
+          ...(Array.isArray(data.repairOrder.repairs_data) ? data.repairOrder.repairs_data.map((repair: any) => ({
+            description: repair.description || 'N/A',
+            quantity: parseFloat(repair.quantity) || 0,
+            discount: parseFloat(repair.discount) || 0,
+            unitPrice: parseFloat(repair.unitCost) || 0,
+            vat: parseFloat(repair.vat) || 20,
+            totalHT: parseFloat(repair.total) || 0
+          })) : []),
+          ...(Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data.map((part: any) => ({
+            description: part.description || 'N/A',
+            quantity: parseFloat(part.quantity) || 0,
+            discount: parseFloat(part.discount) || 0,
+            unitPrice: parseFloat(part.unitCost) || 0,
+            vat: parseFloat(part.vat) || 20,
+            totalHT: parseFloat(part.total) || 0
+          })) : [])
+        ];
+
         // Créer le composant InvoicePDF pour l'ordre de réparation avec la structure de données attendue
         repairOrderPDFComponent = InvoicePDF({ 
           invoice: invoiceData, 
@@ -85,25 +105,7 @@ export const generateAndUploadCessionPDF = async (
             city: finalClientData?.city || 'Ville non renseignée',
             phone: finalClientData?.phone || '',
             email: finalClientData?.email || '',
-            // Transformer les données des réparations et pièces pour l'affichage
-            items: [
-              ...(Array.isArray(data.repairOrder.repairs_data) ? data.repairOrder.repairs_data.map((repair: any) => ({
-                description: repair.description || 'N/A',
-                quantity: parseFloat(repair.quantity) || 0,
-                discount: parseFloat(repair.discount) || 0,
-                unitPrice: parseFloat(repair.unitCost) || 0,
-                vat: parseFloat(repair.vat) || 20,
-                totalHT: parseFloat(repair.total) || 0
-              })) : []),
-              ...(Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data.map((part: any) => ({
-                description: part.description || 'N/A',
-                quantity: parseFloat(part.quantity) || 0,
-                discount: parseFloat(part.discount) || 0,
-                unitPrice: parseFloat(part.unitCost) || 0,
-                vat: parseFloat(part.vat) || 20,
-                totalHT: parseFloat(part.total) || 0
-              })) : [])
-            ],
+            items: allItems,
             totals: {
               subtotal: `${data.totals.subtotal.toFixed(2).replace('.', ',')} €`,
               total: `${data.totals.total.toFixed(2).replace('.', ',')} €`,
