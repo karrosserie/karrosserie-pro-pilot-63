@@ -31,7 +31,9 @@ const Cessions = () => {
       console.log('Nombre total de cessions:', cessions.length);
 
       const cessionsEnAttente = cessions.filter(
-        cession => cession.status === 'en_attente_signature' && cession.oodrive_contract_id
+        cession => cession.status === 'en_attente_signature' && 
+                  cession.oodrive_contract_id && 
+                  cession.document_url // S'assurer que le PDF a été complètement généré
       );
 
       console.log('Cessions en attente de signature trouvées:', cessionsEnAttente.length);
