@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Search, Car } from 'lucide-react';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
+import { Loading } from '@/components/ui/loading';
 
 interface FleetVehiclesTableProps {
   vehicles: FleetVehicle[];
@@ -56,10 +57,7 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
       </div>
       
       {isLoading ? (
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-          <span className="ml-2">Chargement...</span>
-        </div>
+        <Loading text="Chargement des véhicules..." />
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
