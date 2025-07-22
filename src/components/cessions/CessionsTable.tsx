@@ -292,21 +292,34 @@ export const CessionsTable = ({
             }
 
             // Sauvegarder l'ID du second recipient (client) dans clients
-            // Utiliser une mise à jour directe via Supabase pour préserver tous les champs existants
+            // Log des données du client AVANT la mise à jour
             if (repairOrderData.clients?.id) {
+              console.log('=== CLIENT UPDATE DEBUG ===');
+              console.log('Client data BEFORE update:', {
+                id: repairOrderData.clients.id,
+                driver_license_front_url: repairOrderData.clients.driver_license_front_url,
+                driver_license_back_url: repairOrderData.clients.driver_license_back_url,
+                oodrive_recipient_id: repairOrderData.clients.oodrive_recipient_id
+              });
+              
               console.log('Updating client with recipient ID:', signatureResponse.recipients[1].id);
+              
               try {
-                const { error } = await supabase
+                // Utiliser une mise à jour très spécifique qui ne touche QUE au champ oodrive_recipient_id
+                const { data: updatedClient, error } = await supabase
                   .from('clients')
                   .update({ 
                     oodrive_recipient_id: signatureResponse.recipients[1].id.toString() 
                   })
-                  .eq('id', repairOrderData.clients.id);
+                  .eq('id', repairOrderData.clients.id)
+                  .select('id, driver_license_front_url, driver_license_back_url, oodrive_recipient_id')
+                  .single();
 
                 if (error) {
                   console.error('Error updating client via Supabase:', error);
                 } else {
                   console.log('Client updated successfully via Supabase');
+                  console.log('Client data AFTER update:', updatedClient);
                 }
               } catch (clientError) {
                 console.error('Error updating client:', clientError);
