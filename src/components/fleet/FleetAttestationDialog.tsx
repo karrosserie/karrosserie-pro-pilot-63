@@ -74,8 +74,8 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
                 <span className="text-white font-bold text-base">LOGO</span>
               </div>
             )}
-            <p className="text-gray-600 font-bold mb-2">{companyData.name || ''}</p>
-            <div className="text-base text-gray-600 space-y-1">
+            <p className="text-gray-600 font-bold mb-2 text-sm">{companyData.name || ''}</p>
+            <div className="text-sm text-gray-600 space-y-1">
               <p>{companyData.address || ''}</p>
               <p>{companyData.zipcode || ''} {companyData.city || ''}</p>
               <p>Téléphone : {companyData.phone || ''}</p>
@@ -87,8 +87,8 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
     
           {/* Colonne 2 - Désignation du véhicule d'emprunt */}
           <div>
-            <h3 className="text-lg font-semibold mb-3 text-gray-800">Désignation du véhicule d'emprunt</h3>
-            <div className="text-base space-y-1">
+            <h3 className="text-base font-semibold mb-3 text-gray-800">Désignation du véhicule d'emprunt</h3>
+            <div className="text-sm space-y-1">
               <div className="flex justify-between">
                 <span className="font-medium">Marque</span>
                 <span>{loanData?.fleet_vehicles?.car_brands?.name || ''}</span>
@@ -106,8 +106,8 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
     
           {/* Colonne 3 - Au client */}
           <div>
-            <h3 className="text-lg font-semibold mb-3 text-gray-800">Au client</h3>
-            <div className="text-base space-y-1">
+            <h3 className="text-base font-semibold mb-3 text-gray-800">Au client</h3>
+            <div className="text-sm space-y-1">
               <p className="font-medium">{loanData?.clients?.name}</p>
               <p>{[loanData?.clients?.address, loanData?.clients?.postal_code, loanData?.clients?.city].filter(Boolean).join(' ')}</p>
               {loanData.clients.phone && <p>Téléphone : {loanData.clients.phone}</p>}
