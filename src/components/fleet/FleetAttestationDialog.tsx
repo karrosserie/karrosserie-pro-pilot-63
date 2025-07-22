@@ -52,10 +52,6 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Aperçu de l'attestation de prêt</DialogTitle>
-        </DialogHeader>
-
         <div className="text-center mb-8">
           <h1 className="font-bold text-xl mb-2">
             ATTESTATION DE PRÊT DE VÉHICULE DE COURTOISIE
