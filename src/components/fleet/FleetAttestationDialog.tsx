@@ -118,7 +118,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
           </div>
         </div>
         
-        <div className="bg-white p-8 text-black text-sm leading-relaxed">
+        <div className="bg-white text-black text-sm leading-relaxed">
           {/* Titre du document */}
           <div className="text-center mb-8">
             <h1 className="font-bold text-xl mb-2">
@@ -507,7 +507,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
             <h2 className="font-bold text-lg mb-4">Signature de l'assuré</h2>
             <div>
               {loanData?.client_signature ? (
-                <img src={loanData.client_signature} alt="Signature du client" className="max-w-xs mx-auto mb-2" />
+                <img src={loanData.client_signature} alt="Signature du client" className="max-w-xs mb-2" />
               ) : (
                 <div className="text-4xl font-bold mb-2" style={{ fontFamily: 'cursive' }}>
                   ∅
