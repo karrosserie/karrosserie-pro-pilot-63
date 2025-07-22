@@ -1,8 +1,6 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import { Cession } from '@/services/supabase/cessions';
-import { prepareRepairOrderDataForPDF } from '@/utils/repairOrderPDFGeneration';
-import InvoicePDF from '@/components/invoices/InvoicePDF';
 
 const styles = StyleSheet.create({
   page: {
@@ -44,60 +42,6 @@ const styles = StyleSheet.create({
   },
   sectionLarge: {
     marginBottom: 15,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    textDecoration: 'underline',
-  },
-  detailSection: {
-    marginBottom: 15,
-    padding: 10,
-    backgroundColor: '#f9f9f9',
-    border: 1,
-    borderColor: '#ddd',
-  },
-  table: {
-    marginVertical: 10,
-    border: 1,
-    borderColor: '#000',
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    backgroundColor: '#f0f0f0',
-    borderBottom: 1,
-    borderColor: '#000',
-    padding: 5,
-  },
-  tableHeaderText: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  tableRow: {
-    flexDirection: 'row',
-    borderBottom: 1,
-    borderColor: '#ddd',
-    padding: 5,
-  },
-  tableCell: {
-    fontSize: 9,
-    textAlign: 'center',
-    padding: 2,
-  },
-  totalSection: {
-    marginTop: 15,
-    padding: 10,
-    backgroundColor: '#e8f4f8',
-    border: 1,
-    borderColor: '#2196F3',
-  },
-  totalText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    textAlign: 'center',
   },
   headerRow: {
     flexDirection: 'row',
@@ -147,10 +91,10 @@ interface CessionPDFProps {
   selectedInsuranceCompany: any;
   clientData?: any;
   vehicleData?: any;
-  repairOrderPDFComponent?: React.ReactElement | null;
+  repairOrderPDFBlob?: Blob | null;
 }
 
-export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, clientData, vehicleData, repairOrderPDFComponent }: CessionPDFProps) => {
+export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, clientData, vehicleData, repairOrderPDFBlob }: CessionPDFProps) => {
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('fr-FR');
   };
@@ -753,8 +697,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
             <Text style={styles.imageTitle}>PERMIS DE CONDUIRE - RECTO</Text>
             <Image 
               style={styles.documentImage} 
-              src={finalClientData.driver_license_front_url}
-              cache={false}
+              src={finalClientData.driver_license_front_url} 
             />
           </View>
         </Page>
@@ -767,8 +710,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
             <Text style={styles.imageTitle}>PERMIS DE CONDUIRE - VERSO</Text>
             <Image 
               style={styles.documentImage} 
-              src={finalClientData.driver_license_back_url}
-              cache={false}
+              src={finalClientData.driver_license_back_url} 
             />
           </View>
         </Page>
@@ -793,8 +735,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
                       <Text style={styles.imageTitle}>VÉHICULE - {timing.toUpperCase()}</Text>
                       <Image 
                         style={styles.documentImage} 
-                        src={imageUrl}
-                        cache={false}
+                        src={imageUrl} 
                       />
                     </View>
                   </Page>
@@ -816,8 +757,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
             <Text style={styles.imageTitle}>CERTIFICAT D'IMMATRICULATION - RECTO</Text>
             <Image 
               style={styles.documentImage} 
-              src={finalVehicleData.registration_document_front_url}
-              cache={false}
+              src={finalVehicleData.registration_document_front_url} 
             />
           </View>
         </Page>
@@ -830,107 +770,21 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
             <Text style={styles.imageTitle}>CERTIFICAT D'IMMATRICULATION - VERSO</Text>
             <Image 
               style={styles.documentImage} 
-              src={finalVehicleData.registration_document_back_url}
-              cache={false}
+              src={finalVehicleData.registration_document_back_url} 
             />
           </View>
         </Page>
       )}
 
-      {/* Ordre de réparation intégré directement */}
-      {cession.repair_orders && (
+      {/* Ordre de réparation PDF */}
+      {cession.repair_order_id && repairOrderPDFBlob && (
         <Page size="A4" style={styles.page} break>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>ORDRE DE RÉPARATION N° {cession.repair_orders.reference}</Text>
-            
-            {/* Informations client */}
-            <View style={styles.detailSection}>
-              <Text style={styles.subtitle}>CLIENT</Text>
-              <Text style={styles.text}>
-                {clientName || 'Client non spécifié'}
-              </Text>
-              {clientData?.address && (
-                <Text style={styles.text}>{clientData.address}</Text>
-              )}
-              {finalClientData?.email && (
-                <Text style={styles.text}>Email: {finalClientData.email}</Text>
-              )}
-              {finalClientData?.phone && (
-                <Text style={styles.text}>Téléphone: {finalClientData.phone}</Text>
-              )}
-            </View>
-            
-            {/* Informations véhicule */}
-            <View style={styles.detailSection}>
-              <Text style={styles.subtitle}>VÉHICULE</Text>
-              {cession.repair_orders.vehicles && (
-                <>
-                  <Text style={styles.text}>
-                    {cession.repair_orders.vehicles.car_brands?.name} {cession.repair_orders.vehicles.car_models?.name}
-                  </Text>
-                  <Text style={styles.text}>
-                    Immatriculation: {cession.repair_orders.vehicles.license_plate}
-                  </Text>
-                  <Text style={styles.text}>
-                    VIN: {cession.repair_orders.vehicles.vin}
-                  </Text>
-                  <Text style={styles.text}>
-                    Kilométrage: {cession.repair_orders.vehicles.mileage} km
-                  </Text>
-                </>
-              )}
-            </View>
-            
-            {/* Tableau des réparations */}
-            <View style={styles.table}>
-              <View style={styles.tableHeader}>
-                <Text style={[styles.tableHeaderText, { flex: 3 }]}>Description</Text>
-                <Text style={[styles.tableHeaderText, { flex: 1 }]}>Quantité</Text>
-                <Text style={[styles.tableHeaderText, { flex: 1 }]}>P.U. HT</Text>
-                <Text style={[styles.tableHeaderText, { flex: 1 }]}>Total HT</Text>
-              </View>
-              
-              {/* Réparations */}
-              {(() => {
-                try {
-                  const repairs = JSON.parse(cession.repair_orders.repairs_data || '[]');
-                  return repairs.map((repair: any, index: number) => (
-                    <View key={`repair-${index}`} style={styles.tableRow}>
-                      <Text style={[styles.tableCell, { flex: 3 }]}>{repair.description}</Text>
-                      <Text style={[styles.tableCell, { flex: 1 }]}>{repair.quantity}</Text>
-                      <Text style={[styles.tableCell, { flex: 1 }]}>{repair.unitCost?.toFixed(2)} €</Text>
-                      <Text style={[styles.tableCell, { flex: 1 }]}>{repair.total?.toFixed(2)} €</Text>
-                    </View>
-                  ));
-                } catch (error) {
-                  return null;
-                }
-              })()}
-              
-              {/* Pièces */}
-              {(() => {
-                try {
-                  const parts = JSON.parse(cession.repair_orders.parts_data || '[]');
-                  return parts.map((part: any, index: number) => (
-                    <View key={`part-${index}`} style={styles.tableRow}>
-                      <Text style={[styles.tableCell, { flex: 3 }]}>{part.description}</Text>
-                      <Text style={[styles.tableCell, { flex: 1 }]}>{part.quantity}</Text>
-                      <Text style={[styles.tableCell, { flex: 1 }]}>{part.unitCost?.toFixed(2)} €</Text>
-                      <Text style={[styles.tableCell, { flex: 1 }]}>{part.total?.toFixed(2)} €</Text>
-                    </View>
-                  ));
-                } catch (error) {
-                  return null;
-                }
-              })()}
-            </View>
-            
-            {/* Total */}
-            <View style={styles.totalSection}>
-              <Text style={styles.totalText}>
-                MONTANT TOTAL: {formatEuro(cession.repair_orders.amount || 0)}
-              </Text>
-            </View>
+          <View style={styles.imageSection}>
+            <Text style={styles.imageTitle}>ORDRE DE RÉPARATION</Text>
+            <Text style={styles.section}>Référence: {cession.repair_orders?.reference || ''}</Text>
+            <Text style={styles.section}>
+              Le PDF de l'ordre de réparation a été généré et sera inclus dans le document final.
+            </Text>
           </View>
         </Page>
       )}

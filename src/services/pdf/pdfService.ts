@@ -12,15 +12,36 @@ export const generateAndUploadCessionPDF = async (
   clientData?: any,
   vehicleData?: any
 ): Promise<string> => {
-  console.log('=== STARTING PDF SERVICE ===');
-  console.log('Cession passed to pdfService:', JSON.stringify(cession, null, 2));
-  console.log('Company data:', JSON.stringify(companyData, null, 2));
-  console.log('Client data passed to pdfService:', JSON.stringify(clientData, null, 2));
-  console.log('Vehicle data passed to pdfService:', JSON.stringify(vehicleData, null, 2));
-  
   try {
-    // Ne pas générer de composant PDF complexe, laisser le CessionPDF gérer l'affichage
-    let repairOrderPDFComponent = null;
+    // Générer le PDF de l'ordre de réparation si disponible
+    let repairOrderPDFBlob: Blob | null = null;
+    if (cession.repair_orders) {
+      try {
+        const data = await prepareRepairOrderDataForPDF(cession.repair_orders as any, companyData);
+        const invoiceData = {
+          ...data.repairOrder,
+          amount: data.totals.total,
+          date: data.repairOrder.created_at,
+          due_date: data.repairOrder.created_at,
+          repairs_data: Array.isArray(data.repairOrder.repairs_data) ? data.repairOrder.repairs_data : [],
+          parts_data: Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data : []
+        } as any;
+
+        const repairOrderDoc = InvoicePDF({ 
+          invoice: invoiceData, 
+          companyData: data.companyData, 
+          receipts: [],
+          clientData: data.clientData,
+          vehicleData: data.vehicleData,
+          template: data.template,
+          documentType: 'repair_order'
+        });
+        
+        repairOrderPDFBlob = await pdf(repairOrderDoc).toBlob();
+      } catch (error) {
+        console.error('Erreur lors de la génération du PDF ordre de réparation:', error);
+      }
+    }
 
     // Generate PDF blob
     const pdfBlob = await pdf(
@@ -30,7 +51,7 @@ export const generateAndUploadCessionPDF = async (
         selectedInsuranceCompany,
         clientData,
         vehicleData,
-        repairOrderPDFComponent
+        repairOrderPDFBlob
       })
     ).toBlob();
 
