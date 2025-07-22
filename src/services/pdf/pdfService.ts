@@ -6,7 +6,9 @@ import { Cession } from '@/services/supabase/cessions';
 export const generateAndUploadCessionPDF = async (
   cession: Cession,
   companyData: any,
-  selectedInsuranceCompany: any
+  selectedInsuranceCompany: any,
+  clientData?: any,
+  vehicleData?: any
 ): Promise<string> => {
   try {
     // Generate PDF blob
@@ -14,7 +16,9 @@ export const generateAndUploadCessionPDF = async (
       CessionPDF({
         cession,
         companyData,
-        selectedInsuranceCompany
+        selectedInsuranceCompany,
+        clientData,
+        vehicleData
       })
     ).toBlob();
 

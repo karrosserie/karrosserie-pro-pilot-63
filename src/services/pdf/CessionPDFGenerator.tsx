@@ -89,9 +89,11 @@ interface CessionPDFProps {
   cession: Cession;
   companyData: any;
   selectedInsuranceCompany: any;
+  clientData?: any;
+  vehicleData?: any;
 }
 
-export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: CessionPDFProps) => {
+export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, clientData, vehicleData }: CessionPDFProps) => {
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('fr-FR');
   };
@@ -222,8 +224,9 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
     ? `${cession.repair_orders.clients.first_name} ${cession.repair_orders.clients.last_name}`
     : 'Client non assigné';
 
-  const clientData = cession.repair_orders?.clients;
-  const vehicleData = cession.repair_orders?.vehicles;
+  // Utiliser les données passées en paramètres en priorité, sinon fallback sur cession.repair_orders
+  const finalClientData = clientData || cession.repair_orders?.clients;
+  const finalVehicleData = vehicleData || cession.repair_orders?.vehicles;
 
   return (
     <Document>
@@ -278,10 +281,10 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
         <View style={styles.sectionLarge}>
           <Text>LE CÉDANT</Text>
           <Text style={styles.boldText}>{clientName.toUpperCase()}</Text>
-          {clientData?.address && <Text>{clientData.address}</Text>}
-          {clientData?.postal_code && clientData?.city && <Text>{clientData.postal_code} {clientData.city}</Text>}
-          {clientData?.email && <Text>{clientData.email}</Text>}
-          {clientData?.phone && <Text>{clientData.phone}</Text>}
+          {finalClientData?.address && <Text>{finalClientData.address}</Text>}
+          {finalClientData?.postal_code && finalClientData?.city && <Text>{finalClientData.postal_code} {finalClientData.city}</Text>}
+          {finalClientData?.email && <Text>{finalClientData.email}</Text>}
+          {finalClientData?.phone && <Text>{finalClientData.phone}</Text>}
         </View>
 
         {/* Au profit de */}
@@ -302,7 +305,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
           <Text style={styles.text}>Concernant l'indemnisation des réparations du véhicule :</Text>
           <Text>{cession.repair_orders?.vehicles?.car_brands?.name?.toUpperCase() || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''}</Text>
           <Text>Immatriculation : {cession.repair_orders?.vehicles?.license_plate || 'N/A'}</Text>
-          <Text>N° Série : {vehicleData?.vin || 'N/A'}</Text>
+          <Text>N° Série : {finalVehicleData?.vin || 'N/A'}</Text>
         </View>
 
         {/* Incident date */}
@@ -420,10 +423,10 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
         <View style={styles.section}>
           <Text style={styles.text}>LE CÉDANT</Text>
           <Text style={styles.boldText}>{clientName.toUpperCase()}</Text>
-          {clientData?.address && <Text>{clientData.address}</Text>}
-          {clientData?.postal_code && clientData?.city && <Text>{clientData.postal_code} {clientData.city}</Text>}
-          {clientData?.email && <Text>{clientData.email}</Text>}
-          {clientData?.phone && <Text>{clientData.phone}</Text>}
+          {finalClientData?.address && <Text>{finalClientData.address}</Text>}
+          {finalClientData?.postal_code && finalClientData?.city && <Text>{finalClientData.postal_code} {finalClientData.city}</Text>}
+          {finalClientData?.email && <Text>{finalClientData.email}</Text>}
+          {finalClientData?.phone && <Text>{finalClientData.phone}</Text>}
           <Text style={styles.text}>Ci-après dénommé "Le Client/Assuré"</Text>
         </View>
 
@@ -687,37 +690,37 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany }: C
       {/* Documents annexes */}
       
       {/* Permis de conduire recto */}
-      {(clientData as any)?.driver_license_front_url && (
+      {finalClientData?.driver_license_front_url && (
         <Page size="A4" style={styles.page} break>
           <View style={styles.imageSection}>
             <Text style={styles.imageTitle}>PERMIS DE CONDUIRE - RECTO</Text>
             <Image 
               style={styles.documentImage} 
-              src={(clientData as any).driver_license_front_url} 
+              src={finalClientData.driver_license_front_url} 
             />
           </View>
         </Page>
       )}
 
       {/* Permis de conduire verso */}
-      {(clientData as any)?.driver_license_back_url && (
+      {finalClientData?.driver_license_back_url && (
         <Page size="A4" style={styles.page} break>
           <View style={styles.imageSection}>
             <Text style={styles.imageTitle}>PERMIS DE CONDUIRE - VERSO</Text>
             <Image 
               style={styles.documentImage} 
-              src={(clientData as any).driver_license_back_url} 
+              src={finalClientData.driver_license_back_url} 
             />
           </View>
         </Page>
       )}
 
       {/* Images du véhicule */}
-      {(vehicleData as any)?.vehicle_images && (() => {
+      {finalVehicleData?.vehicle_images && (() => {
         try {
-          const vehicleImages = typeof (vehicleData as any).vehicle_images === 'string' 
-            ? JSON.parse((vehicleData as any).vehicle_images) 
-            : (vehicleData as any).vehicle_images;
+          const vehicleImages = typeof finalVehicleData.vehicle_images === 'string' 
+            ? JSON.parse(finalVehicleData.vehicle_images) 
+            : finalVehicleData.vehicle_images;
           
           if (Array.isArray(vehicleImages) && vehicleImages.length > 0) {
             return vehicleImages.map((imageData: any, index: number) => {

@@ -218,7 +218,9 @@ export const CessionsTable = ({
       const pdfUrl = await generateAndUploadCessionPDF(
         cession,
         companyData,
-        selectedInsuranceCompany
+        selectedInsuranceCompany,
+        repairOrderData.clients,
+        repairOrderData.vehicles
       );
 
       // Mettre à jour la cession avec l'URL du PDF
