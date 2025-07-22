@@ -42,17 +42,17 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
         <div className="bg-white p-8 text-black text-sm leading-relaxed">
           {/* Titre du document */}
           <div className="text-center mb-8">
-            <h1 className="text-blue-600 font-bold text-xl mb-2">
+            <h1 className="font-bold text-xl mb-2">
               CONTRAT DE PRÊT DE VÉHICULE DE COURTOISIE
             </h1>
-            <div className="text-blue-600 text-sm italic">
+            <div className="text-sm italic">
               (Version amendée, complétée et renforcée)
             </div>
           </div>
 
           {/* ENTRE LES SOUSSIGNÉS */}
           <div className="mb-6">
-            <h2 className="text-blue-600 font-bold text-lg mb-4">ENTRE LES SOUSSIGNÉS :</h2>
+            <h2 className="font-bold text-lg mb-4">ENTRE LES SOUSSIGNÉS :</h2>
             
             <div className="mb-4">
               <div className="font-bold">Le Prêteur :</div>
@@ -75,7 +75,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
 
           {/* PRÉAMBULE */}
           <div className="mb-6">
-            <h2 className="text-blue-600 font-bold text-lg mb-4">PRÉAMBULE</h2>
+            <h2 className="font-bold text-lg mb-4">PRÉAMBULE</h2>
             <div className="text-justify">
               Le présent contrat est conclu à titre exceptionnel et gracieux, dans le seul but de faciliter la mobilité temporaire de l'Emprunteur pendant l'immobilisation de son véhicule. Cette mise à disposition n'entraine aucune relation commerciale de location et ne saurait créer une quelconque obligation de résultat à l'égard du Prêteur quant aux performances, au confort ou à l'adaptation du véhicule aux besoins spécifiques de l'Emprunteur.
             </div>
@@ -83,7 +83,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
 
           {/* 1. OBJET DU CONTRAT */}
           <div className="mb-6">
-            <h2 className="text-blue-600 font-bold text-lg mb-4">1. OBJET DU CONTRAT</h2>
+            <h2 className="font-bold text-lg mb-4">1. OBJET DU CONTRAT</h2>
             <div className="mb-2">
               Le garage met gratuitement à disposition de l'Emprunteur le véhicule suivant :
             </div>
@@ -98,7 +98,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
 
           {/* 2. DURÉE DU PRÊT */}
           <div className="mb-6">
-            <h2 className="text-blue-600 font-bold text-lg mb-4">2. DURÉE DU PRÊT</h2>
+            <h2 className="font-bold text-lg mb-4">2. DURÉE DU PRÊT</h2>
             <div>Période initiale : du {formatDate(loanData.startDate)} au {formatDate(loanData.expectedReturnDate)}</div>
             <div className="font-bold mt-2">Restitution anticipée obligatoire.</div>
             <div className="mt-2">
@@ -122,7 +122,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
 
           {/* 3. UTILISATION DU VÉHICULE */}
           <div className="mb-6">
-            <h2 className="text-blue-600 font-bold text-lg mb-4">3. UTILISATION DU VÉHICULE</h2>
+            <h2 className="font-bold text-lg mb-4">3. UTILISATION DU VÉHICULE</h2>
             
             <div className="mb-4">
               <div className="font-bold">3.1. Conducteurs autorisés</div>
@@ -243,7 +243,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
 
           {/* 4. ASSURANCE ET RESPONSABILITÉ */}
           <div className="mb-6">
-            <h2 className="text-blue-600 font-bold text-lg mb-4">4. ASSURANCE ET RESPONSABILITÉ</h2>
+            <h2 className="font-bold text-lg mb-4">4. ASSURANCE ET RESPONSABILITÉ</h2>
             
             <div className="mb-4">
               <div className="font-bold">4.1. Couverture d'assurance</div>
@@ -312,7 +312,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
 
           {/* 5. RESTITUTION DU VÉHICULE */}
           <div className="mb-6">
-            <h2 className="text-blue-600 font-bold text-lg mb-4">5. RESTITUTION DU VÉHICULE</h2>
+            <h2 className="font-bold text-lg mb-4">5. RESTITUTION DU VÉHICULE</h2>
             
             <div className="mb-4">
               <div className="font-bold">5.1. État de restitution</div>
@@ -355,7 +355,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
 
           {/* 6. CLAUSES PÉNALES ET RÉSOLUTION */}
           <div className="mb-6">
-            <h2 className="text-blue-600 font-bold text-lg mb-4">6. CLAUSES PÉNALES ET RÉSOLUTION</h2>
+            <h2 className="font-bold text-lg mb-4">6. CLAUSES PÉNALES ET RÉSOLUTION</h2>
             
             <div className="mb-4">
               <div className="font-bold">6.1. Manquements aux obligations</div>
@@ -392,7 +392,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
 
           {/* 7. DÉPÔT DE GARANTIE */}
           <div className="mb-6">
-            <h2 className="text-blue-600 font-bold text-lg mb-4">7. DÉPÔT DE GARANTIE</h2>
+            <h2 className="font-bold text-lg mb-4">7. DÉPÔT DE GARANTIE</h2>
             <div>Un dépôt de garantie de 1500€ sera versé par l'Emprunteur au moment de la prise en charge du véhicule.</div>
             <div className="mt-2">Ce dépôt pourra être encaissé immédiatement par le Prêteur en cas de:</div>
             <div className="ml-4 mt-2">
@@ -405,7 +405,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
 
           {/* 8. SIGNATURES */}
           <div className="mb-6">
-            <h2 className="text-blue-600 font-bold text-lg mb-4">8. SIGNATURES</h2>
+            <h2 className="font-bold text-lg mb-4">8. SIGNATURES</h2>
             <div>L'Emprunteur reconnaît expressément avoir lu l'intégralité du présent contrat, en avoir compris toutes les clauses et les accepter sans réserve.</div>
             <div className="mt-2">Il reconnaît en particulier l'étendue de sa responsabilité et la limitation de celle du Prêteur dans les cas énumérés à l'article 4.</div>
           </div>
@@ -424,9 +424,9 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
 
           {/* Signature de l'assuré */}
           <div className="mb-6">
-            <h2 className="text-blue-600 font-bold text-lg mb-4">Signature de l'assuré</h2>
+            <h2 className="font-bold text-lg mb-4">Signature de l'assuré</h2>
             <div className="text-center">
-              <div className="text-blue-600 text-4xl font-bold mb-2" style={{ fontFamily: 'cursive' }}>
+              <div className="text-4xl font-bold mb-2" style={{ fontFamily: 'cursive' }}>
                 ∅
               </div>
               <div className="font-bold">Monsieur BOUCIE Ahmed</div>
