@@ -293,6 +293,94 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               
               <div className="font-bold mt-2">4.4.1. Délai et modalités de déclaration</div>
               <div>L'Emprunteur s'engage à...</div>
+              
+              <div className="font-bold mt-2">4.4.2. Informations à communiquer</div>
+              <div>En cas de sinistre impliquant un tiers identifié, l'Emprunteur doit impérativement recueillir et transmettre au Prêteur...</div>
+              
+              <div className="font-bold mt-2">4.4.3. Conservation des preuves</div>
+              <div>L'Emprunteur doit préserver toutes les preuves matérielles du sinistre et s'abstenir de...</div>
+              
+              <div className="font-bold mt-2">4.4.4. Coopération avec les experts et assureurs</div>
+              <div>L'Emprunteur s'engage à...</div>
+            </div>
+
+            <div className="mb-4">
+              <div className="font-bold">4.5. Responsabilité en cas d'infraction</div>
+              <div>L'Emprunteur assume l'entière et exclusive responsabilité des infractions commises pendant la durée du prêt, y compris...</div>
+            </div>
+          </div>
+
+          {/* 5. RESTITUTION DU VÉHICULE */}
+          <div className="mb-6">
+            <h2 className="text-blue-600 font-bold text-lg mb-4">5. RESTITUTION DU VÉHICULE</h2>
+            
+            <div className="mb-4">
+              <div className="font-bold">5.1. État de restitution</div>
+              <div>L'Emprunteur s'engage à restituer le véhicule:</div>
+              <div className="ml-4 mt-2">
+                <div>• Dans un état rigoureusement identique à celui constaté lors de la prise en charge, hors usure normale</div>
+                <div>• Parfaitement propre à l'intérieur comme à l'extérieur</div>
+                <div>• Avec un réservoir de carburant intégralement rempli</div>
+                <div>• Avec tous les documents, clés, accessoires et équipements fournis</div>
+                <div>• Sans odeur résiduelle (tabac, nourriture, etc.)</div>
+                <div>• Sans aucun objet personnel ou professionnel à l'intérieur</div>
+                <div>• Tout kilométrage excédant la prévision sera facturé 0.25 € du Km.</div>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <div className="font-bold">5.2. Procédure de restitution</div>
+              <div>La restitution du véhicule s'effectuera:</div>
+              <div className="ml-4 mt-2">
+                <div>• Exclusivement pendant les heures d'ouverture du garage</div>
+                <div>• En présence d'un représentant habilité du Prêteur</div>
+                <div>• Après inspection contradictoire détaillée du véhicule</div>
+                <div>• Avec signature d'un procès-verbal de restitution</div>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <div className="font-bold">5.3. Frais additionnels de remise en état</div>
+              <div>Seront facturés à l'Emprunteur lors de la restitution:</div>
+              <div className="ml-4 mt-2">
+                <div>• Nettoyage intérieur complet si nécessaire: 150€</div>
+                <div>• Nettoyage extérieur si nécessaire: 50€</div>
+                <div>• Désodorisation en cas d'odeur de tabac: 200€</div>
+                <div>• Remplacement des documents manquants: 150€ par document</div>
+                <div>• Réparation de tout dommage non signalé: coût réel majoré de 20%</div>
+                <div>• Remplacement de tout équipement ou accessoire manquant: valeur à neuf</div>
+              </div>
+            </div>
+          </div>
+
+          {/* 6. CLAUSES PÉNALES ET RÉSOLUTION */}
+          <div className="mb-6">
+            <h2 className="text-blue-600 font-bold text-lg mb-4">6. CLAUSES PÉNALES ET RÉSOLUTION</h2>
+            
+            <div className="mb-4">
+              <div className="font-bold">6.1. Manquements aux obligations</div>
+              <div>Toute violation des clauses susmentionnées entraînera:</div>
+              <div className="ml-4 mt-2">
+                <div>• La résolution immédiate du présent contrat sans préavis</div>
+                <div>• L'obligation de restituer immédiatement le véhicule, sous astreinte de 200€ par jour de retard</div>
+                <div>• Le paiement d&#39;une indemnité forfaitaire de 1000€ pour préjudice moral et commercial</div>
+                <div>• Le remboursement intégral de tous frais engagés par le Prêteur pour récupérer le véhicule</div>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <div className="font-bold">6.2. Recours contre les tiers</div>
+              <div>En cas de dommage causé par un tiers identifié, l'Emprunteur:</div>
+              <div className="ml-4 mt-2">
+                <div>? S'oblige à coopérer pleinement avec le Prêteur et son assureur</div>
+                <div>? Cède au Prêteur, à titre de garantie, sa créance à l'encontre du tiers responsable</div>
+                <div>? S'engage à effectuer toutes démarches utiles pour préserver les droits du Prêteur</div>
+                <div>? Accepte d'être appelé en garantie dans toute procédure judiciaire</div>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <div className="font-bold">6.3. Attribution de juridiction</div>
             </div>
           </div>
 
