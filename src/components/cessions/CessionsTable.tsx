@@ -32,6 +32,7 @@ import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
 import { sendForSignature } from '@/services/api/signatureService';
 import { companyService } from '@/services/supabase/company';
 import { supabase } from '@/integrations/supabase/client';
+import { clientsService } from '@/services/supabase/clients';
 
 interface CessionsTableProps {
   cessions: Cession[];
@@ -292,19 +293,22 @@ export const CessionsTable = ({
             }
 
             // Sauvegarder l'ID du second recipient (client) dans clients
-            // Log des données du client AVANT la mise à jour
             if (repairOrderData.clients?.id) {
               console.log('=== CLIENT UPDATE DEBUG ===');
-              console.log('Client data BEFORE update:', {
-                id: repairOrderData.clients.id,
-                driver_license_front_url: repairOrderData.clients.driver_license_front_url,
-                driver_license_back_url: repairOrderData.clients.driver_license_back_url,
-                oodrive_recipient_id: repairOrderData.clients.oodrive_recipient_id
-              });
-              
-              console.log('Updating client with recipient ID:', signatureResponse.recipients[1].id);
               
               try {
+                // D'abord récupérer les données complètes du client
+                const fullClientData = await clientsService.getById(repairOrderData.clients.id);
+                
+                console.log('Client data BEFORE update:', {
+                  id: fullClientData.id,
+                  driver_license_front_url: fullClientData.driver_license_front_url,
+                  driver_license_back_url: fullClientData.driver_license_back_url,
+                  oodrive_recipient_id: fullClientData.oodrive_recipient_id
+                });
+                
+                console.log('Updating client with recipient ID:', signatureResponse.recipients[1].id);
+                
                 // Utiliser une mise à jour très spécifique qui ne touche QUE au champ oodrive_recipient_id
                 const { data: updatedClient, error } = await supabase
                   .from('clients')
