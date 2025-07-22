@@ -5,9 +5,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 import { useCompany } from '@/hooks/use-company';
+import { formatDate } from '@/utils/date-formatter';
 
 interface FleetAttestationDialogProps {
   open: boolean;
@@ -28,10 +27,6 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
   loanData
 }) => {
   const { companyData } = useCompany();
-
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), 'dd/MM/yyyy', { locale: fr });
-  };
 
   const currentDate = formatDate(new Date().toISOString());
 
