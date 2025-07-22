@@ -255,17 +255,18 @@ export const CessionsTable = ({
         );
 
         console.log('Signature response received:', signatureResponse);
-        console.log('Contract ID:', signatureResponse.contract_id);
+        console.log('Contract object:', signatureResponse.contract);
+        console.log('Contract ID:', signatureResponse.contract?.contract_id);
         console.log('Recipients array:', signatureResponse.recipients);
         console.log('Recipients length:', signatureResponse.recipients?.length);
 
-        // Sauvegarder les identifiants Oodrive avec une vérification plus détaillée
-        if (signatureResponse.contract_id) {
-          console.log('Contract ID found, updating cession...');
+        // Vérifier la présence du contract_id dans l'objet contract
+        if (signatureResponse.contract?.contract_id) {
+          console.log('Contract ID found:', signatureResponse.contract.contract_id);
           
           // Sauvegarder l'ID du contrat dans la cession
           await updateCession(cession.id, {
-            oodrive_contract_id: signatureResponse.contract_id,
+            oodrive_contract_id: signatureResponse.contract.contract_id.toString(),
             status: 'en_attente_signature'
           });
 
@@ -281,7 +282,7 @@ export const CessionsTable = ({
               try {
                 await companyService.updateCompanyInfo(repairOrderData.user_id, {
                   ...companyData,
-                  oodrive_recipient_id: signatureResponse.recipients[0].id
+                  oodrive_recipient_id: signatureResponse.recipients[0].id.toString()
                 });
                 console.log('Company updated successfully');
               } catch (companyError) {
@@ -297,7 +298,7 @@ export const CessionsTable = ({
               try {
                 await clientsService.update(repairOrderData.clients.id, {
                   ...repairOrderData.clients,
-                  oodrive_recipient_id: signatureResponse.recipients[1].id
+                  oodrive_recipient_id: signatureResponse.recipients[1].id.toString()
                 });
                 console.log('Client updated successfully');
               } catch (clientError) {
@@ -309,7 +310,7 @@ export const CessionsTable = ({
 
             toast({
               title: "Document envoyé",
-              description: "Le document a été envoyé pour signature avec succès et les identifiants ont été sauvegardés.",
+              description: "Le document a été envoyé pour signature avec succès et tous les identifiants ont été sauvegardés.",
             });
           } else {
             console.log('Insufficient recipients in response:', signatureResponse.recipients?.length || 0);
@@ -320,7 +321,7 @@ export const CessionsTable = ({
             });
           }
         } else {
-          console.log('No contract ID in response');
+          console.log('No contract ID in contract object');
           toast({
             title: "Erreur",
             description: "Le document a été envoyé mais aucun identifiant de contrat n'a été retourné.",

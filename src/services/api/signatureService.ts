@@ -22,11 +22,13 @@ interface SignatureRequest {
 }
 
 interface SignatureResponse {
-  contract_id: string;
   recipients: Array<{
-    id: string;
+    id: number;
     email: string;
   }>;
+  contract: {
+    contract_id: number;
+  };
 }
 
 export const sendForSignature = async (
