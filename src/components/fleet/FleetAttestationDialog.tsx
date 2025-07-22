@@ -215,6 +215,84 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
                   <div>- Les issues de secours</div>
                 </div>
               </div>
+
+              <div className="font-bold mt-2">3.4.5. Responsabilité spécifique liée au chargement</div>
+              <div className="ml-4">
+                <div>En cas de manquement à ces obligations, et, sauf cause d'exonération de l'Emprunteur sera tenu pour seul et unique responsable de tous dommages au véhicule, à ses occupants ou à des tiers résultant d'un déplacement ou d'une projection du chargement.</div>
+                <div>L'Emprunteur renonce expressément à tout recours contre le Prêteur à ce titre.</div>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <div className="font-bold">3.5. Entretien et préservation du véhicule</div>
+              <div className="font-bold mt-2">3.6. Entretien et préservation du véhicule</div>
+              <div>L'Emprunteur s'engage à:</div>
+              <div className="ml-4 mt-2">
+                <div>• Vérifier régulièrement les niveaux (huile, liquide de refroidissement, lave-glace)</div>
+                <div>• Contrôler la pression des pneumatiques avant tout trajet important</div>
+                <div>• Maintenir la propreté intérieure et extérieure et éviter que s'altèrent</div>
+                <div>• Ne pas fumer ni vapoter dans le véhicule</div>
+                <div>• Ne pas consommer de nourriture ou boisson dans l'habitacle</div>
+                <div>• Protéger les sièges en cas de transport d'outils ou d'équipements professionnels</div>
+                <div>• Stationner le véhicule dans des lieux sécurisés, de préférence fermés et couverts la nuit</div>
+                <div>• Ne jamais laisser les clés sur le contact ou dans le véhicule, même momentanément</div>
+                <div>• Verrouiller systématiquement toutes les portières et activer l'alarme lors de chaque stationnement</div>
+              </div>
+            </div>
+          </div>
+
+          {/* 4. ASSURANCE ET RESPONSABILITÉ */}
+          <div className="mb-6">
+            <h2 className="text-blue-600 font-bold text-lg mb-4">4. ASSURANCE ET RESPONSABILITÉ</h2>
+            
+            <div className="mb-4">
+              <div className="font-bold">4.1. Couverture d'assurance</div>
+              <div>Le véhicule objet du présent contrat est couvert par l'assurance souscrite par le Prêteur sous le numéro de police 51105175W0001 auprès de GROUPAMA, conformément aux dispositions de l'article L 121-1 du Code des assurances.</div>
+              <div>Cette garantie est strictement limitée aux risques expressément prévus dans ladite police, dont l'Emprunteur reconnaît avoir pris connaissance.</div>
+            </div>
+
+            <div className="mb-4">
+              <div className="font-bold">4.2. Franchise et contribution de l'Emprunteur</div>
+              <div>L'Emprunteur accepte expressément qu'en cas de sinistre, quelle que soit la responsabilité établie, il contribuera systématiquement à hauteur de:</div>
+              <div className="ml-4 mt-2">
+                <div>• 750€ en cas de sinistre matériel causé au véhicule prêté</div>
+                <div>• 2000€ minimum en cas de vol ou tentative de vol. Cette contribution minimale s'applique indépendamment de la franchise prévue par l'assurance et constitue une condition essentielle du prêt gratuit consenti.</div>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <div className="font-bold">4.3. Exclusions de responsabilité du Prêteur</div>
+              <div>En application des articles L. 121-1 et L. 124-1 du Code des assurances, le Prêteur décline toute responsabilité, et l'assurance susvisée ne couvrirait pas les dommages matériels ou corporels survenus au véhicule prêté dans les cas suivants:</div>
+              
+              <div className="ml-4 mt-2">
+                <div className="font-bold">4.3.1. Utilisation non conforme du véhicule</div>
+                <div>L'utilisation du véhicule pour des activités non autorisées, y compris mais sans se limiter à la participation à des courses, des compétitions ou des essais de vitesse.</div>
+
+                <div className="font-bold mt-2">4.3.2. Dommages intentionnels</div>
+                <div>Les dommages causés par des actes intentionnels, fraude ou tout comportement malveillant de la part de l'Emprunteur.</div>
+
+                <div className="font-bold mt-2">4.3.3. Faux témoignage</div>
+                <div>Toute fausse déclaration faite par l'Emprunteur lors de la déclaration d'un sinistre.</div>
+
+                <div className="font-bold mt-2">4.3.4. Absence de permis de conduire valide</div>
+                <div>L'utilisation du véhicule par l'Emprunteur sans avoir un permis de conduire valide.</div>
+
+                <div className="font-bold mt-2">4.3.5. Non-respect des conditions contractuelles</div>
+                <div>Toute violation des conditions stipulées dans le contrat de prêt.</div>
+
+                <div className="font-bold mt-2">4.3.6. Conduite sous l'emprise de l'alcool ou de stupéfiants</div>
+                <div>L'utilisation du véhicule par l'Emprunteur sous l'emprise de l'alcool ou de stupéfiants.</div>
+
+                <div className="font-bold mt-2">4.3.7. Vol ou tentative de vol</div>
+                <div>Le vol ou la tentative de vol du véhicule prêté.</div>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <div className="font-bold">4.4. Obligations de l'Emprunteur en matière de déclaration et de gestion des sinistres</div>
+              
+              <div className="font-bold mt-2">4.4.1. Délai et modalités de déclaration</div>
+              <div>L'Emprunteur s'engage à...</div>
             </div>
           </div>
 
