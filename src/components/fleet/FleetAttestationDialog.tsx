@@ -140,7 +140,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
             {loanData?.insurance_contract_number && 
               <div className="text-sm space-y-1 text-black mt-3">              
                 <div className="flex">
-                  <span className="font-medium w-32">Numéro de contrat client :</span>
+                  <span className="font-medium w-32">N° de contrat :</span>
                   <span>{loanData.insurance_contract_number}</span>
                 </div>
               </div>}
