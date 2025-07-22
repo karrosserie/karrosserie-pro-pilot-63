@@ -82,7 +82,7 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => console.log('Télécharger attestation', loan.id)}
+                onClick={() => onDownloadAttestation?.(loan.id)}
               >
                 <Download className="h-4 w-4" />
               </Button>

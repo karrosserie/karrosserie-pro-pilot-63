@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
 import { useFleetPage } from '@/hooks/use-fleet-page';
+import { useCompany } from '@/hooks/use-company';
+import { getCurrentPosition } from '@/utils/geolocation';
+import { generateAttestationPDF } from '@/utils/pdf-generator';
 import FleetVehicleDialog from './FleetVehicleDialog';
 import FleetLoanDialog from './FleetLoanDialog';
 import VehicleSelectionDialog from './VehicleSelectionDialog';
@@ -66,6 +69,32 @@ const FleetPageContent = () => {
     : null;
 
   const { reservations } = useFleetReservations();
+  const { companyData } = useCompany();
+
+  // Fonction pour gérer le téléchargement de l'attestation
+  const handleDownloadAttestation = async (loanId: string) => {
+    try {
+      const loanData = reservations?.find(r => r.id === loanId);
+      if (!loanData) {
+        console.error('Données du prêt non trouvées');
+        return;
+      }
+
+      // Obtenir la position utilisateur
+      let userPosition = '[position non disponible]';
+      try {
+        const position = await getCurrentPosition();
+        userPosition = `${position.latitude.toFixed(6)},${position.longitude.toFixed(6)}`;
+      } catch (error) {
+        console.error('Erreur de géolocalisation:', error);
+      }
+
+      // Générer le PDF
+      await generateAttestationPDF(loanData, companyData, userPosition);
+    } catch (error) {
+      console.error('Erreur lors de la génération du PDF:', error);
+    }
+  };
 
   if (isLoading) {
     return <Loading text="Chargement de la flotte..." size="lg" />;
@@ -108,14 +137,15 @@ const FleetPageContent = () => {
 
         {/* Right column - narrower (1/3) */}
         <div className="space-y-6">
-          <FleetCurrentLoans
-            currentLoans={currentLoans}
-            onViewDetails={handleViewLoanDetails}
-            onReturnVehicle={handleReturnVehicle}
-            onNewLoan={handleNewLoan}
-            onDeleteLoan={handleDeleteLoan}
-            onViewAttestation={handleViewAttestation}
-          />
+            <FleetCurrentLoans
+              currentLoans={currentLoans}
+              onViewDetails={handleViewLoanDetails}
+              onReturnVehicle={handleReturnVehicle}
+              onNewLoan={handleNewLoan}
+              onDeleteLoan={handleDeleteLoan}
+              onViewAttestation={handleViewAttestation}
+              onDownloadAttestation={handleDownloadAttestation}
+            />
 
           {/* Contraventions section - placeholder for now */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
