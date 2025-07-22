@@ -1,4 +1,3 @@
-
 interface SignatureData {
   firstname: string;
   lastname: string;
@@ -11,6 +10,7 @@ interface SignatureData {
   email: string;
   signature_mode: number;
   transport_mode: number;
+  recipient_id?: string;
 }
 
 interface SignatureRequest {
@@ -53,36 +53,51 @@ export const sendForSignature = async (
     const companyPhone = companyData?.phone || '';
     const formattedCompanyPhone = companyPhone.startsWith('+33') ? companyPhone : `+33${companyPhone.replace(/^0/, '')}`;
 
+    // Préparer les données de l'entreprise avec l'ID Oodrive si disponible
+    const companySignatureData: SignatureData = {
+      firstname: companyFirstName,
+      lastname: companyLastName,
+      company_name: companyName,
+      address_1: companyData?.address || '',
+      postal_code: companyData?.zipcode || '',
+      city: companyData?.city || '',
+      cell_phone: formattedCompanyPhone || '',
+      email: 'archive@karrosserie.pro',
+      signature_mode: 15,
+      transport_mode: 2
+    };
+
+    // Ajouter l'ID Oodrive de l'entreprise si disponible
+    if (companyData?.oodrive_recipient_id) {
+      companySignatureData.recipient_id = companyData.oodrive_recipient_id;
+      console.log('Including company recipient_id:', companyData.oodrive_recipient_id);
+    }
+
+    // Préparer les données du client avec l'ID Oodrive si disponible
+    const clientSignatureData: SignatureData = {
+      firstname: clientData?.first_name || '',
+      lastname: clientData?.last_name || '',
+      address_1: clientData?.address || '',
+      postal_code: clientData?.postal_code || '',
+      city: clientData?.city || '',
+      cell_phone: formattedClientPhone || '',
+      email: 'archive2@karrosserie.pro',
+      signature_mode: 15,
+      transport_mode: 2
+    };
+
+    // Ajouter l'ID Oodrive du client si disponible
+    if (clientData?.oodrive_recipient_id) {
+      clientSignatureData.recipient_id = clientData.oodrive_recipient_id;
+      console.log('Including client recipient_id:', clientData.oodrive_recipient_id);
+    }
+
     const requestData: SignatureRequest = {
       contractName: `${cessionId}.pdf`,
       messageTitle: "Votre cession de créance",
       messageBody: "Dans le cadre du processus de cession de créance, nous vous invitons à signer le document ci-joint. Cette signature est nécessaire pour autoriser votre compagnie d'assurance à nous verser directement le montant dû.",
       filePath: documentUrl,
-      data: [
-        {
-          firstname: companyFirstName,
-          lastname: companyLastName,
-          company_name: companyName,
-          address_1: companyData?.address || '',
-          postal_code: companyData?.zipcode || '',
-          city: companyData?.city || '',
-          cell_phone: formattedCompanyPhone || '',
-          email: 'archive@karrosserie.pro',
-          signature_mode: 15,
-          transport_mode: 2
-        },
-        {
-          firstname: clientData?.first_name || '',
-          lastname: clientData?.last_name || '',
-          address_1: clientData?.address || '',
-          postal_code: clientData?.postal_code || '',
-          city: clientData?.city || '',
-          cell_phone: formattedClientPhone || '',
-          email: 'archive2@karrosserie.pro',
-          signature_mode: 15,
-          transport_mode: 2
-        }
-      ]
+      data: [companySignatureData, clientSignatureData]
     };
 
     console.log('Signature request data:', requestData);
