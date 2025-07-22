@@ -17,7 +17,13 @@ export const generateAndUploadCessionPDF = async (
     let repairOrderPDFComponent: React.ReactElement | null = null;
     if (cession.repair_orders) {
       try {
+        console.log('Generating repair order PDF component for cession:', cession.repair_orders);
+        console.log('Client data passed:', clientData);
+        console.log('Vehicle data passed:', vehicleData);
+        
         const data = await prepareRepairOrderDataForPDF(cession.repair_orders as any, companyData);
+        console.log('Prepared repair order data:', data);
+        
         const invoiceData = {
           ...data.repairOrder,
           amount: data.totals.total,
@@ -26,6 +32,10 @@ export const generateAndUploadCessionPDF = async (
           repairs_data: Array.isArray(data.repairOrder.repairs_data) ? data.repairOrder.repairs_data : [],
           parts_data: Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data : []
         } as any;
+
+        console.log('Invoice data for PDF:', invoiceData);
+        console.log('Final client data for PDF:', data.clientData);
+        console.log('Final vehicle data for PDF:', data.vehicleData);
 
         // Créer le composant InvoicePDF pour l'ordre de réparation
         repairOrderPDFComponent = InvoicePDF({ 
