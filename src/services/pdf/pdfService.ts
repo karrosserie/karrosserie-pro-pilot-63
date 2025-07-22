@@ -4,6 +4,9 @@ import { CessionPDF } from './CessionPDFGenerator';
 import { Cession } from '@/services/supabase/cessions';
 import { prepareRepairOrderDataForPDF } from '@/utils/repairOrderPDFGeneration';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
+import { repairOrdersService } from '@/services/supabase/repair-orders';
+import { quotesService } from '@/services/supabase/quotes';
+import { expertiseReportsService } from '@/services/supabase/expertise-reports';
 
 export const generateAndUploadCessionPDF = async (
   cession: Cession,
@@ -128,6 +131,45 @@ export const generateAndUploadCessionPDF = async (
       }
     }
 
+    // Récupérer le PDF du rapport d'expertise si disponible
+    let expertiseReportPDFUrl = null;
+    if (cession.repair_order_id) {
+      try {
+        console.log('Récupération du rapport d\'expertise pour l\'ordre de réparation:', cession.repair_order_id);
+        
+        // 1. Récupérer l'ordre de réparation pour obtenir le quote_id
+        const repairOrder = await repairOrdersService.getById(cession.repair_order_id);
+        console.log('Ordre de réparation récupéré:', repairOrder);
+        
+        if (repairOrder?.quote_id) {
+          // 2. Récupérer le devis pour obtenir le report_id
+          const quote = await quotesService.getById(repairOrder.quote_id);
+          console.log('Devis récupéré:', quote);
+          
+          if (quote?.report_id) {
+            // 3. Récupérer le rapport d'expertise pour obtenir le document_url
+            const expertiseReport = await expertiseReportsService.getById(quote.report_id);
+            console.log('Rapport d\'expertise récupéré:', expertiseReport);
+            
+            if (expertiseReport?.document_url) {
+              expertiseReportPDFUrl = expertiseReport.document_url;
+              console.log('URL du PDF du rapport d\'expertise trouvée:', expertiseReportPDFUrl);
+            } else {
+              console.log('Aucun document_url trouvé dans le rapport d\'expertise');
+            }
+          } else {
+            console.log('Aucun report_id trouvé dans le devis');
+          }
+        } else {
+          console.log('Aucun quote_id trouvé dans l\'ordre de réparation');
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération du rapport d\'expertise:', error);
+      }
+    } else {
+      console.log('Aucun repair_order_id dans la cession');
+    }
+
     // Generate PDF blob
     const pdfBlob = await pdf(
       CessionPDF({
@@ -136,7 +178,8 @@ export const generateAndUploadCessionPDF = async (
         selectedInsuranceCompany,
         clientData,
         vehicleData,
-        repairOrderPDFDocument
+        repairOrderPDFDocument,
+        expertiseReportPDFUrl
       })
     ).toBlob();
 
