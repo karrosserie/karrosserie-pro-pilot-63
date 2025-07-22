@@ -62,7 +62,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
           </h1>
         </div>
         
-        <div className="grid grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-[1fr_1.5fr_1fr] gap-6 mb-6">
           {/* Colonne 1 - Entreprise */}
           <div>
             {companyData.logo_url ? (
