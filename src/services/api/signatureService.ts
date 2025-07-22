@@ -1,3 +1,4 @@
+
 interface SignatureData {
   firstname: string;
   lastname: string;
@@ -40,6 +41,24 @@ export const sendForSignature = async (
   try {
     console.log('Sending cession for signature:', { cessionId, documentUrl, companyData, clientData });
 
+    // Logs détaillés pour diagnostiquer le problème des recipient_id
+    console.log('=== DIAGNOSTIC RECIPIENT_ID ===');
+    console.log('CompanyData structure:', {
+      id: companyData?.id,
+      name: companyData?.name,
+      oodrive_recipient_id: companyData?.oodrive_recipient_id,
+      hasOodriveId: !!companyData?.oodrive_recipient_id
+    });
+    
+    console.log('ClientData structure:', {
+      id: clientData?.id,
+      first_name: clientData?.first_name,
+      last_name: clientData?.last_name,
+      oodrive_recipient_id: clientData?.oodrive_recipient_id,
+      hasOodriveId: !!clientData?.oodrive_recipient_id,
+      fullClientData: clientData
+    });
+
     // Préparer les données de l'entreprise
     const companyName = companyData?.name || '';
     const companyWords = companyName.split(' ').filter(word => word.trim());
@@ -70,7 +89,9 @@ export const sendForSignature = async (
     // Ajouter l'ID Oodrive de l'entreprise si disponible
     if (companyData?.oodrive_recipient_id) {
       companySignatureData.recipient_id = companyData.oodrive_recipient_id;
-      console.log('Including company recipient_id:', companyData.oodrive_recipient_id);
+      console.log('✅ Including company recipient_id:', companyData.oodrive_recipient_id);
+    } else {
+      console.log('❌ No company recipient_id found');
     }
 
     // Préparer les données du client avec l'ID Oodrive si disponible
@@ -89,7 +110,9 @@ export const sendForSignature = async (
     // Ajouter l'ID Oodrive du client si disponible
     if (clientData?.oodrive_recipient_id) {
       clientSignatureData.recipient_id = clientData.oodrive_recipient_id;
-      console.log('Including client recipient_id:', clientData.oodrive_recipient_id);
+      console.log('✅ Including client recipient_id:', clientData.oodrive_recipient_id);
+    } else {
+      console.log('❌ No client recipient_id found');
     }
 
     const requestData: SignatureRequest = {
@@ -100,7 +123,10 @@ export const sendForSignature = async (
       data: [companySignatureData, clientSignatureData]
     };
 
-    console.log('Signature request data:', requestData);
+    console.log('=== FINAL REQUEST DATA ===');
+    console.log('Company signature data:', companySignatureData);
+    console.log('Client signature data:', clientSignatureData);
+    console.log('Full request data:', requestData);
 
     const response = await fetch('https://n8n.karrosserie.pro/webhook/3a2a91a0-2ff5-4c42-a37e-3568ae7cf5dc', {
       method: 'POST',
