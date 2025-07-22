@@ -21,6 +21,50 @@ export const generateAndUploadCessionPDF = async (
         const repairOrderClient = cession.repair_orders.clients;
         const repairOrderVehicle = cession.repair_orders.vehicles;
         
+        // Parser les données des réparations et pièces
+        let repairs = [];
+        let parts = [];
+        try {
+          repairs = cession.repair_orders.repairs_data ? JSON.parse(cession.repair_orders.repairs_data as string) : [];
+          parts = cession.repair_orders.parts_data ? JSON.parse(cession.repair_orders.parts_data as string) : [];
+        } catch (error) {
+          console.error('Error parsing repair/parts data:', error);
+        }
+
+        // Formater les articles pour le PDF
+        const allItems = [...repairs, ...parts];
+        const formattedItems = allItems.map(item => {
+          const unitCost = parseFloat(item.unitCost) || 0;
+          const quantity = parseFloat(item.quantity) || 0;
+          const discount = parseFloat(item.discount) || 0;
+          const vat = parseFloat(item.vat) || 20;
+          
+          const subtotal = unitCost * quantity;
+          const afterDiscount = subtotal - discount;
+          const vatAmount = (afterDiscount * vat) / 100;
+          const totalTTC = afterDiscount + vatAmount;
+
+          return {
+            ref: item.ref || '',
+            description: item.description || '',
+            quantity: quantity,
+            discount: discount,
+            unitPrice: unitCost,
+            vat: vat,
+            totalHT: afterDiscount,
+            totalTTC: totalTTC
+          };
+        });
+
+        // Calculer les totaux
+        const totals = formattedItems.reduce((acc, item) => {
+          acc.subtotal += item.totalHT;
+          acc.vat += item.totalTTC - item.totalHT;
+          acc.total += item.totalTTC;
+          acc.discount += item.discount;
+          return acc;
+        }, { subtotal: 0, vat: 0, total: 0, discount: 0 });
+
         // Formater les données client comme attendu par InvoicePDF
         const formattedClientData = repairOrderClient ? {
           number: cession.repair_orders.reference,
@@ -33,6 +77,19 @@ export const generateAndUploadCessionPDF = async (
           mileage: repairOrderVehicle?.mileage ? repairOrderVehicle.mileage.toLocaleString() + ' km' : '',
           vehicle: repairOrderVehicle ? `${repairOrderVehicle.car_brands?.name || ''} ${repairOrderVehicle.car_models?.name || ''}`.trim() : '',
           billingDate: cession.repair_orders.created_at ? new Date(cession.repair_orders.created_at).toLocaleDateString('fr-FR') : '',
+          notes: '',  // Les notes ne sont pas disponibles dans les données de cession
+          items: formattedItems,
+          totals: {
+            // Format pour le template par défaut
+            subtotal: `${totals.subtotal.toFixed(2).replace('.', ',')} €`,
+            vat: `${totals.vat.toFixed(2).replace('.', ',')} €`,
+            total: `${totals.total.toFixed(2).replace('.', ',')} €`,
+            // Format pour le template alternatif
+            totalHT: `${totals.subtotal.toFixed(2).replace('.', ',')} €`,
+            totalVAT: `${totals.vat.toFixed(2).replace('.', ',')} €`,
+            totalDiscount: `${totals.discount.toFixed(2).replace('.', ',')} €`,
+            totalTTC: `${totals.total.toFixed(2).replace('.', ',')} €`
+          }
         } : null;
 
         // Formater les données véhicule comme attendu par InvoicePDF
@@ -43,24 +100,6 @@ export const generateAndUploadCessionPDF = async (
           start_date: null, // Ces données ne sont pas disponibles dans la cession
           end_date: null,   // Ces données ne sont pas disponibles dans la cession
         } : null;
-
-        // Parser les données des réparations et pièces
-        let repairs = [];
-        let parts = [];
-        try {
-          repairs = cession.repair_orders.repairs_data ? JSON.parse(cession.repair_orders.repairs_data as string) : [];
-          parts = cession.repair_orders.parts_data ? JSON.parse(cession.repair_orders.parts_data as string) : [];
-        } catch (error) {
-          console.error('Error parsing repair/parts data:', error);
-        }
-
-        // Calculer les totaux
-        const allItems = [...repairs, ...parts];
-        const totals = allItems.reduce((acc, item) => {
-          const total = parseFloat(item.total) || 0;
-          acc.total += total;
-          return acc;
-        }, { total: 0 });
 
         const invoiceData = {
           ...cession.repair_orders,
