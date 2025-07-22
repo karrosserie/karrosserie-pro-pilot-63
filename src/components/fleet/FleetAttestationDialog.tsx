@@ -104,7 +104,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               
               {/* Informations de départ */}
               <div className="grid grid-cols-2">
-                <div className="mt-6">
+                <div className="mt-3">
                   <div className="font-bold text-black mb-1">Départ :</div>
                   <div className="space-y-1 text-black">
                     <div>Le : {loanData?.start_date ? formatDate(loanData.start_date) : ''}</div>
@@ -114,7 +114,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
                 </div>
                 
                 {/* Informations de retour */}
-                <div>
+                <div  className="mt-3">
                   <div className="font-bold text-black mb-1">Retour :</div>
                   <div className="space-y-1 text-black">
                     <div>Le : {loanData?.expected_return_date ? formatDate(loanData.expected_return_date) : ''}</div>
@@ -136,7 +136,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
                 <p>{[loanData?.clients?.postal_code, loanData?.clients?.city].filter(Boolean).join(' ')}</p>
               )}
               {loanData?.clients?.phone && <p>Téléphone : {loanData.clients.phone}</p>}
-              {loanData?.insurance_contract_number && <p className="mt-6"><span className="font-bold">Numéro de contrat client :</span> {loanData.insurance_contract_number}</p>}
+              {loanData?.insurance_contract_number && <div className="mt-3"><p><span className="font-bold">Numéro de contrat client :</span> {loanData.insurance_contract_number}</p></div>}
             </div>
           </div>
         </div>
