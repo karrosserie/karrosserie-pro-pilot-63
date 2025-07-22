@@ -23,7 +23,7 @@ export const generateAndUploadCessionPDF = async (
     let repairOrderPDFComponent: React.ReactElement | null = null;
     if (cession.repair_orders) {
       try {
-        console.log('=== CESSION PDF GENERATION ===');
+        console.log('=== DÉBUT GÉNÉRATION COMPOSANT ORDRE DE RÉPARATION ===');
         console.log('Generating repair order PDF component for cession:', JSON.stringify(cession.repair_orders, null, 2));
         console.log('Client data passed to PDF service:', JSON.stringify(clientData, null, 2));
         console.log('Vehicle data passed to PDF service:', JSON.stringify(vehicleData, null, 2));
@@ -126,6 +126,8 @@ export const generateAndUploadCessionPDF = async (
     }
 
     // Generate PDF blob
+    console.log('=== GÉNÉRATION PDF FINAL ===');
+    console.log('repairOrderPDFComponent créé?', !!repairOrderPDFComponent);
     const pdfBlob = await pdf(
       CessionPDF({
         cession,
