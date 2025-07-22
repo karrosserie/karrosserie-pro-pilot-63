@@ -26,6 +26,9 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
   const currentDate = formatDate(new Date().toISOString());
 
   if (!loanData) return null;
+  
+  // Debug pour voir la structure des données
+  console.log('FleetAttestationDialog loanData:', loanData);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
