@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Table, 
@@ -55,6 +55,49 @@ export const CessionsTable = ({
   
   const { companyData } = useCompany();
   const { insuranceCompanies } = useInsuranceCompanies();
+
+  // Vérifier le statut de signature des cessions en attente
+  useEffect(() => {
+    const checkSignatureStatus = async () => {
+      if (!cessions) return;
+
+      const cessionsEnAttente = cessions.filter(
+        cession => cession.status === 'en_attente_signature' && cession.oodrive_contract_id
+      );
+
+      for (const cession of cessionsEnAttente) {
+        try {
+          const response = await fetch('https://n8n.karrosserie.pro/webhook/e6854e25-9a51-4362-b9d2-9a18af911863', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              contractId: parseInt(cession.oodrive_contract_id!)
+            })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            
+            // Vérifier si les deux entrées ont signature_status = 'SIGNED'
+            if (Array.isArray(data) && data.length === 2) {
+              const allSigned = data.every(entry => entry.signature_status === 'SIGNED');
+              
+              if (allSigned) {
+                // Mettre à jour le statut de la cession
+                await updateCession(cession.id, { status: 'signee' });
+              }
+            }
+          }
+        } catch (error) {
+          console.error(`Erreur lors de la vérification du statut pour la cession ${cession.id}:`, error);
+        }
+      }
+    };
+
+    checkSignatureStatus();
+  }, [cessions]);
   
   const parseValidationError = (validationError: string) => {
     const lines = validationError.split('\n').filter(line => line.trim() !== '');
