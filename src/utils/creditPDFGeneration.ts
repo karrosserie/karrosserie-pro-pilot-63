@@ -107,10 +107,12 @@ export const prepareCreditDataForPDF = async (credit: any, companyData: any) => 
 
     // Calculer les totaux
     const totals = items.reduce((acc, item) => {
-      const unitCost = parseFloat(item.unit_price || item.unitCost) || 0;
-      const quantity = parseFloat(item.quantity) || 0;
+      const unitCost = parseFloat(item.unit_price || item.unitCost || item.total) || 0;
+      const quantity = parseFloat(item.quantity) || 1;
       const discount = parseFloat(item.discount) || 0;
-      const vat = parseFloat(item.vat) || 0;
+      const vat = parseFloat(item.vat) || 20;
+      
+      console.log('Processing credit item:', item, { unitCost, quantity, discount, vat });
       
       const subtotal = unitCost * quantity;
       const afterDiscount = subtotal - discount;
@@ -123,6 +125,8 @@ export const prepareCreditDataForPDF = async (credit: any, companyData: any) => 
 
       return acc;
     }, { subtotalHT: 0, totalVAT: 0, total: 0 });
+    
+    console.log('Credit totals calculated:', totals);
 
     return {
       credit: {
@@ -148,10 +152,10 @@ export const prepareCreditDataForPDF = async (credit: any, companyData: any) => 
         invoiceReference: invoiceData?.reference || 'N/A',
         notes: credit.notes || '',
         items: items.map(item => {
-          const unitPrice = parseFloat(item.unit_price || item.unitCost) || 0;
-          const quantity = parseFloat(item.quantity) || 0;
+          const unitPrice = parseFloat(item.unit_price || item.unitCost || item.total) || 0;
+          const quantity = parseFloat(item.quantity) || 1;
           const discount = parseFloat(item.discount) || 0;
-          const vat = parseFloat(item.vat) || 0;
+          const vat = parseFloat(item.vat) || 20;
           
           const subtotal = unitPrice * quantity;
           const afterDiscount = subtotal - discount;
