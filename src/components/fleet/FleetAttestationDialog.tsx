@@ -57,18 +57,16 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
             <div className="mb-4">
               <div className="font-bold">Le Prêteur :</div>
               <div>Nom du garage : {companyData.name?.toUpperCase() || "KORPORATE"}</div>
-              <div>Adresse : {companyData.address || "25 COURS PIERRE PUGET 13006"}</div>
+              <div>Adresse : {companyData.address || "25 COURS PIERRE PUGET"} {companyData.zipcode || "13006"} {companyData.city || "MARSEILLE"}</div>
               <div>N° SIRET : {companyData.siret || "917 775 835 00015"}</div>
-              <div>Représenté par : {companyData.name?.toUpperCase() || "KORPORATE"}</div>
             </div>
 
             <div className="font-bold mb-2">ET</div>
 
             <div className="mb-4">
               <div className="font-bold">L'Emprunteur :</div>
-              <div>Raison sociale : {loanData.client}</div>
-              <div>Adresse : 36 AV DE FRAIS VALLON 13013 MARSEILLE 13</div>
-              <div>Nom et prénom de l'employeur : Monsieur BOUCIE Ahmad</div>
+              <div>Nom et prénom : {loanData.client}</div>
+              <div>Adresse : {/* TODO: récupérer depuis la fiche client */}</div>
               <div>Téléphone : +33646465242</div>
             </div>
           </div>
@@ -89,10 +87,10 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
             </div>
             <div className="ml-4">
               <div>Marque : {loanData.vehicle.split(' ')[0] || "AUDI"}</div>
-              <div>Modèle : {loanData.vehicle.split(' ').slice(1).join(' ') || "Q2"}</div>
+              <div>Modèle : {loanData.vehicle.split(' ').slice(1, -1).join(' ') || "Q2"}</div>
               <div>N° d'immatriculation : AC-426-FB</div>
               <div>Carburant : 92 %</div>
-              <div>Kilométrage : 234567 Km</div>
+              <div>Kilométrage : 23679 Km</div>
             </div>
           </div>
 
