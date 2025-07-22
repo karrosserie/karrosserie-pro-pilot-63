@@ -17,12 +17,49 @@ export const generateAndUploadCessionPDF = async (
     let repairOrderPDFComponent: React.ReactElement | null = null;
     if (cession.repair_orders) {
       try {
-        console.log('Generating repair order PDF component for cession:', cession.repair_orders);
-        console.log('Client data passed:', clientData);
-        console.log('Vehicle data passed:', vehicleData);
+        console.log('=== CESSION PDF GENERATION ===');
+        console.log('Generating repair order PDF component for cession:', JSON.stringify(cession.repair_orders, null, 2));
+        console.log('Client data passed to PDF service:', JSON.stringify(clientData, null, 2));
+        console.log('Vehicle data passed to PDF service:', JSON.stringify(vehicleData, null, 2));
         
-        const data = await prepareRepairOrderDataForPDF(cession.repair_orders as any, companyData);
-        console.log('Prepared repair order data:', data);
+        // Préparer les données de l'ordre de réparation depuis les données de la cession
+        const repairOrderForPDF = {
+          id: cession.repair_order_id,
+          reference: cession.repair_orders.reference,
+          created_at: cession.repair_orders.created_at,
+          client_id: null, // Nous avons les données directement
+          vehicle_id: null, // Nous avons les données directement
+          parts_data: cession.repair_orders.parts_data,
+          repairs_data: cession.repair_orders.repairs_data,
+          user_id: cession.user_id
+        };
+        
+        console.log('Prepared repair order for PDF:', JSON.stringify(repairOrderForPDF, null, 2));
+        
+        const data = await prepareRepairOrderDataForPDF(repairOrderForPDF as any, companyData);
+        console.log('Prepared repair order data from function:', JSON.stringify(data, null, 2));
+        
+        // Surcharger les données client et véhicule avec celles de la cession si elles ne sont pas présentes
+        const finalClientData = data.clientData || (cession.repair_orders.clients ? {
+          clientName: `${cession.repair_orders.clients.first_name} ${cession.repair_orders.clients.last_name}`,
+          address: cession.repair_orders.clients.address || '',
+          postalCode: cession.repair_orders.clients.postal_code || '',
+          city: cession.repair_orders.clients.city || '',
+          email: cession.repair_orders.clients.email || '',
+          phone: cession.repair_orders.clients.phone || ''
+        } : null);
+        
+        const finalVehicleData = data.vehicleData || (cession.repair_orders.vehicles ? {
+          licensePlate: cession.repair_orders.vehicles.license_plate,
+          vin: cession.repair_orders.vehicles.vin,
+          brandName: cession.repair_orders.vehicles.car_brands?.name,
+          modelName: cession.repair_orders.vehicles.car_models?.name,
+          year: null,
+          mileage: cession.repair_orders.vehicles.mileage
+        } : null);
+        
+        console.log('Final client data for PDF:', JSON.stringify(finalClientData, null, 2));
+        console.log('Final vehicle data for PDF:', JSON.stringify(finalVehicleData, null, 2));
         
         const invoiceData = {
           ...data.repairOrder,
@@ -33,22 +70,23 @@ export const generateAndUploadCessionPDF = async (
           parts_data: Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data : []
         } as any;
 
-        console.log('Invoice data for PDF:', invoiceData);
-        console.log('Final client data for PDF:', data.clientData);
-        console.log('Final vehicle data for PDF:', data.vehicleData);
+        console.log('Invoice data for PDF:', JSON.stringify(invoiceData, null, 2));
 
         // Créer le composant InvoicePDF pour l'ordre de réparation
         repairOrderPDFComponent = InvoicePDF({ 
           invoice: invoiceData, 
           companyData: data.companyData, 
           receipts: [],
-          clientData: data.clientData,
-          vehicleData: data.vehicleData,
+          clientData: finalClientData,
+          vehicleData: finalVehicleData,
           template: data.template,
           documentType: 'repair_order'
         });
+        
+        console.log('RepairOrder PDF component created successfully');
       } catch (error) {
         console.error('Erreur lors de la génération du composant PDF ordre de réparation:', error);
+        console.error('Error stack:', error.stack);
       }
     }
 
