@@ -18,6 +18,7 @@ interface FleetCurrentLoansProps {
   onDeleteLoan?: (loanId: string) => void;
   onNewLoan?: () => void;
   onViewAttestation?: (loanId: string) => void;
+  onDownloadAttestation?: (loanId: string) => void;
 }
 
 const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({ 
@@ -26,7 +27,8 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
   onReturnVehicle,
   onDeleteLoan,
   onNewLoan,
-  onViewAttestation
+  onViewAttestation,
+  onDownloadAttestation
 }) => {
   return (
     <div className="card-container">
