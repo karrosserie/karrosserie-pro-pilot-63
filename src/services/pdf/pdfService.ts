@@ -77,7 +77,9 @@ export const generateAndUploadCessionPDF = async (
           mileage: repairOrderVehicle?.mileage ? repairOrderVehicle.mileage.toLocaleString() + ' km' : '',
           vehicle: repairOrderVehicle ? `${repairOrderVehicle.car_brands?.name || ''} ${repairOrderVehicle.car_models?.name || ''}`.trim() : '',
           billingDate: cession.repair_orders.created_at ? new Date(cession.repair_orders.created_at).toLocaleDateString('fr-FR') : '',
-          notes: '',  // Les notes ne sont pas disponibles dans les données de cession
+          notes: '',  // Notes non disponibles dans les données
+          expectedDelay: '',  // Délai non disponible dans les données
+          customFooterText: '[Signature2/]',
           items: formattedItems,
           totals: {
             // Format pour le template par défaut
