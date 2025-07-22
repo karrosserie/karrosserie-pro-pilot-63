@@ -34,7 +34,7 @@ export const sendForSignature = async (
     const companyName = companyData?.name || '';
     const companyWords = companyName.split(' ').filter(word => word.trim());
     const companyFirstName = companyWords.length >= 2 ? companyWords[0] : 'Société';
-    const companyLastName = companyWords.length >= 2 ? companyWords.slice(1).join(' ') : companyName || 'CAR COOL';
+    const companyLastName = companyWords.length >= 2 ? companyWords.slice(1).join(' ') : companyName || '';
 
     // Préparer les données du client
     const clientPhone = clientData?.phone || '';
@@ -53,22 +53,21 @@ export const sendForSignature = async (
           firstname: companyFirstName,
           lastname: companyLastName,
           company_name: companyName,
-          address_1: companyData?.address || '123 Boulevard Michelet',
-          postal_code: companyData?.zipcode || '13008',
-          city: companyData?.city || 'MARSEILLE',
-          cell_phone: formattedCompanyPhone || '+33646465242',
+          address_1: companyData?.address || '',
+          postal_code: companyData?.zipcode || '',
+          city: companyData?.city || '',
+          cell_phone: formattedCompanyPhone || '',
           email: 'archive@karrosserie.pro',
           signature_mode: 15,
           transport_mode: 2
         },
         {
-          civility: 'Monsieur',
-          firstname: clientData?.first_name || 'Geoffrey',
-          lastname: clientData?.last_name || 'GOBEYN',
-          address_1: clientData?.address || '83 Boulevard du redon',
-          postal_code: clientData?.postal_code || '13009',
-          city: clientData?.city || 'MARSEILLE',
-          cell_phone: formattedClientPhone || '+33646465242',
+          firstname: clientData?.first_name || '',
+          lastname: clientData?.last_name || '',
+          address_1: clientData?.address || '',
+          postal_code: clientData?.postal_code || '',
+          city: clientData?.city || '',
+          cell_phone: formattedClientPhone || '',
           email: 'archive2@karrosserie.pro',
           signature_mode: 15,
           transport_mode: 2
