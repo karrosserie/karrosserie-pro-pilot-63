@@ -699,7 +699,8 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
             <Text style={styles.imageTitle}>PERMIS DE CONDUIRE - RECTO</Text>
             <Image 
               style={styles.documentImage} 
-              src={finalClientData.driver_license_front_url} 
+              src={finalClientData.driver_license_front_url}
+              cache={false}
             />
           </View>
         </Page>
@@ -712,7 +713,8 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
             <Text style={styles.imageTitle}>PERMIS DE CONDUIRE - VERSO</Text>
             <Image 
               style={styles.documentImage} 
-              src={finalClientData.driver_license_back_url} 
+              src={finalClientData.driver_license_back_url}
+              cache={false}
             />
           </View>
         </Page>
@@ -737,7 +739,8 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
                       <Text style={styles.imageTitle}>VÉHICULE - {timing.toUpperCase()}</Text>
                       <Image 
                         style={styles.documentImage} 
-                        src={imageUrl} 
+                        src={imageUrl}
+                        cache={false}
                       />
                     </View>
                   </Page>
@@ -759,7 +762,8 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
             <Text style={styles.imageTitle}>CERTIFICAT D'IMMATRICULATION - RECTO</Text>
             <Image 
               style={styles.documentImage} 
-              src={finalVehicleData.registration_document_front_url} 
+              src={finalVehicleData.registration_document_front_url}
+              cache={false}
             />
           </View>
         </Page>
@@ -772,7 +776,8 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
             <Text style={styles.imageTitle}>CERTIFICAT D'IMMATRICULATION - VERSO</Text>
             <Image 
               style={styles.documentImage} 
-              src={finalVehicleData.registration_document_back_url} 
+              src={finalVehicleData.registration_document_back_url}
+              cache={false}
             />
           </View>
         </Page>
