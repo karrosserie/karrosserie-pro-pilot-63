@@ -139,7 +139,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               <div>L'Emprunteur garantit que:</div>
               <div className="ml-4 mt-2">
                 <div>• Le véhicule est utilisé exclusivement dans le cadre de son activité professionnelle déclarée, conformément à l'article L. 3121-1 du Code du travail.</div>
-                <div>• L'usage du véhicule est strictement limité au département de {companyData.city} ({companyData.zipcode?.substring(0,2)}) et aux départements limitrophes.</div>
+                <div>• L'usage du véhicule est strictement limité au département de la ville de {companyData.city} ({companyData.zipcode?.substring(0,2)}) et aux départements limitrophes.</div>
                 <div>• Le kilométrage journalier n'excède pas 100 km, sauf autorisation écrite préalable du Prêteur.</div>
                 <div>• Le véhicule n'est jamais utilisé:</div>
                 <div className="ml-4">
@@ -428,30 +428,6 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               <div className="font-bold">Monsieur BOUCIE Ahmed</div>
               <div className="text-sm">Signé le {formatDate(new Date().toISOString())} à {new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</div>
               <div className="text-xs text-gray-600">À la latitude/longitude : 43.266749,5.3944581</div>
-            </div>
-          </div>
-
-          {/* Signature */}
-          <div className="mt-12">
-            <div className="grid grid-cols-2 gap-8">
-              <div className="text-center">
-                <div className="mb-4">L'Emprunteur</div>
-                <div className="font-bold">{loanData?.clients?.first_name?.toUpperCase()} {loanData?.clients?.last_name?.toUpperCase()}</div>
-                <div className="mt-8 border-t border-gray-400 pt-2">Signature</div>
-              </div>
-              
-              <div className="text-center">
-                <div className="mb-4">Le Prêteur</div>
-                <div className="font-bold">{companyData.name?.toUpperCase() || "KORPORATE"}</div>
-                <div className="mt-8 border-t border-gray-400 pt-2">Signature et cachet</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Mentions légales */}
-          <div className="mt-8 text-xs text-gray-600 border-t pt-4">
-            <div className="text-center">
-              Document établi le {currentDate} - Référence: PRET-{loanId}
             </div>
           </div>
         </div>
