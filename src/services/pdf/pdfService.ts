@@ -183,37 +183,53 @@ export const generateAndUploadCessionPDF = async (
       })
     ).toBlob();
 
+    console.log('PDF de cession généré, taille:', cessionPdfBlob.size, 'bytes');
+
     // Si on a un PDF du rapport d'expertise, fusionner les deux PDFs
     let finalPdfBlob = cessionPdfBlob;
     if (expertiseReportPDFUrl) {
       try {
         console.log('Fusion du PDF du rapport d\'expertise avec le PDF de cession');
+        console.log('URL du rapport d\'expertise:', expertiseReportPDFUrl);
         
         // Télécharger le PDF du rapport d'expertise
         const response = await fetch(expertiseReportPDFUrl);
+        if (!response.ok) {
+          throw new Error(`Impossible de télécharger le rapport d'expertise: ${response.status}`);
+        }
         const expertisePdfArrayBuffer = await response.arrayBuffer();
+        console.log('Rapport d\'expertise téléchargé, taille:', expertisePdfArrayBuffer.byteLength, 'bytes');
         
         // Convertir le blob de cession en ArrayBuffer
         const cessionPdfArrayBuffer = await cessionPdfBlob.arrayBuffer();
+        console.log('PDF de cession converti, taille:', cessionPdfArrayBuffer.byteLength, 'bytes');
         
         // Créer les documents PDF avec pdf-lib
         const cessionPdfDoc = await PDFDocument.load(cessionPdfArrayBuffer);
         const expertisePdfDoc = await PDFDocument.load(expertisePdfArrayBuffer);
         
+        console.log('Nombre de pages du PDF de cession:', cessionPdfDoc.getPageCount());
+        console.log('Nombre de pages du rapport d\'expertise:', expertisePdfDoc.getPageCount());
+        
         // Copier toutes les pages du rapport d'expertise dans le document de cession
         const expertisePages = await cessionPdfDoc.copyPages(expertisePdfDoc, expertisePdfDoc.getPageIndices());
         expertisePages.forEach((page) => cessionPdfDoc.addPage(page));
+        
+        console.log('Nombre total de pages après fusion:', cessionPdfDoc.getPageCount());
         
         // Sauvegarder le PDF fusionné
         const mergedPdfBytes = await cessionPdfDoc.save();
         finalPdfBlob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
         
-        console.log('PDF fusionné avec succès');
+        console.log('PDF fusionné avec succès, taille finale:', finalPdfBlob.size, 'bytes');
       } catch (error) {
         console.error('Erreur lors de la fusion des PDFs:', error);
         // En cas d'erreur, on garde le PDF de cession original
         finalPdfBlob = cessionPdfBlob;
+        console.log('Utilisation du PDF de cession original à cause de l\'erreur de fusion');
       }
+    } else {
+      console.log('Aucun rapport d\'expertise à fusionner');
     }
 
     // Get current user
