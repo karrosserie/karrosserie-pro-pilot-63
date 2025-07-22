@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -254,39 +255,75 @@ export const CessionsTable = ({
         );
 
         console.log('Signature response received:', signatureResponse);
+        console.log('Contract ID:', signatureResponse.contract_id);
+        console.log('Recipients array:', signatureResponse.recipients);
+        console.log('Recipients length:', signatureResponse.recipients?.length);
 
-        // Sauvegarder les identifiants Oodrive
-        if (signatureResponse.contract_id && signatureResponse.recipients?.length >= 2) {
+        // Sauvegarder les identifiants Oodrive avec une vérification plus détaillée
+        if (signatureResponse.contract_id) {
+          console.log('Contract ID found, updating cession...');
+          
           // Sauvegarder l'ID du contrat dans la cession
           await updateCession(cession.id, {
             oodrive_contract_id: signatureResponse.contract_id,
             status: 'en_attente_signature'
           });
 
-          // Sauvegarder l'ID du premier recipient (entreprise) dans company_info
-          if (companyData?.id) {
-            await companyService.updateCompanyInfo(repairOrderData.user_id, {
-              ...companyData,
-              oodrive_recipient_id: signatureResponse.recipients[0].id
+          console.log('Cession updated with contract ID');
+
+          // Vérifier si nous avons suffisamment de recipients
+          if (signatureResponse.recipients && signatureResponse.recipients.length >= 2) {
+            console.log('Recipients found, updating company and client...');
+            
+            // Sauvegarder l'ID du premier recipient (entreprise) dans company_info
+            if (companyData?.id && repairOrderData.user_id) {
+              console.log('Updating company with recipient ID:', signatureResponse.recipients[0].id);
+              try {
+                await companyService.updateCompanyInfo(repairOrderData.user_id, {
+                  ...companyData,
+                  oodrive_recipient_id: signatureResponse.recipients[0].id
+                });
+                console.log('Company updated successfully');
+              } catch (companyError) {
+                console.error('Error updating company:', companyError);
+              }
+            } else {
+              console.log('Missing company data or user ID:', { companyData: !!companyData, userId: repairOrderData.user_id });
+            }
+
+            // Sauvegarder l'ID du second recipient (client) dans clients
+            if (repairOrderData.clients?.id) {
+              console.log('Updating client with recipient ID:', signatureResponse.recipients[1].id);
+              try {
+                await clientsService.update(repairOrderData.clients.id, {
+                  ...repairOrderData.clients,
+                  oodrive_recipient_id: signatureResponse.recipients[1].id
+                });
+                console.log('Client updated successfully');
+              } catch (clientError) {
+                console.error('Error updating client:', clientError);
+              }
+            } else {
+              console.log('Missing client ID:', repairOrderData.clients?.id);
+            }
+
+            toast({
+              title: "Document envoyé",
+              description: "Le document a été envoyé pour signature avec succès et les identifiants ont été sauvegardés.",
+            });
+          } else {
+            console.log('Insufficient recipients in response:', signatureResponse.recipients?.length || 0);
+            toast({
+              title: "Document envoyé partiellement",
+              description: "Le document a été envoyé et l'ID du contrat sauvegardé, mais les identifiants des destinataires n'ont pas pu être sauvegardés.",
+              variant: "destructive",
             });
           }
-
-          // Sauvegarder l'ID du second recipient (client) dans clients
-          if (repairOrderData.clients?.id) {
-            await clientsService.update(repairOrderData.clients.id, {
-              ...repairOrderData.clients,
-              oodrive_recipient_id: signatureResponse.recipients[1].id
-            });
-          }
-
-          toast({
-            title: "Document envoyé",
-            description: "Le document a été envoyé pour signature avec succès et les identifiants ont été sauvegardés.",
-          });
         } else {
+          console.log('No contract ID in response');
           toast({
-            title: "Avertissement",
-            description: "Le document a été envoyé mais certains identifiants n'ont pas pu être sauvegardés.",
+            title: "Erreur",
+            description: "Le document a été envoyé mais aucun identifiant de contrat n'a été retourné.",
             variant: "destructive",
           });
         }
