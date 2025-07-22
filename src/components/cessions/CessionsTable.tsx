@@ -163,7 +163,9 @@ export const CessionsTable = ({
   };
 
   const handleInitializeProcedure = async (cession: Cession) => {
+    console.log('=== INITIALIZE PROCEDURE STARTED ===');
     console.log('Initializing procedure for cession:', cession.id);
+    console.log('Cession data:', JSON.stringify(cession, null, 2));
     
     // Vérifier qu'il y a un repair_order_id
     if (!cession.repair_order_id) {
@@ -178,8 +180,10 @@ export const CessionsTable = ({
     setIsGeneratingPDF(true);
 
     try {
+      console.log('=== FETCHING REPAIR ORDER DATA ===');
       // Récupérer les données complètes de l'ordre de réparation avec client et véhicule
       const repairOrderData = await repairOrdersService.getById(cession.repair_order_id);
+      console.log('Repair order data fetched:', JSON.stringify(repairOrderData, null, 2));
       
       // Valider que toutes les photos sont présentes
       const validationError = validateRepairOrderData(
@@ -214,6 +218,15 @@ export const CessionsTable = ({
         return;
       }
 
+      console.log('=== CALLING GENERATE PDF FUNCTION ===');
+      console.log('About to call generateAndUploadCessionPDF with:', {
+        cession: cession.id,
+        companyData: companyData,
+        selectedInsuranceCompany: selectedInsuranceCompany.name,
+        clientData: repairOrderData.clients,
+        vehicleData: repairOrderData.vehicles
+      });
+
       // Générer et uploader le PDF
       const pdfUrl = await generateAndUploadCessionPDF(
         cession,
@@ -222,6 +235,9 @@ export const CessionsTable = ({
         repairOrderData.clients,
         repairOrderData.vehicles
       );
+      
+      console.log('=== PDF GENERATION COMPLETED ===');
+      console.log('Generated PDF URL:', pdfUrl);
 
       // Mettre à jour la cession avec l'URL du PDF
       await updateCession(cession.id, {
