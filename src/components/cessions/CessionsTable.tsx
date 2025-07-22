@@ -247,11 +247,14 @@ export const CessionsTable = ({
           description: "Envoi du document pour signature en cours...",
         });
 
+        // Récupérer les données complètes du client avec l'oodrive_recipient_id
+        const fullClientData = await clientsService.getById(repairOrderData.clients.id);
+        
         const signatureResponse = await sendForSignature(
           cession.id,
           pdfUrl,
           companyData,
-          repairOrderData.clients
+          fullClientData
         );
 
         console.log('Signature response received:', signatureResponse);
