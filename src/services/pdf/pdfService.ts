@@ -47,9 +47,8 @@ export const generateAndUploadCessionPDF = async (
         
         // Surcharger les données client et véhicule avec celles de la cession si elles ne sont pas présentes
         const finalClientData = data.clientData || (cession.repair_orders.clients ? {
-          clientName: `${cession.repair_orders.clients.first_name} ${cession.repair_orders.clients.last_name}`,
-          address: cession.repair_orders.clients.address || '',
-          postalCode: cession.repair_orders.clients.postal_code || '',
+          name: `${cession.repair_orders.clients.first_name} ${cession.repair_orders.clients.last_name}`,
+          address: `${cession.repair_orders.clients.address || ''} ${cession.repair_orders.clients.postal_code || ''} ${cession.repair_orders.clients.city || ''}`.trim(),
           city: cession.repair_orders.clients.city || '',
           email: cession.repair_orders.clients.email || '',
           phone: cession.repair_orders.clients.phone || ''
