@@ -12,7 +12,7 @@ interface FleetAttestationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   loanId: string | null;
-  loanData?: any; // Données complètes de la réservation
+  loanData?: any; // Données complètes de la réservation avec relations
 }
 
 const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
@@ -63,9 +63,9 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
 
             <div className="mb-4">
               <div className="font-bold">L'Emprunteur :</div>
-              <div>Nom et prénom : {loanData?.client || ''}</div>
-              <div>Adresse : </div>
-              <div>Téléphone : </div>
+              <div>Nom et prénom : {loanData?.clients?.first_name} {loanData?.clients?.last_name}</div>
+              <div>Adresse : {[loanData?.clients?.address, loanData?.clients?.postal_code, loanData?.clients?.city].filter(Boolean).join(' ')}</div>
+              {loanData?.clients?.phone && <div>Téléphone : {loanData.clients.phone}</div>}
             </div>
           </div>
 
@@ -84,18 +84,18 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               Le garage met gratuitement à disposition de l'Emprunteur le véhicule suivant :
             </div>
             <div className="ml-4">
-              <div>Marque : {loanData?.vehicle?.split(' ')[0] || ''}</div>
-              <div>Modèle : {loanData?.vehicle?.split(' ')[1] || ''}</div>
-              <div>N° d'immatriculation : {loanData?.vehicle?.split(' - ')[1] || ''}</div>
-              <div>Carburant : %</div>
-              <div>Kilométrage : Km</div>
+              <div>Marque : {loanData?.fleet_vehicles?.car_brands?.name || ''}</div>
+              <div>Modèle : {loanData?.fleet_vehicles?.car_models?.name || ''}</div>
+              <div>N° d'immatriculation : {loanData?.fleet_vehicles?.license_plate || ''}</div>
+              <div>Carburant : {loanData?.fuel_level_start || ''}%</div>
+              <div>Kilométrage : {loanData?.start_mileage || ''} Km</div>
             </div>
           </div>
 
           {/* 2. DURÉE DU PRÊT */}
           <div className="mb-6">
             <h2 className="font-bold text-lg mb-4">2. DURÉE DU PRÊT</h2>
-            <div>Période initiale : du {loanData?.startDate || ''} au {loanData?.expectedReturnDate || ''}</div>
+            <div>Période initiale : du {loanData?.start_date ? formatDate(loanData.start_date) : ''} au {loanData?.expected_return_date ? formatDate(loanData.expected_return_date) : ''}</div>
             <div className="font-bold mt-2">Restitution anticipée obligatoire.</div>
             <div className="mt-2">
               L'emprunteur s'engage expressément à restituer le véhicule sans délai dès que son véhicule personnel est prêt, même si cette disponibilité intervient avant la date de fin prévue initialement.
@@ -139,7 +139,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               <div>L'Emprunteur garantit que:</div>
               <div className="ml-4 mt-2">
                 <div>• Le véhicule est utilisé exclusivement dans le cadre de son activité professionnelle déclarée, conformément à l'article L. 3121-1 du Code du travail.</div>
-                <div>• L'usage du véhicule est strictement limité au département des Bouches-du-Rhône (13) et aux départements limitrophes.</div>
+                <div>• L'usage du véhicule est strictement limité au département de {companyData.city} ({companyData.zipcode?.substring(0,2)}) et aux départements limitrophes.</div>
                 <div>• Le kilométrage journalier n'excède pas 100 km, sauf autorisation écrite préalable du Prêteur.</div>
                 <div>• Le véhicule n'est jamais utilisé:</div>
                 <div className="ml-4">
@@ -436,7 +436,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
             <div className="grid grid-cols-2 gap-8">
               <div className="text-center">
                 <div className="mb-4">L'Emprunteur</div>
-                <div className="font-bold">{loanData.client.toUpperCase()}</div>
+                <div className="font-bold">{loanData?.clients?.first_name?.toUpperCase()} {loanData?.clients?.last_name?.toUpperCase()}</div>
                 <div className="mt-8 border-t border-gray-400 pt-2">Signature</div>
               </div>
               

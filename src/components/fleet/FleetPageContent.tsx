@@ -58,7 +58,7 @@ const FleetPageContent = () => {
     setSelectedLoanForAttestation(null);
   };
 
-  // Trouver les données du prêt sélectionné pour l'attestation
+  // Trouver les données complètes du prêt sélectionné pour l'attestation
   const selectedLoanData = selectedLoanForAttestation 
     ? currentLoans.find(loan => loan.id === selectedLoanForAttestation)
     : null;
