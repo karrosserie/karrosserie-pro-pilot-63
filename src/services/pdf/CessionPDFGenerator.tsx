@@ -91,9 +91,10 @@ interface CessionPDFProps {
   selectedInsuranceCompany: any;
   clientData?: any;
   vehicleData?: any;
+  repairOrderPDFBlob?: Blob | null;
 }
 
-export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, clientData, vehicleData }: CessionPDFProps) => {
+export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, clientData, vehicleData, repairOrderPDFBlob }: CessionPDFProps) => {
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('fr-FR');
   };
@@ -750,12 +751,13 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
       })()}
 
       {/* Ordre de réparation PDF */}
-      {(cession.repair_orders as any)?.document_url && (
+      {cession.repair_order_id && repairOrderPDFBlob && (
         <Page size="A4" style={styles.page} break>
           <View style={styles.imageSection}>
             <Text style={styles.imageTitle}>ORDRE DE RÉPARATION</Text>
-            <Text style={styles.text}>
-              Document disponible à l'adresse : {(cession.repair_orders as any).document_url}
+            <Text style={styles.section}>Référence: {cession.repair_orders?.reference || ''}</Text>
+            <Text style={styles.section}>
+              Le PDF de l'ordre de réparation a été généré et sera inclus dans le document final.
             </Text>
           </View>
         </Page>

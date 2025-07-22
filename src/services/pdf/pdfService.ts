@@ -2,6 +2,8 @@ import { pdf } from '@react-pdf/renderer';
 import { supabase } from '@/integrations/supabase/client';
 import { CessionPDF } from './CessionPDFGenerator';
 import { Cession } from '@/services/supabase/cessions';
+import { prepareRepairOrderDataForPDF } from '@/utils/repairOrderPDFGeneration';
+import InvoicePDF from '@/components/invoices/InvoicePDF';
 
 export const generateAndUploadCessionPDF = async (
   cession: Cession,
@@ -11,6 +13,36 @@ export const generateAndUploadCessionPDF = async (
   vehicleData?: any
 ): Promise<string> => {
   try {
+    // Générer le PDF de l'ordre de réparation si disponible
+    let repairOrderPDFBlob: Blob | null = null;
+    if (cession.repair_orders) {
+      try {
+        const data = await prepareRepairOrderDataForPDF(cession.repair_orders as any, companyData);
+        const invoiceData = {
+          ...data.repairOrder,
+          amount: data.totals.total,
+          date: data.repairOrder.created_at,
+          due_date: data.repairOrder.created_at,
+          repairs_data: Array.isArray(data.repairOrder.repairs_data) ? data.repairOrder.repairs_data : [],
+          parts_data: Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data : []
+        } as any;
+
+        const repairOrderDoc = InvoicePDF({ 
+          invoice: invoiceData, 
+          companyData: data.companyData, 
+          receipts: [],
+          clientData: data.clientData,
+          vehicleData: data.vehicleData,
+          template: data.template,
+          documentType: 'repair_order'
+        });
+        
+        repairOrderPDFBlob = await pdf(repairOrderDoc).toBlob();
+      } catch (error) {
+        console.error('Erreur lors de la génération du PDF ordre de réparation:', error);
+      }
+    }
+
     // Generate PDF blob
     const pdfBlob = await pdf(
       CessionPDF({
@@ -18,7 +50,8 @@ export const generateAndUploadCessionPDF = async (
         companyData,
         selectedInsuranceCompany,
         clientData,
-        vehicleData
+        vehicleData,
+        repairOrderPDFBlob
       })
     ).toBlob();
 
