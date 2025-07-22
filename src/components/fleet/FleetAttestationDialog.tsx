@@ -63,9 +63,9 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
 
             <div className="mb-4">
               <div className="font-bold">L'Emprunteur :</div>
-              <div>Nom et prénom : {loanData?.clients?.first_name} {loanData?.clients?.last_name}</div>
-              <div>Adresse : {loanData?.clients?.address || ''} {loanData?.clients?.postal_code || ''} {loanData?.clients?.city || ''}</div>
-              {loanData?.clients?.phone && <div>Téléphone : {loanData.clients.phone}</div>}
+              <div>Nom et prénom : {loanData?.client || ''}</div>
+              <div>Adresse : </div>
+              <div>Téléphone : </div>
             </div>
           </div>
 
@@ -84,18 +84,18 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               Le garage met gratuitement à disposition de l'Emprunteur le véhicule suivant :
             </div>
             <div className="ml-4">
-              <div>Marque : {loanData?.fleet_vehicles?.car_brands?.name || ''}</div>
-              <div>Modèle : {loanData?.fleet_vehicles?.car_models?.name || ''}</div>
-              <div>N° d'immatriculation : {loanData?.fleet_vehicles?.license_plate || ''}</div>
-              <div>Carburant : {loanData?.fuel_level_start || ''}%</div>
-              <div>Kilométrage : {loanData?.start_mileage || ''} Km</div>
+              <div>Marque : {loanData?.vehicle?.split(' ')[0] || ''}</div>
+              <div>Modèle : {loanData?.vehicle?.split(' ')[1] || ''}</div>
+              <div>N° d'immatriculation : {loanData?.vehicle?.split(' - ')[1] || ''}</div>
+              <div>Carburant : %</div>
+              <div>Kilométrage : Km</div>
             </div>
           </div>
 
           {/* 2. DURÉE DU PRÊT */}
           <div className="mb-6">
             <h2 className="font-bold text-lg mb-4">2. DURÉE DU PRÊT</h2>
-            <div>Période initiale : du {loanData?.start_date ? formatDate(loanData.start_date) : ''} au {loanData?.expected_return_date ? formatDate(loanData.expected_return_date) : ''}</div>
+            <div>Période initiale : du {loanData?.startDate || ''} au {loanData?.expectedReturnDate || ''}</div>
             <div className="font-bold mt-2">Restitution anticipée obligatoire.</div>
             <div className="mt-2">
               L'emprunteur s'engage expressément à restituer le véhicule sans délai dès que son véhicule personnel est prêt, même si cette disponibilité intervient avant la date de fin prévue initialement.
