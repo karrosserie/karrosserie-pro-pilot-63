@@ -109,7 +109,10 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
             <h3 className="text-base font-semibold mb-3 text-gray-800">Au client</h3>
             <div className="text-sm space-y-1">
               <p className="font-medium">{loanData?.clients?.first_name} {loanData?.clients?.last_name}</p>
-              <p>{[loanData?.clients?.address, loanData?.clients?.postal_code, loanData?.clients?.city].filter(Boolean).join(' ')}</p>
+              {loanData?.clients?.address && <p>{loanData.clients.address}</p>}
+              {(loanData?.clients?.postal_code || loanData?.clients?.city) && (
+                <p>{[loanData?.clients?.postal_code, loanData?.clients?.city].filter(Boolean).join(' ')}</p>
+              )}
               {loanData?.clients?.phone && <p>Téléphone : {loanData.clients.phone}</p>}
             </div>
           </div>
@@ -142,7 +145,10 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
             <div className="mb-4">
               <div className="font-bold">L'Emprunteur :</div>
               <div>Nom et prénom : {loanData?.clients?.first_name} {loanData?.clients?.last_name}</div>
-              <div>Adresse : {[loanData?.clients?.address, loanData?.clients?.postal_code, loanData?.clients?.city].filter(Boolean).join(' ')}</div>
+              {loanData?.clients?.address && <div>Adresse : {loanData.clients.address}</div>}
+              {(loanData?.clients?.postal_code || loanData?.clients?.city) && (
+                <div>{[loanData?.clients?.postal_code, loanData?.clients?.city].filter(Boolean).join(' ')}</div>
+              )}
               {loanData?.clients?.phone && <div>Téléphone : {loanData.clients.phone}</div>}
             </div>
           </div>
