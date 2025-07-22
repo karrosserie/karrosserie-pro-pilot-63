@@ -56,9 +56,9 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
             
             <div className="mb-4">
               <div className="font-bold">Le Prêteur :</div>
-              <div>Nom du garage : {companyData.name?.toUpperCase() || "KORPORATE"}</div>
-              <div>Adresse : {companyData.address || "25 COURS PIERRE PUGET"} {companyData.zipcode || "13006"} {companyData.city || "MARSEILLE"}</div>
-              <div>N° SIRET : {companyData.siret || "917 775 835 00015"}</div>
+              <div>Nom du garage : {companyData.name?.toUpperCase() || ""}</div>
+              <div>Adresse : {companyData.address || ""} {companyData.zipcode || ""} {companyData.city || ""}</div>
+              <div>N° SIRET : {companyData.siret || ""}</div>
             </div>
 
             <div className="font-bold mb-2">ET</div>
@@ -86,8 +86,8 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               Le garage met gratuitement à disposition de l'Emprunteur le véhicule suivant :
             </div>
             <div className="ml-4">
-              <div>Marque : {loanData.vehicle.split(' ')[0] || "AUDI"}</div>
-              <div>Modèle : {loanData.vehicle.split(' ').slice(1, -1).join(' ') || "Q2"}</div>
+              <div>Marque : {loanData.vehicle.split(' ')[0] || ""}</div>
+              <div>Modèle : {loanData.vehicle.split(' ').slice(1, -1).join(' ') || ""}</div>
               <div>N° d'immatriculation : AC-426-FB</div>
               <div>Carburant : 92 %</div>
               <div>Kilométrage : 23679 Km</div>
