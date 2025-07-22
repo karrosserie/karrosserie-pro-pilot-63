@@ -88,18 +88,18 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
           {/* Colonne 2 - Désignation du véhicule d'emprunt */}
           <div>
             <h3 className="text-base font-semibold mb-3 text-black">Désignation du véhicule d'emprunt</h3>
-            <div className="text-sm space-y-1">
+            <div className="text-sm space-y-1 text-black">
               <div className="flex justify-between">
                 <span className="font-medium">Marque</span>
-                <span>{loanData?.fleet_vehicles?.car_brands?.name || ''}</span>
+                <span className="text-left">{loanData?.fleet_vehicles?.car_brands?.name || ''}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Modèle</span>
-                <span>{loanData?.fleet_vehicles?.car_models?.name || ''}</span>
+                <span className="text-left">{loanData?.fleet_vehicles?.car_models?.name || ''}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between mb-4">
                 <span className="font-medium">Immatriculation</span>
-                <span>{loanData?.fleet_vehicles?.license_plate || ''}</span>
+                <span className="text-left">{loanData?.fleet_vehicles?.license_plate || ''}</span>
               </div>
               
               {/* Informations de départ */}
@@ -129,14 +129,14 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
           {/* Colonne 3 - Au client */}
           <div>
             <h3 className="text-base font-semibold mb-3 text-black">Au client</h3>
-            <div className="text-sm space-y-1">
+            <div className="text-sm space-y-1 text-black">
               <p className="font-medium">{loanData?.clients?.first_name} {loanData?.clients?.last_name}</p>
               {loanData?.clients?.address && <p>{loanData.clients.address}</p>}
               {(loanData?.clients?.postal_code || loanData?.clients?.city) && (
                 <p>{[loanData?.clients?.postal_code, loanData?.clients?.city].filter(Boolean).join(' ')}</p>
               )}
               {loanData?.clients?.phone && <p>Téléphone : {loanData.clients.phone}</p>}
-              {loanData?.insurance_contract_number && <p>Numéro de contrat client : {loanData.insurance_contract_number}</p>}
+              {loanData?.insurance_contract_number && <p className="mt-2"><span className="font-bold">Numéro de contrat client :</span> {loanData.insurance_contract_number}</p>}
             </div>
           </div>
         </div>
