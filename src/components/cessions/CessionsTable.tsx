@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Table, 
@@ -56,75 +56,6 @@ export const CessionsTable = ({
   const { companyData } = useCompany();
   const { insuranceCompanies } = useInsuranceCompanies();
 
-  // Vérifier le statut de signature des cessions en attente
-  useEffect(() => {
-    console.log('=== DEBUT DE LA VERIFICATION DES SIGNATURES ===');
-    console.log('Cessions reçues:', cessions);
-    
-    const checkSignatureStatus = async () => {
-      if (!cessions) {
-        console.log('Pas de cessions disponibles');
-        return;
-      }
-
-      console.log('Nombre total de cessions:', cessions.length);
-
-      const cessionsEnAttente = cessions.filter(
-        cession => cession.status === 'en_attente_signature' && cession.oodrive_contract_id
-      );
-
-      console.log('Cessions en attente de signature trouvées:', cessionsEnAttente.length);
-      console.log('Détails des cessions en attente:', cessionsEnAttente.map(c => ({
-        id: c.id,
-        status: c.status,
-        oodrive_contract_id: c.oodrive_contract_id
-      })));
-
-      for (const cession of cessionsEnAttente) {
-        try {
-          console.log(`=== APPEL API POUR CESSION ${cession.id} ===`);
-          console.log(`Contract ID: ${cession.oodrive_contract_id}`);
-          
-          const response = await fetch('https://n8n.karrosserie.pro/webhook/e6854e25-9a51-4362-b9d2-9a18af911863', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              contractId: parseInt(cession.oodrive_contract_id!)
-            })
-          });
-
-          console.log('Réponse API statut:', response.status);
-
-          if (response.ok) {
-            const data = await response.json();
-            console.log('Données reçues de l\'API:', data);
-            
-            // Vérifier si les deux entrées ont signature_status = 'SIGNED'
-            if (Array.isArray(data) && data.length === 2) {
-              const allSigned = data.every(entry => entry.signature_status === 'SIGNED');
-              console.log('Toutes les signatures sont-elles complètes?', allSigned);
-              
-              if (allSigned) {
-                console.log('Mise à jour du statut de la cession vers "signee"');
-                // Mettre à jour le statut de la cession
-                await updateCession(cession.id, { status: 'signee' });
-              }
-            } else {
-              console.log('Format de données inattendu:', data);
-            }
-          } else {
-            console.error('Erreur API:', response.status, await response.text());
-          }
-        } catch (error) {
-          console.error(`Erreur lors de la vérification du statut pour la cession ${cession.id}:`, error);
-        }
-      }
-    };
-
-    checkSignatureStatus();
-  }, [cessions]);
   
   const parseValidationError = (validationError: string) => {
     const lines = validationError.split('\n').filter(line => line.trim() !== '');
