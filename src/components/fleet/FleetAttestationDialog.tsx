@@ -381,6 +381,44 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
 
             <div className="mb-4">
               <div className="font-bold">6.3. Attribution de juridiction</div>
+              <div className="ml-4 mt-2">
+                <div>En cas de litige relatif à l'interprétation ou l'exécution du présent contrat:</div>
+                <div>• Les parties s'efforceront de trouver une solution amiable</div>
+                <div>• À défaut, le Tribunal de Commerce de Marseille sera seul compétent</div>
+                <div>• L'Emprunteur renonce expressément à toute exception d'incompétence territoriale</div>
+              </div>
+            </div>
+          </div>
+
+          {/* 7. DÉPÔT DE GARANTIE */}
+          <div className="mb-6">
+            <h2 className="text-blue-600 font-bold text-lg mb-4">7. DÉPÔT DE GARANTIE</h2>
+            <div>Un dépôt de garantie de 1500€ sera versé par l'Emprunteur au moment de la prise en charge du véhicule.</div>
+            <div className="mt-2">Ce dépôt pourra être encaissé immédiatement par le Prêteur en cas de:</div>
+            <div className="ml-4 mt-2">
+              <div>- Dommage constaté lors de la restitution</div>
+              <div>- Retard dans la restitution</div>
+              <div>- Infraction aux conditions d'utilisation</div>
+              <div>- Frais non remboursés (amendes, carburant, nettoyage)</div>
+            </div>
+          </div>
+
+          {/* 8. SIGNATURES */}
+          <div className="mb-6">
+            <h2 className="text-blue-600 font-bold text-lg mb-4">8. SIGNATURES</h2>
+            <div>L'Emprunteur reconnaît expressément avoir lu l'intégralité du présent contrat, en avoir compris toutes les clauses et les accepter sans réserve.</div>
+            <div className="mt-2">Il reconnaît en particulier l'étendue de sa responsabilité et la limitation de celle du Prêteur dans les cas énumérés à l'article 4.</div>
+          </div>
+
+          {/* Références légales */}
+          <div className="mb-6">
+            <div className="font-bold">Références légales intégrées :</div>
+            <div className="text-sm mt-2">
+              <div><span className="font-bold">Code des assurances :</span> Art. L. 121-1, L. 124-1, L. 124-3</div>
+              <div><span className="font-bold">Code de la route :</span> Art. R. 412-1, R. 312-17, R. 413-17, R. 313-20, R. 317-25</div>
+              <div><span className="font-bold">Code civil :</span> Art. 1242, 1226, 1231-1</div>
+              <div><span className="font-bold">Code du travail :</span> Art. L. 3121-1</div>
+              <div><span className="font-bold">Jurisprudence :</span> Cass. crim., 10 juillet 2012, n° 11-17.898 ; Cass. crim., 5 janvier 2016, n° 15-81.856</div>
             </div>
           </div>
 
