@@ -105,23 +105,23 @@ export const prepareCreditDataForPDF = async (credit: any, companyData: any) => 
       console.error('Error parsing credit items:', error);
     }
 
-    // Calculer les totaux
+    // Calculer les totaux - utiliser directement le total calculé de chaque item
     const totals = items.reduce((acc, item) => {
-      const unitCost = parseFloat(item.unitCost || item.unit_price || item.total) || 0;
+      const itemTotal = parseFloat(item.total) || 0;
       const quantity = parseFloat(item.quantity) || 1;
-      const discount = parseFloat(item.discount) || 0;
+      const unitCost = parseFloat(item.unitCost) || 0;
       const vat = parseFloat(item.vat) || 20;
       
-      console.log('Processing credit item:', item, { unitCost, quantity, discount, vat });
+      console.log('Processing credit item:', item, { itemTotal, quantity, unitCost, vat });
       
-      const subtotal = unitCost * quantity;
-      const afterDiscount = subtotal - discount;
-      const vatAmount = (afterDiscount * vat) / 100;
-      const total = afterDiscount + vatAmount;
+      // Utiliser le total déjà calculé
+      const totalTTC = itemTotal;
+      const totalHT = totalTTC / (1 + vat / 100);
+      const vatAmount = totalTTC - totalHT;
 
-      acc.subtotalHT += afterDiscount;
+      acc.subtotalHT += totalHT;
       acc.totalVAT += vatAmount;
-      acc.total += total;
+      acc.total += totalTTC;
 
       return acc;
     }, { subtotalHT: 0, totalVAT: 0, total: 0 });
@@ -152,14 +152,12 @@ export const prepareCreditDataForPDF = async (credit: any, companyData: any) => 
         invoiceReference: invoiceData?.reference || 'N/A',
         notes: credit.notes || '',
         items: items.map(item => {
-          const unitPrice = parseFloat(item.unitCost || item.unit_price || item.total) || 0;
+          const unitPrice = parseFloat(item.unitCost) || 0;
           const quantity = parseFloat(item.quantity) || 1;
           const discount = parseFloat(item.discount) || 0;
           const vat = parseFloat(item.vat) || 20;
-          
-          const subtotal = unitPrice * quantity;
-          const afterDiscount = subtotal - discount;
-          const totalTTC = afterDiscount + (afterDiscount * vat / 100);
+          const totalTTC = parseFloat(item.total) || 0;
+          const totalHT = totalTTC / (1 + vat / 100);
           
           return {
             ref: item.ref || '',
@@ -168,7 +166,7 @@ export const prepareCreditDataForPDF = async (credit: any, companyData: any) => 
             discount: discount,
             unitPrice: unitPrice,
             vat: vat,
-            totalHT: afterDiscount,
+            totalHT: totalHT,
             totalTTC: totalTTC
           };
         }),
