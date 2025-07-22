@@ -105,8 +105,8 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               {/* Informations de départ */}
               <div className="grid grid-cols-2 mt-3">
                 <div>
-                  <div className="font-semibold text-gray-800 mb-1">Départ :</div>
-                  <div className="space-y-1">
+                  <div className="font-semibold text-black mb-1">Départ :</div>
+                  <div className="space-y-1 text-black">
                     <div>Le : {loanData?.start_date ? formatDate(loanData.start_date) : ''}</div>
                     <div>Kilométrage : {loanData?.start_mileage || ''} Km</div>
                     <div>Carburant : {loanData?.fuel_level_start || ''}%</div>
@@ -115,8 +115,8 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
                 
                 {/* Informations de retour */}
                 <div>
-                  <div className="font-semibold text-gray-800 mb-1">Retour :</div>
-                  <div className="space-y-1">
+                  <div className="font-semibold text-black mb-1">Retour :</div>
+                  <div className="space-y-1 text-black">
                     <div>Le : {loanData?.expected_return_date ? formatDate(loanData.expected_return_date) : ''}</div>
                     <div>Kilométrage : - - - Km</div>
                     <div>Carburant : - - - %</div>
