@@ -87,7 +87,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
     
           {/* Colonne 2 - Désignation du véhicule d'emprunt */}
           <div>
-            <h3 className="text-base font-semibold mb-3 text-gray-800">Désignation du véhicule d'emprunt</h3>
+            <h3 className="text-base font-semibold mb-3 text-black">Désignation du véhicule d'emprunt</h3>
             <div className="text-sm space-y-1">
               <div className="flex justify-between">
                 <span className="font-medium">Marque</span>
@@ -128,7 +128,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
     
           {/* Colonne 3 - Au client */}
           <div>
-            <h3 className="text-base font-semibold mb-3 text-gray-800">Au client</h3>
+            <h3 className="text-base font-semibold mb-3 text-black">Au client</h3>
             <div className="text-sm space-y-1">
               <p className="font-medium">{loanData?.clients?.first_name} {loanData?.clients?.last_name}</p>
               {loanData?.clients?.address && <p>{loanData.clients.address}</p>}
