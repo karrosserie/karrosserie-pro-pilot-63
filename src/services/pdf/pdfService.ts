@@ -13,8 +13,8 @@ export const generateAndUploadCessionPDF = async (
   vehicleData?: any
 ): Promise<string> => {
   try {
-    // Générer le PDF de l'ordre de réparation si disponible
-    let repairOrderPDFBlob: Blob | null = null;
+    // Générer le document InvoicePDF pour l'ordre de réparation si disponible
+    let repairOrderPDFDocument = null;
     if (cession.repair_orders) {
       try {
         const data = await prepareRepairOrderDataForPDF(cession.repair_orders as any, companyData);
@@ -27,7 +27,7 @@ export const generateAndUploadCessionPDF = async (
           parts_data: Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data : []
         } as any;
 
-        const repairOrderDoc = InvoicePDF({ 
+        repairOrderPDFDocument = InvoicePDF({ 
           invoice: invoiceData, 
           companyData: data.companyData, 
           receipts: [],
@@ -36,8 +36,6 @@ export const generateAndUploadCessionPDF = async (
           template: data.template,
           documentType: 'repair_order'
         });
-        
-        repairOrderPDFBlob = await pdf(repairOrderDoc).toBlob();
       } catch (error) {
         console.error('Erreur lors de la génération du PDF ordre de réparation:', error);
       }
@@ -51,7 +49,7 @@ export const generateAndUploadCessionPDF = async (
         selectedInsuranceCompany,
         clientData,
         vehicleData,
-        repairOrderPDFBlob
+        repairOrderPDFDocument
       })
     ).toBlob();
 
