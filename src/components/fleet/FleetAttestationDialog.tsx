@@ -103,8 +103,8 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               </div>
               
               {/* Informations de départ */}
-              <div className="grid grid-cols-2 mt-6">
-                <div>
+              <div className="grid grid-cols-2">
+                <div className="mt-6">
                   <div className="font-bold text-black mb-1">Départ :</div>
                   <div className="space-y-1 text-black">
                     <div>Le : {loanData?.start_date ? formatDate(loanData.start_date) : ''}</div>
