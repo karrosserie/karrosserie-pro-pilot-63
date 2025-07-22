@@ -87,7 +87,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
     
           {/* Colonne 2 - Désignation du véhicule d'emprunt */}
           <div>
-            <h3 className="text-base font-semibold mb-3 text-black">Désignation du véhicule d'emprunt</h3>
+            <h3 className="text-base font-bold mb-3 text-black">Désignation du véhicule d'emprunt</h3>
             <div className="text-sm space-y-1 text-black">
               <div className="flex">
                 <span className="font-medium w-32">Marque</span>
@@ -103,9 +103,9 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               </div>
               
               {/* Informations de départ */}
-              <div className="grid grid-cols-2 mt-3">
+              <div className="grid grid-cols-2 mt-6">
                 <div>
-                  <div className="font-semibold text-black mb-1">Départ :</div>
+                  <div className="font-bold text-black mb-1">Départ :</div>
                   <div className="space-y-1 text-black">
                     <div>Le : {loanData?.start_date ? formatDate(loanData.start_date) : ''}</div>
                     <div>Kilométrage : {loanData?.start_mileage || ''} Km</div>
@@ -115,7 +115,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
                 
                 {/* Informations de retour */}
                 <div>
-                  <div className="font-semibold text-black mb-1">Retour :</div>
+                  <div className="font-bold text-black mb-1">Retour :</div>
                   <div className="space-y-1 text-black">
                     <div>Le : {loanData?.expected_return_date ? formatDate(loanData.expected_return_date) : ''}</div>
                     <div>Kilométrage : - - - Km</div>
@@ -128,7 +128,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
     
           {/* Colonne 3 - Au client */}
           <div>
-            <h3 className="text-base font-semibold mb-3 text-black">Au client</h3>
+            <h3 className="text-base font-bold mb-3 text-black">Au client</h3>
             <div className="text-sm space-y-1 text-black">
               <p className="font-medium">{loanData?.clients?.first_name} {loanData?.clients?.last_name}</p>
               {loanData?.clients?.address && <p>{loanData.clients.address}</p>}
@@ -136,7 +136,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
                 <p>{[loanData?.clients?.postal_code, loanData?.clients?.city].filter(Boolean).join(' ')}</p>
               )}
               {loanData?.clients?.phone && <p>Téléphone : {loanData.clients.phone}</p>}
-              {loanData?.insurance_contract_number && <p className="mt-2"><span className="font-bold">Numéro de contrat client :</span> {loanData.insurance_contract_number}</p>}
+              {loanData?.insurance_contract_number && <p className="mt-6"><span className="font-bold">Numéro de contrat client :</span> {loanData.insurance_contract_number}</p>}
             </div>
           </div>
         </div>
