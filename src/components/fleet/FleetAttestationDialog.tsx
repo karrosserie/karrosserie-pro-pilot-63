@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/dialog';
 import { useCompany } from '@/hooks/use-company';
 import { formatDate } from '@/utils/date-formatter';
+import { getCurrentPosition, getDepartmentFromZipCode } from '@/utils/geolocation';
 
 interface FleetAttestationDialogProps {
   open: boolean;
@@ -22,8 +23,26 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
   loanData
 }) => {
   const { companyData } = useCompany();
+  const [userPosition, setUserPosition] = useState<string>('[position en cours...]');
 
   const loanCreationDate = loanData?.created_at ? formatDate(loanData.created_at) : formatDate(new Date().toISOString());
+
+  // Obtenir la position de l'utilisateur
+  useEffect(() => {
+    const getUserPosition = async () => {
+      try {
+        const position = await getCurrentPosition();
+        setUserPosition(`${position.latitude.toFixed(6)},${position.longitude.toFixed(6)}`);
+      } catch (error) {
+        console.error('Erreur de géolocalisation:', error);
+        setUserPosition('[position non disponible]');
+      }
+    };
+
+    if (open) {
+      getUserPosition();
+    }
+  }, [open]);
 
   if (!loanData) return null;
   
@@ -139,7 +158,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               <div>L'Emprunteur garantit que:</div>
               <div className="ml-4 mt-2">
                 <div>• Le véhicule est utilisé exclusivement dans le cadre de son activité professionnelle déclarée, conformément à l'article L. 3121-1 du Code du travail.</div>
-                <div>• L'usage du véhicule est strictement limité au département de la ville de {companyData.city} ({companyData.zipcode?.substring(0,2)}) et aux départements limitrophes.</div>
+                <div>• L'usage du véhicule est strictement limité au département de {getDepartmentFromZipCode(companyData.zipcode || '')} et aux départements limitrophes.</div>
                 <div>• Le kilométrage journalier n'excède pas 100 km, sauf autorisation écrite préalable du Prêteur.</div>
                 <div>• Le véhicule n'est jamais utilisé:</div>
                 <div className="ml-4">
@@ -431,7 +450,7 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               )}
               <div className="font-bold">{loanData?.clients?.first_name} {loanData?.clients?.last_name}</div>
               <div className="text-sm">Signé le {loanCreationDate} à {new Date(loanData?.created_at || new Date()).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</div>
-              <div className="text-xs text-gray-600">À la latitude/longitude : [position à obtenir]</div>
+              <div className="text-xs text-gray-600">À la latitude/longitude : {userPosition}</div>
             </div>
           </div>
         </div>

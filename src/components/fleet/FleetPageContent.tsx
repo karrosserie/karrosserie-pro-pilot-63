@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useFleetReservations } from '@/hooks/use-fleet-reservations';
 import { useFleetPage } from '@/hooks/use-fleet-page';
 import FleetVehicleDialog from './FleetVehicleDialog';
 import FleetLoanDialog from './FleetLoanDialog';
@@ -62,6 +63,8 @@ const FleetPageContent = () => {
   const selectedLoanData = selectedLoanForAttestation 
     ? currentLoans.find(loan => loan.id === selectedLoanForAttestation)
     : null;
+
+  const { reservations } = useFleetReservations();
 
   if (isLoading) {
     return (
@@ -163,7 +166,7 @@ const FleetPageContent = () => {
         open={isAttestationDialogOpen}
         onOpenChange={handleCloseAttestationDialog}
         loanId={selectedLoanForAttestation}
-        loanData={selectedLoanData}
+        loanData={reservations?.find(r => r.id === selectedLoanForAttestation)}
       />
     </div>
   );
