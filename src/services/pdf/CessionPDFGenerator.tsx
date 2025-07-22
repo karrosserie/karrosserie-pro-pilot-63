@@ -45,6 +45,60 @@ const styles = StyleSheet.create({
   sectionLarge: {
     marginBottom: 15,
   },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+    textDecoration: 'underline',
+  },
+  detailSection: {
+    marginBottom: 15,
+    padding: 10,
+    backgroundColor: '#f9f9f9',
+    border: 1,
+    borderColor: '#ddd',
+  },
+  table: {
+    marginVertical: 10,
+    border: 1,
+    borderColor: '#000',
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#f0f0f0',
+    borderBottom: 1,
+    borderColor: '#000',
+    padding: 5,
+  },
+  tableHeaderText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  tableRow: {
+    flexDirection: 'row',
+    borderBottom: 1,
+    borderColor: '#ddd',
+    padding: 5,
+  },
+  tableCell: {
+    fontSize: 9,
+    textAlign: 'center',
+    padding: 2,
+  },
+  totalSection: {
+    marginTop: 15,
+    padding: 10,
+    backgroundColor: '#e8f4f8',
+    border: 1,
+    borderColor: '#2196F3',
+  },
+  totalText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -783,8 +837,103 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
         </Page>
       )}
 
-      {/* Ordre de réparation PDF complet */}
-      {repairOrderPDFComponent}
+      {/* Ordre de réparation intégré directement */}
+      {cession.repair_orders && (
+        <Page size="A4" style={styles.page} break>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>ORDRE DE RÉPARATION N° {cession.repair_orders.reference}</Text>
+            
+            {/* Informations client */}
+            <View style={styles.detailSection}>
+              <Text style={styles.subtitle}>CLIENT</Text>
+              <Text style={styles.text}>
+                {clientName || 'Client non spécifié'}
+              </Text>
+              {clientData?.address && (
+                <Text style={styles.text}>{clientData.address}</Text>
+              )}
+              {finalClientData?.email && (
+                <Text style={styles.text}>Email: {finalClientData.email}</Text>
+              )}
+              {finalClientData?.phone && (
+                <Text style={styles.text}>Téléphone: {finalClientData.phone}</Text>
+              )}
+            </View>
+            
+            {/* Informations véhicule */}
+            <View style={styles.detailSection}>
+              <Text style={styles.subtitle}>VÉHICULE</Text>
+              {cession.repair_orders.vehicles && (
+                <>
+                  <Text style={styles.text}>
+                    {cession.repair_orders.vehicles.car_brands?.name} {cession.repair_orders.vehicles.car_models?.name}
+                  </Text>
+                  <Text style={styles.text}>
+                    Immatriculation: {cession.repair_orders.vehicles.license_plate}
+                  </Text>
+                  <Text style={styles.text}>
+                    VIN: {cession.repair_orders.vehicles.vin}
+                  </Text>
+                  <Text style={styles.text}>
+                    Kilométrage: {cession.repair_orders.vehicles.mileage} km
+                  </Text>
+                </>
+              )}
+            </View>
+            
+            {/* Tableau des réparations */}
+            <View style={styles.table}>
+              <View style={styles.tableHeader}>
+                <Text style={[styles.tableHeaderText, { flex: 3 }]}>Description</Text>
+                <Text style={[styles.tableHeaderText, { flex: 1 }]}>Quantité</Text>
+                <Text style={[styles.tableHeaderText, { flex: 1 }]}>P.U. HT</Text>
+                <Text style={[styles.tableHeaderText, { flex: 1 }]}>Total HT</Text>
+              </View>
+              
+              {/* Réparations */}
+              {(() => {
+                try {
+                  const repairs = JSON.parse(cession.repair_orders.repairs_data || '[]');
+                  return repairs.map((repair: any, index: number) => (
+                    <View key={`repair-${index}`} style={styles.tableRow}>
+                      <Text style={[styles.tableCell, { flex: 3 }]}>{repair.description}</Text>
+                      <Text style={[styles.tableCell, { flex: 1 }]}>{repair.quantity}</Text>
+                      <Text style={[styles.tableCell, { flex: 1 }]}>{repair.unitCost?.toFixed(2)} €</Text>
+                      <Text style={[styles.tableCell, { flex: 1 }]}>{repair.total?.toFixed(2)} €</Text>
+                    </View>
+                  ));
+                } catch (error) {
+                  return null;
+                }
+              })()}
+              
+              {/* Pièces */}
+              {(() => {
+                try {
+                  const parts = JSON.parse(cession.repair_orders.parts_data || '[]');
+                  return parts.map((part: any, index: number) => (
+                    <View key={`part-${index}`} style={styles.tableRow}>
+                      <Text style={[styles.tableCell, { flex: 3 }]}>{part.description}</Text>
+                      <Text style={[styles.tableCell, { flex: 1 }]}>{part.quantity}</Text>
+                      <Text style={[styles.tableCell, { flex: 1 }]}>{part.unitCost?.toFixed(2)} €</Text>
+                      <Text style={[styles.tableCell, { flex: 1 }]}>{part.total?.toFixed(2)} €</Text>
+                    </View>
+                  ));
+                } catch (error) {
+                  return null;
+                }
+              })()}
+            </View>
+            
+            {/* Total */}
+            <View style={styles.totalSection}>
+              <Text style={styles.totalText}>
+                MONTANT TOTAL: {formatEuro(cession.repair_orders.amount || 0)}
+              </Text>
+            </View>
+          </View>
+        </Page>
+      )}
 
       {/* Rapport d'expertise original */}
       {cession.document_url && (
