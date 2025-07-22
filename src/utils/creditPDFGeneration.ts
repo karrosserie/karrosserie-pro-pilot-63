@@ -174,7 +174,10 @@ export const prepareCreditDataForPDF = async (credit: any, companyData: any) => 
           totalHT: `${totals.subtotalHT.toFixed(2).replace('.', ',')} €`,
           totalVAT: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
           totalDiscount: `${items.reduce((sum, item) => sum + (parseFloat(item.discount) || 0), 0).toFixed(2).replace('.', ',')} €`,
-          totalTTC: `${totals.total.toFixed(2).replace('.', ',')} €`
+          totalTTC: `${totals.total.toFixed(2).replace('.', ',')} €`,
+          subtotal: `${totals.subtotalHT.toFixed(2).replace('.', ',')} €`,
+          vat: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
+          total: `${totals.total.toFixed(2).replace('.', ',')} €`
         }
       },
       vehicleData: vehicleData ? {
