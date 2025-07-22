@@ -9,6 +9,9 @@ export type FleetReservation = Database['public']['Tables']['fleet_reservations'
     last_name: string;
     email?: string;
     phone?: string;
+    address?: string;
+    postal_code?: string;
+    city?: string;
   } | null;
   fleet_vehicles?: {
     id: string;
@@ -39,7 +42,7 @@ export const fleetReservationsService = {
       .from('fleet_reservations')
       .select(`
         *,
-        clients(id, first_name, last_name, email, phone),
+        clients(id, first_name, last_name, email, phone, address, postal_code, city),
         fleet_vehicles(
           id,
           brand_id,
@@ -69,7 +72,7 @@ export const fleetReservationsService = {
       .from('fleet_reservations')
       .select(`
         *,
-        clients(id, first_name, last_name, email, phone),
+        clients(id, first_name, last_name, email, phone, address, postal_code, city),
         fleet_vehicles(
           id,
           brand_id,
@@ -100,7 +103,7 @@ export const fleetReservationsService = {
       .from('fleet_reservations')
       .select(`
         *,
-        clients(id, first_name, last_name, email, phone),
+        clients(id, first_name, last_name, email, phone, address, postal_code, city),
         fleet_vehicles(
           id,
           brand_id,
@@ -132,7 +135,7 @@ export const fleetReservationsService = {
       .insert([reservation])
       .select(`
         *,
-        clients(id, first_name, last_name, email, phone),
+        clients(id, first_name, last_name, email, phone, address, postal_code, city),
         fleet_vehicles(
           id,
           brand_id,
@@ -164,7 +167,7 @@ export const fleetReservationsService = {
       .eq('id', id)
       .select(`
         *,
-        clients(id, first_name, last_name, email, phone),
+        clients(id, first_name, last_name, email, phone, address, postal_code, city),
         fleet_vehicles(
           id,
           brand_id,
