@@ -107,7 +107,7 @@ export const prepareCreditDataForPDF = async (credit: any, companyData: any) => 
 
     // Calculer les totaux
     const totals = items.reduce((acc, item) => {
-      const unitCost = parseFloat(item.unitCost) || 0;
+      const unitCost = parseFloat(item.unit_price || item.unitCost) || 0;
       const quantity = parseFloat(item.quantity) || 0;
       const discount = parseFloat(item.discount) || 0;
       const vat = parseFloat(item.vat) || 0;
@@ -147,16 +147,27 @@ export const prepareCreditDataForPDF = async (credit: any, companyData: any) => 
         billingDate: credit.created_at ? new Date(credit.created_at).toLocaleDateString('fr-FR') : '',
         invoiceReference: invoiceData?.reference || 'N/A',
         notes: credit.notes || '',
-        items: items.map(item => ({
-          ref: item.ref || '',
-          description: item.description || '',
-          quantity: item.quantity || 0,
-          discount: item.discount || 0,
-          unitPrice: parseFloat(item.unitCost) || 0,
-          vat: item.vat || 20,
-          totalHT: ((parseFloat(item.unitCost) || 0) * (item.quantity || 0)) - (item.discount || 0),
-          totalTTC: ((parseFloat(item.unitCost) || 0) * (item.quantity || 0)) - (item.discount || 0) + (((parseFloat(item.unitCost) || 0) * (item.quantity || 0) - (item.discount || 0)) * (item.vat || 20) / 100)
-        })),
+        items: items.map(item => {
+          const unitPrice = parseFloat(item.unit_price || item.unitCost) || 0;
+          const quantity = parseFloat(item.quantity) || 0;
+          const discount = parseFloat(item.discount) || 0;
+          const vat = parseFloat(item.vat) || 0;
+          
+          const subtotal = unitPrice * quantity;
+          const afterDiscount = subtotal - discount;
+          const totalTTC = afterDiscount + (afterDiscount * vat / 100);
+          
+          return {
+            ref: item.ref || '',
+            description: item.description || '',
+            quantity: quantity,
+            discount: discount,
+            unitPrice: unitPrice,
+            vat: vat,
+            totalHT: afterDiscount,
+            totalTTC: totalTTC
+          };
+        }),
         totals: {
           totalHT: `${totals.subtotalHT.toFixed(2).replace('.', ',')} €`,
           totalVAT: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
