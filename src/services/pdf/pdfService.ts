@@ -7,6 +7,7 @@ import InvoicePDF from '@/components/invoices/InvoicePDF';
 import { repairOrdersService } from '@/services/supabase/repair-orders';
 import { quotesService } from '@/services/supabase/quotes';
 import { expertiseReportsService } from '@/services/supabase/expertise-reports';
+import { PDFDocument } from 'pdf-lib';
 
 export const generateAndUploadCessionPDF = async (
   cession: Cession,
@@ -170,18 +171,50 @@ export const generateAndUploadCessionPDF = async (
       console.log('Aucun repair_order_id dans la cession');
     }
 
-    // Generate PDF blob
-    const pdfBlob = await pdf(
+    // Generate PDF blob (sans le rapport d'expertise car on va le fusionner séparément)
+    const cessionPdfBlob = await pdf(
       CessionPDF({
         cession,
         companyData,
         selectedInsuranceCompany,
         clientData,
         vehicleData,
-        repairOrderPDFDocument,
-        expertiseReportPDFUrl
+        repairOrderPDFDocument
       })
     ).toBlob();
+
+    // Si on a un PDF du rapport d'expertise, fusionner les deux PDFs
+    let finalPdfBlob = cessionPdfBlob;
+    if (expertiseReportPDFUrl) {
+      try {
+        console.log('Fusion du PDF du rapport d\'expertise avec le PDF de cession');
+        
+        // Télécharger le PDF du rapport d'expertise
+        const response = await fetch(expertiseReportPDFUrl);
+        const expertisePdfArrayBuffer = await response.arrayBuffer();
+        
+        // Convertir le blob de cession en ArrayBuffer
+        const cessionPdfArrayBuffer = await cessionPdfBlob.arrayBuffer();
+        
+        // Créer les documents PDF avec pdf-lib
+        const cessionPdfDoc = await PDFDocument.load(cessionPdfArrayBuffer);
+        const expertisePdfDoc = await PDFDocument.load(expertisePdfArrayBuffer);
+        
+        // Copier toutes les pages du rapport d'expertise dans le document de cession
+        const expertisePages = await cessionPdfDoc.copyPages(expertisePdfDoc, expertisePdfDoc.getPageIndices());
+        expertisePages.forEach((page) => cessionPdfDoc.addPage(page));
+        
+        // Sauvegarder le PDF fusionné
+        const mergedPdfBytes = await cessionPdfDoc.save();
+        finalPdfBlob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+        
+        console.log('PDF fusionné avec succès');
+      } catch (error) {
+        console.error('Erreur lors de la fusion des PDFs:', error);
+        // En cas d'erreur, on garde le PDF de cession original
+        finalPdfBlob = cessionPdfBlob;
+      }
+    }
 
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -197,7 +230,7 @@ export const generateAndUploadCessionPDF = async (
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('documents')
-      .upload(filePath, pdfBlob, {
+      .upload(filePath, finalPdfBlob, {
         contentType: 'application/pdf',
         upsert: false
       });

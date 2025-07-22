@@ -92,10 +92,9 @@ interface CessionPDFProps {
   clientData?: any;
   vehicleData?: any;
   repairOrderPDFDocument?: React.ReactElement | null;
-  expertiseReportPDFUrl?: string | null;
 }
 
-export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, clientData, vehicleData, repairOrderPDFDocument, expertiseReportPDFUrl }: CessionPDFProps) => {
+export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, clientData, vehicleData, repairOrderPDFDocument }: CessionPDFProps) => {
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('fr-FR');
   };
@@ -780,21 +779,8 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
       {/* Intégration directe de l'ordre de réparation */}
       {repairOrderPDFDocument}
 
-      {/* Rapport d'expertise original - PDF intégré */}
-      {expertiseReportPDFUrl && (
-        <Page size="A4" style={styles.page} break>
-          <View style={styles.imageSection}>
-            <Text style={styles.imageTitle}>RAPPORT D'EXPERTISE</Text>
-            <Image 
-              style={styles.documentImage} 
-              src={expertiseReportPDFUrl} 
-            />
-          </View>
-        </Page>
-      )}
-
       {/* Rapport d'expertise original - fallback */}
-      {!expertiseReportPDFUrl && cession.document_url && (
+      {cession.document_url && (
         <Page size="A4" style={styles.page} break>
           <View style={styles.imageSection}>
             <Text style={styles.imageTitle}>RAPPORT D'EXPERTISE ORIGINAL</Text>
