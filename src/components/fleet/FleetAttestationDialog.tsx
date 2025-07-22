@@ -422,6 +422,19 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
             </div>
           </div>
 
+          {/* Signature de l'assuré */}
+          <div className="mb-6">
+            <h2 className="text-blue-600 font-bold text-lg mb-4">Signature de l'assuré</h2>
+            <div className="text-center">
+              <div className="text-blue-600 text-4xl font-bold mb-2" style={{ fontFamily: 'cursive' }}>
+                ∅
+              </div>
+              <div className="font-bold">Monsieur BOUCIE Ahmed</div>
+              <div className="text-sm">Signé le {formatDate(new Date().toISOString())} à {new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</div>
+              <div className="text-xs text-gray-600">À la latitude/longitude : 43.266749,5.3944581</div>
+            </div>
+          </div>
+
           {/* Signature */}
           <div className="mt-12">
             <div className="grid grid-cols-2 gap-8">
