@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useFleetPage } from '@/hooks/use-fleet-page';
 import FleetVehicleDialog from './FleetVehicleDialog';
 import FleetLoanDialog from './FleetLoanDialog';
@@ -7,8 +7,13 @@ import VehicleSelectionDialog from './VehicleSelectionDialog';
 import FleetVehiclesTable from './FleetVehiclesTable';
 import FleetCurrentLoans from './FleetCurrentLoans';
 import FleetLoansHistory from './FleetLoansHistory';
+import FleetAttestationDialog from './FleetAttestationDialog';
 
 const FleetPageContent = () => {
+  // État pour le dialog d'attestation
+  const [isAttestationDialogOpen, setIsAttestationDialogOpen] = useState(false);
+  const [selectedLoanForAttestation, setSelectedLoanForAttestation] = useState<string | null>(null);
+
   const {
     vehicles,
     currentLoans,
@@ -40,6 +45,23 @@ const FleetPageContent = () => {
     handleViewReturn,
     handleDeleteLoan
   } = useFleetPage();
+
+  // Fonction pour gérer l'ouverture du dialog d'attestation
+  const handleViewAttestation = (loanId: string) => {
+    setSelectedLoanForAttestation(loanId);
+    setIsAttestationDialogOpen(true);
+  };
+
+  // Fonction pour fermer le dialog d'attestation
+  const handleCloseAttestationDialog = () => {
+    setIsAttestationDialogOpen(false);
+    setSelectedLoanForAttestation(null);
+  };
+
+  // Trouver les données du prêt sélectionné pour l'attestation
+  const selectedLoanData = selectedLoanForAttestation 
+    ? currentLoans.find(loan => loan.id === selectedLoanForAttestation)
+    : null;
 
   if (isLoading) {
     return (
@@ -92,6 +114,7 @@ const FleetPageContent = () => {
             onReturnVehicle={handleReturnVehicle}
             onNewLoan={handleNewLoan}
             onDeleteLoan={handleDeleteLoan}
+            onViewAttestation={handleViewAttestation}
           />
 
           {/* Contraventions section - placeholder for now */}
@@ -134,6 +157,13 @@ const FleetPageContent = () => {
         onClose={() => setIsVehicleSelectionOpen(false)}
         vehicles={vehicles}
         onVehicleSelect={handleVehicleSelected}
+      />
+
+      <FleetAttestationDialog
+        open={isAttestationDialogOpen}
+        onOpenChange={handleCloseAttestationDialog}
+        loanId={selectedLoanForAttestation}
+        loanData={selectedLoanData}
       />
     </div>
   );

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Car, Calendar, User, Trash } from 'lucide-react';
+import { Car, Calendar, User, Trash, FileText } from 'lucide-react';
 
 interface CurrentLoan {
   id: string;
@@ -17,6 +17,7 @@ interface FleetCurrentLoansProps {
   onReturnVehicle?: (loanId: string) => void;
   onDeleteLoan?: (loanId: string) => void;
   onNewLoan?: () => void;
+  onViewAttestation?: (loanId: string) => void;
 }
 
 const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({ 
@@ -24,7 +25,8 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
   onViewDetails,
   onReturnVehicle,
   onDeleteLoan,
-  onNewLoan 
+  onNewLoan,
+  onViewAttestation
 }) => {
   return (
     <div className="card-container">
@@ -60,6 +62,15 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
                 onClick={() => onViewDetails?.(loan.id)}
               >
                 Détails
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => onViewAttestation?.(loan.id)}
+                className="flex items-center gap-1"
+              >
+                <FileText className="h-4 w-4" />
+                Attestation
               </Button>
               <Button 
                 className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
