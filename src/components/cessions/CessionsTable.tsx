@@ -425,16 +425,18 @@ export const CessionsTable = ({
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-1">
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => {
-                        setSelectedCession(cession);
-                        setPreviewOpen(true);
-                      }}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
+                    {cession.status === 'en_attente' && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => {
+                          setSelectedCession(cession);
+                          setPreviewOpen(true);
+                        }}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    )}
                     {cession.status !== 'en_attente' && cession.status !== 'en_attente_signature' && (
                       <Button 
                         variant="ghost" 
