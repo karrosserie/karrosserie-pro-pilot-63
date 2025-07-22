@@ -19,6 +19,7 @@ interface MultipleVehicleImagesProps {
   onImageRemove: (index: number) => void;
   onImageUpdate: (index: number, url: string) => void;
   onImageTimingUpdate: (index: number, timing: 'Avant' | 'Pendant' | 'Après') => void;
+  showTimingSelector?: boolean; // Nouvelle prop pour désactiver le sélecteur de timing
 }
 
 const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
@@ -28,7 +29,8 @@ const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
   onImageAdd,
   onImageRemove,
   onImageUpdate,
-  onImageTimingUpdate
+  onImageTimingUpdate,
+  showTimingSelector = true // Par défaut, afficher le sélecteur de timing
 }) => {
   const addNewImageSlot = () => {
     // Ajouter un slot vide pour une nouvelle image
@@ -80,7 +82,7 @@ const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
                     onUploadComplete={(url) => handleImageUpload(index, url)}
                     isViewMode={isViewMode}
                     customContent={
-                      imageData.url ? (
+                      imageData.url && showTimingSelector ? (
                         <Select
                           value={imageData.timing}
                           onValueChange={(value) => onImageTimingUpdate(index, value as 'Avant' | 'Pendant' | 'Après')}

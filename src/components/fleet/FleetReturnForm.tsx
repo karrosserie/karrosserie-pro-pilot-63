@@ -150,6 +150,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
               console.log('Timing update:', index, timing);
             }}
             isViewMode={isViewMode}
+            showTimingSelector={false}
           />
         </TabsContent>
 

@@ -189,6 +189,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
               console.log('Timing update:', index, timing);
             }}
             isViewMode={isViewMode}
+            showTimingSelector={false}
           />
         </TabsContent>
 

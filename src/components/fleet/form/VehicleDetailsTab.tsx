@@ -22,6 +22,7 @@ interface VehicleDetailsTabProps {
   onImageUpdate: (index: number, url: string) => void;
   onImageTimingUpdate: (index: number, timing: 'Avant' | 'Pendant' | 'Après') => void;
   isViewMode?: boolean;
+  showTimingSelector?: boolean;
 }
 
 const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
@@ -35,7 +36,8 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
   onImageRemove,
   onImageUpdate,
   onImageTimingUpdate,
-  isViewMode = false
+  isViewMode = false,
+  showTimingSelector = true
 }) => {
   const handleMileageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value) || 0;
@@ -104,6 +106,7 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
             onImageRemove={handleImageRemove}
             onImageUpdate={handleImageUpdate}
             onImageTimingUpdate={onImageTimingUpdate}
+            showTimingSelector={showTimingSelector}
           />
         </div>
       </div>
