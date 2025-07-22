@@ -103,22 +103,24 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
               </div>
               
               {/* Informations de départ */}
-              <div className="mt-3">
-                <div className="font-semibold text-gray-800 mb-1">Départ :</div>
-                <div className="ml-2 space-y-1">
-                  <div>Le : {loanData?.start_date ? formatDate(loanData.start_date) : ''}</div>
-                  <div>Kilométrage : {loanData?.start_mileage || ''} Km</div>
-                  <div>Carburant : {loanData?.fuel_level_start || ''}%</div>
+              <div className="grid grid-cols-2 mt-3">
+                <div>
+                  <div className="font-semibold text-gray-800 mb-1">Départ :</div>
+                  <div className="space-y-1">
+                    <div>Le : {loanData?.start_date ? formatDate(loanData.start_date) : ''}</div>
+                    <div>Kilométrage : {loanData?.start_mileage || ''} Km</div>
+                    <div>Carburant : {loanData?.fuel_level_start || ''}%</div>
+                  </div>
                 </div>
-              </div>
-              
-              {/* Informations de retour */}
-              <div className="mt-3">
-                <div className="font-semibold text-gray-800 mb-1">Retour :</div>
-                <div className="ml-2 space-y-1">
-                  <div>Le : {loanData?.expected_return_date ? formatDate(loanData.expected_return_date) : ''}</div>
-                  <div>Kilométrage : - - - Km</div>
-                  <div>Carburant : - - - %</div>
+                
+                {/* Informations de retour */}
+                <div>
+                  <div className="font-semibold text-gray-800 mb-1">Retour :</div>
+                  <div className="space-y-1">
+                    <div>Le : {loanData?.expected_return_date ? formatDate(loanData.expected_return_date) : ''}</div>
+                    <div>Kilométrage : - - - Km</div>
+                    <div>Carburant : - - - %</div>
+                  </div>
                 </div>
               </div>
             </div>
