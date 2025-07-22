@@ -12,6 +12,12 @@ export const generateAndUploadCessionPDF = async (
   clientData?: any,
   vehicleData?: any
 ): Promise<string> => {
+  console.log('=== STARTING PDF SERVICE ===');
+  console.log('Cession passed to pdfService:', JSON.stringify(cession, null, 2));
+  console.log('Company data:', JSON.stringify(companyData, null, 2));
+  console.log('Client data passed to pdfService:', JSON.stringify(clientData, null, 2));
+  console.log('Vehicle data passed to pdfService:', JSON.stringify(vehicleData, null, 2));
+  
   try {
     // Générer le composant PDF de l'ordre de réparation si disponible
     let repairOrderPDFComponent: React.ReactElement | null = null;
