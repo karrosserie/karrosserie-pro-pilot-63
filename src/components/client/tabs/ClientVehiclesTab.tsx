@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import VehicleCardAdapter from '@/components/vehicle/VehicleCardAdapter';
-import VehicleDialog from '@/components/vehicle/VehicleDialog';
+import VehicleDetailsDialog from '@/components/vehicle/VehicleDetailsDialog';
 import VehicleDocumentDialogs from '@/components/vehicle/VehicleDocumentDialogs';
 import { Car } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -100,7 +100,7 @@ const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
         ))}
       </div>
 
-      <VehicleDialog
+      <VehicleDetailsDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         title={
