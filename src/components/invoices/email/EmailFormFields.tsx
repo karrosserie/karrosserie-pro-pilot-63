@@ -97,9 +97,6 @@ export const EmailFormFields = ({ data, onChange, isLoading, invoiceReference, d
               }
             })()}
           </span>
-          <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-            Générée automatiquement
-          </span>
         </div>
       </div>
     </div>
