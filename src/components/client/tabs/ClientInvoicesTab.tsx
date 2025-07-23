@@ -27,12 +27,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Download, Printer, Mail, CreditCard, FileX } from 'lucide-react';
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
+import InvoiceViewerModal from '@/components/invoices/InvoiceViewerModal';
 import InvoiceEmailDialog from '@/components/invoices/InvoiceEmailDialog';
 import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 import { CreditDialog } from '@/components/credits/CreditDialog';
 import { Invoice } from '@/services/supabase/invoices';
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
+import { useCompany } from '@/hooks/use-company';
+import { generateInvoicePDFWithTemplate, printInvoicePDFWithTemplate } from '@/utils/invoicePDFGeneration';
 
 interface ClientInvoicesTabProps {
   clientId: string;
@@ -42,7 +45,9 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
   const { invoices, isLoading, deleteInvoice } = useInvoices();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
+  const { companyData } = useCompany();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
   const [creditDialogOpen, setCreditDialogOpen] = useState(false);
@@ -60,7 +65,7 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
 
   const handleView = (invoice: Invoice) => {
     setSelectedInvoice(invoice);
-    setDialogOpen(true);
+    setViewerModalOpen(true);
   };
 
   const handleEdit = (invoice: Invoice) => {
@@ -101,13 +106,7 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
         description: "Génération du PDF en cours..."
       });
 
-      const { generateInvoicePDF } = await import('@/utils/pdfGenerator');
-      const { useCompany } = await import('@/hooks/use-company');
-      const { useReceiptsData } = await import('@/hooks/use-receipts-data');
-      
-      // Note: En pratique, ces hooks devraient être utilisés au niveau du composant
-      // Pour cette démo, on passe des données vides pour companyData et receipts
-      const result = await generateInvoicePDF(invoice, {}, []);
+      const result = await generateInvoicePDFWithTemplate(invoice, companyData);
       
       if (result.success) {
         toast({
@@ -127,11 +126,26 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
     }
   };
 
-  const handlePrint = (invoice: Invoice) => {
-    toast({
-      title: "Impression",
-      description: `Impression de la facture ${invoice.reference}...`
-    });
+  const handlePrint = async (invoice: Invoice) => {
+    try {
+      toast({
+        title: "Ouverture pour impression",
+        description: `Ouverture de la facture ${invoice.reference} pour impression...`
+      });
+
+      const result = await printInvoicePDFWithTemplate(invoice, companyData);
+      
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'impression:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ouvrir le PDF pour impression. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSendEmail = (invoice: Invoice) => {
@@ -313,6 +327,12 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
         invoice={selectedInvoice}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
+      />
+
+      <InvoiceViewerModal
+        invoice={selectedInvoice}
+        open={viewerModalOpen}
+        onOpenChange={setViewerModalOpen}
       />
 
       <InvoiceEmailDialog
