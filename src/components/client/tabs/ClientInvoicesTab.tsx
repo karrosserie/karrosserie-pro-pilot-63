@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useInvoices } from '@/hooks/use-invoices';
+import { useCredits } from '@/hooks/use-credits';
 import { 
   Table, 
   TableBody, 
@@ -9,6 +10,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Receipt, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -43,6 +45,7 @@ interface ClientInvoicesTabProps {
 
 const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
   const { invoices, isLoading, deleteInvoice } = useInvoices();
+  const { credits } = useCredits();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   const { companyData } = useCompany();
@@ -186,6 +189,36 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
     }).format(amount);
   };
 
+  const getInvoiceCredits = (invoiceId: string) => {
+    return credits?.filter(credit => credit.invoice_id === invoiceId)
+      .sort((a, b) => {
+        // Tri par ordre croissant de la référence
+        const refA = a.reference || '';
+        const refB = b.reference || '';
+        return refA.localeCompare(refB, 'fr', { numeric: true });
+      }) || [];
+  };
+
+  const renderCreditsBadges = (invoiceCredits: any[]) => {
+    if (invoiceCredits.length === 0) {
+      return <span className="text-gray-500 text-sm">-</span>;
+    }
+    
+    return (
+      <div className="flex flex-col gap-1">
+        {invoiceCredits.map((credit) => (
+          <Badge
+            key={credit.id}
+            variant="secondary"
+            className="bg-orange-100 text-orange-800 hover:bg-orange-100 text-xs"
+           >
+             Avoir n°{credit.reference} - {formatAmount(credit.amount || 0)}
+           </Badge>
+        ))}
+      </div>
+    );
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Payée':
@@ -208,19 +241,22 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Numéro</TableHead>
-                    <TableHead>Date de création</TableHead>
-                    <TableHead>Client</TableHead>
-                    <TableHead>Véhicule</TableHead>
-                    <TableHead>Montant</TableHead>
-                    <TableHead>Statut</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+              <TableHead>Numéro</TableHead>
+              <TableHead>Date de création</TableHead>
+              <TableHead>Client</TableHead>
+              <TableHead>Véhicule</TableHead>
+              <TableHead>Montant</TableHead>
+              <TableHead>Avoirs</TableHead>
+              <TableHead>Statut</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
-                  {clientInvoices.length > 0 ? (
-                    clientInvoices.map((invoice) => (
-                      <TableRow key={invoice.id}>
+          <TableBody>
+            {clientInvoices.length > 0 ? (
+              clientInvoices.map((invoice) => {
+                const invoiceCredits = getInvoiceCredits(invoice.id);
+                return (
+                <TableRow key={invoice.id}>
                         <TableCell className="font-medium">{invoice.reference}</TableCell>
                         <TableCell>{formatDate(invoice.created_at)}</TableCell>
                         <TableCell>
@@ -235,7 +271,10 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
                             : '-'
                           }
                         </TableCell>
-                        <TableCell>{formatAmount((invoice.amount as number) || 0)}</TableCell>
+                        <TableCell>{formatAmount(invoice.amount || 0)}</TableCell>
+                        <TableCell>
+                          {renderCreditsBadges(invoiceCredits)}
+                        </TableCell>
                         <TableCell>
                           <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente de paiement')}`}>
                             {invoice.status || 'En attente de paiement'}
@@ -287,13 +326,14 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
+                  </div>
+                </TableCell>
+              </TableRow>
+              );
+              })
+            ) : (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-4">
+                      <TableCell colSpan={8} className="text-center py-4">
                         <div className="flex flex-col items-center justify-center py-8">
                           <Receipt className="h-10 w-10 text-gray-400 mb-2" />
                           <h3 className="font-medium text-gray-900">Aucune facture</h3>
