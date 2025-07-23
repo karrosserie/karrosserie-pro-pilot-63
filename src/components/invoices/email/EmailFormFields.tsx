@@ -5,6 +5,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Paperclip, FileText } from 'lucide-react';
 import { InvoiceEmailFormData } from './types';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface EmailFormFieldsProps {
   data: InvoiceEmailFormData;
@@ -13,9 +15,11 @@ interface EmailFormFieldsProps {
   invoiceReference?: string;
   documentType?: 'invoice' | 'quote' | 'credit' | 'repair_order' | 'report';
   reportType?: 'monthly' | 'quarterly' | 'yearly' | 'fec' | 'csv' | 'excel';
+  reportFromDate?: Date;
+  reportToDate?: Date;
 }
 
-export const EmailFormFields = ({ data, onChange, isLoading, invoiceReference, documentType = 'invoice', reportType }: EmailFormFieldsProps) => {
+export const EmailFormFields = ({ data, onChange, isLoading, invoiceReference, documentType = 'invoice', reportType, reportFromDate, reportToDate }: EmailFormFieldsProps) => {
   return (
     <div className="space-y-4">
       <div>
@@ -66,9 +70,23 @@ export const EmailFormFields = ({ data, onChange, isLoading, invoiceReference, d
           <FileText className="h-4 w-4" />
           <span>
             {(() => {
-              if (documentType === 'report') {
-                const extension = reportType === 'fec' ? 'txt' : (reportType === 'csv' || reportType === 'excel') ? 'csv' : 'pdf';
-                return `${invoiceReference || 'XXX'}.${extension}`;
+              if (documentType === 'report' && reportFromDate && reportToDate) {
+                // Utiliser la même logique de nommage que dans useReportEmail
+                if (reportType === 'monthly' || reportType === 'quarterly' || reportType === 'yearly') {
+                  const fromDateStr = format(reportFromDate, 'dd/MM/yyyy', { locale: fr });
+                  const toDateStr = format(reportToDate, 'dd/MM/yyyy', { locale: fr });
+                  const fileName = `${invoiceReference?.toLowerCase().replace(/\s+/g, '-')}-${fromDateStr.replace(/\//g, '-')}-${toDateStr.replace(/\//g, '-')}.pdf`;
+                  return fileName;
+                } else if (reportType === 'csv' || reportType === 'excel') {
+                  const fromDateStr = format(reportFromDate, 'dd-MM-yyyy', { locale: fr });
+                  const toDateStr = format(reportToDate, 'dd-MM-yyyy', { locale: fr });
+                  return `export-comptable-${fromDateStr}-${toDateStr}.csv`;
+                } else if (reportType === 'fec') {
+                  const fromDateStr = format(reportFromDate, 'dd-MM-yyyy', { locale: fr });
+                  const toDateStr = format(reportToDate, 'dd-MM-yyyy', { locale: fr });
+                  return `export-fec-${fromDateStr}-${toDateStr}.txt`;
+                }
+                return `${invoiceReference || 'XXX'}.pdf`;
               }
               
               switch (documentType) {

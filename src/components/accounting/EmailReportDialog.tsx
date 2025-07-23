@@ -72,6 +72,8 @@ export const EmailReportDialog = ({
           invoiceReference={report.name}
           documentType="report"
           reportType={report.type}
+          reportFromDate={report.fromDate}
+          reportToDate={report.toDate}
         />
 
         <EmailDialogActions
