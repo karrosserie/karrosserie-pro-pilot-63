@@ -29,10 +29,10 @@ export const AccountingTabs = ({
   return (
     <Tabs defaultValue="transactions" className="w-full">
       <TabsList className="grid w-full grid-cols-2 mb-4 sm:mb-6 h-9 sm:h-10">
-        <TabsTrigger value="transactions" className="text-xs sm:text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 hover:bg-white">
+        <TabsTrigger value="transactions" className="text-xs sm:text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:border-orange-500 data-[state=active]:border hover:bg-white">
           Transactions
         </TabsTrigger>
-        <TabsTrigger value="reports" className="text-xs sm:text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 hover:bg-white">
+        <TabsTrigger value="reports" className="text-xs sm:text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:border-orange-500 data-[state=active]:border hover:bg-white">
           Rapports
         </TabsTrigger>
       </TabsList>
