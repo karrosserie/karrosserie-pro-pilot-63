@@ -91,7 +91,7 @@ export const TransactionFilters = ({
             onClick={() => setSelectedFilter(filter.value)}
             className={`gap-2 flex-1 sm:flex-none ${
               selectedFilter === filter.value 
-                ? 'bg-white shadow-sm text-gray-900 hover:bg-white border border-orange-500' 
+                ? 'bg-white shadow-sm text-gray-900 hover:bg-white' 
                 : 'text-gray-600 hover:text-gray-900 hover:bg-white'
             }`}
           >
