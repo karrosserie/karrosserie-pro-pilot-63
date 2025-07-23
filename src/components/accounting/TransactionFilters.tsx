@@ -46,8 +46,8 @@ export const TransactionFilters = ({
             onClick={() => setSelectedFilter(filter.value)}
             className={`gap-2 flex-1 sm:flex-none ${
               selectedFilter === filter.value 
-                ? 'bg-orange-500 shadow-sm text-white hover:bg-orange-500' 
-                : 'text-gray-600 hover:text-gray-900 hover:bg-orange-100'
+                ? 'bg-white shadow-sm text-gray-900 hover:bg-white' 
+                : 'text-gray-600 hover:text-gray-900 hover:bg-white'
             }`}
           >
             {filter.label}
