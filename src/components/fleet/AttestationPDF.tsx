@@ -643,7 +643,7 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
 
         <Text style={[styles.subSectionTitle, { fontSize: 9, fontWeight: 'bold' }]}>4.3.2. Dommages intentionnels</Text>
         <Text style={styles.articleText}>Les dommages causés par des actes intentionnels, fraude ou tout comportement malveillant de la part de l'Emprunteur.</Text>
-
+        
         <Text style={[styles.subSectionTitle, { fontSize: 9, fontWeight: 'bold' }]}>4.3.3. Faux témoignage</Text>
         <Text style={styles.articleText}>Toute fausse déclaration faite par l'Emprunteur lors de la déclaration d'un sinistre.</Text>
 
@@ -664,6 +664,9 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
         <Text style={styles.articleText}>L'Emprunteur s'engage à...</Text>
         <Text style={[styles.subSectionTitle, { fontSize: 9, fontWeight: 'bold' }]}>4.4.2. Informations à communiquer</Text>
         <Text style={styles.articleText}>En cas de sinistre impliquant un tiers identifié, l'Emprunteur doit impérativement recueillir et transmettre au Prêteur...</Text>
+      </Page>
+
+      <Page size="A4" style={styles.page}>
         <Text style={[styles.subSectionTitle, { fontSize: 9, fontWeight: 'bold' }]}>4.4.3. Conservation des preuves</Text>
         <Text style={styles.articleText}>L'Emprunteur doit préserver toutes les preuves matérielles du sinistre et s'abstenir de...</Text>
         <Text style={[styles.subSectionTitle, { fontSize: 9, fontWeight: 'bold' }]}>4.4.4. Coopération avec les experts et assureurs</Text>
