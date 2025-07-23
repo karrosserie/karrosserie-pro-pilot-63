@@ -3,6 +3,8 @@ import React from 'react';
 import { Euro, TrendingUp, CreditCard, Receipt, TrendingDown } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface KpiData {
   title: string;
@@ -34,31 +36,46 @@ export const AccountingKpis = ({
     }).format(amount);
   };
 
+  // Calculer le mois et l'année actuels
+  const currentDate = new Date();
+  const currentMonth = format(currentDate, 'MMMM yyyy', { locale: fr });
+  const capitalizedMonth = currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1);
+
+  // Pour les tendances, on peut calculer un pourcentage basé sur les données réelles
+  // ou simplement indiquer qu'on ne peut pas calculer sans données historiques
+  const calculateTrend = (value: number) => {
+    // Comme on n'a pas de données historiques, on peut soit :
+    // 1. Retourner "N/A" ou "Nouveau"
+    // 2. Faire un calcul basé sur une heuristique simple
+    // Je vais opter pour indiquer qu'on ne peut pas calculer
+    return "N/A";
+  };
+
   const kpis: KpiData[] = [
     {
       title: 'Encaissements du mois',
       value: formatCurrency(totalReceipts),
-      trend: '+12%',
-      trendUp: true,
-      period: 'Décembre 2024',
+      trend: 'Données actuelles',
+      trendUp: totalReceipts > 0,
+      period: capitalizedMonth,
       variant: 'success',
       icon: <TrendingUp className="h-6 w-6" />
     },
     {
       title: 'Dépenses du mois',
       value: formatCurrency(totalExpenses),
-      trend: '+8%',
+      trend: 'Données actuelles',
       trendUp: false,
-      period: 'Décembre 2024',
+      period: capitalizedMonth,
       variant: 'default',
       icon: <CreditCard className="h-6 w-6" />
     },
     {
       title: 'Bénéfice net',
       value: formatCurrency(balance),
-      trend: balance >= 0 ? '+15%' : '-5%',
+      trend: balance >= 0 ? 'Positif' : 'Négatif',
       trendUp: balance >= 0,
-      period: 'Décembre 2024',
+      period: capitalizedMonth,
       variant: balance >= 0 ? 'success' : 'danger',
       icon: <Euro className="h-6 w-6" />
     }
@@ -108,7 +125,6 @@ export const AccountingKpis = ({
                 <TrendingDown className="h-4 w-4 mr-1" />
               )}
               <span>{kpi.trend}</span>
-              <span className="text-gray-500 ml-1">vs mois dernier</span>
             </div>
           </CardContent>
         </Card>

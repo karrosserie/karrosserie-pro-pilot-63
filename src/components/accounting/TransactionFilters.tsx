@@ -53,11 +53,7 @@ export const TransactionFilters = ({
             {filter.label}
             <Badge 
               variant="secondary" 
-              className={`text-xs ${
-                selectedFilter === filter.value 
-                  ? 'bg-gray-100 text-gray-700' 
-                  : 'bg-gray-200 text-gray-600'
-              }`}
+              className="text-xs bg-red-500 text-white"
             >
               {filter.count}
             </Badge>
