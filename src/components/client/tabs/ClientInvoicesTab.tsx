@@ -242,7 +242,7 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
                 <TableHeader>
                   <TableRow>
               <TableHead>Numéro</TableHead>
-              <TableHead>Date de création</TableHead>
+              <TableHead>Date</TableHead>
               <TableHead>Client</TableHead>
               <TableHead>Véhicule</TableHead>
               <TableHead>Montant</TableHead>

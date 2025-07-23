@@ -281,7 +281,7 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
           <TableHeader>
             <TableRow>
               <TableHead>Numéro</TableHead>
-              <TableHead>Date de création</TableHead>
+              <TableHead>Date</TableHead>
               <TableHead>Véhicule</TableHead>
               <TableHead>Facture d'origine</TableHead>
               <TableHead>Montant</TableHead>
