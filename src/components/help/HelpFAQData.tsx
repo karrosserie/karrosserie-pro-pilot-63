@@ -180,7 +180,31 @@ export const faqSections: FAQSection[] = [
       },
       {
         question: "Comment ajouter des documents au dossier client ?",
-        answer: "Dans la fiche client, onglet 'Documents', vous pouvez uploader le permis de conduire (recto/verso obligatoire), carte d'identité, justificatif de domicile et d'autres documents utiles. Les formats acceptés sont PDF, JPEG, PNG (max 10Mo par fichier). Chaque document peut être renommé et catégorisé pour un meilleur classement. L'historique des documents est conservé avec dates d'ajout."
+        answer: (
+          <div className="space-y-3">
+            <p>Pour ajouter des documents au dossier d&apos;un client :</p>
+            <ol className="list-decimal list-inside space-y-2 ml-4">
+              <li>Accédez à la fiche client</li>
+              <li>Cliquez sur l&apos;onglet "Documents"</li>
+              <li>Téléchargez les documents nécessaires :</li>
+              <ul className="list-disc list-inside space-y-1 ml-6 mt-2">
+                <li>Permis de conduire (recto/verso obligatoire)</li>
+                <li>Carte d&apos;identité</li>
+                <li>Justificatif de domicile</li>
+                <li>Autres documents utiles</li>
+              </ul>
+            </ol>
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+              <p className="font-medium text-blue-800 mb-2">Formats acceptés :</p>
+              <ul className="list-disc list-inside space-y-1 ml-4 text-blue-700">
+                <li>PDF, JPEG, PNG</li>
+                <li>Taille maximum : 10Mo par fichier</li>
+                <li>Possibilité de renommer et catégoriser chaque document</li>
+                <li>Historique conservé avec dates d&apos;ajout</li>
+              </ul>
+            </div>
+          </div>
+        )
       }
     ]
   },
@@ -191,15 +215,92 @@ export const faqSections: FAQSection[] = [
     items: [
       {
         question: "Comment ajouter un véhicule ?",
-        answer: "Dans 'Véhicules', cliquez sur '+ Nouveau véhicule'. Associez-le obligatoirement à un client existant via le menu déroulant. Renseignez les informations de base : marque, modèle, année, plaque d'immatriculation. Le numéro VIN (17 caractères) permet un remplissage automatique des informations techniques. Ajoutez des photos du véhicule, l'état du carburant, et les documents (carte grise). Sauvegardez pour finaliser l'ajout."
+        answer: (
+          <div className="space-y-3">
+            <p>Pour ajouter un nouveau véhicule :</p>
+            <ol className="list-decimal list-inside space-y-2 ml-4">
+              <li>Accédez à la section "Véhicules"</li>
+              <li>Cliquez sur "+ Nouveau véhicule"</li>
+              <li>Associez obligatoirement le véhicule à un client existant via le menu déroulant</li>
+              <li>Renseignez les informations de base :</li>
+              <ul className="list-disc list-inside space-y-1 ml-6 mt-2">
+                <li>Marque et modèle</li>
+                <li>Année de fabrication</li>
+                <li>Plaque d&apos;immatriculation</li>
+                <li>Numéro VIN (17 caractères) pour le remplissage automatique</li>
+              </ul>
+              <li>Ajoutez les éléments complémentaires :</li>
+              <ul className="list-disc list-inside space-y-1 ml-6 mt-2">
+                <li>Photos du véhicule</li>
+                <li>État du carburant</li>
+                <li>Documents (carte grise)</li>
+              </ul>
+              <li>Sauvegardez pour finaliser l&apos;ajout</li>
+            </ol>
+          </div>
+        )
       },
       {
         question: "Comment fonctionne le décodage VIN automatique ?",
-        answer: "Saisissez un numéro VIN de 17 caractères valide dans le champ prévu. L'application vérifie automatiquement le format et décode la marque, le modèle et l'année de fabrication grâce à notre API intégrée qui reconnaît plus de 500 codes constructeurs mondiaux. Si le VIN n'est pas reconnu, vous pouvez saisir manuellement les informations. Le décodage fonctionne pour les véhicules de 1980 à aujourd'hui."
+        answer: (
+          <div className="space-y-3">
+            <p>Le décodage VIN automatique fonctionne en plusieurs étapes :</p>
+            <ol className="list-decimal list-inside space-y-2 ml-4">
+              <li>Saisissez un numéro VIN de 17 caractères valide dans le champ prévu</li>
+              <li>L&apos;application vérifie automatiquement le format</li>
+              <li>Notre API intégrée décode les informations :</li>
+              <ul className="list-disc list-inside space-y-1 ml-6 mt-2">
+                <li>Marque du véhicule</li>
+                <li>Modèle</li>
+                <li>Année de fabrication</li>
+              </ul>
+            </ol>
+            <div className="mt-4 p-3 bg-green-50 rounded-lg">
+              <p className="font-medium text-green-800 mb-2">Caractéristiques du système :</p>
+              <ul className="list-disc list-inside space-y-1 ml-4 text-green-700">
+                <li>Reconnaissance de plus de 500 codes constructeurs mondiaux</li>
+                <li>Compatible avec les véhicules de 1980 à aujourd&apos;hui</li>
+                <li>Possibilité de saisie manuelle si le VIN n&apos;est pas reconnu</li>
+              </ul>
+            </div>
+          </div>
+        )
       },
       {
         question: "Quelles informations puis-je enregistrer pour un véhicule ?",
-        answer: "Informations techniques : marque, modèle, année, VIN, plaque d'immatriculation, couleur, type de carburant, kilométrage, puissance. Documents : carte grise recto/verso, photos du véhicule (jusqu'à 10 photos), contrat d'achat. Informations d'assurance : compagnie, numéro de police, date d'expiration. Vous pouvez aussi suivre l'historique complet des interventions, réparations et factures associées au véhicule."
+        answer: (
+          <div className="space-y-3">
+            <p>Vous pouvez enregistrer de nombreuses informations pour chaque véhicule :</p>
+            <div className="ml-4">
+              <p className="font-medium mb-2">Informations techniques :</p>
+              <ul className="list-disc list-inside space-y-1 ml-4">
+                <li>Marque, modèle, année</li>
+                <li>VIN et plaque d&apos;immatriculation</li>
+                <li>Couleur et type de carburant</li>
+                <li>Kilométrage et puissance</li>
+              </ul>
+            </div>
+            <div className="ml-4">
+              <p className="font-medium mb-2">Documents :</p>
+              <ul className="list-disc list-inside space-y-1 ml-4">
+                <li>Carte grise recto/verso</li>
+                <li>Photos du véhicule (jusqu&apos;à 10 photos)</li>
+                <li>Contrat d&apos;achat</li>
+              </ul>
+            </div>
+            <div className="ml-4">
+              <p className="font-medium mb-2">Informations d&apos;assurance :</p>
+              <ul className="list-disc list-inside space-y-1 ml-4">
+                <li>Compagnie d&apos;assurance</li>
+                <li>Numéro de police</li>
+                <li>Date d&apos;expiration</li>
+              </ul>
+            </div>
+            <p className="text-sm text-gray-600 mt-3">
+              Vous pouvez aussi suivre l&apos;historique complet des interventions, réparations et factures associées au véhicule.
+            </p>
+          </div>
+        )
       },
       {
         question: "Comment associer un véhicule à un client ?",
