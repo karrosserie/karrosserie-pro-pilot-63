@@ -64,13 +64,12 @@ AUTO PAINT`;
 
     setIsLoading(true);
     try {
-      // Pour les rapports PDF, on suppose qu'ils sont stockés comme base64
-      // ou qu'on peut les récupérer depuis le fileUrl
-      let pdfBase64 = '';
+      // Générer le contenu du fichier selon le type de rapport
+      let fileBase64 = '';
+      let fileExtension = '';
       
       if (report.type === 'monthly' || report.type === 'quarterly' || report.type === 'yearly') {
-        // Pour les rapports PDF, on devrait les avoir en base64 stockés quelque part
-        // Pour l'instant, on va générer un PDF simple avec les données du rapport
+        // Pour les rapports PDF
         const reportData = {
           name: report.name,
           type: report.type,
@@ -79,24 +78,31 @@ AUTO PAINT`;
           generatedAt: report.generatedAt
         };
         
-        // Convertir en base64 basique pour test
-        pdfBase64 = btoa(JSON.stringify(reportData));
-      } else {
-        // Pour CSV/FEC, on peut créer un fichier texte simple
+        fileBase64 = btoa(JSON.stringify(reportData));
+        fileExtension = 'pdf';
+      } else if (report.type === 'csv') {
+        // Pour les rapports CSV
         const csvData = `Rapport,Type,Date début,Date fin,Généré le
 ${report.name},${report.type},${report.fromDate.toLocaleDateString('fr-FR')},${report.toDate.toLocaleDateString('fr-FR')},${report.generatedAt.toLocaleDateString('fr-FR')}`;
-        pdfBase64 = btoa(csvData);
+        fileBase64 = btoa(csvData);
+        fileExtension = 'csv';
+      } else if (report.type === 'fec') {
+        // Pour les rapports FEC (format texte)
+        const fecData = `Rapport,Type,Date début,Date fin,Généré le
+${report.name},${report.type},${report.fromDate.toLocaleDateString('fr-FR')},${report.toDate.toLocaleDateString('fr-FR')},${report.generatedAt.toLocaleDateString('fr-FR')}`;
+        fileBase64 = btoa(fecData);
+        fileExtension = 'txt';
       }
 
-      // Envoyer l'email avec le PDF en pièce jointe via l'edge function
+      // Envoyer l'email avec la pièce jointe via l'edge function
       const { error } = await supabase.functions.invoke('send-document-email', {
         body: {
           to: emailData.to,
           subject: emailData.subject,
           message: emailData.message,
-          pdfBase64: pdfBase64,
+          pdfBase64: fileBase64,
           invoiceReference: report.name,
-          documentType: 'report'
+          documentType: fileExtension
         }
       });
 
