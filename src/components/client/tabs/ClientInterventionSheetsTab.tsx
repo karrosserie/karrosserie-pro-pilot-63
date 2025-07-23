@@ -81,7 +81,7 @@ const ClientInterventionSheetsTab: React.FC<ClientInterventionSheetsTabProps> = 
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-lg">
-                  Fiche d'intervention - {getVehicleInfo(sheet.vehicle_id)}
+                  {getVehicleInfo(sheet.vehicle_id)}
                 </CardTitle>
                 <CardDescription>
                   Créée le {format(new Date(sheet.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
