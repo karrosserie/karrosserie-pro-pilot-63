@@ -1,6 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
+import { useReportToQuote } from '@/hooks/use-report-to-quote';
 import { Table, TableBody } from '@/components/ui/table';
 import { FileText, Pencil, Trash, MoreVertical, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -26,10 +27,20 @@ interface ClientExpertiseReportsTabProps {
 
 const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ clientId }) => {
   const { reports, isLoading, deleteReport } = useExpertiseReports();
+  const { checkMultipleReports, isConverted, convertedReports } = useReportToQuote();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<ExpertiseReport | null>(null);
+
+  const clientReports = reports?.filter(report => report.client_id === clientId) || [];
+
+  // Vérifier le statut de conversion des rapports quand ils changent
+  useEffect(() => {
+    if (clientReports && clientReports.length > 0) {
+      checkMultipleReports(clientReports);
+    }
+  }, [clientReports, checkMultipleReports]);
 
   if (isLoading) {
     return (
@@ -38,8 +49,6 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
       </div>
     );
   }
-
-  const clientReports = reports?.filter(report => report.client_id === clientId) || [];
 
   const handleEditReport = (report: ExpertiseReport) => {
     setSelectedReport(report);
@@ -93,9 +102,8 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
   };
 
   const getStatusDisplay = (report: ExpertiseReport) => {
-    // For now, we'll show "Importé" as default, but this could be enhanced
-    // to show "Converti" if the report has been converted to a quote
-    const status = report.status || 'Importé';
+    // Utiliser la même logique que le composant principal
+    const status = isConverted(report.id) ? 'Converti' : (report.status || 'Importé');
     return (
       <Badge 
         variant="outline" 
