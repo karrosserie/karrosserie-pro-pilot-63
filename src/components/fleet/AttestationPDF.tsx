@@ -277,7 +277,7 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
               <Image src={companyData.logo_url} style={styles.logo} />
             ) : (
               <View style={styles.logoFallback}>
-                <Text style={styles.logoText}>AUTO PAINT</Text>
+                <Text style={styles.logoText}>{companyData?.name || ''}</Text>
               </View>
             )}
             <Text style={styles.companyName}>{companyData?.name || ''}</Text>
@@ -468,10 +468,7 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
         <Text style={styles.bulletPoint}>• Ne jamais conduire sous l'emprise d'alcool (taux supérieur à 0,0 g/l) ou de stupéfiants</Text>
         <Text style={styles.bulletPoint}>• Ne jamais utiliser un téléphone tenu en main pendant la conduite</Text>
         <Text style={styles.bulletPoint}>• Signaler immédiatement au Prêteur tout dysfonctionnement constaté sur le véhicule</Text>
-      </Page>
 
-      {/* Quatrième page pour les sections 3.4 à 3.6 */}
-      <Page size="A4" style={styles.page}>
         {/* 3.4. Sécurisation du matériel transporté */}
         <Text style={styles.subSectionTitle}>3.4. Sécurisation du matériel transporté</Text>
         
@@ -481,7 +478,10 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
         <Text style={styles.indentedText}>- L'utilisation exclusive du coffre est obligatoire pour tout équipement professionnel</Text>
         <Text style={styles.indentedText}>- Aucun objet ne doit être placé sur le siège arrière ou les sièges arrières</Text>
         <Text style={styles.indentedText}>- Le chargement ne doit jamais dépasser la hauteur des dossiers des sièges arrière</Text>
+      </Page>
 
+      {/* Quatrième page pour les sections 3.4 à 3.6 */}
+      <Page size="A4" style={styles.page}>
         <Text style={[styles.subSectionTitle, { fontSize: 9, fontWeight: 'bold' }]}>3.4.2. Fixation et arrimage du chargement</Text>
         <Text style={styles.articleText}>Les objets transportés doivent être arrimés conformément à l'article R. 312-17 du Code de la route, avec:</Text>
         <Text style={styles.bulletPoint}>• Utilisation obligatoire de sangles, cordes, fixation homologués CE</Text>
@@ -663,14 +663,14 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
           {loanData?.client_signature ? (
             <Image 
               src={loanData.client_signature}
-              style={{ width: 150, height: 75, marginVertical: 10, objectFit: 'contain' }}
+              style={{ width: 150, height: 75, objectFit: 'contain' }}
             />
           ) : (
-            <View style={{ height: 75, marginVertical: 10, borderBottom: '1 solid #000' }}></View>
+            <View style={{ height: 75, borderBottom: '1 solid #000' }}></View>
           )}
           
           <Text style={styles.finalSignatureName}>
-            {loanData?.clients?.first_name || 'Geoffrey'} {loanData?.clients?.last_name || 'GOBEYN'}
+            {loanData?.clients?.first_name || ''} {loanData?.clients?.last_name || ''}
           </Text>
           <Text style={styles.signatureDate}>
             Signé le {loanCreationDate} à {new Date(loanData?.created_at || new Date()).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
