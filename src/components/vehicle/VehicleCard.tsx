@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Car, User, Eye, Pencil, Trash, MoreVertical, FileText, Receipt, ClipboardList } from 'lucide-react';
+import { Car, User, Eye, Pencil, Trash, MoreVertical, FileText, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -21,7 +21,6 @@ interface VehicleCardProps {
   onDelete?: () => void;
   onCreateQuote?: () => void;
   onCreateInvoice?: () => void;
-  onCreateIntervention?: () => void;
 }
 
 const VehicleCard: React.FC<VehicleCardProps> = ({
@@ -38,8 +37,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
   onEdit,
   onDelete,
   onCreateQuote,
-  onCreateInvoice,
-  onCreateIntervention
+  onCreateInvoice
 }) => {
   // Détermine la couleur du statut
   const getStatusColor = () => {
@@ -124,13 +122,6 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
     }
   };
 
-  const handleCreateIntervention = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onCreateIntervention) {
-      onCreateIntervention();
-    }
-  };
-
   return (
     <div className="card-container flex flex-col h-full animate-fade-in">
       <div className="relative h-40 bg-gray-100 rounded-lg mb-4 overflow-hidden">
@@ -211,12 +202,6 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
                 <Receipt className="h-4 w-4 mr-2" />
                 Créer une facture
               </DropdownMenuItem>
-              {onCreateIntervention && (
-                <DropdownMenuItem onClick={handleCreateIntervention}>
-                  <ClipboardList className="h-4 w-4 mr-2" />
-                  Créer une fiche
-                </DropdownMenuItem>
-              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
