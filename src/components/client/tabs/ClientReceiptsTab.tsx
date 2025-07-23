@@ -9,19 +9,12 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Banknote, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { Banknote, Eye, Pencil, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { StatusBadge } from '@/components/ui/status-badge';
+
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import { useInvoices } from '@/hooks/use-invoices';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Download, Printer, Mail } from 'lucide-react';
 import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 
 interface ClientReceiptsTabProps {
@@ -97,26 +90,6 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
     }
   };
 
-  const handleDownload = (receipt: any) => {
-    toast({
-      title: "Téléchargement",
-      description: `Téléchargement de l'encaissement...`
-    });
-  };
-
-  const handlePrint = (receipt: any) => {
-    toast({
-      title: "Impression",
-      description: `Impression de l'encaissement...`
-    });
-  };
-
-  const handleSendEmail = (receipt: any) => {
-    toast({
-      title: "Envoi par e-mail",
-      description: `Envoi de l'encaissement par e-mail...`
-    });
-  };
 
   const formatAmount = (amount: number | null | undefined): string => {
     if (amount === null || amount === undefined) return '-';
@@ -154,12 +127,11 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Référence</TableHead>
-              <TableHead>Date d'encaissement</TableHead>
+              <TableHead>Numéro</TableHead>
+              <TableHead>Date</TableHead>
               <TableHead>Facture</TableHead>
               <TableHead>Montant</TableHead>
-              <TableHead>Mode de paiement</TableHead>
-              <TableHead>Compte bancaire</TableHead>
+              <TableHead>Méthode de paiement</TableHead>
               <TableHead>Statut</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -168,23 +140,31 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
             {clientReceipts.length > 0 ? (
               clientReceipts.map((receipt) => (
                 <TableRow key={receipt.id}>
-                  <TableCell className="font-medium">{receipt.reference}</TableCell>
+                  <TableCell>{receipt.reference || 'N/A'}</TableCell>
                   <TableCell>{formatDate(receipt.date)}</TableCell>
-                  <TableCell>{getInvoiceDisplay(receipt.invoice_id)}</TableCell>
-                  <TableCell>{formatAmount(receipt.amount)}</TableCell>
-                  <TableCell>{receipt.payment_method || "-"}</TableCell>
-                  <TableCell>{receipt.bank_account || "-"}</TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(receipt.status || 'En attente')}`}>
-                      {receipt.status || 'En attente'}
+                    {getInvoiceDisplay(receipt.invoice_id)}
+                  </TableCell>
+                  <TableCell>
+                    {formatAmount(receipt.amount)}
+                  </TableCell>
+                  <TableCell>{receipt.payment_method}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(receipt.status)}`}>
+                      {receipt.status}
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-1">
-                      <Button variant="ghost" size="icon" onClick={() => handleView(receipt)}>
+                      <Button variant="ghost" size="icon" title="Voir les détails">
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(receipt)}>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleEdit(receipt)}
+                        title="Modifier"
+                      >
                         <Pencil className="h-4 w-4" />
                       </Button>
                       <Button 
@@ -192,37 +172,17 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
                         size="icon" 
                         className="text-red-500 hover:text-red-700"
                         onClick={() => handleDelete(receipt)}
+                        title="Supprimer"
                       >
                         <Trash className="h-4 w-4" />
                       </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56">
-                          <DropdownMenuItem onClick={() => handleDownload(receipt)}>
-                            <Download className="mr-2 h-4 w-4" />
-                            Télécharger
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handlePrint(receipt)}>
-                            <Printer className="mr-2 h-4 w-4" />
-                            Imprimer
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleSendEmail(receipt)}>
-                            <Mail className="mr-2 h-4 w-4" />
-                            Envoyer par e-mail
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </div>
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-4">
+                <TableCell colSpan={7} className="text-center py-4">
                   <div className="flex flex-col items-center justify-center py-8">
                     <Banknote className="h-10 w-10 text-gray-400 mb-2" />
                     <h3 className="font-medium text-gray-900">Aucun encaissement</h3>
