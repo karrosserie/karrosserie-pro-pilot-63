@@ -659,11 +659,15 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
         <View style={styles.signatureSection}>
           <Text style={styles.finalSignatureTitle}>Signature de l'assuré</Text>
           
-          {/* Image de signature */}
-          <Image 
-            src="/lovable-uploads/4a0a856a-d685-40ca-add4-95cc9af49f5c.png"
-            style={{ width: 120, height: 60, marginVertical: 10 }}
-          />
+          {/* Image de signature électronique */}
+          {loanData?.clientSignature ? (
+            <Image 
+              src={loanData.clientSignature}
+              style={{ width: 120, height: 60, marginVertical: 10 }}
+            />
+          ) : (
+            <View style={{ height: 60, marginVertical: 10, borderBottom: '1 solid #000' }}></View>
+          )}
           
           <Text style={styles.finalSignatureName}>
             {loanData?.clients?.first_name || 'Geoffrey'} {loanData?.clients?.last_name || 'GOBEYN'}
