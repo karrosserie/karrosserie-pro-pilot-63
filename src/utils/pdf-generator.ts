@@ -14,15 +14,14 @@ export const generateAttestationPDF = async (loanData: any, companyData: any, us
     // Créer un nom de fichier unique
     const fileName = `attestation-pret-${loanData?.clients?.last_name || 'client'}-${formatDate(new Date().toISOString())}.pdf`;
     
-    // Créer un lien de téléchargement
+    // Créer une URL pour le blob et l'ouvrir dans un nouvel onglet
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-    link.click();
+    window.open(url, '_blank');
     
-    // Nettoyer l'URL
-    URL.revokeObjectURL(url);
+    // Nettoyer l'URL après un délai pour permettre l'ouverture
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 1000);
     
     return { success: true, fileName };
   } catch (error) {
