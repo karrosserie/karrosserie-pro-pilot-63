@@ -578,10 +578,7 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
 
         <Text style={styles.subSectionTitle}>4.5. Responsabilité en cas d'infraction</Text>
         <Text style={styles.articleText}>L'Emprunteur assume l'entière et exclusive responsabilité des infractions commises pendant la durée du prêt, y compris...</Text>
-      </Page>
 
-      {/* Sixième page pour les sections 5, 6, 7 et 8 */}
-      <Page size="A4" style={styles.page}>
         {/* 5. RESTITUTION DU VÉHICULE */}
         <Text style={styles.articleTitle}>5. RESTITUTION DU VÉHICULE</Text>
 
@@ -610,7 +607,10 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
         <Text style={styles.bulletPoint}>• Remplacement des documents manquants: 150€ par document</Text>
         <Text style={styles.bulletPoint}>• Réparation de tout dommage non signalé: coût réel majoré de 20%</Text>
         <Text style={styles.bulletPoint}>• Remplacement de tout équipement ou accessoire manquant: valeur à neuf</Text>
+      </Page>
 
+      {/* Sixième page pour les sections 6, 7 et 8 */}
+      <Page size="A4" style={styles.page}>
         {/* 6. CLAUSES PÉNALES ET RÉSOLUTION */}
         <Text style={styles.articleTitle}>6. CLAUSES PÉNALES ET RÉSOLUTION</Text>
 
