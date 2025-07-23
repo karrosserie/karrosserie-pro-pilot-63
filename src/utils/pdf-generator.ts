@@ -46,11 +46,11 @@ export const generateAttestationPDF = async (loanData: any, companyData: any, us
   } else {
     // Logo fallback orange arrondi comme dans l'aperçu
     doc.setFillColor(249, 115, 22); // bg-orange-500
-    doc.roundedRect(col1X, y1 - 3, 30, 12, 6, 6, 'F');
+    doc.roundedRect(col1X, y1 - 3, 50, 12, 6, 6, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
-    doc.text('LOGO', col1X + 15, y1 + 3, { align: 'center' });
+    doc.text('AUTO PAINT', col1X + 25, y1 + 3, { align: 'center' });
   }
   y1 += 15;
 
@@ -178,10 +178,9 @@ export const generateAttestationPDF = async (loanData: any, companyData: any, us
   if (loanData?.insurance_contract_number) {
     y3 += 3;
     doc.setFont('helvetica', 'bold');
-    doc.text('N° de contrat :', col3X, y3);
-    y3 += 4;
+    doc.text('N° de contrat : ', col3X, y3);
     doc.setFont('helvetica', 'normal');
-    doc.text(loanData.insurance_contract_number, col3X, y3);
+    doc.text(loanData.insurance_contract_number, col3X + 28, y3);
   }
   
   // Nouvelle page pour le contrat détaillé
