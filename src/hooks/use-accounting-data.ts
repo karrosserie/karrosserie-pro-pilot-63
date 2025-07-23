@@ -105,7 +105,7 @@ export const useAccountingData = () => {
               allTransactions.push({
                 id: `invoice-${invoice.id}`,
                 date: new Date(invoice.due_date || invoice.date || invoice.created_at).toLocaleDateString('fr-FR'),
-                description: `Facture impayée - F-${invoice.reference}`,
+                description: `Facture - F-${invoice.reference}`,
                 type: 'Encaissement',
                 method: 'À encaisser',
                 amount: formatCurrency(amountDue),
