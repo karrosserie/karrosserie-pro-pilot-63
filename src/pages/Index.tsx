@@ -113,7 +113,8 @@ const Index = () => {
         <StatsCard 
           title="Clients actifs" 
           value={dashboardStats?.activeClients || 0}
-          change="+15%" 
+          change={dashboardStats?.clientsChange} 
+          isPositive={dashboardStats?.clientsIsPositive}
           icon={<Users className="h-5 w-5 sm:h-6 sm:w-6" />}
           iconBg="bg-blue-500"
         />
@@ -126,7 +127,8 @@ const Index = () => {
         <StatsCard 
           title="Chiffre d'affaires" 
           value={(dashboardStats?.revenue || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} 
-          change="+22%" 
+          change={dashboardStats?.revenueChange} 
+          isPositive={dashboardStats?.revenueIsPositive}
           icon={<CreditCard className="h-5 w-5 sm:h-6 sm:w-6" />}
           iconBg="bg-green-500"
         />
@@ -136,15 +138,17 @@ const Index = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
         <StatsCard 
           title="CA carrosserie" 
-          value={(0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} 
-          change="+18%" 
+          value={(dashboardStats?.carBodyRevenue || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} 
+          change={dashboardStats?.carBodyChange} 
+          isPositive={dashboardStats?.carBodyIsPositive}
           icon={<PaintBucket className="h-5 w-5 sm:h-6 sm:w-6" />}
           iconBg="bg-orange-500"
         />
         <StatsCard 
           title="CA mécanique" 
-          value={(0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} 
-          change="+26%" 
+          value={(dashboardStats?.mechanicRevenue || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} 
+          change={dashboardStats?.mechanicChange} 
+          isPositive={dashboardStats?.mechanicIsPositive}
           icon={<Wrench className="h-5 w-5 sm:h-6 sm:w-6" />}
           iconBg="bg-gray-600"
         />
