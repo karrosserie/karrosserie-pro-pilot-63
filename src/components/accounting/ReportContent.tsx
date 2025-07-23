@@ -15,7 +15,7 @@ const ReportContent = () => {
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<GeneratedReport | null>(null);
   const { toast } = useToast();
-  const { reports, addReport, sendEmail } = useGeneratedReports();
+  const { reports, addReport, sendEmail, deleteReport } = useGeneratedReports();
 
   const handleGenerate = (type: string, fromDate: Date, toDate: Date) => {
     const reportId = addReport(type, fromDate, toDate);
@@ -107,7 +107,7 @@ const ReportContent = () => {
         
         <div className="mb-4 sm:mb-6">
           <h4 className="font-medium mb-3 sm:mb-4 text-sm sm:text-base">Export pour cabinet comptable</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
             <Button 
               variant="outline"
               onClick={() => setOpenDialog('fec')}
@@ -124,14 +124,6 @@ const ReportContent = () => {
               <Download className="h-4 w-4 mr-2" />
               <span className="text-sm sm:text-base">Format CSV</span>
             </Button>
-            <Button 
-              variant="outline"
-              onClick={() => setOpenDialog('excel')}
-              className="w-full justify-center h-10 sm:h-11"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              <span className="text-sm sm:text-base">Format Excel</span>
-            </Button>
           </div>
         </div>
 
@@ -146,6 +138,7 @@ const ReportContent = () => {
       <GeneratedReportsTable 
         reports={reports}
         onSendEmail={handleSendEmail}
+        onDeleteReport={deleteReport}
       />
 
       <EmailReportDialog

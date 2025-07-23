@@ -216,9 +216,14 @@ export const useGeneratedReports = () => {
     });
   };
 
+  const deleteReport = (reportId: string) => {
+    setReports(prev => prev.filter(report => report.id !== reportId));
+  };
+
   return {
     reports,
     addReport,
-    sendEmail
+    sendEmail,
+    deleteReport
   };
 };

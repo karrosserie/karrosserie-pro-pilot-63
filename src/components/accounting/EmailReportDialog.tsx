@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Paperclip, FileText } from 'lucide-react';
 import { GeneratedReport } from '@/hooks/use-generated-reports';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -106,6 +107,23 @@ L'équipe comptabilité`;
               readOnly
               className="bg-gray-50 min-h-[200px]"
             />
+          </div>
+
+          {/* Section Pièces jointes */}
+          <div className="border rounded-lg p-4 bg-muted/50">
+            <div className="flex items-center gap-2 mb-2">
+              <Paperclip className="h-4 w-4 text-muted-foreground" />
+              <Label className="text-sm font-medium">Pièce jointe</Label>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <FileText className="h-4 w-4" />
+              <span>
+                {report.name.replace(/\s+/g, '_')}.pdf
+              </span>
+              <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                Générée automatiquement
+              </span>
+            </div>
           </div>
 
           <div className="flex justify-end gap-3">

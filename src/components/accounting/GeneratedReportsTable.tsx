@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Download, Mail } from 'lucide-react';
+import { Download, Mail, Trash2 } from 'lucide-react';
 import { GeneratedReport } from '@/hooks/use-generated-reports';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -19,9 +19,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 interface GeneratedReportsTableProps {
   reports: GeneratedReport[];
   onSendEmail: (reportId: string) => void;
+  onDeleteReport: (reportId: string) => void;
 }
 
-export const GeneratedReportsTable = ({ reports, onSendEmail }: GeneratedReportsTableProps) => {
+export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport }: GeneratedReportsTableProps) => {
   const getStatusBadge = (status: GeneratedReport['status']) => {
     switch (status) {
       case 'generating':
@@ -36,8 +37,15 @@ export const GeneratedReportsTable = ({ reports, onSendEmail }: GeneratedReports
   };
 
   const handleDownload = (report: GeneratedReport) => {
-    // Simuler le téléchargement
-    console.log(`Téléchargement de ${report.name}`);
+    if (report.fileUrl) {
+      // Créer un lien de téléchargement
+      const link = document.createElement('a');
+      link.href = report.fileUrl;
+      link.download = `${report.name}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
 
   if (reports.length === 0) {
@@ -107,6 +115,7 @@ export const GeneratedReportsTable = ({ reports, onSendEmail }: GeneratedReports
                         onClick={() => handleDownload(report)}
                         disabled={report.status !== 'ready'}
                         className="h-8 w-8 p-0"
+                        title="Télécharger"
                       >
                         <Download className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
@@ -116,8 +125,18 @@ export const GeneratedReportsTable = ({ reports, onSendEmail }: GeneratedReports
                         onClick={() => onSendEmail(report.id)}
                         disabled={report.status !== 'ready'}
                         className="h-8 w-8 p-0"
+                        title="Envoyer par e-mail"
                       >
                         <Mail className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => onDeleteReport(report.id)}
+                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                        title="Supprimer"
+                      >
+                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
                     </div>
                   </TableCell>
