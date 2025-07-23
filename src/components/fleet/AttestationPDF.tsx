@@ -275,18 +275,18 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   documentItem: {
-    width: '48%',
-    marginBottom: 10,
+    width: '100%',
+    marginBottom: 15,
   },
   documentLabel: {
-    fontSize: 8,
+    fontSize: 10,
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 8,
     textAlign: 'center',
   },
   documentImage: {
     width: '100%',
-    height: 80,
+    maxHeight: 200,
     objectFit: 'contain',
   },
 });
