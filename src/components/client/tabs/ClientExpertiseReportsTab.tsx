@@ -126,7 +126,7 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
 
   return (
     <>
-      <div className="card-container">
+      <div className="card-container p-0">
           <Table>
             <ExpertiseReportTableHeader />
             <TableBody>
