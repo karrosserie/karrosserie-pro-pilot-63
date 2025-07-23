@@ -1,10 +1,11 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useCredits } from '@/hooks/use-credits';
 import { useInvoices } from '@/hooks/use-invoices';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { FileText } from 'lucide-react';
 
 interface VehicleCreditsTabProps {
   vehicleId: string;
@@ -46,53 +47,54 @@ const VehicleCreditsTab: React.FC<VehicleCreditsTabProps> = ({ vehicleId }) => {
 
   if (vehicleCredits.length === 0) {
     return (
-      <div className="p-4">
-        <p className="text-muted-foreground">Aucun avoir trouvé pour ce véhicule.</p>
+      <div className="text-center py-8">
+        <FileText className="mx-auto h-12 w-12 text-gray-400" />
+        <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucun avoir</h3>
+        <p className="mt-1 text-sm text-gray-500">Ce véhicule n'a pas encore d'avoir.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {vehicleCredits.map((credit) => {
-        const relatedInvoice = invoices?.find(invoice => invoice.id === credit.invoice_id);
-        
-        return (
-          <Card key={credit.id}>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg">
-                    Avoir {credit.reference}
-                  </CardTitle>
-                  <CardDescription>
-                    Créé le {format(new Date(credit.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
-                  </CardDescription>
-                </div>
-                <Badge className={getStatusColor(credit.status || 'En attente')}>
-                  {credit.status || 'En attente'}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p><span className="font-medium">Montant:</span> {formatAmount(credit.amount)}</p>
-                  <p><span className="font-medium">Facture associée:</span> {relatedInvoice?.reference || 'N/A'}</p>
-                </div>
-                <div>
-                  <p><span className="font-medium">Statut:</span> {credit.status || 'En attente'}</p>
-                </div>
-              </div>
-              {credit.notes && (
-                <div className="mt-3 pt-3 border-t">
-                  <p className="text-sm"><span className="font-medium">Notes:</span> {credit.notes}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        );
-      })}
+    <div className="card-container p-0">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Référence</TableHead>
+            <TableHead>Date de création</TableHead>
+            <TableHead>Montant</TableHead>
+            <TableHead>Facture associée</TableHead>
+            <TableHead>Statut</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {vehicleCredits.map((credit) => {
+            const relatedInvoice = invoices?.find(invoice => invoice.id === credit.invoice_id);
+            
+            return (
+              <TableRow key={credit.id} className="hover:bg-gray-50">
+                <TableCell className="font-medium">
+                  {credit.reference || 'Non spécifié'}
+                </TableCell>
+                <TableCell>
+                  {format(new Date(credit.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
+                </TableCell>
+                <TableCell>
+                  {formatAmount(credit.amount)}
+                </TableCell>
+                <TableCell>
+                  {relatedInvoice?.reference || 'N/A'}
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className={getStatusColor(credit.status || 'En attente')}>
+                    {credit.status || 'En attente'}
+                  </Badge>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
     </div>
   );
 };

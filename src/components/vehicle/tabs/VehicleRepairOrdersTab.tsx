@@ -1,9 +1,10 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { FileText } from 'lucide-react';
 
 interface VehicleRepairOrdersTabProps {
   vehicleId: string;
@@ -30,50 +31,58 @@ const VehicleRepairOrdersTab: React.FC<VehicleRepairOrdersTabProps> = ({ vehicle
 
   if (vehicleOrders.length === 0) {
     return (
-      <div className="p-4">
-        <p className="text-muted-foreground">Aucun ordre de réparation trouvé pour ce véhicule.</p>
+      <div className="text-center py-8">
+        <FileText className="mx-auto h-12 w-12 text-gray-400" />
+        <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucun ordre de réparation</h3>
+        <p className="mt-1 text-sm text-gray-500">Ce véhicule n'a pas encore d'ordre de réparation.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {vehicleOrders.map((order) => (
-        <Card key={order.id}>
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-lg">
-                  Ordre {order.reference}
-                </CardTitle>
-                <CardDescription>
-                  Créé le {format(new Date(order.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
-                </CardDescription>
-              </div>
-              <Badge className={getStatusColor(order.status || 'En attente')}>
-                {order.status || 'En attente'}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p><span className="font-medium">N° de rapport:</span> {order.report_number || 'N/A'}</p>
-                <p><span className="font-medium">Expert:</span> {order.expert_name || 'N/A'}</p>
-              </div>
-              <div>
-                <p><span className="font-medium">N° de sinistre:</span> {order.claim_number || 'N/A'}</p>
-                <p><span className="font-medium">Date d'incident:</span> {order.incident_date ? format(new Date(order.incident_date), 'dd/MM/yyyy', { locale: fr }) : 'N/A'}</p>
-              </div>
-            </div>
-            {order.notes && (
-              <div className="mt-3 pt-3 border-t">
-                <p className="text-sm"><span className="font-medium">Notes:</span> {order.notes}</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      ))}
+    <div className="card-container p-0">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Référence</TableHead>
+            <TableHead>Date de création</TableHead>
+            <TableHead>N° Rapport</TableHead>
+            <TableHead>Expert</TableHead>
+            <TableHead>N° Sinistre</TableHead>
+            <TableHead>Date incident</TableHead>
+            <TableHead>Statut</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {vehicleOrders.map((order) => (
+            <TableRow key={order.id} className="hover:bg-gray-50">
+              <TableCell className="font-medium">
+                {order.reference || 'Non spécifié'}
+              </TableCell>
+              <TableCell>
+                {format(new Date(order.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
+              </TableCell>
+              <TableCell>
+                {order.report_number || 'N/A'}
+              </TableCell>
+              <TableCell>
+                {order.expert_name || 'N/A'}
+              </TableCell>
+              <TableCell>
+                {order.claim_number || 'N/A'}
+              </TableCell>
+              <TableCell>
+                {order.incident_date ? format(new Date(order.incident_date), 'dd/MM/yyyy', { locale: fr }) : 'N/A'}
+              </TableCell>
+              <TableCell>
+                <Badge variant="outline" className={getStatusColor(order.status || 'En attente')}>
+                  {order.status || 'En attente'}
+                </Badge>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };

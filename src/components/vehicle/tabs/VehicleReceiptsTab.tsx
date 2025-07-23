@@ -1,10 +1,11 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { useInvoices } from '@/hooks/use-invoices';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { FileText } from 'lucide-react';
 
 interface VehicleReceiptsTabProps {
   vehicleId: string;
@@ -46,54 +47,58 @@ const VehicleReceiptsTab: React.FC<VehicleReceiptsTabProps> = ({ vehicleId }) =>
 
   if (vehicleReceipts.length === 0) {
     return (
-      <div className="p-4">
-        <p className="text-muted-foreground">Aucun encaissement trouvé pour ce véhicule.</p>
+      <div className="text-center py-8">
+        <FileText className="mx-auto h-12 w-12 text-gray-400" />
+        <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucun encaissement</h3>
+        <p className="mt-1 text-sm text-gray-500">Ce véhicule n'a pas encore d'encaissement.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {vehicleReceipts.map((receipt) => {
-        const relatedInvoice = invoices?.find(invoice => invoice.id === receipt.invoice_id);
-        
-        return (
-          <Card key={receipt.id}>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg">
-                    Encaissement {receipt.reference}
-                  </CardTitle>
-                  <CardDescription>
-                    Date: {format(new Date(receipt.date), 'dd/MM/yyyy', { locale: fr })}
-                  </CardDescription>
-                </div>
-                <Badge className={getStatusColor(receipt.status || 'En attente')}>
-                  {receipt.status || 'En attente'}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p><span className="font-medium">Montant:</span> {formatAmount(receipt.amount)}</p>
-                  <p><span className="font-medium">Méthode:</span> {receipt.payment_method || 'N/A'}</p>
-                </div>
-                <div>
-                  <p><span className="font-medium">Facture associée:</span> {relatedInvoice?.reference || 'N/A'}</p>
-                  <p><span className="font-medium">Compte bancaire:</span> {receipt.bank_account || 'N/A'}</p>
-                </div>
-              </div>
-              {receipt.notes && (
-                <div className="mt-3 pt-3 border-t">
-                  <p className="text-sm"><span className="font-medium">Notes:</span> {receipt.notes}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        );
-      })}
+    <div className="card-container p-0">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Référence</TableHead>
+            <TableHead>Date de création</TableHead>
+            <TableHead>Montant</TableHead>
+            <TableHead>Date encaissement</TableHead>
+            <TableHead>Facture associée</TableHead>
+            <TableHead>Statut</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {vehicleReceipts.map((receipt) => {
+            const relatedInvoice = invoices?.find(invoice => invoice.id === receipt.invoice_id);
+            
+            return (
+              <TableRow key={receipt.id} className="hover:bg-gray-50">
+                <TableCell className="font-medium">
+                  {receipt.reference || 'Non spécifié'}
+                </TableCell>
+                <TableCell>
+                  {format(new Date(receipt.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
+                </TableCell>
+                <TableCell>
+                  {formatAmount(receipt.amount)}
+                </TableCell>
+                <TableCell>
+                  {receipt.date ? format(new Date(receipt.date), 'dd/MM/yyyy', { locale: fr }) : 'N/A'}
+                </TableCell>
+                <TableCell>
+                  {relatedInvoice?.reference || 'N/A'}
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className={getStatusColor(receipt.status || 'En attente')}>
+                    {receipt.status || 'En attente'}
+                  </Badge>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
     </div>
   );
 };

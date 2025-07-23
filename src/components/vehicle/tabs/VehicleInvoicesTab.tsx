@@ -1,9 +1,10 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useInvoices } from '@/hooks/use-invoices';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { FileText } from 'lucide-react';
 
 interface VehicleInvoicesTabProps {
   vehicleId: string;
@@ -38,50 +39,58 @@ const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) =>
 
   if (vehicleInvoices.length === 0) {
     return (
-      <div className="p-4">
-        <p className="text-muted-foreground">Aucune facture trouvée pour ce véhicule.</p>
+      <div className="text-center py-8">
+        <FileText className="mx-auto h-12 w-12 text-gray-400" />
+        <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucune facture</h3>
+        <p className="mt-1 text-sm text-gray-500">Ce véhicule n'a pas encore de facture.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {vehicleInvoices.map((invoice) => (
-        <Card key={invoice.id}>
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-lg">
-                  Facture {invoice.reference}
-                </CardTitle>
-                <CardDescription>
-                  Créée le {format(new Date(invoice.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
-                </CardDescription>
-              </div>
-              <Badge className={getStatusColor(invoice.status || 'En attente de paiement')}>
-                {invoice.status || 'En attente de paiement'}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p><span className="font-medium">Montant:</span> {formatAmount(invoice.amount)}</p>
-                <p><span className="font-medium">Date d'échéance:</span> {invoice.due_date ? format(new Date(invoice.due_date), 'dd/MM/yyyy', { locale: fr }) : 'N/A'}</p>
-              </div>
-              <div>
-                <p><span className="font-medium">N° de rapport:</span> {invoice.report_number || 'N/A'}</p>
-                <p><span className="font-medium">Expert:</span> {invoice.expert_name || 'N/A'}</p>
-              </div>
-            </div>
-            {invoice.notes && (
-              <div className="mt-3 pt-3 border-t">
-                <p className="text-sm"><span className="font-medium">Notes:</span> {invoice.notes}</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      ))}
+    <div className="card-container p-0">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Référence</TableHead>
+            <TableHead>Date de création</TableHead>
+            <TableHead>Montant</TableHead>
+            <TableHead>Échéance</TableHead>
+            <TableHead>N° Rapport</TableHead>
+            <TableHead>Expert</TableHead>
+            <TableHead>Statut</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {vehicleInvoices.map((invoice) => (
+            <TableRow key={invoice.id} className="hover:bg-gray-50">
+              <TableCell className="font-medium">
+                {invoice.reference || 'Non spécifié'}
+              </TableCell>
+              <TableCell>
+                {format(new Date(invoice.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
+              </TableCell>
+              <TableCell>
+                {formatAmount(invoice.amount)}
+              </TableCell>
+              <TableCell>
+                {invoice.due_date ? format(new Date(invoice.due_date), 'dd/MM/yyyy', { locale: fr }) : 'N/A'}
+              </TableCell>
+              <TableCell>
+                {invoice.report_number || 'N/A'}
+              </TableCell>
+              <TableCell>
+                {invoice.expert_name || 'N/A'}
+              </TableCell>
+              <TableCell>
+                <Badge variant="outline" className={getStatusColor(invoice.status || 'En attente de paiement')}>
+                  {invoice.status || 'En attente de paiement'}
+                </Badge>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };

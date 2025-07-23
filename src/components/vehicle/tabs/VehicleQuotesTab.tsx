@@ -1,9 +1,10 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useQuotes } from '@/hooks/use-quotes';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { FileText } from 'lucide-react';
 
 interface VehicleQuotesTabProps {
   vehicleId: string;
@@ -37,45 +38,58 @@ const VehicleQuotesTab: React.FC<VehicleQuotesTabProps> = ({ vehicleId }) => {
 
   if (vehicleQuotes.length === 0) {
     return (
-      <div className="p-4">
-        <p className="text-muted-foreground">Aucun devis trouvé pour ce véhicule.</p>
+      <div className="text-center py-8">
+        <FileText className="mx-auto h-12 w-12 text-gray-400" />
+        <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucun devis</h3>
+        <p className="mt-1 text-sm text-gray-500">Ce véhicule n'a pas encore de devis.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {vehicleQuotes.map((quote) => (
-        <Card key={quote.id}>
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-lg">
-                  Devis {quote.reference}
-                </CardTitle>
-                <CardDescription>
-                  Créé le {format(new Date(quote.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
-                </CardDescription>
-              </div>
-              <Badge className={getStatusColor(quote.status || 'En attente')}>
-                {quote.status || 'En attente'}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p><span className="font-medium">Montant:</span> {formatAmount(quote.amount)}</p>
-                <p><span className="font-medium">Valide jusqu'au:</span> {quote.valid_until ? format(new Date(quote.valid_until), 'dd/MM/yyyy', { locale: fr }) : 'N/A'}</p>
-              </div>
-              <div>
-                <p><span className="font-medium">N° de rapport:</span> {quote.report_number || 'N/A'}</p>
-                <p><span className="font-medium">Expert:</span> {quote.expert_name || 'N/A'}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+    <div className="card-container p-0">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Référence</TableHead>
+            <TableHead>Date de création</TableHead>
+            <TableHead>Montant</TableHead>
+            <TableHead>Validité</TableHead>
+            <TableHead>N° Rapport</TableHead>
+            <TableHead>Expert</TableHead>
+            <TableHead>Statut</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {vehicleQuotes.map((quote) => (
+            <TableRow key={quote.id} className="hover:bg-gray-50">
+              <TableCell className="font-medium">
+                {quote.reference || 'Non spécifié'}
+              </TableCell>
+              <TableCell>
+                {format(new Date(quote.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
+              </TableCell>
+              <TableCell>
+                {formatAmount(quote.amount)}
+              </TableCell>
+              <TableCell>
+                {quote.valid_until ? format(new Date(quote.valid_until), 'dd/MM/yyyy', { locale: fr }) : 'N/A'}
+              </TableCell>
+              <TableCell>
+                {quote.report_number || 'N/A'}
+              </TableCell>
+              <TableCell>
+                {quote.expert_name || 'N/A'}
+              </TableCell>
+              <TableCell>
+                <Badge variant="outline" className={getStatusColor(quote.status || 'En attente')}>
+                  {quote.status || 'En attente'}
+                </Badge>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };
