@@ -3,6 +3,7 @@ import React from 'react';
 import VehicleDialog from '@/components/vehicle/VehicleDialog';
 import VehicleDetailsDialog from '@/components/vehicle/VehicleDetailsDialog';
 import VehicleDocumentDialogs from '@/components/vehicle/VehicleDocumentDialogs';
+import VehicleInterventionDialog from '@/components/vehicle/VehicleInterventionDialog';
 import VehiclesHeader from '@/components/vehicle/VehiclesHeader';
 import VehiclesGrid from '@/components/vehicle/VehiclesGrid';
 import VehiclesEmptyState from '@/components/vehicle/VehiclesEmptyState';
@@ -34,6 +35,9 @@ const Vehicles = () => {
     handleVehicleSubmit,
     handleCreateQuote,
     handleCreateInvoice,
+    interventionDialogOpen,
+    setInterventionDialogOpen,
+    handleCreateIntervention,
   } = useVehiclesPage();
 
   if (isLoading) return <TableLoading />;
@@ -61,6 +65,7 @@ const Vehicles = () => {
           onDeleteVehicle={handleDeleteVehicle}
           onCreateQuote={handleCreateQuote}
           onCreateInvoice={handleCreateInvoice}
+          onCreateIntervention={handleCreateIntervention}
         />
       )}
 
@@ -100,6 +105,12 @@ const Vehicles = () => {
         setInvoiceDialogOpen={setInvoiceDialogOpen}
         selectedVehicleForDocument={selectedVehicleForDocument}
         setSelectedVehicleForDocument={setSelectedVehicleForDocument}
+      />
+
+      <VehicleInterventionDialog
+        open={interventionDialogOpen}
+        onOpenChange={setInterventionDialogOpen}
+        selectedVehicle={selectedVehicleForDocument}
       />
     </div>
   );

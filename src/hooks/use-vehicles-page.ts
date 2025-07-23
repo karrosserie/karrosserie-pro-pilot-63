@@ -16,6 +16,7 @@ export function useVehiclesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
+  const [interventionDialogOpen, setInterventionDialogOpen] = useState(false);
   const [selectedVehicleForDocument, setSelectedVehicleForDocument] = useState<any>(null);
 
   const { vehicles, isLoading, error, createVehicle, updateVehicle, deleteVehicle } = useVehicles();
@@ -166,6 +167,11 @@ export function useVehiclesPage() {
     setInvoiceDialogOpen(true);
   };
 
+  const handleCreateIntervention = (vehicle: any) => {
+    setSelectedVehicleForDocument(vehicle);
+    setInterventionDialogOpen(true);
+  };
+
   return {
     dialogOpen,
     dialogMode,
@@ -178,6 +184,8 @@ export function useVehiclesPage() {
     setQuoteDialogOpen,
     invoiceDialogOpen,
     setInvoiceDialogOpen,
+    interventionDialogOpen,
+    setInterventionDialogOpen,
     selectedVehicleForDocument,
     setSelectedVehicleForDocument,
     setDialogOpen,
@@ -189,5 +197,6 @@ export function useVehiclesPage() {
     handleVehicleSubmit,
     handleCreateQuote,
     handleCreateInvoice,
+    handleCreateIntervention,
   };
 }

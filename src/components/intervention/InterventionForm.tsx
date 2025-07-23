@@ -16,6 +16,7 @@ interface InterventionFormProps {
   onCancel: () => void;
   isSubmitting: boolean;
   existingSheet?: any;
+  preselectedVehicle?: any;
 }
 
 interface ReportItem {
@@ -34,9 +35,12 @@ export const InterventionForm: React.FC<InterventionFormProps> = ({
   onSubmit,
   onCancel,
   isSubmitting,
-  existingSheet
+  existingSheet,
+  preselectedVehicle
 }) => {
-  const [selectedVehicleId, setSelectedVehicleId] = useState<string>(existingSheet?.vehicle_id || '');
+  const [selectedVehicleId, setSelectedVehicleId] = useState<string>(
+    existingSheet?.vehicle_id || preselectedVehicle?.id || ''
+  );
   const [isApproved, setIsApproved] = useState(existingSheet?.is_approved || false);
   const [reports, setReports] = useState<ReportSection>({
     carrosserie: existingSheet?.carrosserie_reports || [],
@@ -146,7 +150,7 @@ export const InterventionForm: React.FC<InterventionFormProps> = ({
           <Select 
             value={selectedVehicleId} 
             onValueChange={setSelectedVehicleId}
-            disabled={vehiclesLoading || clientVehicles.length === 0}
+            disabled={vehiclesLoading || clientVehicles.length === 0 || !!preselectedVehicle}
           >
             <SelectTrigger>
               <SelectValue 

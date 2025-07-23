@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Pencil, Trash, MoreVertical, FileText, Receipt, Car, User } from 'lucide-react';
+import { Eye, Pencil, Trash, MoreVertical, FileText, Receipt, Car, User, Wrench } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { StatusBadge } from '@/components/ui/status-badge';
 
@@ -41,6 +41,7 @@ interface VehiclesGridProps {
   onDeleteVehicle: (vehicleId: string) => void;
   onCreateQuote?: (vehicle: Vehicle) => void;
   onCreateInvoice?: (vehicle: Vehicle) => void;
+  onCreateIntervention?: (vehicle: Vehicle) => void;
 }
 
 const VehiclesGrid: React.FC<VehiclesGridProps> = ({
@@ -49,7 +50,8 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
   onEditVehicle,
   onDeleteVehicle,
   onCreateQuote,
-  onCreateInvoice
+  onCreateInvoice,
+  onCreateIntervention
 }) => {
   const handleCreateQuote = (e: React.MouseEvent, vehicle: Vehicle) => {
     e.preventDefault();
@@ -63,6 +65,13 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
     e.stopPropagation();
     console.log('Creating invoice for vehicle:', vehicle);
     onCreateInvoice?.(vehicle);
+  };
+
+  const handleCreateIntervention = (e: React.MouseEvent, vehicle: Vehicle) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Creating intervention for vehicle:', vehicle);
+    onCreateIntervention?.(vehicle);
   };
 
   const getFirstImage = (vehicle: Vehicle) => {
@@ -178,6 +187,10 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
                     <DropdownMenuItem onClick={(e) => handleCreateInvoice(e, vehicle)} className="cursor-pointer">
                       <Receipt className="h-4 w-4 mr-2" />
                       Créer une facture
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => handleCreateIntervention(e, vehicle)} className="cursor-pointer">
+                      <Wrench className="h-4 w-4 mr-2" />
+                      Créer une fiche
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

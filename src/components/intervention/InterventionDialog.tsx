@@ -16,13 +16,15 @@ interface InterventionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   existingSheet?: any;
+  preselectedVehicle?: any;
 }
 
 const InterventionDialog = ({
   client,
   open,
   onOpenChange,
-  existingSheet
+  existingSheet,
+  preselectedVehicle
 }: InterventionDialogProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -75,6 +77,7 @@ const InterventionDialog = ({
           onCancel={() => onOpenChange(false)}
           isSubmitting={isSubmitting}
           existingSheet={existingSheet}
+          preselectedVehicle={preselectedVehicle}
         />
       </DialogContent>
     </Dialog>
