@@ -17,6 +17,7 @@ import ClientRepairOrdersTab from './tabs/ClientRepairOrdersTab';
 import ClientInvoicesTab from './tabs/ClientInvoicesTab';
 import ClientCreditsTab from './tabs/ClientCreditsTab';
 import ClientReceiptsTab from './tabs/ClientReceiptsTab';
+import ClientInterventionSheetsTab from './tabs/ClientInterventionSheetsTab';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useQuotes } from '@/hooks/use-quotes';
@@ -24,6 +25,7 @@ import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useCredits } from '@/hooks/use-credits';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
+import { useInterventionSheetsByClient } from '@/hooks/use-intervention-sheets';
 
 interface ClientDialogProps {
   open: boolean;
@@ -51,6 +53,7 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
   const { invoices } = useInvoices();
   const { credits } = useCredits();
   const { receipts } = useReceiptsData();
+  const { data: interventionSheets } = useInterventionSheetsByClient(defaultValues?.id || '');
 
   const handleCancel = () => {
     onOpenChange(false);
@@ -83,6 +86,8 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
     }
     return false;
   }) || [];
+  
+  const clientInterventionSheets = interventionSheets || [];
 
   // Si c'est en mode visualisation, on affiche les onglets
   if (mode === 'view') {
@@ -95,7 +100,7 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
           </DialogHeader>
           
           <Tabs defaultValue="details" className="w-full h-full">
-            <TabsList className="grid w-full grid-cols-8">
+            <TabsList className="grid w-full grid-cols-9">
               <TabsTrigger value="details">Fiche</TabsTrigger>
               <TabsTrigger value="vehicles" className="flex items-center gap-2">
                 Véhicules
@@ -139,6 +144,12 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
                   {clientReceipts.length}
                 </Badge>
               </TabsTrigger>
+              <TabsTrigger value="interventions" className="flex items-center gap-2">
+                Fiches
+                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
+                  {clientInterventionSheets.length}
+                </Badge>
+              </TabsTrigger>
             </TabsList>
             
             <div className="mt-4 overflow-y-auto max-h-[calc(90vh-200px)]">
@@ -177,6 +188,10 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
               
               <TabsContent value="receipts">
                 <ClientReceiptsTab clientId={defaultValues?.id} />
+              </TabsContent>
+              
+              <TabsContent value="interventions">
+                <ClientInterventionSheetsTab clientId={defaultValues?.id} client={defaultValues} />
               </TabsContent>
             </div>
           </Tabs>

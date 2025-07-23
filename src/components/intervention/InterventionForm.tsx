@@ -15,6 +15,7 @@ interface InterventionFormProps {
   onSubmit: (formData: any) => Promise<void>;
   onCancel: () => void;
   isSubmitting: boolean;
+  existingSheet?: any;
 }
 
 interface ReportItem {
@@ -32,14 +33,15 @@ export const InterventionForm: React.FC<InterventionFormProps> = ({
   client,
   onSubmit,
   onCancel,
-  isSubmitting
+  isSubmitting,
+  existingSheet
 }) => {
-  const [selectedVehicleId, setSelectedVehicleId] = useState<string>('');
-  const [isApproved, setIsApproved] = useState(false);
+  const [selectedVehicleId, setSelectedVehicleId] = useState<string>(existingSheet?.vehicle_id || '');
+  const [isApproved, setIsApproved] = useState(existingSheet?.is_approved || false);
   const [reports, setReports] = useState<ReportSection>({
-    carrosserie: [],
-    mecanique: [],
-    electrique: []
+    carrosserie: existingSheet?.carrosserie_reports || [],
+    mecanique: existingSheet?.mecanique_reports || [],
+    electrique: existingSheet?.electrique_reports || []
   });
   
   const { vehicles, isLoading: vehiclesLoading } = useVehicles();
@@ -198,10 +200,10 @@ export const InterventionForm: React.FC<InterventionFormProps> = ({
           </Button>
           <Button
             type="submit"
-            disabled={isSubmitting || !selectedVehicleId}
+            disabled={isSubmitting || (!existingSheet && !selectedVehicleId)}
             className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
           >
-            {isSubmitting ? "Création..." : "Créer la fiche"}
+            {isSubmitting ? (existingSheet ? "Mise à jour..." : "Création...") : (existingSheet ? "Modifier la fiche" : "Créer la fiche")}
           </Button>
         </div>
       </form>
