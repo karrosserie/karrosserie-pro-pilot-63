@@ -16,7 +16,7 @@ interface InvoiceEmailRequest {
 }
 
 // Fonction pour envoyer l'email avec nodemailer
-const sendEmail = async (to: string, subject: string, htmlBody: string, pdfBase64: string, filename: string, fromEmail: string) => {
+const sendEmail = async (to: string, subject: string, htmlBody: string, fileBase64: string, filename: string, fromEmail: string, contentType: string) => {
   try {
     console.log('🚀 Début de sendEmail');
     
@@ -57,7 +57,7 @@ const sendEmail = async (to: string, subject: string, htmlBody: string, pdfBase6
     console.log('📤 Envoi de l\'email avec pièce jointe...');
     
     // Convertir le base64 en buffer pour la pièce jointe
-    const pdfBuffer = Uint8Array.from(atob(pdfBase64), c => c.charCodeAt(0));
+    const fileBuffer = Uint8Array.from(atob(fileBase64), c => c.charCodeAt(0));
     
     const info = await transporter.sendMail({
       from: fromEmail,
@@ -67,8 +67,8 @@ const sendEmail = async (to: string, subject: string, htmlBody: string, pdfBase6
       attachments: [
         {
           filename: filename,
-          content: pdfBuffer,
-          contentType: 'application/pdf'
+          content: fileBuffer,
+          contentType: contentType
         }
       ]
     });
@@ -138,25 +138,51 @@ const handler = async (req: Request): Promise<Response> => {
       </div>
     `;
 
-    // Déterminer le nom du fichier en fonction du type de document
-    const getDocTypeLabel = (type: string) => {
-      switch (type) {
-        case 'quote': return 'Devis';
-        case 'invoice': return 'Facture';
-        case 'repair_order': return 'Ordre_de_reparation';
-        case 'credit': return 'Avoir';
-        default: return 'Document';
+    // Déterminer le nom du fichier et le type de contenu en fonction du type de document
+    let filename: string;
+    let contentType: string;
+    
+    if (documentType === 'pdf' || documentType === 'csv' || documentType === 'txt') {
+      // Pour les rapports, utiliser directement la référence sans préfixe
+      const extension = documentType;
+      filename = `${invoiceReference}.${extension}`;
+      
+      switch (extension) {
+        case 'pdf':
+          contentType = 'application/pdf';
+          break;
+        case 'csv':
+          contentType = 'text/csv';
+          break;
+        case 'txt':
+          contentType = 'text/plain';
+          break;
+        default:
+          contentType = 'application/octet-stream';
       }
-    };
-    const docTypeLabel = getDocTypeLabel(documentType);
-    console.log("- Label du document généré:", docTypeLabel);
-    const filename = `${docTypeLabel}_${invoiceReference}.pdf`;
+    } else {
+      // Pour les autres documents (factures, devis, etc.), garder l'ancien comportement
+      const getDocTypeLabel = (type: string) => {
+        switch (type) {
+          case 'quote': return 'Devis';
+          case 'invoice': return 'Facture';
+          case 'repair_order': return 'Ordre_de_reparation';
+          case 'credit': return 'Avoir';
+          default: return 'Document';
+        }
+      };
+      const docTypeLabel = getDocTypeLabel(documentType);
+      filename = `${docTypeLabel}_${invoiceReference}.pdf`;
+      contentType = 'application/pdf';
+    }
+    
     console.log("- Nom de fichier final:", filename);
+    console.log("- Type de contenu:", contentType);
     
     console.log("=== TENTATIVE D'ENVOI VIA SMTP ===");
 
     // Envoyer l'email réellement avec nodemailer
-    const emailResult = await sendEmail(to, subject, htmlBody, pdfBase64, filename, fromEmail);
+    const emailResult = await sendEmail(to, subject, htmlBody, pdfBase64, filename, fromEmail, contentType);
     console.log('Résultat de l\'envoi email:', emailResult);
 
     return new Response(JSON.stringify({ 
