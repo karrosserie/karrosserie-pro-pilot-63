@@ -20,6 +20,9 @@ export type FleetReservation = Database['public']['Tables']['fleet_reservations'
     license_plate: string;
     color?: string;
     year: number;
+    registration_front_url?: string;
+    registration_back_url?: string;
+    insurance_card_url?: string;
     car_brands?: {
       id: string;
       name: string;
@@ -50,6 +53,9 @@ export const fleetReservationsService = {
           license_plate,
           color,
           year,
+          registration_front_url,
+          registration_back_url,
+          insurance_card_url,
           car_brands(id, name),
           car_models(id, name)
         )
@@ -80,6 +86,9 @@ export const fleetReservationsService = {
           license_plate,
           color,
           year,
+          registration_front_url,
+          registration_back_url,
+          insurance_card_url,
           car_brands(id, name),
           car_models(id, name)
         )
@@ -111,6 +120,9 @@ export const fleetReservationsService = {
           license_plate,
           color,
           year,
+          registration_front_url,
+          registration_back_url,
+          insurance_card_url,
           car_brands(id, name),
           car_models(id, name)
         )
@@ -143,6 +155,9 @@ export const fleetReservationsService = {
           license_plate,
           color,
           year,
+          registration_front_url,
+          registration_back_url,
+          insurance_card_url,
           car_brands(id, name),
           car_models(id, name)
         )
@@ -175,6 +190,9 @@ export const fleetReservationsService = {
           license_plate,
           color,
           year,
+          registration_front_url,
+          registration_back_url,
+          insurance_card_url,
           car_brands(id, name),
           car_models(id, name)
         )
