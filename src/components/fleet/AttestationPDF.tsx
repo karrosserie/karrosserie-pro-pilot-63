@@ -663,10 +663,10 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
           {loanData?.client_signature ? (
             <Image 
               src={loanData.client_signature}
-              style={{ width: 120, height: 60, marginVertical: 10 }}
+              style={{ width: 150, height: 75, marginVertical: 10, objectFit: 'contain' }}
             />
           ) : (
-            <View style={{ height: 60, marginVertical: 10, borderBottom: '1 solid #000' }}></View>
+            <View style={{ height: 75, marginVertical: 10, borderBottom: '1 solid #000' }}></View>
           )}
           
           <Text style={styles.finalSignatureName}>
