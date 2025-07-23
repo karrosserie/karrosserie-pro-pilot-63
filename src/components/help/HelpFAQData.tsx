@@ -105,15 +105,78 @@ export const faqSections: FAQSection[] = [
     items: [
       {
         question: "Comment créer un nouveau client ?",
-        answer: "Allez dans 'Clients' puis cliquez sur '+ Nouveau client'. Remplissez les informations obligatoires : nom, prénom, email, téléphone. Vous pouvez ajouter l'adresse complète (rue, ville, code postal), des notes personnalisées et des documents (permis de conduire recto/verso). Une fois toutes les informations saisies, cliquez sur 'Enregistrer'. Le client apparaîtra immédiatement dans votre liste."
+        answer: (
+          <div className="space-y-3">
+            <p>Pour créer un nouveau client :</p>
+            <ol className="list-decimal list-inside space-y-2 ml-4">
+              <li>Allez dans la section "Clients"</li>
+              <li>Cliquez sur le bouton "+ Nouveau client"</li>
+              <li>Remplissez les informations obligatoires :</li>
+              <ul className="list-disc list-inside space-y-1 ml-6 mt-2">
+                <li>Nom et prénom</li>
+                <li>Adresse email</li>
+                <li>Numéro de téléphone</li>
+              </ul>
+              <li>Ajoutez les informations optionnelles :</li>
+              <ul className="list-disc list-inside space-y-1 ml-6 mt-2">
+                <li>Adresse complète (rue, ville, code postal)</li>
+                <li>Notes personnalisées</li>
+                <li>Documents (permis de conduire recto/verso)</li>
+              </ul>
+              <li>Cliquez sur "Enregistrer"</li>
+            </ol>
+            <p className="text-sm text-gray-600">Le client apparaîtra immédiatement dans votre liste.</p>
+          </div>
+        )
       },
       {
         question: "Comment modifier un client existant ?",
-        answer: "Dans la liste des clients, cliquez sur l'icône crayon (éditer) à droite de la ligne du client. Modifiez les informations nécessaires dans le formulaire qui s'ouvre. Vous pouvez aussi accéder à la fiche complète en cliquant sur le nom du client pour voir l'historique des interventions, factures et véhicules associés. Pensez à sauvegarder vos modifications."
+        answer: (
+          <div className="space-y-3">
+            <p>Pour modifier un client existant :</p>
+            <div className="ml-4">
+              <p className="font-medium mb-2">Méthode 1 - Via la liste :</p>
+              <ol className="list-decimal list-inside space-y-1 ml-4">
+                <li>Dans la liste des clients, cliquez sur l&apos;icône crayon (éditer) à droite de la ligne du client</li>
+                <li>Modifiez les informations nécessaires dans le formulaire</li>
+                <li>Sauvegardez vos modifications</li>
+              </ol>
+            </div>
+            <div className="ml-4">
+              <p className="font-medium mb-2">Méthode 2 - Via la fiche complète :</p>
+              <ol className="list-decimal list-inside space-y-1 ml-4">
+                <li>Cliquez sur le nom du client pour accéder à sa fiche complète</li>
+                <li>Visualisez l&apos;historique des interventions, factures et véhicules associés</li>
+                <li>Modifiez les informations depuis cette vue détaillée</li>
+              </ol>
+            </div>
+          </div>
+        )
       },
       {
         question: "Comment rechercher un client ?",
-        answer: "Utilisez la barre de recherche en haut de la liste des clients. Vous pouvez rechercher par nom, prénom, email, téléphone ou même par fragments de ces informations. Les filtres avancés permettent de trier par type de client (particulier/professionnel), statut (actif/inactif), ou date de création. La recherche est instantanée et met à jour la liste en temps réel."
+        answer: (
+          <div className="space-y-3">
+            <p>Plusieurs options de recherche sont disponibles :</p>
+            <div className="ml-4">
+              <p className="font-medium mb-2">Recherche simple :</p>
+              <ul className="list-disc list-inside space-y-1 ml-4">
+                <li>Utilisez la barre de recherche en haut de la liste des clients</li>
+                <li>Recherchez par nom, prénom, email, téléphone</li>
+                <li>Vous pouvez aussi utiliser des fragments d&apos;informations</li>
+              </ul>
+            </div>
+            <div className="ml-4">
+              <p className="font-medium mb-2">Filtres avancés :</p>
+              <ul className="list-disc list-inside space-y-1 ml-4">
+                <li>Type de client (particulier/professionnel)</li>
+                <li>Statut (actif/inactif)</li>
+                <li>Date de création</li>
+              </ul>
+            </div>
+            <p className="text-sm text-gray-600">La recherche est instantanée et met à jour la liste en temps réel.</p>
+          </div>
+        )
       },
       {
         question: "Comment ajouter des documents au dossier client ?",
