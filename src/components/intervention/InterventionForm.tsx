@@ -6,7 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash } from 'lucide-react';
 import { Client } from '@/services/supabase/clients';
 import { useVehicles } from '@/hooks/use-vehicles';
 
@@ -126,7 +126,7 @@ export const InterventionForm: React.FC<InterventionFormProps> = ({
                 onClick={() => removeReportItem(section, item.id)}
                 className="h-8 w-8 p-0 text-destructive hover:text-destructive"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash className="h-4 w-4" />
               </Button>
             </div>
           ))
@@ -181,7 +181,7 @@ export const InterventionForm: React.FC<InterventionFormProps> = ({
             checked={isApproved}
             onCheckedChange={setIsApproved}
           />
-          <Label htmlFor="approved" className="text-sm font-medium">
+          <Label htmlFor="approved" className="text-sm">
             Est-ce que cette fiche d'intervention est approuvée par le client ?
           </Label>
         </div>

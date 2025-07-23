@@ -45,9 +45,6 @@ const InterventionDialog = ({
           <DialogTitle>
             Créer une fiche d'intervention
           </DialogTitle>
-          <DialogDescription>
-            Créez une nouvelle fiche d'intervention pour {client?.first_name} {client?.last_name}.
-          </DialogDescription>
         </DialogHeader>
         
         <InterventionForm
