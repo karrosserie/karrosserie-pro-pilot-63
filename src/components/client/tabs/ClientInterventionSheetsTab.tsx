@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { MoreHorizontal, Edit, Trash, Check, X } from 'lucide-react';
 import { useInterventionSheetsByClient, useDeleteInterventionSheet } from '@/hooks/use-intervention-sheets';
 import { useVehicles } from '@/hooks/use-vehicles';
@@ -20,6 +21,8 @@ interface ClientInterventionSheetsTabProps {
 const ClientInterventionSheetsTab: React.FC<ClientInterventionSheetsTabProps> = ({ clientId, client }) => {
   const [selectedSheet, setSelectedSheet] = useState<InterventionSheet | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [sheetToDelete, setSheetToDelete] = useState<InterventionSheet | null>(null);
   
   const { data: sheets, isLoading } = useInterventionSheetsByClient(clientId);
   const { vehicles } = useVehicles();
@@ -30,9 +33,16 @@ const ClientInterventionSheetsTab: React.FC<ClientInterventionSheetsTabProps> = 
     setEditDialogOpen(true);
   };
 
-  const handleDeleteSheet = async (id: string) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette fiche d\'intervention ?')) {
-      await deleteSheet.mutateAsync(id);
+  const handleDeleteSheet = (sheet: InterventionSheet) => {
+    setSheetToDelete(sheet);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteSheet = async () => {
+    if (sheetToDelete) {
+      await deleteSheet.mutateAsync(sheetToDelete.id);
+      setDeleteDialogOpen(false);
+      setSheetToDelete(null);
     }
   };
 
@@ -102,7 +112,7 @@ const ClientInterventionSheetsTab: React.FC<ClientInterventionSheetsTabProps> = 
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       className="text-destructive"
-                      onClick={() => handleDeleteSheet(sheet.id)}
+                      onClick={() => handleDeleteSheet(sheet)}
                     >
                       <Trash className="mr-2 h-4 w-4" />
                       Supprimer
@@ -162,6 +172,27 @@ const ClientInterventionSheetsTab: React.FC<ClientInterventionSheetsTabProps> = 
         onOpenChange={setEditDialogOpen}
         existingSheet={selectedSheet}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer la fiche d'intervention</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer cette fiche d'intervention ? Cette action est irréversible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDeleteSheet}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
