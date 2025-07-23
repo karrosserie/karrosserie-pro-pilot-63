@@ -1,6 +1,7 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import { formatDate } from '@/utils/date-formatter';
+import { getDepartmentFromZipCode } from '@/utils/geolocation';
 
 interface AttestationPDFProps {
   loanData: any;
@@ -450,7 +451,7 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
         <Text style={styles.subSectionTitle}>3.2. Garde d'utilisation autorisée</Text>
         <Text style={styles.articleText}>L'Emprunteur garantit que:</Text>
         <Text style={styles.bulletPoint}>• Le véhicule est utilisé exclusivement dans le cadre de son activité professionnelle déclarée, conformément à l'article L. 3121-1 du Code du travail.</Text>
-        <Text style={styles.bulletPoint}>• L'usage du véhicule est strictement limité au département de Bouches-du-Rhône (13) et aux départements limitrophes.</Text>
+        <Text style={styles.bulletPoint}>• L'usage du véhicule est strictement limité au département de {getDepartmentFromZipCode(companyData?.zipcode || '')} et aux départements limitrophes.</Text>
         <Text style={styles.bulletPoint}>• Le kilométrage journalier n'excède pas 100 km, sauf autorisation écrite préalable du Prêteur.</Text>
         <Text style={styles.bulletPoint}>• Le véhicule n'est jamais utilisé:</Text>
         <Text style={styles.indentedText}>- Pour le transport de marchandises ou de marchandises dangereuses</Text>
