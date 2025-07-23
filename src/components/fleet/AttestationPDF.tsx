@@ -38,8 +38,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logo: {
-    width: 80,
-    height: 30,
+    width: 120,
+    height: 45,
     marginBottom: 10,
   },
   logoFallback: {
@@ -659,8 +659,11 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
         <View style={styles.signatureSection}>
           <Text style={styles.finalSignatureTitle}>Signature de l'assuré</Text>
           
-          {/* Espace pour la signature manuscrite */}
-          <View style={{ height: 40, marginVertical: 10, borderBottom: '1 solid #000' }}></View>
+          {/* Image de signature */}
+          <Image 
+            src="/lovable-uploads/4a0a856a-d685-40ca-add4-95cc9af49f5c.png"
+            style={{ width: 120, height: 60, marginVertical: 10 }}
+          />
           
           <Text style={styles.finalSignatureName}>
             {loanData?.clients?.first_name || 'Geoffrey'} {loanData?.clients?.last_name || 'GOBEYN'}
