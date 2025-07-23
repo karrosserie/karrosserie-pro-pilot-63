@@ -107,25 +107,35 @@ export const faqSections: FAQSection[] = [
         question: "Comment créer un nouveau client ?",
         answer: (
           <div className="space-y-3">
-            <p>Pour créer un nouveau client :</p>
+            <p>Pour créer un nouveau client dans l'application :</p>
             <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li>Allez dans la section "Clients"</li>
-              <li>Cliquez sur le bouton "+ Nouveau client"</li>
-              <li>Remplissez les informations obligatoires :</li>
+              <li>Accédez à la section "Clients" via le menu latéral</li>
+              <li>Cliquez sur le bouton "+ Nouveau client" en haut de la liste</li>
+              <li>Remplissez le formulaire de création avec les informations requises :</li>
               <ul className="list-disc list-inside space-y-1 ml-6 mt-2">
-                <li>Nom et prénom</li>
-                <li>Adresse email</li>
-                <li>Numéro de téléphone</li>
+                <li><strong>Informations obligatoires :</strong> Nom (last_name), prénom (first_name)</li>
+                <li><strong>Contact :</strong> Adresse email, numéro de téléphone</li>
+                <li><strong>Adresse :</strong> Rue, ville, code postal</li>
               </ul>
-              <li>Ajoutez les informations optionnelles :</li>
+              <li>Ajoutez les documents optionnels :</li>
               <ul className="list-disc list-inside space-y-1 ml-6 mt-2">
-                <li>Adresse complète (rue, ville, code postal)</li>
-                <li>Notes personnalisées</li>
-                <li>Documents (permis de conduire recto/verso)</li>
+                <li>Permis de conduire recto (stockage sécurisé)</li>
+                <li>Permis de conduire verso (stockage sécurisé)</li>
+                <li>Documents automatiquement liés au dossier client</li>
               </ul>
-              <li>Cliquez sur "Enregistrer"</li>
+              <li>Cliquez sur "Enregistrer" pour finaliser la création</li>
             </ol>
-            <p className="text-sm text-gray-600">Le client apparaîtra immédiatement dans votre liste.</p>
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+              <p className="font-medium text-blue-800 mb-2">Fonctionnalités automatiques :</p>
+              <ul className="list-disc list-inside space-y-1 ml-4 text-blue-700">
+                <li>Attribution automatique d'un ID unique</li>
+                <li>Association avec votre compte utilisateur</li>
+                <li>Horodatage de création et de modification</li>
+                <li>Intégration possible avec systèmes externes (OODrive)</li>
+                <li>Tri automatique alphabétique par nom de famille</li>
+              </ul>
+            </div>
+            <p className="text-sm text-gray-600 mt-3">Le client apparaîtra immédiatement dans votre liste et pourra être associé à des véhicules et documents.</p>
           </div>
         )
       },
