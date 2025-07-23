@@ -607,10 +607,7 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
         <Text style={styles.bulletPoint}>• Remplacement des documents manquants: 150€ par document</Text>
         <Text style={styles.bulletPoint}>• Réparation de tout dommage non signalé: coût réel majoré de 20%</Text>
         <Text style={styles.bulletPoint}>• Remplacement de tout équipement ou accessoire manquant: valeur à neuf</Text>
-      </Page>
-
-      {/* Sixième page pour les sections 6, 7 et 8 */}
-      <Page size="A4" style={styles.page}>
+        
         {/* 6. CLAUSES PÉNALES ET RÉSOLUTION */}
         <Text style={styles.articleTitle}>6. CLAUSES PÉNALES ET RÉSOLUTION</Text>
 
@@ -620,7 +617,10 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
         <Text style={styles.bulletPoint}>• L'obligation de restituer immédiatement le véhicule, sous astreinte de 200€ par jour de retard</Text>
         <Text style={styles.bulletPoint}>• Le paiement d'une indemnité forfaitaire de 1000€ pour préjudice moral et commercial</Text>
         <Text style={styles.bulletPoint}>• Le remboursement intégral de tous frais engagés par le Prêteur pour récupérer le véhicule</Text>
+      </Page>
 
+      {/* Sixième page pour les sections 6, 7 et 8 */}
+      <Page size="A4" style={styles.page}>
         <Text style={styles.subSectionTitle}>6.2. Recours contre les tiers</Text>
         <Text style={styles.articleText}>En cas de dommage causé par un tiers identifié, l'Emprunteur:</Text>
         <Text style={styles.bulletPoint}>? S'oblige à coopérer pleinement avec le Prêteur et son assureur</Text>
