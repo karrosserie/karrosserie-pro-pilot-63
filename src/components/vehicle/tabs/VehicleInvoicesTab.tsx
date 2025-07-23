@@ -1,97 +1,414 @@
-import React from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import React, { useState } from 'react';
 import { useInvoices } from '@/hooks/use-invoices';
+import { useCredits } from '@/hooks/use-credits';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
+import { Receipt, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { FileText } from 'lucide-react';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Download, Printer, Mail, CreditCard, FileX } from 'lucide-react';
+import InvoiceDialog from '@/components/invoices/InvoiceDialog';
+import InvoiceViewerModal from '@/components/invoices/InvoiceViewerModal';
+import InvoiceEmailDialog from '@/components/invoices/InvoiceEmailDialog';
+import ReceiptDialog from '@/components/receipts/ReceiptDialog';
+import { CreditDialog } from '@/components/credits/CreditDialog';
+import { Invoice } from '@/services/supabase/invoices';
+import { useToast } from '@/hooks/use-toast';
+import { useConfirmation } from '@/hooks/use-confirmation';
+import { useCompany } from '@/hooks/use-company';
+import { generateInvoicePDFWithTemplate, printInvoicePDFWithTemplate } from '@/utils/invoicePDFGeneration';
 
 interface VehicleInvoicesTabProps {
   vehicleId: string;
 }
 
 const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) => {
-  const { invoices, isLoading } = useInvoices();
+  const { invoices, isLoading, deleteInvoice } = useInvoices();
+  const { credits } = useCredits();
+  const { toast } = useToast();
+  const { confirm } = useConfirmation();
+  const { companyData } = useCompany();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [viewerModalOpen, setViewerModalOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
+  const [creditDialogOpen, setCreditDialogOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-32">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-karrosserie-orange"></div>
+      </div>
+    );
+  }
 
   const vehicleInvoices = invoices?.filter(invoice => invoice.vehicle_id === vehicleId) || [];
 
-  const formatAmount = (amount: number | null | undefined) => {
-    if (amount === null || amount === undefined) return 'N/A';
+  const handleView = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setViewerModalOpen(true);
+  };
+
+  const handleEdit = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setDialogOpen(true);
+  };
+
+  const handleDelete = async (invoice: Invoice) => {
+    const confirmed = await confirm({
+      title: 'Supprimer la facture',
+      description: `Êtes-vous sûr de vouloir supprimer la facture ${invoice.reference} ? Cette action est irréversible.`,
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
+      try {
+        await deleteInvoice.mutateAsync(invoice.id);
+        toast({
+          title: "Facture supprimée",
+          description: "La facture a été supprimée avec succès."
+        });
+      } catch (error: any) {
+        toast({
+          title: "Erreur",
+          description: `Impossible de supprimer la facture: ${error.message}`,
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
+  const handleDownload = async (invoice: Invoice) => {
+    try {
+      toast({
+        title: "Génération du PDF",
+        description: "Génération du PDF en cours..."
+      });
+
+      const result = await generateInvoicePDFWithTemplate(invoice, companyData);
+      
+      if (result.success) {
+        toast({
+          title: "Téléchargement réussi",
+          description: `La facture ${invoice.reference} a été téléchargée.`
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors du téléchargement:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer le PDF. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handlePrint = async (invoice: Invoice) => {
+    try {
+      toast({
+        title: "Ouverture pour impression",
+        description: `Ouverture de la facture ${invoice.reference} pour impression...`
+      });
+
+      const result = await printInvoicePDFWithTemplate(invoice, companyData);
+      
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'impression:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ouvrir le PDF pour impression. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSendEmail = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setEmailDialogOpen(true);
+  };
+
+  const handleAddPayment = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setReceiptDialogOpen(true);
+  };
+
+  const handleAddCredit = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setCreditDialogOpen(true);
+  };
+
+  const contextMenuProps = {
+    onDownload: handleDownload,
+    onPrint: handlePrint,
+    onSendEmail: handleSendEmail,
+    onCreateCredit: handleAddCredit
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return '-';
+    try {
+      return format(new Date(dateString), 'dd/MM/yyyy', { locale: fr });
+    } catch (error) {
+      return '-';
+    }
+  };
+
+  const formatAmount = (amount: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'EUR'
     }).format(amount);
   };
 
+  const getInvoiceCredits = (invoiceId: string) => {
+    return credits?.filter(credit => credit.invoice_id === invoiceId)
+      .sort((a, b) => {
+        // Tri par ordre croissant de la référence
+        const refA = a.reference || '';
+        const refB = b.reference || '';
+        return refA.localeCompare(refB, 'fr', { numeric: true });
+      }) || [];
+  };
+
+  const renderCreditsBadges = (invoiceCredits: any[]) => {
+    if (invoiceCredits.length === 0) {
+      return <span className="text-gray-500 text-sm">-</span>;
+    }
+    
+    return (
+      <div className="flex flex-col gap-1">
+        {invoiceCredits.map((credit) => (
+          <Badge
+            key={credit.id}
+            variant="secondary"
+            className="bg-orange-100 text-orange-800 hover:bg-orange-100 text-xs"
+           >
+             Avoir n°{credit.reference} - {formatAmount(credit.amount || 0)}
+           </Badge>
+        ))}
+      </div>
+    );
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Payée': return 'bg-green-100 text-green-800 border-green-200';
-      case 'En attente de paiement': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'Paiement partiel': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'En retard': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'Payée':
+        return 'bg-green-100 text-green-800';
+      case 'En attente de paiement':
+        return 'bg-amber-100 text-amber-800';
+      case 'Paiement partiel':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
-  if (isLoading) {
-    return <div className="p-4">Chargement des factures...</div>;
-  }
-
-  if (vehicleInvoices.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <FileText className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucune facture</h3>
-        <p className="mt-1 text-sm text-gray-500">Ce véhicule n'a pas encore de facture.</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="card-container p-0">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Référence</TableHead>
-            <TableHead>Date de création</TableHead>
-            <TableHead>Montant</TableHead>
-            <TableHead>Échéance</TableHead>
-            <TableHead>N° Rapport</TableHead>
-            <TableHead>Expert</TableHead>
-            <TableHead>Statut</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {vehicleInvoices.map((invoice) => (
-            <TableRow key={invoice.id} className="hover:bg-gray-50">
-              <TableCell className="font-medium">
-                {invoice.reference || 'Non spécifié'}
-              </TableCell>
-              <TableCell>
-                {format(new Date(invoice.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
-              </TableCell>
-              <TableCell>
-                {formatAmount(invoice.amount)}
-              </TableCell>
-              <TableCell>
-                {invoice.due_date ? format(new Date(invoice.due_date), 'dd/MM/yyyy', { locale: fr }) : 'N/A'}
-              </TableCell>
-              <TableCell>
-                {invoice.report_number || 'N/A'}
-              </TableCell>
-              <TableCell>
-                {invoice.expert_name || 'N/A'}
-              </TableCell>
-              <TableCell>
-                <Badge variant="outline" className={getStatusColor(invoice.status || 'En attente de paiement')}>
-                  {invoice.status || 'En attente de paiement'}
-                </Badge>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+    <>
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          <div>
+            <div className="card-container p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+              <TableHead>Numéro</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Client</TableHead>
+              <TableHead>Véhicule</TableHead>
+              <TableHead>Montant</TableHead>
+              <TableHead>Avoirs</TableHead>
+              <TableHead>Statut</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+          <TableBody>
+            {vehicleInvoices.length > 0 ? (
+              vehicleInvoices.map((invoice) => {
+                const invoiceCredits = getInvoiceCredits(invoice.id);
+                return (
+                <TableRow key={invoice.id}>
+                        <TableCell className="font-medium">{invoice.reference}</TableCell>
+                        <TableCell>{formatDate(invoice.created_at)}</TableCell>
+                        <TableCell>
+                          {invoice.clients 
+                            ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
+                            : '-'
+                          }
+                        </TableCell>
+                        <TableCell>
+                          {invoice.vehicles 
+                            ? `${invoice.vehicles.car_brands?.name || 'Marque inconnue'} ${invoice.vehicles.car_models?.name || 'Modèle inconnu'} - ${invoice.vehicles.license_plate}`
+                            : '-'
+                          }
+                        </TableCell>
+                        <TableCell>{formatAmount(invoice.amount || 0)}</TableCell>
+                        <TableCell>
+                          {renderCreditsBadges(invoiceCredits)}
+                        </TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente de paiement')}`}>
+                            {invoice.status || 'En attente de paiement'}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end space-x-1">
+                            <Button variant="ghost" size="icon" onClick={() => handleView(invoice)}>
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleEdit(invoice)}>
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="text-red-500 hover:text-red-700"
+                              onClick={() => handleDelete(invoice)}
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent className="w-56">
+                                <DropdownMenuItem onClick={() => handleDownload(invoice)}>
+                                  <Download className="mr-2 h-4 w-4" />
+                                  Télécharger
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handlePrint(invoice)}>
+                                  <Printer className="mr-2 h-4 w-4" />
+                                  Imprimer
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleSendEmail(invoice)}>
+                                  <Mail className="mr-2 h-4 w-4" />
+                                  Envoyer par e-mail
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => handleAddPayment(invoice)}>
+                                  <CreditCard className="mr-2 h-4 w-4" />
+                                  Ajouter un paiement
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleAddCredit(invoice)}>
+                                  <FileX className="mr-2 h-4 w-4" />
+                                  Ajouter un avoir
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                  </div>
+                </TableCell>
+              </TableRow>
+              );
+              })
+            ) : (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center py-4">
+                        <div className="flex flex-col items-center justify-center py-8">
+                          <Receipt className="h-10 w-10 text-gray-400 mb-2" />
+                          <h3 className="font-medium text-gray-900">Aucune facture</h3>
+                          <p className="text-gray-500 mt-1">Ce véhicule n'a pas encore de facture.</p>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem onClick={() => contextMenuProps.onDownload(vehicleInvoices[0])}>
+            Télécharger
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => contextMenuProps.onPrint(vehicleInvoices[0])}>
+            Imprimer
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => contextMenuProps.onSendEmail(vehicleInvoices[0])}>
+            Envoyer par e-mail
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => contextMenuProps.onCreateCredit(vehicleInvoices[0])}>
+            Créer un avoir
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+
+      <InvoiceDialog
+        invoice={selectedInvoice}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
+
+      <InvoiceViewerModal
+        invoice={selectedInvoice}
+        open={viewerModalOpen}
+        onOpenChange={setViewerModalOpen}
+      />
+
+      <InvoiceEmailDialog
+        invoice={selectedInvoice}
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+      />
+
+      <ReceiptDialog
+        receipt={selectedInvoice ? {
+          invoice: selectedInvoice.id,
+          reference: '',
+          date: new Date().toISOString().split('T')[0],
+          amount: selectedInvoice.amount || 0,
+          status: 'Encaissé',
+          payment_method: 'Virement',
+          bank_account: '',
+          notes: '',
+          payment_proofs: []
+        } : null}
+        open={receiptDialogOpen}
+        onOpenChange={setReceiptDialogOpen}
+      />
+
+      <CreditDialog
+        credit={selectedInvoice ? {
+          invoice_id: selectedInvoice.id,
+          reference: '',
+          status: 'Émis',
+          amount: 0,
+          notes: ''
+        } : null}
+        open={creditDialogOpen}
+        onOpenChange={setCreditDialogOpen}
+      />
+    </>
   );
 };
 
