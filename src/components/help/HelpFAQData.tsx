@@ -30,6 +30,18 @@ export const faqSections: FAQSection[] = [
       {
         question: "Comment personnaliser mon profil ?",
         answer: "Rendez-vous dans 'Paramètres' > 'Profil' pour modifier vos informations personnelles : nom, prénom, email, téléphone. Vous pouvez également changer votre mot de passe, configurer vos préférences d'affichage (thème clair/sombre), et définir vos notifications. N'oubliez pas de sauvegarder vos changements."
+      },
+      {
+        question: "Que faire en cas de problème technique ?",
+        answer: "En cas de dysfonctionnement, vérifiez d'abord votre connexion internet et actualisez la page. Si le problème persiste, consultez cette FAQ ou contactez le support technique via le chat en ligne. Décrivez précisément le problème rencontré et les étapes suivies. L'équipe technique vous répondra sous 24h ouvrées. Vous pouvez aussi vérifier la page statut du service pour les maintenances programmées."
+      },
+      {
+        question: "Comment sauvegarder mes données ?",
+        answer: "Vos données sont automatiquement sauvegardées en temps réel sur nos serveurs sécurisés avec cryptage. Des sauvegardes complètes sont effectuées quotidiennement et conservées 30 jours. Vous pouvez exporter vos données principales (clients, véhicules, factures) au format Excel depuis chaque module. Pour une sauvegarde complète, contactez le support qui peut générer une archive complète de votre compte."
+      },
+      {
+        question: "Comment paramétrer mes notifications ?",
+        answer: "Dans 'Paramètres' > 'Notifications', activez/désactivez les alertes par email ou SMS : nouvelles factures à envoyer, échéances de paiement, maintenances véhicules de courtoisie, cessions en attente. Définissez la fréquence (immédiate, quotidienne, hebdomadaire) et les horaires d'envoi. Vous pouvez personnaliser les messages et ajouter des destinataires supplémentaires pour certaines notifications."
       }
     ]
   },
@@ -53,6 +65,22 @@ export const faqSections: FAQSection[] = [
       {
         question: "Comment ajouter des documents au dossier client ?",
         answer: "Dans la fiche client, onglet 'Documents', vous pouvez uploader le permis de conduire (recto/verso obligatoire), carte d'identité, justificatif de domicile et d'autres documents utiles. Les formats acceptés sont PDF, JPEG, PNG (max 10Mo par fichier). Chaque document peut être renommé et catégorisé pour un meilleur classement. L'historique des documents est conservé avec dates d'ajout."
+      },
+      {
+        question: "Comment supprimer un client ?",
+        answer: "Vous ne pouvez supprimer un client que s'il n'a aucun document ou véhicule associé. Sinon, vous pouvez l'archiver en changeant son statut vers 'Inactif'. Pour supprimer définitivement, allez dans la fiche client et cliquez sur 'Actions' > 'Supprimer'. Une confirmation sera demandée car cette action est irréversible. Les données supprimées ne peuvent être récupérées."
+      },
+      {
+        question: "Comment gérer les clients professionnels ?",
+        answer: "Créez un client professionnel en sélectionnant 'Entreprise' dans le type de client. Renseignez la raison sociale, SIRET, numéro TVA intracommunautaire, adresse de facturation. Vous pouvez ajouter plusieurs contacts (gérant, comptable, responsable technique) avec leurs coordonnées. Les tarifs professionnels peuvent être différents des particuliers. Historique des contrats et conventions spéciales. Facturation avec mentions légales adaptées."
+      },
+      {
+        question: "Comment importer une liste de clients ?",
+        answer: "Utilisez la fonction d'import Excel/CSV dans 'Clients' > 'Importer'. Téléchargez le modèle de fichier avec les colonnes obligatoires : nom, prénom, email, téléphone. Respectez le format des données (dates, téléphones). L'import vérifie les doublons et les erreurs avant validation. Un rapport détaille les lignes importées avec succès et les erreurs à corriger. Maximum 1000 clients par import."
+      },
+      {
+        question: "Comment gérer les données RGPD ?",
+        answer: "L'application respecte le RGPD : consentement client tracé, droit à l'oubli (suppression des données sur demande), portabilité (export des données client), rectification (modification des informations). Les clients peuvent demander l'accès à leurs données via un formulaire dédié. Un registre des traitements est tenu à jour. Les données sont hébergées en France avec cryptage et accès sécurisés."
       }
     ]
   },
@@ -76,6 +104,18 @@ export const faqSections: FAQSection[] = [
       {
         question: "Comment associer un véhicule à un client ?",
         answer: "Lors de la création du véhicule, sélectionnez le client dans la liste déroulante 'Propriétaire'. Si le client n'existe pas encore, créez-le d'abord via le bouton 'Nouveau client'. Un client peut posséder plusieurs véhicules - ils apparaîtront tous dans sa fiche. Vous pouvez modifier l'association à tout moment en éditant la fiche véhicule. L'historique des changements de propriétaire est conservé."
+      },
+      {
+        question: "Comment gérer l'historique d'un véhicule ?",
+        answer: "Chaque véhicule dispose d'un historique complet accessible depuis sa fiche : interventions effectuées, réparations, changements de pièces, contrôles techniques, révisions. Vous pouvez ajouter des événements manuellement (accident, vol, vente) avec dates et descriptions. Les factures et devis associés sont automatiquement liés. Cet historique est consultable par le client et peut être imprimé pour la revente."
+      },
+      {
+        question: "Comment gérer les rappels de maintenance ?",
+        answer: "Dans la fiche véhicule, programmez les rappels selon les préconisations constructeur : vidange (tous les 15000 km), contrôle technique (tous les 2 ans), révision annuelle. Le système calcule automatiquement les prochaines échéances selon le kilométrage saisi et envoie des alertes. Vous pouvez personnaliser les intervalles et ajouter des rappels spécifiques (pneus, freins, distribution). Notifications par email et SMS au client."
+      },
+      {
+        question: "Comment archiver un véhicule ?",
+        answer: "Archivez un véhicule vendu, détruit ou plus entretenu chez vous via 'Actions' > 'Archiver'. Le véhicule disparaît des listes actives mais conserve son historique complet. Indiquez la raison (vente, casse, changement de garage) et la date. Les véhicules archivés restent consultables dans l'onglet 'Archives' et peuvent être réactivés si nécessaire. Statistiques d'archivage disponibles pour analyser les départs clients."
       }
     ]
   },
@@ -99,6 +139,18 @@ export const faqSections: FAQSection[] = [
       {
         question: "Comment convertir un ordre en facture ?",
         answer: "Dans la liste des ordres, cliquez sur l'action 'Convertir en facture' pour un ordre avec le statut 'Terminé'. Toutes les informations (client, véhicule, réparations, pièces, montants) sont reprises automatiquement dans la nouvelle facture. Vous pouvez modifier les éléments si nécessaire avant la génération finale. La facture reçoit automatiquement un numéro séquentiel et la date du jour. L'ordre original reste accessible pour traçabilité."
+      },
+      {
+        question: "Comment planifier les interventions ?",
+        answer: "Utilisez le calendrier intégré pour planifier vos interventions par technicien et par poste de travail. Glissez-déposez les ordres de réparation sur les créneaux disponibles. Le système vérifie les conflits de planning et la disponibilité des pièces. Vous pouvez définir des durées prévisionnelles par type d'intervention, gérer les absences des techniciens et optimiser la charge de travail. Notifications automatiques aux clients pour confirmer les rendez-vous."
+      },
+      {
+        question: "Comment gérer les ordres urgents ?",
+        answer: "Marquez un ordre comme 'Urgent' avec une priorité élevée. Il apparaîtra en rouge dans la liste et remontera automatiquement en haut du planning. Vous pouvez définir des niveaux d'urgence (faible, normale, élevée, critique) avec des codes couleur. Les ordres urgents peuvent passer devant d'autres interventions programmées. Notifications automatiques à l'équipe technique et possibilité d'alertes SMS pour les cas critiques."
+      },
+      {
+        question: "Comment suivre la rentabilité par ordre ?",
+        answer: "Chaque ordre affiche sa marge brute (prix de vente - coût des pièces) et le temps passé versus le temps prévu. L'onglet 'Analyse' détaille la rentabilité : coût de la main-d'œuvre, marge sur pièces, coût indirect (charges fixes réparties). Comparaison avec les ordres similaires et benchmarking par type d'intervention. Identification des ordres les plus/moins rentables pour optimiser vos tarifs et processus."
       }
     ]
   },
@@ -122,6 +174,22 @@ export const faqSections: FAQSection[] = [
       {
         question: "Comment gérer les avoirs ?",
         answer: "Dans 'Documents' > 'Avoirs', créez un avoir pour annuler tout ou partie d'une facture. Sélectionnez la facture concernée (seules les factures payées peuvent faire l'objet d'un avoir), indiquez le montant à créditer et la raison du remboursement (défaut, annulation, geste commercial). L'avoir est numéroté automatiquement et vient en déduction du chiffre d'affaires. Il peut être envoyé au client et impacte automatiquement les statistiques comptables."
+      },
+      {
+        question: "Comment personnaliser mes modèles de documents ?",
+        answer: "Dans 'Paramètres' > 'Modèles de documents', personnalisez vos devis, factures et ordres : logo, couleurs, polices, mise en page. Modifiez les mentions légales, conditions de vente, coordonnées bancaires. Créez plusieurs modèles selon le type de client (particulier/professionnel) ou de prestation. Prévisualisez avant validation. Les modifications s'appliquent aux nouveaux documents seulement."
+      },
+      {
+        question: "Comment gérer les relances clients ?",
+        answer: "Le système génère automatiquement des relances pour les factures impayées : 1ère relance à J+8, 2ème à J+15, mise en demeure à J+30. Personnalisez les délais et messages dans 'Paramètres' > 'Relances'. Envoi automatique par email avec accusé de réception. Vous pouvez également envoyer des relances manuelles avec courrier recommandé. Suivi des actions en cours et des promesses de paiement clients."
+      },
+      {
+        question: "Comment gérer les factures récurrentes ?",
+        answer: "Pour les contrats d'entretien ou locations longue durée, créez des factures récurrentes dans 'Documents' > 'Factures récurrentes'. Définissez la périodicité (mensuelle, trimestrielle, annuelle), les dates d'échéance et la durée du contrat. Le système génère automatiquement les factures selon votre planning et peut les envoyer directement aux clients. Gestion des indexations tarifaires et des avenants au contrat."
+      },
+      {
+        question: "Comment exporter mes documents en lot ?",
+        answer: "Dans chaque module (devis, factures, ordres), utilisez la sélection multiple pour exporter plusieurs documents simultanément. Choix des formats : PDF individuel, PDF groupé, Excel, CSV. Définissez les critères de sélection (période, client, statut) pour filtrer les documents à exporter. Possibilité de programmer des exports automatiques mensuels envoyés par email à votre comptable ou expert-comptable."
       }
     ]
   },
@@ -145,6 +213,18 @@ export const faqSections: FAQSection[] = [
       {
         question: "Comment suivre l'avancement des cessions ?",
         answer: "Le tableau de bord des cessions affiche toutes vos demandes avec leurs statuts en temps réel. Vous pouvez filtrer par statut, client, assurance ou période pour suivre l'évolution de vos dossiers. Des alertes automatiques vous préviennent des cessions en retard ou nécessitant une action. Un graphique montre l'évolution mensuelle des cessions et les délais moyens de paiement par assurance. Export Excel disponible pour reporting."
+      },
+      {
+        question: "Quels documents sont nécessaires pour une cession ?",
+        answer: "Documents obligatoires : lettre de cession signée par le client, devis/facture détaillé, constat d'accident ou déclaration de sinistre, photos des dommages, procès-verbal d'expertise si disponible. Documents complémentaires : permis de conduire du conducteur, attestation d'assurance, carte grise du véhicule. Tous les documents doivent être lisibles et complets pour éviter les rejets de l'assurance."
+      },
+      {
+        question: "Comment optimiser mes taux d'acceptation ?",
+        answer: "Conseils pour améliorer l'acceptation : complétez toujours tous les champs obligatoires, fournissez des devis détaillés avec références de pièces, respectez les barèmes constructeur, joignez des photos de qualité, envoyez rapidement après l'expertise. Analysez vos taux de rejet par assurance pour identifier les points d'amélioration. Maintenez une relation privilégiée avec les experts et gestionnaires de votre secteur."
+      },
+      {
+        question: "Comment gérer les litiges avec les assurances ?",
+        answer: "En cas de désaccord, documentez précisément les points de contestation avec pièces justificatives. Contactez directement le gestionnaire du dossier pour négocier. Si nécessaire, sollicitez une contre-expertise ou l'intervention d'un expert indépendant. L'application conserve l'historique complet des échanges pour vos démarches. En dernier recours, saisissez le médiateur de l'assurance ou consultez votre avocat spécialisé."
       }
     ]
   },
@@ -164,6 +244,18 @@ export const faqSections: FAQSection[] = [
       {
         question: "Comment gérer les retours de véhicules ?",
         answer: "Lors du retour, accédez à la réservation active et complétez l'état des lieux de sortie : kilométrage final, niveau de carburant, dommages éventuels avec photos. Comparez avec l'état d'entrée pour identifier les différences. Notez les éventuels dommages avec estimation des coûts de remise en état. Une fois validé, le véhicule redevient automatiquement disponible pour de nouvelles réservations. Facturation automatique des frais supplémentaires si nécessaire."
+      },
+      {
+        question: "Comment optimiser la rotation de ma flotte ?",
+        answer: "Analysez les statistiques d'utilisation : taux d'occupation par véhicule, durée moyenne des prêts, périodes de forte demande. Identifiez les véhicules sous-utilisés et ceux en surouccupation. Adaptez votre flotte selon la demande saisonnière et les préférences clients. Programmez les maintenances pendant les périodes creuses. Proposez des véhicules de catégorie supérieure en cas d'indisponibilité pour fidéliser la clientèle."
+      },
+      {
+        question: "Comment gérer les assurances des véhicules de courtoisie ?",
+        answer: "Vérifiez que votre contrat d'assurance flotte couvre tous vos véhicules de prêt avec les bonnes valeurs. Contrôlez systématiquement le permis de conduire des emprunteurs (validité, points restants, restrictions). Informez l'assurance des nouveaux véhicules dans les délais contractuels. En cas de sinistre sur véhicule de courtoisie, déclarez immédiatement et récupérez le constat auprès du client. Tenez un registre des conducteurs autorisés."
+      },
+      {
+        question: "Comment tarifer mes véhicules de courtoisie ?",
+        answer: "Définissez vos tarifs selon plusieurs critères : catégorie de véhicule (citadine, berline, utilitaire), durée de prêt (1er jour, jours suivants), type de client (particulier/professionnel), période (haute/basse saison). Vous pouvez appliquer des remises pour les bons clients ou inclure le prêt dans le forfait réparation. Affichez clairement vos conditions : franchise, kilométrage autorisé, état du carburant au retour. Facturation automatique selon vos barèmes."
       }
     ]
   },
@@ -183,6 +275,18 @@ export const faqSections: FAQSection[] = [
       {
         question: "Comment suivre le statut des expertises ?",
         answer: "Les statuts disponibles sont : 'Importé' (rapport reçu), 'En cours d'analyse' (étude en cours), 'En attente' (informations manquantes), 'Validé' (expertise acceptée, travaux autorisés), 'Rejeté' (expertise refusée, raison indiquée), 'Facturé' (travaux terminés et facturés). Modifiez le statut selon l'avancement du dossier. Des rappels automatiques alertent sur les dossiers en attente. Statistiques des délais de traitement par expert disponibles."
+      },
+      {
+        question: "Comment contester une expertise défavorable ?",
+        answer: "Si l'expertise sous-évalue les dommages ou exclut certaines réparations, vous pouvez contester. Demandez d'abord des explications écrites à l'expert. Fournissez des devis de confrères ou des barèmes constructeur pour étayer votre position. Si nécessaire, demandez une contre-expertise par un expert indépendant. Documentez tous vos échanges dans l'application. En cas de blocage persistant, saisissez le service contentieux de la compagnie d'assurance."
+      },
+      {
+        question: "Comment optimiser mes relations avec les experts ?",
+        answer: "Maintenez des relations professionnelles avec les experts de votre secteur : accueillez-les correctement, fournissez des devis précis et justifiés, respectez les délais demandés, proposez des créneaux de rendez-vous flexibles. Invitez-les à visiter votre atelier pour qu'ils comprennent vos méthodes de travail. Un bon relationnel facilite les négociations et peut influencer positivement l'évaluation des dossiers complexes."
+      },
+      {
+        question: "Comment gérer les expertises amiables ?",
+        answer: "Pour les petits sinistres, proposez une expertise amiable directement avec l'assurance pour accélérer le processus. Présentez un devis détaillé avec photos des dommages. L'assurance peut valider sans expertise physique si les montants restent raisonnables. Cette méthode réduit les délais (5-10 jours au lieu de 3-4 semaines) et améliore la satisfaction client. Suivez les directives spécifiques de chaque compagnie pour les seuils et procédures d'expertise amiable."
       }
     ]
   },
@@ -206,6 +310,22 @@ export const faqSections: FAQSection[] = [
       {
         question: "Comment exporter mes données comptables ?",
         answer: "Dans la section comptabilité, utilisez les boutons d'export pour générer des rapports détaillés aux formats PDF (présentation) ou Excel (données brutes). Exports disponibles : journal des ventes, journal des achats, balance comptable, bilan simplifié. Les fichiers sont compatibles avec la plupart des logiciels comptables (Sage, Ciel, EBP). Possibilité d'automatiser les exports mensuels par email à votre comptable. Historique des exports conservé 12 mois."
+      },
+      {
+        question: "Comment gérer ma TVA ?",
+        answer: "L'application calcule automatiquement la TVA selon les taux en vigueur : 20% sur les prestations et pièces neuves, 20% sur la main-d'œuvre, taux réduits selon réglementation. Générez vos déclarations TVA (mensuelle/trimestrielle) avec le détail des opérations. Export direct vers les téléprocédures fiscales. Gestion de la TVA déductible sur achats avec rapprochement automatique. Alertes pour les seuils de franchise et changements de régime."
+      },
+      {
+        question: "Comment analyser ma rentabilité ?",
+        answer: "Le tableau de bord comptable présente vos indicateurs clés : marge brute par activité (carrosserie, mécanique, peinture), évolution du chiffre d'affaires, analyse des charges par poste, seuil de rentabilité. Comparez vos performances avec les moyennes du secteur. Identifiez vos activités les plus/moins rentables pour optimiser votre stratégie commerciale. Suivi des ratios financiers et alertes sur les déviations budgétaires importantes."
+      },
+      {
+        question: "Comment prévoir ma trésorerie ?",
+        answer: "L'outil de prévision analyse vos factures impayées, échéances fournisseurs, charges fixes récurrentes pour projeter votre trésorerie sur 3 mois. Intégrez vos prévisionnels de commandes et planning d'interventions. Identifiez les périodes de tension et anticipez vos besoins de financement. Simulez différents scénarios (retards de paiement, saisonnalité) pour sécuriser votre activité. Alertes automatiques en cas de trésorerie prévisionnelle négative."
+      },
+      {
+        question: "Comment gérer mes immobilisations ?",
+        answer: "Enregistrez vos équipements (pont élévateur, cabine de peinture, outillage) avec leurs valeurs d'acquisition, dates de mise en service et durées d'amortissement. Le système calcule automatiquement les dotations aux amortissements selon les durées fiscales ou comptables. Suivi des maintenances préventives et curative, calcul de la rentabilité par équipement. Gestion des cessions et mises au rebut avec impact sur les résultats."
       }
     ]
   },
@@ -225,6 +345,64 @@ export const faqSections: FAQSection[] = [
       {
         question: "Comment activer les suggestions automatiques ?",
         answer: "Dans les paramètres de l'assistant IA, activez les suggestions pour les modules qui vous intéressent : gestion des stocks, planification, facturation, relances clients. Définissez le niveau de suggestions (faible, moyen, élevé) et les types d'alertes souhaitées. L'IA commence à apprendre après quelques semaines d'utilisation et ses suggestions deviennent progressivement plus pertinentes. Vous pouvez désactiver les suggestions à tout moment ou les modifier selon vos besoins."
+      },
+      {
+        question: "L'IA peut-elle gérer mes relances clients automatiquement ?",
+        answer: "Oui, l'assistant IA peut automatiser vos relances de paiement selon des règles personnalisables. Il analyse les habitudes de paiement de chaque client pour adapter le ton et la fréquence des relances. L'IA peut envoyer des rappels par email, SMS ou courrier selon vos préférences. Elle escalade automatiquement vers des actions plus fermes en cas de non-réponse. Vous gardez toujours le contrôle final avant les actions importantes comme la mise en demeure."
+      },
+      {
+        question: "Comment l'IA aide-t-elle à optimiser mon planning ?",
+        answer: "L'IA analyse vos historiques pour optimiser automatiquement votre planning : elle estime les durées réelles d'intervention selon le type de réparation et le technicien, propose des créneaux optimaux en fonction des compétences et disponibilités, anticipe les retards potentiels et suggest des réorganisations. Elle peut même proposer des plannings alternatifs pour maximiser votre productivité ou minimiser les temps d'attente clients."
+      },
+      {
+        question: "Mes données sont-elles protégées avec l'IA ?",
+        answer: "Absolument. L'IA fonctionne entièrement sur nos serveurs sécurisés en France, vos données ne sont jamais transmises à des tiers. L'apprentissage se fait uniquement sur vos propres données d'activité pour personnaliser les suggestions. Nous respectons strictement le RGPD et vous pouvez désactiver l'IA à tout moment. L'historique des actions proposées par l'IA est traçable et vous gardez toujours le contrôle des décisions importantes."
+      }
+    ]
+  },
+  {
+    id: "data-security",
+    title: "Sécurité et données",
+    icon: <Bot className="h-5 w-5" />,
+    items: [
+      {
+        question: "Mes données sont-elles sécurisées ?",
+        answer: "Vos données sont hébergées sur des serveurs sécurisés en France avec cryptage SSL/TLS. Sauvegardes automatiques quotidiennes, accès sécurisé par authentification forte, surveillance 24h/24. Conformité RGPD stricte avec possibilité d'export et suppression des données. Nos serveurs respectent les certifications ISO 27001 et HDS (Hébergement de Données de Santé). Aucune donnée n'est partagée avec des tiers sans votre consentement explicite."
+      },
+      {
+        question: "Puis-je récupérer toutes mes données ?",
+        answer: "Oui, vous pouvez exporter l'intégralité de vos données à tout moment aux formats Excel/CSV et PDF. L'export inclut : clients, véhicules, factures, devis, ordres de réparation, paiements, documents joints. Les données sont fournies dans des formats standards compatibles avec d'autres logiciels. En cas de résiliation, nous conservons vos données 3 mois pour permettre la récupération avant suppression définitive et irréversible."
+      },
+      {
+        question: "Comment sont gérées les mises à jour ?",
+        answer: "Les mises à jour sont déployées automatiquement sans interruption de service. Nous testons toutes les évolutions sur des environnements dédiés avant déploiement. Vous êtes informé par email des nouvelles fonctionnalités importantes. Les mises à jour de sécurité sont appliquées immédiatement. Un système de rollback permet de revenir à la version précédente en cas de problème. Historique complet des versions disponible dans l'aide."
+      },
+      {
+        question: "Que se passe-t-il en cas de panne ?",
+        answer: "Notre infrastructure redondante assure une disponibilité maximale (99.9% de SLA). En cas d'incident majeur, nos équipes techniques interviennent 24h/24. Vous êtes informé en temps réel via email et la page de statut du service. Les données sont protégées par des sauvegardes multiples sur plusieurs datacenters. Procédure de plan de reprise d'activité testée régulièrement pour garantir la continuité de service."
+      }
+    ]
+  },
+  {
+    id: "advanced-features",
+    title: "Fonctionnalités avancées",
+    icon: <Bot className="h-5 w-5" />,
+    items: [
+      {
+        question: "Comment utiliser les API pour intégrer d'autres logiciels ?",
+        answer: "Nos API REST permettent d'intégrer l'application avec vos autres outils : logiciel comptable, ERP, site web, CRM. Documentation technique complète disponible avec exemples de code. Authentification par clés API sécurisées. Webhooks disponibles pour recevoir les notifications en temps réel (nouvelle facture, paiement reçu). Support technique dédié pour accompagner vos développements d'intégration."
+      },
+      {
+        question: "Puis-je personnaliser les champs et formulaires ?",
+        answer: "Oui, dans 'Paramètres' > 'Personnalisation', ajoutez des champs personnalisés aux fiches clients, véhicules et interventions. Types de champs disponibles : texte, nombre, date, liste déroulante, case à cocher, fichier. Organisez vos champs par onglets pour une meilleure ergonomie. Les champs personnalisés sont inclus dans les exports et peuvent être utilisés dans les recherches et filtres. Sauvegarde automatique des configurations."
+      },
+      {
+        question: "Comment configurer les utilisateurs et permissions ?",
+        answer: "Dans 'Paramètres' > 'Utilisateurs', créez des comptes pour vos employés avec des niveaux d'accès différenciés : administrateur (tous droits), gestionnaire (création/modification), consultation seule, comptable (accès facturation/paiements uniquement). Définissez les modules accessibles par utilisateur. Traçabilité complète des actions utilisateurs. Possibilité de désactiver temporairement un compte sans perdre l'historique des actions."
+      },
+      {
+        question: "Comment automatiser mes workflows ?",
+        answer: "Créez des automatisations dans 'Paramètres' > 'Workflows' : envoi automatique de devis après création, relances de paiement programmées, notifications de maintenance véhicules, alertes stock bas pour les pièces détachées. Définissez les conditions de déclenchement et les actions à effectuer. Testez vos workflows avant activation. Logs détaillés pour suivre l'exécution des automatisations. Interface glisser-déposer pour créer facilement vos processus."
       }
     ]
   }
