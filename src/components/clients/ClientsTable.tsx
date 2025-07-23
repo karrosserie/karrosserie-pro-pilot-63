@@ -136,7 +136,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={handleCreateIntervention} className="cursor-pointer">
                             <Wrench className="h-4 w-4 mr-2" />
-                            Créer une fiche d'intervention
+                            Créer une fiche
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
