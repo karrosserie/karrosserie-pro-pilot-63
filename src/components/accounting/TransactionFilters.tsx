@@ -82,7 +82,7 @@ export const TransactionFilters = ({
   return (
     <div className="space-y-4">
       {/* Sous-onglets principaux */}
-      <div className="flex flex-wrap gap-2 p-1 bg-gray-50 rounded-lg">
+      <div className="flex flex-wrap gap-2 p-1 bg-muted rounded-lg">
         {filters.map((filter) => (
           <Button
             key={filter.value}

@@ -26,11 +26,15 @@ const Accounting = () => {
                          (selectedFilter === 'unpaid' && transaction.status === 'En attente');
     
     // Filtrage par date
-    const matchesDateRange = !dateRange?.from || !transaction.date || 
-                            isWithinInterval(parseISO(transaction.date), {
-                              start: dateRange.from,
-                              end: dateRange.to || dateRange.from
-                            });
+    const matchesDateRange = !dateRange?.from || !transaction.date || (() => {
+      // Convertir la date de transaction du format "dd/MM/yyyy" vers un objet Date
+      const [day, month, year] = transaction.date.split('/').map(Number);
+      const transactionDate = new Date(year, month - 1, day);
+      return isWithinInterval(transactionDate, {
+        start: dateRange.from,
+        end: dateRange.to || dateRange.from
+      });
+    })();
     
     // Filtrage par méthode de paiement
     const matchesPaymentMethod = paymentMethod === 'all' || transaction.method === paymentMethod;
