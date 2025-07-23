@@ -5,7 +5,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { StatusBadge } from '@/components/ui/status-badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { Eye, Download, Pencil, Trash2, MoreVertical, FileText, Receipt, CreditCard } from 'lucide-react';
+import { Eye, Download, Pencil, Trash2, MoreVertical, FileText, Receipt, CreditCard, Wrench } from 'lucide-react';
 
 interface ClientListTableProps {
   clients: Client[];
@@ -15,6 +15,7 @@ interface ClientListTableProps {
   onCreateQuote?: (client: Client) => void;
   onCreateInvoice?: (client: Client) => void;
   onCreateCredit?: (client: Client) => void;
+  onCreateIntervention?: (client: Client) => void;
 }
 
 const ClientListTable: React.FC<ClientListTableProps> = ({
@@ -24,7 +25,8 @@ const ClientListTable: React.FC<ClientListTableProps> = ({
   onDeleteClient,
   onCreateQuote,
   onCreateInvoice,
-  onCreateCredit
+  onCreateCredit,
+  onCreateIntervention
 }) => {
   const columns: ColumnDef<Client>[] = [
     {
@@ -88,6 +90,13 @@ const ClientListTable: React.FC<ClientListTableProps> = ({
           onCreateCredit?.(client);
         };
 
+        const handleCreateIntervention = (e: React.MouseEvent) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Creating intervention for client:', client);
+          onCreateIntervention?.(client);
+        };
+
         return (
           <div className="text-right space-x-1 flex items-center justify-end">
             <Button variant="ghost" size="icon" onClick={() => onViewClient(client)}>
@@ -120,6 +129,11 @@ const ClientListTable: React.FC<ClientListTableProps> = ({
                 <DropdownMenuItem onClick={handleCreateCredit} className="cursor-pointer">
                   <CreditCard className="h-4 w-4 mr-2" />
                   Créer un avoir
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleCreateIntervention} className="cursor-pointer">
+                  <Wrench className="h-4 w-4 mr-2" />
+                  Créer une fiche d'intervention
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

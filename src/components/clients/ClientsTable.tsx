@@ -9,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Eye, Pencil, Trash, UserPlus, MoreVertical, FileText, Receipt, CreditCard } from 'lucide-react';
+import { Eye, Pencil, Trash, UserPlus, MoreVertical, FileText, Receipt, CreditCard, Wrench } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Client } from '@/services/supabase/clients';
@@ -22,6 +22,7 @@ interface ClientsTableProps {
   onCreateQuote?: (client: Client) => void;
   onCreateInvoice?: (client: Client) => void;
   onCreateCredit?: (client: Client) => void;
+  onCreateIntervention?: (client: Client) => void;
 }
 
 const ClientsTable: React.FC<ClientsTableProps> = ({
@@ -31,7 +32,8 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
   onDeleteClient,
   onCreateQuote,
   onCreateInvoice,
-  onCreateCredit
+  onCreateCredit,
+  onCreateIntervention
 }) => {
   
   return (
@@ -74,6 +76,13 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                 e.stopPropagation();
                 console.log('Creating credit for client:', client);
                 onCreateCredit?.(client);
+              };
+
+              const handleCreateIntervention = (e: React.MouseEvent) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Creating intervention for client:', client);
+                onCreateIntervention?.(client);
               };
               
               return (
@@ -124,6 +133,10 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                           <DropdownMenuItem onClick={handleCreateCredit} className="cursor-pointer">
                             <CreditCard className="h-4 w-4 mr-2" />
                             Créer un avoir
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={handleCreateIntervention} className="cursor-pointer">
+                            <Wrench className="h-4 w-4 mr-2" />
+                            Créer une fiche d'intervention
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

@@ -13,6 +13,7 @@ export const useClientActions = () => {
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
   const [creditDialogOpen, setCreditDialogOpen] = useState(false);
+  const [interventionDialogOpen, setInterventionDialogOpen] = useState(false);
   const [selectedClientForDocument, setSelectedClientForDocument] = useState<Client | null>(null);
   
   const { createClient, updateClient, deleteClient } = useClients();
@@ -57,6 +58,12 @@ export const useClientActions = () => {
     console.log('Opening credit dialog for client:', client);
     setSelectedClientForDocument(client);
     setCreditDialogOpen(true);
+  };
+
+  const handleCreateIntervention = (client: Client) => {
+    console.log('Opening intervention dialog for client:', client);
+    setSelectedClientForDocument(client);
+    setInterventionDialogOpen(true);
   };
 
   const handleClientSubmit = (data: any) => {
@@ -107,6 +114,8 @@ export const useClientActions = () => {
     setInvoiceDialogOpen,
     creditDialogOpen,
     setCreditDialogOpen,
+    interventionDialogOpen,
+    setInterventionDialogOpen,
     selectedClientForDocument,
     setSelectedClientForDocument,
     
@@ -118,6 +127,7 @@ export const useClientActions = () => {
     handleCreateQuote,
     handleCreateInvoice,
     handleCreateCredit,
+    handleCreateIntervention,
     handleClientSubmit
   };
 };

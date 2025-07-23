@@ -27,6 +27,8 @@ const ClientsPage = () => {
     setInvoiceDialogOpen,
     creditDialogOpen,
     setCreditDialogOpen,
+    interventionDialogOpen,
+    setInterventionDialogOpen,
     selectedClientForDocument,
     setSelectedClientForDocument,
     
@@ -38,6 +40,7 @@ const ClientsPage = () => {
     handleCreateQuote,
     handleCreateInvoice,
     handleCreateCredit,
+    handleCreateIntervention,
     handleClientSubmit
   } = useClientActions();
 
@@ -76,6 +79,7 @@ const ClientsPage = () => {
         onCreateQuote={handleCreateQuote}
         onCreateInvoice={handleCreateInvoice}
         onCreateCredit={handleCreateCredit}
+        onCreateIntervention={handleCreateIntervention}
       />
 
       <ClientDialogs
@@ -90,6 +94,8 @@ const ClientsPage = () => {
         setInvoiceDialogOpen={setInvoiceDialogOpen}
         creditDialogOpen={creditDialogOpen}
         setCreditDialogOpen={setCreditDialogOpen}
+        interventionDialogOpen={interventionDialogOpen}
+        setInterventionDialogOpen={setInterventionDialogOpen}
         selectedClientForDocument={selectedClientForDocument}
         setSelectedClientForDocument={setSelectedClientForDocument}
       />
