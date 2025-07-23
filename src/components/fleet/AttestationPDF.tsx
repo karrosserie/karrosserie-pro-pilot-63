@@ -38,8 +38,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logo: {
-    width: 40,
-    height: 15,
+    width: 80,
+    height: 30,
     marginBottom: 10,
   },
   logoFallback: {
@@ -657,22 +657,11 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
 
         {/* Section signature finale */}
         <View style={styles.signatureSection}>
-          <Text style={[styles.articleText, styles.boldText]}>Lu et approuvé par les parties.</Text>
-          
-          <View style={styles.signatureGrid}>
-            <View style={styles.signatureColumn}>
-              <Text style={styles.signatureTitle}>Le Prêteur</Text>
-              <Text style={styles.signatureName}>{companyData?.name || 'AUTO PAINT'}</Text>
-            </View>
-            <View style={styles.signatureColumn}>
-              <Text style={styles.signatureTitle}>L'Emprunteur</Text>
-              <Text style={styles.signatureName}>
-                {loanData?.clients?.first_name || 'Geoffrey'} {loanData?.clients?.last_name || 'GOBEYN'}
-              </Text>
-            </View>
-          </View>
-
           <Text style={styles.finalSignatureTitle}>Signature de l'assuré</Text>
+          
+          {/* Espace pour la signature manuscrite */}
+          <View style={{ height: 40, marginVertical: 10, borderBottom: '1 solid #000' }}></View>
+          
           <Text style={styles.finalSignatureName}>
             {loanData?.clients?.first_name || 'Geoffrey'} {loanData?.clients?.last_name || 'GOBEYN'}
           </Text>
