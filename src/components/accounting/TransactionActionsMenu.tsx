@@ -1,91 +1,61 @@
-
 import React, { useState } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
 import { Transaction } from '@/hooks/use-accounting-data';
+import { useInvoices } from '@/hooks/use-invoices';
+import { useReceiptsData } from '@/hooks/use-receipts-data';
+import { useExpenses } from '@/hooks/use-expenses';
 import { 
   MoreHorizontal, 
-  Edit, 
-  Trash2, 
-  Download, 
-  Mail, 
-  Copy,
-  CheckCircle,
-  AlertCircle 
+  Edit
 } from 'lucide-react';
+import InvoiceDialog from '@/components/invoices/InvoiceDialog';
+import ReceiptDialog from '@/components/receipts/ReceiptDialog';
+import ExpenseDialog from '@/components/expenses/ExpenseDialog';
 
 interface TransactionActionsMenuProps {
   transaction: Transaction;
 }
 
 export const TransactionActionsMenu = ({ transaction }: TransactionActionsMenuProps) => {
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [markPaidDialogOpen, setMarkPaidDialogOpen] = useState(false);
-  const { toast } = useToast();
+  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
+  const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
+  const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
+  
+  const { invoices } = useInvoices();
+  const { receipts } = useReceiptsData();
+  const { expenses } = useExpenses();
 
   const handleEdit = () => {
-    toast({
-      title: "Modification",
-      description: `Ouverture de l'édition pour la transaction ${transaction.id}`,
-    });
+    // Déterminer le type de transaction et ouvrir le bon dialog
+    if (transaction.type === 'Encaissement') {
+      // C'est soit un encaissement (receipt) soit une facture payée
+      // Chercher d'abord dans les receipts
+      const receipt = receipts?.find(r => r.id === transaction.id);
+      if (receipt) {
+        setReceiptDialogOpen(true);
+      } else {
+        // C'est probablement une facture en attente de paiement
+        setInvoiceDialogOpen(true);
+      }
+    } else if (transaction.type === 'Dépense') {
+      setExpenseDialogOpen(true);
+    } else if (transaction.status === 'En attente') {
+      // Facture en attente de paiement
+      setInvoiceDialogOpen(true);
+    }
   };
 
-  const handleDelete = () => {
-    setDeleteDialogOpen(false);
-    toast({
-      title: "Transaction supprimée",
-      description: `La transaction ${transaction.id} a été supprimée`,
-      variant: "destructive",
-    });
-  };
-
-  const handleDownload = () => {
-    toast({
-      title: "Téléchargement",
-      description: `Téléchargement du reçu pour ${transaction.description}`,
-    });
-  };
-
-  const handleSendEmail = () => {
-    toast({
-      title: "Email envoyé",
-      description: `Reçu envoyé par email à ${transaction.client}`,
-    });
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(transaction.id);
-    toast({
-      title: "Copié",
-      description: "ID de transaction copié dans le presse-papiers",
-    });
-  };
-
-  const handleMarkAsPaid = () => {
-    setMarkPaidDialogOpen(false);
-    toast({
-      title: "Statut mis à jour",
-      description: `Transaction marquée comme payée`,
-    });
-  };
+  // Trouver l'entité correspondante pour l'édition
+  const invoice = invoices?.find(i => i.id === transaction.id);
+  const receipt = receipts?.find(r => r.id === transaction.id);
+  const expense = expenses?.find(e => e.id === transaction.id);
 
   return (
     <>
@@ -97,92 +67,34 @@ export const TransactionActionsMenu = ({ transaction }: TransactionActionsMenuPr
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuSeparator />
           
           <DropdownMenuItem onClick={handleEdit}>
             <Edit className="mr-2 h-4 w-4" />
             Modifier
           </DropdownMenuItem>
-          
-          <DropdownMenuItem onClick={handleCopy}>
-            <Copy className="mr-2 h-4 w-4" />
-            Copier l'ID
-          </DropdownMenuItem>
-          
-          <DropdownMenuSeparator />
-          
-          <DropdownMenuItem onClick={handleDownload}>
-            <Download className="mr-2 h-4 w-4" />
-            Télécharger le reçu
-          </DropdownMenuItem>
-          
-          <DropdownMenuItem onClick={handleSendEmail}>
-            <Mail className="mr-2 h-4 w-4" />
-            Envoyer par email
-          </DropdownMenuItem>
-          
-          <DropdownMenuSeparator />
-          
-          {transaction.status === 'En attente' && (
-            <DropdownMenuItem onClick={() => setMarkPaidDialogOpen(true)}>
-              <CheckCircle className="mr-2 h-4 w-4" />
-              Marquer comme payé
-            </DropdownMenuItem>
-          )}
-          
-          <DropdownMenuItem 
-            onClick={() => setDeleteDialogOpen(true)}
-            className="text-red-600 focus:text-red-600"
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Supprimer
-          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Dialog de confirmation de suppression */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer la transaction</AlertDialogTitle>
-            <AlertDialogDescription>
-              Êtes-vous sûr de vouloir supprimer cette transaction ? Cette action est irréversible.
-              <br /><br />
-              <strong>Transaction :</strong> {transaction.description}
-              <br />
-              <strong>Montant :</strong> {transaction.amount}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
-              Supprimer
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Dialog de modification de facture */}
+      <InvoiceDialog
+        invoice={invoice}
+        open={invoiceDialogOpen}
+        onOpenChange={(open) => setInvoiceDialogOpen(open)}
+      />
 
-      {/* Dialog de confirmation pour marquer comme payé */}
-      <AlertDialog open={markPaidDialogOpen} onOpenChange={setMarkPaidDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Marquer comme payé</AlertDialogTitle>
-            <AlertDialogDescription>
-              Confirmer que cette transaction a été payée ?
-              <br /><br />
-              <strong>Client :</strong> {transaction.client}
-              <br />
-              <strong>Montant :</strong> {transaction.amount}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={handleMarkAsPaid}>
-              Confirmer le paiement
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Dialog de modification d'encaissement */}
+      <ReceiptDialog
+        receipt={receipt}
+        open={receiptDialogOpen}
+        onOpenChange={(open) => setReceiptDialogOpen(open)}
+      />
+
+      {/* Dialog de modification de dépense */}
+      <ExpenseDialog
+        expense={expense}
+        open={expenseDialogOpen}
+        onOpenChange={(open) => setExpenseDialogOpen(open)}
+      />
     </>
   );
 };
