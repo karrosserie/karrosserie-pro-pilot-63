@@ -1,6 +1,7 @@
 
 import React from 'react';
 import VehicleDialog from '@/components/vehicle/VehicleDialog';
+import VehicleDetailsDialog from '@/components/vehicle/VehicleDetailsDialog';
 import VehicleDocumentDialogs from '@/components/vehicle/VehicleDocumentDialogs';
 import VehiclesHeader from '@/components/vehicle/VehiclesHeader';
 import VehiclesGrid from '@/components/vehicle/VehiclesGrid';
@@ -63,27 +64,34 @@ const Vehicles = () => {
         />
       )}
 
-      <VehicleDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        title={
-          dialogMode === 'create' 
-            ? 'Ajouter un véhicule' 
-            : dialogMode === 'edit' 
-            ? 'Modifier le véhicule' 
-            : 'Détails du véhicule'
-        }
-        description={
-          dialogMode === 'create' 
-            ? 'Saisissez les informations du nouveau véhicule.'
-            : dialogMode === 'edit'
-            ? 'Modifiez les informations du véhicule.'
-            : ''
-        }
-        defaultValues={selectedVehicle || {}}
-        onSubmit={handleVehicleSubmit}
-        mode={dialogMode}
-      />
+      {dialogMode === 'view' ? (
+        <VehicleDetailsDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          title="Détails du véhicule"
+          defaultValues={selectedVehicle || {}}
+          onSubmit={handleVehicleSubmit}
+          mode={dialogMode}
+        />
+      ) : (
+        <VehicleDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          title={
+            dialogMode === 'create' 
+              ? 'Ajouter un véhicule' 
+              : 'Modifier le véhicule'
+          }
+          description={
+            dialogMode === 'create' 
+              ? 'Saisissez les informations du nouveau véhicule.'
+              : 'Modifiez les informations du véhicule.'
+          }
+          defaultValues={selectedVehicle || {}}
+          onSubmit={handleVehicleSubmit}
+          mode={dialogMode}
+        />
+      )}
 
       <VehicleDocumentDialogs
         quoteDialogOpen={quoteDialogOpen}
