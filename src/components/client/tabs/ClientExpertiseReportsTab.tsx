@@ -126,8 +126,7 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
 
   return (
     <>
-      <TooltipProvider>
-        <div className="overflow-x-auto">
+      <div className="card-container">
           <Table>
             <ExpertiseReportTableHeader />
             <TableBody>
@@ -233,7 +232,6 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
             </TableBody>
           </Table>
         </div>
-      </TooltipProvider>
 
       {/* Edit Report Dialog */}
       <ExpertiseReportDialog
