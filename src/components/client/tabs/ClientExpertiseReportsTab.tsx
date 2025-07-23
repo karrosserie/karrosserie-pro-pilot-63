@@ -169,13 +169,14 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
                               variant="ghost" 
                               size="icon"
                               onClick={() => handleEditReport(report)}
+                              disabled={isConverted(report.id)}
                               className="h-8 w-8"
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            Modifier le rapport
+                            {isConverted(report.id) ? 'Impossible de modifier un rapport converti' : 'Modifier le rapport'}
                           </TooltipContent>
                         </Tooltip>
 
@@ -186,12 +187,13 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
                               size="icon" 
                               className="text-red-500 hover:text-red-700 h-8 w-8"
                               onClick={() => handleDeleteReport(report.id)}
+                              disabled={isConverted(report.id)}
                             >
                               <Trash className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            Supprimer le rapport
+                            {isConverted(report.id) ? 'Impossible de supprimer un rapport converti' : 'Supprimer le rapport'}
                           </TooltipContent>
                         </Tooltip>
 
