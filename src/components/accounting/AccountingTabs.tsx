@@ -25,7 +25,7 @@ export const AccountingTabs = ({
   allTransactions
 }: AccountingTabsProps) => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [paymentMethod, setPaymentMethod] = useState<string>('');
+  const [paymentMethod, setPaymentMethod] = useState<string>('all');
   return (
     <Tabs defaultValue="transactions" className="w-full">
       <TabsList className="grid w-full grid-cols-2 mb-4 sm:mb-6 h-9 sm:h-10">

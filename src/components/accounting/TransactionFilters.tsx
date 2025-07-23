@@ -74,10 +74,10 @@ export const TransactionFilters = ({
   };
 
   const clearPaymentMethodFilter = () => {
-    setPaymentMethod?.('');
+    setPaymentMethod?.('all');
   };
 
-  const hasActiveFilters = dateRange?.from || dateRange?.to || paymentMethod;
+  const hasActiveFilters = dateRange?.from || dateRange?.to || (paymentMethod && paymentMethod !== 'all');
 
   return (
     <div className="space-y-4">
@@ -194,12 +194,12 @@ export const TransactionFilters = ({
                 <div className="space-y-3">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Méthode de paiement</label>
-                    <Select value={paymentMethod || ''} onValueChange={setPaymentMethod}>
+                    <Select value={paymentMethod || 'all'} onValueChange={setPaymentMethod}>
                       <SelectTrigger>
                         <SelectValue placeholder="Toutes les méthodes" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Toutes les méthodes</SelectItem>
+                        <SelectItem value="all">Toutes les méthodes</SelectItem>
                         {paymentMethods.map((method) => (
                           <SelectItem key={method} value={method}>
                             {method}
