@@ -10,6 +10,7 @@ export interface Credit {
   amount: number;
   items_data: string | null;
   notes: string | null;
+  created_date: string | null;
   created_at: string;
   updated_at: string;
   // Relations (optionnelles, ajoutées par les joins)

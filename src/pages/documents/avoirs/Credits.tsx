@@ -406,7 +406,7 @@ const Credits = () => {
           <TableHeader>
             <TableRow>
               <TableHead>Numéro</TableHead>
-              <TableHead>Date de création</TableHead>
+              <TableHead>Date</TableHead>
               <TableHead>Véhicule</TableHead>
               <TableHead>Facture d'origine</TableHead>
               <TableHead>Montant</TableHead>
@@ -419,7 +419,7 @@ const Credits = () => {
               filteredCredits.map((credit) => (
                 <TableRow key={credit.id}>
                   <TableCell className="font-medium">{credit.reference}</TableCell>
-                  <TableCell>{formatDate(credit.created_at)}</TableCell>
+                  <TableCell>{formatDate(credit.created_date || credit.created_at)}</TableCell>
                   <TableCell>
                     {formatVehicleDisplay(credit)}
                   </TableCell>

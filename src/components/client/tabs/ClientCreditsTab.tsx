@@ -294,7 +294,7 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
               clientCredits.map((credit) => (
                 <TableRow key={credit.id}>
                   <TableCell className="font-medium">{credit.reference}</TableCell>
-                  <TableCell>{formatDate(credit.created_at)}</TableCell>
+                  <TableCell>{formatDate(credit.created_date || credit.created_at)}</TableCell>
                   <TableCell>
                     {formatVehicleDisplay(credit)}
                   </TableCell>
