@@ -24,31 +24,6 @@ export const AccountingHeader = ({ onExport }: AccountingHeaderProps) => {
           Pilotez votre activité en temps réel
         </p>
       </div>
-      
-      <div className="flex items-center gap-3">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              <Download className="h-4 w-4" />
-              Exporter
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onExport('fec')}>
-              <FileText className="h-4 w-4 mr-2" />
-              Export FEC (DGFiP)
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onExport('excel')}>
-              <FileText className="h-4 w-4 mr-2" />
-              Export Excel
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onExport('pdf')}>
-              <FileText className="h-4 w-4 mr-2" />
-              Bilan PDF
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
     </div>
   );
 };
