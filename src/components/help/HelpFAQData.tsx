@@ -1,5 +1,5 @@
 import React from 'react';
-import { Rocket, Users, Car, Wrench, FileText, CreditCard, Truck, ClipboardList, DollarSign, Bot } from 'lucide-react';
+import { Rocket, Users, Car, Wrench, FileText, CreditCard, Truck, ClipboardList, DollarSign, Bot, MoreVertical } from 'lucide-react';
 
 export interface FAQItem {
   question: string;
@@ -194,6 +194,29 @@ export const faqSections: FAQSection[] = [
         )
       },
       {
+        question: "Comment importer un rapport d'expertise ?",
+        answer: (
+          <div className="space-y-4">
+            <p>Pour importer un rapport d'expertise :</p>
+            <ol className="list-decimal list-inside space-y-2 ml-4">
+              <li>Allez dans <strong>Documents {'>'} Rapports d'expertise</strong></li>
+              <li>Cliquez sur <strong>"Importer un rapport"</strong></li>
+              <li>Sélectionnez votre fichier (PDF, JPEG, PNG jusqu'à 10MB) :</li>
+              <ul className="list-disc list-inside space-y-1 ml-8">
+                <li>Cliquez pour parcourir vos fichiers</li>
+                <li>Ou glissez-déposez directement le fichier</li>
+              </ul>
+              <li>Cliquez sur <strong>"Importer"</strong></li>
+              <li>L'IA analysera automatiquement le document</li>
+              <li>Le rapport sera traité et ajouté à votre liste</li>
+            </ol>
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+              <p className="text-sm"><strong>Note :</strong> L'analyse par IA extrait automatiquement les informations importantes du rapport (clients, véhicules, dommages, etc.) pour faciliter la création de devis.</p>
+            </div>
+          </div>
+        )
+      },
+      {
         question: "Comment créer un devis ?",
         answer: (
           <div className="space-y-4">
@@ -343,6 +366,111 @@ export const faqSections: FAQSection[] = [
               <li>Paramétrage des notifications</li>
               <li>Gestion des utilisateurs (si administrateur)</li>
             </ul>
+          </div>
+        )
+      }
+    ]
+  },
+  {
+    id: "context-menus",
+    title: "Menus contextuels et actions",
+    icon: <MoreVertical className="h-5 w-5" />,
+    items: [
+      {
+        question: "Comment utiliser les menus d'actions sur les clients ?",
+        answer: (
+          <div className="space-y-4">
+            <p>Sur la page des clients, chaque ligne dispose d'un menu d'actions (trois points) qui permet :</p>
+            <ul className="list-disc list-inside space-y-1 ml-4">
+              <li><strong>Voir</strong> : Consulter les détails du client (icône œil)</li>
+              <li><strong>Modifier</strong> : Éditer les informations du client (icône crayon)</li>
+              <li><strong>Supprimer</strong> : Effacer le client (icône poubelle)</li>
+              <li><strong>Créer un devis</strong> : Générer un nouveau devis pour ce client</li>
+              <li><strong>Créer une facture</strong> : Établir une facture pour ce client</li>
+              <li><strong>Créer un avoir</strong> : Émettre un avoir/note de crédit</li>
+            </ul>
+            <p className="text-sm text-muted-foreground">Cliquez sur les trois points verticaux à droite de chaque ligne pour accéder à ces options.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment utiliser les menus d'actions sur les véhicules ?",
+        answer: (
+          <div className="space-y-4">
+            <p>Sur la page des véhicules, chaque carte de véhicule propose :</p>
+            <ul className="list-disc list-inside space-y-1 ml-4">
+              <li><strong>Voir</strong> : Consulter les détails du véhicule (icône œil)</li>
+              <li><strong>Modifier</strong> : Éditer les informations du véhicule (icône crayon)</li>
+              <li><strong>Supprimer</strong> : Effacer le véhicule (icône poubelle)</li>
+            </ul>
+            <p>Dans le menu contextuel (trois points) :</p>
+            <ul className="list-disc list-inside space-y-1 ml-4">
+              <li><strong>Créer un devis</strong> : Générer un devis pour les réparations</li>
+              <li><strong>Créer une facture</strong> : Établir une facture pour ce véhicule</li>
+            </ul>
+          </div>
+        )
+      },
+      {
+        question: "Comment utiliser les menus d'actions sur les documents ?",
+        answer: (
+          <div className="space-y-4">
+            <p>Les documents (devis, factures, avoirs) disposent d'actions spécifiques :</p>
+            <ul className="list-disc list-inside space-y-1 ml-4">
+              <li><strong>Télécharger</strong> : Sauvegarder le document en PDF</li>
+              <li><strong>Imprimer</strong> : Lancer l'impression du document</li>
+              <li><strong>Envoyer par email</strong> : Expédier le document au client</li>
+              <li><strong>Modifier</strong> : Éditer le contenu du document</li>
+              <li><strong>Dupliquer</strong> : Créer une copie du document</li>
+              <li><strong>Marquer comme payé</strong> : Pour les factures impayées</li>
+              <li><strong>Supprimer</strong> : Effacer définitivement le document</li>
+            </ul>
+            <p className="text-sm text-muted-foreground">Les actions disponibles varient selon le type de document et son statut.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment utiliser les filtres et la recherche ?",
+        answer: (
+          <div className="space-y-4">
+            <p>Chaque page principale dispose d'outils de recherche et de filtrage :</p>
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+              <h4 className="font-semibold mb-2">Barre de recherche :</h4>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Tapez directement dans le champ de recherche</li>
+                <li>La recherche s'effectue en temps réel</li>
+                <li>Fonctionne sur les champs principaux (nom, email, immatriculation, etc.)</li>
+              </ul>
+            </div>
+            <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+              <h4 className="font-semibold mb-2">Filtres avancés :</h4>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Cliquez sur l'icône filtre pour ouvrir les options</li>
+                <li>Filtrez par statut, date, type, etc.</li>
+                <li>Combinez plusieurs filtres pour affiner les résultats</li>
+                <li>Réinitialisez les filtres avec le bouton "Effacer"</li>
+              </ul>
+            </div>
+          </div>
+        )
+      },
+      {
+        question: "Comment utiliser les actions en lot ?",
+        answer: (
+          <div className="space-y-4">
+            <p>Certaines pages permettent d'effectuer des actions sur plusieurs éléments :</p>
+            <ol className="list-decimal list-inside space-y-2 ml-4">
+              <li>Cochez les cases à gauche des éléments à sélectionner</li>
+              <li>Une barre d'actions apparaît en haut</li>
+              <li>Choisissez l'action à effectuer :</li>
+            </ol>
+            <ul className="list-disc list-inside space-y-1 ml-8">
+              <li><strong>Exporter</strong> : Télécharger les données sélectionnées</li>
+              <li><strong>Archiver</strong> : Archiver plusieurs éléments</li>
+              <li><strong>Supprimer</strong> : Effacer en lot (avec confirmation)</li>
+              <li><strong>Changer le statut</strong> : Modifier le statut de plusieurs éléments</li>
+            </ul>
+            <p className="text-sm text-muted-foreground">Utilisez "Sélectionner tout" pour traiter l'ensemble des résultats visibles.</p>
           </div>
         )
       }
