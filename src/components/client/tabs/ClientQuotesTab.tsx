@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Download, Printer, Mail, FileCheck, ArrowRight } from 'lucide-react';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
+import QuoteViewerModal from '@/components/quotes/QuoteViewerModal';
 import QuoteEmailDialog from '@/components/quotes/QuoteEmailDialog';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
 import { Quote } from '@/services/supabase/quotes';
@@ -37,6 +38,7 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [repairOrderDialogOpen, setRepairOrderDialogOpen] = useState(false);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
@@ -53,12 +55,12 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
 
   const clientQuotes = quotes?.filter(quote => quote.client_id === clientId) || [];
 
-  const handleView = (quote: any) => {
+  const handleView = (quote: Quote) => {
     setSelectedQuote(quote);
-    setEditDialogOpen(true);
+    setViewerModalOpen(true);
   };
 
-  const handleEdit = (quote: any) => {
+  const handleEdit = (quote: Quote) => {
     setSelectedQuote(quote);
     setEditDialogOpen(true);
   };
@@ -81,18 +83,38 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
     }
   };
 
-  const handleDownload = (quote: Quote) => {
-    toast({
-      title: "Téléchargement",
-      description: `Téléchargement du devis ${quote.reference}...`
-    });
+  const handleDownload = async (quote: Quote) => {
+    const { generateQuotePDFWithTemplate } = await import('@/utils/quotePDFGeneration');
+    const result = await generateQuotePDFWithTemplate(quote, {});
+    if (result.success) {
+      toast({
+        title: "Téléchargement réussi",
+        description: `Le devis ${quote.reference} a été téléchargé.`
+      });
+    } else {
+      toast({
+        title: "Erreur",
+        description: "Impossible de télécharger le devis.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handlePrint = (quote: Quote) => {
-    toast({
-      title: "Impression",
-      description: `Impression du devis ${quote.reference}...`
-    });
+  const handlePrint = async (quote: Quote) => {
+    const { printQuotePDFWithTemplate } = await import('@/utils/quotePDFGeneration');
+    const result = await printQuotePDFWithTemplate(quote, {});
+    if (result.success) {
+      toast({
+        title: "Impression",
+        description: `Le devis ${quote.reference} a été ouvert pour impression.`
+      });
+    } else {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'imprimer le devis.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSendEmail = (quote: Quote) => {
@@ -279,6 +301,12 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
         quote={selectedQuote}
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
+      />
+
+      <QuoteViewerModal
+        quote={selectedQuote}
+        open={viewerModalOpen}
+        onOpenChange={setViewerModalOpen}
       />
 
       <QuoteEmailDialog
