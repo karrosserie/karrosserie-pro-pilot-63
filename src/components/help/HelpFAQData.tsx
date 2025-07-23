@@ -1,5 +1,5 @@
 import React from 'react';
-import { Rocket, Users, Car, Wrench, FileText, CreditCard, Truck, ClipboardList, DollarSign, Bot } from 'lucide-react';
+import { Rocket, Users, Car, Wrench, FileText, CreditCard, Truck, ClipboardList, DollarSign, Bot, Wallet } from 'lucide-react';
 
 export interface FAQItem {
   question: string;
@@ -225,6 +225,111 @@ export const faqSections: FAQSection[] = [
       {
         question: "Comment activer les suggestions automatiques ?",
         answer: "Dans les paramètres de l'assistant IA, activez les suggestions pour les modules qui vous intéressent : gestion des stocks, planification, facturation, relances clients. Définissez le niveau de suggestions (faible, moyen, élevé) et les types d'alertes souhaitées. L'IA commence à apprendre après quelques semaines d'utilisation et ses suggestions deviennent progressivement plus pertinentes. Vous pouvez désactiver les suggestions à tout moment ou les modifier selon vos besoins."
+      }
+    ]
+  },
+  {
+    id: "receipts",
+    title: "Encaissements",
+    icon: <CreditCard className="h-5 w-5" />,
+    items: [
+      {
+        question: "Comment créer un nouvel encaissement ?",
+        answer: "Accédez à la section 'Paiements' > 'Encaissements' et cliquez sur 'Nouvel encaissement'. Sélectionnez la facture concernée, indiquez le montant encaissé, choisissez la méthode de paiement (espèces, carte bancaire, virement, chèque) et le compte bancaire. Vous pouvez ajouter des notes et des justificatifs de paiement. L'encaissement est automatiquement lié à la facture sélectionnée."
+      },
+      {
+        question: "Comment modifier un encaissement existant ?",
+        answer: "Dans la liste des encaissements, cliquez sur l'icône crayon (modifier) à droite de la ligne de l'encaissement. Vous pouvez modifier tous les détails : montant, méthode de paiement, compte bancaire, notes et justificatifs. Les modifications sont sauvegardées immédiatement et mettent à jour le statut de la facture associée."
+      },
+      {
+        question: "Comment supprimer un encaissement ?",
+        answer: "Dans la liste des encaissements, cliquez sur l'icône corbeille (supprimer) à droite de la ligne de l'encaissement. Une confirmation vous sera demandée avant la suppression définitive. La suppression d'un encaissement met automatiquement à jour le statut de la facture associée."
+      },
+      {
+        question: "Comment rechercher un encaissement ?",
+        answer: "Utilisez la barre de recherche en haut de la page des encaissements. Vous pouvez rechercher par référence d'encaissement, nom du client, ou montant. La recherche s'effectue en temps réel et filtre automatiquement la liste des encaissements."
+      },
+      {
+        question: "Quelles méthodes de paiement sont disponibles ?",
+        answer: "L'application prend en charge plusieurs méthodes de paiement : espèces, carte bancaire, virement bancaire, chèque, et prélèvement. Pour chaque encaissement, vous pouvez sélectionner la méthode appropriée et ajouter des références spécifiques (numéro de chèque, référence de virement, etc.)."
+      },
+      {
+        question: "Comment ajouter des justificatifs de paiement ?",
+        answer: "Lors de la création ou modification d'un encaissement, vous pouvez télécharger des justificatifs de paiement (tickets de carte bancaire, bordereaux de remise, etc.) via le champ 'Justificatifs de paiement'. Les fichiers acceptés sont en format PDF, JPEG ou PNG avec une taille maximale de 10Mo par fichier."
+      }
+    ]
+  },
+  {
+    id: "expenses",
+    title: "Dépenses",
+    icon: <DollarSign className="h-5 w-5" />,
+    items: [
+      {
+        question: "Comment enregistrer une nouvelle dépense ?",
+        answer: "Accédez à la section 'Paiements' > 'Dépenses' et cliquez sur 'Nouvelle dépense'. Remplissez les informations obligatoires : type de dépense, date, fournisseur, catégorie, montant TVA et montant TTC. Vous pouvez associer la dépense à un véhicule spécifique et ajouter des justificatifs (factures fournisseurs)."
+      },
+      {
+        question: "Comment modifier une dépense ?",
+        answer: "Dans la liste des dépenses, cliquez sur l'icône crayon (modifier) à droite de la ligne de la dépense. Vous pouvez modifier tous les détails de la dépense : montants, catégorie, fournisseur, statut, et véhicule associé. Les modifications sont sauvegardées immédiatement."
+      },
+      {
+        question: "Comment supprimer une dépense ?",
+        answer: "Dans la liste des dépenses, cliquez sur l'icône corbeille (supprimer) à droite de la ligne de la dépense. Une demande de confirmation apparaîtra avant la suppression définitive. Cette action est irréversible, assurez-vous que la suppression est nécessaire."
+      },
+      {
+        question: "Comment associer une dépense à un véhicule ?",
+        answer: "Lors de la création ou modification d'une dépense, activez l'option 'Assigner à un véhicule' et sélectionnez le véhicule concerné dans la liste déroulante. Cela permet de suivre les coûts spécifiques à chaque véhicule et d'établir des rapports de rentabilité par véhicule."
+      },
+      {
+        question: "Quels sont les statuts des dépenses ?",
+        answer: "Les dépenses peuvent avoir plusieurs statuts : 'En attente' (dépense créée mais non validée), 'Validée' (dépense approuvée), 'Payée' (dépense réglée au fournisseur), ou 'Rejetée' (dépense refusée). Le statut peut être modifié à tout moment selon l'avancement du traitement de la dépense."
+      },
+      {
+        question: "Comment rechercher une dépense ?",
+        answer: "Utilisez la barre de recherche en haut de la page des dépenses. Vous pouvez rechercher par type, fournisseur, catégorie, ou montant. La recherche filtre automatiquement la liste et affiche les résultats en temps réel."
+      },
+      {
+        question: "Comment ajouter des justificatifs à une dépense ?",
+        answer: "Dans le formulaire de dépense, utilisez le champ 'Justificatif' pour télécharger la facture fournisseur ou tout autre document justificatif. Les formats acceptés sont PDF, JPEG et PNG. Le justificatif est obligatoire pour la validation comptable de la dépense."
+      }
+    ]
+  },
+  {
+    id: "accounts",
+    title: "Gestion des comptes",
+    icon: <Wallet className="h-5 w-5" />,
+    items: [
+      {
+        question: "Comment créer un nouveau compte bancaire ?",
+        answer: "Accédez à la section 'Paiements' > 'Gestion des comptes' et cliquez sur 'Nouveau compte'. Remplissez les informations bancaires : nom du compte, banque, IBAN, BIC, type de compte (Courant, Épargne, Professionnel), et solde initial. Toutes ces informations sont nécessaires pour le suivi comptable."
+      },
+      {
+        question: "Comment modifier un compte bancaire ?",
+        answer: "Dans la liste des comptes, cliquez sur l'icône crayon (modifier) à droite de la ligne du compte. Vous pouvez modifier le nom, la banque, les coordonnées bancaires, le type de compte et le solde. Les modifications sont sauvegardées immédiatement et impactent les futurs encaissements et dépenses."
+      },
+      {
+        question: "Comment supprimer un compte bancaire ?",
+        answer: "Dans la liste des comptes, cliquez sur l'icône corbeille (supprimer) à droite de la ligne du compte. Une confirmation sera demandée car cette action est irréversible. Attention : vous ne pouvez pas supprimer un compte qui a des transactions associées (encaissements ou dépenses)."
+      },
+      {
+        question: "Comment synchroniser le solde d'un compte ?",
+        answer: "Dans la liste des comptes, cliquez sur l'icône actualiser (synchroniser) à droite de la ligne du compte. Cette fonction permet de mettre à jour le solde du compte en tenant compte de toutes les transactions récentes. La synchronisation est recommandée régulièrement pour maintenir des données exactes."
+      },
+      {
+        question: "Quels types de comptes puis-je créer ?",
+        answer: "L'application prend en charge trois types de comptes : 'Courant' (compte bancaire principal pour les opérations courantes), 'Épargne' (compte d'épargne pour les réserves), et 'Professionnel' (compte dédié à l'activité professionnelle). Chaque type a ses propres caractéristiques pour un meilleur suivi comptable."
+      },
+      {
+        question: "Comment voir les détails d'un compte ?",
+        answer: "Dans la liste des comptes, cliquez sur l'icône œil (voir) à droite de la ligne du compte. Cela affiche les détails complets du compte : informations bancaires, historique des transactions, évolution du solde, et dernière synchronisation. Vous pouvez également voir toutes les opérations liées à ce compte."
+      },
+      {
+        question: "Que signifient les statuts des comptes ?",
+        answer: "Les comptes peuvent avoir plusieurs statuts : 'Actif' (compte opérationnel et utilisé), 'Inactif' (compte fermé ou non utilisé), et 'Suspendu' (compte temporairement bloqué). Le statut d'un compte détermine s'il peut être sélectionné lors de la création d'encaissements ou de dépenses."
+      },
+      {
+        question: "Comment rechercher un compte ?",
+        answer: "Utilisez la barre de recherche en haut de la page de gestion des comptes. Vous pouvez rechercher par nom de compte, banque, IBAN, ou BIC. La recherche filtre automatiquement la liste et affiche les résultats correspondants en temps réel."
       }
     ]
   }
