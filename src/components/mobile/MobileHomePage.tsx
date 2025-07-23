@@ -9,13 +9,13 @@ const MobileHomePage = () => {
   console.log('MobileHomePage: Component rendering');
 
   const quickActions = [
-    {
-      icon: <Bot className="h-6 w-6" />,
-      title: "Assistant IA",
-      description: "Gestion automatique",
-      color: "bg-gradient-to-br from-blue-500 to-purple-600",
-      path: "/ai-assistant"
-    },
+    // {
+    //   icon: <Bot className="h-6 w-6" />,
+    //   title: "Assistant IA",
+    //   description: "Gestion automatique",
+    //   color: "bg-gradient-to-br from-blue-500 to-purple-600",
+    //   path: "/ai-assistant"
+    // },
     {
       icon: <Car className="h-6 w-6" />,
       title: "Véhicules",

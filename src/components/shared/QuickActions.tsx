@@ -69,7 +69,7 @@ const QuickActions: React.FC = () => {
   ];
 
   return (
-    <div className="fixed bottom-20 right-20 z-50">
+    <div className="fixed bottom-20 right-20 z-50 hidden">
       {isOpen && (
         <Card className="mb-4 p-4 shadow-xl border-2 bg-white">
           <div className="grid grid-cols-2 gap-3">
