@@ -67,6 +67,54 @@ export const useGeneratedReports = () => {
     yPos += 7;
     doc.text(`Solde: ${(totalReceipts - totalExpenses).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}`, 20, yPos);
     
+    // Détail des transactions
+    yPos += 20;
+    if (filteredTransactions.length > 0) {
+      doc.setFontSize(14);
+      doc.text('Détail des transactions', 20, yPos);
+      yPos += 10;
+      
+      // En-têtes du tableau
+      doc.setFontSize(8);
+      doc.text('Date', 20, yPos);
+      doc.text('Description', 45, yPos);
+      doc.text('Type', 110, yPos);
+      doc.text('Méthode', 135, yPos);
+      doc.text('Montant', 165, yPos);
+      doc.text('Statut', 185, yPos);
+      yPos += 5;
+      
+      // Ligne de séparation
+      doc.line(20, yPos, 200, yPos);
+      yPos += 5;
+      
+      // Transactions
+      filteredTransactions.forEach((transaction) => {
+        if (yPos > 270) { // Nouvelle page si nécessaire
+          doc.addPage();
+          yPos = 20;
+        }
+        
+        doc.text(transaction.date, 20, yPos);
+        
+        // Tronquer la description si trop longue
+        const description = transaction.description.length > 25 ? 
+          transaction.description.substring(0, 25) + '...' : 
+          transaction.description;
+        doc.text(description, 45, yPos);
+        
+        doc.text(transaction.type, 110, yPos);
+        doc.text(transaction.method, 135, yPos);
+        doc.text(transaction.amount, 165, yPos);
+        doc.text(transaction.status || '-', 185, yPos);
+        
+        yPos += 5;
+      });
+    } else {
+      doc.setFontSize(10);
+      doc.text('Aucune transaction trouvée pour cette période.', 20, yPos);
+    }
+    
     // Download the PDF
     doc.save(`${reportName.toLowerCase().replace(/\s+/g, '-')}-${fromDateStr.replace(/\//g, '-')}-${toDateStr.replace(/\//g, '-')}.pdf`);
   };
