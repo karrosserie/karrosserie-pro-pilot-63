@@ -660,9 +660,9 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
           <Text style={styles.finalSignatureTitle}>Signature de l'assuré</Text>
           
           {/* Image de signature électronique */}
-          {loanData?.clientSignature ? (
+          {loanData?.client_signature ? (
             <Image 
-              src={loanData.clientSignature}
+              src={loanData.client_signature}
               style={{ width: 120, height: 60, marginVertical: 10 }}
             />
           ) : (
