@@ -70,7 +70,8 @@ export const EmailReportDialog = ({
           onChange={handleFieldChange}
           isLoading={isLoading}
           invoiceReference={report.name}
-          documentType="invoice"
+          documentType="report"
+          reportType={report.type}
         />
 
         <EmailDialogActions
