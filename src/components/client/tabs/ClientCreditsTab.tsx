@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCredits } from '@/hooks/use-credits';
 import { useInvoices } from '@/hooks/use-invoices';
+import { generateCreditPDFWithTemplate, printCreditPDFWithTemplate } from '@/utils/creditPDFGeneration';
 import { 
   Table, 
   TableBody, 
@@ -21,6 +22,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Download, Printer, Mail } from 'lucide-react';
 import { EditCreditDialog } from '@/components/credits/EditCreditDialog';
+import InvoiceViewerModal from '@/components/invoices/InvoiceViewerModal';
+
 
 interface ClientCreditsTabProps {
   clientId: string;
@@ -32,8 +35,10 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [invoiceViewerModalOpen, setInvoiceViewerModalOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [selectedCredit, setSelectedCredit] = useState<any>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
 
   if (isLoading) {
     return (
@@ -126,21 +131,26 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   };
 
   const handleView = (credit: any) => {
-    // Parse items_data if it exists
-    let items = [];
-    if (credit.items_data) {
-      try {
-        items = JSON.parse(credit.items_data);
-      } catch (error) {
-        console.error('Error parsing items_data:', error);
+    // Find the related invoice to display
+    if (credit.invoice_id && invoices) {
+      const relatedInvoice = invoices.find(invoice => invoice.id === credit.invoice_id);
+      if (relatedInvoice) {
+        setSelectedInvoice(relatedInvoice);
+        setInvoiceViewerModalOpen(true);
+      } else {
+        toast({
+          title: "Facture introuvable",
+          description: "La facture associée à cet avoir n'a pas été trouvée.",
+          variant: "destructive"
+        });
       }
+    } else {
+      toast({
+        title: "Aucune facture associée",
+        description: "Cet avoir n'est pas lié à une facture.",
+        variant: "destructive"
+      });
     }
-
-    setSelectedCredit({
-      ...credit,
-      items
-    });
-    setViewDialogOpen(true);
   };
 
   const handleEdit = (credit: any) => {
@@ -179,25 +189,58 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
     }
   };
 
-  const handleDownload = (credit: any) => {
-    toast({
-      title: "Téléchargement",
-      description: `Téléchargement de l'avoir ${credit.reference}...`
-    });
+  const handleDownload = async (credit: any) => {
+    try {
+      toast({
+        title: "Génération du PDF",
+        description: "Génération du PDF en cours..."
+      });
+
+      const result = await generateCreditPDFWithTemplate(credit, {});
+      
+      if (result.success) {
+        toast({
+          title: "Téléchargement réussi",
+          description: `L'avoir ${credit.reference} a été téléchargé.`
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors du téléchargement:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer le PDF. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handlePrint = (credit: any) => {
-    toast({
-      title: "Impression",
-      description: `Impression de l'avoir ${credit.reference}...`
-    });
+  const handlePrint = async (credit: any) => {
+    try {
+      toast({
+        title: "Ouverture pour impression",
+        description: `Ouverture de l'avoir ${credit.reference} pour impression...`
+      });
+
+      const result = await printCreditPDFWithTemplate(credit, {});
+      
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'impression:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ouvrir le PDF pour impression. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSendEmail = (credit: any) => {
-    toast({
-      title: "Envoi par e-mail",
-      description: `Envoi de l'avoir ${credit.reference} par e-mail...`
-    });
+    setSelectedCredit(credit);
+    setEmailDialogOpen(true);
   };
 
   const formatAmount = (amount: number | null | undefined): string => {
@@ -321,35 +364,25 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
       </div>
 
       {selectedCredit && (
-        <>
-          <EditCreditDialog
-            open={editDialogOpen}
-            onOpenChange={setEditDialogOpen}
-            creditId={selectedCredit.id}
-            initialData={{
-              reference: selectedCredit.reference,
-              invoice_id: selectedCredit.invoice_id,
-              status: selectedCredit.status,
-              notes: selectedCredit.notes,
-              items: selectedCredit.items
-            }}
-          />
-
-          <EditCreditDialog
-            open={viewDialogOpen}
-            onOpenChange={setViewDialogOpen}
-            creditId={selectedCredit.id}
-            initialData={{
-              reference: selectedCredit.reference,
-              invoice_id: selectedCredit.invoice_id,
-              status: selectedCredit.status,
-              notes: selectedCredit.notes,
-              items: selectedCredit.items
-            }}
-            readOnly={true}
-          />
-        </>
+        <EditCreditDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          creditId={selectedCredit.id}
+          initialData={{
+            reference: selectedCredit.reference,
+            invoice_id: selectedCredit.invoice_id,
+            status: selectedCredit.status,
+            notes: selectedCredit.notes,
+            items: selectedCredit.items
+          }}
+        />
       )}
+
+      <InvoiceViewerModal
+        invoice={selectedInvoice}
+        open={invoiceViewerModalOpen}
+        onOpenChange={setInvoiceViewerModalOpen}
+      />
     </>
   );
 };
