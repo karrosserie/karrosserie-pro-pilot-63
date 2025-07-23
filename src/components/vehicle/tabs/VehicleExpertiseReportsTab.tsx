@@ -1,13 +1,15 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Edit, Trash, Download } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
+import { useReportToQuote } from '@/hooks/use-report-to-quote';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { FileText, Pencil, Trash } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { useConfirmation } from '@/hooks/use-confirmation';
+import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface VehicleExpertiseReportsTabProps {
   vehicleId: string;
@@ -15,107 +17,188 @@ interface VehicleExpertiseReportsTabProps {
 
 const VehicleExpertiseReportsTab: React.FC<VehicleExpertiseReportsTabProps> = ({ vehicleId }) => {
   const { reports, isLoading, deleteReport } = useExpertiseReports();
+  const { checkMultipleReports, isConverted } = useReportToQuote();
+  const { toast } = useToast();
+  const { confirm } = useConfirmation();
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<ExpertiseReport | null>(null);
 
   const vehicleReports = reports?.filter(report => report.vehicle_id === vehicleId) || [];
 
+  useEffect(() => {
+    if (vehicleReports && vehicleReports.length > 0) {
+      checkMultipleReports(vehicleReports);
+    }
+  }, [vehicleReports, checkMultipleReports]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-32">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-karrosserie-orange"></div>
+      </div>
+    );
+  }
+
+  const handleEditReport = (report: ExpertiseReport) => {
+    setSelectedReport(report);
+    setEditDialogOpen(true);
+  };
+
   const handleDeleteReport = async (id: string) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce rapport d\'expertise ?')) {
-      deleteReport.mutate(id);
+    const confirmed = await confirm({
+      title: 'Supprimer le rapport d\'expertise',
+      description: 'Êtes-vous sûr de vouloir supprimer ce rapport d\'expertise ? Cette action est irréversible.',
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
+      try {
+        await deleteReport.mutateAsync(id);
+        toast({
+          title: "Rapport supprimé",
+          description: "Le rapport d'expertise a été supprimé avec succès."
+        });
+      } catch (error: any) {
+        toast({
+          title: "Erreur",
+          description: `Impossible de supprimer le rapport d'expertise: ${error.message}`,
+          variant: "destructive"
+        });
+      }
     }
   };
 
-  const formatAmount = (amount: number | null | undefined) => {
-    if (amount === null || amount === undefined) return 'N/A';
+  const formatAmount = (amount: number | null | undefined): string => {
+    if (amount === null || amount === undefined) return '-';
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'EUR'
     }).format(amount);
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Importé': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'Converti': return 'bg-green-100 text-green-800 border-green-200';
-      case 'Traité': return 'bg-gray-100 text-gray-800 border-gray-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+  const getStatusColor = (status: string): string => {
+    switch (status.toLowerCase()) {
+      case 'converti':
+        return 'text-green-700 bg-green-50 border-green-200';
+      case 'en cours':
+        return 'text-blue-700 bg-blue-50 border-blue-200';
+      case 'importé':
+      default:
+        return 'text-gray-700 bg-gray-50 border-gray-200';
     }
   };
 
-  if (isLoading) {
-    return <div className="p-4">Chargement des rapports d'expertise...</div>;
-  }
+  const getStatusDisplay = (report: ExpertiseReport) => {
+    const status = isConverted(report.id) ? 'Converti' : (report.status || 'Importé');
+    return (
+      <Badge 
+        variant="outline" 
+        className={`${getStatusColor(status)} font-medium`}
+      >
+        {status}
+      </Badge>
+    );
+  };
 
   if (vehicleReports.length === 0) {
     return (
-      <div className="p-4">
-        <p className="text-muted-foreground">Aucun rapport d'expertise trouvé pour ce véhicule.</p>
+      <div className="text-center py-8">
+        <FileText className="mx-auto h-12 w-12 text-gray-400" />
+        <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucun rapport d'expertise</h3>
+        <p className="mt-1 text-sm text-gray-500">Ce véhicule n'a pas encore de rapport d'expertise.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {vehicleReports.map((report) => (
-        <Card key={report.id}>
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-lg">
-                  Rapport {report.report_number || 'N/A'}
-                </CardTitle>
-                <CardDescription>
-                  Expert: {report.expert_name || 'N/A'} • 
-                  Date: {report.report_date ? format(new Date(report.report_date), 'dd/MM/yyyy', { locale: fr }) : 'N/A'}
-                </CardDescription>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Badge className={getStatusColor(report.status || 'Importé')}>
-                  {report.status || 'Importé'}
-                </Badge>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      <Edit className="mr-2 h-4 w-4" />
-                      Modifier
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      className="text-destructive"
-                      onClick={() => handleDeleteReport(report.id)}
-                    >
-                      <Trash className="mr-2 h-4 w-4" />
-                      Supprimer
-                    </DropdownMenuItem>
-                    {report.document_url && (
-                      <DropdownMenuItem>
-                        <Download className="mr-2 h-4 w-4" />
-                        Télécharger
-                      </DropdownMenuItem>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p><span className="font-medium">Montant:</span> {formatAmount(report.amount)}</p>
-                <p><span className="font-medium">N° de police:</span> {report.policy_number || 'N/A'}</p>
-              </div>
-              <div>
-                <p><span className="font-medium">N° de sinistre:</span> {report.claim_number || 'N/A'}</p>
-                <p><span className="font-medium">Date d'incident:</span> {report.incident_date ? format(new Date(report.incident_date), 'dd/MM/yyyy', { locale: fr }) : 'N/A'}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+    <>
+      <div className="card-container p-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>N° Rapport</TableHead>
+              <TableHead>Date du rapport</TableHead>
+              <TableHead>Client</TableHead>
+              <TableHead>Montant</TableHead>
+              <TableHead>Statut</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {vehicleReports.map((report) => (
+              <TableRow key={report.id} className="hover:bg-gray-50">
+                <TableCell>
+                  {report.report_number || 'Non spécifié'}
+                </TableCell>
+                <TableCell>
+                  {report.report_date ? new Date(report.report_date).toLocaleDateString('fr-FR') : 'Non spécifiée'}
+                </TableCell>
+                <TableCell>
+                  {report.clients ? (
+                    <span>
+                      {report.clients.first_name} {report.clients.last_name}
+                    </span>
+                  ) : (
+                    <span className="text-gray-400 italic">Non assigné</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {formatAmount(report.amount)}
+                </TableCell>
+                <TableCell>
+                  {getStatusDisplay(report)}
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end space-x-1">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleEditReport(report)}
+                          disabled={isConverted(report.id)}
+                          className="h-8 w-8"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {isConverted(report.id) ? 'Impossible de modifier un rapport converti' : 'Modifier le rapport'}
+                      </TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="text-red-500 hover:text-red-700 h-8 w-8"
+                          onClick={() => handleDeleteReport(report.id)}
+                          disabled={isConverted(report.id)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {isConverted(report.id) ? 'Impossible de supprimer un rapport converti' : 'Supprimer le rapport'}
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <ExpertiseReportDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        report={selectedReport}
+      />
+    </>
   );
 };
 
