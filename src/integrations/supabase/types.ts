@@ -844,7 +844,6 @@ export type Database = {
           generated_at: string
           id: string
           name: string
-          status: string
           to_date: string
           type: string
           updated_at: string
@@ -857,7 +856,6 @@ export type Database = {
           generated_at?: string
           id?: string
           name: string
-          status?: string
           to_date: string
           type: string
           updated_at?: string
@@ -870,7 +868,6 @@ export type Database = {
           generated_at?: string
           id?: string
           name?: string
-          status?: string
           to_date?: string
           type?: string
           updated_at?: string

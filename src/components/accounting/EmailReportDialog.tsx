@@ -1,19 +1,21 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Dialog, 
   DialogContent, 
   DialogHeader, 
   DialogTitle 
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Paperclip, FileText, Mail } from 'lucide-react';
-import { GeneratedReport, useGeneratedReports } from '@/hooks/use-generated-reports';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { EmailFormFields } from '../invoices/email/EmailFormFields';
+import { EmailDialogActions } from '../invoices/email/EmailDialogActions';
+import { GeneratedReport } from '@/hooks/use-generated-reports';
+import { useReportEmail } from './email/useReportEmail';
+
+interface ReportEmailFormData {
+  to: string;
+  subject: string;
+  message: string;
+}
 
 interface EmailReportDialogProps {
   open: boolean;
@@ -28,59 +30,31 @@ export const EmailReportDialog = ({
   report, 
   onSend 
 }: EmailReportDialogProps) => {
-  const [email, setEmail] = useState('');
-  const [subject, setSubject] = useState('');
-  const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const { companyName } = useGeneratedReports();
+  const { getDefaultEmailData, sendEmail, isLoading } = useReportEmail(report);
+  const [emailData, setEmailData] = useState<ReportEmailFormData>({
+    to: '',
+    subject: '',
+    message: ''
+  });
 
-  const getEmailSubject = (report: GeneratedReport) => {
-    const fromDateStr = format(report.fromDate, 'dd/MM/yyyy', { locale: fr });
-    const toDateStr = format(report.toDate, 'dd/MM/yyyy', { locale: fr });
-    return `${report.name} - Période du ${fromDateStr} au ${toDateStr}`;
-  };
-
-  const getEmailBody = (report: GeneratedReport) => {
-    const fromDateStr = format(report.fromDate, 'dd/MM/yyyy', { locale: fr });
-    const toDateStr = format(report.toDate, 'dd/MM/yyyy', { locale: fr });
-    
-    const reportTypeText = {
-      'monthly': 'le bilan mensuel',
-      'quarterly': 'le bilan trimestriel', 
-      'yearly': 'le bilan annuel',
-      'fec': 'l\'export au format FEC',
-      'csv': 'l\'export au format CSV'
-    };
-
-    return `Bonjour,
-
-Veuillez trouver ${reportTypeText[report.type] || 'le rapport'} en pièce jointe pour la période du ${fromDateStr} au ${toDateStr}.
-
-Ce document a été généré automatiquement le ${format(report.generatedAt, 'dd/MM/yyyy à HH:mm', { locale: fr })}.
-
-Cordialement,
-L'équipe comptabilité
-${companyName || ''}`;
-  };
-
-  React.useEffect(() => {
-    if (report && open) {
-      setSubject(getEmailSubject(report));
-      setMessage(getEmailBody(report));
+  useEffect(() => {
+    if (open && report) {
+      getDefaultEmailData().then(setEmailData);
     }
-  }, [report, open, companyName]);
+  }, [open, report]);
+
+  const handleFieldChange = (field: keyof ReportEmailFormData, value: string) => {
+    setEmailData(prev => ({ ...prev, [field]: value }));
+  };
 
   const handleSend = async () => {
-    if (!email || !report) return;
-
-    setIsLoading(true);
-    await onSend(email);
-    setIsLoading(false);
-    setEmail('');
-    setSubject('');
-    setMessage('');
-    onOpenChange(false);
+    const success = await sendEmail(emailData);
+    if (success) {
+      onOpenChange(false);
+    }
   };
+
+  const isFormValid = Boolean(emailData.to && emailData.subject && emailData.message);
 
   if (!report) return null;
 
@@ -90,82 +64,21 @@ ${companyName || ''}`;
         <DialogHeader>
           <DialogTitle>Envoyer le rapport par email</DialogTitle>
         </DialogHeader>
-        
-        <div className="space-y-6 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Adresse email du destinataire</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="exemple@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
 
-          <div className="space-y-2">
-            <Label>Objet</Label>
-            <Input
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="Objet de l'e-mail"
-            />
-          </div>
+        <EmailFormFields
+          data={emailData}
+          onChange={handleFieldChange}
+          isLoading={isLoading}
+          invoiceReference={report.name}
+          documentType="invoice"
+        />
 
-          <div className="space-y-2">
-            <Label>Message</Label>
-            <Textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="min-h-[200px]"
-              placeholder="Contenu du message..."
-            />
-          </div>
-
-          {/* Section Pièces jointes */}
-          <div className="border rounded-lg p-4 bg-muted/50">
-            <div className="flex items-center gap-2 mb-2">
-              <Paperclip className="h-4 w-4 text-muted-foreground" />
-              <Label className="text-sm font-medium">Pièce jointe</Label>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <FileText className="h-4 w-4" />
-              <span>
-                {report.name.replace(/\s+/g, '_')}.pdf
-              </span>
-              <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                Générée automatiquement
-              </span>
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-3">
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isLoading}
-            >
-              Annuler
-            </Button>
-            <Button 
-              onClick={handleSend}
-              disabled={!email || !subject || !message || isLoading}
-              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-            >
-              {isLoading ? (
-                <>
-                  <Mail className="h-4 w-4 mr-2 animate-spin" />
-                  Envoi en cours...
-                </>
-              ) : (
-                <>
-                  <Mail className="h-4 w-4 mr-2" />
-                  Envoyer
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
+        <EmailDialogActions
+          onCancel={() => onOpenChange(false)}
+          onSend={handleSend}
+          isLoading={isLoading}
+          isFormValid={isFormValid}
+        />
       </DialogContent>
     </Dialog>
   );

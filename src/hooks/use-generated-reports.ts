@@ -15,7 +15,6 @@ export interface GeneratedReport {
   fromDate: Date;
   toDate: Date;
   generatedAt: Date;
-  status: 'generating' | 'ready' | 'sent' | 'error';
   fileUrl?: string;
 }
 
@@ -45,7 +44,6 @@ export const useGeneratedReports = () => {
           fromDate: new Date(report.from_date),
           toDate: new Date(report.to_date),
           generatedAt: new Date(report.generated_at),
-          status: report.status as GeneratedReport['status'],
           fileUrl: report.file_url
         }));
         setReports(transformedReports);
@@ -254,8 +252,7 @@ export const useGeneratedReports = () => {
         name: type,
         type: reportTypeMap[type] || 'monthly',
         from_date: fromDate.toISOString().split('T')[0],
-        to_date: toDate.toISOString().split('T')[0],
-        status: 'generating'
+        to_date: toDate.toISOString().split('T')[0]
       })
       .select()
       .single();
@@ -271,8 +268,7 @@ export const useGeneratedReports = () => {
       type: reportData.type as GeneratedReport['type'],
       fromDate: new Date(reportData.from_date),
       toDate: new Date(reportData.to_date),
-      generatedAt: new Date(reportData.generated_at),
-      status: 'generating'
+      generatedAt: new Date(reportData.generated_at)
     };
 
     setReports(prev => [newReport, ...prev]);
@@ -294,11 +290,10 @@ export const useGeneratedReports = () => {
           generateCSVExport(fromDate, toDate, filteredTransactions);
         }
 
-        // Mettre à jour le statut en base
+        // Mettre à jour le fichier URL en base
         await supabase
           .from('generated_reports')
           .update({ 
-            status: 'ready',
             file_url: `/downloads/${reportData.id}.pdf`
           })
           .eq('id', reportData.id);
@@ -306,25 +301,21 @@ export const useGeneratedReports = () => {
         setReports(prev => 
           prev.map(report => 
             report.id === reportData.id 
-              ? { ...report, status: 'ready', fileUrl: `/downloads/${reportData.id}.pdf` }
+              ? { ...report, fileUrl: `/downloads/${reportData.id}.pdf` }
               : report
           )
         );
       } catch (error) {
         console.error('Erreur lors de la génération:', error);
         
-        // Mettre à jour le statut d'erreur en base
+        // En cas d'erreur, on supprime le rapport
         await supabase
           .from('generated_reports')
-          .update({ status: 'error' })
+          .delete()
           .eq('id', reportData.id);
 
         setReports(prev => 
-          prev.map(report => 
-            report.id === reportData.id 
-              ? { ...report, status: 'error' }
-              : report
-          )
+          prev.filter(report => report.id !== reportData.id)
         );
       }
     }, 1000);
@@ -338,21 +329,6 @@ export const useGeneratedReports = () => {
 
     const fromDateStr = format(report.fromDate, 'dd/MM/yyyy', { locale: fr });
     const toDateStr = format(report.toDate, 'dd/MM/yyyy', { locale: fr });
-
-    // Mettre à jour le statut en base
-    await supabase
-      .from('generated_reports')
-      .update({ status: 'sent' })
-      .eq('id', reportId);
-
-    // Marquer le rapport comme envoyé
-    setReports(prev => 
-      prev.map(r => 
-        r.id === reportId 
-          ? { ...r, status: 'sent' }
-          : r
-      )
-    );
 
     toast({
       title: "Email envoyé",

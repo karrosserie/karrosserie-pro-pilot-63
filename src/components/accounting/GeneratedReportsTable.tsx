@@ -24,18 +24,6 @@ interface GeneratedReportsTableProps {
 }
 
 export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, onDownloadReport }: GeneratedReportsTableProps) => {
-  const getStatusBadge = (status: GeneratedReport['status']) => {
-    switch (status) {
-      case 'generating':
-        return <Badge variant="secondary" className="bg-blue-100 text-blue-800">En cours</Badge>;
-      case 'ready':
-        return <Badge variant="default" className="bg-green-100 text-green-800">Prêt</Badge>;
-      case 'sent':
-        return <Badge variant="default" className="bg-purple-100 text-purple-800">Envoyé</Badge>;
-      case 'error':
-        return <Badge variant="destructive">Erreur</Badge>;
-    }
-  };
 
   const handleDownload = (reportId: string) => {
     onDownloadReport(reportId);
@@ -67,7 +55,6 @@ export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, on
                 <TableHead className="font-semibold text-xs sm:text-sm min-w-[120px]">Nom du rapport</TableHead>
                 <TableHead className="font-semibold text-xs sm:text-sm min-w-[140px]">Période</TableHead>
                 <TableHead className="font-semibold text-xs sm:text-sm min-w-[120px] hidden sm:table-cell">Date de génération</TableHead>
-                <TableHead className="font-semibold text-xs sm:text-sm min-w-[80px]">Statut</TableHead>
                 <TableHead className="font-semibold text-xs sm:text-sm text-right min-w-[100px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -97,16 +84,12 @@ export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, on
                       {format(report.generatedAt, 'dd/MM/yyyy à HH:mm', { locale: fr })}
                     </div>
                   </TableCell>
-                  <TableCell>
-                    {getStatusBadge(report.status)}
-                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
                       <Button 
                         variant="ghost" 
                         size="sm"
                         onClick={() => handleDownload(report.id)}
-                        disabled={report.status !== 'ready'}
                         className="h-8 w-8 p-0"
                         title="Télécharger"
                       >
@@ -116,7 +99,6 @@ export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, on
                         variant="ghost" 
                         size="sm"
                         onClick={() => onSendEmail(report.id)}
-                        disabled={report.status !== 'ready'}
                         className="h-8 w-8 p-0"
                         title="Envoyer par e-mail"
                       >
