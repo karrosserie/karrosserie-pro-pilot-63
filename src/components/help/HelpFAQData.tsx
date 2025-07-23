@@ -1,9 +1,9 @@
 import React from 'react';
-import { Rocket, Users, Car, Wrench, FileText, CreditCard, Truck, ClipboardList, DollarSign, Bot, Wallet } from 'lucide-react';
+import { Rocket, Users, Car, Wrench, FileText, CreditCard, Truck, ClipboardList, DollarSign, Wallet } from 'lucide-react';
 
 export interface FAQItem {
   question: string;
-  answer: string;
+  answer: string | React.ReactNode;
 }
 
 export interface FAQSection {
@@ -21,15 +21,80 @@ export const faqSections: FAQSection[] = [
     items: [
       {
         question: "Comment me connecter à l'application ?",
-        answer: "Utilisez vos identifiants fournis lors de l'inscription. Cliquez sur 'Se connecter' et saisissez votre email et mot de passe. Si vous avez oublié votre mot de passe, utilisez le lien 'Mot de passe oublié' pour le réinitialiser. Vous recevrez un email avec les instructions détaillées pour créer un nouveau mot de passe sécurisé. Assurez-vous que votre navigateur accepte les cookies pour maintenir votre session active. Si vous rencontrez des difficultés persistantes, vérifiez que votre compte n'est pas temporairement bloqué après plusieurs tentatives de connexion infructueuses."
+        answer: (
+          <div className="space-y-3">
+            <p>Pour vous connecter à l'application :</p>
+            <ol className="list-decimal list-inside space-y-2 ml-4">
+              <li>Cliquez sur le bouton "Se connecter" sur la page d'accueil</li>
+              <li>Saisissez votre adresse email et votre mot de passe</li>
+              <li>Cliquez sur "Connexion" pour accéder à votre espace</li>
+            </ol>
+            <div className="mt-4">
+              <p className="font-medium">En cas de problème :</p>
+              <ul className="list-disc list-inside space-y-1 ml-4 mt-2">
+                <li>Si vous avez oublié votre mot de passe, utilisez le lien "Mot de passe oublié"</li>
+                <li>Vous recevrez un email avec un lien pour réinitialiser votre mot de passe</li>
+                <li>Assurez-vous que votre navigateur accepte les cookies</li>
+                <li>Vérifiez que votre compte n'est pas temporairement bloqué après plusieurs tentatives infructueuses</li>
+              </ul>
+            </div>
+          </div>
+        )
       },
       {
         question: "Comment naviguer dans l'interface ?",
-        answer: "L'application est organisée en modules accessibles via le menu latéral : Tableau de bord (vue d'ensemble), Clients (gestion des clients), Véhicules (parc automobile), Documents (devis, factures, ordres), Cessions (créances), Comptabilité (finances). Chaque section a ses propres fonctionnalités et filtres. Sur mobile, utilisez le bouton menu en haut à gauche pour accéder à la navigation."
+        answer: (
+          <div className="space-y-3">
+            <p>L'application est organisée en modules principaux accessibles via le menu latéral :</p>
+            <ul className="list-disc list-inside space-y-2 ml-4">
+              <li><strong>Tableau de bord</strong> : Vue d'ensemble avec statistiques et activité récente</li>
+              <li><strong>Clients</strong> : Gestion complète de votre clientèle</li>
+              <li><strong>Véhicules</strong> : Gestion du parc automobile</li>
+              <li><strong>Documents</strong> : Devis, factures, ordres de réparation, avoirs</li>
+              <li><strong>Paiements</strong> : Encaissements, dépenses et gestion des comptes</li>
+              <li><strong>Comptabilité</strong> : Vue financière et rapports</li>
+            </ul>
+            <div className="mt-4">
+              <p className="font-medium">Navigation mobile :</p>
+              <p className="ml-4">Sur mobile, utilisez le bouton menu (☰) en haut à gauche pour accéder à la navigation.</p>
+            </div>
+          </div>
+        )
       },
       {
         question: "Comment personnaliser mon profil ?",
-        answer: "Rendez-vous dans 'Paramètres' > 'Profil' pour modifier vos informations personnelles : nom, prénom, email, téléphone. Vous pouvez également changer votre mot de passe, configurer vos préférences d'affichage (thème clair/sombre), et définir vos notifications. N'oubliez pas de sauvegarder vos changements."
+        answer: (
+          <div className="space-y-3">
+            <p>Pour personnaliser votre profil, accédez à la section "Paramètres" puis "Profil" :</p>
+            <div className="ml-4">
+              <p className="font-medium mb-2">Informations personnelles :</p>
+              <ul className="list-disc list-inside space-y-1 ml-4">
+                <li>Nom et prénom</li>
+                <li>Adresse email (utilisée pour la connexion)</li>
+                <li>Numéro de téléphone</li>
+                <li>Photo de profil</li>
+              </ul>
+            </div>
+            <div className="ml-4">
+              <p className="font-medium mb-2">Sécurité :</p>
+              <ul className="list-disc list-inside space-y-1 ml-4">
+                <li>Modification du mot de passe</li>
+                <li>Configuration de l'authentification à deux facteurs</li>
+              </ul>
+            </div>
+            <div className="ml-4">
+              <p className="font-medium mb-2">Préférences :</p>
+              <ul className="list-disc list-inside space-y-1 ml-4">
+                <li>Thème d'affichage (clair/sombre)</li>
+                <li>Paramètres de notifications</li>
+                <li>Langue de l'interface</li>
+              </ul>
+            </div>
+            <p className="text-sm text-gray-600 mt-3">
+              <strong>Important :</strong> N'oubliez pas de cliquer sur "Sauvegarder" pour enregistrer vos modifications.
+            </p>
+          </div>
+        )
       }
     ]
   },
@@ -206,25 +271,6 @@ export const faqSections: FAQSection[] = [
       {
         question: "Comment exporter mes données comptables ?",
         answer: "Dans la section comptabilité, utilisez les boutons d'export pour générer des rapports détaillés aux formats PDF (présentation) ou Excel (données brutes). Exports disponibles : journal des ventes, journal des achats, balance comptable, bilan simplifié. Les fichiers sont compatibles avec la plupart des logiciels comptables (Sage, Ciel, EBP). Possibilité d'automatiser les exports mensuels par email à votre comptable. Historique des exports conservé 12 mois."
-      }
-    ]
-  },
-  {
-    id: "ai-assistant",
-    title: "Assistant IA",
-    icon: <Bot className="h-5 w-5" />,
-    items: [
-      {
-        question: "Comment fonctionne l'assistant IA ?",
-        answer: "L'assistant IA analyse vos données d'activité pour identifier des patterns et optimisations possibles. Il vous aide à automatiser certaines tâches répétitives, suggère des améliorations de processus et peut répondre à vos questions sur l'utilisation de l'application. L'IA apprend de vos habitudes pour proposer des suggestions de plus en plus personnalisées. Elle respecte strictement la confidentialité de vos données et ne partage aucune information avec l'extérieur."
-      },
-      {
-        question: "Quelles tâches peut automatiser l'IA ?",
-        answer: "L'IA peut automatiser : la catégorisation des dépenses selon vos habitudes, la suggestion de réparations types selon les véhicules et pannes récurrentes, l'optimisation de la planification des interventions selon les disponibilités, la génération de rapports personnalisés avec analyses de performance, la détection d'anomalies (factures inhabituelles, retards de paiement), et l'envoi de rappels automatiques aux clients pour les échéances importantes."
-      },
-      {
-        question: "Comment activer les suggestions automatiques ?",
-        answer: "Dans les paramètres de l'assistant IA, activez les suggestions pour les modules qui vous intéressent : gestion des stocks, planification, facturation, relances clients. Définissez le niveau de suggestions (faible, moyen, élevé) et les types d'alertes souhaitées. L'IA commence à apprendre après quelques semaines d'utilisation et ses suggestions deviennent progressivement plus pertinentes. Vous pouvez désactiver les suggestions à tout moment ou les modifier selon vos besoins."
       }
     ]
   },

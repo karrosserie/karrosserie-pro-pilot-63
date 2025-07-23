@@ -16,10 +16,11 @@ const Help = () => {
     const searchLower = searchTerm.toLowerCase();
     
     return faqSections.map(section => {
-      const filteredItems = section.items.filter(item => 
-        item.question.toLowerCase().includes(searchLower) ||
-        item.answer.toLowerCase().includes(searchLower)
-      );
+      const filteredItems = section.items.filter(item => {
+        const answerText = typeof item.answer === 'string' ? item.answer : '';
+        return item.question.toLowerCase().includes(searchLower) ||
+               answerText.toLowerCase().includes(searchLower);
+      });
 
       return {
         ...section,
