@@ -127,7 +127,7 @@ export const TransactionFilters = ({
                 size="sm" 
                 className={cn(
                   "gap-2",
-                  (dateRange?.from || dateRange?.to) && "bg-blue-50 border-blue-200 text-blue-700"
+                  (dateRange?.from || dateRange?.to) && "bg-orange-50 border-karrosserie-orange text-karrosserie-orange"
                 )}
               >
                 <Calendar className="h-4 w-4" />
@@ -170,13 +170,13 @@ export const TransactionFilters = ({
                 size="sm" 
                 className={cn(
                   "gap-2",
-                  hasActiveFilters && "bg-blue-50 border-blue-200 text-blue-700"
+                  hasActiveFilters && "bg-orange-50 border-karrosserie-orange text-karrosserie-orange"
                 )}
               >
                 <Filter className="h-4 w-4" />
                 Plus de filtres
                 {hasActiveFilters && (
-                  <Badge variant="secondary" className="ml-1 bg-blue-100 text-blue-700 text-xs">
+                  <Badge variant="secondary" className="ml-1 bg-orange-100 text-karrosserie-orange text-xs">
                     {(dateRange?.from ? 1 : 0) + (paymentMethod ? 1 : 0)}
                   </Badge>
                 )}

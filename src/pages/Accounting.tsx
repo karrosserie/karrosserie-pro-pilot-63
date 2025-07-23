@@ -5,10 +5,14 @@ import { AccountingKpis } from '@/components/accounting/AccountingKpis';
 import { AccountingTabs } from '@/components/accounting/AccountingTabs';
 import { useAccountingData } from '@/hooks/use-accounting-data';
 import { useToast } from '@/hooks/use-toast';
+import type { DateRange } from 'react-day-picker';
+import { isWithinInterval, parseISO } from 'date-fns';
 
 const Accounting = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'receipts' | 'expenses' | 'unpaid'>('all');
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [paymentMethod, setPaymentMethod] = useState<string>('all');
   const { transactions, isLoading, totalReceipts, totalExpenses, balance } = useAccountingData();
   const { toast } = useToast();
   
@@ -21,7 +25,17 @@ const Accounting = () => {
                          (selectedFilter === 'expenses' && transaction.type === 'Dépense') ||
                          (selectedFilter === 'unpaid' && transaction.status === 'En attente');
     
-    return matchesSearch && matchesFilter;
+    // Filtrage par date
+    const matchesDateRange = !dateRange?.from || !transaction.date || 
+                            isWithinInterval(parseISO(transaction.date), {
+                              start: dateRange.from,
+                              end: dateRange.to || dateRange.from
+                            });
+    
+    // Filtrage par méthode de paiement
+    const matchesPaymentMethod = paymentMethod === 'all' || transaction.method === paymentMethod;
+    
+    return matchesSearch && matchesFilter && matchesDateRange && matchesPaymentMethod;
   });
 
   const handleExport = (type: 'fec' | 'excel' | 'pdf') => {
@@ -64,6 +78,10 @@ const Accounting = () => {
         setSelectedFilter={setSelectedFilter}
         filteredTransactions={filteredTransactions}
         allTransactions={transactions}
+        dateRange={dateRange}
+        setDateRange={setDateRange}
+        paymentMethod={paymentMethod}
+        setPaymentMethod={setPaymentMethod}
       />
     </div>
   );

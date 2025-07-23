@@ -14,6 +14,10 @@ interface AccountingTabsProps {
   setSelectedFilter: (filter: 'all' | 'receipts' | 'expenses' | 'unpaid') => void;
   filteredTransactions: Transaction[];
   allTransactions: Transaction[];
+  dateRange?: DateRange;
+  setDateRange: (range: DateRange | undefined) => void;
+  paymentMethod: string;
+  setPaymentMethod: (method: string) => void;
 }
 
 export const AccountingTabs = ({
@@ -22,10 +26,12 @@ export const AccountingTabs = ({
   selectedFilter,
   setSelectedFilter,
   filteredTransactions,
-  allTransactions
+  allTransactions,
+  dateRange,
+  setDateRange,
+  paymentMethod,
+  setPaymentMethod
 }: AccountingTabsProps) => {
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [paymentMethod, setPaymentMethod] = useState<string>('all');
   return (
     <Tabs defaultValue="transactions" className="w-full">
       <TabsList className="grid w-full grid-cols-2 mb-4 sm:mb-6 h-9 sm:h-10">
