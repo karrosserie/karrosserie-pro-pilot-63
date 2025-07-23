@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useReportToQuote } from '@/hooks/use-report-to-quote';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { FileText, Pencil, Trash } from 'lucide-react';
+import { FileText, Pencil, Trash, MoreVertical, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -10,6 +10,13 @@ import { useConfirmation } from '@/hooks/use-confirmation';
 import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator 
+} from '@/components/ui/dropdown-menu';
 
 interface VehicleExpertiseReportsTabProps {
   vehicleId: string;
@@ -25,6 +32,7 @@ const VehicleExpertiseReportsTab: React.FC<VehicleExpertiseReportsTabProps> = ({
 
   const vehicleReports = reports?.filter(report => report.vehicle_id === vehicleId) || [];
 
+  // Vérifier le statut de conversion des rapports quand ils changent
   useEffect(() => {
     if (vehicleReports && vehicleReports.length > 0) {
       checkMultipleReports(vehicleReports);
@@ -91,6 +99,7 @@ const VehicleExpertiseReportsTab: React.FC<VehicleExpertiseReportsTabProps> = ({
   };
 
   const getStatusDisplay = (report: ExpertiseReport) => {
+    // Utiliser la même logique que le composant principal
     const status = isConverted(report.id) ? 'Converti' : (report.status || 'Importé');
     return (
       <Badge 
@@ -118,77 +127,108 @@ const VehicleExpertiseReportsTab: React.FC<VehicleExpertiseReportsTabProps> = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>N° Rapport</TableHead>
-              <TableHead>Date du rapport</TableHead>
+              <TableHead className="w-[200px]">Numéro</TableHead>
+              <TableHead className="w-[120px]">Date</TableHead>
               <TableHead>Client</TableHead>
-              <TableHead>Montant</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="w-[120px]">Montant</TableHead>
+              <TableHead className="w-[120px]">Statut</TableHead>
+              <TableHead className="text-right w-[160px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {vehicleReports.map((report) => (
-              <TableRow key={report.id} className="hover:bg-gray-50">
-                <TableCell>
-                  {report.report_number || 'Non spécifié'}
-                </TableCell>
-                <TableCell>
-                  {report.report_date ? new Date(report.report_date).toLocaleDateString('fr-FR') : 'Non spécifiée'}
-                </TableCell>
-                <TableCell>
-                  {report.clients ? (
-                    <span>
-                      {report.clients.first_name} {report.clients.last_name}
-                    </span>
-                  ) : (
-                    <span className="text-gray-400 italic">Non assigné</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {formatAmount(report.amount)}
-                </TableCell>
-                <TableCell>
-                  {getStatusDisplay(report)}
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end space-x-1">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleEditReport(report)}
-                          disabled={isConverted(report.id)}
-                          className="h-8 w-8"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {isConverted(report.id) ? 'Impossible de modifier un rapport converti' : 'Modifier le rapport'}
-                      </TooltipContent>
-                    </Tooltip>
+            {vehicleReports.length > 0 ? (
+              vehicleReports.map((report) => (
+                <TableRow key={report.id} className="hover:bg-gray-50">
+                  <TableCell>
+                    {report.report_number || 'Non spécifié'}
+                  </TableCell>
+                  <TableCell>
+                    {report.report_date ? new Date(report.report_date).toLocaleDateString('fr-FR') : 'Non spécifiée'}
+                  </TableCell>
+                  <TableCell>
+                    {report.clients ? (
+                      <span>
+                        {report.clients.first_name} {report.clients.last_name}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400 italic">Non assigné</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {formatAmount(report.amount)}
+                  </TableCell>
+                  <TableCell>
+                    {getStatusDisplay(report)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end space-x-1">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleEditReport(report)}
+                            disabled={isConverted(report.id)}
+                            className="h-8 w-8"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {isConverted(report.id) ? 'Impossible de modifier un rapport converti' : 'Modifier le rapport'}
+                        </TooltipContent>
+                      </Tooltip>
 
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="text-red-500 hover:text-red-700 h-8 w-8"
-                          onClick={() => handleDeleteReport(report.id)}
-                          disabled={isConverted(report.id)}
-                        >
-                          <Trash className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {isConverted(report.id) ? 'Impossible de supprimer un rapport converti' : 'Supprimer le rapport'}
-                      </TooltipContent>
-                    </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="text-red-500 hover:text-red-700 h-8 w-8"
+                            onClick={() => handleDeleteReport(report.id)}
+                            disabled={isConverted(report.id)}
+                          >
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {isConverted(report.id) ? 'Impossible de supprimer un rapport converti' : 'Supprimer le rapport'}
+                        </TooltipContent>
+                      </Tooltip>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem 
+                            onClick={() => window.open(report.document_url, '_blank')}
+                            disabled={!report.document_url}
+                          >
+                            <Download className="mr-2 h-4 w-4" />
+                            Télécharger
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-4">
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <FileText className="h-10 w-10 text-gray-400 mb-2" />
+                    <h3 className="font-medium text-gray-900">Aucun rapport d'expertise</h3>
+                    <p className="text-gray-500 mt-1">
+                      Ce véhicule n'a pas encore de rapport d'expertise.
+                    </p>
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </div>
