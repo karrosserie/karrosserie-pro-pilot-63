@@ -36,7 +36,7 @@ export const useAccountingData = () => {
           let invoiceRef = 'Sans facture';
 
           if (receipt.invoices) {
-            invoiceRef = `F-${receipt.invoices.reference}`;
+            invoiceRef = `n°${receipt.invoices.reference}`;
             
             if (receipt.invoices.client_id) {
               const client = clients.find(c => c.id === receipt.invoices!.client_id);
@@ -49,7 +49,7 @@ export const useAccountingData = () => {
           allTransactions.push({
             id: receipt.id,
             date: new Date(receipt.date).toLocaleDateString('fr-FR'),
-            description: `Encaissement - ${invoiceRef}`,
+            description: `Encaissement ${invoiceRef}`,
             type: 'Encaissement',
             method: receipt.payment_method || 'Non spécifié',
             amount: formatCurrency(receipt.amount),
@@ -105,7 +105,7 @@ export const useAccountingData = () => {
               allTransactions.push({
                 id: `invoice-${invoice.id}`,
                 date: new Date(invoice.due_date || invoice.date || invoice.created_at).toLocaleDateString('fr-FR'),
-                description: `Facture - F-${invoice.reference}`,
+                description: `Facture n°${invoice.reference}`,
                 type: 'Encaissement',
                 method: 'À encaisser',
                 amount: formatCurrency(amountDue),
