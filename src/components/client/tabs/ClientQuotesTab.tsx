@@ -1,9 +1,15 @@
 
 import React, { useState } from 'react';
 import { useQuotes } from '@/hooks/use-quotes';
-import { SimpleTable } from '@/components/ui/simple-table';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
 import { FileText, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
-import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import {
@@ -172,145 +178,102 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
     }) + ' €';
   };
 
-  const columns: ColumnDef<any>[] = [
-    {
-      accessorKey: "reference",
-      header: "Numéro",
-      cell: ({ row }) => (
-        <span className="font-medium">{row.getValue("reference") as string}</span>
-      )
-    },
-    {
-      accessorKey: "created_at",
-      header: "Date",
-      cell: ({ row }) => new Date(row.getValue("created_at") as string).toLocaleDateString('fr-FR')
-    },
-    {
-      accessorKey: "clients",
-      header: "Client",
-      cell: ({ row }) => {
-        const client = row.getValue("clients") as any;
-        return client ? `${client.first_name} ${client.last_name}` : '-';
-      }
-    },
-    {
-      accessorKey: "vehicles",
-      header: "Véhicule",
-      cell: ({ row }) => {
-        const vehicle = row.getValue("vehicles") as any;
-        if (!vehicle) return '-';
-        return `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate}`;
-      }
-    },
-    {
-      accessorKey: "amount",
-      header: "Montant",
-      cell: ({ row }) => {
-        const amount = row.getValue("amount");
-        return formatAmount(amount as number);
-      }
-    },
-    {
-      accessorKey: "status",
-      header: "Statut",
-      cell: ({ row }) => {
-        const status = row.getValue("status") as string;
-        return <StatusBadge status={status || 'En attente'} />;
-      }
-    },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }) => {
-        const quote = row.original;
-        return (
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleView(quote);
-              }}
-              title="Voir les détails"
-            >
-              <Eye className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleEdit(quote);
-              }}
-              title="Modifier"
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-red-500 hover:text-red-700"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete(quote);
-              }}
-              title="Supprimer"
-            >
-              <Trash className="h-4 w-4" />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56">
-                <DropdownMenuItem onClick={() => handleDownload(quote)}>
-                  <Download className="mr-2 h-4 w-4" />
-                  Télécharger
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handlePrint(quote)}>
-                  <Printer className="mr-2 h-4 w-4" />
-                  Imprimer
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSendEmail(quote)}>
-                  <Mail className="mr-2 h-4 w-4" />
-                  Envoyer par e-mail
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => handleRequestDocuments(quote)}>
-                  <FileCheck className="mr-2 h-4 w-4" />
-                  Demander les justificatifs
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleConvertToRepairOrder(quote)}>
-                  <ArrowRight className="mr-2 h-4 w-4" />
-                  Convertir en ordre de réparation
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        );
-      }
-    }
-  ];
-
-  if (clientQuotes.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <FileText className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucun devis</h3>
-        <p className="mt-1 text-sm text-gray-500">Ce client n'a pas encore de devis.</p>
-      </div>
-    );
-  }
-
   return (
     <>
-      <SimpleTable
-        columns={columns}
-        data={clientQuotes}
-      />
+      <div className="card-container">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Numéro</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Client</TableHead>
+              <TableHead>Véhicule</TableHead>
+              <TableHead>Montant</TableHead>
+              <TableHead>Statut</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {clientQuotes.length > 0 ? (
+              clientQuotes.map((quote) => (
+                <TableRow key={quote.id}>
+                  <TableCell className="font-medium">{quote.reference}</TableCell>
+                  <TableCell>{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
+                  <TableCell>{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
+                  <TableCell>
+                    {quote.vehicles 
+                      ? `${quote.vehicles.car_brands?.name || 'Marque inconnue'} ${quote.vehicles.car_models?.name || 'Modèle inconnu'} - ${quote.vehicles.license_plate}`
+                      : '-'
+                    }
+                  </TableCell>
+                  <TableCell>{formatAmount(quote.amount)}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={quote.status === 'draft' ? 'En attente' : (quote.status || 'En attente')} />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end space-x-1">
+                      <Button variant="ghost" size="icon" onClick={() => handleView(quote)}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleEdit(quote)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-red-500 hover:text-red-700" 
+                        onClick={() => handleDelete(quote)}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56">
+                          <DropdownMenuItem onClick={() => handleDownload(quote)}>
+                            <Download className="mr-2 h-4 w-4" />
+                            Télécharger
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handlePrint(quote)}>
+                            <Printer className="mr-2 h-4 w-4" />
+                            Imprimer
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleSendEmail(quote)}>
+                            <Mail className="mr-2 h-4 w-4" />
+                            Envoyer par e-mail
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => handleRequestDocuments(quote)}>
+                            <FileCheck className="mr-2 h-4 w-4" />
+                            Demander les justificatifs
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleConvertToRepairOrder(quote)}>
+                            <ArrowRight className="mr-2 h-4 w-4" />
+                            Convertir en ordre de réparation
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-4">
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <FileText className="h-10 w-10 text-gray-400 mb-2" />
+                    <h3 className="font-medium text-gray-900">Aucun devis</h3>
+                    <p className="text-gray-500 mt-1">Ce client n'a pas encore de devis.</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
       <QuoteDialog
         quote={selectedQuote}

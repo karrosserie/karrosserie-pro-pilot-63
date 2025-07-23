@@ -1,9 +1,14 @@
-
 import React, { useState } from 'react';
 import { useInvoices } from '@/hooks/use-invoices';
-import { SimpleTable } from '@/components/ui/simple-table';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
 import { Receipt, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
-import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -180,149 +185,112 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
     }
   };
 
-  const columns: ColumnDef<any>[] = [
-    {
-      accessorKey: "reference",
-      header: "Numéro",
-      cell: ({ row }) => (
-        <span className="font-medium">{row.getValue("reference") as string}</span>
-      )
-    },
-    {
-      accessorKey: "created_at",
-      header: "Date de création",
-      cell: ({ row }) => formatDate(row.getValue("created_at") as string)
-    },
-    {
-      accessorKey: "clients",
-      header: "Client",
-      cell: ({ row }) => {
-        const client = row.getValue("clients") as any;
-        return client ? `${client.first_name} ${client.last_name}` : '-';
-      }
-    },
-    {
-      accessorKey: "vehicles",
-      header: "Véhicule",
-      cell: ({ row }) => {
-        const vehicle = row.getValue("vehicles") as any;
-        if (!vehicle) return '-';
-        return `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate}`;
-      }
-    },
-    {
-      accessorKey: "amount",
-      header: "Montant",
-      cell: ({ row }) => formatAmount((row.getValue("amount") as number) || 0)
-    },
-    {
-      accessorKey: "status",
-      header: "Statut",
-      cell: ({ row }) => {
-        const status = row.getValue("status") as string;
-        return (
-          <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(status || 'En attente de paiement')}`}>
-            {status || 'En attente de paiement'}
-          </span>
-        );
-      }
-    },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }) => {
-        const invoice = row.original;
-        return (
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleView(invoice);
-              }}
-              title="Voir les détails"
-            >
-              <Eye className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleEdit(invoice);
-              }}
-              title="Modifier"
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-red-500 hover:text-red-700"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete(invoice);
-              }}
-              title="Supprimer"
-            >
-              <Trash className="h-4 w-4" />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56">
-                <DropdownMenuItem onClick={() => handleDownload(invoice)}>
-                  <Download className="mr-2 h-4 w-4" />
-                  Télécharger
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handlePrint(invoice)}>
-                  <Printer className="mr-2 h-4 w-4" />
-                  Imprimer
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSendEmail(invoice)}>
-                  <Mail className="mr-2 h-4 w-4" />
-                  Envoyer par e-mail
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => handleAddPayment(invoice)}>
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Ajouter un paiement
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleAddCredit(invoice)}>
-                  <FileX className="mr-2 h-4 w-4" />
-                  Ajouter un avoir
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        );
-      }
-    }
-  ];
-
-  if (clientInvoices.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <Receipt className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucune facture</h3>
-        <p className="mt-1 text-sm text-gray-500">Ce client n'a pas encore de facture.</p>
-      </div>
-    );
-  }
-
   return (
     <>
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <div>
-            <SimpleTable
-              columns={columns}
-              data={clientInvoices}
-            />
+            <div className="card-container">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Numéro</TableHead>
+                    <TableHead>Date de création</TableHead>
+                    <TableHead>Client</TableHead>
+                    <TableHead>Véhicule</TableHead>
+                    <TableHead>Montant</TableHead>
+                    <TableHead>Statut</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {clientInvoices.length > 0 ? (
+                    clientInvoices.map((invoice) => (
+                      <TableRow key={invoice.id}>
+                        <TableCell className="font-medium">{invoice.reference}</TableCell>
+                        <TableCell>{formatDate(invoice.created_at)}</TableCell>
+                        <TableCell>
+                          {invoice.clients 
+                            ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
+                            : '-'
+                          }
+                        </TableCell>
+                        <TableCell>
+                          {invoice.vehicles 
+                            ? `${invoice.vehicles.car_brands?.name || 'Marque inconnue'} ${invoice.vehicles.car_models?.name || 'Modèle inconnu'} - ${invoice.vehicles.license_plate}`
+                            : '-'
+                          }
+                        </TableCell>
+                        <TableCell>{formatAmount((invoice.amount as number) || 0)}</TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente de paiement')}`}>
+                            {invoice.status || 'En attente de paiement'}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end space-x-1">
+                            <Button variant="ghost" size="icon" onClick={() => handleView(invoice)}>
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleEdit(invoice)}>
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="text-red-500 hover:text-red-700"
+                              onClick={() => handleDelete(invoice)}
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent className="w-56">
+                                <DropdownMenuItem onClick={() => handleDownload(invoice)}>
+                                  <Download className="mr-2 h-4 w-4" />
+                                  Télécharger
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handlePrint(invoice)}>
+                                  <Printer className="mr-2 h-4 w-4" />
+                                  Imprimer
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleSendEmail(invoice)}>
+                                  <Mail className="mr-2 h-4 w-4" />
+                                  Envoyer par e-mail
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => handleAddPayment(invoice)}>
+                                  <CreditCard className="mr-2 h-4 w-4" />
+                                  Ajouter un paiement
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleAddCredit(invoice)}>
+                                  <FileX className="mr-2 h-4 w-4" />
+                                  Ajouter un avoir
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-4">
+                        <div className="flex flex-col items-center justify-center py-8">
+                          <Receipt className="h-10 w-10 text-gray-400 mb-2" />
+                          <h3 className="font-medium text-gray-900">Aucune facture</h3>
+                          <p className="text-gray-500 mt-1">Ce client n'a pas encore de facture.</p>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent>

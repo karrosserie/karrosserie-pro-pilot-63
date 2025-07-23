@@ -1,9 +1,15 @@
 
 import React, { useState } from 'react';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
-import { SimpleTable } from '@/components/ui/simple-table';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
 import { Wrench, Eye, Pencil, Trash } from 'lucide-react';
-import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { RepairOrderActionsDropdown } from '@/components/repair-orders/RepairOrderActionsDropdown';
@@ -166,117 +172,78 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
     }
   };
 
-  const columns: ColumnDef<any>[] = [
-    {
-      accessorKey: "reference",
-      header: "Numéro",
-      cell: ({ row }) => (
-        <span className="font-medium">{row.getValue("reference") as string}</span>
-      )
-    },
-    {
-      accessorKey: "created_at",
-      header: "Date",
-      cell: ({ row }) => formatDate(row.getValue("created_at") as string)
-    },
-    {
-      accessorKey: "clients",
-      header: "Client",
-      cell: ({ row }) => {
-        const client = row.getValue("clients") as any;
-        return client ? `${client.first_name} ${client.last_name}` : '-';
-      }
-    },
-    {
-      accessorKey: "vehicles",
-      header: "Véhicule",
-      cell: ({ row }) => {
-        const vehicle = row.getValue("vehicles") as any;
-        if (!vehicle) return '-';
-        return `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate}`;
-      }
-    },
-    {
-      accessorKey: "amount",
-      header: "Montant",
-      cell: ({ row }) => {
-        const order = row.original;
-        const amount = calculateOrderAmount(order);
-        return formatAmount(amount);
-      }
-    },
-    {
-      accessorKey: "status",
-      header: "Statut",
-      cell: ({ row }) => {
-        const status = row.getValue("status") as string;
-        return <StatusBadge status={status || 'En cours'} />;
-      }
-    },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }) => {
-        const order = row.original;
-        return (
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleViewOrder(order);
-              }}
-              title="Voir les détails"
-            >
-              <Eye className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleEditOrder(order);
-              }}
-              title="Modifier"
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-red-500 hover:text-red-700"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDeleteOrder(order);
-              }}
-              title="Supprimer"
-            >
-              <Trash className="h-4 w-4" />
-            </Button>
-            <RepairOrderActionsDropdown order={order} contextMenuProps={contextMenuProps} />
-          </div>
-        );
-      }
-    }
-  ];
-
-  if (clientOrders.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <Wrench className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucun ordre de réparation</h3>
-        <p className="mt-1 text-sm text-gray-500">Ce client n'a pas encore d'ordre de réparation.</p>
-      </div>
-    );
-  }
-
   return (
     <>
-      <SimpleTable
-        columns={columns}
-        data={clientOrders}
-      />
+      <div className="card-container">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Numéro</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Client</TableHead>
+              <TableHead>Véhicule</TableHead>
+              <TableHead>Montant</TableHead>
+              <TableHead>Statut</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {clientOrders.length > 0 ? (
+              clientOrders.map((order) => (
+                <TableRow key={order.id}>
+                  <TableCell className="font-medium">{order.reference}</TableCell>
+                  <TableCell>{formatDate(order.created_at)}</TableCell>
+                  <TableCell>
+                    {order.clients 
+                      ? `${order.clients.first_name} ${order.clients.last_name}`
+                      : '-'
+                    }
+                  </TableCell>
+                  <TableCell>
+                    {order.vehicles 
+                      ? `${order.vehicles.car_brands?.name || 'Marque inconnue'} ${order.vehicles.car_models?.name || 'Modèle inconnu'} - ${order.vehicles.license_plate}`
+                      : '-'
+                    }
+                  </TableCell>
+                  <TableCell>{formatAmount(calculateOrderAmount(order))}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={order.status || 'En cours'} />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end space-x-1">
+                      <Button variant="ghost" size="icon" onClick={() => handleViewOrder(order)}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleEditOrder(order)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => handleDeleteOrder(order)}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                      <RepairOrderActionsDropdown order={order} contextMenuProps={contextMenuProps} />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-4">
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <Wrench className="h-10 w-10 text-gray-400 mb-2" />
+                    <h3 className="font-medium text-gray-900">Aucun ordre de réparation</h3>
+                    <p className="text-gray-500 mt-1">Ce client n'a pas encore d'ordre de réparation.</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
       <RepairOrderDialog
         order={selectedOrder}

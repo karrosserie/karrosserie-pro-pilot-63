@@ -1,9 +1,15 @@
 
 import React, { useState } from 'react';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
-import { SimpleTable } from '@/components/ui/simple-table';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
 import { Banknote, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
-import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { useToast } from '@/hooks/use-toast';
@@ -142,147 +148,92 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
     }
   };
 
-  const columns: ColumnDef<any>[] = [
-    {
-      accessorKey: "reference",
-      header: "Référence",
-      cell: ({ row }) => (
-        <span className="font-medium">{row.getValue("reference") as string}</span>
-      )
-    },
-    {
-      accessorKey: "date",
-      header: "Date d'encaissement",
-      cell: ({ row }) => formatDate(row.getValue("date") as string)
-    },
-    {
-      accessorKey: "invoice_id",
-      header: "Facture",
-      cell: ({ row }) => {
-        const receipt = row.original;
-        return getInvoiceDisplay(receipt.invoice_id);
-      }
-    },
-    {
-      accessorKey: "amount",
-      header: "Montant",
-      cell: ({ row }) => {
-        const amount = row.getValue("amount");
-        return formatAmount(amount as number);
-      }
-    },
-    {
-      accessorKey: "payment_method",
-      header: "Mode de paiement",
-      cell: ({ row }) => {
-        const paymentMethod = row.getValue("payment_method") as string;
-        return paymentMethod || "-";
-      }
-    },
-    {
-      accessorKey: "bank_account",
-      header: "Compte bancaire",
-      cell: ({ row }) => {
-        const bankAccount = row.getValue("bank_account") as string;
-        return bankAccount || "-";
-      }
-    },
-    {
-      accessorKey: "status",
-      header: "Statut",
-      cell: ({ row }) => {
-        const status = row.getValue("status") as string;
-        return (
-          <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(status || 'En attente')}`}>
-            {status || 'En attente'}
-          </span>
-        );
-      }
-    },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }) => {
-        const receipt = row.original;
-        return (
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleView(receipt);
-              }}
-              title="Voir les détails"
-            >
-              <Eye className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleEdit(receipt);
-              }}
-              title="Modifier"
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-red-500 hover:text-red-700"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete(receipt);
-              }}
-              title="Supprimer"
-            >
-              <Trash className="h-4 w-4" />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56">
-                <DropdownMenuItem onClick={() => handleDownload(receipt)}>
-                  <Download className="mr-2 h-4 w-4" />
-                  Télécharger
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handlePrint(receipt)}>
-                  <Printer className="mr-2 h-4 w-4" />
-                  Imprimer
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSendEmail(receipt)}>
-                  <Mail className="mr-2 h-4 w-4" />
-                  Envoyer par e-mail
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        );
-      }
-    }
-  ];
-
-  if (clientReceipts.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <Banknote className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucun encaissement</h3>
-        <p className="mt-1 text-sm text-gray-500">Ce client n'a pas encore d'encaissement.</p>
-      </div>
-    );
-  }
-
   return (
     <>
-      <SimpleTable
-        columns={columns}
-        data={clientReceipts}
-      />
+      <div className="card-container">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Référence</TableHead>
+              <TableHead>Date d'encaissement</TableHead>
+              <TableHead>Facture</TableHead>
+              <TableHead>Montant</TableHead>
+              <TableHead>Mode de paiement</TableHead>
+              <TableHead>Compte bancaire</TableHead>
+              <TableHead>Statut</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {clientReceipts.length > 0 ? (
+              clientReceipts.map((receipt) => (
+                <TableRow key={receipt.id}>
+                  <TableCell className="font-medium">{receipt.reference}</TableCell>
+                  <TableCell>{formatDate(receipt.date)}</TableCell>
+                  <TableCell>{getInvoiceDisplay(receipt.invoice_id)}</TableCell>
+                  <TableCell>{formatAmount(receipt.amount)}</TableCell>
+                  <TableCell>{receipt.payment_method || "-"}</TableCell>
+                  <TableCell>{receipt.bank_account || "-"}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(receipt.status || 'En attente')}`}>
+                      {receipt.status || 'En attente'}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end space-x-1">
+                      <Button variant="ghost" size="icon" onClick={() => handleView(receipt)}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleEdit(receipt)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => handleDelete(receipt)}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56">
+                          <DropdownMenuItem onClick={() => handleDownload(receipt)}>
+                            <Download className="mr-2 h-4 w-4" />
+                            Télécharger
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handlePrint(receipt)}>
+                            <Printer className="mr-2 h-4 w-4" />
+                            Imprimer
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleSendEmail(receipt)}>
+                            <Mail className="mr-2 h-4 w-4" />
+                            Envoyer par e-mail
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-4">
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <Banknote className="h-10 w-10 text-gray-400 mb-2" />
+                    <h3 className="font-medium text-gray-900">Aucun encaissement</h3>
+                    <p className="text-gray-500 mt-1">Ce client n'a pas encore d'encaissement.</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
       {selectedReceipt && (
         <ReceiptDialog
