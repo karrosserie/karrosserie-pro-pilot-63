@@ -48,7 +48,7 @@ export const TransactionDetailsDialog = ({
             </Badge>
             {transaction.status === 'En attente' && (
               <Badge variant="destructive">
-                Impayé
+                En attente de paiement
               </Badge>
             )}
           </div>

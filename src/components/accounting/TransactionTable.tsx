@@ -83,7 +83,7 @@ export const TransactionTable = ({ transactions }: TransactionTableProps) => {
                           variant="secondary"
                           className="bg-red-100 text-red-800 hover:bg-red-100 text-xs"
                         >
-                          Impayé
+                          En attente de paiement
                         </Badge>
                       )}
                     </div>
@@ -169,7 +169,7 @@ export const TransactionTable = ({ transactions }: TransactionTableProps) => {
                           variant="secondary"
                           className="ml-2 bg-red-100 text-red-800 hover:bg-red-100"
                         >
-                          Impayé
+                          En attente de paiement
                         </Badge>
                       )}
                     </TableCell>

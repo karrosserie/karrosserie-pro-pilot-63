@@ -31,7 +31,7 @@ export const TransactionFilters = ({
     { value: 'all', label: 'Tous', count: allCount },
     { value: 'receipts', label: 'Encaissements', count: receiptsCount },
     { value: 'expenses', label: 'Dépenses', count: expensesCount },
-    { value: 'unpaid', label: 'Impayés', count: unpaidCount }
+    { value: 'unpaid', label: 'En attente de paiement', count: unpaidCount }
   ] as const;
 
   return (
