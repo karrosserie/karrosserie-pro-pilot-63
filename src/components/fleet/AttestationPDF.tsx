@@ -572,7 +572,10 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
         <Text style={styles.indentedText}>- L'utilisation exclusive du coffre est obligatoire pour tout équipement professionnel</Text>
         <Text style={styles.indentedText}>- Aucun objet ne doit être placé sur le siège arrière ou les sièges arrières</Text>
         <Text style={styles.indentedText}>- Le chargement ne doit jamais dépasser la hauteur des dossiers des sièges arrière</Text>
-        
+      </Page>
+
+      {/* Quatrième page pour les sections 3.4 à 3.6 */}
+      <Page size="A4" style={styles.page}>
         <Text style={[styles.subSectionTitle, { fontSize: 9, fontWeight: 'bold' }]}>3.4.2. Fixation et arrimage du chargement</Text>
         <Text style={styles.articleText}>Les objets transportés doivent être arrimés conformément à l'article R. 312-17 du Code de la route, avec:</Text>
         <Text style={styles.bulletPoint}>• Utilisation obligatoire de sangles, cordes, fixation homologués CE</Text>
@@ -581,10 +584,7 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
         <Text style={styles.bulletPoint}>• Calage des objets par des dispositifs appropriés pour éviter tout glissement</Text>
         <Text style={styles.bulletPoint}>• Répartition uniforme de la charge pour maintenir l'équilibre du véhicule et sa stabilité en conduite</Text>
         <Text style={styles.bulletPoint}>• Vérification de l'arrimage avant chaque départ et après chaque arrêt</Text>
-      </Page>
 
-      {/* Quatrième page pour les sections 3.4 à 3.6 */}
-      <Page size="A4" style={styles.page}>
         <Text style={[styles.subSectionTitle, { fontSize: 9, fontWeight: 'bold' }]}>3.4.3. Restrictions de chargement</Text>
         <Text style={styles.articleText}>Il est formellement interdit de transporter:</Text>
         <Text style={styles.bulletPoint}>• Des matières dangereuses au sens de l'ADR (inflammables, corrosives, toxiques, explosives)</Text>
