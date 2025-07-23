@@ -10,7 +10,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { EmptyState } from '@/components/ui/empty-state';
-import { Eye, Pencil, Trash, CreditCard, Building, Wallet, RefreshCw } from 'lucide-react';
+import { Pencil, Trash, CreditCard, Building, Wallet, RefreshCw } from 'lucide-react';
 
 interface Account {
   id: string;
@@ -114,12 +114,9 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end space-x-1">
-                  <Button variant="ghost" size="icon" title="Voir les détails">
-                    <Eye className="h-4 w-4" />
-                  </Button>
                   <Button 
                     variant="ghost" 
-                    size="icon" 
+                    size="icon"
                     onClick={() => onSync(account)}
                     title="Synchroniser"
                   >

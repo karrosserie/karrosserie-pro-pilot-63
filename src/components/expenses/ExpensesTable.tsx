@@ -9,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Eye, Pencil, Trash, TrendingDown } from 'lucide-react';
+import { Pencil, Trash, TrendingDown } from 'lucide-react';
 import { ExpenseWithRelations } from '@/services/supabase/expenses';
 import { StatusBadge } from '@/components/ui/status-badge';
 
@@ -81,9 +81,6 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete, isLoading }: Expense
                 <TableCell>{formatAmount(expense.total_amount)}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-1">
-                    <Button variant="ghost" size="icon">
-                      <Eye className="h-4 w-4" />
-                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => onEdit(expense)}>
                       <Pencil className="h-4 w-4" />
                     </Button>

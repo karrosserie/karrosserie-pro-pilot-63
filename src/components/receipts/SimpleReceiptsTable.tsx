@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
-import { Eye, Pencil, Trash, Receipt } from "lucide-react";
+import { Pencil, Trash, Receipt } from "lucide-react";
 import { ReceiptWithClient } from '@/services/supabase/receipts/types';
 import { useInvoices } from '@/hooks/use-invoices';
 
@@ -114,9 +114,6 @@ export const SimpleReceiptsTable = ({
             </TableCell>
             <TableCell className="text-right">
               <div className="flex justify-end space-x-1">
-                <Button variant="ghost" size="icon" title="Voir les détails">
-                  <Eye className="h-4 w-4" />
-                </Button>
                 <Button 
                   variant="ghost" 
                   size="icon" 
