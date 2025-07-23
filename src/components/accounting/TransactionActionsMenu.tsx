@@ -4,6 +4,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from '@/components/ui/button';
@@ -11,9 +12,11 @@ import { Transaction } from '@/hooks/use-accounting-data';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { useExpenses } from '@/hooks/use-expenses';
+import { useToast } from '@/hooks/use-toast';
 import { 
   MoreHorizontal, 
-  Edit
+  Edit,
+  CheckCircle
 } from 'lucide-react';
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import ReceiptDialog from '@/components/receipts/ReceiptDialog';
@@ -31,6 +34,7 @@ export const TransactionActionsMenu = ({ transaction }: TransactionActionsMenuPr
   const { invoices } = useInvoices();
   const { receipts } = useReceiptsData();
   const { expenses } = useExpenses();
+  const { toast } = useToast();
 
   const handleEdit = () => {
     // Déterminer le type de transaction et ouvrir le bon dialog
@@ -50,6 +54,13 @@ export const TransactionActionsMenu = ({ transaction }: TransactionActionsMenuPr
       // Facture en attente de paiement
       setInvoiceDialogOpen(true);
     }
+  };
+
+  const handleMarkAsPaid = () => {
+    toast({
+      title: "Statut mis à jour",
+      description: `Transaction marquée comme payée`,
+    });
   };
 
   // Trouver l'entité correspondante pour l'édition
@@ -72,6 +83,16 @@ export const TransactionActionsMenu = ({ transaction }: TransactionActionsMenuPr
             <Edit className="mr-2 h-4 w-4" />
             Modifier
           </DropdownMenuItem>
+
+          {transaction.status === 'En attente' && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleMarkAsPaid}>
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Marquer comme payé
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
