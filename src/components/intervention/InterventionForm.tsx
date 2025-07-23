@@ -142,7 +142,7 @@ export const InterventionForm: React.FC<InterventionFormProps> = ({
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Vehicle Selection */}
         <div className="space-y-2">
-          <Label htmlFor="vehicle">Véhicule *</Label>
+          <Label htmlFor="vehicle">Véhicule <span className="text-red-500">*</span></Label>
           <Select 
             value={selectedVehicleId} 
             onValueChange={setSelectedVehicleId}
