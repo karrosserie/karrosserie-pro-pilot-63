@@ -15,6 +15,7 @@ import { StatusBadge } from '@/components/ui/status-badge';
 import { RepairOrderActionsDropdown } from '@/components/repair-orders/RepairOrderActionsDropdown';
 import { calculateOrderAmount } from '@/components/repair-orders/utils/orderCalculations';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
+import RepairOrderViewerModal from '@/components/repair-orders/RepairOrderViewerModal';
 import RepairOrderEmailDialog from '@/components/repair-orders/RepairOrderEmailDialog';
 import RepairOrderSignatureDialog from '@/components/repair-orders/RepairOrderSignatureDialog';
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
@@ -31,7 +32,8 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
   const { orders, isLoading, deleteOrder } = useRepairOrders();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [signatureDialogOpen, setSignatureDialogOpen] = useState(false);
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
@@ -52,12 +54,12 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
 
   const handleViewOrder = (order: RepairOrder) => {
     setSelectedOrder(order);
-    setDialogOpen(true);
+    setViewerModalOpen(true);
   };
 
   const handleEditOrder = (order: RepairOrder) => {
     setSelectedOrder(order);
-    setDialogOpen(true);
+    setEditDialogOpen(true);
   };
 
   const handleDeleteOrder = async (order: RepairOrder) => {
@@ -86,18 +88,55 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
     }
   };
 
-  const handleDownload = (order: RepairOrder) => {
-    toast({
-      title: "Téléchargement",
-      description: `Téléchargement de l'ordre de réparation ${order.reference}...`
-    });
+  const handleDownload = async (order: RepairOrder) => {
+    try {
+      toast({
+        title: "Génération du PDF",
+        description: "Génération du PDF en cours..."
+      });
+
+      const { generateRepairOrderPDFWithTemplate } = await import('@/utils/repairOrderPDFGeneration');
+      const result = await generateRepairOrderPDFWithTemplate(order, {});
+      
+      if (result.success) {
+        toast({
+          title: "Téléchargement réussi",
+          description: `L'ordre de réparation ${order.reference} a été téléchargé.`
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors du téléchargement:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer le PDF. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handlePrint = (order: RepairOrder) => {
-    toast({
-      title: "Impression",
-      description: `Impression de l'ordre de réparation ${order.reference}...`
-    });
+  const handlePrint = async (order: RepairOrder) => {
+    try {
+      toast({
+        title: "Ouverture pour impression",
+        description: `Ouverture de l'ordre de réparation ${order.reference} pour impression...`
+      });
+
+      const { printRepairOrderPDFWithTemplate } = await import('@/utils/repairOrderPDFGeneration');
+      const result = await printRepairOrderPDFWithTemplate(order, {});
+      
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'impression:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ouvrir le PDF pour impression. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSendEmail = (order: RepairOrder) => {
@@ -110,11 +149,28 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
     setSignatureDialogOpen(true);
   };
 
-  const handleRequestDocuments = (order: RepairOrder) => {
-    toast({
-      title: "Demande de justificatifs",
-      description: `Demande de justificatifs envoyée pour l'ordre de réparation ${order.reference}`
-    });
+  const handleRequestDocuments = async (order: RepairOrder) => {
+    try {
+      const { tokensService } = await import('@/services/supabase/tokens');
+      
+      await tokensService.createToken({
+        user_id: order.user_id!,
+        client_id: order.client_id,
+        vehicule_id: order.vehicle_id
+      });
+
+      toast({
+        title: "Demande de justificatifs",
+        description: `Demande de justificatifs envoyée pour l'ordre de réparation ${order.reference}. Token créé avec succès.`
+      });
+    } catch (error) {
+      console.error('Erreur lors de la création du token:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer le token pour la demande de justificatifs.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleConvertToInvoice = (order: RepairOrder) => {
@@ -247,8 +303,14 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
 
       <RepairOrderDialog
         order={selectedOrder}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
+
+      <RepairOrderViewerModal
+        repairOrder={selectedOrder}
+        open={viewerModalOpen}
+        onOpenChange={setViewerModalOpen}
       />
 
       <RepairOrderEmailDialog
