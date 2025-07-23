@@ -3,7 +3,7 @@ import { Rocket, Users, Car, Wrench, FileText, CreditCard, Truck, ClipboardList,
 
 export interface FAQItem {
   question: string;
-  answer: string;
+  answer: string | React.ReactNode;
 }
 
 export interface FAQSection {
@@ -109,19 +109,424 @@ export const faqSections: FAQSection[] = [
     items: [
       {
         question: "Comment créer un devis ?",
-        answer: "Dans 'Documents' > 'Devis', créez un nouveau devis en sélectionnant client et véhicule. Ajoutez les prestations avec descriptions détaillées, quantités et prix unitaires. Vous pouvez inclure plusieurs types de travaux : réparations, peinture, carrosserie, mécanique. Définissez une date de validité (généralement 30 jours) et des conditions de paiement. Le devis peut être converti en ordre de réparation une fois accepté par le client."
+        answer: (
+          <div className="space-y-3">
+            <p>Pour créer un nouveau devis :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Accédez au menu "Documents" puis "Devis"</li>
+              <li>Cliquez sur le bouton "+ Nouveau devis"</li>
+              <li>Sélectionnez le client concerné dans la liste déroulante</li>
+              <li>Choisissez le véhicule associé au devis</li>
+              <li>Ajoutez les prestations : description, quantité, prix unitaire</li>
+              <li>Définissez la date de validité (généralement 30 jours)</li>
+              <li>Précisez les conditions de paiement</li>
+              <li>Sauvegardez votre devis</li>
+            </ol>
+            <p>Le système calcule automatiquement les totaux HT, TVA et TTC. Le devis reçoit automatiquement un numéro de référence unique.</p>
+          </div>
+        )
       },
       {
-        question: "Comment envoyer un devis par email ?",
-        answer: "Dans la fiche devis, cliquez sur 'Envoyer par email'. Rédigez votre message personnalisé, l'application génère automatiquement le PDF du devis en pièce jointe. Vous pouvez prévisualiser l'email avant envoi. Le client recevra le devis en PDF avec votre logo et informations d'entreprise. Un accusé de réception vous informe de la bonne réception. L'historique des envois est conservé dans la fiche devis."
+        question: "Comment créer un devis à partir de la fiche d'un client ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Depuis la fiche client, vous pouvez créer directement un devis :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Ouvrez la fiche du client concerné</li>
+              <li>Allez dans l'onglet "Devis"</li>
+              <li>Cliquez sur "+ Nouveau devis"</li>
+              <li>Le client est automatiquement présélectionné</li>
+              <li>Sélectionnez le véhicule parmi ceux du client</li>
+              <li>Remplissez les prestations et conditions</li>
+              <li>Sauvegardez le devis</li>
+            </ol>
+            <p>Cette méthode est plus rapide car les informations client sont déjà renseignées.</p>
+          </div>
+        )
       },
       {
-        question: "Comment créer une facture ?",
-        answer: "Deux possibilités : créer une facture manuellement dans 'Documents' > 'Factures' en sélectionnant client/véhicule et en ajoutant les prestations, ou convertir automatiquement un ordre de réparation terminé (plus rapide). La facture reprend toutes les informations avec numérotation automatique chronologique. Définissez la date d'échéance, les conditions de paiement et les pénalités de retard. La facture peut être envoyée par email ou imprimée."
+        question: "Comment créer une facture à partir de la fiche d'un client ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Créer une facture directement depuis la fiche client :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Accédez à la fiche du client</li>
+              <li>Naviguez vers l'onglet "Factures"</li>
+              <li>Cliquez sur "+ Nouvelle facture"</li>
+              <li>Le client est automatiquement sélectionné</li>
+              <li>Choisissez le véhicule concerné</li>
+              <li>Ajoutez les prestations réalisées</li>
+              <li>Définissez les conditions de paiement</li>
+              <li>Validez et générez la facture</li>
+            </ol>
+            <p>La facture est immédiatement disponible pour envoi ou impression.</p>
+          </div>
+        )
       },
       {
-        question: "Comment gérer les avoirs ?",
-        answer: "Dans 'Documents' > 'Avoirs', créez un avoir pour annuler tout ou partie d'une facture. Sélectionnez la facture concernée (seules les factures payées peuvent faire l'objet d'un avoir), indiquez le montant à créditer et la raison du remboursement (défaut, annulation, geste commercial). L'avoir est numéroté automatiquement et vient en déduction du chiffre d'affaires. Il peut être envoyé au client et impacte automatiquement les statistiques comptables."
+        question: "Comment créer un avoir à partir de la fiche d'un client ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Pour créer un avoir depuis la fiche client :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Ouvrez la fiche du client</li>
+              <li>Allez dans l'onglet "Factures"</li>
+              <li>Localisez la facture concernée</li>
+              <li>Cliquez sur le menu d'actions (⋮) de la facture</li>
+              <li>Sélectionnez "Ajouter un avoir"</li>
+              <li>Précisez le montant et la raison</li>
+              <li>Validez la création de l'avoir</li>
+            </ol>
+            <p>L'avoir est automatiquement lié à la facture originale et impacte la comptabilité.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment créer un devis à partir de la fiche d'un véhicule ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Depuis la fiche véhicule :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Accédez à la fiche du véhicule</li>
+              <li>Cliquez sur l'onglet "Documents" ou "Devis"</li>
+              <li>Sélectionnez "+ Nouveau devis"</li>
+              <li>Le véhicule et son propriétaire sont pré-remplis</li>
+              <li>Ajoutez les réparations spécifiques au véhicule</li>
+              <li>Renseignez les conditions commerciales</li>
+              <li>Enregistrez le devis</li>
+            </ol>
+            <p>Cette approche est idéale pour les interventions spécifiques à un véhicule donné.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment créer une facture à partir de la fiche d'un véhicule ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Création d'une facture depuis la fiche véhicule :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Ouvrez la fiche du véhicule</li>
+              <li>Accédez à l'onglet "Factures" ou "Documents"</li>
+              <li>Cliquez sur "+ Nouvelle facture"</li>
+              <li>Le véhicule et le propriétaire sont automatiquement sélectionnés</li>
+              <li>Listez les travaux effectués sur le véhicule</li>
+              <li>Ajoutez les pièces utilisées si nécessaire</li>
+              <li>Finalisez et sauvegardez la facture</li>
+            </ol>
+            <p>Particulièrement utile pour facturer les interventions terminées sur un véhicule spécifique.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment créer un devis à partir de la fiche d'un rapport d'expertise ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Créer un devis basé sur un rapport d'expertise :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Ouvrez le rapport d'expertise concerné</li>
+              <li>Vérifiez les dommages et réparations listés</li>
+              <li>Cliquez sur "Créer un devis" depuis le rapport</li>
+              <li>Les informations du véhicule et client sont importées</li>
+              <li>Les réparations recommandées sont pré-remplies</li>
+              <li>Ajustez les prix et quantités si nécessaire</li>
+              <li>Validez le devis</li>
+            </ol>
+            <p>Cette fonctionnalité permet un gain de temps considérable en reprenant automatiquement les éléments de l'expertise.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment télécharger un devis ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Pour télécharger un devis au format PDF :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Accédez à la liste des devis ou à un devis spécifique</li>
+              <li>Cliquez sur le menu d'actions (⋮) du devis</li>
+              <li>Sélectionnez "Télécharger"</li>
+              <li>Le PDF se génère automatiquement</li>
+              <li>Le fichier est téléchargé dans votre dossier de téléchargements</li>
+            </ol>
+            <p>Le PDF contient toutes les informations : logo entreprise, détails client, prestations, totaux et conditions.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment imprimer un devis ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Pour imprimer un devis :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Depuis la liste des devis, localisez le devis à imprimer</li>
+              <li>Cliquez sur le menu d'actions (⋮)</li>
+              <li>Sélectionnez "Imprimer"</li>
+              <li>La boîte de dialogue d'impression de votre navigateur s'ouvre</li>
+              <li>Configurez vos options d'impression (format, qualité)</li>
+              <li>Lancez l'impression</li>
+            </ol>
+            <p>Vous pouvez également prévisualiser le document avant impression pour vérifier la mise en page.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment envoyer un devis par e-mail ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Envoi d'un devis par email :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Dans la liste des devis, sélectionnez le devis à envoyer</li>
+              <li>Cliquez sur le menu d'actions (⋮)</li>
+              <li>Choisissez "Envoyer par e-mail"</li>
+              <li>L'adresse email du client est pré-remplie</li>
+              <li>Personnalisez l'objet et le message si nécessaire</li>
+              <li>Vérifiez le contenu et cliquez sur "Envoyer"</li>
+            </ol>
+            <p>Le devis est automatiquement généré en PDF et joint à l'email. Un accusé de réception confirme l'envoi.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment demander les justificatifs à un client ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Pour demander des justificatifs à un client :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Accédez au devis concerné</li>
+              <li>Cliquez sur le menu d'actions (⋮)</li>
+              <li>Sélectionnez "Demander les justificatifs"</li>
+              <li>Un email automatique est préparé</li>
+              <li>Personnalisez le message selon vos besoins</li>
+              <li>Spécifiez les documents requis</li>
+              <li>Envoyez la demande au client</li>
+            </ol>
+            <p>Cette fonction facilite la collecte des documents nécessaires (permis, carte grise, constat, etc.) avant le début des travaux.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment convertir un devis en ordre de réparation ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Conversion d'un devis accepté en ordre de réparation :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Ouvrez le devis validé par le client</li>
+              <li>Cliquez sur le menu d'actions (⋮)</li>
+              <li>Sélectionnez "Convertir en ordre de réparation"</li>
+              <li>Toutes les informations sont automatiquement transférées</li>
+              <li>Ajustez les détails techniques si nécessaire</li>
+              <li>Définissez les dates prévisionnelles d'intervention</li>
+              <li>Sauvegardez l'ordre de réparation</li>
+            </ol>
+            <p>L'ordre de réparation reprend tous les éléments du devis : client, véhicule, prestations et montants.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment télécharger un ordre de réparation ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Téléchargement d'un ordre de réparation :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Accédez à la liste des ordres de réparation</li>
+              <li>Localisez l'ordre souhaité</li>
+              <li>Cliquez sur le menu d'actions (⋮)</li>
+              <li>Sélectionnez "Télécharger"</li>
+              <li>Le PDF se génère avec tous les détails techniques</li>
+              <li>Le fichier est sauvegardé sur votre appareil</li>
+            </ol>
+            <p>Le document PDF contient les instructions détaillées pour les techniciens et peut être utilisé en atelier.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment imprimer un ordre de réparation ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Impression d'un ordre de réparation :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Dans la liste des ordres, sélectionnez l'ordre à imprimer</li>
+              <li>Cliquez sur le menu d'actions (⋮)</li>
+              <li>Choisissez "Imprimer"</li>
+              <li>La boîte de dialogue d'impression s'ouvre</li>
+              <li>Sélectionnez vos préférences d'impression</li>
+              <li>Lancez l'impression</li>
+            </ol>
+            <p>L'ordre imprimé peut être utilisé directement en atelier par les techniciens pour suivre les interventions.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment envoyer un ordre de réparation par e-mail ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Envoi d'un ordre de réparation par email :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Sélectionnez l'ordre de réparation concerné</li>
+              <li>Cliquez sur le menu d'actions (⋮)</li>
+              <li>Choisissez "Envoyer par e-mail"</li>
+              <li>L'adresse du client est automatiquement renseignée</li>
+              <li>Adaptez le message selon le contexte</li>
+              <li>Envoyez l'ordre avec le PDF joint</li>
+            </ol>
+            <p>Utile pour tenir le client informé de l'avancement des travaux ou lui transmettre les détails de l'intervention.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment convertir un ordre de réparation en facture ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Conversion d'un ordre terminé en facture :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Accédez à l'ordre de réparation avec le statut "Terminé"</li>
+              <li>Cliquez sur le menu d'actions (⋮)</li>
+              <li>Sélectionnez "Convertir en facture"</li>
+              <li>Toutes les prestations réalisées sont reprises</li>
+              <li>Vérifiez et ajustez les montants si nécessaire</li>
+              <li>Définissez les conditions de paiement</li>
+              <li>Générez la facture finale</li>
+            </ol>
+            <p>La facture reprend automatiquement tous les éléments de l'ordre : travaux, pièces, main-d'œuvre et totaux.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment télécharger une facture ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Téléchargement d'une facture au format PDF :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Accédez à la liste des factures</li>
+              <li>Localisez la facture souhaitée</li>
+              <li>Cliquez sur le menu d'actions (⋮)</li>
+              <li>Sélectionnez "Télécharger"</li>
+              <li>Le PDF est généré avec toutes les mentions légales</li>
+              <li>Le fichier est enregistré sur votre appareil</li>
+            </ol>
+            <p>Le PDF de facture contient toutes les informations légales requises et peut être archivé ou transmis à votre comptable.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment imprimer une facture ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Impression d'une facture :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Dans la liste des factures, sélectionnez la facture à imprimer</li>
+              <li>Cliquez sur le menu d'actions (⋮)</li>
+              <li>Choisissez "Imprimer"</li>
+              <li>La boîte de dialogue d'impression s'affiche</li>
+              <li>Configurez le format et la qualité d'impression</li>
+              <li>Procédez à l'impression</li>
+            </ol>
+            <p>L'impression produit un document conforme aux exigences légales de facturation.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment envoyer une facture par e-mail ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Envoi d'une facture par email :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Sélectionnez la facture à envoyer</li>
+              <li>Cliquez sur le menu d'actions (⋮)</li>
+              <li>Choisissez "Envoyer par e-mail"</li>
+              <li>L'adresse email du client est pré-remplie</li>
+              <li>Personnalisez l'objet et le message</li>
+              <li>Vérifiez et envoyez</li>
+            </ol>
+            <p>La facture PDF est automatiquement jointe à l'email. Un accusé de réception confirme la bonne réception par le client.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment ajouter un paiement depuis une facture ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Enregistrement d'un paiement :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Ouvrez la facture concernée</li>
+              <li>Cliquez sur le menu d'actions (⋮)</li>
+              <li>Sélectionnez "Ajouter un paiement"</li>
+              <li>Choisissez le mode de paiement (espèces, carte, virement, chèque)</li>
+              <li>Saisissez le montant encaissé</li>
+              <li>Ajoutez une référence (numéro de chèque, transaction)</li>
+              <li>Validez l'encaissement</li>
+            </ol>
+            <p>Le statut de la facture se met automatiquement à jour. Pour les paiements partiels, le solde restant dû est affiché.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment ajouter un avoir depuis une facture ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Création d'un avoir depuis une facture :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Accédez à la facture concernée</li>
+              <li>Cliquez sur le menu d'actions (⋮)</li>
+              <li>Sélectionnez "Ajouter un avoir"</li>
+              <li>Précisez le montant à créditer</li>
+              <li>Indiquez la raison (défaut, annulation, geste commercial)</li>
+              <li>Ajoutez des commentaires si nécessaire</li>
+              <li>Générez l'avoir</li>
+            </ol>
+            <p>L'avoir est automatiquement lié à la facture originale et impacte les statistiques comptables.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment télécharger un avoir ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Téléchargement d'un avoir :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Accédez à la liste des avoirs</li>
+              <li>Localisez l'avoir souhaité</li>
+              <li>Cliquez sur le menu d'actions (⋮)</li>
+              <li>Sélectionnez "Télécharger"</li>
+              <li>Le PDF de l'avoir est généré</li>
+              <li>Le fichier est sauvegardé sur votre appareil</li>
+            </ol>
+            <p>Le document PDF de l'avoir contient toutes les informations légales et peut être transmis au client.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment imprimer un avoir ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Impression d'un avoir :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Dans la liste des avoirs, sélectionnez l'avoir à imprimer</li>
+              <li>Cliquez sur le menu d'actions (⋮)</li>
+              <li>Choisissez "Imprimer"</li>
+              <li>La boîte de dialogue d'impression s'ouvre</li>
+              <li>Configurez vos options d'impression</li>
+              <li>Lancez l'impression</li>
+            </ol>
+            <p>L'avoir imprimé respecte les normes comptables et peut être archivé avec vos documents comptables.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment envoyer un avoir par e-mail ?",
+        answer: (
+          <div className="space-y-3">
+            <p>Envoi d'un avoir par email :</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+              <li>Sélectionnez l'avoir à envoyer</li>
+              <li>Cliquez sur le menu d'actions (⋮)</li>
+              <li>Choisissez "Envoyer par e-mail"</li>
+              <li>L'adresse du client est automatiquement renseignée</li>
+              <li>Rédigez un message explicatif</li>
+              <li>Envoyez l'avoir avec le PDF joint</li>
+            </ol>
+            <p>Le client reçoit l'avoir en PDF, lui permettant de justifier le crédit accordé dans sa comptabilité.</p>
+          </div>
+        )
       }
     ]
   },
