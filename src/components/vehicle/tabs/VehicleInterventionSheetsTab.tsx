@@ -156,10 +156,11 @@ const VehicleInterventionSheetsTab: React.FC<VehicleInterventionSheetsTabProps> 
 
       {/* Edit Dialog */}
       <InterventionDialog
-        client={vehicle}
+        client={vehicle?.clients}
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
         existingSheet={selectedSheet}
+        preselectedVehicle={vehicle}
       />
 
       {/* Delete Confirmation Dialog */}
