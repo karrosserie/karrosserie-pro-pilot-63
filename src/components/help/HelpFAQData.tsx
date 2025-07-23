@@ -1,9 +1,9 @@
 import React from 'react';
-import { Rocket, Users, Car, Wrench, FileText, CreditCard, Truck, ClipboardList, DollarSign, Bot, MoreVertical } from 'lucide-react';
+import { Rocket, Users, Car, Wrench, FileText, CreditCard, Truck, ClipboardList, DollarSign, Bot } from 'lucide-react';
 
 export interface FAQItem {
   question: string;
-  answer: React.ReactNode;
+  answer: string;
 }
 
 export interface FAQSection {
@@ -21,41 +21,15 @@ export const faqSections: FAQSection[] = [
     items: [
       {
         question: "Comment me connecter à l'application ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Pour vous connecter à l'application :</p>
-            <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li>Accédez à la page de connexion</li>
-              <li>Saisissez votre adresse email</li>
-              <li>Entrez votre mot de passe</li>
-              <li>Cliquez sur "Se connecter"</li>
-            </ol>
-            <p className="text-sm text-muted-foreground">En cas d'oubli de mot de passe, utilisez le lien "Mot de passe oublié" sur la page de connexion.</p>
-          </div>
-        )
+        answer: "Utilisez vos identifiants fournis lors de l'inscription. Cliquez sur 'Se connecter' et saisissez votre email et mot de passe. Si vous avez oublié votre mot de passe, utilisez le lien 'Mot de passe oublié' pour le réinitialiser. Vous recevrez un email avec les instructions détaillées pour créer un nouveau mot de passe sécurisé. Assurez-vous que votre navigateur accepte les cookies pour maintenir votre session active. Si vous rencontrez des difficultés persistantes, vérifiez que votre compte n'est pas temporairement bloqué après plusieurs tentatives de connexion infructueuses."
       },
       {
-        question: "Comment naviguer dans l'application ?",
-        answer: (
-          <div className="space-y-4">
-            <p>L'application est organisée avec un menu de navigation sur la gauche contenant :</p>
-            <ul className="list-disc list-inside space-y-1 ml-4">
-              <li><strong>Tableau de bord</strong> : Vue d'ensemble de votre activité</li>
-              <li><strong>Activité</strong> : Historique des actions</li>
-              <li><strong>Assistant IA</strong> : Aide intelligente</li>
-              <li><strong>Profil</strong> : Gestion de votre compte</li>
-              <li><strong>Clients</strong> : Gestion des clients</li>
-              <li><strong>Véhicules</strong> : Gestion du parc automobile</li>
-              <li><strong>Flotte</strong> : Vue d'ensemble de la flotte</li>
-              <li><strong>Documents</strong> : Devis, factures, ordres de réparation</li>
-              <li><strong>Paiements</strong> : Encaissements, dépenses, comptes</li>
-              <li><strong>Comptabilité</strong> : Suivi financier</li>
-              <li><strong>Cessions</strong> : Gestion des ventes de véhicules</li>
-              <li><strong>Planning</strong> : Organisation du travail</li>
-              <li><strong>Paramètres</strong> : Configuration</li>
-            </ul>
-          </div>
-        )
+        question: "Comment naviguer dans l'interface ?",
+        answer: "L'application est organisée en modules accessibles via le menu latéral : Tableau de bord (vue d'ensemble), Clients (gestion des clients), Véhicules (parc automobile), Documents (devis, factures, ordres), Cessions (créances), Comptabilité (finances). Chaque section a ses propres fonctionnalités et filtres. Sur mobile, utilisez le bouton menu en haut à gauche pour accéder à la navigation."
+      },
+      {
+        question: "Comment personnaliser mon profil ?",
+        answer: "Rendez-vous dans 'Paramètres' > 'Profil' pour modifier vos informations personnelles : nom, prénom, email, téléphone. Vous pouvez également changer votre mot de passe, configurer vos préférences d'affichage (thème clair/sombre), et définir vos notifications. N'oubliez pas de sauvegarder vos changements."
       }
     ]
   },
@@ -66,48 +40,19 @@ export const faqSections: FAQSection[] = [
     items: [
       {
         question: "Comment créer un nouveau client ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Pour ajouter un nouveau client :</p>
-            <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li>Rendez-vous dans la section <strong>Clients</strong></li>
-              <li>Cliquez sur le bouton <strong>"Nouveau client"</strong></li>
-              <li>Remplissez les informations obligatoires (nom, prénom, email ou téléphone)</li>
-              <li>Ajoutez les informations complémentaires si nécessaire</li>
-              <li>Cliquez sur <strong>"Enregistrer"</strong></li>
-            </ol>
-            <p className="text-sm text-muted-foreground">Vous pouvez modifier ces informations à tout moment en cliquant sur le client dans la liste.</p>
-          </div>
-        )
+        answer: "Allez dans 'Clients' puis cliquez sur '+ Nouveau client'. Remplissez les informations obligatoires : nom, prénom, email, téléphone. Vous pouvez ajouter l'adresse complète (rue, ville, code postal), des notes personnalisées et des documents (permis de conduire recto/verso). Une fois toutes les informations saisies, cliquez sur 'Enregistrer'. Le client apparaîtra immédiatement dans votre liste."
+      },
+      {
+        question: "Comment modifier un client existant ?",
+        answer: "Dans la liste des clients, cliquez sur l'icône crayon (éditer) à droite de la ligne du client. Modifiez les informations nécessaires dans le formulaire qui s'ouvre. Vous pouvez aussi accéder à la fiche complète en cliquant sur le nom du client pour voir l'historique des interventions, factures et véhicules associés. Pensez à sauvegarder vos modifications."
       },
       {
         question: "Comment rechercher un client ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Plusieurs options s'offrent à vous :</p>
-            <ul className="list-disc list-inside space-y-1 ml-4">
-              <li>Utilisez la barre de recherche en haut de la liste des clients</li>
-              <li>La recherche fonctionne sur le nom, prénom, email et téléphone</li>
-              <li>Utilisez les filtres pour affiner votre recherche</li>
-            </ul>
-          </div>
-        )
+        answer: "Utilisez la barre de recherche en haut de la liste des clients. Vous pouvez rechercher par nom, prénom, email, téléphone ou même par fragments de ces informations. Les filtres avancés permettent de trier par type de client (particulier/professionnel), statut (actif/inactif), ou date de création. La recherche est instantanée et met à jour la liste en temps réel."
       },
       {
-        question: "Comment créer un devis pour un client ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Pour créer un devis :</p>
-            <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li>Sélectionnez le client dans la liste</li>
-              <li>Cliquez sur le menu actions (trois points) à droite</li>
-              <li>Choisissez <strong>"Créer un devis"</strong></li>
-              <li>Remplissez les détails du devis</li>
-              <li>Ajoutez les réparations et pièces nécessaires</li>
-              <li>Enregistrez le devis</li>
-            </ol>
-          </div>
-        )
+        question: "Comment ajouter des documents au dossier client ?",
+        answer: "Dans la fiche client, onglet 'Documents', vous pouvez uploader le permis de conduire (recto/verso obligatoire), carte d'identité, justificatif de domicile et d'autres documents utiles. Les formats acceptés sont PDF, JPEG, PNG (max 10Mo par fichier). Chaque document peut être renommé et catégorisé pour un meilleur classement. L'historique des documents est conservé avec dates d'ajout."
       }
     ]
   },
@@ -118,200 +63,149 @@ export const faqSections: FAQSection[] = [
     items: [
       {
         question: "Comment ajouter un véhicule ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Pour ajouter un nouveau véhicule :</p>
-            <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li>Allez dans la section <strong>Véhicules</strong></li>
-              <li>Cliquez sur <strong>"Nouveau véhicule"</strong></li>
-              <li>Remplissez les informations de base (marque, modèle, immatriculation)</li>
-              <li>Ajoutez les détails techniques (année, couleur, etc.)</li>
-              <li>Téléchargez les photos du véhicule</li>
-              <li>Ajoutez les documents (carte grise, etc.)</li>
-              <li>Enregistrez le véhicule</li>
-            </ol>
-          </div>
-        )
+        answer: "Dans 'Véhicules', cliquez sur '+ Nouveau véhicule'. Associez-le obligatoirement à un client existant via le menu déroulant. Renseignez les informations de base : marque, modèle, année, plaque d'immatriculation. Le numéro VIN (17 caractères) permet un remplissage automatique des informations techniques. Ajoutez des photos du véhicule, l'état du carburant, et les documents (carte grise). Sauvegardez pour finaliser l'ajout."
       },
       {
-        question: "Comment modifier le statut d'un véhicule ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Pour changer le statut d'un véhicule :</p>
-            <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li>Cliquez sur le véhicule dans la liste</li>
-              <li>Sélectionnez <strong>"Modifier"</strong></li>
-              <li>Dans l'onglet statut, choisissez le nouveau statut :</li>
-            </ol>
-            <ul className="list-disc list-inside space-y-1 ml-8">
-              <li><strong>En attente</strong> : Véhicule en attente de prise en charge</li>
-              <li><strong>En cours</strong> : Véhicule en réparation</li>
-              <li><strong>Terminé</strong> : Réparation terminée</li>
-              <li><strong>Réservé</strong> : Véhicule réservé</li>
-              <li><strong>Annulé</strong> : Intervention annulée</li>
-            </ul>
-          </div>
-        )
+        question: "Comment fonctionne le décodage VIN automatique ?",
+        answer: "Saisissez un numéro VIN de 17 caractères valide dans le champ prévu. L'application vérifie automatiquement le format et décode la marque, le modèle et l'année de fabrication grâce à notre API intégrée qui reconnaît plus de 500 codes constructeurs mondiaux. Si le VIN n'est pas reconnu, vous pouvez saisir manuellement les informations. Le décodage fonctionne pour les véhicules de 1980 à aujourd'hui."
       },
       {
-        question: "Comment ajouter des photos à un véhicule ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Pour ajouter des photos :</p>
-            <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li>Ouvrez la fiche du véhicule</li>
-              <li>Cliquez sur <strong>"Modifier"</strong></li>
-              <li>Dans l'onglet "Documents", section "Photos du véhicule"</li>
-              <li>Cliquez sur <strong>"Ajouter une photo"</strong></li>
-              <li>Sélectionnez l'image depuis votre appareil</li>
-              <li>Ajoutez une description si nécessaire</li>
-              <li>Enregistrez les modifications</li>
-            </ol>
-          </div>
-        )
+        question: "Quelles informations puis-je enregistrer pour un véhicule ?",
+        answer: "Informations techniques : marque, modèle, année, VIN, plaque d'immatriculation, couleur, type de carburant, kilométrage, puissance. Documents : carte grise recto/verso, photos du véhicule (jusqu'à 10 photos), contrat d'achat. Informations d'assurance : compagnie, numéro de police, date d'expiration. Vous pouvez aussi suivre l'historique complet des interventions, réparations et factures associées au véhicule."
+      },
+      {
+        question: "Comment associer un véhicule à un client ?",
+        answer: "Lors de la création du véhicule, sélectionnez le client dans la liste déroulante 'Propriétaire'. Si le client n'existe pas encore, créez-le d'abord via le bouton 'Nouveau client'. Un client peut posséder plusieurs véhicules - ils apparaîtront tous dans sa fiche. Vous pouvez modifier l'association à tout moment en éditant la fiche véhicule. L'historique des changements de propriétaire est conservé."
       }
     ]
   },
   {
-    id: "documents",
-    title: "Documents",
+    id: "repair-orders",
+    title: "Ordres de réparation",
+    icon: <Wrench className="h-5 w-5" />,
+    items: [
+      {
+        question: "Comment créer un ordre de réparation ?",
+        answer: "Dans 'Documents' > 'Ordres de réparation', cliquez sur 'Nouvel ordre'. Sélectionnez le client et le véhicule concerné. Ajoutez les réparations nécessaires avec descriptions détaillées, quantités, prix unitaires et temps de main-d'œuvre. Vous pouvez aussi ajouter des pièces détachées avec références fournisseur. Le système calcule automatiquement les sous-totaux, TVA et total TTC. Définissez les dates prévisionnelles de début et fin d'intervention."
+      },
+      {
+        question: "Comment ajouter des réparations et pièces ?",
+        answer: "Dans l'ordre de réparation, utilisez les sections 'Réparations' et 'Pièces détachées'. Pour chaque ligne de réparation, indiquez la description précise, le nombre d'heures, le taux horaire. Pour les pièces, renseignez la référence, la description, la quantité, le prix unitaire HT. Vous pouvez appliquer des remises par ligne ou globales. Les calculs (sous-total, TVA à 20%, total TTC) se font automatiquement. Sauvegardez régulièrement votre travail."
+      },
+      {
+        question: "Comment gérer les statuts des ordres ?",
+        answer: "Les statuts disponibles sont : 'En attente' (ordre créé), 'En cours' (travaux commencés), 'Terminé' (travaux finis), 'Facturé' (ordre converti en facture), 'Annulé'. Changez le statut selon l'avancement des travaux via le menu déroulant en haut de l'ordre. Un ordre 'Terminé' peut être converti en facture directement. Les notifications automatiques informent le client des changements de statut."
+      },
+      {
+        question: "Comment convertir un ordre en facture ?",
+        answer: "Dans la liste des ordres, cliquez sur l'action 'Convertir en facture' pour un ordre avec le statut 'Terminé'. Toutes les informations (client, véhicule, réparations, pièces, montants) sont reprises automatiquement dans la nouvelle facture. Vous pouvez modifier les éléments si nécessaire avant la génération finale. La facture reçoit automatiquement un numéro séquentiel et la date du jour. L'ordre original reste accessible pour traçabilité."
+      }
+    ]
+  },
+  {
+    id: "quotes-invoices",
+    title: "Devis et factures",
     icon: <FileText className="h-5 w-5" />,
     items: [
       {
-        question: "Quels types de documents puis-je créer ?",
-        answer: (
-          <div className="space-y-4">
-            <p>L'application permet de créer plusieurs types de documents :</p>
-            <ul className="list-disc list-inside space-y-1 ml-4">
-              <li><strong>Devis</strong> : Estimation des coûts de réparation</li>
-              <li><strong>Ordres de réparation</strong> : Instructions de travail</li>
-              <li><strong>Factures</strong> : Facturation des prestations</li>
-              <li><strong>Avoirs</strong> : Notes de crédit</li>
-              <li><strong>Rapports d'expertise</strong> : Documents d'expertise technique</li>
-            </ul>
-            <p className="text-sm text-muted-foreground">Chaque type de document a ses propres champs et peut être personnalisé selon vos besoins.</p>
-          </div>
-        )
-      },
-      {
-        question: "Comment importer un rapport d'expertise ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Pour importer un rapport d'expertise :</p>
-            <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li>Allez dans <strong>Documents {'>'} Rapports d'expertise</strong></li>
-              <li>Cliquez sur <strong>"Importer un rapport"</strong></li>
-              <li>Sélectionnez votre fichier (PDF, JPEG, PNG jusqu'à 10MB) :</li>
-              <ul className="list-disc list-inside space-y-1 ml-8">
-                <li>Cliquez pour parcourir vos fichiers</li>
-                <li>Ou glissez-déposez directement le fichier</li>
-              </ul>
-              <li>Cliquez sur <strong>"Importer"</strong></li>
-              <li>L'IA analysera automatiquement le document</li>
-              <li>Le rapport sera traité et ajouté à votre liste</li>
-            </ol>
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-              <p className="text-sm"><strong>Note :</strong> L'analyse par IA extrait automatiquement les informations importantes du rapport (clients, véhicules, dommages, etc.) pour faciliter la création de devis.</p>
-            </div>
-          </div>
-        )
-      },
-      {
         question: "Comment créer un devis ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Pour créer un devis :</p>
-            <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li>Allez dans <strong>Documents {'>'} Devis</strong></li>
-              <li>Cliquez sur <strong>"Nouveau devis"</strong></li>
-              <li>Sélectionnez le client et le véhicule</li>
-              <li>Ajoutez les réparations nécessaires avec les prix</li>
-              <li>Ajoutez les pièces requises</li>
-              <li>Appliquez des remises si nécessaire</li>
-              <li>Vérifiez les totaux et enregistrez</li>
-            </ol>
-            <p className="text-sm text-muted-foreground">Le devis peut ensuite être envoyé par email au client directement depuis l'application.</p>
-          </div>
-        )
+        answer: "Dans 'Documents' > 'Devis', créez un nouveau devis en sélectionnant client et véhicule. Ajoutez les prestations avec descriptions détaillées, quantités et prix unitaires. Vous pouvez inclure plusieurs types de travaux : réparations, peinture, carrosserie, mécanique. Définissez une date de validité (généralement 30 jours) et des conditions de paiement. Le devis peut être converti en ordre de réparation une fois accepté par le client."
       },
       {
         question: "Comment envoyer un devis par email ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Pour envoyer un devis par email :</p>
-            <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li>Ouvrez le devis dans la liste</li>
-              <li>Cliquez sur le bouton <strong>"Envoyer par email"</strong></li>
-              <li>Vérifiez l'adresse email du destinataire</li>
-              <li>Personnalisez le message si nécessaire</li>
-              <li>Cliquez sur <strong>"Envoyer"</strong></li>
-            </ol>
-            <p className="text-sm text-muted-foreground">Le devis sera automatiquement joint au message en format PDF.</p>
-          </div>
-        )
+        answer: "Dans la fiche devis, cliquez sur 'Envoyer par email'. Rédigez votre message personnalisé, l'application génère automatiquement le PDF du devis en pièce jointe. Vous pouvez prévisualiser l'email avant envoi. Le client recevra le devis en PDF avec votre logo et informations d'entreprise. Un accusé de réception vous informe de la bonne réception. L'historique des envois est conservé dans la fiche devis."
+      },
+      {
+        question: "Comment créer une facture ?",
+        answer: "Deux possibilités : créer une facture manuellement dans 'Documents' > 'Factures' en sélectionnant client/véhicule et en ajoutant les prestations, ou convertir automatiquement un ordre de réparation terminé (plus rapide). La facture reprend toutes les informations avec numérotation automatique chronologique. Définissez la date d'échéance, les conditions de paiement et les pénalités de retard. La facture peut être envoyée par email ou imprimée."
+      },
+      {
+        question: "Comment gérer les avoirs ?",
+        answer: "Dans 'Documents' > 'Avoirs', créez un avoir pour annuler tout ou partie d'une facture. Sélectionnez la facture concernée (seules les factures payées peuvent faire l'objet d'un avoir), indiquez le montant à créditer et la raison du remboursement (défaut, annulation, geste commercial). L'avoir est numéroté automatiquement et vient en déduction du chiffre d'affaires. Il peut être envoyé au client et impacte automatiquement les statistiques comptables."
+      }
+    ]
+  },
+  {
+    id: "cessions",
+    title: "Cessions de créance",
+    icon: <CreditCard className="h-5 w-5" />,
+    items: [
+      {
+        question: "Qu'est-ce qu'une cession de créance ?",
+        answer: "La cession de créance permet à votre client de vous céder ses droits au remboursement d'assurance. Concrètement : au lieu que l'assurance rembourse le client qui vous règle ensuite, l'assurance vous paie directement. Cela améliore votre trésorerie en évitant les délais de paiement clients et réduit les risques d'impayés. C'est un mécanisme légal très utilisé dans l'automobile, encadré par le Code des assurances."
+      },
+      {
+        question: "Comment créer une cession de créance ?",
+        answer: "Dans 'Cession de créance', cliquez sur 'Nouvelle cession'. Sélectionnez un ordre de réparation existant (statut 'Terminé' requis), les informations client/véhicule/montant sont automatiquement récupérées. Renseignez les détails de l'assurance : compagnie, numéro de sinistre, expert. Générez les documents légaux nécessaires (lettre de cession, bordereau). Le client doit signer la cession pour qu'elle soit valide juridiquement."
+      },
+      {
+        question: "Quels sont les statuts d'une cession ?",
+        answer: "Les statuts suivent le processus complet : 'En attente' (cession créée, signature client en cours), 'Envoyée' (transmise à l'assurance avec tous les documents), 'Acceptée' (validée par l'assurance, paiement programmé), 'Payée' (encaissement effectué), 'Rejetée' (refusée par l'assurance, raison indiquée). Chaque changement de statut est horodaté pour traçabilité complète du dossier."
+      },
+      {
+        question: "Comment suivre l'avancement des cessions ?",
+        answer: "Le tableau de bord des cessions affiche toutes vos demandes avec leurs statuts en temps réel. Vous pouvez filtrer par statut, client, assurance ou période pour suivre l'évolution de vos dossiers. Des alertes automatiques vous préviennent des cessions en retard ou nécessitant une action. Un graphique montre l'évolution mensuelle des cessions et les délais moyens de paiement par assurance. Export Excel disponible pour reporting."
+      }
+    ]
+  },
+  {
+    id: "fleet",
+    title: "Véhicules de courtoisie",
+    icon: <Truck className="h-5 w-5" />,
+    items: [
+      {
+        question: "Comment gérer ma flotte de véhicules de courtoisie ?",
+        answer: "Dans 'Véhicules de courtoisie', ajoutez vos véhicules de prêt avec leurs caractéristiques complètes : marque, modèle, immatriculation, année, kilométrage, état général. Définissez les tarifs de location si applicable, les conditions d'utilisation, les restrictions (âge minimum du conducteur, permis requis). Vous pouvez suivre leur disponibilité en temps réel, planifier leur maintenance et gérer les contrats de prêt avec états des lieux détaillés."
+      },
+      {
+        question: "Comment faire une réservation de véhicule ?",
+        answer: "Créez une nouvelle réservation en sélectionnant le client concerné, le véhicule disponible sur la période souhaitée et les dates de prêt (début/fin). Le système vérifie automatiquement les disponibilités et les conflits. Définissez les conditions particulières (franchise, utilisation autorisée). Le contrat de prêt se génère automatiquement avec état des lieux d'entrée à compléter lors de la remise des clés. Signature électronique possible."
+      },
+      {
+        question: "Comment gérer les retours de véhicules ?",
+        answer: "Lors du retour, accédez à la réservation active et complétez l'état des lieux de sortie : kilométrage final, niveau de carburant, dommages éventuels avec photos. Comparez avec l'état d'entrée pour identifier les différences. Notez les éventuels dommages avec estimation des coûts de remise en état. Une fois validé, le véhicule redevient automatiquement disponible pour de nouvelles réservations. Facturation automatique des frais supplémentaires si nécessaire."
+      }
+    ]
+  },
+  {
+    id: "expertise",
+    title: "Rapports d'expertise",
+    icon: <ClipboardList className="h-5 w-5" />,
+    items: [
+      {
+        question: "Comment importer un rapport d'expertise ?",
+        answer: "Dans 'Documents' > 'Rapports d'expertise', utilisez l'outil d'import pour télécharger les rapports PDF envoyés par les experts. L'application utilise la reconnaissance optique (OCR) pour extraire automatiquement les informations principales : numéro de sinistre, montant des dommages, détail des réparations, expert signataire. Les données extraites sont associées automatiquement aux véhicules et clients concernés si ils existent dans votre base."
+      },
+      {
+        question: "Comment traiter un rapport d'expertise ?",
+        answer: "Une fois importé, vérifiez les informations extraites automatiquement dans l'onglet 'Détails'. Corrigez si nécessaire les montants, descriptions de dommages, références des pièces. Associez manuellement le rapport au bon client et véhicule si l'association automatique a échoué. Renseignez les données complémentaires : expert, compagnie d'assurance, date de sinistre, statut du dossier. Ajoutez vos commentaires et observations personnelles."
+      },
+      {
+        question: "Comment suivre le statut des expertises ?",
+        answer: "Les statuts disponibles sont : 'Importé' (rapport reçu), 'En cours d'analyse' (étude en cours), 'En attente' (informations manquantes), 'Validé' (expertise acceptée, travaux autorisés), 'Rejeté' (expertise refusée, raison indiquée), 'Facturé' (travaux terminés et facturés). Modifiez le statut selon l'avancement du dossier. Des rappels automatiques alertent sur les dossiers en attente. Statistiques des délais de traitement par expert disponibles."
       }
     ]
   },
   {
     id: "payments",
-    title: "Paiements",
-    icon: <CreditCard className="h-5 w-5" />,
+    title: "Paiements et comptabilité",
+    icon: <DollarSign className="h-5 w-5" />,
     items: [
       {
         question: "Comment enregistrer un encaissement ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Pour enregistrer un paiement reçu :</p>
-            <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li>Allez dans <strong>Paiements {'>'} Encaissements</strong></li>
-              <li>Cliquez sur <strong>"Nouvel encaissement"</strong></li>
-              <li>Sélectionnez le client</li>
-              <li>Choisissez le mode de paiement (espèces, chèque, virement, carte)</li>
-              <li>Saisissez le montant</li>
-              <li>Ajoutez une référence si nécessaire</li>
-              <li>Enregistrez l'encaissement</li>
-            </ol>
-          </div>
-        )
+        answer: "Dans 'Paiements' > 'Encaissements', créez un nouveau reçu en sélectionnant la facture concernée dans la liste des factures impayées. Choisissez le mode de paiement (espèces, carte bancaire, virement, chèque, prélèvement) et saisissez le montant encaissé. Pour les paiements partiels, le solde restant dû s'affiche automatiquement. Ajoutez une référence (numéro de chèque, transaction CB) et des notes si nécessaire. Le reçu PDF est généré automatiquement."
       },
       {
         question: "Comment gérer les dépenses ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Pour enregistrer une dépense :</p>
-            <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li>Allez dans <strong>Paiements {'>'} Dépenses</strong></li>
-              <li>Cliquez sur <strong>"Nouvelle dépense"</strong></li>
-              <li>Sélectionnez la catégorie de dépense</li>
-              <li>Saisissez le montant et la description</li>
-              <li>Ajoutez la date et le fournisseur</li>
-              <li>Téléchargez le justificatif si disponible</li>
-              <li>Enregistrez la dépense</li>
-            </ol>
-          </div>
-        )
-      }
-    ]
-  },
-  {
-    id: "planning",
-    title: "Planning",
-    icon: <ClipboardList className="h-5 w-5" />,
-    items: [
+        answer: "Dans 'Paiements' > 'Dépenses', enregistrez tous vos achats : pièces détachées, prestations externes (sous-traitance, expertise), frais généraux (électricité, assurance, téléphone). Associez chaque dépense à un fournisseur, une catégorie comptable et un projet/véhicule si applicable. Scannez les factures fournisseurs pour joindre les justificatifs. La TVA déductible est calculée automatiquement selon les taux en vigueur."
+      },
       {
-        question: "Comment utiliser le planning ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Le planning vous permet d'organiser votre travail :</p>
-            <ul className="list-disc list-inside space-y-1 ml-4">
-              <li>Visualisez les interventions planifiées</li>
-              <li>Organisez les créneaux horaires</li>
-              <li>Assignez les véhicules aux équipes</li>
-              <li>Suivez l'avancement des travaux</li>
-            </ul>
-            <p className="text-sm text-muted-foreground">Le planning se synchronise automatiquement avec les ordres de réparation.</p>
-          </div>
-        )
+        question: "Comment consulter ma comptabilité ?",
+        answer: "Le module 'Comptabilité' offre une vue d'ensemble complète : chiffre d'affaires mensuel/annuel, dépenses par catégorie, marges brutes et nettes, évolution de la trésorerie. Tableaux de bord interactifs avec graphiques en temps réel. Utilisez les filtres de période (mois, trimestre, année) pour analyser vos performances. Comparaison avec les périodes précédentes et objectifs. Indicateurs clés : délai moyen de paiement, factures en retard, top clients."
+      },
+      {
+        question: "Comment exporter mes données comptables ?",
+        answer: "Dans la section comptabilité, utilisez les boutons d'export pour générer des rapports détaillés aux formats PDF (présentation) ou Excel (données brutes). Exports disponibles : journal des ventes, journal des achats, balance comptable, bilan simplifié. Les fichiers sont compatibles avec la plupart des logiciels comptables (Sage, Ciel, EBP). Possibilité d'automatiser les exports mensuels par email à votre comptable. Historique des exports conservé 12 mois."
       }
     ]
   },
@@ -321,158 +215,16 @@ export const faqSections: FAQSection[] = [
     icon: <Bot className="h-5 w-5" />,
     items: [
       {
-        question: "Comment utiliser l'assistant IA ?",
-        answer: (
-          <div className="space-y-4">
-            <p>L'assistant IA vous aide dans vos tâches quotidiennes :</p>
-            <ul className="list-disc list-inside space-y-1 ml-4">
-              <li>Accédez à l'assistant via le menu <strong>"Assistant IA"</strong></li>
-              <li>Posez vos questions en langage naturel</li>
-              <li>Demandez de l'aide pour la navigation</li>
-              <li>Obtenez des suggestions d'optimisation</li>
-            </ul>
-          </div>
-        )
-      }
-    ]
-  },
-  {
-    id: "settings",
-    title: "Paramètres",
-    icon: <Wrench className="h-5 w-5" />,
-    items: [
-      {
-        question: "Comment configurer mon profil ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Pour modifier vos informations personnelles :</p>
-            <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li>Cliquez sur <strong>Profil</strong> dans le menu</li>
-              <li>Modifiez vos informations (nom, email, téléphone)</li>
-              <li>Changez votre mot de passe si nécessaire</li>
-              <li>Enregistrez les modifications</li>
-            </ol>
-          </div>
-        )
+        question: "Comment fonctionne l'assistant IA ?",
+        answer: "L'assistant IA analyse vos données d'activité pour identifier des patterns et optimisations possibles. Il vous aide à automatiser certaines tâches répétitives, suggère des améliorations de processus et peut répondre à vos questions sur l'utilisation de l'application. L'IA apprend de vos habitudes pour proposer des suggestions de plus en plus personnalisées. Elle respecte strictement la confidentialité de vos données et ne partage aucune information avec l'extérieur."
       },
       {
-        question: "Comment accéder aux paramètres généraux ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Les paramètres généraux sont accessibles via :</p>
-            <ul className="list-disc list-inside space-y-1 ml-4">
-              <li>Le menu <strong>Paramètres</strong> dans la navigation</li>
-              <li>Configuration des préférences d'affichage</li>
-              <li>Paramétrage des notifications</li>
-              <li>Gestion des utilisateurs (si administrateur)</li>
-            </ul>
-          </div>
-        )
-      }
-    ]
-  },
-  {
-    id: "context-menus",
-    title: "Menus contextuels et actions",
-    icon: <MoreVertical className="h-5 w-5" />,
-    items: [
-      {
-        question: "Comment utiliser les menus d'actions sur les clients ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Sur la page des clients, chaque ligne dispose d'un menu d'actions (trois points) qui permet :</p>
-            <ul className="list-disc list-inside space-y-1 ml-4">
-              <li><strong>Voir</strong> : Consulter les détails du client (icône œil)</li>
-              <li><strong>Modifier</strong> : Éditer les informations du client (icône crayon)</li>
-              <li><strong>Supprimer</strong> : Effacer le client (icône poubelle)</li>
-              <li><strong>Créer un devis</strong> : Générer un nouveau devis pour ce client</li>
-              <li><strong>Créer une facture</strong> : Établir une facture pour ce client</li>
-              <li><strong>Créer un avoir</strong> : Émettre un avoir/note de crédit</li>
-            </ul>
-            <p className="text-sm text-muted-foreground">Cliquez sur les trois points verticaux à droite de chaque ligne pour accéder à ces options.</p>
-          </div>
-        )
+        question: "Quelles tâches peut automatiser l'IA ?",
+        answer: "L'IA peut automatiser : la catégorisation des dépenses selon vos habitudes, la suggestion de réparations types selon les véhicules et pannes récurrentes, l'optimisation de la planification des interventions selon les disponibilités, la génération de rapports personnalisés avec analyses de performance, la détection d'anomalies (factures inhabituelles, retards de paiement), et l'envoi de rappels automatiques aux clients pour les échéances importantes."
       },
       {
-        question: "Comment utiliser les menus d'actions sur les véhicules ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Sur la page des véhicules, chaque carte de véhicule propose :</p>
-            <ul className="list-disc list-inside space-y-1 ml-4">
-              <li><strong>Voir</strong> : Consulter les détails du véhicule (icône œil)</li>
-              <li><strong>Modifier</strong> : Éditer les informations du véhicule (icône crayon)</li>
-              <li><strong>Supprimer</strong> : Effacer le véhicule (icône poubelle)</li>
-            </ul>
-            <p>Dans le menu contextuel (trois points) :</p>
-            <ul className="list-disc list-inside space-y-1 ml-4">
-              <li><strong>Créer un devis</strong> : Générer un devis pour les réparations</li>
-              <li><strong>Créer une facture</strong> : Établir une facture pour ce véhicule</li>
-            </ul>
-          </div>
-        )
-      },
-      {
-        question: "Comment utiliser les menus d'actions sur les documents ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Les documents (devis, factures, avoirs) disposent d'actions spécifiques :</p>
-            <ul className="list-disc list-inside space-y-1 ml-4">
-              <li><strong>Télécharger</strong> : Sauvegarder le document en PDF</li>
-              <li><strong>Imprimer</strong> : Lancer l'impression du document</li>
-              <li><strong>Envoyer par email</strong> : Expédier le document au client</li>
-              <li><strong>Modifier</strong> : Éditer le contenu du document</li>
-              <li><strong>Dupliquer</strong> : Créer une copie du document</li>
-              <li><strong>Marquer comme payé</strong> : Pour les factures impayées</li>
-              <li><strong>Supprimer</strong> : Effacer définitivement le document</li>
-            </ul>
-            <p className="text-sm text-muted-foreground">Les actions disponibles varient selon le type de document et son statut.</p>
-          </div>
-        )
-      },
-      {
-        question: "Comment utiliser les filtres et la recherche ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Chaque page principale dispose d'outils de recherche et de filtrage :</p>
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-              <h4 className="font-semibold mb-2">Barre de recherche :</h4>
-              <ul className="list-disc list-inside space-y-1">
-                <li>Tapez directement dans le champ de recherche</li>
-                <li>La recherche s'effectue en temps réel</li>
-                <li>Fonctionne sur les champs principaux (nom, email, immatriculation, etc.)</li>
-              </ul>
-            </div>
-            <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-              <h4 className="font-semibold mb-2">Filtres avancés :</h4>
-              <ul className="list-disc list-inside space-y-1">
-                <li>Cliquez sur l'icône filtre pour ouvrir les options</li>
-                <li>Filtrez par statut, date, type, etc.</li>
-                <li>Combinez plusieurs filtres pour affiner les résultats</li>
-                <li>Réinitialisez les filtres avec le bouton "Effacer"</li>
-              </ul>
-            </div>
-          </div>
-        )
-      },
-      {
-        question: "Comment utiliser les actions en lot ?",
-        answer: (
-          <div className="space-y-4">
-            <p>Certaines pages permettent d'effectuer des actions sur plusieurs éléments :</p>
-            <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li>Cochez les cases à gauche des éléments à sélectionner</li>
-              <li>Une barre d'actions apparaît en haut</li>
-              <li>Choisissez l'action à effectuer :</li>
-            </ol>
-            <ul className="list-disc list-inside space-y-1 ml-8">
-              <li><strong>Exporter</strong> : Télécharger les données sélectionnées</li>
-              <li><strong>Archiver</strong> : Archiver plusieurs éléments</li>
-              <li><strong>Supprimer</strong> : Effacer en lot (avec confirmation)</li>
-              <li><strong>Changer le statut</strong> : Modifier le statut de plusieurs éléments</li>
-            </ul>
-            <p className="text-sm text-muted-foreground">Utilisez "Sélectionner tout" pour traiter l'ensemble des résultats visibles.</p>
-          </div>
-        )
+        question: "Comment activer les suggestions automatiques ?",
+        answer: "Dans les paramètres de l'assistant IA, activez les suggestions pour les modules qui vous intéressent : gestion des stocks, planification, facturation, relances clients. Définissez le niveau de suggestions (faible, moyen, élevé) et les types d'alertes souhaitées. L'IA commence à apprendre après quelques semaines d'utilisation et ses suggestions deviennent progressivement plus pertinentes. Vous pouvez désactiver les suggestions à tout moment ou les modifier selon vos besoins."
       }
     ]
   }
