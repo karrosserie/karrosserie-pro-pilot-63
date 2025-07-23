@@ -67,8 +67,8 @@ export const generateAttestationPDF = async (loanData: any, companyData: any, us
       
       // Essayer d'afficher le logo de l'entreprise
       const logoBase64 = await getBase64Image(companyData.logo_url);
-      doc.addImage(logoBase64, 'PNG', col1X, y1 - 3, 50, 20);
-      y1 += 25;
+      doc.addImage(logoBase64, 'PNG', col1X, y1 - 3, 40, 15);
+      y1 += 20;
     } catch (error) {
       console.error('Erreur lors du chargement du logo:', error);
       // Fallback en cas d'erreur
@@ -277,8 +277,131 @@ export const generateAttestationPDF = async (loanData: any, companyData: any, us
   }
   yPosition += 8;
   
-  // Section signature
-  yPosition += 20;
+  // CONTENU DU CONTRAT
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.text('IL A ÉTÉ CONVENU ET ARRÊTÉ CE QUI SUIT :', leftMargin, yPosition);
+  yPosition += 12;
+  
+  // Article 1
+  doc.setFont('helvetica', 'bold');
+  doc.text('Article 1 : OBJET DU CONTRAT', leftMargin, yPosition);
+  yPosition += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text('Le présent contrat a pour objet la mise à disposition gratuite d\'un véhicule de courtoisie', leftMargin, yPosition);
+  yPosition += 4;
+  doc.text('au profit de l\'emprunteur pendant la durée d\'immobilisation de son véhicule personnel', leftMargin, yPosition);
+  yPosition += 4;
+  doc.text('pour réparation ou entretien dans les locaux du prêteur.', leftMargin, yPosition);
+  yPosition += 8;
+  
+  // Article 2
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.text('Article 2 : DURÉE', leftMargin, yPosition);
+  yPosition += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text('Le véhicule est mis à disposition pour la durée strictement nécessaire à la réparation', leftMargin, yPosition);
+  yPosition += 4;
+  doc.text('ou à l\'entretien du véhicule de l\'emprunteur.', leftMargin, yPosition);
+  yPosition += 8;
+  
+  // Article 3
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.text('Article 3 : OBLIGATIONS DE L\'EMPRUNTEUR', leftMargin, yPosition);
+  yPosition += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text('L\'emprunteur s\'engage à :', leftMargin, yPosition);
+  yPosition += 5;
+  doc.text('• Utiliser le véhicule en bon père de famille', leftMargin + 5, yPosition);
+  yPosition += 4;
+  doc.text('• Respecter le code de la route', leftMargin + 5, yPosition);
+  yPosition += 4;
+  doc.text('• Ne pas prêter, louer ou céder le véhicule à un tiers', leftMargin + 5, yPosition);
+  yPosition += 4;
+  doc.text('• Restituer le véhicule dans l\'état où il l\'a reçu', leftMargin + 5, yPosition);
+  yPosition += 4;
+  doc.text('• Signaler immédiatement tout accident ou vol', leftMargin + 5, yPosition);
+  yPosition += 8;
+  
+  // Article 4
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.text('Article 4 : ASSURANCE', leftMargin, yPosition);
+  yPosition += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text('Le véhicule est assuré par le prêteur. L\'emprunteur est couvert pour la conduite', leftMargin, yPosition);
+  yPosition += 4;
+  doc.text('du véhicule sous réserve du respect des conditions d\'assurance.', leftMargin, yPosition);
+  yPosition += 8;
+  
+  // Article 5
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.text('Article 5 : RESPONSABILITÉ', leftMargin, yPosition);
+  yPosition += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text('L\'emprunteur est responsable des dommages causés par sa faute au véhicule', leftMargin, yPosition);
+  yPosition += 4;
+  doc.text('et des amendes encourues pendant la période de prêt.', leftMargin, yPosition);
+  yPosition += 8;
+  
+  // Si on arrive en bas de page, ajouter une nouvelle page
+  if (yPosition > pageHeight - 60) {
+    doc.addPage();
+    yPosition = 30;
+  }
+  
+  // Article 6
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.text('Article 6 : RESTITUTION', leftMargin, yPosition);
+  yPosition += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text('Le véhicule doit être restitué dès que le véhicule de l\'emprunteur est disponible.', leftMargin, yPosition);
+  yPosition += 4;
+  doc.text('Le prêteur se réserve le droit de récupérer le véhicule à tout moment.', leftMargin, yPosition);
+  yPosition += 8;
+  
+  // Article 7
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.text('Article 7 : RÉSILIATION', leftMargin, yPosition);
+  yPosition += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text('Le présent contrat peut être résilié à tout moment par le prêteur en cas de', leftMargin, yPosition);
+  yPosition += 4;
+  doc.text('non-respect des obligations par l\'emprunteur.', leftMargin, yPosition);
+  yPosition += 10;
+  
+  // Lu et approuvé
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text('Lu et approuvé par les parties.', leftMargin, yPosition);
+  yPosition += 15;
+  
+  // Signatures
+  const signatureY = yPosition;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Le Prêteur', leftMargin, signatureY);
+  doc.text('L\'Emprunteur', leftMargin + 100, signatureY);
+  yPosition += 15;
+  
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${companyData.name || 'AUTO PAINT'}`, leftMargin, yPosition);
+  doc.text(`${loanData?.clients?.first_name || 'Geoffrey'} ${loanData?.clients?.last_name || 'GOBEYN'}`, leftMargin + 100, yPosition);
+  yPosition += 15;
+  
+  // Section signature de l'assuré
+  yPosition += 10;
   doc.setFont('helvetica', 'bold');
   doc.text('Signature de l\'assuré', leftMargin, yPosition);
   yPosition += 10;
