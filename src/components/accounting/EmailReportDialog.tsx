@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Paperclip, FileText } from 'lucide-react';
+import { Paperclip, FileText, Mail } from 'lucide-react';
 import { GeneratedReport } from '@/hooks/use-generated-reports';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -29,6 +29,8 @@ export const EmailReportDialog = ({
   onSend 
 }: EmailReportDialogProps) => {
   const [email, setEmail] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const getEmailSubject = (report: GeneratedReport) => {
@@ -46,8 +48,7 @@ export const EmailReportDialog = ({
       'quarterly': 'le bilan trimestriel', 
       'yearly': 'le bilan annuel',
       'fec': 'l\'export au format FEC',
-      'csv': 'l\'export au format CSV',
-      'excel': 'l\'export au format Excel'
+      'csv': 'l\'export au format CSV'
     };
 
     return `Bonjour,
@@ -57,8 +58,16 @@ Veuillez trouver ${reportTypeText[report.type] || 'le rapport'} en pièce jointe
 Ce document a été généré automatiquement le ${format(report.generatedAt, 'dd/MM/yyyy à HH:mm', { locale: fr })}.
 
 Cordialement,
-L'équipe comptabilité`;
+L'équipe comptabilité
+Garage MUSSO`;
   };
+
+  React.useEffect(() => {
+    if (report && open) {
+      setSubject(getEmailSubject(report));
+      setMessage(getEmailBody(report));
+    }
+  }, [report, open]);
 
   const handleSend = async () => {
     if (!email || !report) return;
@@ -67,6 +76,8 @@ L'équipe comptabilité`;
     await onSend(email);
     setIsLoading(false);
     setEmail('');
+    setSubject('');
+    setMessage('');
     onOpenChange(false);
   };
 
@@ -94,18 +105,19 @@ L'équipe comptabilité`;
           <div className="space-y-2">
             <Label>Objet</Label>
             <Input
-              value={getEmailSubject(report)}
-              readOnly
-              className="bg-gray-50"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Objet de l'e-mail"
             />
           </div>
 
           <div className="space-y-2">
             <Label>Message</Label>
             <Textarea
-              value={getEmailBody(report)}
-              readOnly
-              className="bg-gray-50 min-h-[200px]"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="min-h-[200px]"
+              placeholder="Contenu du message..."
             />
           </div>
 
@@ -130,14 +142,26 @@ L'équipe comptabilité`;
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
+              disabled={isLoading}
             >
               Annuler
             </Button>
             <Button 
               onClick={handleSend}
-              disabled={!email || isLoading}
+              disabled={!email || !subject || !message || isLoading}
+              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
             >
-              {isLoading ? 'Envoi...' : 'Envoyer'}
+              {isLoading ? (
+                <>
+                  <Mail className="h-4 w-4 mr-2 animate-spin" />
+                  Envoi en cours...
+                </>
+              ) : (
+                <>
+                  <Mail className="h-4 w-4 mr-2" />
+                  Envoyer
+                </>
+              )}
             </Button>
           </div>
         </div>

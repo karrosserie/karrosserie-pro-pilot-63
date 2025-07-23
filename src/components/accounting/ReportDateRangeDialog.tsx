@@ -123,7 +123,7 @@ export const ReportDateRangeDialog = ({
             <Button 
               onClick={handleGenerate}
               disabled={isGenerateDisabled}
-              className="min-w-24"
+              className="min-w-24 bg-karrosserie-orange hover:bg-karrosserie-orange/90"
             >
               Générer
             </Button>
