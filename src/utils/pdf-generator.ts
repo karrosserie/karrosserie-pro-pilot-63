@@ -39,14 +39,57 @@ export const generateAttestationPDF = async (loanData: any, companyData: any, us
   let y3 = yPosition;
 
   // === COLONNE 1 - ENTREPRISE ===
-  // Logo - toujours afficher le fallback pour l'instant
-  doc.setFillColor(249, 115, 22); // bg-orange-500
-  doc.roundedRect(col1X, y1 - 3, 50, 12, 6, 6, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'bold');
-  doc.text('AUTO PAINT', col1X + 25, y1 + 3, { align: 'center' });
-  y1 += 15;
+  // Logo de l'entreprise
+  if (companyData.logo_url) {
+    try {
+      // Charger l'image et la convertir en base64
+      const img = new window.Image();
+      img.crossOrigin = 'anonymous';
+      
+      // Fonction pour convertir une image en base64
+      const getBase64Image = (url: string): Promise<string> => {
+        return new Promise((resolve, reject) => {
+          const img = new window.Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx?.drawImage(img, 0, 0);
+            const dataURL = canvas.toDataURL('image/png');
+            resolve(dataURL);
+          };
+          img.onerror = reject;
+          img.src = url;
+        });
+      };
+      
+      // Essayer d'afficher le logo de l'entreprise
+      const logoBase64 = await getBase64Image(companyData.logo_url);
+      doc.addImage(logoBase64, 'PNG', col1X, y1 - 3, 50, 20);
+      y1 += 25;
+    } catch (error) {
+      console.error('Erreur lors du chargement du logo:', error);
+      // Fallback en cas d'erreur
+      doc.setFillColor(249, 115, 22); // bg-orange-500
+      doc.roundedRect(col1X, y1 - 3, 50, 12, 6, 6, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.text('AUTO PAINT', col1X + 25, y1 + 3, { align: 'center' });
+      y1 += 15;
+    }
+  } else {
+    // Fallback si pas de logo
+    doc.setFillColor(249, 115, 22); // bg-orange-500
+    doc.roundedRect(col1X, y1 - 3, 50, 12, 6, 6, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text('AUTO PAINT', col1X + 25, y1 + 3, { align: 'center' });
+    y1 += 15;
+  }
 
   // Nom de l'entreprise
   doc.setTextColor(0, 0, 0);
