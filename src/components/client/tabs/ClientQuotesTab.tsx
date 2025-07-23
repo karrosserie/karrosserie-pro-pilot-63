@@ -202,7 +202,7 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
 
   return (
     <>
-      <div className="card-container">
+      <div className="card-container p-0">
         <Table>
           <TableHeader>
             <TableRow>

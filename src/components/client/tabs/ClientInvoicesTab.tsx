@@ -237,7 +237,7 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <div>
-            <div className="card-container">
+            <div className="card-container p-0">
               <Table>
                 <TableHeader>
                   <TableRow>

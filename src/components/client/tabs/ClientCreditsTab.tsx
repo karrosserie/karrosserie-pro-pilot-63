@@ -276,7 +276,7 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
 
   return (
     <>
-      <div className="card-container">
+      <div className="card-container p-0">
         <Table>
           <TableHeader>
             <TableRow>

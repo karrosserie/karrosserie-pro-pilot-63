@@ -230,7 +230,7 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
 
   return (
     <>
-      <div className="card-container">
+      <div className="card-container p-0">
         <Table>
           <TableHeader>
             <TableRow>
