@@ -98,7 +98,7 @@ export const TransactionFilters = ({
             {filter.label}
             <Badge 
               variant="secondary" 
-              className="text-xs bg-red-500 text-white"
+              className="text-xs bg-karrosserie-orange text-white"
             >
               {filter.count}
             </Badge>
