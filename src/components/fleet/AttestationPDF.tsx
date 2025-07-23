@@ -257,6 +257,40 @@ const styles = StyleSheet.create({
   signatureLocation: {
     fontSize: 7,
   },
+  documentsSection: {
+    marginTop: 20,
+    marginBottom: 20,
+    border: '2px solid red',
+    padding: 15,
+    minHeight: 200,
+  },
+  documentsTitle: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  documentsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  documentItem: {
+    width: '48%',
+    marginBottom: 10,
+  },
+  documentLabel: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    textAlign: 'center',
+  },
+  documentImage: {
+    width: '100%',
+    height: 80,
+    objectFit: 'contain',
+    border: '1px solid #ccc',
+  },
 });
 
 const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFProps) => {
@@ -348,6 +382,67 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
               <View style={styles.contractRow}>
                 <Text style={styles.contractLabel}>N° de contrat :</Text>
                 <Text style={styles.contractValue}>{loanData.insurance_contract_number}</Text>
+              </View>
+            )}
+          </View>
+        </View>
+
+        {/* Section Documents */}
+        <View style={styles.documentsSection}>
+          <Text style={styles.documentsTitle}>DOCUMENTS JOINTS</Text>
+          <View style={styles.documentsGrid}>
+            {/* Certificat d'immatriculation recto */}
+            {loanData?.fleet_vehicles?.registration_front_url && (
+              <View style={styles.documentItem}>
+                <Text style={styles.documentLabel}>Certificat d'immatriculation - Recto</Text>
+                <Image 
+                  src={loanData.fleet_vehicles.registration_front_url} 
+                  style={styles.documentImage}
+                />
+              </View>
+            )}
+
+            {/* Certificat d'immatriculation verso */}
+            {loanData?.fleet_vehicles?.registration_back_url && (
+              <View style={styles.documentItem}>
+                <Text style={styles.documentLabel}>Certificat d'immatriculation - Verso</Text>
+                <Image 
+                  src={loanData.fleet_vehicles.registration_back_url} 
+                  style={styles.documentImage}
+                />
+              </View>
+            )}
+
+            {/* Carte d'assurance */}
+            {loanData?.fleet_vehicles?.insurance_card_url && (
+              <View style={styles.documentItem}>
+                <Text style={styles.documentLabel}>Carte d'assurance</Text>
+                <Image 
+                  src={loanData.fleet_vehicles.insurance_card_url} 
+                  style={styles.documentImage}
+                />
+              </View>
+            )}
+
+            {/* Permis de conduire recto */}
+            {loanData?.driver_license_front_url && (
+              <View style={styles.documentItem}>
+                <Text style={styles.documentLabel}>Permis de conduire - Recto</Text>
+                <Image 
+                  src={loanData.driver_license_front_url} 
+                  style={styles.documentImage}
+                />
+              </View>
+            )}
+
+            {/* Permis de conduire verso */}
+            {loanData?.driver_license_back_url && (
+              <View style={styles.documentItem}>
+                <Text style={styles.documentLabel}>Permis de conduire - Verso</Text>
+                <Image 
+                  src={loanData.driver_license_back_url} 
+                  style={styles.documentImage}
+                />
               </View>
             )}
           </View>
