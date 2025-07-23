@@ -60,7 +60,7 @@ Ce document a été généré automatiquement le ${format(report.generatedAt, 'd
 
 Cordialement,
 L'équipe comptabilité
-${companyName || 'AUTO PAINT'}`;
+${companyName || ''}`;
   };
 
   React.useEffect(() => {
