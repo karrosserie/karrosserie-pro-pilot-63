@@ -39,19 +39,13 @@ export const generateAttestationPDF = async (loanData: any, companyData: any, us
   let y3 = yPosition;
 
   // === COLONNE 1 - ENTREPRISE ===
-  // Logo comme dans l'aperçu
-  if (companyData.logo_url) {
-    // Si un logo existe, on l'afficherait ici (jsPDF nécessite des images en base64)
-    // Pour l'instant, on garde le fallback
-  } else {
-    // Logo fallback orange arrondi comme dans l'aperçu
-    doc.setFillColor(249, 115, 22); // bg-orange-500
-    doc.roundedRect(col1X, y1 - 3, 50, 12, 6, 6, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.text('AUTO PAINT', col1X + 25, y1 + 3, { align: 'center' });
-  }
+  // Logo - toujours afficher le fallback pour l'instant
+  doc.setFillColor(249, 115, 22); // bg-orange-500
+  doc.roundedRect(col1X, y1 - 3, 50, 12, 6, 6, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  doc.text('AUTO PAINT', col1X + 25, y1 + 3, { align: 'center' });
   y1 += 15;
 
   // Nom de l'entreprise
