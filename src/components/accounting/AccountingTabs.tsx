@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReportContent from './ReportContent';
 import { TransactionFilters } from './TransactionFilters';
 import { TransactionTable } from './TransactionTable';
 import { Transaction } from '@/hooks/use-accounting-data';
+import type { DateRange } from 'react-day-picker';
 
 interface AccountingTabsProps {
   searchTerm: string;
@@ -23,6 +24,8 @@ export const AccountingTabs = ({
   filteredTransactions,
   allTransactions
 }: AccountingTabsProps) => {
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [paymentMethod, setPaymentMethod] = useState<string>('');
   return (
     <Tabs defaultValue="transactions" className="w-full">
       <TabsList className="grid w-full grid-cols-2 mb-4 sm:mb-6 h-9 sm:h-10">
@@ -41,6 +44,10 @@ export const AccountingTabs = ({
           selectedFilter={selectedFilter}
           setSelectedFilter={setSelectedFilter}
           transactions={allTransactions}
+          dateRange={dateRange}
+          setDateRange={setDateRange}
+          paymentMethod={paymentMethod}
+          setPaymentMethod={setPaymentMethod}
         />
         
         <TransactionTable transactions={filteredTransactions} />
