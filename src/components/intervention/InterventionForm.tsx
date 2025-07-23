@@ -175,7 +175,7 @@ export const InterventionForm: React.FC<InterventionFormProps> = ({
         </div>
 
         {/* Approval Switch */}
-        <div className="flex items-center space-x-3 p-4 bg-muted/50 rounded-lg">
+        <div className="flex items-center space-x-3">
           <Switch
             id="approved"
             checked={isApproved}
@@ -199,6 +199,7 @@ export const InterventionForm: React.FC<InterventionFormProps> = ({
           <Button
             type="submit"
             disabled={isSubmitting || !selectedVehicleId}
+            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
           >
             {isSubmitting ? "Création..." : "Créer la fiche"}
           </Button>
