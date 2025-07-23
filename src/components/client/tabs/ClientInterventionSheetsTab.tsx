@@ -6,6 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { MoreHorizontal, Edit, Trash, Check, X } from 'lucide-react';
 import { useInterventionSheetsByClient, useDeleteInterventionSheet } from '@/hooks/use-intervention-sheets';
+import { useVehicles } from '@/hooks/use-vehicles';
 import { InterventionSheet } from '@/services/supabase/intervention-sheets/types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -21,6 +22,7 @@ const ClientInterventionSheetsTab: React.FC<ClientInterventionSheetsTabProps> = 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   
   const { data: sheets, isLoading } = useInterventionSheetsByClient(clientId);
+  const { vehicles } = useVehicles();
   const deleteSheet = useDeleteInterventionSheet();
 
   const handleEditSheet = (sheet: InterventionSheet) => {
@@ -48,6 +50,17 @@ const ClientInterventionSheetsTab: React.FC<ClientInterventionSheetsTabProps> = 
     );
   };
 
+  const getVehicleInfo = (vehicleId: string) => {
+    const vehicle = vehicles?.find(v => v.id === vehicleId);
+    if (!vehicle) return 'Véhicule non trouvé';
+    
+    const brand = vehicle.car_brands?.name || 'Marque inconnue';
+    const model = vehicle.car_models?.name || 'Modèle inconnu';
+    const plate = vehicle.license_plate || 'Plaque inconnue';
+    
+    return `${brand} ${model} - ${plate}`;
+  };
+
   if (isLoading) {
     return <div className="p-4">Chargement des fiches d'intervention...</div>;
   }
@@ -68,7 +81,7 @@ const ClientInterventionSheetsTab: React.FC<ClientInterventionSheetsTabProps> = 
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-lg">
-                  Fiche d'intervention - {format(new Date(sheet.created_at), 'dd/MM/yyyy', { locale: fr })}
+                  Fiche d'intervention - {getVehicleInfo(sheet.vehicle_id)}
                 </CardTitle>
                 <CardDescription>
                   Créée le {format(new Date(sheet.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
