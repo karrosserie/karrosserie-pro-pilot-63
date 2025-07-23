@@ -23,6 +23,7 @@ import {
 import { Download, Printer, Mail } from 'lucide-react';
 import { EditCreditDialog } from '@/components/credits/EditCreditDialog';
 import InvoiceViewerModal from '@/components/invoices/InvoiceViewerModal';
+import { CreditEmailDialog } from '@/components/credits/email/CreditEmailDialog';
 
 
 interface ClientCreditsTabProps {
@@ -382,6 +383,12 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
         invoice={selectedInvoice}
         open={invoiceViewerModalOpen}
         onOpenChange={setInvoiceViewerModalOpen}
+      />
+
+      <CreditEmailDialog
+        credit={selectedCredit}
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
       />
     </>
   );
