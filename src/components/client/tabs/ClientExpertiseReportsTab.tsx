@@ -1,15 +1,24 @@
 
 import React, { useState } from 'react';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
-import { SimpleTable } from '@/components/ui/simple-table';
-import { FileText, Pencil, Trash } from 'lucide-react';
-import { ColumnDef } from '@tanstack/react-table';
+import { Table, TableBody } from '@/components/ui/table';
+import { FileText, Pencil, Trash, MoreVertical, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
+import { ExpertiseReportTableHeader } from '@/components/expertise/table/ExpertiseReportTableHeader';
+import { TableCell, TableRow } from '@/components/ui/table';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator 
+} from '@/components/ui/dropdown-menu';
 
 interface ClientExpertiseReportsTabProps {
   clientId: string;
@@ -65,95 +74,37 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
 
   const formatAmount = (amount: number | null | undefined): string => {
     if (amount === null || amount === undefined) return '-';
-    return amount.toLocaleString('fr-FR', { 
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2 
-    }) + ' €';
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(amount);
   };
 
-  const columns: ColumnDef<any>[] = [
-    {
-      accessorKey: "report_number",
-      header: "Numéro de rapport",
-      cell: ({ row }) => (
-        <span className="font-medium">{row.getValue("report_number") || "Non défini"}</span>
-      )
-    },
-    {
-      accessorKey: "report_date",
-      header: "Date",
-      cell: ({ row }) => {
-        const date = row.getValue("report_date");
-        return date ? new Date(date as string).toLocaleDateString('fr-FR') : "Non définie";
-      }
-    },
-    {
-      accessorKey: "clients",
-      header: "Client",
-      cell: ({ row }) => {
-        const client = row.getValue("clients") as any;
-        return client ? `${client.first_name} ${client.last_name}` : "-";
-      }
-    },
-    {
-      accessorKey: "vehicles",
-      header: "Véhicule",
-      cell: ({ row }) => {
-        const vehicle = row.getValue("vehicles") as any;
-        if (!vehicle) return "-";
-        return `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate}`;
-      }
-    },
-    {
-      accessorKey: "amount",
-      header: "Montant",
-      cell: ({ row }) => {
-        const amount = row.getValue("amount");
-        return formatAmount(amount as number);
-      }
-    },
-    {
-      header: "Statut",
-      cell: ({ row }) => {
-        const status = row.original.status || "Importé";
-        return <Badge variant="outline">{status}</Badge>;
-      }
-    },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }) => {
-        const report = row.original;
-        return (
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleEditReport(report);
-              }}
-              title="Modifier"
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-red-500 hover:text-red-700"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDeleteReport(report.id);
-              }}
-              title="Supprimer"
-            >
-              <Trash className="h-4 w-4" />
-            </Button>
-          </div>
-        );
-      }
+  const getStatusColor = (status: string): string => {
+    switch (status.toLowerCase()) {
+      case 'converti':
+        return 'text-green-700 bg-green-50 border-green-200';
+      case 'en cours':
+        return 'text-blue-700 bg-blue-50 border-blue-200';
+      case 'importé':
+      default:
+        return 'text-gray-700 bg-gray-50 border-gray-200';
     }
-  ];
+  };
+
+  const getStatusDisplay = (report: ExpertiseReport) => {
+    // For now, we'll show "Importé" as default, but this could be enhanced
+    // to show "Converti" if the report has been converted to a quote
+    const status = report.status || 'Importé';
+    return (
+      <Badge 
+        variant="outline" 
+        className={`${getStatusColor(status)} font-medium`}
+      >
+        {status}
+      </Badge>
+    );
+  };
 
   if (clientReports.length === 0) {
     return (
@@ -167,10 +118,112 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
 
   return (
     <>
-      <SimpleTable
-        columns={columns}
-        data={clientReports}
-      />
+      <TooltipProvider>
+        <div className="overflow-x-auto">
+          <Table>
+            <ExpertiseReportTableHeader />
+            <TableBody>
+              {clientReports.length > 0 ? (
+                clientReports.map((report) => (
+                  <TableRow key={report.id} className="hover:bg-gray-50">
+                    <TableCell>
+                      {report.report_number || 'Non spécifié'}
+                    </TableCell>
+                    <TableCell>
+                      {report.report_date ? new Date(report.report_date).toLocaleDateString('fr-FR') : 'Non spécifiée'}
+                    </TableCell>
+                    <TableCell>
+                      {report.clients ? (
+                        <span>
+                          {report.clients.first_name} {report.clients.last_name}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 italic">Non assigné</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {report.vehicles 
+                        ? `${report.vehicles.car_brands?.name || 'Marque inconnue'} ${report.vehicles.car_models?.name || 'Modèle inconnu'} - ${report.vehicles.license_plate || 'Plaque non spécifiée'}`
+                        : 'Non assigné'
+                      }
+                    </TableCell>
+                    <TableCell>
+                      {formatAmount(report.amount)}
+                    </TableCell>
+                    <TableCell>
+                      {getStatusDisplay(report)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end space-x-1">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => handleEditReport(report)}
+                              className="h-8 w-8"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            Modifier le rapport
+                          </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="text-red-500 hover:text-red-700 h-8 w-8"
+                              onClick={() => handleDeleteReport(report.id)}
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            Supprimer le rapport
+                          </TooltipContent>
+                        </Tooltip>
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem 
+                              onClick={() => window.open(report.document_url, '_blank')}
+                              disabled={!report.document_url}
+                            >
+                              <Download className="mr-2 h-4 w-4" />
+                              Télécharger
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-4">
+                    <div className="flex flex-col items-center justify-center py-8">
+                      <FileText className="h-10 w-10 text-gray-400 mb-2" />
+                      <h3 className="font-medium text-gray-900">Aucun rapport d'expertise</h3>
+                      <p className="text-gray-500 mt-1">
+                        Ce client n'a pas encore de rapport d'expertise.
+                      </p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </TooltipProvider>
 
       {/* Edit Report Dialog */}
       <ExpertiseReportDialog
