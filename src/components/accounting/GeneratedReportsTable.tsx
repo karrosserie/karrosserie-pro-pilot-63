@@ -20,9 +20,10 @@ interface GeneratedReportsTableProps {
   reports: GeneratedReport[];
   onSendEmail: (reportId: string) => void;
   onDeleteReport: (reportId: string) => void;
+  onDownloadReport: (reportId: string) => void;
 }
 
-export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport }: GeneratedReportsTableProps) => {
+export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, onDownloadReport }: GeneratedReportsTableProps) => {
   const getStatusBadge = (status: GeneratedReport['status']) => {
     switch (status) {
       case 'generating':
@@ -36,16 +37,8 @@ export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport }: 
     }
   };
 
-  const handleDownload = (report: GeneratedReport) => {
-    if (report.fileUrl) {
-      // Créer un lien de téléchargement
-      const link = document.createElement('a');
-      link.href = report.fileUrl;
-      link.download = `${report.name}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+  const handleDownload = (reportId: string) => {
+    onDownloadReport(reportId);
   };
 
   if (reports.length === 0) {
@@ -112,7 +105,7 @@ export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport }: 
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        onClick={() => handleDownload(report)}
+                        onClick={() => handleDownload(report.id)}
                         disabled={report.status !== 'ready'}
                         className="h-8 w-8 p-0"
                         title="Télécharger"

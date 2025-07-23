@@ -1,11 +1,12 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useAccountingData } from '@/hooks/use-accounting-data';
 import { isWithinInterval, parseISO } from 'date-fns';
 import jsPDF from 'jspdf';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface GeneratedReport {
   id: string;
@@ -20,8 +21,59 @@ export interface GeneratedReport {
 
 export const useGeneratedReports = () => {
   const [reports, setReports] = useState<GeneratedReport[]>([]);
+  const [companyName, setCompanyName] = useState<string>('');
   const { toast } = useToast();
   const { transactions } = useAccountingData();
+
+  // Charger les rapports depuis la base de données
+  useEffect(() => {
+    const loadReportsFromDB = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: reportsData, error: reportsError } = await supabase
+        .from('generated_reports')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (!reportsError && reportsData) {
+        const transformedReports = reportsData.map(report => ({
+          id: report.id,
+          name: report.name,
+          type: report.type as GeneratedReport['type'],
+          fromDate: new Date(report.from_date),
+          toDate: new Date(report.to_date),
+          generatedAt: new Date(report.generated_at),
+          status: report.status as GeneratedReport['status'],
+          fileUrl: report.file_url
+        }));
+        setReports(transformedReports);
+      }
+
+      // Charger le nom de l'entreprise
+      const { data: userCompanyData } = await supabase
+        .from('user_companies')
+        .select('company_id')
+        .eq('user_id', user.id)
+        .eq('active', true)
+        .single();
+
+      if (userCompanyData) {
+        const { data: companyData } = await supabase
+          .from('company_info')
+          .select('name')
+          .eq('id', userCompanyData.company_id)
+          .single();
+        
+        if (companyData) {
+          setCompanyName(companyData.name);
+        }
+      }
+    };
+
+    loadReportsFromDB();
+  }, []);
 
   const filterTransactionsByDateRange = (fromDate: Date, toDate: Date) => {
     return transactions.filter(transaction => {
@@ -181,7 +233,7 @@ export const useGeneratedReports = () => {
     link.click();
   };
 
-  const addReport = (type: string, fromDate: Date, toDate: Date) => {
+  const addReport = async (type: string, fromDate: Date, toDate: Date) => {
     const reportTypeMap: Record<string, GeneratedReport['type']> = {
       'Bilan mensuel': 'monthly',
       'Bilan trimestriel': 'quarterly',
@@ -191,13 +243,35 @@ export const useGeneratedReports = () => {
       'Export Excel': 'excel'
     };
 
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Créer le rapport en base de données
+    const { data: reportData, error: reportError } = await supabase
+      .from('generated_reports')
+      .insert({
+        user_id: user.id,
+        name: type,
+        type: reportTypeMap[type] || 'monthly',
+        from_date: fromDate.toISOString().split('T')[0],
+        to_date: toDate.toISOString().split('T')[0],
+        status: 'generating'
+      })
+      .select()
+      .single();
+
+    if (reportError || !reportData) {
+      console.error('Erreur lors de la création du rapport:', reportError);
+      return;
+    }
+
     const newReport: GeneratedReport = {
-      id: `report-${Date.now()}`,
-      name: type,
-      type: reportTypeMap[type] || 'monthly',
-      fromDate,
-      toDate,
-      generatedAt: new Date(),
+      id: reportData.id,
+      name: reportData.name,
+      type: reportData.type as GeneratedReport['type'],
+      fromDate: new Date(reportData.from_date),
+      toDate: new Date(reportData.to_date),
+      generatedAt: new Date(reportData.generated_at),
       status: 'generating'
     };
 
@@ -207,7 +281,7 @@ export const useGeneratedReports = () => {
     const filteredTransactions = filterTransactionsByDateRange(fromDate, toDate);
 
     // Génération immédiate selon le type
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
         if (type.includes('Bilan')) {
           generatePDFReport(type, fromDate, toDate, filteredTransactions);
@@ -220,18 +294,34 @@ export const useGeneratedReports = () => {
           generateCSVExport(fromDate, toDate, filteredTransactions);
         }
 
+        // Mettre à jour le statut en base
+        await supabase
+          .from('generated_reports')
+          .update({ 
+            status: 'ready',
+            file_url: `/downloads/${reportData.id}.pdf`
+          })
+          .eq('id', reportData.id);
+
         setReports(prev => 
           prev.map(report => 
-            report.id === newReport.id 
-              ? { ...report, status: 'ready', fileUrl: `/downloads/${report.id}.pdf` }
+            report.id === reportData.id 
+              ? { ...report, status: 'ready', fileUrl: `/downloads/${reportData.id}.pdf` }
               : report
           )
         );
       } catch (error) {
         console.error('Erreur lors de la génération:', error);
+        
+        // Mettre à jour le statut d'erreur en base
+        await supabase
+          .from('generated_reports')
+          .update({ status: 'error' })
+          .eq('id', reportData.id);
+
         setReports(prev => 
           prev.map(report => 
-            report.id === newReport.id 
+            report.id === reportData.id 
               ? { ...report, status: 'error' }
               : report
           )
@@ -239,7 +329,7 @@ export const useGeneratedReports = () => {
       }
     }, 1000);
 
-    return newReport.id;
+    return reportData.id;
   };
 
   const sendEmail = async (reportId: string, email: string) => {
@@ -248,6 +338,12 @@ export const useGeneratedReports = () => {
 
     const fromDateStr = format(report.fromDate, 'dd/MM/yyyy', { locale: fr });
     const toDateStr = format(report.toDate, 'dd/MM/yyyy', { locale: fr });
+
+    // Mettre à jour le statut en base
+    await supabase
+      .from('generated_reports')
+      .update({ status: 'sent' })
+      .eq('id', reportId);
 
     // Marquer le rapport comme envoyé
     setReports(prev => 
@@ -264,14 +360,38 @@ export const useGeneratedReports = () => {
     });
   };
 
-  const deleteReport = (reportId: string) => {
+  const deleteReport = async (reportId: string) => {
+    // Supprimer de la base de données
+    await supabase
+      .from('generated_reports')
+      .delete()
+      .eq('id', reportId);
+
+    // Supprimer du state local
     setReports(prev => prev.filter(report => report.id !== reportId));
+  };
+
+  const downloadReport = (reportId: string) => {
+    const report = reports.find(r => r.id === reportId);
+    if (!report) return;
+
+    const filteredTransactions = filterTransactionsByDateRange(report.fromDate, report.toDate);
+    
+    if (report.type === 'monthly' || report.type === 'quarterly' || report.type === 'yearly') {
+      generatePDFReport(report.name, report.fromDate, report.toDate, filteredTransactions);
+    } else if (report.type === 'csv') {
+      generateCSVExport(report.fromDate, report.toDate, filteredTransactions);
+    } else if (report.type === 'fec') {
+      generateFECExport(report.fromDate, report.toDate, filteredTransactions);
+    }
   };
 
   return {
     reports,
+    companyName,
     addReport,
     sendEmail,
-    deleteReport
+    deleteReport,
+    downloadReport
   };
 };

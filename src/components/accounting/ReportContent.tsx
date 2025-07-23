@@ -15,7 +15,7 @@ const ReportContent = () => {
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<GeneratedReport | null>(null);
   const { toast } = useToast();
-  const { reports, addReport, sendEmail, deleteReport } = useGeneratedReports();
+  const { reports, addReport, sendEmail, deleteReport, downloadReport } = useGeneratedReports();
 
   const handleGenerate = (type: string, fromDate: Date, toDate: Date) => {
     const reportId = addReport(type, fromDate, toDate);
@@ -139,6 +139,7 @@ const ReportContent = () => {
         reports={reports}
         onSendEmail={handleSendEmail}
         onDeleteReport={deleteReport}
+        onDownloadReport={downloadReport}
       />
 
       <EmailReportDialog

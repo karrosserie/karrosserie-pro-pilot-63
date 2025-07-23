@@ -836,6 +836,48 @@ export type Database = {
           },
         ]
       }
+      generated_reports: {
+        Row: {
+          created_at: string
+          file_url: string | null
+          from_date: string
+          generated_at: string
+          id: string
+          name: string
+          status: string
+          to_date: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_url?: string | null
+          from_date: string
+          generated_at?: string
+          id?: string
+          name: string
+          status?: string
+          to_date: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          file_url?: string | null
+          from_date?: string
+          generated_at?: string
+          id?: string
+          name?: string
+          status?: string
+          to_date?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       insurance_companies: {
         Row: {
           address: string | null

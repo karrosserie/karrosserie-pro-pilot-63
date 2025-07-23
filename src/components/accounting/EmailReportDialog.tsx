@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Paperclip, FileText, Mail } from 'lucide-react';
-import { GeneratedReport } from '@/hooks/use-generated-reports';
+import { GeneratedReport, useGeneratedReports } from '@/hooks/use-generated-reports';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -32,6 +32,7 @@ export const EmailReportDialog = ({
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { companyName } = useGeneratedReports();
 
   const getEmailSubject = (report: GeneratedReport) => {
     const fromDateStr = format(report.fromDate, 'dd/MM/yyyy', { locale: fr });
@@ -59,7 +60,7 @@ Ce document a été généré automatiquement le ${format(report.generatedAt, 'd
 
 Cordialement,
 L'équipe comptabilité
-Garage MUSSO`;
+${companyName || 'AUTO PAINT'}`;
   };
 
   React.useEffect(() => {
@@ -67,7 +68,7 @@ Garage MUSSO`;
       setSubject(getEmailSubject(report));
       setMessage(getEmailBody(report));
     }
-  }, [report, open]);
+  }, [report, open, companyName]);
 
   const handleSend = async () => {
     if (!email || !report) return;
