@@ -130,6 +130,7 @@ const VehicleExpertiseReportsTab: React.FC<VehicleExpertiseReportsTabProps> = ({
               <TableHead className="w-[200px]">Numéro</TableHead>
               <TableHead className="w-[120px]">Date</TableHead>
               <TableHead>Client</TableHead>
+              <TableHead>Véhicule</TableHead>
               <TableHead className="w-[120px]">Montant</TableHead>
               <TableHead className="w-[120px]">Statut</TableHead>
               <TableHead className="text-right w-[160px]">Actions</TableHead>
@@ -153,6 +154,12 @@ const VehicleExpertiseReportsTab: React.FC<VehicleExpertiseReportsTabProps> = ({
                     ) : (
                       <span className="text-gray-400 italic">Non assigné</span>
                     )}
+                  </TableCell>
+                  <TableCell>
+                    {report.vehicles 
+                      ? `${report.vehicles.car_brands?.name || 'Marque inconnue'} ${report.vehicles.car_models?.name || 'Modèle inconnu'} - ${report.vehicles.license_plate || 'Plaque non spécifiée'}`
+                      : 'Non assigné'
+                    }
                   </TableCell>
                   <TableCell>
                     {formatAmount(report.amount)}
@@ -218,7 +225,7 @@ const VehicleExpertiseReportsTab: React.FC<VehicleExpertiseReportsTabProps> = ({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-4">
+                <TableCell colSpan={7} className="text-center py-4">
                   <div className="flex flex-col items-center justify-center py-8">
                     <FileText className="h-10 w-10 text-gray-400 mb-2" />
                     <h3 className="font-medium text-gray-900">Aucun rapport d'expertise</h3>
