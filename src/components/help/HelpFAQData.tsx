@@ -3,7 +3,7 @@ import { Rocket, Users, Car, Wrench, FileText, CreditCard, Truck, ClipboardList,
 
 export interface FAQItem {
   question: string;
-  answer: string;
+  answer: React.ReactNode;
 }
 
 export interface FAQSection {
@@ -21,15 +21,116 @@ export const faqSections: FAQSection[] = [
     items: [
       {
         question: "Comment me connecter à l'application ?",
-        answer: "Pour vous connecter à l'application, suivez ces étapes détaillées : 1) Rendez-vous sur la page de connexion via votre navigateur web (Chrome, Firefox, Safari ou Edge recommandés). 2) Saisissez votre adresse email exactement telle qu'elle a été enregistrée lors de votre inscription - attention aux majuscules/minuscules et aux caractères spéciaux. 3) Entrez votre mot de passe en veillant à respecter la casse. Si vous avez activé l'authentification à deux facteurs, un code vous sera demandé via SMS ou application d'authentification. 4) Cochez 'Se souvenir de moi' pour éviter de ressaisir vos identifiants pendant 30 jours sur cet appareil. 5) Cliquez sur 'Se connecter'. En cas d'oubli de mot de passe, cliquez sur 'Mot de passe oublié' : vous recevrez un email avec un lien de réinitialisation valide 24h. Créez un nouveau mot de passe d'au moins 8 caractères incluant majuscules, minuscules, chiffres et caractères spéciaux. Si votre compte est temporairement bloqué après 5 tentatives infructueuses, attendez 15 minutes ou contactez le support. Assurez-vous que votre navigateur accepte les cookies et JavaScript pour un fonctionnement optimal. En cas de problème persistant, videz le cache de votre navigateur ou essayez en navigation privée."
+        answer: (
+          <div className="space-y-4">
+            <p>Pour vous connecter à l'application, suivez ces étapes détaillées :</p>
+            <ol className="list-decimal list-inside space-y-2 ml-4">
+              <li><strong>Accès :</strong> Rendez-vous sur la page de connexion via votre navigateur web (Chrome, Firefox, Safari ou Edge recommandés).</li>
+              <li><strong>Email :</strong> Saisissez votre adresse email exactement telle qu'elle a été enregistrée lors de votre inscription - attention aux majuscules/minuscules et aux caractères spéciaux.</li>
+              <li><strong>Mot de passe :</strong> Entrez votre mot de passe en veillant à respecter la casse. Si vous avez activé l'authentification à deux facteurs, un code vous sera demandé via SMS ou application d'authentification.</li>
+              <li><strong>Options :</strong> Cochez "Se souvenir de moi" pour éviter de ressaisir vos identifiants pendant 30 jours sur cet appareil.</li>
+              <li><strong>Connexion :</strong> Cliquez sur "Se connecter".</li>
+            </ol>
+            
+            <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg">
+              <h4 className="font-semibold text-amber-800 dark:text-amber-200 mb-2">En cas d'oubli de mot de passe :</h4>
+              <ul className="list-disc list-inside space-y-1 text-amber-700 dark:text-amber-300">
+                <li>Cliquez sur "Mot de passe oublié"</li>
+                <li>Vous recevrez un email avec un lien de réinitialisation valide 24h</li>
+                <li>Créez un nouveau mot de passe d'au moins 8 caractères incluant majuscules, minuscules, chiffres et caractères spéciaux</li>
+              </ul>
+            </div>
+
+            <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+              <h4 className="font-semibold text-red-800 dark:text-red-200 mb-2">Dépannage :</h4>
+              <ul className="list-disc list-inside space-y-1 text-red-700 dark:text-red-300">
+                <li>Si votre compte est temporairement bloqué après 5 tentatives infructueuses, attendez 15 minutes ou contactez le support</li>
+                <li>Assurez-vous que votre navigateur accepte les cookies et JavaScript</li>
+                <li>En cas de problème persistant, videz le cache de votre navigateur ou essayez en navigation privée</li>
+              </ul>
+            </div>
+          </div>
+        )
       },
       {
         question: "Comment naviguer dans l'interface ?",
-        answer: "L'interface de l'application est conçue pour une navigation intuitive et efficace. Voici un guide détaillé : **Menu principal (barre latérale gauche)** : 1) **Tableau de bord** - Vue d'ensemble avec indicateurs clés, graphiques de performance, alertes importantes et raccourcis vers les actions fréquentes. 2) **Clients** - Gestion complète de votre clientèle avec recherche avancée, filtres par type/statut, historique des interactions, documents associés. 3) **Véhicules** - Parc automobile avec fiches détaillées, historique des interventions, photos, documents techniques, rappels de maintenance. 4) **Documents** - Sous-menus pour Devis (création, suivi, conversion), Factures (émission, relances, paiements), Ordres de réparation (planification, suivi, facturation), Avoirs (remboursements, annulations). 5) **Cessions de créance** - Gestion des demandes de paiement direct par les assurances, suivi des statuts, documents légaux. 6) **Comptabilité** - Tableaux de bord financiers, journal des ventes/achats, trésorerie, exports comptables. **Barre supérieure** : notifications en temps réel, recherche globale, accès au profil utilisateur, aide contextuelle, paramètres. **Navigation mobile** : sur tablette/smartphone, le menu devient un tiroir accessible via l'icône hamburger (☰) en haut à gauche. L'interface s'adapte automatiquement à la taille d'écran. **Raccourcis clavier** : Ctrl+K pour la recherche rapide, Ctrl+N pour nouveau document selon le module actif, F1 pour l'aide contextuelle. **Fil d'Ariane** : toujours visible en haut des pages pour connaître votre position et revenir rapidement aux niveaux supérieurs."
+        answer: (
+          <div className="space-y-4">
+            <p>L'interface de l'application est conçue pour une navigation intuitive et efficace. Voici un guide détaillé :</p>
+            
+            <div>
+              <h4 className="font-semibold mb-2">Menu principal (barre latérale gauche) :</h4>
+              <ul className="list-disc list-inside space-y-2 ml-4">
+                <li><strong>Tableau de bord</strong> - Vue d'ensemble avec indicateurs clés, graphiques de performance, alertes importantes et raccourcis vers les actions fréquentes</li>
+                <li><strong>Clients</strong> - Gestion complète de votre clientèle avec recherche avancée, filtres par type/statut, historique des interactions, documents associés</li>
+                <li><strong>Véhicules</strong> - Parc automobile avec fiches détaillées, historique des interventions, photos, documents techniques, rappels de maintenance</li>
+                <li><strong>Documents</strong> - Sous-menus pour Devis (création, suivi, conversion), Factures (émission, relances, paiements), Ordres de réparation (planification, suivi, facturation), Avoirs (remboursements, annulations)</li>
+                <li><strong>Cessions de créance</strong> - Gestion des demandes de paiement direct par les assurances, suivi des statuts, documents légaux</li>
+                <li><strong>Comptabilité</strong> - Tableaux de bord financiers, journal des ventes/achats, trésorerie, exports comptables</li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-2">Barre supérieure :</h4>
+              <p>Notifications en temps réel, recherche globale, accès au profil utilisateur, aide contextuelle, paramètres.</p>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-2">Navigation mobile :</h4>
+              <p>Sur tablette/smartphone, le menu devient un tiroir accessible via l'icône hamburger (☰) en haut à gauche. L'interface s'adapte automatiquement à la taille d'écran.</p>
+            </div>
+
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+              <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">Raccourcis clavier :</h4>
+              <ul className="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-300">
+                <li><kbd className="px-2 py-1 bg-blue-100 dark:bg-blue-800 rounded text-sm">Ctrl+K</kbd> pour la recherche rapide</li>
+                <li><kbd className="px-2 py-1 bg-blue-100 dark:bg-blue-800 rounded text-sm">Ctrl+N</kbd> pour nouveau document selon le module actif</li>
+                <li><kbd className="px-2 py-1 bg-blue-100 dark:bg-blue-800 rounded text-sm">F1</kbd> pour l'aide contextuelle</li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-2">Fil d'Ariane :</h4>
+              <p>Toujours visible en haut des pages pour connaître votre position et revenir rapidement aux niveaux supérieurs.</p>
+            </div>
+          </div>
+        )
       },
       {
         question: "Comment personnaliser mon profil ?",
-        answer: "Rendez-vous dans 'Paramètres' > 'Profil' pour modifier vos informations personnelles : nom, prénom, email, téléphone. Vous pouvez également changer votre mot de passe, configurer vos préférences d'affichage (thème clair/sombre), et définir vos notifications. N'oubliez pas de sauvegarder vos changements."
+        answer: (
+          <div className="space-y-3">
+            <p>Rendez-vous dans <strong>Paramètres &gt; Profil</strong> pour personnaliser votre compte :</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                <h5 className="font-medium mb-2">Informations personnelles :</h5>
+                <ul className="list-disc list-inside space-y-1 text-sm">
+                  <li>Nom et prénom</li>
+                  <li>Adresse email</li>
+                  <li>Numéro de téléphone</li>
+                  <li>Photo de profil</li>
+                </ul>
+              </div>
+              
+              <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                <h5 className="font-medium mb-2">Préférences :</h5>
+                <ul className="list-disc list-inside space-y-1 text-sm">
+                  <li>Thème (clair/sombre)</li>
+                  <li>Langue de l'interface</li>
+                  <li>Format des dates</li>
+                  <li>Notifications email/SMS</li>
+                </ul>
+              </div>
+            </div>
+            
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg">
+              <p className="text-yellow-800 dark:text-yellow-200 text-sm">
+                <strong>Important :</strong> N'oubliez pas de cliquer sur "Sauvegarder" après vos modifications pour conserver vos changements.
+              </p>
+            </div>
+          </div>
+        )
       },
       {
         question: "Que faire en cas de problème technique ?",
@@ -52,7 +153,89 @@ export const faqSections: FAQSection[] = [
     items: [
       {
         question: "Comment créer un nouveau client ?",
-        answer: "La création d'un nouveau client suit un processus structuré pour garantir la complétude des informations : **Étape 1 - Accès au formulaire** : Dans le module 'Clients', cliquez sur le bouton '+ Nouveau client' (bleu, en haut à droite). **Étape 2 - Informations de base (obligatoires)** : Type de client (Particulier/Entreprise) - cette sélection adapte automatiquement les champs disponibles. Pour un particulier : Civilité (M./Mme), Nom et Prénom (minimum 2 caractères chacun), Date de naissance (pour vérifications d'âge et assurances). Pour une entreprise : Raison sociale, Nom du contact principal, SIRET (14 chiffres, validation automatique), Numéro de TVA intracommunautaire si applicable. **Étape 3 - Coordonnées** : Email (validation du format automatique, utilisé pour l'envoi des documents), Téléphone principal (fixe ou mobile, format français ou international), Téléphone secondaire optionnel. **Étape 4 - Adresse complète** : Numéro et nom de rue, Complément d'adresse (bâtiment, escalier, étage, appartement), Code postal (5 chiffres), Ville (autocomplétion depuis la base INSEE), Pays (France par défaut). **Étape 5 - Informations complémentaires** : Profession/Secteur d'activité, Notes personnalisées (habitudes, préférences, allergies), Source de prospection (bouche-à-oreille, internet, publicité), Autorisation marketing (RGPD). **Étape 6 - Documents** : Upload des pièces justificatives via glisser-déposer ou sélection : Permis de conduire recto/verso (obligatoire pour les conducteurs), Carte d'identité ou passeport, Justificatif de domicile de moins de 3 mois, RIB pour les prélèvements automatiques. Formats acceptés : PDF, JPEG, PNG, taille max 10Mo par fichier. **Étape 7 - Validation** : Vérification automatique des champs obligatoires, Contrôle de cohérence des données (email valide, téléphone français), Détection des doublons potentiels par nom/email/téléphone, Clic sur 'Enregistrer' pour finaliser. Le client reçoit automatiquement un email de bienvenue si configuré. Il apparaît immédiatement dans la liste avec un statut 'Actif' et peut être utilisé pour créer des véhicules et documents."
+        answer: (
+          <div className="space-y-4">
+            <p>La création d'un nouveau client suit un processus structuré pour garantir la complétude des informations :</p>
+            
+            <div className="space-y-4">
+              <div className="border-l-4 border-blue-500 pl-4">
+                <h5 className="font-semibold text-blue-700 dark:text-blue-300">Étape 1 - Accès au formulaire</h5>
+                <p className="text-sm">Dans le module "Clients", cliquez sur le bouton "+ Nouveau client" (bleu, en haut à droite).</p>
+              </div>
+              
+              <div className="border-l-4 border-green-500 pl-4">
+                <h5 className="font-semibold text-green-700 dark:text-green-300">Étape 2 - Informations de base (obligatoires)</h5>
+                <div className="text-sm space-y-2">
+                  <p><strong>Type de client :</strong> Particulier/Entreprise (adapte automatiquement les champs disponibles)</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded">
+                      <h6 className="font-medium">Pour un particulier :</h6>
+                      <ul className="list-disc list-inside text-xs space-y-1">
+                        <li>Civilité (M./Mme)</li>
+                        <li>Nom et Prénom (minimum 2 caractères chacun)</li>
+                        <li>Date de naissance (vérifications d'âge et assurances)</li>
+                      </ul>
+                    </div>
+                    <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded">
+                      <h6 className="font-medium">Pour une entreprise :</h6>
+                      <ul className="list-disc list-inside text-xs space-y-1">
+                        <li>Raison sociale</li>
+                        <li>Nom du contact principal</li>
+                        <li>SIRET (14 chiffres, validation automatique)</li>
+                        <li>Numéro de TVA intracommunautaire si applicable</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border-l-4 border-purple-500 pl-4">
+                <h5 className="font-semibold text-purple-700 dark:text-purple-300">Étape 3 - Coordonnées</h5>
+                <ul className="list-disc list-inside text-sm space-y-1">
+                  <li><strong>Email :</strong> Validation du format automatique, utilisé pour l'envoi des documents</li>
+                  <li><strong>Téléphone principal :</strong> Fixe ou mobile, format français ou international</li>
+                  <li><strong>Téléphone secondaire :</strong> Optionnel</li>
+                </ul>
+              </div>
+              
+              <div className="border-l-4 border-orange-500 pl-4">
+                <h5 className="font-semibold text-orange-700 dark:text-orange-300">Étape 4 - Adresse complète</h5>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>• Numéro et nom de rue</div>
+                  <div>• Code postal (5 chiffres)</div>
+                  <div>• Complément d'adresse</div>
+                  <div>• Ville (autocomplétion INSEE)</div>
+                  <div>• Pays (France par défaut)</div>
+                </div>
+              </div>
+              
+              <div className="border-l-4 border-red-500 pl-4">
+                <h5 className="font-semibold text-red-700 dark:text-red-300">Étape 5 - Documents requis</h5>
+                <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded text-sm">
+                  <p className="font-medium mb-2">Upload via glisser-déposer ou sélection :</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>Permis de conduire recto/verso (obligatoire pour les conducteurs)</li>
+                    <li>Carte d'identité ou passeport</li>
+                    <li>Justificatif de domicile de moins de 3 mois</li>
+                    <li>RIB pour les prélèvements automatiques</li>
+                  </ul>
+                  <p className="mt-2 text-xs"><strong>Formats acceptés :</strong> PDF, JPEG, PNG - Taille max 10Mo par fichier</p>
+                </div>
+              </div>
+              
+              <div className="bg-green-100 dark:bg-green-900/30 p-4 rounded-lg">
+                <h5 className="font-semibold text-green-800 dark:text-green-200 mb-2">Validation finale :</h5>
+                <ul className="list-disc list-inside text-green-700 dark:text-green-300 text-sm space-y-1">
+                  <li>Vérification automatique des champs obligatoires</li>
+                  <li>Contrôle de cohérence des données</li>
+                  <li>Détection des doublons potentiels</li>
+                  <li>Clic sur "Enregistrer" pour finaliser</li>
+                </ul>
+                <p className="mt-2 text-sm font-medium">Le client reçoit automatiquement un email de bienvenue et apparaît immédiatement dans la liste.</p>
+              </div>
+            </div>
+          </div>
+        )
       },
       {
         question: "Comment modifier un client existant ?",

@@ -5,6 +5,31 @@ import HelpSearchBar from '@/components/help/HelpSearchBar';
 import HelpFAQSectionComponent from '@/components/help/HelpFAQSection';
 import { faqSections } from '@/components/help/HelpFAQData';
 
+// Fonction utilitaire pour extraire le texte d'un ReactNode
+const extractTextFromReactNode = (node: React.ReactNode): string => {
+  if (typeof node === 'string') return node;
+  if (typeof node === 'number') return node.toString();
+  if (!node) return '';
+  
+  if (React.isValidElement(node)) {
+    if (typeof node.props.children === 'string') {
+      return node.props.children;
+    }
+    if (Array.isArray(node.props.children)) {
+      return node.props.children.map(extractTextFromReactNode).join(' ');
+    }
+    if (node.props.children) {
+      return extractTextFromReactNode(node.props.children);
+    }
+  }
+  
+  if (Array.isArray(node)) {
+    return node.map(extractTextFromReactNode).join(' ');
+  }
+  
+  return '';
+};
+
 const Help = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -16,10 +41,11 @@ const Help = () => {
     const searchLower = searchTerm.toLowerCase();
     
     return faqSections.map(section => {
-      const filteredItems = section.items.filter(item => 
-        item.question.toLowerCase().includes(searchLower) ||
-        item.answer.toLowerCase().includes(searchLower)
-      );
+      const filteredItems = section.items.filter(item => {
+        const answerText = extractTextFromReactNode(item.answer);
+        return item.question.toLowerCase().includes(searchLower) ||
+               answerText.toLowerCase().includes(searchLower);
+      });
 
       return {
         ...section,
