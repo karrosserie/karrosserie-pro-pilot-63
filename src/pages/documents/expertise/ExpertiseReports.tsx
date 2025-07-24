@@ -152,69 +152,67 @@ const ExpertiseReports = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto py-4 sm:py-6 lg:py-8">
-        <ExpertiseReportHeader 
-          title="Rapports d'expertise"
-          description="Consultez et gérez les rapports d'expertise automobile."
+    <div className="space-y-6">
+      <ExpertiseReportHeader 
+        title="Rapports d'expertise"
+        description="Consultez et gérez les rapports d'expertise automobile."
+      />
+      
+      <ExpertiseReportFilters 
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onImportClick={() => setImportDialogOpen(true)}
+      />
+      
+      <div className="card-container">
+        <ExpertiseReportTable 
+          reports={filteredReports}
+          isLoading={isLoading}
+          error={error as Error | null}
+          onEditReport={handleEditReport}
+          onDeleteReport={handleDeleteReport}
+          onConvertToQuote={handleConvertToQuote}
+          convertingReportId={getConvertingReportId()}
+          convertedReports={convertedReports}
         />
-        
-        <ExpertiseReportFilters 
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          onImportClick={() => setImportDialogOpen(true)}
-        />
-        
-        <div className="card-container">
-          <ExpertiseReportTable 
-            reports={filteredReports}
-            isLoading={isLoading}
-            error={error as Error | null}
-            onEditReport={handleEditReport}
-            onDeleteReport={handleDeleteReport}
-            onConvertToQuote={handleConvertToQuote}
-            convertingReportId={getConvertingReportId()}
-            convertedReports={convertedReports}
-          />
-        </div>
-
-        {/* Import Rapport Dialog */}
-        <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
-          <DialogContent className="w-[95vw] max-w-md mx-auto">
-            <DialogHeader>
-              <DialogTitle className="text-lg">Importer un rapport d'expertise</DialogTitle>
-              <DialogDescription className="text-sm">
-                Importez un rapport d'expertise au format PDF.
-              </DialogDescription>
-            </DialogHeader>
-            <ExpertiseReportUploader 
-              onSuccess={() => setImportDialogOpen(false)}
-              onCancel={() => setImportDialogOpen(false)}
-              className="mt-4"
-            />
-          </DialogContent>
-        </Dialog>
-
-        {/* Edit Rapport Dialog */}
-        <ExpertiseReportDialog
-          report={selectedReport}
-          open={editDialogOpen}
-          onOpenChange={setEditDialogOpen}
-        />
-
-        {/* Quote Dialog for conversion */}
-        <QuoteDialog
-          quote={prefilledQuoteData as Quote}
-          open={quoteDialogOpen}
-          onOpenChange={(open) => {
-            setQuoteDialogOpen(open);
-            if (!open) {
-              setPrefilledQuoteData(null);
-            }
-          }}
-        />
-
       </div>
+
+      {/* Import Rapport Dialog */}
+      <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+        <DialogContent className="w-[95vw] max-w-md mx-auto">
+          <DialogHeader>
+            <DialogTitle className="text-lg">Importer un rapport d'expertise</DialogTitle>
+            <DialogDescription className="text-sm">
+              Importez un rapport d'expertise au format PDF.
+            </DialogDescription>
+          </DialogHeader>
+          <ExpertiseReportUploader 
+            onSuccess={() => setImportDialogOpen(false)}
+            onCancel={() => setImportDialogOpen(false)}
+            className="mt-4"
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Rapport Dialog */}
+      <ExpertiseReportDialog
+        report={selectedReport}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
+
+      {/* Quote Dialog for conversion */}
+      <QuoteDialog
+        quote={prefilledQuoteData as Quote}
+        open={quoteDialogOpen}
+        onOpenChange={(open) => {
+          setQuoteDialogOpen(open);
+          if (!open) {
+            setPrefilledQuoteData(null);
+          }
+        }}
+      />
+
     </div>
   );
 };

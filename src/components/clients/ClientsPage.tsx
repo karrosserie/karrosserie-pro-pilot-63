@@ -62,7 +62,7 @@ const ClientsPage = () => {
   if (error) return <ErrorMessage message={error.message} />;
 
   return (
-    <div className="page-container">
+    <>
       <ClientsHeader />
       
       <ClientsFilters 
@@ -99,7 +99,7 @@ const ClientsPage = () => {
         selectedClientForDocument={selectedClientForDocument}
         setSelectedClientForDocument={setSelectedClientForDocument}
       />
-    </div>
+    </>
   );
 };
 
