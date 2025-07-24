@@ -124,7 +124,7 @@ const MobileHomePage = () => {
                 className="flex-col h-24 p-2 w-full text-sm hover:shadow-sm transition-shadow aspect-square"
               >
                 <div className="mb-2">
-                  {React.cloneElement(action.icon, { className: "h-8 w-8" })}
+                  {React.cloneElement(action.icon, { className: "h-10 w-10" })}
                 </div>
                 <span className="leading-tight text-center">{action.title}</span>
               </Button>
