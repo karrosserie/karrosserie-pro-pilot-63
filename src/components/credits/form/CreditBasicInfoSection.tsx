@@ -81,7 +81,7 @@ export const CreditBasicInfoSection = ({
               readOnly
               className={cn(
                 "bg-gray-50 cursor-not-allowed",
-                errors.reference && "border-red-500 focus-visible:ring-red-500"
+                errors.reference && "border-red-500"
               )}
               placeholder="Généré automatiquement"
             />
@@ -103,7 +103,7 @@ export const CreditBasicInfoSection = ({
               readOnly={readOnly}
               className={cn(
                 readOnly && "bg-gray-50 cursor-not-allowed",
-                errors.created_date && "border-red-500 focus-visible:ring-red-500"
+                errors.created_date && "border-red-500"
               )}
             />
             {errors.created_date && !readOnly && (
@@ -127,7 +127,7 @@ export const CreditBasicInfoSection = ({
                     id="status"
                     className={cn(
                       readOnly && "bg-gray-50 cursor-not-allowed",
-                      errors.status && "border-red-500 focus-visible:ring-red-500"
+                      errors.status && "border-red-500"
                     )}
                   >
                     <SelectValue placeholder="Sélectionner un statut" />
@@ -162,7 +162,7 @@ export const CreditBasicInfoSection = ({
             disabled={readOnly}
             className={cn(
               readOnly && "bg-gray-50 cursor-not-allowed",
-              errors.invoice_id && "border-red-500 focus-visible:ring-red-500"
+              errors.invoice_id && "border-red-500"
             )}
           />
           {errors.invoice_id && !readOnly && (
@@ -183,7 +183,7 @@ export const CreditBasicInfoSection = ({
             readOnly={readOnly}
             className={cn(
               readOnly && "bg-gray-50 cursor-not-allowed",
-              errors.notes && "border-red-500 focus-visible:ring-red-500"
+              errors.notes && "border-red-500"
             )}
             rows={3}
           />
