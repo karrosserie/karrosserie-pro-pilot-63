@@ -130,7 +130,7 @@ const PreferencesTab = () => {
           </div>
 
           {/* Options d'affichage */}
-          <div className="space-y-4">
+          <div className="space-y-4 hidden">
             <h3 className="text-lg font-medium">Options d'affichage</h3>
             
             <div className="flex items-center justify-between">

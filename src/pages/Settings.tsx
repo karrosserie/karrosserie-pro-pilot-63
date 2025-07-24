@@ -47,15 +47,15 @@ const Settings = () => {
             <Users className="h-4 w-4 mr-2" />
             Équipe
           </TabsTrigger>
-          <TabsTrigger value="appearance">
+          <TabsTrigger value="appearance" className="hidden">
             <SettingsIcon className="h-4 w-4 mr-2" />
             Apparence
           </TabsTrigger>
-          <TabsTrigger value="notifications">
+          <TabsTrigger value="notifications" className="hidden">
             <Bell className="h-4 w-4 mr-2" />
             Notifications
           </TabsTrigger>
-          <TabsTrigger value="subscription">
+          <TabsTrigger value="subscription" className="hidden">
             <CreditCard className="h-4 w-4 mr-2" />
             Abonnement
           </TabsTrigger>

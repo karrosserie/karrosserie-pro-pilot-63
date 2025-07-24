@@ -33,7 +33,7 @@ const Navbar = ({ onToggleSidebar, isSidebarOpen = false }: NavbarProps) => {
           <MobileMenuButton onClick={onToggleSidebar} />
         </div>
 
-        <div className="hidden sm:block flex-1 max-w-md mx-4">
+        <div className="hidden sm:block flex-1 max-w-md mx-4 hidden">
           <SearchBar onImportClick={() => setImportDialogOpen(true)} />
         </div>
 
@@ -41,16 +41,18 @@ const Navbar = ({ onToggleSidebar, isSidebarOpen = false }: NavbarProps) => {
           <Button 
             variant="ghost" 
             size="icon"
-            className="text-gray-600 sm:hidden h-9 w-9"
+            className="text-gray-600 sm:hidden h-9 w-9 hidden"
           >
             <Search className="h-4 w-4" />
           </Button>
           
-          <NotificationsPanel 
-            showNotifications={showNotifications} 
-            setShowNotifications={setShowNotifications}
-            notifications={notifications}
-          />
+          <div className="hidden">
+            <NotificationsPanel 
+              showNotifications={showNotifications} 
+              setShowNotifications={setShowNotifications}
+              notifications={notifications}
+            />
+          </div>
           
           <UserProfileMenu />
         </div>
