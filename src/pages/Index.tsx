@@ -157,6 +157,73 @@ const Index = () => {
       
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
         <div className="xl:col-span-2 space-y-4 sm:space-y-6">
+          {/* Raccourcis */}
+          <div className="card-container animate-fade-in">
+            <h3 className="section-title text-lg sm:text-xl mb-4">Raccourcis</h3>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div 
+                className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer h-28 flex flex-col justify-center"
+                onClick={() => {
+                  setSelectedVehicle(null);
+                  setVehicleDialogMode('create');
+                  setIsVehicleDialogOpen(true);
+                }}
+              >
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                    <Car className="h-6 w-6 text-karrosserie-orange" />
+                  </div>
+                  <div className="text-center">
+                    <div className="font-medium text-foreground text-xs whitespace-nowrap overflow-hidden text-ellipsis">Nouveau véhicule</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div 
+                className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer h-28 flex flex-col justify-center"
+                onClick={() => setIsQuoteDialogOpen(true)}
+              >
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <FileText className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div className="text-center">
+                    <div className="font-medium text-foreground text-xs whitespace-nowrap overflow-hidden text-ellipsis">Nouveau devis</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div 
+                className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer h-28 flex flex-col justify-center"
+                onClick={() => setIsClientDialogOpen(true)}
+              >
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <Users className="h-6 w-6 text-green-600" />
+                  </div>
+                  <div className="text-center">
+                    <div className="font-medium text-foreground text-xs whitespace-nowrap overflow-hidden text-ellipsis">Nouveau client</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div 
+                className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer h-28 flex flex-col justify-center"
+                onClick={() => setIsReceiptDialogOpen(true)}
+              >
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                    <CreditCard className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <div className="text-center">
+                    <div className="font-medium text-foreground text-xs whitespace-nowrap overflow-hidden text-ellipsis">Encaisser</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Véhicules récents */}
           <div className="card-container animate-fade-in">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
@@ -277,72 +344,6 @@ const Index = () => {
         <div className="space-y-4 sm:space-y-6">
           <RecentActivity activities={recentActivity} />
           
-          {/* Raccourcis */}
-          <div className="card-container animate-fade-in">
-            <h3 className="section-title text-lg sm:text-xl mb-4">Raccourcis</h3>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div 
-                className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer h-28 flex flex-col justify-center"
-                onClick={() => {
-                  setSelectedVehicle(null);
-                  setVehicleDialogMode('create');
-                  setIsVehicleDialogOpen(true);
-                }}
-              >
-                <div className="flex flex-col items-center space-y-3">
-                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <Car className="h-6 w-6 text-karrosserie-orange" />
-                  </div>
-                  <div className="text-center">
-                    <div className="font-medium text-foreground text-xs whitespace-nowrap overflow-hidden text-ellipsis">Nouveau véhicule</div>
-                  </div>
-                </div>
-              </div>
-              
-              <div 
-                className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer h-28 flex flex-col justify-center"
-                onClick={() => setIsQuoteDialogOpen(true)}
-              >
-                <div className="flex flex-col items-center space-y-3">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <FileText className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div className="text-center">
-                    <div className="font-medium text-foreground text-xs whitespace-nowrap overflow-hidden text-ellipsis">Nouveau devis</div>
-                  </div>
-                </div>
-              </div>
-              
-              <div 
-                className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer h-28 flex flex-col justify-center"
-                onClick={() => setIsClientDialogOpen(true)}
-              >
-                <div className="flex flex-col items-center space-y-3">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <Users className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div className="text-center">
-                    <div className="font-medium text-foreground text-xs whitespace-nowrap overflow-hidden text-ellipsis">Nouveau client</div>
-                  </div>
-                </div>
-              </div>
-              
-              <div 
-                className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer h-28 flex flex-col justify-center"
-                onClick={() => setIsReceiptDialogOpen(true)}
-              >
-                <div className="flex flex-col items-center space-y-3">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                    <CreditCard className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <div className="text-center">
-                    <div className="font-medium text-foreground text-xs whitespace-nowrap overflow-hidden text-ellipsis">Encaisser</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
