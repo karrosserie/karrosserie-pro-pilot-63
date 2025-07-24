@@ -280,46 +280,66 @@ const Index = () => {
           <div className="card-container animate-fade-in">
             <h3 className="section-title text-lg sm:text-xl">Raccourcis</h3>
             
-            <div className="grid grid-cols-2 gap-2 sm:gap-3">
-              <Button 
-                variant="outline" 
-                className="flex-col h-16 sm:h-20 p-2 w-full text-xs sm:text-sm hover:shadow-sm transition-shadow"
+            <div className="grid grid-cols-2 gap-4">
+              <div 
+                className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer h-28 flex flex-col justify-center"
                 onClick={() => {
                   setSelectedVehicle(null);
                   setVehicleDialogMode('create');
                   setIsVehicleDialogOpen(true);
                 }}
               >
-                <Car className="h-5 w-5 sm:h-6 sm:w-6 mb-1" />
-                <span className="leading-tight text-center">Nouveau véhicule</span>
-              </Button>
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                    <Car className="h-6 w-6 text-karrosserie-orange" />
+                  </div>
+                  <div className="text-center">
+                    <div className="font-medium text-foreground text-xs whitespace-nowrap overflow-hidden text-ellipsis">Nouveau véhicule</div>
+                  </div>
+                </div>
+              </div>
               
-              <Button 
-                variant="outline" 
-                className="flex-col h-16 sm:h-20 p-2 w-full text-xs sm:text-sm hover:shadow-sm transition-shadow"
+              <div 
+                className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer h-28 flex flex-col justify-center"
                 onClick={() => setIsQuoteDialogOpen(true)}
               >
-                <FileText className="h-5 w-5 sm:h-6 sm:w-6 mb-1" />
-                <span className="leading-tight text-center">Nouveau devis</span>
-              </Button>
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <FileText className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div className="text-center">
+                    <div className="font-medium text-foreground text-xs whitespace-nowrap overflow-hidden text-ellipsis">Nouveau devis</div>
+                  </div>
+                </div>
+              </div>
               
-              <Button 
-                variant="outline" 
-                className="flex-col h-16 sm:h-20 p-2 w-full text-xs sm:text-sm hover:shadow-sm transition-shadow"
+              <div 
+                className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer h-28 flex flex-col justify-center"
                 onClick={() => setIsClientDialogOpen(true)}
               >
-                <Users className="h-5 w-5 sm:h-6 sm:w-6 mb-1" />
-                <span className="leading-tight text-center">Nouveau client</span>
-              </Button>
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <Users className="h-6 w-6 text-green-600" />
+                  </div>
+                  <div className="text-center">
+                    <div className="font-medium text-foreground text-xs whitespace-nowrap overflow-hidden text-ellipsis">Nouveau client</div>
+                  </div>
+                </div>
+              </div>
               
-              <Button 
-                variant="outline" 
-                className="flex-col h-16 sm:h-20 p-2 w-full text-xs sm:text-sm hover:shadow-sm transition-shadow"
+              <div 
+                className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer h-28 flex flex-col justify-center"
                 onClick={() => setIsReceiptDialogOpen(true)}
               >
-                <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 mb-1" />
-                <span className="leading-tight text-center">Encaisser</span>
-              </Button>
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                    <CreditCard className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <div className="text-center">
+                    <div className="font-medium text-foreground text-xs whitespace-nowrap overflow-hidden text-ellipsis">Encaisser</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
