@@ -142,13 +142,6 @@ const MobileHomePage = () => {
           </Link>
         </div>
       </div>
-
-      {/* Footer */}
-      <div className="p-6 text-center">
-        <p className="text-xs text-muted-foreground">
-          © 2024 Karrosserie Pro • Version Mobile
-        </p>
-      </div>
     </div>
   );
 };
