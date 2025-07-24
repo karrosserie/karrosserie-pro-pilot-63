@@ -275,8 +275,6 @@ const Index = () => {
         </div>
         
         <div className="space-y-4 sm:space-y-6">
-          <RecentActivity activities={recentActivity} />
-          
           {/* Raccourcis */}
           <div className="card-container animate-fade-in">
             <h3 className="section-title text-lg sm:text-xl mb-4">Raccourcis</h3>
@@ -343,6 +341,8 @@ const Index = () => {
               </div>
             </div>
           </div>
+          
+          <RecentActivity activities={recentActivity} />
         </div>
       </div>
 
