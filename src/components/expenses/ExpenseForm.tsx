@@ -75,11 +75,64 @@ export const ExpenseForm = ({
     }));
   };
 
+  const handleAnalysisComplete = (analysisData: any) => {
+    console.log('Received analysis data:', analysisData);
+    
+    // Mapper les données de l'API aux champs du formulaire
+    if (analysisData) {
+      const updates: Partial<ExpenseFormData> = {};
+      
+      // Date
+      if (analysisData.date) {
+        // Convertir la date au format YYYY-MM-DD si nécessaire
+        const date = new Date(analysisData.date);
+        if (!isNaN(date.getTime())) {
+          updates.date = date.toISOString().split('T')[0];
+        }
+      }
+      
+      // Fournisseur
+      if (analysisData.name || analysisData.supplier) {
+        updates.supplier = analysisData.name || analysisData.supplier;
+      }
+      
+      // Catégorie
+      if (analysisData.category) {
+        updates.category = analysisData.category;
+      }
+      
+      // Montant TVA
+      if (analysisData.tva || analysisData.vat_amount) {
+        const vatAmount = parseFloat(analysisData.tva || analysisData.vat_amount);
+        if (!isNaN(vatAmount)) {
+          updates.vat_amount = vatAmount;
+        }
+      }
+      
+      // Montant TTC
+      if (analysisData.ttc || analysisData.total_amount) {
+        const totalAmount = parseFloat(analysisData.ttc || analysisData.total_amount);
+        if (!isNaN(totalAmount)) {
+          updates.total_amount = totalAmount;
+        }
+      }
+      
+      // Appliquer les mises à jour
+      if (Object.keys(updates).length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          ...updates
+        }));
+      }
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <TypeProofFields
         formData={formData}
         onChange={handleChange}
+        onAnalysisComplete={handleAnalysisComplete}
       />
 
       <BasicFields

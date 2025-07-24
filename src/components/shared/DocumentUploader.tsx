@@ -14,6 +14,7 @@ interface DocumentUploaderProps {
   documentId: string;
   currentDocumentUrl?: string | null;
   onUploadComplete: (url: string) => void;
+  onAnalysisComplete?: (data: any) => void;
   isViewMode?: boolean;
   customContent?: React.ReactNode;
 }
@@ -23,13 +24,15 @@ export function DocumentUploader({
   documentId,
   currentDocumentUrl,
   onUploadComplete,
+  onAnalysisComplete,
   isViewMode = false,
   customContent
 }: DocumentUploaderProps) {
   const { isUploading, isDeleting, isAnalyzing, uploadFile, handleDelete } = useDocumentUpload({
     documentType,
     documentId,
-    onUploadComplete
+    onUploadComplete,
+    onAnalysisComplete
   });
 
   const {

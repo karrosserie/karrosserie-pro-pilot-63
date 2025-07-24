@@ -7,12 +7,14 @@ interface UseDocumentUploadProps {
   documentType: string;
   documentId: string;
   onUploadComplete: (url: string) => void;
+  onAnalysisComplete?: (data: any) => void;
 }
 
 export function useDocumentUpload({
   documentType,
   documentId,
-  onUploadComplete
+  onUploadComplete,
+  onAnalysisComplete
 }: UseDocumentUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -61,6 +63,13 @@ export function useDocumentUpload({
             
             if (response.ok) {
               console.log('File sent to analysis API successfully');
+              const analysisData = await response.json();
+              console.log('Analysis data received:', analysisData);
+              
+              // Appeler le callback avec les données analysées
+              if (onAnalysisComplete && analysisData) {
+                onAnalysisComplete(analysisData);
+              }
             } else {
               console.warn('Analysis API call failed:', response.status, response.statusText);
             }
