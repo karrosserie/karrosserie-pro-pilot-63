@@ -1,17 +1,21 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bot, Car, Users, FileText, ArrowRight, Zap, Camera } from 'lucide-react';
+import { Bot, Car, Users, FileText, ArrowRight, Zap, Camera, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useDashboardData } from '@/hooks/use-dashboard-data';
 import { useVehicles } from '@/hooks/use-vehicles';
+import ImportDialog from '@/components/layout/navbar/ImportDialog';
 
 const MobileHomePage = () => {
   console.log('MobileHomePage: Component rendering');
   
   const { dashboardStats } = useDashboardData();
   const { vehicles } = useVehicles();
+  const [showImportDialog, setShowImportDialog] = useState(false);
+  const [showPhotoDialog, setShowPhotoDialog] = useState(false);
 
   const quickActions = [
     {
@@ -108,28 +112,49 @@ const MobileHomePage = () => {
         
         {/* Bouton principal remonté */}
         <div className="mb-8">
-          <Link to="/documents/expertise">
-            <Button className="w-full h-12 bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90 font-medium transition-all duration-300">
-              <FileText className="h-4 w-4 mr-2" />
-              Importer un rapport d&apos;expertise
-            </Button>
-          </Link>
+          <Button 
+            onClick={() => setShowImportDialog(true)}
+            className="w-full h-12 bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90 font-medium transition-all duration-300"
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            Importer un rapport d&apos;expertise
+          </Button>
         </div>
         
         <div className="grid grid-cols-2 gap-4 mb-8">
-          {quickActions.map((action, index) => (
-            <Link key={index} to={action.path}>
-              <Button 
-                variant="outline" 
-                className="flex-col h-24 p-2 w-full text-sm hover:shadow-sm transition-shadow aspect-square"
-              >
-                <div className="mb-2">
-                  {React.cloneElement(action.icon, { className: "h-12 w-12" })}
-                </div>
-                <span className="leading-tight text-center">{action.title}</span>
-              </Button>
-            </Link>
-          ))}
+          {quickActions.map((action, index) => {
+            const isPhotoAction = action.title === "Prendre une photo";
+            
+            if (isPhotoAction) {
+              return (
+                <Button 
+                  key={index}
+                  variant="outline" 
+                  className="flex-col h-24 p-2 w-full text-sm hover:shadow-sm transition-shadow aspect-square"
+                  onClick={() => setShowPhotoDialog(true)}
+                >
+                  <div className="mb-2">
+                    {React.cloneElement(action.icon, { className: "h-12 w-12" })}
+                  </div>
+                  <span className="leading-tight text-center">{action.title}</span>
+                </Button>
+              );
+            }
+            
+            return (
+              <Link key={index} to={action.path}>
+                <Button 
+                  variant="outline" 
+                  className="flex-col h-24 p-2 w-full text-sm hover:shadow-sm transition-shadow aspect-square"
+                >
+                  <div className="mb-2">
+                    {React.cloneElement(action.icon, { className: "h-12 w-12" })}
+                  </div>
+                  <span className="leading-tight text-center">{action.title}</span>
+                </Button>
+              </Link>
+            );
+          })}
         </div>
 
         {/* Bouton accès complet */}
@@ -142,6 +167,47 @@ const MobileHomePage = () => {
           </Link>
         </div>
       </div>
+
+      {/* Dialog d'import de rapport d'expertise */}
+      <ImportDialog 
+        open={showImportDialog} 
+        onOpenChange={setShowImportDialog} 
+      />
+
+      {/* Dialog pour les options de photo */}
+      <Dialog open={showPhotoDialog} onOpenChange={setShowPhotoDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Choisir une action</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 mt-4">
+            <Button
+              variant="outline"
+              className="w-full h-16 flex items-center justify-center space-x-3"
+              onClick={() => {
+                setShowPhotoDialog(false);
+                // Navigation vers la page de photo de véhicule
+                window.location.href = '/camera';
+              }}
+            >
+              <Car className="h-6 w-6" />
+              <span>Photo d'un véhicule</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full h-16 flex items-center justify-center space-x-3"
+              onClick={() => {
+                setShowPhotoDialog(false);
+                // Navigation vers la page de dépense
+                window.location.href = '/expenses';
+              }}
+            >
+              <Receipt className="h-6 w-6" />
+              <span>Photo d'une dépense</span>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
