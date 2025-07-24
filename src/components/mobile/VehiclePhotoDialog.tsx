@@ -149,6 +149,7 @@ const VehiclePhotoDialog: React.FC<VehiclePhotoDialogProps> = ({
             Annuler
           </Button>
           <Button 
+            variant="validation"
             onClick={handleSubmit}
             disabled={!selectedVehicleId || updateVehicle.isPending}
           >
