@@ -58,6 +58,7 @@ export function DocumentUploader({
         documentUrl={currentDocumentUrl}
         isViewMode={isViewMode}
         isDeleting={isDeleting}
+        isAnalyzing={isAnalyzing}
         onDelete={() => handleDelete(currentDocumentUrl)}
         customContent={customContent}
       />

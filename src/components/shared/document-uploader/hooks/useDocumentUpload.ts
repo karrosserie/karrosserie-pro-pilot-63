@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useStorage } from '@/hooks/use-storage';
 import { useToast } from '@/hooks/use-toast';
@@ -40,6 +39,13 @@ export function useDocumentUpload({
       console.log('Upload successful, URL:', url);
       
       if (url) {
+        // D'abord appeler onUploadComplete pour afficher le document
+        onUploadComplete(url);
+        toast({
+          title: "Document téléchargé",
+          description: "Le document a été téléchargé avec succès."
+        });
+
         // Si c'est une preuve d'achat, appeler l'API d'analyse
         if (documentType === 'expense-proof') {
           setIsAnalyzing(true);
@@ -65,12 +71,6 @@ export function useDocumentUpload({
             setIsAnalyzing(false);
           }
         }
-        
-        onUploadComplete(url);
-        toast({
-          title: "Document téléchargé",
-          description: "Le document a été téléchargé avec succès."
-        });
       }
     } catch (error: any) {
       console.error('Upload error:', error);

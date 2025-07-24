@@ -8,6 +8,7 @@ interface DocumentDisplayProps {
   documentUrl: string;
   isViewMode: boolean;
   isDeleting: boolean;
+  isAnalyzing?: boolean;
   onDelete: () => void;
   customContent?: React.ReactNode;
 }
@@ -16,6 +17,7 @@ export const DocumentDisplay: React.FC<DocumentDisplayProps> = ({
   documentUrl,
   isViewMode,
   isDeleting,
+  isAnalyzing = false,
   onDelete,
   customContent
 }) => {
@@ -33,7 +35,14 @@ export const DocumentDisplay: React.FC<DocumentDisplayProps> = ({
         </div>
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            {customContent}
+            {isAnalyzing ? (
+              <div className="flex items-center text-karrosserie-orange">
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <span className="text-sm">Analyse en cours...</span>
+              </div>
+            ) : (
+              customContent
+            )}
           </div>
           {!isViewMode && (
             <div className="flex space-x-2">
