@@ -48,9 +48,9 @@ const MobileHomePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="pt-12 pb-8 px-6 bg-gradient-to-br from-orange-50 to-orange-100/30">
+      <div className="pt-12 pb-8 px-6">
         <div className="text-center">
           <div className="mb-4">
             <span className="text-3xl font-bold text-karrosserie-orange">
@@ -109,10 +109,9 @@ const MobileHomePage = () => {
         {/* Bouton principal remonté */}
         <div className="mb-8">
           <Link to="/documents/expertise">
-            <Button className="w-full h-14 bg-gradient-to-r from-karrosserie-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95">
-              <FileText className="h-6 w-6 mr-3" />
+            <Button className="w-full h-12 bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90 font-medium transition-all duration-300">
+              <FileText className="h-4 w-4 mr-2" />
               Charger un rapport d&apos;expertise
-              <ArrowRight className="h-5 w-5 ml-3" />
             </Button>
           </Link>
         </div>
@@ -120,21 +119,15 @@ const MobileHomePage = () => {
         <div className="grid grid-cols-2 gap-4 mb-8">
           {quickActions.map((action, index) => (
             <Link key={index} to={action.path}>
-              <Card className="border shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 h-32 bg-card">
-                <CardContent className="p-0 h-full">
-                  <div className={`${action.color} h-full rounded-lg flex flex-col items-center justify-center text-white relative overflow-hidden`}>
-                    <div className="absolute inset-0 bg-black/10"></div>
-                    <div className="relative z-10 text-center">
-                      <div className="mb-2">
-                        {action.icon}
-                      </div>
-                      <div className="font-semibold text-sm">
-                        {action.title}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <Button 
+                variant="outline" 
+                className="flex-col h-20 p-2 w-full text-sm hover:shadow-sm transition-shadow"
+              >
+                <div className="mb-2">
+                  {React.cloneElement(action.icon, { className: "h-6 w-6" })}
+                </div>
+                <span className="leading-tight text-center">{action.title}</span>
+              </Button>
             </Link>
           ))}
         </div>
