@@ -111,7 +111,7 @@ const MobileHomePage = () => {
           <Link to="/documents/expertise">
             <Button className="w-full h-12 bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90 font-medium transition-all duration-300">
               <FileText className="h-4 w-4 mr-2" />
-              Charger un rapport d&apos;expertise
+              Importer un rapport d&apos;expertise
             </Button>
           </Link>
         </div>
@@ -121,7 +121,7 @@ const MobileHomePage = () => {
             <Link key={index} to={action.path}>
               <Button 
                 variant="outline" 
-                className="flex-col h-20 p-2 w-full text-sm hover:shadow-sm transition-shadow"
+                className="flex-col h-24 p-2 w-full text-sm hover:shadow-sm transition-shadow aspect-square"
               >
                 <div className="mb-2">
                   {React.cloneElement(action.icon, { className: "h-6 w-6" })}
