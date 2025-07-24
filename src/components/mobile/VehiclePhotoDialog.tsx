@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import MultipleVehicleImages from '@/components/vehicle/form/MultipleVehicleImages';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface VehicleImageData {
   url: string;
@@ -78,13 +79,18 @@ const VehiclePhotoDialog: React.FC<VehiclePhotoDialogProps> = ({
     }
 
     try {
-      // Récupérer les données actuelles du véhicule depuis la base
-      const currentVehicle = vehicles?.find(v => v.id === selectedVehicleId);
+      // Récupérer les données actuelles du véhicule directement depuis la base
+      const { data: currentVehicleData } = await supabase
+        .from('vehicles')
+        .select('vehicle_images')
+        .eq('id', selectedVehicleId)
+        .single();
+      
       let existingImages: VehicleImageData[] = [];
       
-      if (currentVehicle?.vehicle_images) {
-        existingImages = Array.isArray(currentVehicle.vehicle_images) 
-          ? currentVehicle.vehicle_images as unknown as VehicleImageData[]
+      if (currentVehicleData?.vehicle_images) {
+        existingImages = Array.isArray(currentVehicleData.vehicle_images) 
+          ? currentVehicleData.vehicle_images as unknown as VehicleImageData[]
           : [];
       }
       
