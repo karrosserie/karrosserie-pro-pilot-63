@@ -152,7 +152,7 @@ const ExpertiseReports = () => {
   };
   
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
       <ExpertiseReportHeader 
         title="Rapports d'expertise"
         description="Consultez et gérez les rapports d'expertise automobile."
