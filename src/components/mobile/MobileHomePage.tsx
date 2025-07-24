@@ -9,6 +9,7 @@ import { useDashboardData } from '@/hooks/use-dashboard-data';
 import { useVehicles } from '@/hooks/use-vehicles';
 import ImportDialog from '@/components/layout/navbar/ImportDialog';
 import VehiclePhotoDialog from './VehiclePhotoDialog';
+import ExpenseDialog from '@/components/expenses/ExpenseDialog';
 
 const MobileHomePage = () => {
   console.log('MobileHomePage: Component rendering');
@@ -18,6 +19,7 @@ const MobileHomePage = () => {
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showPhotoDialog, setShowPhotoDialog] = useState(false);
   const [showVehiclePhotoDialog, setShowVehiclePhotoDialog] = useState(false);
+  const [showExpenseDialog, setShowExpenseDialog] = useState(false);
 
   const quickActions = [
     {
@@ -213,8 +215,7 @@ const MobileHomePage = () => {
               className="w-full h-16 flex items-center justify-center space-x-3"
               onClick={() => {
                 setShowPhotoDialog(false);
-                // Navigation vers la page de dépense
-                window.location.href = '/expenses';
+                setShowExpenseDialog(true);
               }}
             >
               <Receipt className="h-6 w-6" />
@@ -228,6 +229,12 @@ const MobileHomePage = () => {
       <VehiclePhotoDialog 
         open={showVehiclePhotoDialog} 
         onOpenChange={setShowVehiclePhotoDialog} 
+      />
+
+      {/* Dialog pour ajouter une dépense */}
+      <ExpenseDialog
+        open={showExpenseDialog}
+        onOpenChange={setShowExpenseDialog}
       />
     </div>
   );
