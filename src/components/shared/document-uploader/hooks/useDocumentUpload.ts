@@ -17,6 +17,7 @@ export function useDocumentUpload({
 }: UseDocumentUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { uploadDocument, deleteDocument } = useStorage();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -41,6 +42,7 @@ export function useDocumentUpload({
       if (url) {
         // Si c'est une preuve d'achat, appeler l'API d'analyse
         if (documentType === 'expense-proof') {
+          setIsAnalyzing(true);
           try {
             console.log('Sending file to analysis API...');
             const formData = new FormData();
@@ -59,6 +61,8 @@ export function useDocumentUpload({
           } catch (apiError) {
             console.error('Error calling analysis API:', apiError);
             // Ne pas bloquer le processus principal si l'API d'analyse échoue
+          } finally {
+            setIsAnalyzing(false);
           }
         }
         
@@ -104,6 +108,7 @@ export function useDocumentUpload({
   return {
     isUploading,
     isDeleting,
+    isAnalyzing,
     uploadFile,
     handleDelete
   };

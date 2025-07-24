@@ -6,6 +6,7 @@ import { useDocumentUpload } from './document-uploader/hooks/useDocumentUpload';
 import { useImageCropping } from './document-uploader/hooks/useImageCropping';
 import { DocumentDisplay } from './document-uploader/DocumentDisplay';
 import { DocumentUploadLoading } from './document-uploader/DocumentUploadLoading';
+import { DocumentAnalysisLoading } from './document-uploader/DocumentAnalysisLoading';
 import { DocumentEmptyState } from './document-uploader/DocumentEmptyState';
 
 interface DocumentUploaderProps {
@@ -25,7 +26,7 @@ export function DocumentUploader({
   isViewMode = false,
   customContent
 }: DocumentUploaderProps) {
-  const { isUploading, isDeleting, uploadFile, handleDelete } = useDocumentUpload({
+  const { isUploading, isDeleting, isAnalyzing, uploadFile, handleDelete } = useDocumentUpload({
     documentType,
     documentId,
     onUploadComplete
@@ -45,6 +46,10 @@ export function DocumentUploader({
 
   if (isUploading) {
     return <DocumentUploadLoading />;
+  }
+
+  if (isAnalyzing) {
+    return <DocumentAnalysisLoading />;
   }
   
   if (currentDocumentUrl) {
