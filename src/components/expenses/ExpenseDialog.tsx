@@ -58,7 +58,7 @@ const ExpenseDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={!isSubmitting ? onOpenChange : undefined}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto mx-4 sm:mx-auto">
         <DialogHeader>
           <DialogTitle>
             {expense ? `Modifier la dépense` : "Nouvelle dépense"}
