@@ -33,7 +33,7 @@ const Navbar = ({ onToggleSidebar, isSidebarOpen = false }: NavbarProps) => {
           <MobileMenuButton onClick={onToggleSidebar} />
         </div>
 
-        <div className="hidden sm:block flex-1 max-w-md mx-4 hidden">
+        <div className="hidden sm:block flex-1 max-w-md mx-4">
           <SearchBar onImportClick={() => setImportDialogOpen(true)} />
         </div>
 

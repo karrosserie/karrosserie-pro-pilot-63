@@ -10,7 +10,7 @@ interface SearchBarProps {
 const SearchBar = ({ onImportClick }: SearchBarProps) => {
   return (
     <div className="hidden md:flex items-center space-x-2 relative max-w-xl w-full mx-4">
-      <div className="relative flex-1">
+      <div className="relative flex-1 hidden">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         <input 
           type="text" 
