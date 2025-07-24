@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { useDashboardData } from '@/hooks/use-dashboard-data';
 import { useVehicles } from '@/hooks/use-vehicles';
 import ImportDialog from '@/components/layout/navbar/ImportDialog';
+import VehiclePhotoDialog from './VehiclePhotoDialog';
 
 const MobileHomePage = () => {
   console.log('MobileHomePage: Component rendering');
@@ -16,6 +17,7 @@ const MobileHomePage = () => {
   const { vehicles } = useVehicles();
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showPhotoDialog, setShowPhotoDialog] = useState(false);
+  const [showVehiclePhotoDialog, setShowVehiclePhotoDialog] = useState(false);
 
   const quickActions = [
     {
@@ -186,8 +188,7 @@ const MobileHomePage = () => {
               className="w-full h-16 flex items-center justify-center space-x-3"
               onClick={() => {
                 setShowPhotoDialog(false);
-                // Navigation vers la page de photo de véhicule
-                window.location.href = '/camera';
+                setShowVehiclePhotoDialog(true);
               }}
             >
               <Car className="h-6 w-6" />
@@ -208,6 +209,12 @@ const MobileHomePage = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Dialog pour les photos de véhicule */}
+      <VehiclePhotoDialog 
+        open={showVehiclePhotoDialog} 
+        onOpenChange={setShowVehiclePhotoDialog} 
+      />
     </div>
   );
 };
