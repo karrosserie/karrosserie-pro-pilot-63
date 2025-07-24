@@ -35,6 +35,11 @@ export function useDocumentUpload({
     
     setIsUploading(true);
     
+    // Si c'est une preuve d'achat, commencer l'analyse dès maintenant
+    if (documentType === 'expense-proof') {
+      setIsAnalyzing(true);
+    }
+    
     try {
       console.log('Uploading file to storage...', { userId: user.id, documentType, documentId });
       const url = await uploadDocument(file, documentType, documentId);
@@ -50,7 +55,6 @@ export function useDocumentUpload({
 
         // Si c'est une preuve d'achat, appeler l'API d'analyse
         if (documentType === 'expense-proof') {
-          setIsAnalyzing(true);
           try {
             console.log('Sending file to analysis API...');
             const formData = new FormData();
@@ -90,8 +94,6 @@ export function useDocumentUpload({
           } catch (apiError) {
             console.error('Error calling analysis API:', apiError);
             // Ne pas bloquer le processus principal si l'API d'analyse échoue
-          } finally {
-            setIsAnalyzing(false);
           }
         }
       }
@@ -104,6 +106,10 @@ export function useDocumentUpload({
       });
     } finally {
       setIsUploading(false);
+      // Reset l'état d'analyse dans tous les cas
+      if (documentType === 'expense-proof') {
+        setIsAnalyzing(false);
+      }
     }
   };
 
