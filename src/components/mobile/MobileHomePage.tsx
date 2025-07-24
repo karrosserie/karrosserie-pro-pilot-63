@@ -129,31 +129,45 @@ const MobileHomePage = () => {
             
             if (isPhotoAction) {
               return (
-                <Button 
+                <div 
                   key={index}
-                  variant="outline" 
-                  className="flex-col h-24 p-2 w-full text-sm hover:shadow-sm transition-shadow aspect-square"
+                  className="bg-card border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer"
                   onClick={() => setShowPhotoDialog(true)}
                 >
-                  <div className="mb-2">
-                    {React.cloneElement(action.icon, { className: "h-12 w-12" })}
+                  <div className="flex flex-col items-center space-y-3">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Camera className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <div className="text-center">
+                      <div className="font-medium text-foreground">{action.title}</div>
+                    </div>
                   </div>
-                  <span className="leading-tight text-center">{action.title}</span>
-                </Button>
+                </div>
               );
             }
             
             return (
               <Link key={index} to={action.path}>
-                <Button 
-                  variant="outline" 
-                  className="flex-col h-24 p-2 w-full text-sm hover:shadow-sm transition-shadow aspect-square"
-                >
-                  <div className="mb-2">
-                    {React.cloneElement(action.icon, { className: "h-12 w-12" })}
+                <div className="bg-card border rounded-lg p-6 hover:shadow-md transition-shadow">
+                  <div className="flex flex-col items-center space-y-3">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                      action.title === "Véhicules" ? "bg-orange-100" :
+                      action.title === "Clients" ? "bg-green-100" :
+                      action.title === "Documents" ? "bg-purple-100" : "bg-gray-100"
+                    }`}>
+                      {React.cloneElement(action.icon, { 
+                        className: `h-6 w-6 ${
+                          action.title === "Véhicules" ? "text-karrosserie-orange" :
+                          action.title === "Clients" ? "text-green-600" :
+                          action.title === "Documents" ? "text-purple-600" : "text-gray-600"
+                        }`
+                      })}
+                    </div>
+                    <div className="text-center">
+                      <div className="font-medium text-foreground">{action.title}</div>
+                    </div>
                   </div>
-                  <span className="leading-tight text-center">{action.title}</span>
-                </Button>
+                </div>
               </Link>
             );
           })}
