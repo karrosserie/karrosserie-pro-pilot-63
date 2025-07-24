@@ -1,14 +1,25 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Bot, Car, Users, FileText, ArrowRight, Zap } from 'lucide-react';
+import { Bot, Car, Users, FileText, ArrowRight, Zap, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { useDashboardData } from '@/hooks/use-dashboard-data';
+import { useVehicles } from '@/hooks/use-vehicles';
 
 const MobileHomePage = () => {
   console.log('MobileHomePage: Component rendering');
+  
+  const { dashboardStats } = useDashboardData();
+  const { vehicles } = useVehicles();
 
   const quickActions = [
+    {
+      icon: <Camera className="h-8 w-8" />,
+      title: "Prendre une photo",
+      color: "bg-blue-500",
+      path: "/camera"
+    },
     // {
     //   icon: <Bot className="h-6 w-6" />,
     //   title: "Assistant IA",
@@ -17,30 +28,27 @@ const MobileHomePage = () => {
     //   path: "/ai-assistant"
     // },
     {
-      icon: <Car className="h-6 w-6" />,
+      icon: <Car className="h-8 w-8" />,
       title: "Véhicules",
-      description: "Suivi réparations",
-      color: "bg-gradient-to-br from-orange-500 to-red-600",
+      color: "bg-karrosserie-orange",
       path: "/vehicles"
     },
     {
-      icon: <Users className="h-6 w-6" />,
+      icon: <Users className="h-8 w-8" />,
       title: "Clients",
-      description: "Gestion clientèle",
-      color: "bg-gradient-to-br from-green-500 to-emerald-600",
+      color: "bg-green-600",
       path: "/clients"
     },
     {
-      icon: <FileText className="h-6 w-6" />,
+      icon: <FileText className="h-8 w-8" />,
       title: "Documents",
-      description: "Devis & Factures",
-      color: "bg-gradient-to-br from-purple-500 to-pink-600",
+      color: "bg-purple-600",
       path: "/documents"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
       <div className="pt-12 pb-8 px-6 bg-gradient-to-br from-orange-50 to-orange-100/30">
         <div className="text-center">
@@ -67,19 +75,25 @@ const MobileHomePage = () => {
         <div className="grid grid-cols-3 gap-4">
           <Card className="border shadow-sm bg-card">
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-karrosserie-orange mb-1">12</div>
+              <div className="text-2xl font-bold text-karrosserie-orange mb-1">
+                {vehicles?.length || 0}
+              </div>
               <div className="text-xs text-muted-foreground">Véhicules</div>
             </CardContent>
           </Card>
           <Card className="border shadow-sm bg-card">
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-600 mb-1">8</div>
+              <div className="text-2xl font-bold text-green-600 mb-1">
+                {vehicles?.filter(v => v.status === 'En cours').length || 0}
+              </div>
               <div className="text-xs text-muted-foreground">En cours</div>
             </CardContent>
           </Card>
           <Card className="border shadow-sm bg-card">
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600 mb-1">4</div>
+              <div className="text-2xl font-bold text-blue-600 mb-1">
+                {vehicles?.filter(v => v.status === 'Terminé').length || 0}
+              </div>
               <div className="text-xs text-muted-foreground">Terminés</div>
             </CardContent>
           </Card>
@@ -92,6 +106,17 @@ const MobileHomePage = () => {
           Accès rapide
         </h2>
         
+        {/* Bouton principal remonté */}
+        <div className="mb-8">
+          <Link to="/documents/expertise">
+            <Button className="w-full h-14 bg-gradient-to-r from-karrosserie-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95">
+              <FileText className="h-6 w-6 mr-3" />
+              Charger un rapport d&apos;expertise
+              <ArrowRight className="h-5 w-5 ml-3" />
+            </Button>
+          </Link>
+        </div>
+        
         <div className="grid grid-cols-2 gap-4 mb-8">
           {quickActions.map((action, index) => (
             <Link key={index} to={action.path}>
@@ -103,11 +128,8 @@ const MobileHomePage = () => {
                       <div className="mb-2">
                         {action.icon}
                       </div>
-                      <div className="font-semibold text-sm mb-1">
+                      <div className="font-semibold text-sm">
                         {action.title}
-                      </div>
-                      <div className="text-xs opacity-90">
-                        {action.description}
                       </div>
                     </div>
                   </div>
@@ -117,16 +139,8 @@ const MobileHomePage = () => {
           ))}
         </div>
 
-        {/* Bouton principal */}
+        {/* Bouton accès complet */}
         <div className="space-y-4">
-          <Link to="/documents/expertise">
-            <Button className="w-full h-14 bg-gradient-to-r from-karrosserie-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95">
-              <FileText className="h-6 w-6 mr-3" />
-              Charger un rapport d&apos;expertise
-              <ArrowRight className="h-5 w-5 ml-3" />
-            </Button>
-          </Link>
-
           <Link to="/vehicles">
             <Button variant="outline" className="w-full h-12 border-2 border-border hover:border-karrosserie-orange hover:bg-orange-50 font-medium text-muted-foreground hover:text-karrosserie-orange transition-all duration-300">
               Accéder à l&apos;application complète
