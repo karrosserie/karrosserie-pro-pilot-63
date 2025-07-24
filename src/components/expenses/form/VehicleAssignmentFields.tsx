@@ -30,7 +30,7 @@ export const VehicleAssignmentFields = ({ formData, onChange }: VehicleAssignmen
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="status" required>Statut</Label>
           <Select 
@@ -49,7 +49,7 @@ export const VehicleAssignmentFields = ({ formData, onChange }: VehicleAssignmen
           </Select>
         </div>
 
-        <div className="flex items-center space-x-2 pt-6">
+        <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 pt-2 sm:pt-6">
           <Switch
             id="assign_to_vehicle"
             checked={formData.assign_to_vehicle}

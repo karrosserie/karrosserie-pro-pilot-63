@@ -18,7 +18,7 @@ export const TypeProofFields = ({ formData, onChange }: TypeProofFieldsProps) =>
         <RadioGroup 
           value={formData.type || 'Note de frais'} 
           onValueChange={(value) => onChange('type', value)}
-          className="flex gap-6 mt-2"
+          className="flex flex-col sm:flex-row gap-4 sm:gap-6 mt-2"
         >
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="Note de frais" id="note-frais" />

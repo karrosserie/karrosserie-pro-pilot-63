@@ -14,8 +14,8 @@ export const SupplierCategoryFields = ({ formData, onChange }: SupplierCategoryF
   const hasProofUploaded = formData.proof_url && formData.proof_url.trim() !== '';
 
   return (
-    <div className="grid grid-cols-4 gap-4">
-      <div className="md:col-span-2">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="sm:col-span-2 lg:col-span-2">
         <Label htmlFor="category" required>Catégorie</Label>
         <Select 
           value={formData.category} 
