@@ -40,23 +40,23 @@ const MobileHomePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-blue-50 flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="pt-12 pb-8 px-6">
+      <div className="pt-12 pb-8 px-6 bg-gradient-to-br from-orange-50 to-orange-100/30">
         <div className="text-center">
           <div className="mb-4">
             <span className="text-3xl font-bold text-karrosserie-orange">
               Karrosserie
             </span>
-            <span className="text-3xl font-bold text-gray-800 ml-2">
+            <span className="text-3xl font-bold text-foreground ml-2">
               Pro
             </span>
           </div>
-          <p className="text-lg text-gray-600 mb-2">
+          <p className="text-lg text-muted-foreground mb-2">
             Votre atelier, digitalisé
           </p>
-          <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-            <Zap className="h-4 w-4 text-yellow-500" />
+          <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
+            <Zap className="h-4 w-4 text-karrosserie-orange" />
             <span>Rapide • Simple • Efficace</span>
           </div>
         </div>
@@ -65,22 +65,22 @@ const MobileHomePage = () => {
       {/* Stats rapides */}
       <div className="px-6 mb-8">
         <div className="grid grid-cols-3 gap-4">
-          <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
+          <Card className="border shadow-sm bg-card">
             <CardContent className="p-4 text-center">
               <div className="text-2xl font-bold text-karrosserie-orange mb-1">12</div>
-              <div className="text-xs text-gray-600">Véhicules</div>
+              <div className="text-xs text-muted-foreground">Véhicules</div>
             </CardContent>
           </Card>
-          <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
+          <Card className="border shadow-sm bg-card">
             <CardContent className="p-4 text-center">
               <div className="text-2xl font-bold text-green-600 mb-1">8</div>
-              <div className="text-xs text-gray-600">En cours</div>
+              <div className="text-xs text-muted-foreground">En cours</div>
             </CardContent>
           </Card>
-          <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
+          <Card className="border shadow-sm bg-card">
             <CardContent className="p-4 text-center">
               <div className="text-2xl font-bold text-blue-600 mb-1">4</div>
-              <div className="text-xs text-gray-600">Terminés</div>
+              <div className="text-xs text-muted-foreground">Terminés</div>
             </CardContent>
           </Card>
         </div>
@@ -88,14 +88,14 @@ const MobileHomePage = () => {
 
       {/* Actions rapides */}
       <div className="flex-1 px-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center">
+        <h2 className="text-xl font-semibold text-foreground mb-6 text-center">
           Accès rapide
         </h2>
         
         <div className="grid grid-cols-2 gap-4 mb-8">
           {quickActions.map((action, index) => (
             <Link key={index} to={action.path}>
-              <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 h-32">
+              <Card className="border shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 h-32 bg-card">
                 <CardContent className="p-0 h-full">
                   <div className={`${action.color} h-full rounded-lg flex flex-col items-center justify-center text-white relative overflow-hidden`}>
                     <div className="absolute inset-0 bg-black/10"></div>
@@ -128,7 +128,7 @@ const MobileHomePage = () => {
           </Link>
 
           <Link to="/vehicles">
-            <Button variant="outline" className="w-full h-12 border-2 border-gray-200 hover:border-karrosserie-orange hover:bg-orange-50 font-medium text-gray-700 hover:text-karrosserie-orange transition-all duration-300">
+            <Button variant="outline" className="w-full h-12 border-2 border-border hover:border-karrosserie-orange hover:bg-orange-50 font-medium text-muted-foreground hover:text-karrosserie-orange transition-all duration-300">
               Accéder à l&apos;application complète
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
@@ -138,7 +138,7 @@ const MobileHomePage = () => {
 
       {/* Footer */}
       <div className="p-6 text-center">
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           © 2024 Karrosserie Pro • Version Mobile
         </p>
       </div>
