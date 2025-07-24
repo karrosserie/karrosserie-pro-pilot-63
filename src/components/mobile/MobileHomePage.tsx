@@ -208,7 +208,7 @@ const MobileHomePage = () => {
               }}
             >
               <Car className="h-6 w-6" />
-              <span>Photo d'un véhicule</span>
+              <span>Véhicule</span>
             </Button>
             <Button
               variant="outline"
@@ -219,7 +219,7 @@ const MobileHomePage = () => {
               }}
             >
               <Receipt className="h-6 w-6" />
-              <span>Photo d'une dépense</span>
+              <span>Dépense</span>
             </Button>
           </div>
         </DialogContent>
