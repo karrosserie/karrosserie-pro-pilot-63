@@ -139,7 +139,7 @@ const MobileHomePage = () => {
                       <Camera className="h-6 w-6 text-blue-600" />
                     </div>
                     <div className="text-center">
-                      <div className="font-medium text-foreground text-sm">{action.title}</div>
+                      <div className="font-medium text-foreground text-xs">{action.title}</div>
                     </div>
                   </div>
                 </div>
@@ -164,7 +164,7 @@ const MobileHomePage = () => {
                       })}
                     </div>
                     <div className="text-center">
-                      <div className="font-medium text-foreground text-sm">{action.title}</div>
+                      <div className="font-medium text-foreground text-xs">{action.title}</div>
                     </div>
                   </div>
                 </div>
