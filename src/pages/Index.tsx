@@ -108,7 +108,7 @@ const Index = () => {
         <StatsCard 
           title="Véhicules en réparation" 
           value={dashboardStats?.vehiclesInRepair || 0} 
-          icon={<Car className="h-6 w-6 text-orange-600" />}
+          icon={<Car className="h-8 w-8 text-orange-600" />}
           iconBg="bg-orange-100"
         />
         <StatsCard 
@@ -116,13 +116,13 @@ const Index = () => {
           value={dashboardStats?.activeClients || 0}
           change={dashboardStats?.clientsChange} 
           isPositive={dashboardStats?.clientsIsPositive}
-          icon={<Users className="h-6 w-6 text-blue-600" />}
+          icon={<Users className="h-8 w-8 text-blue-600" />}
           iconBg="bg-blue-100"
         />
         <StatsCard 
           title="Devis en attente" 
           value={dashboardStats?.pendingQuotes || 0} 
-          icon={<FileText className="h-6 w-6 text-purple-600" />}
+          icon={<FileText className="h-8 w-8 text-purple-600" />}
           iconBg="bg-purple-100"
         />
         <StatsCard 
@@ -130,7 +130,7 @@ const Index = () => {
           value={(dashboardStats?.revenue || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} 
           change={dashboardStats?.revenueChange} 
           isPositive={dashboardStats?.revenueIsPositive}
-          icon={<CreditCard className="h-6 w-6 text-green-600" />}
+          icon={<CreditCard className="h-8 w-8 text-green-600" />}
           iconBg="bg-green-100"
         />
       </div>
@@ -142,7 +142,7 @@ const Index = () => {
           value={(dashboardStats?.carBodyRevenue || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} 
           change={dashboardStats?.carBodyChange} 
           isPositive={dashboardStats?.carBodyIsPositive}
-          icon={<PaintBucket className="h-6 w-6 text-amber-600" />}
+          icon={<PaintBucket className="h-8 w-8 text-amber-600" />}
           iconBg="bg-amber-100"
         />
         <StatsCard 
@@ -150,7 +150,7 @@ const Index = () => {
           value={(dashboardStats?.mechanicRevenue || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} 
           change={dashboardStats?.mechanicChange} 
           isPositive={dashboardStats?.mechanicIsPositive}
-          icon={<Wrench className="h-6 w-6 text-gray-600" />}
+          icon={<Wrench className="h-8 w-8 text-gray-600" />}
           iconBg="bg-gray-100"
         />
       </div>
