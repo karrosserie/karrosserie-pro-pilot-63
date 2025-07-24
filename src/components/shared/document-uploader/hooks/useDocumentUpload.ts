@@ -33,10 +33,12 @@ export function useDocumentUpload({
       return;
     }
     
+    console.log('Starting upload process...', { documentType });
     setIsUploading(true);
     
     // Si c'est une preuve d'achat, commencer l'analyse dès maintenant
     if (documentType === 'expense-proof') {
+      console.log('Setting isAnalyzing to true for expense-proof');
       setIsAnalyzing(true);
     }
     

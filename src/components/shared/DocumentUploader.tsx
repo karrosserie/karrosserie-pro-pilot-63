@@ -35,6 +35,8 @@ export function DocumentUploader({
     onAnalysisComplete
   });
 
+  console.log('DocumentUploader states:', { isUploading, isDeleting, isAnalyzing, documentType });
+
   const {
     imageToProcess,
     cropDialogOpen,

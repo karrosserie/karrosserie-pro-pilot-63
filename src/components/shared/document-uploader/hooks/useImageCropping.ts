@@ -14,18 +14,21 @@ export function useImageCropping({ documentType, onFileUpload }: UseImageCroppin
     console.log('Starting file upload:', { fileName: file.name, fileSize: file.size, documentType });
     
     if (file.type.startsWith('image/')) {
+      console.log('Image file detected, starting crop process');
       const tempUrl = URL.createObjectURL(file);
       setImageToProcess({ file, tempUrl });
       setCropDialogOpen(true);
       return;
     }
     
+    console.log('Non-image file, uploading directly');
     await onFileUpload(file);
   };
 
   const handleCropComplete = async (croppedImageBlob: Blob) => {
     if (!imageToProcess) return;
     
+    console.log('Crop completed, starting upload process');
     setCropDialogOpen(false);
     
     const filename = imageToProcess.file.name;
@@ -35,6 +38,7 @@ export function useImageCropping({ documentType, onFileUpload }: UseImageCroppin
     URL.revokeObjectURL(imageToProcess.tempUrl);
     setImageToProcess(null);
     
+    console.log('Uploading cropped file');
     await onFileUpload(croppedFile);
   };
   
