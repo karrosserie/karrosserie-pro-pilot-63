@@ -131,7 +131,7 @@ const VehiclePhotoDialog: React.FC<VehiclePhotoDialogProps> = ({
         
         <div className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="vehicle-select">Véhicule</Label>
+            <Label htmlFor="vehicle-select">Véhicule <span className="text-red-500">*</span></Label>
             <Select value={selectedVehicleId} onValueChange={setSelectedVehicleId}>
               <SelectTrigger>
                 <SelectValue placeholder="Sélectionner un véhicule" />
