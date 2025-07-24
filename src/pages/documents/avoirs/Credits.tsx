@@ -327,7 +327,7 @@ const Credits = () => {
   
   if (isLoading) {
     return (
-      <div className="page-container">
+      <div className="p-6 space-y-6">
         <div className="flex items-center justify-center py-8">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-karrosserie-orange mx-auto mb-4"></div>
@@ -341,7 +341,7 @@ const Credits = () => {
   // Show error message if table doesn't exist
   if (error && (error as any)?.code === '42P01') {
     return (
-      <div className="page-container">
+      <div className="p-6 space-y-6">
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Avoirs</h1>
           <p className="text-gray-600 mt-1">
@@ -365,7 +365,7 @@ const Credits = () => {
   }
 
   return (
-    <div className="page-container">
+    <div className="p-6 space-y-6">
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Avoirs</h1>
         <p className="text-gray-600 mt-1">

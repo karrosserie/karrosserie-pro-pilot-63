@@ -44,8 +44,8 @@ const Vehicles = () => {
   if (error) return <ErrorMessage message={error.message} />;
 
   return (
-    <div className="page-container">
-      <VehiclesHeader 
+    <div className="p-6 space-y-6">
+      <VehiclesHeader
         onCreateVehicle={handleCreateVehicle}
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}

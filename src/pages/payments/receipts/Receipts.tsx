@@ -27,7 +27,7 @@ const Receipts = () => {
 
   if (isLoading) {
     return (
-      <div className="page-container">
+      <div className="p-6 space-y-6">
         <div className="flex items-center justify-center h-64">
           <LoadingSpinner />
         </div>
@@ -36,7 +36,7 @@ const Receipts = () => {
   }
 
   return (
-    <div className="page-container">
+    <div className="p-6 space-y-6">
       <ReceiptsHeader
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}

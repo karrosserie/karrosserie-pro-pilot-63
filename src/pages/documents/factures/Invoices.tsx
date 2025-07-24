@@ -218,7 +218,7 @@ const Invoices = () => {
 
   if (isLoading) {
     return (
-      <div className="page-container">
+      <div className="p-6 space-y-6">
         <LoadingSpinner />
       </div>
     );
@@ -226,14 +226,14 @@ const Invoices = () => {
 
   if (error) {
     return (
-      <div className="page-container">
+      <div className="p-6 space-y-6">
         <ErrorMessage message="Erreur lors du chargement des factures" />
       </div>
     );
   }
   
   return (
-    <div className="page-container">
+    <div className="p-6 space-y-6">
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Factures</h1>
         <p className="text-gray-600 mt-1">

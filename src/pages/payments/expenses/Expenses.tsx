@@ -25,7 +25,7 @@ const Expenses = () => {
   };
 
   return (
-    <div className="page-container">
+    <div className="p-6 space-y-6">
       <ExpensesHeader
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}

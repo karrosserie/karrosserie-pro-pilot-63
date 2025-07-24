@@ -15,7 +15,7 @@ const Settings = () => {
 
   if (isLoading) {
     return (
-      <div className="page-container">
+      <div className="p-6 space-y-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-karrosserie-orange mx-auto"></div>
@@ -27,7 +27,7 @@ const Settings = () => {
   }
 
   return (
-    <div className="page-container">
+    <div className="p-6 space-y-6">
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Paramètres</h1>
         <p className="text-gray-600 mt-1">Configurez votre compte et vos préférences.</p>

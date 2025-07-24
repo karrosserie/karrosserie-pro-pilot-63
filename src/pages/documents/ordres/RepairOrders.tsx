@@ -219,7 +219,7 @@ const RepairOrders = () => {
 
   if (isLoading) {
     return (
-      <div className="page-container">
+      <div className="p-6 space-y-6">
         <LoadingSpinner />
       </div>
     );
@@ -227,14 +227,14 @@ const RepairOrders = () => {
 
   if (error) {
     return (
-      <div className="page-container">
+      <div className="p-6 space-y-6">
         <ErrorMessage message="Erreur lors du chargement des ordres de réparation" />
       </div>
     );
   }
   
   return (
-    <div className="page-container">
+    <div className="p-6 space-y-6">
       <RepairOrdersHeader
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
