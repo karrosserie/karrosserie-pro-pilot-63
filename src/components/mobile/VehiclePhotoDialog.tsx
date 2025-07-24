@@ -89,9 +89,21 @@ const VehiclePhotoDialog: React.FC<VehiclePhotoDialogProps> = ({
     }
 
     try {
+      // Récupérer les images existantes du véhicule
+      let existingImages: VehicleImageData[] = [];
+      if (selectedVehicle && selectedVehicle.vehicle_images && Array.isArray(selectedVehicle.vehicle_images)) {
+        existingImages = selectedVehicle.vehicle_images as unknown as VehicleImageData[];
+      }
+      
+      // Filtrer les nouvelles images valides (avec URL)
+      const newValidImages = vehicleImages.filter(img => img.url && img.url.trim() !== '');
+      
+      // Combiner les images existantes avec les nouvelles
+      const allImages = [...existingImages, ...newValidImages];
+      
       await updateVehicle.mutateAsync({
         id: selectedVehicleId,
-        data: { vehicle_images: vehicleImages }
+        data: { vehicle_images: allImages }
       });
       
       onOpenChange(false);

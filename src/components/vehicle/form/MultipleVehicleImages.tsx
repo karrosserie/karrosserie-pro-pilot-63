@@ -89,7 +89,7 @@ const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
                           disabled={isViewMode}
                         >
                           <SelectTrigger className="w-28">
-                            <SelectValue placeholder="Etape" />
+                            <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="Avant">Avant</SelectItem>

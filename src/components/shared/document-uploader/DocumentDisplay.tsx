@@ -42,8 +42,7 @@ export const DocumentDisplay: React.FC<DocumentDisplayProps> = ({
                 size="sm"
                 onClick={() => handleDownload(documentUrl)}
               >
-                <DownloadIcon className="h-4 w-4 mr-2" />
-                Télécharger
+                <DownloadIcon className="h-4 w-4" />
               </Button>
               <Button 
                 variant="outline" 
@@ -80,8 +79,7 @@ export const DocumentDisplay: React.FC<DocumentDisplayProps> = ({
               size="sm"
               onClick={() => handleDownload(documentUrl)}
             >
-              <DownloadIcon className="h-4 w-4 mr-2" />
-              Télécharger
+              <DownloadIcon className="h-4 w-4" />
             </Button>
             <Button 
               variant="outline" 
