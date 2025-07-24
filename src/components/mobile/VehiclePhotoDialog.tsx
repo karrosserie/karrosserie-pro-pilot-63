@@ -83,6 +83,17 @@ const VehiclePhotoDialog: React.FC<VehiclePhotoDialogProps> = ({
       return;
     }
 
+    // Vérifier qu'il y a au moins une photo avec une URL valide
+    const validImages = vehicleImages.filter(img => img.url && img.url.trim() !== '');
+    if (validImages.length === 0) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez ajouter au moins une photo",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       await updateVehicle.mutateAsync({
         id: selectedVehicleId,
@@ -106,6 +117,10 @@ const VehiclePhotoDialog: React.FC<VehiclePhotoDialogProps> = ({
     setSelectedVehicleId('');
     setVehicleImages([]);
   };
+
+  // Calculer si le formulaire est valide
+  const validImages = vehicleImages.filter(img => img.url && img.url.trim() !== '');
+  const isFormValid = selectedVehicleId && validImages.length > 0;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -151,7 +166,7 @@ const VehiclePhotoDialog: React.FC<VehiclePhotoDialogProps> = ({
           <Button 
             variant="validation"
             onClick={handleSubmit}
-            disabled={!selectedVehicleId || updateVehicle.isPending}
+            disabled={!isFormValid || updateVehicle.isPending}
           >
             {updateVehicle.isPending ? 'Enregistrement...' : 'Valider'}
           </Button>
