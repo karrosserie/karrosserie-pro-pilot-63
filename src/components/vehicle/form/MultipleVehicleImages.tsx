@@ -38,7 +38,12 @@ const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
   };
 
   const handleImageUpload = (index: number, url: string) => {
-    onImageUpdate(index, url);
+    // Si c'est la première image et qu'il n'y a pas encore d'images dans le tableau
+    if (index === 0 && vehicleImages.length === 0) {
+      onImageAdd(url); // Utilise onImageAdd qui définit automatiquement timing: 'Avant'
+    } else {
+      onImageUpdate(index, url);
+    }
   };
 
   return (
