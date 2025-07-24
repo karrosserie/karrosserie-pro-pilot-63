@@ -29,20 +29,9 @@ const VehiclePhotoDialog: React.FC<VehiclePhotoDialogProps> = ({
   // Trouver le véhicule sélectionné
   const selectedVehicle = vehicles?.find(v => v.id === selectedVehicleId);
 
-  // Initialiser les images du véhicule quand un véhicule est sélectionné
+  // Réinitialiser les images quand un véhicule est sélectionné
   React.useEffect(() => {
-    if (selectedVehicle) {
-      let existingImages: VehicleImageData[] = [];
-      
-      // Vérifier que vehicle_images est un tableau valide
-      if (selectedVehicle.vehicle_images && Array.isArray(selectedVehicle.vehicle_images)) {
-        existingImages = selectedVehicle.vehicle_images as unknown as VehicleImageData[];
-      }
-      
-      setVehicleImages(existingImages);
-    } else {
-      setVehicleImages([]);
-    }
+    setVehicleImages([]);
   }, [selectedVehicle]);
 
   const handleImageAdd = (url: string) => {
