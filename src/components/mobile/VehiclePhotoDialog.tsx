@@ -32,7 +32,13 @@ const VehiclePhotoDialog: React.FC<VehiclePhotoDialogProps> = ({
   // Initialiser les images du véhicule quand un véhicule est sélectionné
   React.useEffect(() => {
     if (selectedVehicle) {
-      const existingImages = (selectedVehicle.vehicle_images as unknown as VehicleImageData[]) || [];
+      let existingImages: VehicleImageData[] = [];
+      
+      // Vérifier que vehicle_images est un tableau valide
+      if (selectedVehicle.vehicle_images && Array.isArray(selectedVehicle.vehicle_images)) {
+        existingImages = selectedVehicle.vehicle_images as unknown as VehicleImageData[];
+      }
+      
       setVehicleImages(existingImages);
     } else {
       setVehicleImages([]);
