@@ -108,29 +108,30 @@ const Index = () => {
         <StatsCard 
           title="Véhicules en réparation" 
           value={dashboardStats?.vehiclesInRepair || 0} 
-          icon={<Car className="h-5 w-5 sm:h-6 sm:w-6" />}
+          icon={<Car className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />}
+          iconBg="bg-orange-100"
         />
         <StatsCard 
           title="Clients actifs" 
           value={dashboardStats?.activeClients || 0}
           change={dashboardStats?.clientsChange} 
           isPositive={dashboardStats?.clientsIsPositive}
-          icon={<Users className="h-5 w-5 sm:h-6 sm:w-6" />}
-          iconBg="bg-blue-500"
+          icon={<Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />}
+          iconBg="bg-blue-100"
         />
         <StatsCard 
           title="Devis en attente" 
           value={dashboardStats?.pendingQuotes || 0} 
-          icon={<FileText className="h-5 w-5 sm:h-6 sm:w-6" />}
-          iconBg="bg-purple-500"
+          icon={<FileText className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />}
+          iconBg="bg-purple-100"
         />
         <StatsCard 
           title="Chiffre d'affaires" 
           value={(dashboardStats?.revenue || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} 
           change={dashboardStats?.revenueChange} 
           isPositive={dashboardStats?.revenueIsPositive}
-          icon={<CreditCard className="h-5 w-5 sm:h-6 sm:w-6" />}
-          iconBg="bg-green-500"
+          icon={<CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />}
+          iconBg="bg-green-100"
         />
       </div>
 
@@ -141,16 +142,16 @@ const Index = () => {
           value={(dashboardStats?.carBodyRevenue || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} 
           change={dashboardStats?.carBodyChange} 
           isPositive={dashboardStats?.carBodyIsPositive}
-          icon={<PaintBucket className="h-5 w-5 sm:h-6 sm:w-6" />}
-          iconBg="bg-orange-500"
+          icon={<PaintBucket className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />}
+          iconBg="bg-amber-100"
         />
         <StatsCard 
           title="CA mécanique" 
           value={(dashboardStats?.mechanicRevenue || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} 
           change={dashboardStats?.mechanicChange} 
           isPositive={dashboardStats?.mechanicIsPositive}
-          icon={<Wrench className="h-5 w-5 sm:h-6 sm:w-6" />}
-          iconBg="bg-gray-600"
+          icon={<Wrench className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />}
+          iconBg="bg-gray-100"
         />
       </div>
       
@@ -278,7 +279,7 @@ const Index = () => {
           
           {/* Raccourcis */}
           <div className="card-container animate-fade-in">
-            <h3 className="section-title text-lg sm:text-xl">Raccourcis</h3>
+            <h3 className="section-title text-lg sm:text-xl mb-4">Raccourcis</h3>
             
             <div className="grid grid-cols-2 gap-4">
               <div 

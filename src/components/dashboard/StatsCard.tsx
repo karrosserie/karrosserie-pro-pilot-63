@@ -20,10 +20,8 @@ const StatsCard: React.FC<StatsCardProps> = ({
 }) => {
   return (
     <div className="card-container flex items-center animate-fade-in">
-      <div className={`${iconBg} p-4 rounded-lg mr-4`}>
-        <div className="text-white">
-          {icon}
-        </div>
+      <div className={`p-2 sm:p-3 rounded-lg mr-3 flex-shrink-0 ${iconBg}`}>
+        {icon}
       </div>
       
       <div>
