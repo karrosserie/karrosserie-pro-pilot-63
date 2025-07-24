@@ -63,12 +63,26 @@ export function useDocumentUpload({
             
             if (response.ok) {
               console.log('File sent to analysis API successfully');
-              const analysisData = await response.json();
-              console.log('Analysis data received:', analysisData);
+              const rawData = await response.json();
+              console.log('Raw analysis data received:', rawData);
               
-              // Appeler le callback avec les données analysées
-              if (onAnalysisComplete && analysisData) {
-                onAnalysisComplete(analysisData);
+              // L'API retourne les données dans rawData.output comme chaîne JSON
+              if (rawData.output) {
+                try {
+                  // Extraire le JSON de la chaîne output
+                  const jsonMatch = rawData.output.match(/```json\s*([\s\S]*?)\s*```/);
+                  if (jsonMatch && jsonMatch[1]) {
+                    const analysisData = JSON.parse(jsonMatch[1]);
+                    console.log('Parsed analysis data:', analysisData);
+                    
+                    // Appeler le callback avec les données analysées
+                    if (onAnalysisComplete && analysisData) {
+                      onAnalysisComplete(analysisData);
+                    }
+                  }
+                } catch (error) {
+                  console.error('Error parsing analysis data:', error);
+                }
               }
             } else {
               console.warn('Analysis API call failed:', response.status, response.statusText);
