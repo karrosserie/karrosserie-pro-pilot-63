@@ -75,19 +75,7 @@ const ExpertiseReports = () => {
     });
 
     if (confirmed) {
-      try {
-        await deleteReport.mutateAsync(id);
-        toast({
-          title: "Rapport supprimé",
-          description: "Le rapport d'expertise a été supprimé avec succès."
-        });
-      } catch (error: any) {
-        toast({
-          title: "Erreur",
-          description: `Impossible de supprimer le rapport d'expertise: ${error.message}`,
-          variant: "destructive"
-        });
-      }
+      await deleteReport.mutateAsync(id);
     }
   };
 
