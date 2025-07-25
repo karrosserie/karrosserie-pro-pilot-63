@@ -37,7 +37,7 @@ const VehiclePhotoDialog: React.FC<VehiclePhotoDialogProps> = ({
 
   const handleImageAdd = (url: string) => {
     const newImage: VehicleImageData = { url, timing: 'Avant' };
-    setVehicleImages([...vehicleImages, newImage]);
+    setVehicleImages([newImage, ...vehicleImages]);
   };
 
   const handleImageRemove = (index: number) => {
