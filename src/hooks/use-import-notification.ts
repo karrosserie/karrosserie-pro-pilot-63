@@ -11,45 +11,55 @@ export function useImportNotification() {
     audioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+PvuGUdBzuT1vHSeS4FJn/K7tgOQgsXYrfm7KpXFQ1Kn+Xyu2YdCDaR1+/TeSsEGX3K8N2SQgkUY7Pm7qtcFAxKn+LyzGkfCDSR1fHUejEFKHzH7tiSQQcSYrDn7axwHQw/meLyyGsrCzCLxvDXeSsENXzH7NmSSAYMX6zp566DGQ6+fTy/l2+h2qj3mDGqDsVZlXnNOEm4LsDhjxcHwGj9=');
     audioRef.current.volume = 0.7;
 
-    const channel = supabase
-      .channel('import-status-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'imports'
-        },
-        (payload) => {
-          console.log('Import status change detected:', payload);
+    // Polling pour vérifier les changements de statut
+    let intervalId: NodeJS.Timeout;
+    let lastImportIds = new Set<string>();
+
+    const checkImports = async () => {
+      try {
+        const { data: imports } = await supabase
+          .from('imports')
+          .select('id, status')
+          .eq('status', 'Importé');
+
+        if (imports) {
+          const currentImportIds = new Set(imports.map(imp => imp.id));
           
-          const newRecord = payload.new as any;
-          const oldRecord = payload.old as any;
-          
-          // Vérifier si le statut est passé à "Importé"
-          if (oldRecord?.status !== 'Importé' && newRecord?.status === 'Importé') {
-            console.log('Import completed, playing notification sound');
-            
-            // Jouer le signal sonore
-            if (audioRef.current) {
-              audioRef.current.play().catch(error => {
-                console.error('Error playing notification sound:', error);
+          // Vérifier s'il y a de nouveaux imports terminés
+          currentImportIds.forEach(id => {
+            if (!lastImportIds.has(id)) {
+              console.log('New import completed:', id);
+              
+              // Jouer le signal sonore
+              if (audioRef.current) {
+                audioRef.current.play().catch(error => {
+                  console.error('Error playing notification sound:', error);
+                });
+              }
+              
+              // Afficher une notification toast
+              toast({
+                title: "Import terminé",
+                description: "Un rapport d'expertise a été importé avec succès",
               });
             }
-            
-            // Afficher une notification toast
-            toast({
-              title: "Import terminé",
-              description: "Un rapport d'expertise a été importé avec succès",
-            });
-          }
+          });
+          
+          lastImportIds = currentImportIds;
         }
-      )
-      .subscribe();
+      } catch (error) {
+        console.error('Error checking imports:', error);
+      }
+    };
+
+    // Vérifier immédiatement puis toutes les 5 secondes
+    checkImports();
+    intervalId = setInterval(checkImports, 5000);
 
     return () => {
-      console.log('Unsubscribing from import status changes');
-      supabase.removeChannel(channel);
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
     };
   }, [toast]);
 
