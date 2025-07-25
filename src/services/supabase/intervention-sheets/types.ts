@@ -5,7 +5,7 @@ export interface ReportItem {
 
 export interface InterventionSheet {
   id: string;
-  user_id: string;
+  company_id: string;
   client_id: string;
   vehicle_id: string;
   carrosserie_reports: ReportItem[];

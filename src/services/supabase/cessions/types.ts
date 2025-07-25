@@ -3,7 +3,7 @@ export interface Cession {
   id: string;
   reference: string;
   status: 'en_attente' | 'en_attente_signature' | 'signee' | 'signature_refusee' | 'lettre_recommandee_envoyee' | 'lettre_recommandee_recue' | 'lettre_recommandee_non_recuperee' | 'lettre_recommandee_refusee' | 'lettre_recommandee_presentee' | 'payee';
-  user_id: string;
+  company_id: string;
   
   // Required fields for cession form
   repair_order_id: string | null;

@@ -28,7 +28,6 @@ export type Database = {
           status: string | null
           type: string | null
           updated_at: string
-          user_id: string
         }
         Insert: {
           balance?: number | null
@@ -43,7 +42,6 @@ export type Database = {
           status?: string | null
           type?: string | null
           updated_at?: string
-          user_id: string
         }
         Update: {
           balance?: number | null
@@ -58,7 +56,6 @@ export type Database = {
           status?: string | null
           type?: string | null
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -70,7 +67,6 @@ export type Database = {
           created_at: string
           id: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           access_token: string
@@ -79,7 +75,6 @@ export type Database = {
           created_at?: string
           id?: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           access_token?: string
@@ -88,7 +83,6 @@ export type Database = {
           created_at?: string
           id?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -163,7 +157,6 @@ export type Database = {
           report_number: string | null
           status: string | null
           updated_at: string
-          user_id: string
         }
         Insert: {
           bank_account_id?: string | null
@@ -182,7 +175,6 @@ export type Database = {
           report_number?: string | null
           status?: string | null
           updated_at?: string
-          user_id: string
         }
         Update: {
           bank_account_id?: string | null
@@ -201,7 +193,6 @@ export type Database = {
           report_number?: string | null
           status?: string | null
           updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -236,7 +227,6 @@ export type Database = {
           phone: string | null
           postal_code: string | null
           updated_at: string
-          user_id: string
         }
         Insert: {
           address?: string | null
@@ -253,7 +243,6 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           updated_at?: string
-          user_id: string
         }
         Update: {
           address?: string | null
@@ -270,7 +259,6 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -382,7 +370,6 @@ export type Database = {
           reference: string
           status: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           amount?: number
@@ -395,7 +382,6 @@ export type Database = {
           reference: string
           status?: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           amount?: number
@@ -408,7 +394,6 @@ export type Database = {
           reference?: string
           status?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -461,7 +446,6 @@ export type Database = {
           total_amount: number
           type: string
           updated_at: string
-          user_id: string
           vat_amount: number
           vehicle_id: string | null
         }
@@ -478,7 +462,6 @@ export type Database = {
           total_amount?: number
           type?: string
           updated_at?: string
-          user_id: string
           vat_amount?: number
           vehicle_id?: string | null
         }
@@ -495,7 +478,6 @@ export type Database = {
           total_amount?: number
           type?: string
           updated_at?: string
-          user_id?: string
           vat_amount?: number
           vehicle_id?: string | null
         }
@@ -527,7 +509,6 @@ export type Database = {
           report_number: string | null
           status: string | null
           updated_at: string
-          user_id: string
           vehicle_id: string | null
         }
         Insert: {
@@ -547,7 +528,6 @@ export type Database = {
           report_number?: string | null
           status?: string | null
           updated_at?: string
-          user_id: string
           vehicle_id?: string | null
         }
         Update: {
@@ -567,7 +547,6 @@ export type Database = {
           report_number?: string | null
           status?: string | null
           updated_at?: string
-          user_id?: string
           vehicle_id?: string | null
         }
         Relationships: [
@@ -623,7 +602,6 @@ export type Database = {
           start_mileage: number
           status: string
           updated_at: string
-          user_id: string
           vehicle_images: Json | null
         }
         Insert: {
@@ -661,7 +639,6 @@ export type Database = {
           start_mileage?: number
           status?: string
           updated_at?: string
-          user_id: string
           vehicle_images?: Json | null
         }
         Update: {
@@ -699,7 +676,6 @@ export type Database = {
           start_mileage?: number
           status?: string
           updated_at?: string
-          user_id?: string
           vehicle_images?: Json | null
         }
         Relationships: [
@@ -715,13 +691,6 @@ export type Database = {
             columns: ["fleet_vehicle_id"]
             isOneToOne: false
             referencedRelation: "fleet_vehicles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fleet_reservations_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -744,7 +713,6 @@ export type Database = {
           return_mileage: number
           status: string
           updated_at: string
-          user_id: string
           vehicle_images: Json | null
         }
         Insert: {
@@ -764,7 +732,6 @@ export type Database = {
           return_mileage?: number
           status?: string
           updated_at?: string
-          user_id: string
           vehicle_images?: Json | null
         }
         Update: {
@@ -784,7 +751,6 @@ export type Database = {
           return_mileage?: number
           status?: string
           updated_at?: string
-          user_id?: string
           vehicle_images?: Json | null
         }
         Relationships: [
@@ -809,13 +775,6 @@ export type Database = {
             referencedRelation: "fleet_vehicles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "fleet_returns_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       fleet_vehicles: {
@@ -834,7 +793,6 @@ export type Database = {
           registration_front_url: string | null
           status: string | null
           updated_at: string
-          user_id: string
           vin: string | null
           year: number | null
         }
@@ -853,7 +811,6 @@ export type Database = {
           registration_front_url?: string | null
           status?: string | null
           updated_at?: string
-          user_id: string
           vin?: string | null
           year?: number | null
         }
@@ -872,7 +829,6 @@ export type Database = {
           registration_front_url?: string | null
           status?: string | null
           updated_at?: string
-          user_id?: string
           vin?: string | null
           year?: number | null
         }
@@ -905,7 +861,6 @@ export type Database = {
           to_date: string
           type: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           company_id?: string | null
@@ -918,7 +873,6 @@ export type Database = {
           to_date: string
           type: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           company_id?: string | null
@@ -931,7 +885,6 @@ export type Database = {
           to_date?: string
           type?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -944,7 +897,6 @@ export type Database = {
           report_id: string | null
           status: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           company_id?: string | null
@@ -954,7 +906,6 @@ export type Database = {
           report_id?: string | null
           status?: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           company_id?: string | null
@@ -964,7 +915,6 @@ export type Database = {
           report_id?: string | null
           status?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -1026,7 +976,6 @@ export type Database = {
           is_approved: boolean | null
           mecanique_reports: Json | null
           updated_at: string
-          user_id: string
           vehicle_id: string
         }
         Insert: {
@@ -1039,7 +988,6 @@ export type Database = {
           is_approved?: boolean | null
           mecanique_reports?: Json | null
           updated_at?: string
-          user_id: string
           vehicle_id: string
         }
         Update: {
@@ -1052,7 +1000,6 @@ export type Database = {
           is_approved?: boolean | null
           mecanique_reports?: Json | null
           updated_at?: string
-          user_id?: string
           vehicle_id?: string
         }
         Relationships: []
@@ -1083,7 +1030,6 @@ export type Database = {
           status: string | null
           tax_rate: number | null
           updated_at: string
-          user_id: string
           vehicle_id: string | null
         }
         Insert: {
@@ -1111,7 +1057,6 @@ export type Database = {
           status?: string | null
           tax_rate?: number | null
           updated_at?: string
-          user_id: string
           vehicle_id?: string | null
         }
         Update: {
@@ -1139,7 +1084,6 @@ export type Database = {
           status?: string | null
           tax_rate?: number | null
           updated_at?: string
-          user_id?: string
           vehicle_id?: string | null
         }
         Relationships: [
@@ -1228,7 +1172,6 @@ export type Database = {
           status: string | null
           tax_rate: number | null
           updated_at: string
-          user_id: string
           valid_until: string | null
           vehicle_id: string | null
         }
@@ -1254,7 +1197,6 @@ export type Database = {
           status?: string | null
           tax_rate?: number | null
           updated_at?: string
-          user_id: string
           valid_until?: string | null
           vehicle_id?: string | null
         }
@@ -1280,7 +1222,6 @@ export type Database = {
           status?: string | null
           tax_rate?: number | null
           updated_at?: string
-          user_id?: string
           valid_until?: string | null
           vehicle_id?: string | null
         }
@@ -1323,7 +1264,6 @@ export type Database = {
           reference: string | null
           status: string | null
           updated_at: string
-          user_id: string
         }
         Insert: {
           amount: number
@@ -1339,7 +1279,6 @@ export type Database = {
           reference?: string | null
           status?: string | null
           updated_at?: string
-          user_id: string
         }
         Update: {
           amount?: number
@@ -1355,7 +1294,6 @@ export type Database = {
           reference?: string | null
           status?: string | null
           updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -1392,7 +1330,6 @@ export type Database = {
           signature_date: string | null
           status: string | null
           updated_at: string
-          user_id: string
           vehicle_id: string | null
         }
         Insert: {
@@ -1419,7 +1356,6 @@ export type Database = {
           signature_date?: string | null
           status?: string | null
           updated_at?: string
-          user_id: string
           vehicle_id?: string | null
         }
         Update: {
@@ -1446,7 +1382,6 @@ export type Database = {
           signature_date?: string | null
           status?: string | null
           updated_at?: string
-          user_id?: string
           vehicle_id?: string | null
         }
         Relationships: [
@@ -1480,7 +1415,6 @@ export type Database = {
           created_at: string
           id: string
           updated_at: string
-          user_id: string
           vehicule_id: string | null
         }
         Insert: {
@@ -1489,7 +1423,6 @@ export type Database = {
           created_at?: string
           id?: string
           updated_at?: string
-          user_id: string
           vehicule_id?: string | null
         }
         Update: {
@@ -1498,7 +1431,6 @@ export type Database = {
           created_at?: string
           id?: string
           updated_at?: string
-          user_id?: string
           vehicule_id?: string | null
         }
         Relationships: []
@@ -1596,7 +1528,6 @@ export type Database = {
           start_date: string | null
           status: string | null
           updated_at: string
-          user_id: string
           vehicle_image_url: string | null
           vehicle_images: Json | null
           vin: string | null
@@ -1627,7 +1558,6 @@ export type Database = {
           start_date?: string | null
           status?: string | null
           updated_at?: string
-          user_id: string
           vehicle_image_url?: string | null
           vehicle_images?: Json | null
           vin?: string | null
@@ -1658,7 +1588,6 @@ export type Database = {
           start_date?: string | null
           status?: string | null
           updated_at?: string
-          user_id?: string
           vehicle_image_url?: string | null
           vehicle_images?: Json | null
           vin?: string | null

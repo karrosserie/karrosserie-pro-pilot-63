@@ -4,8 +4,8 @@ import { NewInvoice, UpdateInvoice } from './types';
 
 export const invoiceMutations = {
   create: async (invoice: NewInvoice) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    const { getCurrentUserCompanyId } = await import('../auth-company');
+    const companyId = await getCurrentUserCompanyId();
 
     // Clean the invoice data to only include fields that exist in the database
     const cleanInvoice = {
@@ -29,7 +29,7 @@ export const invoiceMutations = {
       report_number: invoice.report_number,
       incident_date: invoice.incident_date,
       notes: invoice.notes,
-      user_id: user.id
+      company_id: companyId
     };
 
     const { data, error } = await supabase

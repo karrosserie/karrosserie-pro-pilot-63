@@ -249,18 +249,13 @@ export const invoiceQueries = {
   },
 
   getLastInvoiceByUser: async () => {
-    // Récupérer l'utilisateur actuel
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    
-    if (userError || !user) {
-      console.error('Error getting current user:', userError);
-      throw new Error('User not authenticated');
-    }
+    const { getCurrentUserCompanyId } = await import('../auth-company');
+    const companyId = await getCurrentUserCompanyId();
 
     const { data: invoice, error } = await supabase
       .from('invoices')
       .select('reference')
-      .eq('user_id', user.id)
+      .eq('company_id', companyId)
       .order('reference', { ascending: false })
       .limit(1)
       .single();

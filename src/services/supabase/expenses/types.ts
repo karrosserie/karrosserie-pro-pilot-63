@@ -1,7 +1,7 @@
 
 export interface Expense {
   id: string;
-  user_id: string;
+  company_id: string;
   vehicle_id: string;
   type: string;
   category: string;
@@ -17,7 +17,7 @@ export interface Expense {
 }
 
 export interface NewExpense {
-  user_id: string;
+  company_id: string;
   vehicle_id?: string;
   type: string;
   category: string;
@@ -45,7 +45,7 @@ export interface UpdateExpense {
 
 export interface ExpenseWithRelations {
   id: string;
-  user_id: string;
+  company_id: string;
   vehicle_id: string;
   type: string;
   category: string;

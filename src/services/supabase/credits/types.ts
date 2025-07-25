@@ -1,7 +1,7 @@
 
 export interface Credit {
   id: string;
-  user_id: string;
+  company_id: string;
   reference: string;
   client_id: string | null;
   vehicle_id: string | null;

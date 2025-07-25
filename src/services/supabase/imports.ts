@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 export type Import = {
   id: string;
   report_id: string;
-  user_id: string;
+  company_id: string;
   status: string;
   document: string | null;
   created_at: string;

@@ -46,10 +46,10 @@ export interface Invoice {
       name: string;
     };
   };
-  user_id: string;
+  company_id: string;
 }
 
-export type NewInvoice = Omit<Invoice, 'id' | 'created_at' | 'user_id'>;
+export type NewInvoice = Omit<Invoice, 'id' | 'created_at' | 'company_id'>;
 export type UpdateInvoice = Partial<NewInvoice>;
 
 export interface Item {

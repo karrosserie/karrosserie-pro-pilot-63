@@ -89,18 +89,13 @@ export const getRepairOrderById = async (id: string): Promise<RepairOrder> => {
 };
 
 export const getLastOrderByUser = async () => {
-  // Récupérer l'utilisateur actuel
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  
-  if (userError || !user) {
-    console.error('Error getting current user:', userError);
-    throw new Error('User not authenticated');
-  }
+  const { getCurrentUserCompanyId } = await import('../auth-company');
+  const companyId = await getCurrentUserCompanyId();
 
   const { data: order, error } = await supabase
     .from('repair_orders')
     .select('reference')
-    .eq('user_id', user.id)
+    .eq('company_id', companyId)
     .order('reference', { ascending: false })
     .limit(1)
     .single();

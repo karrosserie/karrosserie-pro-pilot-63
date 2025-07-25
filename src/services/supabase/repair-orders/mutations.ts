@@ -2,18 +2,18 @@
 import { supabase } from '@/integrations/supabase/client';
 import { NewRepairOrder, UpdateRepairOrder } from './types';
 
-export const createRepairOrder = async (order: NewRepairOrder) => {
+export const createRepairOrder = async (order: NewRepairOrder, companyId: string) => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('User not authenticated');
 
-  const orderWithUser = {
+  const orderWithCompany = {
     ...order,
-    user_id: user.id
+    company_id: companyId
   };
 
   const { data, error } = await supabase
     .from('repair_orders')
-    .insert([orderWithUser])
+    .insert([orderWithCompany])
     .select()
     .single();
     
