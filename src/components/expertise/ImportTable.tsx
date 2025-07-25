@@ -36,8 +36,7 @@ const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
     switch (status) {
       case 'En cours d\'analyse':
         return (
-          <Badge variant="secondary" className="flex items-center gap-1">
-            <Clock className="w-3 h-3" />
+          <Badge variant="secondary">
             En cours d'analyse
           </Badge>
         );
