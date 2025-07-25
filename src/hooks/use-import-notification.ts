@@ -35,6 +35,7 @@ export function useImportNotification() {
     // Polling pour vérifier les changements de statut
     let intervalId: NodeJS.Timeout;
     let lastImportIds = new Set<string>();
+    let isInitialized = false;
 
     const checkImports = async () => {
       try {
@@ -51,6 +52,14 @@ export function useImportNotification() {
           const currentImportIds = new Set(imports.map(imp => imp.id));
           console.log('🆔 Current import IDs:', Array.from(currentImportIds));
           console.log('🆔 Last import IDs:', Array.from(lastImportIds));
+          
+          // Au premier chargement, initialiser sans notification
+          if (!isInitialized) {
+            lastImportIds = currentImportIds;
+            isInitialized = true;
+            console.log('🔧 Initialized with existing imports, no notifications sent');
+            return;
+          }
           
           // Vérifier s'il y a de nouveaux imports terminés
           currentImportIds.forEach(id => {
