@@ -76,7 +76,7 @@ export function useImportNotification() {
               });
               
               // Invalider les caches pour rafraîchir les données
-              queryClient.invalidateQueries({ queryKey: ['expertise-reports'] });
+              queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
               queryClient.invalidateQueries({ queryKey: ['imports', 'pending'] });
             }
           });
