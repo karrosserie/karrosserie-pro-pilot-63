@@ -36,7 +36,7 @@ export function useReceiptsData() {
   }) || [];
   
   const createReceipt = useMutation({
-    mutationFn: (newReceipt: Omit<Parameters<typeof receiptsService.create>[0], 'user_id'>) => 
+    mutationFn: (newReceipt: Omit<Parameters<typeof receiptsService.create>[0], 'company_id'>) => 
       receiptsService.create(newReceipt),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['receipts'] });

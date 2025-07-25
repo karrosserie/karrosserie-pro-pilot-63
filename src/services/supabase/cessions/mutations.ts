@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Cession, NewCession, UpdateCession } from './types';
+import { getCurrentUserCompanyId } from '../auth-company';
 
 export const createCession = async (cession: NewCession): Promise<Cession> => {
   console.log('Creating cession with data:', cession);
@@ -14,9 +15,11 @@ export const createCession = async (cession: NewCession): Promise<Cession> => {
   // Generate a reference if not provided
   const reference = cession.reference || `CC-${new Date().getFullYear()}-${Date.now()}`;
   
+  const companyId = await getCurrentUserCompanyId();
+  
   // Only include fields that exist in the new cessions table structure
   const processedCession = {
-    user_id: user.id,
+    company_id: companyId,
     reference,
     status: cession.status || 'en_attente',
     repair_order_id: cession.repair_order_id || null,

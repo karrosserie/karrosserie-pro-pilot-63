@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Credit, CreditCreateData, CreditUpdateData } from './types';
+import { getCurrentUserCompanyId } from '../auth-company';
 
 export const createCredit = async (creditData: CreditCreateData): Promise<Credit> => {
   console.log('Creating credit with data:', creditData);
@@ -13,8 +14,10 @@ export const createCredit = async (creditData: CreditCreateData): Promise<Credit
 
   console.log('User authenticated:', user.id);
 
+  const companyId = await getCurrentUserCompanyId();
+
   const insertData = {
-    user_id: user.id,
+    company_id: companyId,
     reference: creditData.reference,
     invoice_id: creditData.invoice_id,
     status: creditData.status,

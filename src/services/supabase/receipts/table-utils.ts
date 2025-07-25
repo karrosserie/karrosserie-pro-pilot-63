@@ -1,14 +1,17 @@
 import { supabase } from '@/integrations/supabase/client';
+import { getCurrentUserCompanyId } from '../auth-company';
 
 export const generateReference = async (): Promise<string> => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
+    const companyId = await getCurrentUserCompanyId();
+
     const { data, error } = await supabase
       .from('receipts')
       .select('reference')
-      .eq('user_id', user.id)
+      .eq('company_id', companyId)
       .order('created_at', { ascending: false })
       .limit(1);
 

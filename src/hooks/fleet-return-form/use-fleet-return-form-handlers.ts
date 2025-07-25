@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCompanyId } from '@/hooks/use-company-id';
 import { useFleetReturns } from '@/hooks/use-fleet-returns';
 import { FleetReturnFormData, ReturnDamageItem } from '@/components/fleet/FleetReturnForm.types';
 
@@ -11,6 +12,7 @@ export const useFleetReturnFormHandlers = (
 ) => {
   const { createReturn } = useFleetReturns();
   const { user } = useAuth();
+  const { companyId } = useCompanyId();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -80,7 +82,7 @@ export const useFleetReturnFormHandlers = (
         fleet_reservation_id: formData.reservationId,
         fleet_vehicle_id: formData.vehicleId,
         client_id: formData.clientId,
-        user_id: user.id,
+        company_id: companyId,
         return_date: formData.returnDate,
         return_mileage: formData.returnMileage,
         fuel_level_return: formData.fuelLevelReturn,

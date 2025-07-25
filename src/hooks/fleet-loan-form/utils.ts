@@ -18,7 +18,7 @@ export const getCurrentDateTime = () => {
 };
 
 // Helper function to prepare reservation data for database
-export const prepareReservationData = (formData: any, vehicleId: string, userId: string) => {
+export const prepareReservationData = (formData: any, vehicleId: string, companyId: string) => {
   return {
     fleet_vehicle_id: vehicleId,
     client_id: formData.clientId,
@@ -28,7 +28,7 @@ export const prepareReservationData = (formData: any, vehicleId: string, userId:
     fuel_level_start: formData.fuelLevel,
     notes: formData.notes || '',
     status: 'active' as const,
-    user_id: userId,
+    company_id: companyId,
     // License information
     license_number: formData.licenseNumber,
     license_issue_date: formData.licenseIssueDate || null, // Convert empty string to null

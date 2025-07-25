@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { getCurrentUserCompanyId } from '../auth-company';
 
 export const checkTableExists = async (): Promise<boolean> => {
   try {
@@ -40,6 +41,8 @@ export const generateReference = async (): Promise<string> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
+    const companyId = await getCurrentUserCompanyId();
+
     // Check if table exists first
     const tableExists = await checkTableExists();
     if (!tableExists) {
@@ -50,7 +53,7 @@ export const generateReference = async (): Promise<string> => {
     const { data, error } = await (supabase as any)
       .from('credits')
       .select('reference')
-      .eq('user_id', user.id)
+      .eq('company_id', companyId)
       .order('created_at', { ascending: false })
       .limit(1);
 

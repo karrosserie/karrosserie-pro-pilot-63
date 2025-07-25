@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { getCurrentUserCompanyId } from '@/services/supabase/auth-company';
 
 export function useQuotes() {
   const queryClient = useQueryClient();
@@ -46,15 +47,17 @@ export function useQuotes() {
         throw new Error('User not authenticated');
       }
 
-      // Add user_id automatically
-      const quoteWithUserId = {
+      const companyId = await getCurrentUserCompanyId();
+
+      // Add company_id automatically
+      const quoteWithCompanyId = {
         ...quoteData,
-        user_id: user.id
+        company_id: companyId
       };
 
       const { data, error } = await supabase
         .from('quotes')
-        .insert([quoteWithUserId])
+        .insert([quoteWithCompanyId])
         .select(`
           *,
           clients(first_name, last_name),

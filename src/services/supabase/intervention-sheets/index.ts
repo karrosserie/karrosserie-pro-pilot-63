@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { InterventionSheet, NewInterventionSheet, UpdateInterventionSheet, ReportItem } from './types';
+import { getCurrentUserCompanyId } from '../auth-company';
 
 export const interventionSheetsService = {
   async getAll(): Promise<InterventionSheet[]> {
@@ -55,10 +56,12 @@ export const interventionSheetsService = {
     const { data: user } = await supabase.auth.getUser();
     if (!user.user) throw new Error('User not authenticated');
 
+    const companyId = await getCurrentUserCompanyId();
+
     const { data, error } = await supabase
       .from('intervention_sheets')
       .insert({
-        user_id: user.user.id,
+        company_id: companyId,
         client_id: sheet.client_id,
         vehicle_id: sheet.vehicle_id,
         carrosserie_reports: sheet.carrosserie_reports as any,

@@ -1,6 +1,7 @@
 
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCompanyId } from '@/hooks/use-company-id';
 import { DamageItem, LoanFormData } from '@/components/fleet/FleetLoanForm';
 import { prepareReservationData } from './utils';
 import { FleetLoanFormState } from './types';
@@ -12,6 +13,7 @@ export const useFleetLoanFormHandlers = (
 ) => {
   const { createReservation, updateReservation } = useFleetReservations();
   const { user } = useAuth();
+  const { companyId } = useCompanyId();
   const { formData, setFormData } = state;
   
   // Determine if we're editing an existing reservation
@@ -105,7 +107,7 @@ export const useFleetLoanFormHandlers = (
 
     try {
       // Prepare data for database with proper JSON conversion
-      const reservationData = prepareReservationData(formData, formData.vehicleId, user.id);
+      const reservationData = prepareReservationData(formData, formData.vehicleId, companyId!);
 
       if (isEditing && defaultValues?.id) {
         // Update existing reservation - toast is handled by the mutation

@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { NewReceipt, UpdateReceipt } from './types';
 import { invoicesService } from '../invoices';
+import { getCurrentUserCompanyId } from '../auth-company';
 
 // Helper function to calculate and update invoice status based on receipts
 const updateInvoiceStatus = async (invoiceId: string) => {
@@ -47,18 +48,20 @@ const updateInvoiceStatus = async (invoiceId: string) => {
 };
 
 export const receiptMutations = {
-  create: async (receipt: Omit<NewReceipt, 'user_id'>) => {
+  create: async (receipt: Omit<NewReceipt, 'company_id'>) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const receiptWithUser = {
+    const companyId = await getCurrentUserCompanyId();
+
+    const receiptWithCompany = {
       ...receipt,
-      user_id: user.id
+      company_id: companyId
     };
 
     const { data, error } = await supabase
       .from('receipts')
-      .insert([receiptWithUser])
+      .insert([receiptWithCompany])
       .select()
       .single();
       
