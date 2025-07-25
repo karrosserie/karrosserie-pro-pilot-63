@@ -139,7 +139,7 @@ export const ExpertiseReportUploader = ({
           },
           body: JSON.stringify({
             URL: publicUrlData.publicUrl,
-            userId: user.id,
+            companyId: companyId,
             importId: importData.id
           }),
         });
