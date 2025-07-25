@@ -408,20 +408,26 @@ export type Database = {
       environment: {
         Row: {
           asynchronous_import: boolean
+          average_timing: number | null
           created_at: string
           id: string
+          import_count: number | null
           updated_at: string
         }
         Insert: {
           asynchronous_import?: boolean
+          average_timing?: number | null
           created_at?: string
           id?: string
+          import_count?: number | null
           updated_at?: string
         }
         Update: {
           asynchronous_import?: boolean
+          average_timing?: number | null
           created_at?: string
           id?: string
+          import_count?: number | null
           updated_at?: string
         }
         Relationships: []

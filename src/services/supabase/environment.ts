@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 export type Environment = {
   id: string;
   asynchronous_import: boolean;
+  average_timing: number;
+  import_count: number;
   created_at: string;
   updated_at: string;
 };
