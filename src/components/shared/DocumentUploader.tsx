@@ -49,10 +49,7 @@ export function DocumentUploader({
     onFileUpload: uploadFile
   });
 
-  // Afficher le spinner dès qu'une image est sélectionnée pour crop
-  if (imageToProcess && cropDialogOpen) {
-    return <DocumentUploadLoading />;
-  }
+  // Ne pas afficher le spinner pendant le crop, laisser l'ImageCropper s'afficher
 
   if (isUploading) {
     return <DocumentUploadLoading />;
