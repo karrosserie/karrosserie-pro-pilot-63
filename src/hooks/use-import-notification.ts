@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function useImportNotification() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -42,6 +44,10 @@ export function useImportNotification() {
                 title: "Import terminé",
                 description: "Un rapport d'expertise a été importé avec succès",
               });
+              
+              // Invalider les caches pour rafraîchir les données
+              queryClient.invalidateQueries({ queryKey: ['expertise-reports'] });
+              queryClient.invalidateQueries({ queryKey: ['imports', 'pending'] });
             }
           });
           
@@ -61,7 +67,7 @@ export function useImportNotification() {
         clearInterval(intervalId);
       }
     };
-  }, [toast]);
+  }, [toast, queryClient]);
 
   return null;
 }
