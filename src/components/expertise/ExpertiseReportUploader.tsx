@@ -112,7 +112,7 @@ export const ExpertiseReportUploader = ({
       const { data: importData, error: importError } = await supabase
         .from('imports')
         .insert({
-          report_id: newReport.id,
+          report_id: null,
           status: 'En cours d\'analyse',
           error: null,
           user_id: user.id,
