@@ -77,6 +77,7 @@ const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Document</TableHead>
             <TableHead>Rapport</TableHead>
             <TableHead>Client</TableHead>
             <TableHead>Véhicule</TableHead>
@@ -89,12 +90,22 @@ const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
           {imports.map((importItem) => (
             <TableRow key={importItem.id}>
               <TableCell>
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <div className="font-medium truncate max-w-[200px]" title={importItem.document || 'Fichier inconnu'}>
+                      {importItem.document || 'Fichier inconnu'}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      ID: {importItem.report_id.slice(0, 8)}...
+                    </div>
+                  </div>
+                </div>
+              </TableCell>
+              <TableCell>
                 <div>
                   <div className="font-medium">
                     {importItem.expertise_reports?.report_number || 'Numéro non assigné'}
-                  </div>
-                  <div className="text-sm text-muted-foreground truncate max-w-[200px]">
-                    ID: {importItem.report_id.slice(0, 8)}...
                   </div>
                 </div>
               </TableCell>

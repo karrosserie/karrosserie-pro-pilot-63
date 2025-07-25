@@ -115,7 +115,8 @@ export const ExpertiseReportUploader = ({
           report_id: newReport.id,
           status: 'En cours d\'analyse',
           error: null,
-          user_id: user.id
+          user_id: user.id,
+          document: selectedFile.name
         })
         .select()
         .single();

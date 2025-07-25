@@ -6,6 +6,7 @@ export type Import = {
   user_id: string;
   status: string;
   error: string | null;
+  document: string | null;
   created_at: string;
   updated_at: string;
   // Relations
