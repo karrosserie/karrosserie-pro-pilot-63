@@ -221,11 +221,14 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
   };
 
   const validateRequiredFields = () => {
-    const requiredFields = ['clientId', 'vin', 'brandId', 'modelId', 'licensePlate'];
+    // Marque et modèle temporairement non obligatoires
+    const requiredFields = ['clientId', 'vin', 'licensePlate'];
+    // const requiredFields = ['clientId', 'vin', 'brandId', 'modelId', 'licensePlate'];
     const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
     
     if (missingFields.length > 0) {
-      error('Les champs suivants sont obligatoires : Client, Numéro de série (VIN), Marque, Modèle, Plaque d\'immatriculation', 'Champs manquants');
+      error('Les champs suivants sont obligatoires : Client, Numéro de série (VIN), Plaque d\'immatriculation', 'Champs manquants');
+      // error('Les champs suivants sont obligatoires : Client, Numéro de série (VIN), Marque, Modèle, Plaque d\'immatriculation', 'Champs manquants');
       return false;
     }
     return true;
