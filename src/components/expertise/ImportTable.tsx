@@ -69,8 +69,7 @@ const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
 
   return (
     <div className="card-container">
-      <div className="mb-4 flex items-center gap-2">
-        <FileText className="w-5 h-5 text-karrosserie-orange" />
+      <div className="mb-4">
         <h3 className="text-lg font-semibold">Rapports en cours d'analyse</h3>
       </div>
       
@@ -78,12 +77,9 @@ const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
         <TableHeader>
           <TableRow>
             <TableHead>Document</TableHead>
-            <TableHead>Rapport</TableHead>
-            <TableHead>Client</TableHead>
-            <TableHead>Véhicule</TableHead>
             <TableHead>Statut</TableHead>
             <TableHead>Date d'import</TableHead>
-            <TableHead>Erreur</TableHead>
+            <TableHead></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -101,19 +97,6 @@ const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
                     </div>
                   </div>
                 </div>
-              </TableCell>
-              <TableCell>
-                <div>
-                  <div className="font-medium">
-                    {importItem.expertise_reports?.report_number || 'Numéro non assigné'}
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>
-                {getClientName(importItem.expertise_reports)}
-              </TableCell>
-              <TableCell>
-                {getVehicleInfo(importItem.expertise_reports)}
               </TableCell>
               <TableCell>
                 {getStatusBadge(importItem.status)}
