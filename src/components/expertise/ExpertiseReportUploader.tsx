@@ -154,10 +154,6 @@ export const ExpertiseReportUploader = ({
         throw apiError;
       }
 
-      toast({
-        title: "Rapport importé",
-        description: "Le rapport d'expertise a été importé avec succès."
-      });
 
       // Rediriger vers la page des rapports d'expertise si on ne s'y trouve pas déjà
       if (!location.pathname.includes('/documents/expertise')) {
