@@ -224,14 +224,7 @@ export const ExpertiseReportUploader = ({
               disabled={isUploading}
               className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
             >
-              {isUploading ? (
-                <>
-                  <MovingCar className="mr-2" size={16} />
-                  Analyse en cours...
-                </>
-              ) : (
-                'Importer'
-              )}
+              Importer
             </Button>
           </div>
         </div>
