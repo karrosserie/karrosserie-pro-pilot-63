@@ -5,22 +5,16 @@ export type Token = Tables<'tokens'>;
 export type TokenInsert = TablesInsert<'tokens'>;
 
 export const tokensService = {
-  async createToken(tokenData: Omit<TokenInsert, 'id' | 'created_at' | 'updated_at' | 'company_id'>) {
-    // Récupérer l'ID de l'entreprise depuis user_companies
-    const { data: userCompany, error: companyError } = await supabase
-      .from('user_companies')
-      .select('company_id')
-      .eq('user_id', tokenData.user_id)
-      .eq('active', true)
-      .single();
+  async createToken(tokenData: Omit<TokenInsert, 'id' | 'created_at' | 'updated_at'>) {
+    const companyId = tokenData.company_id;
 
-    if (companyError || !userCompany) throw new Error('Aucune entreprise trouvée pour cet utilisateur');
+    if (!companyId) throw new Error('Company ID is required');
 
     const { data, error } = await supabase
       .from('tokens')
       .insert([{
         ...tokenData,
-        company_id: userCompany.company_id
+        company_id: companyId
       }])
       .select()
       .single();

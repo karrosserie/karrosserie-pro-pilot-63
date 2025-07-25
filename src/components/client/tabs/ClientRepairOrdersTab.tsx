@@ -154,7 +154,7 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
       const { tokensService } = await import('@/services/supabase/tokens');
       
       await tokensService.createToken({
-        user_id: order.user_id!,
+        company_id: order.company_id!,
         client_id: order.client_id,
         vehicule_id: order.vehicle_id
       });

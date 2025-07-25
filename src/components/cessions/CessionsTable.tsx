@@ -281,10 +281,10 @@ export const CessionsTable = ({
             console.log('Recipients found, updating company and client...');
             
             // Sauvegarder l'ID du premier recipient (entreprise) dans company_info
-            if (companyData?.id && repairOrderData.user_id) {
+            if (companyData?.id && repairOrderData.company_id) {
               console.log('Updating company with recipient ID:', signatureResponse.recipients[0].id);
               try {
-                await companyService.updateCompanyInfo(repairOrderData.user_id, {
+                await companyService.updateCompanyInfo(repairOrderData.company_id, {
                   ...companyData,
                   oodrive_recipient_id: signatureResponse.recipients[0].id.toString()
                 });
@@ -293,7 +293,7 @@ export const CessionsTable = ({
                 console.error('Error updating company:', companyError);
               }
             } else {
-              console.log('Missing company data or user ID:', { companyData: !!companyData, userId: repairOrderData.user_id });
+              console.log('Missing company data or company ID:', { companyData: !!companyData, companyId: repairOrderData.company_id });
             }
 
             // Sauvegarder l'ID du second recipient (client) dans clients

@@ -69,10 +69,21 @@ export const receiptQueries = {
       throw new Error('User not authenticated');
     }
 
+    const { data: userCompany } = await supabase
+      .from('user_companies')
+      .select('company_id')
+      .eq('user_id', user.id)
+      .eq('active', true)
+      .single();
+
+    if (!userCompany?.company_id) {
+      throw new Error('No active company found');
+    }
+
     const { data: receipt, error } = await supabase
       .from('receipts')
       .select('reference')
-      .eq('user_id', user.id)
+      .eq('company_id', userCompany.company_id)
       .order('reference', { ascending: false })
       .limit(1)
       .single();

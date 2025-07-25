@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
+import { getCurrentUserCompanyId } from './auth-company';
 
 // Types derived from Supabase
 type BankAccountRow = Database['public']['Tables']['bank_accounts']['Row'];
@@ -40,10 +41,12 @@ export const accountsService = {
       throw new Error('User not authenticated');
     }
 
+    const companyId = await getCurrentUserCompanyId();
+    
     const { data, error } = await supabase
       .from('bank_accounts')
       .select('*')
-      .eq('user_id', session.session.user.id)
+      .eq('company_id', companyId)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -62,11 +65,13 @@ export const accountsService = {
       throw new Error('User not authenticated');
     }
 
+    const companyId = await getCurrentUserCompanyId();
+    
     const { data, error } = await supabase
       .from('bank_accounts')
       .select('*')
       .eq('id', id)
-      .eq('user_id', session.session.user.id)
+      .eq('company_id', companyId)
       .single();
 
     if (error) {
@@ -92,7 +97,7 @@ export const accountsService = {
       balance: account.balance,
       status: account.status,
       type: account.type,
-      user_id: session.session.user.id,
+      company_id: await getCurrentUserCompanyId(),
     };
 
     const { data, error } = await supabase
@@ -116,11 +121,13 @@ export const accountsService = {
       throw new Error('User not authenticated');
     }
 
+    const companyId = await getCurrentUserCompanyId();
+    
     const { data, error } = await supabase
       .from('bank_accounts')
       .update(updates as BankAccountUpdate)
       .eq('id', id)
-      .eq('user_id', session.session.user.id)
+      .eq('company_id', companyId)
       .select()
       .single();
 
@@ -139,11 +146,13 @@ export const accountsService = {
       throw new Error('User not authenticated');
     }
 
+    const companyId = await getCurrentUserCompanyId();
+    
     const { error } = await supabase
       .from('bank_accounts')
       .delete()
       .eq('id', id)
-      .eq('user_id', session.session.user.id);
+      .eq('company_id', companyId);
 
     if (error) {
       console.error('Error deleting account:', error);

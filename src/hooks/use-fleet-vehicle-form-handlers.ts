@@ -1,6 +1,7 @@
 
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCompanyId } from '@/hooks/use-company-id';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 
 interface ValidationData {
@@ -40,6 +41,7 @@ export function useFleetVehicleFormHandlers({
 }: FormHandlersProps) {
   const { createVehicle, updateVehicle } = useFleetVehicles();
   const { user } = useAuth();
+  const { companyId } = useCompanyId();
 
   const handleBrandSelectChange = (brandId: string) => {
     console.log('Manual brand selection:', brandId);
@@ -92,7 +94,7 @@ export function useFleetVehicleFormHandlers({
       } else if (mode === 'create') {
         await createVehicle.mutateAsync({
           ...submissionData,
-          user_id: user.id
+          company_id: companyId
         });
       }
       onSuccess();

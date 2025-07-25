@@ -202,7 +202,7 @@ const Quotes = () => {
       const { tokensService } = await import('@/services/supabase/tokens');
       
       await tokensService.createToken({
-        user_id: quote.user_id!,
+        company_id: quote.company_id!,
         client_id: quote.client_id,
         vehicule_id: quote.vehicle_id
       });

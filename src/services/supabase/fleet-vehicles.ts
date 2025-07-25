@@ -62,7 +62,7 @@ export const fleetVehiclesService = {
         registration_back_url,
         created_at,
         updated_at,
-        user_id,
+        company_id,
         car_brands(id, name),
         car_models(id, name)
       `)
@@ -98,7 +98,7 @@ export const fleetVehiclesService = {
         registration_back_url,
         created_at,
         updated_at,
-        user_id,
+        company_id,
         car_brands(id, name),
         car_models(id, name)
       `)
@@ -136,7 +136,7 @@ export const fleetVehiclesService = {
         registration_back_url,
         created_at,
         updated_at,
-        user_id,
+        company_id,
         car_brands(id, name),
         car_models(id, name)
       `)
@@ -174,7 +174,7 @@ export const fleetVehiclesService = {
         registration_back_url,
         created_at,
         updated_at,
-        user_id,
+        company_id,
         car_brands(id, name),
         car_models(id, name)
       `)

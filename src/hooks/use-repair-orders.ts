@@ -19,7 +19,7 @@ export function useRepairOrders() {
 
   const createOrder = useMutation({
     mutationFn: async (orderData: NewRepairOrder) => {
-      return await repairOrdersService.create(orderData);
+      return await repairOrdersService.create(orderData, orderData.company_id!);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['repair-orders'] });

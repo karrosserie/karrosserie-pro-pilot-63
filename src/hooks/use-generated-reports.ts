@@ -30,10 +30,21 @@ export const useGeneratedReports = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      const { data: userCompany } = await supabase
+        .from('user_companies')
+        .select('company_id')
+        .eq('user_id', user.id)
+        .eq('active', true)
+        .single();
+
+      if (!userCompany?.company_id) {
+        return;
+      }
+
       const { data: reportsData, error: reportsError } = await supabase
         .from('generated_reports')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('company_id', userCompany.company_id)
         .order('created_at', { ascending: false });
 
       if (!reportsError && reportsData) {
@@ -244,11 +255,22 @@ export const useGeneratedReports = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
+    const { data: userCompany } = await supabase
+      .from('user_companies')
+      .select('company_id')
+      .eq('user_id', user.id)
+      .eq('active', true)
+      .single();
+
+    if (!userCompany?.company_id) {
+      throw new Error('No active company found');
+    }
+
     // Créer le rapport en base de données
     const { data: reportData, error: reportError } = await supabase
       .from('generated_reports')
       .insert({
-        user_id: user.id,
+        company_id: userCompany.company_id,
         name: type,
         type: reportTypeMap[type] || 'monthly',
         from_date: fromDate.toISOString().split('T')[0],

@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { expertiseReportsService } from '@/services/supabase/expertise-reports';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
+import { useCompanyId } from '@/hooks/use-company-id';
 import { Upload, FileText, X, Loader2 } from 'lucide-react';
 import { MovingCar } from '@/components/ui/moving-car';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,7 @@ export const ExpertiseReportUploader = ({
   const { toast } = useToast();
   const { user } = useAuth();
   const { createReport } = useExpertiseReports();
+  const { companyId } = useCompanyId();
   const navigate = useNavigate();
   const location = useLocation();
   const [isUploading, setIsUploading] = useState(false);
@@ -103,7 +105,7 @@ export const ExpertiseReportUploader = ({
       const newReport = await createReport.mutateAsync({
         document_url: publicUrlData.publicUrl,
         status: 'Importé',
-        user_id: user.id
+        company_id: companyId
       });
 
       console.log('Expertise report created:', newReport);
@@ -114,7 +116,7 @@ export const ExpertiseReportUploader = ({
         .insert({
           report_id: null,
           status: 'En cours d\'analyse',
-          user_id: user.id,
+          company_id: companyId,
           document: selectedFile.name
         })
         .select()

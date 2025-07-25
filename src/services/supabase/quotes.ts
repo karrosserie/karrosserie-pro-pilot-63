@@ -111,10 +111,21 @@ export const quotesService = {
       throw new Error('User not authenticated');
     }
 
+    const { data: userCompany } = await supabase
+      .from('user_companies')
+      .select('company_id')
+      .eq('user_id', user.id)
+      .eq('active', true)
+      .single();
+
+    if (!userCompany?.company_id) {
+      throw new Error('No active company found');
+    }
+
     const { data: quote, error } = await supabase
       .from('quotes')
       .select('reference')
-      .eq('user_id', user.id)
+      .eq('company_id', userCompany.company_id)
       .order('reference', { ascending: false })
       .limit(1)
       .single();
@@ -138,15 +149,26 @@ export const quotesService = {
       throw new Error('User not authenticated');
     }
 
-    // Ajouter automatiquement le user_id
-    const quoteWithUserId = {
+    // Ajouter automatiquement le company_id
+    const { data: userCompany } = await supabase
+      .from('user_companies')
+      .select('company_id')
+      .eq('user_id', user.id)
+      .eq('active', true)
+      .single();
+
+    if (!userCompany?.company_id) {
+      throw new Error('No active company found');
+    }
+
+    const quoteWithCompanyId = {
       ...quote,
-      user_id: user.id
+      company_id: userCompany.company_id
     };
 
     const { data, error } = await supabase
       .from('quotes')
-      .insert([quoteWithUserId])
+      .insert([quoteWithCompanyId])
       .select()
       .single();
       
@@ -216,6 +238,17 @@ export const quotesService = {
       throw new Error('User not authenticated');
     }
 
+    const { data: userCompany } = await supabase
+      .from('user_companies')
+      .select('company_id')
+      .eq('user_id', user.id)
+      .eq('active', true)
+      .single();
+
+    if (!userCompany?.company_id) {
+      throw new Error('No active company found');
+    }
+
     // Générer le numéro de devis (entier auto-incrémenté)
     const lastQuote = await quotesService.getLastQuoteByUser();
     const lastNumber = lastQuote?.reference ? parseInt(lastQuote.reference) : 0;
@@ -261,7 +294,7 @@ export const quotesService = {
       expert_name: expertiseReport.expert_name || '',
       incident_date: expertiseReport.incident_date || '',
       report_id: expertiseReport.id,
-      user_id: user.id,
+      company_id: userCompany.company_id,
       valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
     };
 

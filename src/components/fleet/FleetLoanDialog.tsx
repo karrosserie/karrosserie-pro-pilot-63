@@ -76,7 +76,7 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
       registration_back_url: partialVehicle.registration_back_url || '',
       created_at: partialVehicle.created_at || new Date().toISOString(),
       updated_at: partialVehicle.updated_at || new Date().toISOString(),
-      user_id: partialVehicle.user_id || '',
+      company_id: partialVehicle.company_id || '',
       car_brands: partialVehicle.car_brands || null,
       car_models: partialVehicle.car_models || null
     };

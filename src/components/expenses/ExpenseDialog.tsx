@@ -43,8 +43,7 @@ const ExpenseDialog = ({
 
       if (expense?.id) {
         // Update existing expense
-        const { user_id, ...updates } = processedData;
-        updateExpense({ id: expense.id, updates });
+        updateExpense({ id: expense.id, updates: processedData });
       } else {
         // Create new expense
         createExpense(processedData);

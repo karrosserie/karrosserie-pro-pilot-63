@@ -57,18 +57,13 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
     let template = 'default';
     try {
       // D'abord récupérer l'ID de l'entreprise de l'utilisateur
-      const { data: userCompany } = await supabase
-        .from('user_companies')
-        .select('company_id')
-        .eq('user_id', invoice.user_id)
-        .eq('active', true)
-        .single();
+      const companyId = invoice.company_id;
 
-      if (userCompany?.company_id) {
+      if (companyId) {
         const { data: preferences } = await supabase
           .from('company_preferences')
           .select('invoice_template')
-          .eq('company_id', userCompany.company_id)
+          .eq('company_id', companyId)
           .single();
         
         template = preferences?.invoice_template || 'default';
