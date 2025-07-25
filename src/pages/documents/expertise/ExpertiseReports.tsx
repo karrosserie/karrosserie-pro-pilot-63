@@ -189,7 +189,7 @@ const ExpertiseReports = () => {
 
       {/* Import Rapport Dialog */}
       <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
-        <DialogContent className="w-[95vw] max-w-md mx-auto">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-lg">Importer un rapport d'expertise</DialogTitle>
             <DialogDescription className="text-sm">
