@@ -19,11 +19,10 @@ export function useFleetVehicleFormValidation() {
   const { toast } = useToast();
 
   const isFormValid = (data: ValidationData): boolean => {
-    // Marque et modèle temporairement non obligatoires
     const basicInfoValid = data.formData.vin && 
+                          data.formData.brand_id && 
+                          data.formData.model_id && 
                           data.formData.license_plate;
-                          // data.formData.brand_id && 
-                          // data.formData.model_id && 
     const documentsValid = data.documentsData.registrationFrontUrl && 
                           data.documentsData.registrationBackUrl && 
                           data.documentsData.insuranceCardUrl;

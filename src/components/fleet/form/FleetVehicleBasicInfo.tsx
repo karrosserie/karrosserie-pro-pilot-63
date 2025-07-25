@@ -124,7 +124,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
       {/* Brand, Model and Status */}
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <Label htmlFor="brand_id">Marque {/* temporairement non obligatoire */}</Label>
+          <Label htmlFor="brand_id" required>Marque</Label>
           <SearchableSelect
             options={brandOptions}
             value={formData.brand_id}
@@ -135,7 +135,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
           />
         </div>
         <div>
-          <Label htmlFor="model_id">Modèle {/* temporairement non obligatoire */}</Label>
+          <Label htmlFor="model_id" required>Modèle</Label>
           <SearchableSelect
             options={modelOptions}
             value={formData.model_id}
