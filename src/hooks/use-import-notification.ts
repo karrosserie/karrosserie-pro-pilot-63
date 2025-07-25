@@ -6,12 +6,31 @@ import { useQueryClient } from '@tanstack/react-query';
 export function useImportNotification() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    // Créer l'élément audio pour le signal sonore
-    audioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+PvuGUdBzuT1vHSeS4FJn/K7tgOQgsXYrfm7KpXFQ1Kn+Xyu2YdCDaR1+/TeSsEGX3K8N2SQgkUY7Pm7qtcFAxKn+LyzGkfCDSR1fHUejEFKHzH7tiSQQcSYrDn7axwHQw/meLyyGsrCzCLxvDXeSsENXzH7NmSSAYMX6zp566DGQ6+fTy/l2+h2qj3mDGqDsVZlXnNOEm4LsDhjxcHwGj9=');
-    audioRef.current.volume = 0.7;
+    // Fonction pour jouer un son de notification simple
+    const playNotificationSound = () => {
+      try {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+        
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+      } catch (error) {
+        console.error('Error playing notification sound:', error);
+      }
+    };
 
     // Polling pour vérifier les changements de statut
     let intervalId: NodeJS.Timeout;
@@ -39,11 +58,7 @@ export function useImportNotification() {
               console.log('🎉 New import completed:', id);
               
               // Jouer le signal sonore
-              if (audioRef.current) {
-                audioRef.current.play().catch(error => {
-                  console.error('Error playing notification sound:', error);
-                });
-              }
+              playNotificationSound();
               
               // Afficher une notification toast
               toast({
