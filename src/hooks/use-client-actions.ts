@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useClients } from '@/hooks/use-clients';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCompanyId } from '@/hooks/use-company-id';
 import { Client } from '@/services/supabase/clients';
 
 export const useClientActions = () => {
@@ -18,6 +19,7 @@ export const useClientActions = () => {
   
   const { createClient, updateClient, deleteClient } = useClients();
   const { user } = useAuth();
+  const { companyId } = useCompanyId();
 
   const handleViewClient = (client: Client) => {
     setSelectedClient(client);
@@ -79,7 +81,7 @@ export const useClientActions = () => {
         company: data.company,
         driverLicenseFrontUrl: data.driverLicenseFrontUrl,
         driverLicenseBackUrl: data.driverLicenseBackUrl,
-        user_id: user ? user.id : null
+        company_id: companyId
       });
     } else if (dialogMode === 'edit' && selectedClient) {
       updateClient.mutate({

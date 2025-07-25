@@ -10,6 +10,7 @@ import { TableLoading } from '@/components/ui/loading';
 import { ErrorMessage } from '@/components/ui/error-message';
 import VehicleDialog from './VehicleDialog';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCompanyId } from '@/hooks/use-company-id';
 
 const VehicleList = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -17,6 +18,7 @@ const VehicleList = () => {
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const { vehicles, isLoading, error, createVehicle, updateVehicle, deleteVehicle } = useVehicles();
   const { user } = useAuth();
+  const { companyId } = useCompanyId();
 
   const handleCreateVehicle = () => {
     setSelectedVehicle(null);
@@ -47,7 +49,7 @@ const VehicleList = () => {
         vin: data.vin,
         mileage: data.mileage ? parseInt(data.mileage) : null,
         client_id: data.clientId,
-        user_id: user ? user.id : null,
+        company_id: companyId,
       });
     } else if (dialogMode === 'edit' && selectedVehicle) {
       updateVehicle.mutate({

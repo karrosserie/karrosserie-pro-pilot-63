@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
+import { getCurrentUserCompanyId } from './auth-company';
 
 export type Client = Database['public']['Tables']['clients']['Row'] & {
   company?: string;
@@ -51,6 +52,8 @@ export const clientsService = {
   create: async (client: any) => {
     // Extract company field and create clientData without it
     const company = client.company;
+    const companyId = await getCurrentUserCompanyId();
+    
     const clientData = {
       first_name: client.firstName,
       last_name: client.lastName,
@@ -59,7 +62,7 @@ export const clientsService = {
       address: client.address,
       city: client.city,
       postal_code: client.zipCode,
-      user_id: client.user_id,
+      company_id: companyId,
       driver_license_front_url: client.driverLicenseFrontUrl || null,
       driver_license_back_url: client.driverLicenseBackUrl || null,
       oodrive_recipient_id: client.oodrive_recipient_id || null

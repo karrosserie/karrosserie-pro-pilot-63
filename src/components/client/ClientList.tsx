@@ -11,6 +11,7 @@ import { Client } from '@/services/supabase/clients';
 import { TableLoading } from '@/components/ui/loading';
 import { ErrorMessage } from '@/components/ui/error-message';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCompanyId } from '@/hooks/use-company-id';
 
 const ClientList = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -26,6 +27,7 @@ const ClientList = () => {
   
   const { clients, isLoading, error, createClient, updateClient, deleteClient } = useClients();
   const { user } = useAuth();
+  const { companyId } = useCompanyId();
 
   // Filtrer les clients en fonction de la recherche
   const filteredClients = useMemo(() => {
@@ -101,7 +103,7 @@ const ClientList = () => {
         company: data.company,
         driverLicenseFrontUrl: data.driverLicenseFrontUrl,
         driverLicenseBackUrl: data.driverLicenseBackUrl,
-        user_id: user ? user.id : null
+        company_id: companyId
       });
     } else if (dialogMode === 'edit' && selectedClient) {
       updateClient.mutate({

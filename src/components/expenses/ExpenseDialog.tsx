@@ -11,6 +11,7 @@ import { ExpenseForm } from './ExpenseForm';
 import { useExpenses } from '@/hooks/use-expenses';
 import { ExpenseWithRelations, NewExpense } from '@/services/supabase/expenses';
 import { useAuthState } from '@/hooks/use-auth-state';
+import { useCompanyId } from '@/hooks/use-company-id';
 
 interface ExpenseDialogProps {
   expense?: ExpenseWithRelations | null;
@@ -25,6 +26,7 @@ const ExpenseDialog = ({
 }: ExpenseDialogProps) => {
   const { createExpense, updateExpense, isCreating, isUpdating } = useExpenses();
   const { user } = useAuthState();
+  const { companyId } = useCompanyId();
   
   const isSubmitting = isCreating || isUpdating;
 
@@ -35,7 +37,7 @@ const ExpenseDialog = ({
       // Convert amounts to numbers for processing
       const processedData: NewExpense = {
         ...formData,
-        user_id: user.id,
+        company_id: companyId,
         vat_amount: typeof formData.vat_amount === 'string' ? parseFloat(formData.vat_amount) || 0 : formData.vat_amount,
         total_amount: typeof formData.total_amount === 'string' ? parseFloat(formData.total_amount) || 0 : formData.total_amount,
         vehicle_id: formData.assign_to_vehicle ? formData.vehicle_id : null

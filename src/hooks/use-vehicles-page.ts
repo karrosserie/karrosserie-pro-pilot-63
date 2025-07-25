@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCompanyId } from '@/hooks/use-company-id';
 import { useCarBrands } from '@/hooks/use-car-brands';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import { useNotification } from '@/hooks/use-notification';
@@ -21,6 +22,7 @@ export function useVehiclesPage() {
 
   const { vehicles, isLoading, error, createVehicle, updateVehicle, deleteVehicle } = useVehicles();
   const { user } = useAuth();
+  const { companyId } = useCompanyId();
   const { carBrands } = useCarBrands();
 
   // Filter vehicles based on search query
@@ -130,7 +132,7 @@ export function useVehiclesPage() {
           console.log('DEBUG - vehicleImages before saving:', filteredImages);
           return JSON.stringify(filteredImages);
         })(),
-        user_id: user.id
+        company_id: companyId
       };
 
       console.log('DEBUG - vehicleData before submission:');
@@ -144,7 +146,7 @@ export function useVehiclesPage() {
       if (dialogMode === 'create') {
         await createVehicle.mutateAsync(vehicleData);
       } else if (dialogMode === 'edit' && selectedVehicle) {
-        const { user_id, ...updateData } = vehicleData;
+        const updateData = vehicleData;
         await updateVehicle.mutateAsync({
           id: selectedVehicle.id,
           data: updateData
