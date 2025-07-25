@@ -52,7 +52,7 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
       <div className="text-center mb-6">
         <h1 className="text-3xl font-bold">
           <span className="text-karrosserie-orange">Karrosserie</span>{" "}
-          <span className="text-gray-900">Pro</span>
+          <span style={{ color: 'rgb(85, 85, 85)' }}>Pro</span>
         </h1>
         <p className="text-gray-600 mt-2">Créez votre compte</p>
       </div>
