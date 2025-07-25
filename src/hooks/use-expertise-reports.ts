@@ -21,8 +21,8 @@ export function useExpertiseReports() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
       toast({
-        title: "Rapport d'expertise créé",
-        description: "Le rapport d'expertise a été créé avec succès."
+        title: "Rapport d'expertise en cours d'analyse...",
+        description: "Le rapport d'expertise a été soumis et est maintenant en cours d'analyse par notre IA."
       });
     },
     onError: (error) => {
