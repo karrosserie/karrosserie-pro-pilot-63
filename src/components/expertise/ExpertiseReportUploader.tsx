@@ -114,7 +114,8 @@ export const ExpertiseReportUploader = ({
         .insert({
           report_id: newReport.id,
           status: 'En cours d\'analyse',
-          error: null
+          error: null,
+          user_id: user.id
         })
         .select()
         .single();
