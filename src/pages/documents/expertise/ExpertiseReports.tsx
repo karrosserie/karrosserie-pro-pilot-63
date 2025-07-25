@@ -4,6 +4,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useReportToQuote } from '@/hooks/use-report-to-quote';
+import { useEnvironment } from '@/hooks/use-environment';
+import { useImports } from '@/hooks/use-imports';
 import { Quote } from '@/services/supabase/quotes';
 import { generateNextQuoteNumber } from '@/components/quotes/form/utils/quoteNumber';
 import { format } from 'date-fns';
@@ -15,10 +17,13 @@ import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 import ExpertiseReportHeader from '@/components/expertise/ExpertiseReportHeader';
 import ExpertiseReportFilters from '@/components/expertise/ExpertiseReportFilters';
 import ExpertiseReportTable from '@/components/expertise/ExpertiseReportTable';
+import ImportTable from '@/components/expertise/ImportTable';
 
 const ExpertiseReports = () => {
   const { reports, isLoading, error, deleteReport } = useExpertiseReports();
   const { convertToQuote, checkMultipleReports, isConverting, isConverted, convertedReports } = useReportToQuote();
+  const { settings: environmentSettings } = useEnvironment();
+  const { pendingImports, isLoading: importsLoading } = useImports();
   const [searchTerm, setSearchTerm] = useState('');
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -27,6 +32,11 @@ const ExpertiseReports = () => {
   const [prefilledQuoteData, setPrefilledQuoteData] = useState<Partial<Quote> | null>(null);
   const { toast } = useToast();
   const { confirm } = useConfirmation();
+
+  // Vérifier si l'import asynchrone est activé et s'il y a des imports en attente
+  const showImportTable = environmentSettings?.asynchronous_import && 
+                          pendingImports && 
+                          pendingImports.length > 0;
   
   const filteredReports = reports?.filter(report => {
     const matchesSearch = report.report_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -163,6 +173,14 @@ const ExpertiseReports = () => {
         onSearchChange={setSearchTerm}
         onImportClick={() => setImportDialogOpen(true)}
       />
+      
+      {/* Tableau conditionnel des imports en cours d'analyse */}
+      {showImportTable && (
+        <ImportTable 
+          imports={pendingImports}
+          isLoading={importsLoading}
+        />
+      )}
       
       <div className="card-container">
         <ExpertiseReportTable 
