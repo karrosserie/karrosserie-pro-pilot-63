@@ -19,18 +19,24 @@ export function useImportNotification() {
 
     const checkImports = async () => {
       try {
+        console.log('🔍 useImportNotification - Checking for completed imports...');
+        
         const { data: imports } = await supabase
           .from('imports')
           .select('id, status')
-          .eq('status', 'Importé');
+          .in('status', ['Importé', 'Terminé']);
+
+        console.log('📊 useImportNotification - Found imports:', imports);
 
         if (imports) {
           const currentImportIds = new Set(imports.map(imp => imp.id));
+          console.log('🆔 Current import IDs:', Array.from(currentImportIds));
+          console.log('🆔 Last import IDs:', Array.from(lastImportIds));
           
           // Vérifier s'il y a de nouveaux imports terminés
           currentImportIds.forEach(id => {
             if (!lastImportIds.has(id)) {
-              console.log('New import completed:', id);
+              console.log('🎉 New import completed:', id);
               
               // Jouer le signal sonore
               if (audioRef.current) {
@@ -54,7 +60,7 @@ export function useImportNotification() {
           lastImportIds = currentImportIds;
         }
       } catch (error) {
-        console.error('Error checking imports:', error);
+        console.error('❌ Error checking imports:', error);
       }
     };
 
