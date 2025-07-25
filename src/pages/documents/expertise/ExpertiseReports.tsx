@@ -6,6 +6,7 @@ import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useReportToQuote } from '@/hooks/use-report-to-quote';
 import { useEnvironment } from '@/hooks/use-environment';
 import { useImports } from '@/hooks/use-imports';
+import { useImportNotification } from '@/hooks/use-import-notification';
 import { Quote } from '@/services/supabase/quotes';
 import { generateNextQuoteNumber } from '@/components/quotes/form/utils/quoteNumber';
 import { format } from 'date-fns';
@@ -32,6 +33,9 @@ const ExpertiseReports = () => {
   const [prefilledQuoteData, setPrefilledQuoteData] = useState<Partial<Quote> | null>(null);
   const { toast } = useToast();
   const { confirm } = useConfirmation();
+  
+  // Activer les notifications sonores pour les imports terminés
+  useImportNotification();
 
   // Vérifier si l'import asynchrone est activé et s'il y a des imports en attente
   const showImportTable = environmentSettings?.asynchronous_import && 
