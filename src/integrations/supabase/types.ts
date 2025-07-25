@@ -896,6 +896,41 @@ export type Database = {
         }
         Relationships: []
       }
+      imports: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          report_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          report_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          report_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "imports_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "expertise_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       insurance_companies: {
         Row: {
           address: string | null
