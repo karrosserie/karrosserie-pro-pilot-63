@@ -405,6 +405,27 @@ export type Database = {
           },
         ]
       }
+      environment: {
+        Row: {
+          asynchronous_import: boolean
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          asynchronous_import?: boolean
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          asynchronous_import?: boolean
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       expenses: {
         Row: {
           assign_to_vehicle: boolean
