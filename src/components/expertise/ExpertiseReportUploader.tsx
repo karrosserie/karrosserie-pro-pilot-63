@@ -99,7 +99,34 @@ export const ExpertiseReportUploader = ({
 
       console.log('Public URL generated:', publicUrlData.publicUrl);
 
-      // 4. Appel API externe pour traitement du document
+      // 4. Créer une entrée dans expertise_reports
+      const newReport = await createReport.mutateAsync({
+        document_url: publicUrlData.publicUrl,
+        status: 'Importé',
+        user_id: user.id
+      });
+
+      console.log('Expertise report created:', newReport);
+
+      // 5. Créer une entrée dans la table imports avec le status "En cours d'analyse"
+      const { data: importData, error: importError } = await supabase
+        .from('imports')
+        .insert({
+          report_id: newReport.id,
+          status: 'En cours d\'analyse',
+          error: null
+        })
+        .select()
+        .single();
+
+      if (importError) {
+        console.error('Error creating import entry:', importError);
+        throw importError;
+      }
+
+      console.log('Import entry created:', importData);
+
+      // 6. Appel API externe pour traitement du document
       try {
         console.log('Calling external API for document processing...');
         const apiResponse = await fetch('https://n8n.karrosserie.pro/webhook/38917be3-c64c-46ff-82f9-7959ece86242', {
@@ -109,7 +136,9 @@ export const ExpertiseReportUploader = ({
           },
           body: JSON.stringify({
             URL: publicUrlData.publicUrl,
-            userId: user.id
+            userId: user.id,
+            reportId: newReport.id,
+            importId: importData.id
           }),
         });
 
