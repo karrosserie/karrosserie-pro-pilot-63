@@ -10,8 +10,9 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, Clock, FileText } from 'lucide-react';
+import { Clock, FileText } from 'lucide-react';
 import { Import } from '@/services/supabase/imports';
+import { useEnvironment } from '@/hooks/use-environment';
 
 interface ImportTableProps {
   imports: Import[];
@@ -19,6 +20,18 @@ interface ImportTableProps {
 }
 
 const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
+  const { settings: environmentSettings } = useEnvironment();
+
+  const formatSecondsToTime = (seconds: number | null): string => {
+    if (!seconds) return '--:--:--';
+    
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'En cours d\'analyse':
@@ -26,13 +39,6 @@ const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
           <Badge variant="secondary" className="flex items-center gap-1">
             <Clock className="w-3 h-3" />
             En cours d'analyse
-          </Badge>
-        );
-      case 'En erreur':
-        return (
-          <Badge variant="destructive" className="flex items-center gap-1">
-            <AlertCircle className="w-3 h-3" />
-            En erreur
           </Badge>
         );
       default:
@@ -82,7 +88,7 @@ const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
             <TableHead>Document</TableHead>
             <TableHead>Statut</TableHead>
             <TableHead>Date d'import</TableHead>
-            <TableHead></TableHead>
+            <TableHead>Temps estimé</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -103,13 +109,12 @@ const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
                 {format(new Date(importItem.created_at), 'dd/MM/yyyy HH:mm', { locale: fr })}
               </TableCell>
               <TableCell>
-                {importItem.error ? (
-                  <div className="text-sm text-red-600 max-w-[200px] truncate" title={importItem.error}>
-                    {importItem.error}
-                  </div>
-                ) : (
-                  <span className="text-sm text-muted-foreground">-</span>
-                )}
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">
+                    {formatSecondsToTime(environmentSettings?.average_timing || 0)}
+                  </span>
+                </div>
               </TableCell>
             </TableRow>
           ))}

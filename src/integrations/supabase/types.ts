@@ -906,7 +906,6 @@ export type Database = {
         Row: {
           created_at: string
           document: string | null
-          error: string | null
           id: string
           report_id: string | null
           status: string
@@ -916,7 +915,6 @@ export type Database = {
         Insert: {
           created_at?: string
           document?: string | null
-          error?: string | null
           id?: string
           report_id?: string | null
           status?: string
@@ -926,7 +924,6 @@ export type Database = {
         Update: {
           created_at?: string
           document?: string | null
-          error?: string | null
           id?: string
           report_id?: string | null
           status?: string

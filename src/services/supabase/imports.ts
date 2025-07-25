@@ -5,7 +5,6 @@ export type Import = {
   report_id: string;
   user_id: string;
   status: string;
-  error: string | null;
   document: string | null;
   created_at: string;
   updated_at: string;
