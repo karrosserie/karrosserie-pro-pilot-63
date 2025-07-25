@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { 
@@ -21,15 +21,35 @@ interface ImportTableProps {
 
 const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
   const { settings: environmentSettings } = useEnvironment();
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Mettre à jour le temps actuel chaque seconde pour le décompteur
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   const formatSecondsToTime = (seconds: number | null): string => {
-    if (!seconds) return '--:--:--';
+    if (!seconds || seconds < 0) return '00:00:00';
     
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = Math.floor(seconds % 60);
     
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const calculateRemainingTime = (createdAt: string): number => {
+    const averageTimingSeconds = environmentSettings?.average_timing || 0;
+    const createdTime = new Date(createdAt).getTime();
+    const elapsedSeconds = Math.floor((currentTime.getTime() - createdTime) / 1000);
+    const remainingSeconds = averageTimingSeconds - elapsedSeconds;
+    
+    // Retourner 0 si le temps est écoulé (jamais négatif)
+    return Math.max(0, remainingSeconds);
   };
 
   const getStatusBadge = (status: string) => {
@@ -87,7 +107,7 @@ const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
             <TableHead>Document</TableHead>
             <TableHead>Statut</TableHead>
             <TableHead>Date d'import</TableHead>
-            <TableHead>Temps estimé</TableHead>
+            <TableHead>Temps restant estimé</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -111,7 +131,7 @@ const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-muted-foreground" />
                   <span className="text-sm font-medium">
-                    {formatSecondsToTime(environmentSettings?.average_timing || 0)}
+                    {formatSecondsToTime(calculateRemainingTime(importItem.created_at))}
                   </span>
                 </div>
               </TableCell>
