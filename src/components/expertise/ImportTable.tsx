@@ -88,13 +88,8 @@ const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
               <TableCell>
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4 text-muted-foreground" />
-                  <div>
-                    <div className="font-medium truncate max-w-[200px]" title={importItem.document || 'Fichier inconnu'}>
-                      {importItem.document || 'Fichier inconnu'}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      ID: {importItem.report_id.slice(0, 8)}...
-                    </div>
+                  <div className="font-medium truncate max-w-[200px]" title={importItem.document || 'Fichier inconnu'}>
+                    {importItem.document || 'Fichier inconnu'}
                   </div>
                 </div>
               </TableCell>
