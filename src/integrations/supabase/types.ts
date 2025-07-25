@@ -19,6 +19,7 @@ export type Database = {
           balance: number | null
           bank: string
           bic: string
+          company_id: string | null
           created_at: string
           iban: string
           id: string
@@ -33,6 +34,7 @@ export type Database = {
           balance?: number | null
           bank: string
           bic: string
+          company_id?: string | null
           created_at?: string
           iban: string
           id?: string
@@ -47,6 +49,7 @@ export type Database = {
           balance?: number | null
           bank?: string
           bic?: string
+          company_id?: string | null
           created_at?: string
           iban?: string
           id?: string
@@ -63,6 +66,7 @@ export type Database = {
         Row: {
           access_token: string
           bridge_id: string
+          company_id: string | null
           created_at: string
           id: string
           updated_at: string
@@ -71,6 +75,7 @@ export type Database = {
         Insert: {
           access_token: string
           bridge_id: string
+          company_id?: string | null
           created_at?: string
           id?: string
           updated_at?: string
@@ -79,6 +84,7 @@ export type Database = {
         Update: {
           access_token?: string
           bridge_id?: string
+          company_id?: string | null
           created_at?: string
           id?: string
           updated_at?: string
@@ -142,6 +148,7 @@ export type Database = {
       cessions: {
         Row: {
           bank_account_id: string | null
+          company_id: string | null
           created_at: string
           document_url: string | null
           expert_name: string | null
@@ -160,6 +167,7 @@ export type Database = {
         }
         Insert: {
           bank_account_id?: string | null
+          company_id?: string | null
           created_at?: string
           document_url?: string | null
           expert_name?: string | null
@@ -178,6 +186,7 @@ export type Database = {
         }
         Update: {
           bank_account_id?: string | null
+          company_id?: string | null
           created_at?: string
           document_url?: string | null
           expert_name?: string | null
@@ -215,6 +224,7 @@ export type Database = {
         Row: {
           address: string | null
           city: string | null
+          company_id: string | null
           created_at: string
           driver_license_back_url: string | null
           driver_license_front_url: string | null
@@ -231,6 +241,7 @@ export type Database = {
         Insert: {
           address?: string | null
           city?: string | null
+          company_id?: string | null
           created_at?: string
           driver_license_back_url?: string | null
           driver_license_front_url?: string | null
@@ -247,6 +258,7 @@ export type Database = {
         Update: {
           address?: string | null
           city?: string | null
+          company_id?: string | null
           created_at?: string
           driver_license_back_url?: string | null
           driver_license_front_url?: string | null
@@ -361,6 +373,7 @@ export type Database = {
       credits: {
         Row: {
           amount: number
+          company_id: string | null
           created_at: string
           id: string
           invoice_id: string | null
@@ -373,6 +386,7 @@ export type Database = {
         }
         Insert: {
           amount?: number
+          company_id?: string | null
           created_at?: string
           id?: string
           invoice_id?: string | null
@@ -385,6 +399,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          company_id?: string | null
           created_at?: string
           id?: string
           invoice_id?: string | null
@@ -436,6 +451,7 @@ export type Database = {
         Row: {
           assign_to_vehicle: boolean
           category: string
+          company_id: string | null
           created_at: string
           date: string
           id: string
@@ -452,6 +468,7 @@ export type Database = {
         Insert: {
           assign_to_vehicle?: boolean
           category: string
+          company_id?: string | null
           created_at?: string
           date: string
           id?: string
@@ -468,6 +485,7 @@ export type Database = {
         Update: {
           assign_to_vehicle?: boolean
           category?: string
+          company_id?: string | null
           created_at?: string
           date?: string
           id?: string
@@ -496,6 +514,7 @@ export type Database = {
           amount: number | null
           claim_number: string | null
           client_id: string | null
+          company_id: string | null
           created_at: string
           document_url: string | null
           expert_name: string | null
@@ -515,6 +534,7 @@ export type Database = {
           amount?: number | null
           claim_number?: string | null
           client_id?: string | null
+          company_id?: string | null
           created_at?: string
           document_url?: string | null
           expert_name?: string | null
@@ -534,6 +554,7 @@ export type Database = {
           amount?: number | null
           claim_number?: string | null
           client_id?: string | null
+          company_id?: string | null
           created_at?: string
           document_url?: string | null
           expert_name?: string | null
@@ -573,6 +594,7 @@ export type Database = {
           client_id: string
           client_insurance: boolean | null
           client_signature: string | null
+          company_id: string | null
           created_at: string
           damages: Json | null
           date_of_birth: string | null
@@ -610,6 +632,7 @@ export type Database = {
           client_id: string
           client_insurance?: boolean | null
           client_signature?: string | null
+          company_id?: string | null
           created_at?: string
           damages?: Json | null
           date_of_birth?: string | null
@@ -647,6 +670,7 @@ export type Database = {
           client_id?: string
           client_insurance?: boolean | null
           client_signature?: string | null
+          company_id?: string | null
           created_at?: string
           damages?: Json | null
           date_of_birth?: string | null
@@ -708,6 +732,7 @@ export type Database = {
           client_id: string
           client_name: string | null
           client_signature: string | null
+          company_id: string | null
           created_at: string
           damages: Json | null
           fleet_reservation_id: string
@@ -727,6 +752,7 @@ export type Database = {
           client_id: string
           client_name?: string | null
           client_signature?: string | null
+          company_id?: string | null
           created_at?: string
           damages?: Json | null
           fleet_reservation_id: string
@@ -746,6 +772,7 @@ export type Database = {
           client_id?: string
           client_name?: string | null
           client_signature?: string | null
+          company_id?: string | null
           created_at?: string
           damages?: Json | null
           fleet_reservation_id?: string
@@ -795,6 +822,7 @@ export type Database = {
         Row: {
           brand_id: string
           color: string | null
+          company_id: string | null
           created_at: string
           engine_number: string | null
           id: string
@@ -813,6 +841,7 @@ export type Database = {
         Insert: {
           brand_id: string
           color?: string | null
+          company_id?: string | null
           created_at?: string
           engine_number?: string | null
           id?: string
@@ -831,6 +860,7 @@ export type Database = {
         Update: {
           brand_id?: string
           color?: string | null
+          company_id?: string | null
           created_at?: string
           engine_number?: string | null
           id?: string
@@ -865,6 +895,7 @@ export type Database = {
       }
       generated_reports: {
         Row: {
+          company_id: string | null
           created_at: string
           file_url: string | null
           from_date: string
@@ -877,6 +908,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          company_id?: string | null
           created_at?: string
           file_url?: string | null
           from_date: string
@@ -889,6 +921,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          company_id?: string | null
           created_at?: string
           file_url?: string | null
           from_date?: string
@@ -904,6 +937,7 @@ export type Database = {
       }
       imports: {
         Row: {
+          company_id: string | null
           created_at: string
           document: string | null
           id: string
@@ -913,6 +947,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          company_id?: string | null
           created_at?: string
           document?: string | null
           id?: string
@@ -922,6 +957,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          company_id?: string | null
           created_at?: string
           document?: string | null
           id?: string
@@ -983,6 +1019,7 @@ export type Database = {
         Row: {
           carrosserie_reports: Json | null
           client_id: string
+          company_id: string | null
           created_at: string
           electrique_reports: Json | null
           id: string
@@ -995,6 +1032,7 @@ export type Database = {
         Insert: {
           carrosserie_reports?: Json | null
           client_id: string
+          company_id?: string | null
           created_at?: string
           electrique_reports?: Json | null
           id?: string
@@ -1007,6 +1045,7 @@ export type Database = {
         Update: {
           carrosserie_reports?: Json | null
           client_id?: string
+          company_id?: string | null
           created_at?: string
           electrique_reports?: Json | null
           id?: string
@@ -1023,6 +1062,7 @@ export type Database = {
           amount: number
           claim_number: string | null
           client_id: string | null
+          company_id: string | null
           created_at: string
           date: string | null
           discounts_data: Json | null
@@ -1050,6 +1090,7 @@ export type Database = {
           amount?: number
           claim_number?: string | null
           client_id?: string | null
+          company_id?: string | null
           created_at?: string
           date?: string | null
           discounts_data?: Json | null
@@ -1077,6 +1118,7 @@ export type Database = {
           amount?: number
           claim_number?: string | null
           client_id?: string | null
+          company_id?: string | null
           created_at?: string
           date?: string | null
           discounts_data?: Json | null
@@ -1168,6 +1210,7 @@ export type Database = {
           amount: number
           claim_number: string | null
           client_id: string | null
+          company_id: string | null
           created_at: string
           discounts_data: string | null
           document_url: string | null
@@ -1193,6 +1236,7 @@ export type Database = {
           amount: number
           claim_number?: string | null
           client_id?: string | null
+          company_id?: string | null
           created_at?: string
           discounts_data?: string | null
           document_url?: string | null
@@ -1218,6 +1262,7 @@ export type Database = {
           amount?: number
           claim_number?: string | null
           client_id?: string | null
+          company_id?: string | null
           created_at?: string
           discounts_data?: string | null
           document_url?: string | null
@@ -1267,6 +1312,7 @@ export type Database = {
         Row: {
           amount: number
           bank_account: string
+          company_id: string | null
           created_at: string
           date: string
           id: string
@@ -1282,6 +1328,7 @@ export type Database = {
         Insert: {
           amount: number
           bank_account: string
+          company_id?: string | null
           created_at?: string
           date: string
           id?: string
@@ -1297,6 +1344,7 @@ export type Database = {
         Update: {
           amount?: number
           bank_account?: string
+          company_id?: string | null
           created_at?: string
           date?: string
           id?: string
@@ -1325,6 +1373,7 @@ export type Database = {
           client_id: string | null
           client_name_signature: string | null
           client_signature: string | null
+          company_id: string | null
           created_at: string
           discounts_data: Json | null
           document_url: string | null
@@ -1351,6 +1400,7 @@ export type Database = {
           client_id?: string | null
           client_name_signature?: string | null
           client_signature?: string | null
+          company_id?: string | null
           created_at?: string
           discounts_data?: Json | null
           document_url?: string | null
@@ -1377,6 +1427,7 @@ export type Database = {
           client_id?: string | null
           client_name_signature?: string | null
           client_signature?: string | null
+          company_id?: string | null
           created_at?: string
           discounts_data?: Json | null
           document_url?: string | null
@@ -1526,6 +1577,7 @@ export type Database = {
           brand_id: string | null
           client_id: string | null
           color: string | null
+          company_id: string | null
           created_at: string
           end_date: string | null
           engine_number: string | null
@@ -1556,6 +1608,7 @@ export type Database = {
           brand_id?: string | null
           client_id?: string | null
           color?: string | null
+          company_id?: string | null
           created_at?: string
           end_date?: string | null
           engine_number?: string | null
@@ -1586,6 +1639,7 @@ export type Database = {
           brand_id?: string | null
           client_id?: string | null
           color?: string | null
+          company_id?: string | null
           created_at?: string
           end_date?: string | null
           engine_number?: string | null
