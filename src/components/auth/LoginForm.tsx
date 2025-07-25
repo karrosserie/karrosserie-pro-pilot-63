@@ -66,7 +66,10 @@ const LoginForm = ({ onToggleMode, onForgotPassword }: LoginFormProps) => {
   return (
     <>
       <div className="text-center mb-6">
-        <h1 className="text-3xl font-bold text-karrosserie-orange">Karrosserie Pro</h1>
+        <h1 className="text-3xl font-bold">
+          <span className="text-karrosserie-orange">Karrosserie</span>{" "}
+          <span className="text-gray-900">Pro</span>
+        </h1>
         <p className="text-gray-600 mt-2">Connectez-vous à votre compte</p>
       </div>
 
