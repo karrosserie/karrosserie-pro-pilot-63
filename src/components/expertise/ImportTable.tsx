@@ -71,6 +71,9 @@ const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
     <div className="card-container">
       <div className="mb-4">
         <h3 className="text-lg font-semibold">Rapports en cours d'analyse</h3>
+        <p className="text-sm text-muted-foreground mt-1">
+          Les rapports d'expertise en cours d'analyse par notre IA s'affichent ici et nous vous notifierons par un signal sonore dès qu'il sera disponible
+        </p>
       </div>
       
       <Table>
