@@ -902,7 +902,7 @@ export type Database = {
           document: string | null
           error: string | null
           id: string
-          report_id: string
+          report_id: string | null
           status: string
           updated_at: string
           user_id: string
@@ -912,7 +912,7 @@ export type Database = {
           document?: string | null
           error?: string | null
           id?: string
-          report_id: string
+          report_id?: string | null
           status?: string
           updated_at?: string
           user_id: string
@@ -922,7 +922,7 @@ export type Database = {
           document?: string | null
           error?: string | null
           id?: string
-          report_id?: string
+          report_id?: string | null
           status?: string
           updated_at?: string
           user_id?: string
