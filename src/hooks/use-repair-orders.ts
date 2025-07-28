@@ -3,10 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { repairOrdersService } from '@/services/supabase/repair-orders';
 import { NewRepairOrder, UpdateRepairOrder } from '@/services/supabase/repair-orders/types';
+import { useCompanyId } from '@/hooks/use-company-id';
 
 export function useRepairOrders() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { companyId } = useCompanyId();
 
   const {
     data: orders,
@@ -19,7 +21,10 @@ export function useRepairOrders() {
 
   const createOrder = useMutation({
     mutationFn: async (orderData: NewRepairOrder) => {
-      return await repairOrdersService.create(orderData, orderData.company_id!);
+      if (!companyId) {
+        throw new Error('Company ID not found. User must be authenticated and belong to a company.');
+      }
+      return await repairOrdersService.create(orderData, companyId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['repair-orders'] });
