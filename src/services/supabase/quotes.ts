@@ -282,7 +282,7 @@ export const quotesService = {
       reference,
       client_id: expertiseReport.client_id,
       vehicle_id: expertiseReport.vehicle_id,
-      amount: expertiseReport.total_amount || 0,
+      amount: expertiseReport.amount || 0,
       status: 'draft',
       notes: '',
       repairs_data: expertiseReport.repairs_data || null,

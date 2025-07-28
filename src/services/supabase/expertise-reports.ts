@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
+import { quotesService } from './quotes';
 
 export type ExpertiseReport = Database['public']['Tables']['expertise_reports']['Row'] & {
   report_number?: string | null;
@@ -132,6 +133,18 @@ export const expertiseReportsService = {
     if (error) {
       console.error('Error creating expertise report:', error);
       throw new Error(error.message);
+    }
+    
+    // Créer automatiquement un devis à partir du rapport d'expertise
+    if (data && data.client_id && data.vehicle_id) {
+      try {
+        console.log('Auto-creating quote from expertise report:', data.id);
+        await quotesService.createFromReport(data);
+        console.log('Quote auto-created successfully from report:', data.id);
+      } catch (quoteError) {
+        console.error('Error auto-creating quote from report:', quoteError);
+        // Ne pas faire échouer la création du rapport si la création du devis échoue
+      }
     }
     
     return data;
