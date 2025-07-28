@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { calculateGlobalTotals } from '@/components/quotes/form/utils/calculations';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,6 +34,7 @@ import { Printer, Mail, FileCheck, ArrowRight, Download } from 'lucide-react';
 
 const Quotes = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { confirm } = useConfirmation();
   const { quotes, isLoading, error, deleteQuote } = useQuotes();
   const [searchTerm, setSearchTerm] = useState('');
@@ -443,6 +444,9 @@ const Quotes = () => {
           if (!open) {
             setPrefilledRepairOrder(null);
           }
+        }}
+        onSuccess={() => {
+          navigate('/documents/ordres');
         }}
       />
 
