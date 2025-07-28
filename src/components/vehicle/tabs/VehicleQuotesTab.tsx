@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuotes } from '@/hooks/use-quotes';
 import { 
   Table, 
@@ -33,6 +34,7 @@ interface VehicleQuotesTabProps {
 }
 
 const VehicleQuotesTab: React.FC<VehicleQuotesTabProps> = ({ vehicleId }) => {
+  const navigate = useNavigate();
   const { quotes, isLoading, deleteQuote } = useQuotes();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
@@ -322,6 +324,9 @@ const VehicleQuotesTab: React.FC<VehicleQuotesTabProps> = ({ vehicleId }) => {
           if (!open) {
             setPrefilledRepairOrder(null);
           }
+        }}
+        onSuccess={() => {
+          navigate('/documents/ordres');
         }}
       />
     </>

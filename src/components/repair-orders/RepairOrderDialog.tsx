@@ -15,12 +15,14 @@ interface RepairOrderDialogProps {
   order?: RepairOrder | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
 const RepairOrderDialog = ({
   order,
   open,
-  onOpenChange
+  onOpenChange,
+  onSuccess
 }: RepairOrderDialogProps) => {
   const { updateOrder, createOrder } = useRepairOrders();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,6 +42,7 @@ const RepairOrderDialog = ({
         await createOrder.mutateAsync(formData as any);
       }
       onOpenChange(false);
+      onSuccess?.();
     } catch (error: any) {
       console.error('Dialog submission error:', error);
     } finally {

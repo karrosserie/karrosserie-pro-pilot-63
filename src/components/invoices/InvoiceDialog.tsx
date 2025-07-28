@@ -15,12 +15,14 @@ interface InvoiceDialogProps {
   invoice?: any;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
 const InvoiceDialog = ({
   invoice,
   open,
-  onOpenChange
+  onOpenChange,
+  onSuccess
 }: InvoiceDialogProps) => {
   const { toast } = useToast();
   const { updateInvoice, createInvoice } = useInvoices();
@@ -38,6 +40,7 @@ const InvoiceDialog = ({
         await createInvoice.mutateAsync(formData);
       }
       onOpenChange(false);
+      onSuccess?.();
     } catch (error: any) {
       console.error('Dialog submission error:', error);
     } finally {
