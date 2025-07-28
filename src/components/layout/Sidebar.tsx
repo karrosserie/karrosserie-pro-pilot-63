@@ -115,10 +115,10 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
 
   const navItems = [
     { icon: <Home className="app-icon" />, label: 'Tableau de bord', path: '/' },
-    { icon: <Bot className="app-icon" />, label: 'Assistant IA', path: '/ai-assistant', hidden: true },
+    { icon: <Bot className="app-icon" />, label: 'Assistant IA', path: '/ai-assistant' },
     { icon: <Users className="app-icon" />, label: 'Clients', path: '/clients' },
     { icon: <Car className="app-icon" />, label: 'Véhicules', path: '/vehicles' },
-    { icon: <Calendar className="app-icon" />, label: 'Planning', path: '/planning', hidden: true },
+    { icon: <Calendar className="app-icon" />, label: 'Planning', path: '/planning' },
     { 
       icon: <FileText className="app-icon" />, 
       label: 'Documents', 
@@ -191,7 +191,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
         
         <div className="p-4 overflow-y-auto h-[calc(100vh-4rem)] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
           <nav className="space-y-1">
-            {navItems.filter(item => !item.hidden).map((item, index) => (
+            {navItems.map((item, index) => (
               <NavItem
                 key={index}
                 icon={item.icon}
