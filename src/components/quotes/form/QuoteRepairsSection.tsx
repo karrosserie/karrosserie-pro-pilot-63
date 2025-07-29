@@ -36,11 +36,23 @@ export const QuoteRepairsSection = ({ repairs, onRepairsChange, isReadOnly = fal
     const updatedRepairs = repairs.map(repair => {
       if (repair.id === id) {
         const updated = { ...repair, [field]: value };
-        // Calculate total
-        const subtotal = updated.quantity * updated.unitCost;
-        const discountAmount = subtotal * (updated.discount / 100);
+        // Ensure numeric values are valid numbers
+        const quantity = isNaN(Number(updated.quantity)) ? 0 : Number(updated.quantity);
+        const unitCost = isNaN(Number(updated.unitCost)) ? 0 : Number(updated.unitCost);
+        const discount = isNaN(Number(updated.discount)) ? 0 : Number(updated.discount);
+        const vat = isNaN(Number(updated.vat)) ? 0 : Number(updated.vat);
+        
+        // Update the repair item with validated values
+        updated.quantity = quantity;
+        updated.unitCost = unitCost;
+        updated.discount = discount;
+        updated.vat = vat;
+        
+        // Calculate total with validated values
+        const subtotal = quantity * unitCost;
+        const discountAmount = subtotal * (discount / 100);
         const afterDiscount = subtotal - discountAmount;
-        const vatAmount = afterDiscount * (updated.vat / 100);
+        const vatAmount = afterDiscount * (vat / 100);
         updated.total = afterDiscount + vatAmount;
         return updated;
       }
