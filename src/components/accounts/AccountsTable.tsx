@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Table, 
@@ -10,7 +10,14 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { EmptyState } from '@/components/ui/empty-state';
-import { Pencil, Trash, CreditCard, Building, Wallet, RefreshCw } from 'lucide-react';
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Pencil, Trash, CreditCard, Building, Wallet, RefreshCw, Link } from 'lucide-react';
 
 interface Account {
   id: string;
@@ -34,6 +41,7 @@ interface AccountsTableProps {
 }
 
 export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTableProps) => {
+  const [showBankConnectDialog, setShowBankConnectDialog] = useState(false);
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Actif':
@@ -80,6 +88,50 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
   }
 
   return (
+    <>
+      <Dialog open={showBankConnectDialog} onOpenChange={setShowBankConnectDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold text-center">
+              🔒 Vérification bancaire 100 % sécurisée
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-3 text-sm text-gray-700">
+              <div className="flex items-start gap-3">
+                <span className="text-blue-600 font-semibold">1.</span>
+                <p>
+                  Karrosserie.pro <strong>ne peut ni voir vos codes ni déplacer un centime</strong>.
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-blue-600 font-semibold">2.</span>
+                <p>
+                  Bridge, agréé ACPR par la Banque de France, se contente de <strong>lire vos lignes bancaires</strong> pour rapprocher automatiquement vos paiements reçus dans Karrosserie.pro.
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-blue-600 font-semibold">3.</span>
+                <p>
+                  <strong>Aucun virement, aucun prélèvement</strong> : connexion strictement « consultation de paiement ».
+                </p>
+              </div>
+            </div>
+            <div className="pt-4 border-t">
+              <Button 
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={() => {
+                  // Ici vous pouvez ajouter la logique de connexion bancaire
+                  console.log('Connexion bancaire Bridge');
+                  setShowBankConnectDialog(false);
+                }}
+              >
+                Je relie mon compte en 30 secondes →
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     <div className="card-container">
       <Table>
         <TableHeader>
@@ -117,6 +169,15 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                   <Button 
                     variant="ghost" 
                     size="icon"
+                    onClick={() => setShowBankConnectDialog(true)}
+                    title="Connecter le compte bancaire"
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    <Link className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
                     onClick={() => onSync(account)}
                     title="Synchroniser"
                   >
@@ -146,5 +207,6 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
         </TableBody>
       </Table>
     </div>
+    </>
   );
 };
