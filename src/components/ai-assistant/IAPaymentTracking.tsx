@@ -627,15 +627,6 @@ const MessagePanel = ({
             </div>
             <div className="flex items-center gap-3">
               <Button
-                variant="outline"
-                onClick={() => onSendMessage(true)}
-                disabled={!generatedMessage || isGenerating}
-                className="bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200"
-              >
-                <Sparkles className="h-4 w-4 mr-1" />
-                Mode auto complet
-              </Button>
-              <Button
                 onClick={() => onSendMessage(false)}
                 disabled={!generatedMessage || isGenerating}
                 className="bg-blue-600 hover:bg-blue-700"
