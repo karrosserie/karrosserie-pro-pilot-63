@@ -257,6 +257,7 @@ const PreferencesTab = () => {
                 value={nextRepairOrderRef}
                 onChange={(e) => setNextRepairOrderRef(e.target.value)}
                 className="w-full"
+                readOnly
               />
               <p className="text-sm text-muted-foreground mt-1">
                 La valeur de la référence de votre prochain ordre de réparation, qui sera affiché sur votre document
@@ -273,6 +274,7 @@ const PreferencesTab = () => {
                 value={nextInvoiceRef}
                 onChange={(e) => setNextInvoiceRef(e.target.value)}
                 className="w-full"
+                readOnly
               />
               <p className="text-sm text-muted-foreground mt-1">
                 La valeur de la référence de votre prochaine facture, qui sera affiché sur votre document
@@ -289,6 +291,7 @@ const PreferencesTab = () => {
                 value={nextCreditRef}
                 onChange={(e) => setNextCreditRef(e.target.value)}
                 className="w-full"
+                readOnly
               />
               <p className="text-sm text-muted-foreground mt-1">
                 La valeur de la référence de votre prochain avoir, qui sera affiché sur votre document
