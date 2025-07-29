@@ -21,9 +21,14 @@ const PreferencesTab = () => {
   const [language, setLanguage] = useState('fr');
   const [timezone, setTimezone] = useState('Europe/Paris');
   const [currency, setCurrency] = useState('EUR');
-  const [showClientSignature, setShowClientSignature] = useState(true);
-  const [showRepairOrderDetails, setShowRepairOrderDetails] = useState(true);
-  const [showZeroPriceProducts, setShowZeroPriceProducts] = useState(false);
+  const [showRepairOrderOnDocuments, setShowRepairOrderOnDocuments] = useState(false);
+  const [showClientSignatureInvoices, setShowClientSignatureInvoices] = useState(true);
+  const [showClientSignatureRepairOrders, setShowClientSignatureRepairOrders] = useState(true);
+  const [showZeroPriceProducts, setShowZeroPriceProducts] = useState(true);
+  const [useDateBasedReference, setUseDateBasedReference] = useState(false);
+  const [showPaymentDetails, setShowPaymentDetails] = useState(true);
+  const [setActivitiesAsHomePage, setSetActivitiesAsHomePage] = useState(true);
+  const [showWarningText, setShowWarningText] = useState(true);
 
   useEffect(() => {
     if (preferences) {
@@ -31,9 +36,8 @@ const PreferencesTab = () => {
       setLanguage(preferences.language || 'fr');
       setTimezone(preferences.timezone || 'Europe/Paris');
       setCurrency(preferences.currency || 'EUR');
-      setShowClientSignature(preferences.show_client_signature ?? true);
-      setShowRepairOrderDetails(preferences.show_repair_order_details ?? true);
-      setShowZeroPriceProducts(preferences.show_zero_price_products ?? false);
+      setShowClientSignatureInvoices(preferences.show_client_signature ?? true);
+      setShowZeroPriceProducts(preferences.show_zero_price_products ?? true);
     }
   }, [preferences]);
 
@@ -47,8 +51,7 @@ const PreferencesTab = () => {
         timezone: timezone,
         currency: currency,
         invoice_template: selectedTemplate,
-        show_client_signature: showClientSignature,
-        show_repair_order_details: showRepairOrderDetails,
+        show_client_signature: showClientSignatureInvoices,
         show_zero_price_products: showZeroPriceProducts,
       };
 
@@ -135,43 +138,98 @@ const PreferencesTab = () => {
             
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="client-signature" className="text-sm font-medium">Signature client</Label>
-                <p className="text-sm text-muted-foreground">
-                  Afficher la signature du client sur les documents
-                </p>
+                <Label htmlFor="repair-order-on-documents" className="text-sm font-medium">Afficher l'ordre de réparation sur vos ordres de réparation et factures</Label>
               </div>
               <Switch
-                id="client-signature"
-                checked={showClientSignature}
-                onCheckedChange={setShowClientSignature}
+                id="repair-order-on-documents"
+                checked={showRepairOrderOnDocuments}
+                onCheckedChange={setShowRepairOrderOnDocuments}
               />
             </div>
 
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="repair-order-details" className="text-sm font-medium">Détails de l'ordre de réparation</Label>
-                <p className="text-sm text-muted-foreground">
-                  Afficher les détails complets de l'ordre de réparation
-                </p>
+                <Label htmlFor="client-signature-invoices" className="text-sm font-medium">Activer les signatures des clients sur les factures</Label>
               </div>
               <Switch
-                id="repair-order-details"
-                checked={showRepairOrderDetails}
-                onCheckedChange={setShowRepairOrderDetails}
+                id="client-signature-invoices"
+                checked={showClientSignatureInvoices}
+                onCheckedChange={setShowClientSignatureInvoices}
               />
             </div>
 
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="zero-price-products" className="text-sm font-medium">Produits à prix zéro</Label>
+                <Label htmlFor="client-signature-repair-orders" className="text-sm font-medium">Activer les signatures des clients sur les ordres de réparation</Label>
+              </div>
+              <Switch
+                id="client-signature-repair-orders"
+                checked={showClientSignatureRepairOrders}
+                onCheckedChange={setShowClientSignatureRepairOrders}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="zero-price-products" className="text-sm font-medium">Afficher les produits avec un prix unitaire zéro</Label>
                 <p className="text-sm text-muted-foreground">
-                  Afficher les produits avec un prix de 0€
+                  (Activez cette option pour inclure des produits avec un prix unitaire de zéro sur les ordres de réparation et les factures.)
                 </p>
               </div>
               <Switch
                 id="zero-price-products"
                 checked={showZeroPriceProducts}
                 onCheckedChange={setShowZeroPriceProducts}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="date-based-reference" className="text-sm font-medium">Activer le format de référence basé sur la date pour les ordres de réparation et les factures</Label>
+                <p className="text-sm text-muted-foreground">
+                  (Si cette option est activée, la référence inclura la date au format YYYY/MM/0000)
+                </p>
+              </div>
+              <Switch
+                id="date-based-reference"
+                checked={useDateBasedReference}
+                onCheckedChange={setUseDateBasedReference}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="payment-details" className="text-sm font-medium">Souhaitez-vous afficher les détails des paiements effectués (liste des paiements) sur la facture ou l'avoir ?</Label>
+              </div>
+              <Switch
+                id="payment-details"
+                checked={showPaymentDetails}
+                onCheckedChange={setShowPaymentDetails}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="activities-homepage" className="text-sm font-medium">Définir la page d'aperçu des activités comme page d'accueil</Label>
+              </div>
+              <Switch
+                id="activities-homepage"
+                checked={setActivitiesAsHomePage}
+                onCheckedChange={setSetActivitiesAsHomePage}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="warning-text" className="text-sm font-medium">Afficher le texte 'Avertissement' sur l'ordre de réparation ou la facture</Label>
+                <p className="text-sm text-muted-foreground">
+                  (Activez cette option pour inclure un avertissement expliquant les limites du ordre de réparation. Si vous souhaitez adopter un ton plus souple, désactivez cette option)
+                </p>
+              </div>
+              <Switch
+                id="warning-text"
+                checked={showWarningText}
+                onCheckedChange={setShowWarningText}
               />
             </div>
           </div>
