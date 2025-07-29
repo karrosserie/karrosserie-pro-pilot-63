@@ -3,15 +3,15 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { MessageCircle, Mail, FileText, Filter, Download, X, Sparkles, Send, Edit } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { MessageCircle, Mail, FileText, Filter, Download, X, Sparkles, Send, Edit, ChevronDown } from 'lucide-react';
 
 const IAPaymentTracking = () => {
-  const [selectedTab, setSelectedTab] = useState('relance1');
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const [selectedActionType, setSelectedActionType] = useState<string>('');
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -19,6 +19,8 @@ const IAPaymentTracking = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isEditMode, setIsEditMode] = useState(true);
   const [messageData, setMessageData] = useState<any>({});
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const unpaidInvoices = [
     {
@@ -216,6 +218,18 @@ const IAPaymentTracking = () => {
     }
   };
 
+  // Filtrer les factures selon le filtre sélectionné
+  const filteredInvoices = filterStatus === 'all' ? unpaidInvoices : unpaidInvoices.filter(invoice => invoice.status === filterStatus);
+
+  const filterOptions = [
+    { value: 'all', label: 'Toutes', count: unpaidInvoices.length },
+    { value: 'relance1', label: 'Relance 1', count: unpaidInvoices.filter(i => i.status === 'relance1').length },
+    { value: 'relance2', label: 'Relance 2', count: unpaidInvoices.filter(i => i.status === 'relance2').length },
+    { value: 'relance3', label: 'Relance 3', count: unpaidInvoices.filter(i => i.status === 'relance3').length },
+    { value: 'relance4', label: 'Relance 4', count: unpaidInvoices.filter(i => i.status === 'relance4').length },
+    { value: 'contentieux', label: 'Contentieux', count: unpaidInvoices.filter(i => i.status === 'contentieux').length }
+  ];
+
   return (
     <Card className="bg-white">
       <CardHeader className="p-3 sm:p-4 lg:p-6">
@@ -229,10 +243,32 @@ const IAPaymentTracking = () => {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-              <Filter className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              Filtrer
-            </Button>
+            <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                  <Filter className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  Filtrer
+                  <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 ml-1" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64" align="end">
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">Filtrer par statut</h4>
+                  {filterOptions.map((option) => (
+                    <div
+                      key={option.value}
+                      className={`flex items-center justify-between p-2 rounded cursor-pointer hover:bg-gray-50 ${
+                        filterStatus === option.value ? 'bg-blue-50 border border-blue-200' : ''
+                      }`}
+                      onClick={() => setFilterStatus(option.value)}
+                    >
+                      <span className="text-sm">{option.label}</span>
+                      <Badge className="bg-orange-500 text-white text-xs">{option.count}</Badge>
+                    </div>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
             <Button variant="outline" size="sm" className="text-xs sm:text-sm">
               <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
               Exporter
@@ -242,112 +278,18 @@ const IAPaymentTracking = () => {
       </CardHeader>
 
       <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
-        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6 mb-4 sm:mb-6">
-            <TabsTrigger value="relance1" className="text-xs sm:text-sm flex items-center gap-2">
-              Relance 1 
-              <Badge className="bg-orange-500 text-white text-xs">{unpaidInvoices.filter(i => i.status === 'relance1').length}</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="relance2" className="text-xs sm:text-sm flex items-center gap-2">
-              Relance 2 
-              <Badge className="bg-orange-500 text-white text-xs">{unpaidInvoices.filter(i => i.status === 'relance2').length}</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="relance3" className="text-xs sm:text-sm flex items-center gap-2">
-              Relance 3 
-              <Badge className="bg-orange-500 text-white text-xs">{unpaidInvoices.filter(i => i.status === 'relance3').length}</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="relance4" className="text-xs sm:text-sm flex items-center gap-2">
-              Relance 4 
-              <Badge className="bg-orange-500 text-white text-xs">{unpaidInvoices.filter(i => i.status === 'relance4').length}</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="contentieux" className="text-xs sm:text-sm flex items-center gap-2">
-              Contentieux 
-              <Badge className="bg-orange-500 text-white text-xs">{unpaidInvoices.filter(i => i.status === 'contentieux').length}</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="all" className="text-xs sm:text-sm flex items-center gap-2">
-              Tous 
-              <Badge className="bg-orange-500 text-white text-xs">{unpaidInvoices.length}</Badge>
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="relance1" className="space-y-3 sm:space-y-4">
-            {unpaidInvoices.filter(invoice => invoice.status === 'relance1').map((invoice, index) => (
-              <InvoiceCard 
-                key={index} 
-                invoice={invoice} 
-                getActionIcon={getActionIcon} 
-                getActionLabel={getActionLabel} 
-                getActionStyle={getActionStyle}
-                onActionClick={handleActionClick}
-              />
-            ))}
-          </TabsContent>
-
-          <TabsContent value="relance2" className="space-y-3 sm:space-y-4">
-            {unpaidInvoices.filter(invoice => invoice.status === 'relance2').map((invoice, index) => (
-              <InvoiceCard 
-                key={index} 
-                invoice={invoice} 
-                getActionIcon={getActionIcon} 
-                getActionLabel={getActionLabel} 
-                getActionStyle={getActionStyle}
-                onActionClick={handleActionClick}
-              />
-            ))}
-          </TabsContent>
-
-          <TabsContent value="relance3" className="space-y-3 sm:space-y-4">
-            {unpaidInvoices.filter(invoice => invoice.status === 'relance3').map((invoice, index) => (
-              <InvoiceCard 
-                key={index} 
-                invoice={invoice} 
-                getActionIcon={getActionIcon} 
-                getActionLabel={getActionLabel} 
-                getActionStyle={getActionStyle}
-                onActionClick={handleActionClick}
-              />
-            ))}
-          </TabsContent>
-
-          <TabsContent value="relance4" className="space-y-3 sm:space-y-4">
-            {unpaidInvoices.filter(invoice => invoice.status === 'relance4').map((invoice, index) => (
-              <InvoiceCard 
-                key={index} 
-                invoice={invoice} 
-                getActionIcon={getActionIcon} 
-                getActionLabel={getActionLabel} 
-                getActionStyle={getActionStyle}
-                onActionClick={handleActionClick}
-              />
-            ))}
-          </TabsContent>
-
-          <TabsContent value="contentieux" className="space-y-3 sm:space-y-4">
-            {unpaidInvoices.filter(invoice => invoice.status === 'contentieux').map((invoice, index) => (
-              <InvoiceCard 
-                key={index} 
-                invoice={invoice} 
-                getActionIcon={getActionIcon} 
-                getActionLabel={getActionLabel} 
-                getActionStyle={getActionStyle}
-                onActionClick={handleActionClick}
-              />
-            ))}
-          </TabsContent>
-
-          <TabsContent value="all" className="space-y-3 sm:space-y-4">
-            {unpaidInvoices.map((invoice, index) => (
-              <InvoiceCard 
-                key={index} 
-                invoice={invoice} 
-                getActionIcon={getActionIcon} 
-                getActionLabel={getActionLabel} 
-                getActionStyle={getActionStyle}
-                onActionClick={handleActionClick}
-              />
-            ))}
-          </TabsContent>
-        </Tabs>
+        <div className="space-y-3 sm:space-y-4">
+          {filteredInvoices.map((invoice, index) => (
+            <InvoiceCard 
+              key={index} 
+              invoice={invoice} 
+              getActionIcon={getActionIcon} 
+              getActionLabel={getActionLabel} 
+              getActionStyle={getActionStyle}
+              onActionClick={handleActionClick}
+            />
+          ))}
+        </div>
       </CardContent>
 
       {/* Sliding Panel */}
