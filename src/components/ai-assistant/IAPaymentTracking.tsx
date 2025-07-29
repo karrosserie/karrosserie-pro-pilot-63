@@ -145,23 +145,29 @@ const IAPaymentTracking = () => {
       <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
           <TabsList className="grid w-full grid-cols-6 mb-4 sm:mb-6">
-            <TabsTrigger value="relance1" className="text-xs sm:text-sm">
-              Relance 1 ({unpaidInvoices.filter(i => i.status === 'relance1').length})
+            <TabsTrigger value="relance1" className="text-xs sm:text-sm flex items-center gap-2">
+              Relance 1 
+              <Badge className="bg-orange-500 text-white text-xs">{unpaidInvoices.filter(i => i.status === 'relance1').length}</Badge>
             </TabsTrigger>
-            <TabsTrigger value="relance2" className="text-xs sm:text-sm">
-              Relance 2 ({unpaidInvoices.filter(i => i.status === 'relance2').length})
+            <TabsTrigger value="relance2" className="text-xs sm:text-sm flex items-center gap-2">
+              Relance 2 
+              <Badge className="bg-orange-500 text-white text-xs">{unpaidInvoices.filter(i => i.status === 'relance2').length}</Badge>
             </TabsTrigger>
-            <TabsTrigger value="relance3" className="text-xs sm:text-sm">
-              Relance 3 ({unpaidInvoices.filter(i => i.status === 'relance3').length})
+            <TabsTrigger value="relance3" className="text-xs sm:text-sm flex items-center gap-2">
+              Relance 3 
+              <Badge className="bg-orange-500 text-white text-xs">{unpaidInvoices.filter(i => i.status === 'relance3').length}</Badge>
             </TabsTrigger>
-            <TabsTrigger value="relance4" className="text-xs sm:text-sm">
-              Relance 4 ({unpaidInvoices.filter(i => i.status === 'relance4').length})
+            <TabsTrigger value="relance4" className="text-xs sm:text-sm flex items-center gap-2">
+              Relance 4 
+              <Badge className="bg-orange-500 text-white text-xs">{unpaidInvoices.filter(i => i.status === 'relance4').length}</Badge>
             </TabsTrigger>
-            <TabsTrigger value="contentieux" className="text-xs sm:text-sm">
-              Contentieux ({unpaidInvoices.filter(i => i.status === 'contentieux').length})
+            <TabsTrigger value="contentieux" className="text-xs sm:text-sm flex items-center gap-2">
+              Contentieux 
+              <Badge className="bg-orange-500 text-white text-xs">{unpaidInvoices.filter(i => i.status === 'contentieux').length}</Badge>
             </TabsTrigger>
-            <TabsTrigger value="all" className="text-xs sm:text-sm">
-              Tous ({unpaidInvoices.length})
+            <TabsTrigger value="all" className="text-xs sm:text-sm flex items-center gap-2">
+              Tous 
+              <Badge className="bg-orange-500 text-white text-xs">{unpaidInvoices.length}</Badge>
             </TabsTrigger>
           </TabsList>
 
