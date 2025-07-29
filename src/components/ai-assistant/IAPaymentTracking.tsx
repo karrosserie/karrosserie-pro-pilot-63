@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { MessageCircle, Mail, FileText, Filter, Download, X, Sparkles, Send, Edit, ChevronDown } from 'lucide-react';
 
+// Composant de suivi des impayés avec filtrage
+
 const IAPaymentTracking = () => {
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const [selectedActionType, setSelectedActionType] = useState<string>('');
