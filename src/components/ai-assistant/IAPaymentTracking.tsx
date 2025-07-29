@@ -568,7 +568,7 @@ const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, o
     <div className="flex flex-col lg:flex-row gap-4">
       {/* En-tête avec numéro de facture et statut */}
       <div className="flex-1">
-        <div className="flex items-start justify-between mb-3">
+        <div className="flex items-start justify-between mb-2">
           <div className="flex items-center gap-3 flex-1">
             <h3 className="text-lg font-semibold text-gray-900">{invoice.id}</h3>
             <Badge className={`${invoice.relanceTypeColor} text-xs font-medium`}>
@@ -576,9 +576,9 @@ const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, o
             </Badge>
           </div>
           <div className="text-right">
-            <p className="text-xl font-bold text-orange-600 mb-2">{invoice.amount}</p>
+            <p className="text-xl font-bold text-orange-600 mb-1">{invoice.amount}</p>
             <Button
-              className="bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90 h-8 text-xs px-3 mb-2"
+              className="bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90 h-8 text-xs px-3 mb-1"
               size="sm"
               onClick={() => onHistoryClick(invoice)}
             >
@@ -592,7 +592,7 @@ const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, o
         </div>
 
         {/* Informations client et véhicule */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-2">
           <div>
             <p className="text-sm text-gray-600">Client</p>
             <p className="font-medium text-gray-900">{invoice.client}</p>
