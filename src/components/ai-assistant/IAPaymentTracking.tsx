@@ -575,16 +575,19 @@ const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, o
               {invoice.relanceType}
             </Badge>
           </div>
-          <div className="flex items-center gap-3">
-            <p className="text-xl font-bold text-orange-600">{invoice.amount.replace('.', ',').replace(/(\d+),(\d)$/, '$1,$20')}</p>
+          <div className="text-right">
+            <p className="text-xl font-bold text-orange-600 mb-2">{invoice.amount}</p>
             <Button
-              className="bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90 h-8 text-xs px-3"
+              className="bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90 h-8 text-xs px-3 mb-2"
               size="sm"
               onClick={() => onHistoryClick(invoice)}
             >
               <History className="h-3 w-3 mr-1" />
               Historique
             </Button>
+            <p className="text-xs text-gray-500">
+              Dernière relance: {invoice.lastRelanceDate}
+            </p>
           </div>
         </div>
 
@@ -635,12 +638,6 @@ const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, o
         </div>
 
 
-        {/* Dernière relance */}
-        <div className="mt-3 pt-3 border-t border-gray-100">
-          <p className="text-xs text-gray-500">
-            Dernière relance: {invoice.lastRelanceDate}
-          </p>
-        </div>
       </div>
     </div>
   </div>
