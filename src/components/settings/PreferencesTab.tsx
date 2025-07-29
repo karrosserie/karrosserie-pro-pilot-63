@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
 import { useCompany } from '@/hooks/use-company';
 import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 import { useToast } from '@/hooks/use-toast';
@@ -29,6 +30,9 @@ const PreferencesTab = () => {
   const [showPaymentDetails, setShowPaymentDetails] = useState(true);
   const [setActivitiesAsHomePage, setSetActivitiesAsHomePage] = useState(true);
   const [showWarningText, setShowWarningText] = useState(true);
+  const [nextRepairOrderRef, setNextRepairOrderRef] = useState('47');
+  const [nextInvoiceRef, setNextInvoiceRef] = useState('8');
+  const [nextCreditRef, setNextCreditRef] = useState('2');
 
   useEffect(() => {
     if (preferences) {
@@ -231,6 +235,64 @@ const PreferencesTab = () => {
                 checked={showWarningText}
                 onCheckedChange={setShowWarningText}
               />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Numérotation */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Numérotation</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <Label htmlFor="next-repair-order-ref" className="text-sm font-medium mb-2 block">
+                Référence pour le prochain ordre de réparation
+              </Label>
+              <Input
+                id="next-repair-order-ref"
+                type="number"
+                value={nextRepairOrderRef}
+                onChange={(e) => setNextRepairOrderRef(e.target.value)}
+                className="w-full"
+              />
+              <p className="text-sm text-muted-foreground mt-1">
+                La valeur de la référence de votre prochain ordre de réparation, qui sera affiché sur votre document
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="next-invoice-ref" className="text-sm font-medium mb-2 block">
+                Référence pour la prochaine facture
+              </Label>
+              <Input
+                id="next-invoice-ref"
+                type="number"
+                value={nextInvoiceRef}
+                onChange={(e) => setNextInvoiceRef(e.target.value)}
+                className="w-full"
+              />
+              <p className="text-sm text-muted-foreground mt-1">
+                La valeur de la référence de votre prochaine facture, qui sera affiché sur votre document
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="next-credit-ref" className="text-sm font-medium mb-2 block">
+                Référence pour le prochain avoir
+              </Label>
+              <Input
+                id="next-credit-ref"
+                type="number"
+                value={nextCreditRef}
+                onChange={(e) => setNextCreditRef(e.target.value)}
+                className="w-full"
+              />
+              <p className="text-sm text-muted-foreground mt-1">
+                La valeur de la référence de votre prochain avoir, qui sera affiché sur votre document
+              </p>
             </div>
           </div>
         </CardContent>
