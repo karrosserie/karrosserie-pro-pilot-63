@@ -4,10 +4,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Eye, Phone, Mail, MessageCircle, MoreHorizontal, Filter, Download, FileText } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { MessageCircle, Mail, FileText, Filter, Download, X, Sparkles, Send, Edit } from 'lucide-react';
 
 const IAPaymentTracking = () => {
   const [selectedTab, setSelectedTab] = useState('relance1');
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [selectedActionType, setSelectedActionType] = useState<string>('');
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [generatedMessage, setGeneratedMessage] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(true);
+  const [messageData, setMessageData] = useState<any>({});
 
   const unpaidInvoices = [
     {
@@ -86,6 +97,94 @@ const IAPaymentTracking = () => {
       availableActions: ['email', 'courrier', 'recommande']
     }
   ];
+
+  const handleActionClick = async (invoice: any, actionType: string) => {
+    setSelectedInvoice(invoice);
+    setSelectedActionType(actionType);
+    setIsPanelOpen(true);
+    setIsEditMode(true);
+    
+    // Initialize message data based on action type
+    const initialData = getInitialMessageData(invoice, actionType);
+    setMessageData(initialData);
+    
+    // Auto-generate message
+    await generateMessage(invoice, actionType);
+  };
+
+  const getInitialMessageData = (invoice: any, actionType: string) => {
+    const baseData = {
+      clientName: invoice.client,
+      invoiceId: invoice.id,
+      amount: invoice.amount,
+      dueDate: invoice.dueDate,
+    };
+
+    switch (actionType) {
+      case 'email':
+        return {
+          ...baseData,
+          subject: `Relance de paiement - Facture ${invoice.id}`,
+          recipient: 'client@example.com'
+        };
+      case 'sms':
+        return {
+          ...baseData,
+          phoneNumber: '+33 6 12 34 56 78'
+        };
+      case 'courrier':
+      case 'recommande':
+        return {
+          ...baseData,
+          address: '123 Rue du Client\n75001 Paris\nFrance'
+        };
+      default:
+        return baseData;
+    }
+  };
+
+  const generateMessage = async (invoice: any, actionType: string) => {
+    setIsGenerating(true);
+    
+    // Simulate AI generation - in real app, call your AI service
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const messages = {
+      sms: `Bonjour ${invoice.client}, votre facture ${invoice.id} de ${invoice.amount} est en retard depuis le ${invoice.dueDate}. Merci de régulariser votre situation rapidement. Cordialement, Karrosserie Pro`,
+      email: `Objet: Relance de paiement - Facture ${invoice.id}\n\nMonsieur/Madame,\n\nNous vous informons que votre facture ${invoice.id} d'un montant de ${invoice.amount}, échue le ${invoice.dueDate}, n'a pas encore été réglée.\n\nNous vous prions de bien vouloir procéder au règlement dans les plus brefs délais.\n\nCordialement,\nL'équipe Karrosserie Pro`,
+      courrier: `Monsieur/Madame,\n\nNous vous adressons la présente lettre afin de vous rappeler que votre facture ${invoice.id} d'un montant de ${invoice.amount}, échue le ${invoice.dueDate}, demeure impayée à ce jour.\n\nNous vous prions de bien vouloir régulariser cette situation dans un délai de 15 jours.\n\nCordialement,\nKarrosserie Pro`,
+      recommande: `MISE EN DEMEURE\n\nMonsieur/Madame,\n\nMalgré nos précédentes relances, votre facture ${invoice.id} d'un montant de ${invoice.amount}, échue le ${invoice.dueDate}, demeure impayée.\n\nNous vous mettons en demeure de procéder au règlement sous 8 jours, faute de quoi nous serons contraints d'engager des poursuites.\n\nCordialement,\nKarrosserie Pro`
+    };
+    
+    setGeneratedMessage(messages[actionType as keyof typeof messages] || '');
+    setIsGenerating(false);
+  };
+
+  const handleSendMessage = async (autoMode = false) => {
+    if (autoMode) {
+      // In auto mode, send directly without user review
+      console.log('Sending message in auto mode:', generatedMessage);
+    } else {
+      // In semi-auto mode, use the edited message
+      console.log('Sending edited message:', generatedMessage);
+    }
+    
+    // Simulate sending
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Close panel and show success
+    setIsPanelOpen(false);
+    // You could add a toast notification here
+  };
+
+  const closePanelAndReset = () => {
+    setIsPanelOpen(false);
+    setSelectedInvoice(null);
+    setSelectedActionType('');
+    setGeneratedMessage('');
+    setMessageData({});
+    setIsEditMode(true);
+  };
 
   const getActionIcon = (action: string) => {
     switch (action) {
@@ -173,46 +272,105 @@ const IAPaymentTracking = () => {
 
           <TabsContent value="relance1" className="space-y-3 sm:space-y-4">
             {unpaidInvoices.filter(invoice => invoice.status === 'relance1').map((invoice, index) => (
-              <InvoiceCard key={index} invoice={invoice} getActionIcon={getActionIcon} getActionLabel={getActionLabel} getActionStyle={getActionStyle} />
+              <InvoiceCard 
+                key={index} 
+                invoice={invoice} 
+                getActionIcon={getActionIcon} 
+                getActionLabel={getActionLabel} 
+                getActionStyle={getActionStyle}
+                onActionClick={handleActionClick}
+              />
             ))}
           </TabsContent>
 
           <TabsContent value="relance2" className="space-y-3 sm:space-y-4">
             {unpaidInvoices.filter(invoice => invoice.status === 'relance2').map((invoice, index) => (
-              <InvoiceCard key={index} invoice={invoice} getActionIcon={getActionIcon} getActionLabel={getActionLabel} getActionStyle={getActionStyle} />
+              <InvoiceCard 
+                key={index} 
+                invoice={invoice} 
+                getActionIcon={getActionIcon} 
+                getActionLabel={getActionLabel} 
+                getActionStyle={getActionStyle}
+                onActionClick={handleActionClick}
+              />
             ))}
           </TabsContent>
 
           <TabsContent value="relance3" className="space-y-3 sm:space-y-4">
             {unpaidInvoices.filter(invoice => invoice.status === 'relance3').map((invoice, index) => (
-              <InvoiceCard key={index} invoice={invoice} getActionIcon={getActionIcon} getActionLabel={getActionLabel} getActionStyle={getActionStyle} />
+              <InvoiceCard 
+                key={index} 
+                invoice={invoice} 
+                getActionIcon={getActionIcon} 
+                getActionLabel={getActionLabel} 
+                getActionStyle={getActionStyle}
+                onActionClick={handleActionClick}
+              />
             ))}
           </TabsContent>
 
           <TabsContent value="relance4" className="space-y-3 sm:space-y-4">
             {unpaidInvoices.filter(invoice => invoice.status === 'relance4').map((invoice, index) => (
-              <InvoiceCard key={index} invoice={invoice} getActionIcon={getActionIcon} getActionLabel={getActionLabel} getActionStyle={getActionStyle} />
+              <InvoiceCard 
+                key={index} 
+                invoice={invoice} 
+                getActionIcon={getActionIcon} 
+                getActionLabel={getActionLabel} 
+                getActionStyle={getActionStyle}
+                onActionClick={handleActionClick}
+              />
             ))}
           </TabsContent>
 
           <TabsContent value="contentieux" className="space-y-3 sm:space-y-4">
             {unpaidInvoices.filter(invoice => invoice.status === 'contentieux').map((invoice, index) => (
-              <InvoiceCard key={index} invoice={invoice} getActionIcon={getActionIcon} getActionLabel={getActionLabel} getActionStyle={getActionStyle} />
+              <InvoiceCard 
+                key={index} 
+                invoice={invoice} 
+                getActionIcon={getActionIcon} 
+                getActionLabel={getActionLabel} 
+                getActionStyle={getActionStyle}
+                onActionClick={handleActionClick}
+              />
             ))}
           </TabsContent>
 
           <TabsContent value="all" className="space-y-3 sm:space-y-4">
             {unpaidInvoices.map((invoice, index) => (
-              <InvoiceCard key={index} invoice={invoice} getActionIcon={getActionIcon} getActionLabel={getActionLabel} getActionStyle={getActionStyle} />
+              <InvoiceCard 
+                key={index} 
+                invoice={invoice} 
+                getActionIcon={getActionIcon} 
+                getActionLabel={getActionLabel} 
+                getActionStyle={getActionStyle}
+                onActionClick={handleActionClick}
+              />
             ))}
           </TabsContent>
         </Tabs>
       </CardContent>
+
+      {/* Sliding Panel */}
+      <MessagePanel
+        isOpen={isPanelOpen}
+        onClose={closePanelAndReset}
+        invoice={selectedInvoice}
+        actionType={selectedActionType}
+        messageData={messageData}
+        setMessageData={setMessageData}
+        generatedMessage={generatedMessage}
+        setGeneratedMessage={setGeneratedMessage}
+        isGenerating={isGenerating}
+        isEditMode={isEditMode}
+        setIsEditMode={setIsEditMode}
+        onSendMessage={handleSendMessage}
+        onRegenerate={() => selectedInvoice && generateMessage(selectedInvoice, selectedActionType)}
+      />
     </Card>
   );
 };
 
-const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle }: any) => (
+const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, onActionClick }: any) => (
   <div className="border rounded-lg p-4 bg-white hover:shadow-md transition-all duration-200 animate-fade-in">
     <div className="flex flex-col lg:flex-row gap-4">
       {/* En-tête avec numéro de facture et statut */}
@@ -263,7 +421,8 @@ const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle }:
                 key={actionIndex}
                 variant="outline"
                 size="sm"
-                className={`text-xs px-3 py-1 ${getActionStyle(action)} hover:opacity-80 transition-opacity`}
+                onClick={() => onActionClick(invoice, action)}
+                className={`text-xs px-3 py-1 ${getActionStyle(action)} hover:opacity-80 transition-opacity cursor-pointer`}
               >
                 {getActionIcon(action)}
                 <span className="ml-1">{getActionLabel(action)}</span>
@@ -279,19 +438,217 @@ const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle }:
           </p>
         </div>
       </div>
-
-      {/* Actions */}
-      <div className="flex lg:flex-col items-center gap-2 lg:w-auto justify-end">
-        <Button
-          variant="outline"
-          size="sm"
-          className="text-blue-600 border-blue-200 hover:bg-blue-50"
-        >
-          Actions
-        </Button>
-      </div>
     </div>
   </div>
 );
+
+// Message Panel Component
+const MessagePanel = ({ 
+  isOpen, 
+  onClose, 
+  invoice, 
+  actionType, 
+  messageData, 
+  setMessageData, 
+  generatedMessage, 
+  setGeneratedMessage, 
+  isGenerating, 
+  isEditMode, 
+  setIsEditMode, 
+  onSendMessage, 
+  onRegenerate 
+}: any) => {
+  if (!isOpen || !invoice) return null;
+
+  const getActionTitle = (action: string) => {
+    switch (action) {
+      case 'sms': return 'Envoi de SMS';
+      case 'email': return 'Envoi d\'Email';
+      case 'courrier': return 'Envoi de Courrier';
+      case 'recommande': return 'Envoi de Recommandé';
+      default: return 'Message';
+    }
+  };
+
+  const getActionIcon = (action: string) => {
+    switch (action) {
+      case 'sms': return <MessageCircle className="h-5 w-5" />;
+      case 'email': return <Mail className="h-5 w-5" />;
+      case 'courrier': return <FileText className="h-5 w-5" />;
+      case 'recommande': return <FileText className="h-5 w-5" />;
+      default: return null;
+    }
+  };
+
+  return (
+    <div className={`fixed inset-y-0 right-0 w-full max-w-2xl bg-white shadow-xl border-l z-50 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className="flex flex-col h-full">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-blue-50 to-purple-50">
+          <div className="flex items-center gap-3">
+            {getActionIcon(actionType)}
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">{getActionTitle(actionType)}</h2>
+              <p className="text-sm text-gray-600">Facture {invoice.id} - {invoice.client}</p>
+            </div>
+          </div>
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* Invoice Info */}
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h3 className="font-medium text-gray-900 mb-2">Informations facture</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-gray-600">Client:</span>
+                <span className="ml-2 font-medium">{invoice.client}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">Montant:</span>
+                <span className="ml-2 font-medium">{invoice.amount}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">Échéance:</span>
+                <span className="ml-2 font-medium">{invoice.dueDate}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">Type:</span>
+                <span className="ml-2 font-medium">{invoice.relanceType}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Message Configuration */}
+          {actionType === 'email' && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="recipient">Destinataire</Label>
+                <Input
+                  id="recipient"
+                  value={messageData.recipient || ''}
+                  onChange={(e) => setMessageData(prev => ({ ...prev, recipient: e.target.value }))}
+                  placeholder="email@client.com"
+                />
+              </div>
+              <div>
+                <Label htmlFor="subject">Objet</Label>
+                <Input
+                  id="subject"
+                  value={messageData.subject || ''}
+                  onChange={(e) => setMessageData(prev => ({ ...prev, subject: e.target.value }))}
+                  placeholder="Objet de l'email"
+                />
+              </div>
+            </div>
+          )}
+
+          {actionType === 'sms' && (
+            <div>
+              <Label htmlFor="phoneNumber">Numéro de téléphone</Label>
+              <Input
+                id="phoneNumber"
+                value={messageData.phoneNumber || ''}
+                onChange={(e) => setMessageData(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                placeholder="+33 6 12 34 56 78"
+              />
+            </div>
+          )}
+
+          {(actionType === 'courrier' || actionType === 'recommande') && (
+            <div>
+              <Label htmlFor="address">Adresse postale</Label>
+              <Textarea
+                id="address"
+                value={messageData.address || ''}
+                onChange={(e) => setMessageData(prev => ({ ...prev, address: e.target.value }))}
+                placeholder="Adresse complète du client"
+                rows={3}
+              />
+            </div>
+          )}
+
+          {/* AI Generation Section */}
+          <div className="border rounded-lg p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-purple-600" />
+                <h3 className="font-medium text-gray-900">Message généré par IA</h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={isEditMode}
+                    onCheckedChange={setIsEditMode}
+                  />
+                  <Label className="text-sm">Mode édition</Label>
+                </div>
+                <Button variant="outline" size="sm" onClick={onRegenerate} disabled={isGenerating}>
+                  <Sparkles className="h-4 w-4 mr-1" />
+                  Régénérer
+                </Button>
+              </div>
+            </div>
+
+            {isGenerating ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                <span className="ml-3 text-gray-600">Génération en cours...</span>
+              </div>
+            ) : (
+              <div>
+                {isEditMode ? (
+                  <Textarea
+                    value={generatedMessage}
+                    onChange={(e) => setGeneratedMessage(e.target.value)}
+                    rows={8}
+                    placeholder="Le message généré apparaîtra ici..."
+                    className="font-mono text-sm"
+                  />
+                ) : (
+                  <div className="bg-gray-50 p-4 rounded border font-mono text-sm whitespace-pre-wrap">
+                    {generatedMessage || 'Aucun message généré'}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="border-t p-6 bg-gray-50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Button variant="outline" onClick={onClose}>
+                Annuler
+              </Button>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                onClick={() => onSendMessage(true)}
+                disabled={!generatedMessage || isGenerating}
+                className="bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200"
+              >
+                <Sparkles className="h-4 w-4 mr-1" />
+                Mode auto complet
+              </Button>
+              <Button
+                onClick={() => onSendMessage(false)}
+                disabled={!generatedMessage || isGenerating}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Send className="h-4 w-4 mr-1" />
+                Envoyer
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default IAPaymentTracking;
