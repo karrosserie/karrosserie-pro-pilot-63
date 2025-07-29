@@ -12,12 +12,13 @@ import { calculateInvoiceTotals } from '@/utils/invoiceCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Edit, Trash2, Printer, Download, Mail, FileText, CreditCard } from 'lucide-react';
+import { Edit, Trash2, Printer, Download, Mail, CreditCard, Minus } from 'lucide-react';
 import DefaultInvoicePreview from './templates/DefaultInvoicePreview';
 import AlternativeInvoicePreview from './templates/AlternativeInvoicePreview';
 import InvoiceDialog from './InvoiceDialog';
 import InvoiceEmailDialog from './InvoiceEmailDialog';
 import ReceiptDialog from '../receipts/ReceiptDialog';
+import { CreditDialog } from '../credits/CreditDialog';
 
 interface InvoiceViewerModalProps {
   invoice: Invoice | null;
@@ -38,6 +39,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
+  const [creditDialogOpen, setCreditDialogOpen] = useState(false);
   
   // Récupérer les données client et véhicule depuis la base de données
   useEffect(() => {
@@ -253,28 +255,8 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
     setEmailDialogOpen(true);
   };
 
-  const handleRequestDocuments = async () => {
-    try {
-      const { tokensService } = await import('@/services/supabase/tokens');
-      
-      await tokensService.createToken({
-        company_id: invoice.company_id!,
-        client_id: invoice.client_id,
-        vehicule_id: invoice.vehicle_id
-      });
-
-      toast({
-        title: "Demande de justificatifs",
-        description: `Demande de justificatifs envoyée pour la facture ${invoice.reference}. Token créé avec succès.`
-      });
-    } catch (error) {
-      console.error('Erreur lors de la création du token:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer le token pour la demande de justificatifs.",
-        variant: "destructive"
-      });
-    }
+  const handleCreateCredit = () => {
+    setCreditDialogOpen(true);
   };
 
   const handleCreateReceipt = () => {
@@ -335,16 +317,16 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
               >
                 <Mail className="h-5 w-5" />
               </Button>
+              <Separator orientation="vertical" className="h-8 mx-1" />
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={handleRequestDocuments}
+                onClick={handleCreateCredit}
                 className="h-10 w-10 p-0"
-                title="Demander les justificatifs"
+                title="Ajouter un avoir"
               >
-                <FileText className="h-5 w-5" />
+                <Minus className="h-5 w-5" />
               </Button>
-              <Separator orientation="vertical" className="h-8 mx-1" />
               <Button
                 variant="ghost"
                 size="sm"
@@ -403,6 +385,18 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
         preselectedInvoice={{
           id: invoice.id,
           amount: remainingAmount > 0 ? remainingAmount : invoice.amount,
+        }}
+      />
+
+      <CreditDialog
+        open={creditDialogOpen}
+        onOpenChange={setCreditDialogOpen}
+        credit={{
+          invoice_id: invoice.id,
+          reference: '',
+          status: 'En attente',
+          amount: 0,
+          notes: ''
         }}
       />
     </>

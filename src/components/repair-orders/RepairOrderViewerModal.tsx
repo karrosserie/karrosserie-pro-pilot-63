@@ -12,7 +12,7 @@ import { calculateOrderAmount } from './utils/orderCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Edit, Trash2, Printer, Download, Mail, FileText, DollarSign } from 'lucide-react';
+import { Edit, Trash2, Printer, Download, Mail, FileText, DollarSign, PenTool } from 'lucide-react';
 import DefaultRepairOrderPreview from './templates/DefaultRepairOrderPreview';
 import AlternativeRepairOrderPreview from './templates/AlternativeRepairOrderPreview';
 import RepairOrderDialog from './RepairOrderDialog';
@@ -301,6 +301,13 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
     setInvoiceDialogOpen(true);
   };
 
+  const handleClientSignature = () => {
+    toast({
+      title: "Signature du client",
+      description: "Fonctionnalité de signature du client à venir."
+    });
+  };
+
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -365,6 +372,15 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
                 <FileText className="h-5 w-5" />
               </Button>
               <Separator orientation="vertical" className="h-8 mx-1" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClientSignature}
+                className="h-10 w-10 p-0"
+                title="Signature du client"
+              >
+                <PenTool className="h-5 w-5" />
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
