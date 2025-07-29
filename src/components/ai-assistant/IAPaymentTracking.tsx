@@ -9,7 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { MessageCircle, Mail, FileText, Filter, Download, X, Sparkles, Send, Edit, ChevronDown } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { MessageCircle, Mail, FileText, Filter, Download, X, Sparkles, Send, Edit, ChevronDown, History } from 'lucide-react';
 
 // Composant de suivi des impayés avec filtrage
 
@@ -23,6 +24,8 @@ const IAPaymentTracking = () => {
   const [messageData, setMessageData] = useState<any>({});
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [selectedHistoryInvoice, setSelectedHistoryInvoice] = useState<any>(null);
 
   const unpaidInvoices = [
     {
@@ -38,7 +41,23 @@ const IAPaymentTracking = () => {
       relanceType: 'Relance 1',
       relanceTypeColor: 'bg-blue-100 text-blue-800',
       status: 'relance1',
-      availableActions: ['sms', 'email', 'courrier', 'recommande']
+      availableActions: ['sms', 'email', 'courrier', 'recommande'],
+      history: [
+        {
+          date: '10/04/2025',
+          type: 'email',
+          status: 'envoyé',
+          message: 'Premier rappel amical par email',
+          recipient: 'contact@durandauto.fr'
+        },
+        {
+          date: '15/04/2025',
+          type: 'sms',
+          status: 'livré',
+          message: 'SMS de rappel envoyé au +33 6 12 34 56 78',
+          recipient: '+33 6 12 34 56 78'
+        }
+      ]
     },
     {
       id: 'F-2023-122',
@@ -53,7 +72,30 @@ const IAPaymentTracking = () => {
       relanceType: 'Relance 2',
       relanceTypeColor: 'bg-orange-100 text-orange-800',
       status: 'relance2',
-      availableActions: ['sms', 'email', 'courrier', 'recommande']
+      availableActions: ['sms', 'email', 'courrier', 'recommande'],
+      history: [
+        {
+          date: '05/04/2025',
+          type: 'email',
+          status: 'envoyé',
+          message: 'Email de relance initial',
+          recipient: 'martin@martin-sarl.com'
+        },
+        {
+          date: '10/04/2025',
+          type: 'sms',
+          status: 'livré',
+          message: 'SMS de rappel urgent',
+          recipient: '+33 6 23 45 67 89'
+        },
+        {
+          date: '17/05/2025',
+          type: 'courrier',
+          status: 'envoyé',
+          message: 'Courrier officiel de mise en demeure',
+          recipient: '123 Rue Martin, 69000 Lyon'
+        }
+      ]
     },
     {
       id: 'F-2023-120',
@@ -68,7 +110,30 @@ const IAPaymentTracking = () => {
       relanceType: 'Relance 3',
       relanceTypeColor: 'bg-orange-100 text-orange-800',
       status: 'relance3',
-      availableActions: ['sms', 'email', 'courrier', 'recommande']
+      availableActions: ['sms', 'email', 'courrier', 'recommande'],
+      history: [
+        {
+          date: '28/03/2025',
+          type: 'email',
+          status: 'envoyé',
+          message: 'Première relance automatique',
+          recipient: 'contact@duboisetfils.fr'
+        },
+        {
+          date: '05/04/2025',
+          type: 'sms',
+          status: 'livré',
+          message: 'Rappel par SMS',
+          recipient: '+33 6 34 56 78 90'
+        },
+        {
+          date: '12/05/2025',
+          type: 'recommande',
+          status: 'envoyé',
+          message: 'Lettre recommandée avec accusé de réception',
+          recipient: '456 Avenue Dubois, 33000 Bordeaux'
+        }
+      ]
     },
     {
       id: 'F-2023-118',
@@ -83,7 +148,37 @@ const IAPaymentTracking = () => {
       relanceType: 'Relance 4',
       relanceTypeColor: 'bg-red-100 text-red-800',
       status: 'relance4',
-      availableActions: ['sms', 'email', 'courrier', 'recommande']
+      availableActions: ['sms', 'email', 'courrier', 'recommande'],
+      history: [
+        {
+          date: '15/03/2025',
+          type: 'email',
+          status: 'envoyé',
+          message: 'Email de relance automatique',
+          recipient: 'admin@garagecentral.com'
+        },
+        {
+          date: '22/03/2025',
+          type: 'sms',
+          status: 'livré',
+          message: 'SMS de rappel',
+          recipient: '+33 6 45 67 89 01'
+        },
+        {
+          date: '01/04/2025',
+          type: 'courrier',
+          status: 'envoyé',
+          message: 'Courrier de mise en demeure',
+          recipient: '789 Boulevard Central, 13000 Marseille'
+        },
+        {
+          date: '08/05/2025',
+          type: 'recommande',
+          status: 'envoyé',
+          message: 'Dernière mise en demeure avant contentieux',
+          recipient: '789 Boulevard Central, 13000 Marseille'
+        }
+      ]
     },
     {
       id: 'F-2023-116',
@@ -98,9 +193,44 @@ const IAPaymentTracking = () => {
       relanceType: 'Contentieux',
       relanceTypeColor: 'bg-red-100 text-red-800',
       status: 'contentieux',
-      availableActions: ['email', 'courrier', 'recommande']
+      availableActions: ['email', 'courrier', 'recommande'],
+      history: [
+        {
+          date: '01/03/2025',
+          type: 'email',
+          status: 'envoyé',
+          message: 'Premier rappel de paiement',
+          recipient: 'contact@autoexpress.fr'
+        },
+        {
+          date: '08/03/2025',
+          type: 'sms',
+          status: 'livré',
+          message: 'SMS de rappel urgent',
+          recipient: '+33 6 56 78 90 12'
+        },
+        {
+          date: '15/03/2025',
+          type: 'courrier',
+          status: 'envoyé',
+          message: 'Courrier de mise en demeure',
+          recipient: '321 Rue Express, 75012 Paris'
+        },
+        {
+          date: '25/04/2025',
+          type: 'recommande',
+          status: 'envoyé',
+          message: 'Mise en demeure finale - Transmission au contentieux',
+          recipient: '321 Rue Express, 75012 Paris'
+        }
+      ]
     }
   ];
+
+  const handleHistoryClick = (invoice: any) => {
+    setSelectedHistoryInvoice(invoice);
+    setIsHistoryOpen(true);
+  };
 
   const handleActionClick = async (invoice: any, actionType: string) => {
     setSelectedInvoice(invoice);
@@ -292,6 +422,7 @@ const IAPaymentTracking = () => {
               getActionLabel={getActionLabel} 
               getActionStyle={getActionStyle}
               onActionClick={handleActionClick}
+              onHistoryClick={handleHistoryClick}
             />
           ))}
         </div>
@@ -313,11 +444,126 @@ const IAPaymentTracking = () => {
         onSendMessage={handleSendMessage}
         onRegenerate={() => selectedInvoice && generateMessage(selectedInvoice, selectedActionType)}
       />
+
+      {/* Modal Historique des relances */}
+      <Dialog open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="h-5 w-5 text-blue-600" />
+              Historique des relances - {selectedHistoryInvoice?.id}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedHistoryInvoice && (
+            <div className="space-y-6">
+              {/* Informations de la facture */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="font-medium text-gray-900 mb-3">Informations de la facture</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-600">Client:</span>
+                    <p className="font-medium">{selectedHistoryInvoice.client}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Montant:</span>
+                    <p className="font-medium text-orange-600">{selectedHistoryInvoice.amount}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Échéance:</span>
+                    <p className="font-medium">{selectedHistoryInvoice.dueDate}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Statut:</span>
+                    <Badge className={selectedHistoryInvoice.relanceTypeColor}>
+                      {selectedHistoryInvoice.relanceType}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              {/* Timeline des relances */}
+              <div className="space-y-4">
+                <h3 className="font-medium text-gray-900">Historique chronologique des relances</h3>
+                <div className="relative">
+                  {/* Ligne de timeline */}
+                  <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                  
+                  {selectedHistoryInvoice.history?.map((historyItem: any, index: number) => (
+                    <div key={index} className="relative flex items-start space-x-4 pb-6">
+                      {/* Icône de timeline */}
+                      <div className="relative z-10 flex items-center justify-center w-12 h-12 bg-white border-2 border-gray-200 rounded-full">
+                        {getActionIcon(historyItem.type)}
+                      </div>
+                      
+                      {/* Contenu */}
+                      <div className="flex-1 bg-white border rounded-lg p-4 shadow-sm">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-medium text-gray-900">
+                              {getActionLabel(historyItem.type)}
+                            </h4>
+                            <Badge 
+                              className={`text-xs ${
+                                historyItem.status === 'envoyé' ? 'bg-blue-100 text-blue-800' :
+                                historyItem.status === 'livré' ? 'bg-green-100 text-green-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}
+                            >
+                              {historyItem.status}
+                            </Badge>
+                          </div>
+                          <span className="text-sm text-gray-500">{historyItem.date}</span>
+                        </div>
+                        
+                        <p className="text-sm text-gray-700 mb-2">{historyItem.message}</p>
+                        
+                        <div className="text-xs text-gray-500">
+                          <strong>Destinataire:</strong> {historyItem.recipient}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Statistiques */}
+              <div className="bg-blue-50 rounded-lg p-4">
+                <h3 className="font-medium text-blue-900 mb-3">Statistiques des relances</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <span className="text-blue-700">Total relances:</span>
+                    <p className="font-bold text-blue-900">{selectedHistoryInvoice.history?.length || 0}</p>
+                  </div>
+                  <div>
+                    <span className="text-blue-700">Emails envoyés:</span>
+                    <p className="font-bold text-blue-900">
+                      {selectedHistoryInvoice.history?.filter((h: any) => h.type === 'email').length || 0}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-blue-700">SMS envoyés:</span>
+                    <p className="font-bold text-blue-900">
+                      {selectedHistoryInvoice.history?.filter((h: any) => h.type === 'sms').length || 0}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-blue-700">Courriers envoyés:</span>
+                    <p className="font-bold text-blue-900">
+                      {selectedHistoryInvoice.history?.filter((h: any) => ['courrier', 'recommande'].includes(h.type)).length || 0}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
 
-const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, onActionClick }: any) => (
+const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, onActionClick, onHistoryClick }: any) => (
   <div className="border rounded-lg p-4 bg-white hover:shadow-md transition-all duration-200 animate-fade-in">
     <div className="flex flex-col lg:flex-row gap-4">
       {/* En-tête avec numéro de facture et statut */}
@@ -376,6 +622,19 @@ const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, o
               </Button>
             ))}
           </div>
+        </div>
+
+        {/* Bouton Historique des relances */}
+        <div className="mt-4 pt-3 border-t border-gray-100">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onHistoryClick(invoice)}
+            className="text-xs bg-gray-50 hover:bg-gray-100 border-gray-300"
+          >
+            <History className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            Historique des relances
+          </Button>
         </div>
 
         {/* Dernière relance */}
