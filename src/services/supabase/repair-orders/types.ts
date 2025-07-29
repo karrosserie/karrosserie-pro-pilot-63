@@ -34,6 +34,7 @@ export type RepairOrder = Database['public']['Tables']['repair_orders']['Row'] &
   report_date?: string | null;
   expert_name?: string | null;
   incident_date?: string | null;
+  personal_items?: string | null;
 };
 
 export type NewRepairOrder = Database['public']['Tables']['repair_orders']['Insert'];

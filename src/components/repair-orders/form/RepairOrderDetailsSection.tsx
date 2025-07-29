@@ -9,10 +9,11 @@ interface RepairOrderDetailsSectionProps {
   onFieldChange: (field: string, value: any) => void;
   globalTotals: GlobalTotals;
   notes: string;
+  personalItems: string;
   isReadOnly?: boolean;
 }
 
-export const RepairOrderDetailsSection = ({ onFieldChange, globalTotals, notes, isReadOnly }: RepairOrderDetailsSectionProps) => {
+export const RepairOrderDetailsSection = ({ onFieldChange, globalTotals, notes, personalItems, isReadOnly }: RepairOrderDetailsSectionProps) => {
   return (
     <Card>
       <CardContent className="space-y-4 pt-6">
@@ -28,16 +29,30 @@ export const RepairOrderDetailsSection = ({ onFieldChange, globalTotals, notes, 
           </div>
         </div>
 
-        <div className="border-t pt-4">
-          <Label htmlFor="notes">Notes</Label>
-          <Textarea
-            id="notes"
-            value={notes}
-            onChange={(e) => onFieldChange('notes', e.target.value)}
-            placeholder="Notes et observations concernant l'ordre de réparation..."
-            rows={4}
-            readOnly={isReadOnly}
-          />
+        <div className="border-t pt-4 space-y-4">
+          <div>
+            <Label htmlFor="notes">Notes</Label>
+            <Textarea
+              id="notes"
+              value={notes}
+              onChange={(e) => onFieldChange('notes', e.target.value)}
+              placeholder="Notes et observations concernant l'ordre de réparation..."
+              rows={4}
+              readOnly={isReadOnly}
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="personal_items">Effets personnels (liste exhaustive)</Label>
+            <Textarea
+              id="personal_items"
+              value={personalItems}
+              onChange={(e) => onFieldChange('personal_items', e.target.value)}
+              placeholder="Liste détaillée des effets personnels présents dans le véhicule..."
+              rows={3}
+              readOnly={isReadOnly}
+            />
+          </div>
         </div>
       </CardContent>
     </Card>

@@ -114,6 +114,7 @@ export const RepairOrderForm = ({
         onFieldChange={handleChange}
         globalTotals={globalTotals}
         notes={formData.notes || ''}
+        personalItems={formData.personal_items || ''}
         isReadOnly={isReadOnly}
       />
 

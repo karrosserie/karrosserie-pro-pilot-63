@@ -9,7 +9,8 @@ export const useFormState = () => {
     client_id: null,
     vehicle_id: null,
     status: 'En cours',
-    notes: ''
+    notes: '',
+    personal_items: ''
   });
 
   const [claimNumber, setClaimNumber] = useState('');
