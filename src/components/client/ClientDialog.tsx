@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -7,8 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import ClientForm from './ClientForm';
 import ClientVehiclesTab from './tabs/ClientVehiclesTab';
 import ClientExpertiseReportsTab from './tabs/ClientExpertiseReportsTab';
@@ -18,6 +16,7 @@ import ClientInvoicesTab from './tabs/ClientInvoicesTab';
 import ClientCreditsTab from './tabs/ClientCreditsTab';
 import ClientReceiptsTab from './tabs/ClientReceiptsTab';
 import ClientInterventionSheetsTab from './tabs/ClientInterventionSheetsTab';
+import { ClientDetailsSidebar, getSidebarItems } from './ClientDetailsSidebar';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useQuotes } from '@/hooks/use-quotes';
@@ -89,112 +88,75 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
   
   const clientInterventionSheets = interventionSheets || [];
 
-  // Si c'est en mode visualisation, on affiche les onglets
+  // État pour gérer l'onglet actif dans la sidebar
+  const [activeTab, setActiveTab] = useState('details');
+
+  // Créer les items de la sidebar
+  const sidebarItems = getSidebarItems(
+    clientVehicles,
+    clientReports,
+    clientQuotes,
+    clientOrders,
+    clientInvoices,
+    clientCredits,
+    clientReceipts,
+    clientInterventionSheets
+  );
+
+  // Fonction pour rendre le contenu selon l'onglet actif
+  const renderActiveContent = () => {
+    switch (activeTab) {
+      case 'details':
+        return (
+          <ClientForm 
+            onSubmit={handleSubmit}
+            defaultValues={defaultValues || {}}
+            isViewMode={true}
+            onCancel={handleCancel}
+          />
+        );
+      case 'vehicles':
+        return <ClientVehiclesTab clientId={defaultValues?.id} />;
+      case 'expertise':
+        return <ClientExpertiseReportsTab clientId={defaultValues?.id} />;
+      case 'quotes':
+        return <ClientQuotesTab clientId={defaultValues?.id} />;
+      case 'repair-orders':
+        return <ClientRepairOrdersTab clientId={defaultValues?.id} />;
+      case 'invoices':
+        return <ClientInvoicesTab clientId={defaultValues?.id} />;
+      case 'credits':
+        return <ClientCreditsTab clientId={defaultValues?.id} />;
+      case 'receipts':
+        return <ClientReceiptsTab clientId={defaultValues?.id} />;
+      case 'interventions':
+        return <ClientInterventionSheetsTab clientId={defaultValues?.id} client={defaultValues} />;
+      default:
+        return null;
+    }
+  };
+
+  // Si c'est en mode visualisation, on affiche la sidebar
   if (mode === 'view') {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
-          <DialogHeader>
+        <DialogContent className="max-w-7xl max-h-[90vh] overflow-hidden p-0">
+          <DialogHeader className="px-6 pt-6 pb-4">
             <DialogTitle>{title}</DialogTitle>
             {description && <DialogDescription>{description}</DialogDescription>}
           </DialogHeader>
           
-          <Tabs defaultValue="details" className="w-full h-full">
-            <TabsList className="grid w-full grid-cols-9">
-              <TabsTrigger value="details">Fiche</TabsTrigger>
-              <TabsTrigger value="vehicles" className="flex items-center gap-2">
-                Véhicules
-                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
-                  {clientVehicles.length}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="expertise" className="flex items-center gap-2">
-                Expertises
-                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
-                  {clientReports.length}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="quotes" className="flex items-center gap-2">
-                Devis
-                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
-                  {clientQuotes.length}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="repair-orders" className="flex items-center gap-2">
-                Ordres
-                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
-                  {clientOrders.length}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="invoices" className="flex items-center gap-2">
-                Factures
-                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
-                  {clientInvoices.length}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="credits" className="flex items-center gap-2">
-                Avoirs
-                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
-                  {clientCredits.length}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="receipts" className="flex items-center gap-2">
-                Encaissements
-                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
-                  {clientReceipts.length}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="interventions" className="flex items-center gap-2">
-                Fiches
-                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
-                  {clientInterventionSheets.length}
-                </Badge>
-              </TabsTrigger>
-            </TabsList>
+          <div className="flex h-[calc(90vh-120px)]">
+            <ClientDetailsSidebar
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              sidebarItems={sidebarItems}
+            />
             
-            <div className="mt-4 overflow-y-auto max-h-[calc(90vh-200px)]">
-              <TabsContent value="details">
-                <ClientForm 
-                  onSubmit={handleSubmit}
-                  defaultValues={defaultValues || {}}
-                  isViewMode={true}
-                  onCancel={handleCancel}
-                />
-              </TabsContent>
-              
-              <TabsContent value="vehicles">
-                <ClientVehiclesTab clientId={defaultValues?.id} />
-              </TabsContent>
-              
-              <TabsContent value="expertise">
-                <ClientExpertiseReportsTab clientId={defaultValues?.id} />
-              </TabsContent>
-              
-              <TabsContent value="quotes">
-                <ClientQuotesTab clientId={defaultValues?.id} />
-              </TabsContent>
-              
-              <TabsContent value="repair-orders">
-                <ClientRepairOrdersTab clientId={defaultValues?.id} />
-              </TabsContent>
-              
-              <TabsContent value="invoices">
-                <ClientInvoicesTab clientId={defaultValues?.id} />
-              </TabsContent>
-              
-              <TabsContent value="credits">
-                <ClientCreditsTab clientId={defaultValues?.id} />
-              </TabsContent>
-              
-              <TabsContent value="receipts">
-                <ClientReceiptsTab clientId={defaultValues?.id} />
-              </TabsContent>
-              
-              <TabsContent value="interventions">
-                <ClientInterventionSheetsTab clientId={defaultValues?.id} client={defaultValues} />
-              </TabsContent>
+            <div className="flex-1 overflow-y-auto p-6">
+              {renderActiveContent()}
             </div>
-          </Tabs>
+          </div>
         </DialogContent>
       </Dialog>
     );
