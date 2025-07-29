@@ -93,35 +93,30 @@ const IAChannelsBanner = () => {
     {
       icon: <Phone className="h-4 w-4 sm:h-5 sm:w-5" />,
       name: 'Téléphone',
-      status: 'Actif',
       count: 3,
       color: 'bg-blue-100 text-blue-800'
     },
     {
       icon: <Mail className="h-4 w-4 sm:h-5 sm:w-5" />,
       name: 'Email',
-      status: 'Actif',
       count: 12,
       color: 'bg-green-100 text-green-800'
     },
     {
       icon: <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" />,
       name: 'SMS',
-      status: 'Actif',
       count: 5,
       color: 'bg-purple-100 text-purple-800'
     },
     {
       icon: <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5" />,
       name: 'WhatsApp',
-      status: 'Actif',
       count: 8,
       color: 'bg-green-100 text-green-800'
     },
     {
       icon: <FileText className="h-4 w-4 sm:h-5 sm:w-5" />,
       name: 'Courrier',
-      status: 'Configuré',
       count: 0,
       color: 'bg-orange-100 text-orange-800'
     }
@@ -332,9 +327,6 @@ const IAChannelsBanner = () => {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{channel.name}</p>
-                  <Badge className={`${channel.color} text-xs mt-1`}>
-                    {channel.status}
-                  </Badge>
                 </div>
               </div>
               <div className="text-right flex-shrink-0 ml-2">

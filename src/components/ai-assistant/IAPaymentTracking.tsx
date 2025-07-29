@@ -66,7 +66,7 @@ const IAPaymentTracking = () => {
       vehicleRef: 'OR 007 139',
       garage: 'DEMO',
       garageRef: 'FR 455 845 897',
-      amount: '3825,5 €',
+      amount: '3825,50 €',
       dueDate: '05/04/2025',
       lastRelanceDate: '17/05/2025',
       relanceType: 'Relance 2',
@@ -142,7 +142,7 @@ const IAPaymentTracking = () => {
       vehicleRef: 'OR 007 129',
       garage: 'DEMO',
       garageRef: 'FR 455 845 897',
-      amount: '4250 €',
+      amount: '4250,00 €',
       dueDate: '15/03/2025',
       lastRelanceDate: '08/05/2025',
       relanceType: 'Relance 4',
@@ -187,7 +187,7 @@ const IAPaymentTracking = () => {
       vehicleRef: 'OR 007 122',
       garage: 'DEMO',
       garageRef: 'FR 455 845 897',
-      amount: '5780,5 €',
+      amount: '5780,50 €',
       dueDate: '01/03/2025',
       lastRelanceDate: '25/04/2025',
       relanceType: 'Contentieux',
@@ -575,7 +575,17 @@ const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, o
               {invoice.relanceType}
             </Badge>
           </div>
-          <p className="text-xl font-bold text-orange-600 ml-4 text-right">{invoice.amount}</p>
+          <div className="flex items-center gap-3">
+            <p className="text-xl font-bold text-orange-600">{invoice.amount.replace('.', ',').replace(/(\d+),(\d)$/, '$1,$20')}</p>
+            <Button
+              className="bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90 h-8 text-xs px-3"
+              size="sm"
+              onClick={() => onHistoryClick(invoice)}
+            >
+              <History className="h-3 w-3 mr-1" />
+              Historique
+            </Button>
+          </div>
         </div>
 
         {/* Informations client et véhicule */}
@@ -624,18 +634,6 @@ const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, o
           </div>
         </div>
 
-        {/* Bouton Historique des relances */}
-        <div className="mt-4 pt-3 border-t border-gray-100">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onHistoryClick(invoice)}
-            className="text-xs bg-gray-50 hover:bg-gray-100 border-gray-300"
-          >
-            <History className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-            Historique des relances
-          </Button>
-        </div>
 
         {/* Dernière relance */}
         <div className="mt-3 pt-3 border-t border-gray-100">
