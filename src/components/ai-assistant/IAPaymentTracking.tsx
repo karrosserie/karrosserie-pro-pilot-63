@@ -217,14 +217,14 @@ const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle }:
     <div className="flex flex-col lg:flex-row gap-4">
       {/* En-tête avec numéro de facture et statut */}
       <div className="flex-1">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center gap-3 flex-1">
             <h3 className="text-lg font-semibold text-gray-900">{invoice.id}</h3>
             <Badge className={`${invoice.relanceTypeColor} text-xs font-medium`}>
               {invoice.relanceType}
             </Badge>
           </div>
-          <p className="text-xl font-bold text-gray-900">{invoice.amount}</p>
+          <p className="text-xl font-bold text-gray-900 ml-4 text-right">{invoice.amount}</p>
         </div>
 
         {/* Informations client et véhicule */}
