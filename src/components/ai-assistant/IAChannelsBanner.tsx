@@ -185,14 +185,10 @@ const IAChannelsBanner = () => {
               </DialogHeader>
               
               <Tabs defaultValue="cycle" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-1">
                   <TabsTrigger value="cycle" className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
                     Cycle de relance
-                  </TabsTrigger>
-                  <TabsTrigger value="escalade" className="flex items-center gap-2">
-                    <Zap className="h-4 w-4" />
-                    Escalade Express
                   </TabsTrigger>
                 </TabsList>
 
@@ -237,99 +233,90 @@ const IAChannelsBanner = () => {
                             </div>
                           ))}
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </TabsContent>
+                       </div>
+                     ))}
+                   </div>
+
+                   {/* Section Escalade Express déplacée */}
+                   <div className="mt-8 space-y-6">
+                     <div className="bg-red-50 p-4 rounded-lg">
+                       <h4 className="font-semibold text-red-800 mb-2 flex items-center gap-2">
+                         <Zap className="h-4 w-4" />
+                         Option "Escalade Express"
+                       </h4>
+                       <p className="text-sm text-red-700">
+                         Passage accéléré pour les montants élevés ou clients récidivistes
+                       </p>
+                     </div>
+
+                     <div className="space-y-4">
+                       <div className="flex items-center justify-between">
+                         <Label className="text-sm font-medium">Activer l'escalade express</Label>
+                         <Switch 
+                           checked={relanceConfig.escaladeExpress.enabled}
+                           onCheckedChange={(checked) => setRelanceConfig(prev => ({
+                             ...prev,
+                             escaladeExpress: { ...prev.escaladeExpress, enabled: checked }
+                           }))}
+                         />
+                       </div>
+
+                       {relanceConfig.escaladeExpress.enabled && (
+                         <div className="space-y-4 ml-6">
+                           <div className="space-y-2">
+                             <Label className="text-sm font-medium">Montant minimum</Label>
+                             <div className="flex items-center gap-2">
+                               <Input 
+                                 type="number"
+                                 value={relanceConfig.escaladeExpress.minAmount}
+                                 onChange={(e) => setRelanceConfig(prev => ({
+                                   ...prev,
+                                   escaladeExpress: { ...prev.escaladeExpress, minAmount: parseInt(e.target.value) || 5000 }
+                                 }))}
+                                 className="w-32"
+                               />
+                               <span className="text-sm text-gray-600">€</span>
+                             </div>
+                           </div>
+
+                           <div className="space-y-2">
+                             <Label className="text-sm font-medium">Passer directement au jour</Label>
+                             <Select 
+                               value={relanceConfig.escaladeExpress.skipToDay.toString()}
+                               onValueChange={(value) => setRelanceConfig(prev => ({
+                                 ...prev,
+                                 escaladeExpress: { ...prev.escaladeExpress, skipToDay: parseInt(value) }
+                               }))}
+                             >
+                               <SelectTrigger className="w-32">
+                                 <SelectValue />
+                               </SelectTrigger>
+                               <SelectContent>
+                                 <SelectItem value="3">J+3</SelectItem>
+                                 <SelectItem value="7">J+7</SelectItem>
+                                 <SelectItem value="10">J+10</SelectItem>
+                               </SelectContent>
+                             </Select>
+                           </div>
+
+                           <div className="bg-yellow-50 p-3 rounded border">
+                             <p className="text-sm text-yellow-800">
+                               <AlertTriangle className="h-4 w-4 inline mr-1" />
+                               <strong>Conditions d'activation :</strong>
+                             </p>
+                             <ul className="text-xs text-yellow-700 mt-1 space-y-1">
+                               <li>• Montant &gt; {relanceConfig.escaladeExpress.minAmount}€</li>
+                               <li>• Historique de retards de paiement</li>
+                               <li>• Client en liste de surveillance</li>
+                             </ul>
+                           </div>
+                         </div>
+                       )}
+                     </div>
+                   </div>
+                 </TabsContent>
 
 
-                <TabsContent value="escalade" className="space-y-6 mt-6">
-                  <div className="space-y-6">
-                    <div className="bg-red-50 p-4 rounded-lg">
-                      <h4 className="font-semibold text-red-800 mb-2 flex items-center gap-2">
-                        <Zap className="h-4 w-4" />
-                        Option "Escalade Express"
-                      </h4>
-                      <p className="text-sm text-red-700">
-                        Passage accéléré pour les montants élevés ou clients récidivistes
-                      </p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <Label className="text-sm font-medium">Activer l'escalade express</Label>
-                        <Switch 
-                          checked={relanceConfig.escaladeExpress.enabled}
-                          onCheckedChange={(checked) => setRelanceConfig(prev => ({
-                            ...prev,
-                            escaladeExpress: { ...prev.escaladeExpress, enabled: checked }
-                          }))}
-                        />
-                      </div>
-
-                      {relanceConfig.escaladeExpress.enabled && (
-                        <div className="space-y-4 ml-6">
-                          <div className="space-y-2">
-                            <Label className="text-sm font-medium">Montant minimum</Label>
-                            <div className="flex items-center gap-2">
-                              <Input 
-                                type="number"
-                                value={relanceConfig.escaladeExpress.minAmount}
-                                onChange={(e) => setRelanceConfig(prev => ({
-                                  ...prev,
-                                  escaladeExpress: { ...prev.escaladeExpress, minAmount: parseInt(e.target.value) || 5000 }
-                                }))}
-                                className="w-32"
-                              />
-                              <span className="text-sm text-gray-600">€</span>
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label className="text-sm font-medium">Passer directement au jour</Label>
-                            <Select 
-                              value={relanceConfig.escaladeExpress.skipToDay.toString()}
-                              onValueChange={(value) => setRelanceConfig(prev => ({
-                                ...prev,
-                                escaladeExpress: { ...prev.escaladeExpress, skipToDay: parseInt(value) }
-                              }))}
-                            >
-                              <SelectTrigger className="w-32">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="3">J+3</SelectItem>
-                                <SelectItem value="7">J+7</SelectItem>
-                                <SelectItem value="10">J+10</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          <div className="bg-yellow-50 p-3 rounded border">
-                            <p className="text-sm text-yellow-800">
-                              <AlertTriangle className="h-4 w-4 inline mr-1" />
-                              <strong>Conditions d'activation :</strong>
-                            </p>
-                            <ul className="text-xs text-yellow-700 mt-1 space-y-1">
-                              <li>• Montant &gt; {relanceConfig.escaladeExpress.minAmount}€</li>
-                              <li>• Historique de retards de paiement</li>
-                              <li>• Client en liste de surveillance</li>
-                            </ul>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h5 className="font-medium text-gray-800 mb-2">Ajustements sectoriels recommandés</h5>
-                      <div className="text-sm text-gray-600 space-y-1">
-                        <p>🏢 <strong>B2B :</strong> +5 jours sur chaque étape</p>
-                        <p>👤 <strong>B2C :</strong> -3 jours sur chaque étape</p>
-                        <p>⚡ <strong>Express :</strong> Cadence actuelle (agressive mais professionnelle)</p>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
               </Tabs>
 
               <div className="flex justify-end space-x-2 pt-6 border-t">
