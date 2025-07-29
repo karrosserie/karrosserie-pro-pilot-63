@@ -252,7 +252,7 @@ export const RepairOrderBasicInfoSection = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div>
             <Label htmlFor="arrival_date">Date d'arrivée</Label>
             <Input
@@ -272,7 +272,7 @@ export const RepairOrderBasicInfoSection = ({
             )}
           </div>
 
-          <div className="md:col-span-3">
+          <div className="md:col-span-4">
             <Label htmlFor="cleanliness_condition">État de propreté</Label>
             <Select
               value={formData.cleanliness_condition || ''}
