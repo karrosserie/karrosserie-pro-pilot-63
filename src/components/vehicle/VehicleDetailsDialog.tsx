@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -6,8 +6,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import VehicleForm from './VehicleForm';
 import VehicleExpertiseReportsTab from './tabs/VehicleExpertiseReportsTab';
 import VehicleQuotesTab from './tabs/VehicleQuotesTab';
@@ -16,6 +14,7 @@ import VehicleInvoicesTab from './tabs/VehicleInvoicesTab';
 import VehicleCreditsTab from './tabs/VehicleCreditsTab';
 import VehicleReceiptsTab from './tabs/VehicleReceiptsTab';
 import VehicleInterventionSheetsTab from './tabs/VehicleInterventionSheetsTab';
+import { VehicleDetailsSidebar, getVehicleSidebarItems } from './VehicleDetailsSidebar';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
@@ -85,102 +84,72 @@ const VehicleDetailsDialog: React.FC<VehicleDetailsDialogProps> = ({
 
   const vehicleInterventionSheets = interventionSheets?.filter(sheet => sheet.vehicle_id === defaultValues?.id) || [];
 
-  // Si c'est en mode visualisation, on affiche les onglets
+  // État pour gérer l'onglet actif dans la sidebar
+  const [activeTab, setActiveTab] = useState('details');
+
+  // Créer les items de la sidebar
+  const sidebarItems = getVehicleSidebarItems(
+    vehicleReports,
+    vehicleQuotes,
+    vehicleOrders,
+    vehicleInvoices,
+    vehicleCredits,
+    vehicleReceipts,
+    vehicleInterventionSheets
+  );
+
+  // Fonction pour rendre le contenu selon l'onglet actif
+  const renderActiveContent = () => {
+    switch (activeTab) {
+      case 'details':
+        return (
+          <VehicleForm 
+            onSubmit={handleSubmit}
+            defaultValues={defaultValues || {}}
+            isViewMode={true}
+            onCancel={handleCancel}
+          />
+        );
+      case 'expertise':
+        return <VehicleExpertiseReportsTab vehicleId={defaultValues?.id} />;
+      case 'quotes':
+        return <VehicleQuotesTab vehicleId={defaultValues?.id} />;
+      case 'repair-orders':
+        return <VehicleRepairOrdersTab vehicleId={defaultValues?.id} />;
+      case 'invoices':
+        return <VehicleInvoicesTab vehicleId={defaultValues?.id} />;
+      case 'credits':
+        return <VehicleCreditsTab vehicleId={defaultValues?.id} />;
+      case 'receipts':
+        return <VehicleReceiptsTab vehicleId={defaultValues?.id} />;
+      case 'interventions':
+        return <VehicleInterventionSheetsTab vehicleId={defaultValues?.id} vehicle={defaultValues} />;
+      default:
+        return null;
+    }
+  };
+
+  // Si c'est en mode visualisation, on affiche la sidebar
   if (mode === 'view') {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
-          <DialogHeader>
+        <DialogContent className="max-w-7xl max-h-[90vh] overflow-hidden p-0">
+          <DialogHeader className="px-6 pt-6 pb-4">
             <DialogTitle>{title}</DialogTitle>
             {description && <DialogDescription>{description}</DialogDescription>}
           </DialogHeader>
           
-          <Tabs defaultValue="details" className="w-full h-full">
-            <TabsList className="grid w-full grid-cols-8">
-              <TabsTrigger value="details">Fiche</TabsTrigger>
-              <TabsTrigger value="expertise" className="flex items-center gap-2">
-                Expertises
-                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
-                  {vehicleReports.length}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="quotes" className="flex items-center gap-2">
-                Devis
-                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
-                  {vehicleQuotes.length}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="repair-orders" className="flex items-center gap-2">
-                Ordres
-                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
-                  {vehicleOrders.length}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="invoices" className="flex items-center gap-2">
-                Factures
-                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
-                  {vehicleInvoices.length}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="credits" className="flex items-center gap-2">
-                Avoirs
-                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
-                  {vehicleCredits.length}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="receipts" className="flex items-center gap-2">
-                Encaissements
-                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
-                  {vehicleReceipts.length}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="interventions" className="flex items-center gap-2">
-                Fiches
-                <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">
-                  {vehicleInterventionSheets.length}
-                </Badge>
-              </TabsTrigger>
-            </TabsList>
+          <div className="flex h-[calc(90vh-120px)]">
+            <VehicleDetailsSidebar
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              sidebarItems={sidebarItems}
+            />
             
-            <div className="mt-4 overflow-y-auto max-h-[calc(90vh-200px)]">
-              <TabsContent value="details">
-                <VehicleForm 
-                  onSubmit={handleSubmit}
-                  defaultValues={defaultValues || {}}
-                  isViewMode={true}
-                  onCancel={handleCancel}
-                />
-              </TabsContent>
-              
-              <TabsContent value="expertise">
-                <VehicleExpertiseReportsTab vehicleId={defaultValues?.id} />
-              </TabsContent>
-              
-              <TabsContent value="quotes">
-                <VehicleQuotesTab vehicleId={defaultValues?.id} />
-              </TabsContent>
-              
-              <TabsContent value="repair-orders">
-                <VehicleRepairOrdersTab vehicleId={defaultValues?.id} />
-              </TabsContent>
-              
-              <TabsContent value="invoices">
-                <VehicleInvoicesTab vehicleId={defaultValues?.id} />
-              </TabsContent>
-              
-              <TabsContent value="credits">
-                <VehicleCreditsTab vehicleId={defaultValues?.id} />
-              </TabsContent>
-              
-              <TabsContent value="receipts">
-                <VehicleReceiptsTab vehicleId={defaultValues?.id} />
-              </TabsContent>
-              
-              <TabsContent value="interventions">
-                <VehicleInterventionSheetsTab vehicleId={defaultValues?.id} vehicle={defaultValues} />
-              </TabsContent>
+            <div className="flex-1 overflow-y-auto p-6">
+              {renderActiveContent()}
             </div>
-          </Tabs>
+          </div>
         </DialogContent>
       </Dialog>
     );
