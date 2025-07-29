@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Eye, Phone, Mail, MessageCircle, MoreHorizontal, Filter, Download } from 'lucide-react';
+import { Eye, Phone, Mail, MessageCircle, MoreHorizontal, Filter, Download, FileText } from 'lucide-react';
 
 const IAPaymentTracking = () => {
   const [selectedTab, setSelectedTab] = useState('urgent');
@@ -12,50 +12,108 @@ const IAPaymentTracking = () => {
   const unpaidInvoices = [
     {
       id: 'F-2023-124',
-      client: 'Durand Auto SARL',
-      amount: '2 450,00 €',
-      dueDate: '15/11/2023',
-      daysOverdue: 2,
+      client: 'Durand Auto',
+      vehicle: 'RENAULT MEGANE',
+      vehicleRef: 'OR 007 142',
+      garage: 'DEMO',
+      garageRef: 'FR 455 845 897',
+      amount: '2450,75 €',
+      dueDate: '10/04/2025',
+      lastRelanceDate: '19/05/2025',
+      relanceType: 'Relance 1',
+      relanceTypeColor: 'bg-blue-100 text-blue-800',
       status: 'urgent',
-      lastAction: 'Relance automatique envoyée',
-      actions: ['phone', 'email', 'sms']
+      availableActions: ['sms', 'email', 'courrier', 'recommande']
     },
     {
-      id: 'F-2023-119',
-      client: 'Martin Réparations',
-      amount: '1 890,50 €',
-      dueDate: '12/11/2023',
-      daysOverdue: 5,
+      id: 'F-2023-122',
+      client: 'Martin SARL',
+      vehicle: 'PEUGEOT 308',
+      vehicleRef: 'OR 007 139',
+      garage: 'DEMO',
+      garageRef: 'FR 455 845 897',
+      amount: '3825,5 €',
+      dueDate: '05/04/2025',
+      lastRelanceDate: '17/05/2025',
+      relanceType: 'Relance 2',
+      relanceTypeColor: 'bg-orange-100 text-orange-800',
       status: 'urgent',
-      lastAction: 'Appel planifié',
-      actions: ['phone', 'email']
+      availableActions: ['sms', 'email', 'courrier', 'recommande']
     },
     {
-      id: 'F-2023-110',
-      client: 'Garage Dubois et Fils',
-      amount: '3 250,00 €',
-      dueDate: '10/11/2023',
-      daysOverdue: 7,
+      id: 'F-2023-120',
+      client: 'Dubois et Fils',
+      vehicle: 'CITROEN C3',
+      vehicleRef: 'OR 007 135',
+      garage: 'DEMO',
+      garageRef: 'FR 455 845 897',
+      amount: '6120,25 €',
+      dueDate: '28/03/2025',
+      lastRelanceDate: '12/05/2025',
+      relanceType: 'Relance 3',
+      relanceTypeColor: 'bg-orange-100 text-orange-800',
       status: 'critical',
-      lastAction: 'Mise en demeure envoyée',
-      actions: ['phone', 'email', 'sms']
+      availableActions: ['sms', 'email', 'courrier', 'recommande']
+    },
+    {
+      id: 'F-2023-118',
+      client: 'Garage Central',
+      vehicle: 'BMW X3',
+      vehicleRef: 'OR 007 129',
+      garage: 'DEMO',
+      garageRef: 'FR 455 845 897',
+      amount: '4250 €',
+      dueDate: '15/03/2025',
+      lastRelanceDate: '08/05/2025',
+      relanceType: 'Relance 4',
+      relanceTypeColor: 'bg-red-100 text-red-800',
+      status: 'critical',
+      availableActions: ['sms', 'email', 'courrier', 'recommande']
+    },
+    {
+      id: 'F-2023-116',
+      client: 'Auto Express',
+      vehicle: 'AUDI A4',
+      vehicleRef: 'OR 007 122',
+      garage: 'DEMO',
+      garageRef: 'FR 455 845 897',
+      amount: '5780,5 €',
+      dueDate: '01/03/2025',
+      lastRelanceDate: '25/04/2025',
+      relanceType: 'Contentieux',
+      relanceTypeColor: 'bg-red-100 text-red-800',
+      status: 'critical',
+      availableActions: ['email', 'courrier', 'recommande']
     }
   ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'urgent': return 'bg-orange-100 text-orange-800';
-      case 'critical': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+  const getActionIcon = (action: string) => {
+    switch (action) {
+      case 'sms': return <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />;
+      case 'email': return <Mail className="h-3 w-3 sm:h-4 sm:w-4" />;
+      case 'courrier': return <FileText className="h-3 w-3 sm:h-4 sm:w-4" />;
+      case 'recommande': return <FileText className="h-3 w-3 sm:h-4 sm:w-4" />;
+      default: return null;
     }
   };
 
-  const getActionIcon = (action: string) => {
+  const getActionLabel = (action: string) => {
     switch (action) {
-      case 'phone': return <Phone className="h-3 w-3 sm:h-4 sm:w-4" />;
-      case 'email': return <Mail className="h-3 w-3 sm:h-4 sm:w-4" />;
-      case 'sms': return <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />;
-      default: return null;
+      case 'sms': return 'SMS';
+      case 'email': return 'Email';
+      case 'courrier': return 'Courrier';
+      case 'recommande': return 'Recommandé';
+      default: return action;
+    }
+  };
+
+  const getActionStyle = (action: string) => {
+    switch (action) {
+      case 'sms': return 'bg-green-100 text-green-800 border-green-200';
+      case 'email': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'courrier': return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'recommande': return 'bg-purple-100 text-purple-800 border-purple-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
@@ -100,19 +158,19 @@ const IAPaymentTracking = () => {
 
           <TabsContent value="urgent" className="space-y-3 sm:space-y-4">
             {unpaidInvoices.filter(invoice => invoice.status === 'urgent').map((invoice, index) => (
-              <InvoiceCard key={index} invoice={invoice} getStatusColor={getStatusColor} getActionIcon={getActionIcon} />
+              <InvoiceCard key={index} invoice={invoice} getActionIcon={getActionIcon} getActionLabel={getActionLabel} getActionStyle={getActionStyle} />
             ))}
           </TabsContent>
 
           <TabsContent value="critical" className="space-y-3 sm:space-y-4">
             {unpaidInvoices.filter(invoice => invoice.status === 'critical').map((invoice, index) => (
-              <InvoiceCard key={index} invoice={invoice} getStatusColor={getStatusColor} getActionIcon={getActionIcon} />
+              <InvoiceCard key={index} invoice={invoice} getActionIcon={getActionIcon} getActionLabel={getActionLabel} getActionStyle={getActionStyle} />
             ))}
           </TabsContent>
 
           <TabsContent value="all" className="space-y-3 sm:space-y-4">
             {unpaidInvoices.map((invoice, index) => (
-              <InvoiceCard key={index} invoice={invoice} getStatusColor={getStatusColor} getActionIcon={getActionIcon} />
+              <InvoiceCard key={index} invoice={invoice} getActionIcon={getActionIcon} getActionLabel={getActionLabel} getActionStyle={getActionStyle} />
             ))}
           </TabsContent>
         </Tabs>
@@ -121,48 +179,90 @@ const IAPaymentTracking = () => {
   );
 };
 
-const InvoiceCard = ({ invoice, getStatusColor, getActionIcon }: any) => (
-  <div className="border rounded-lg p-3 sm:p-4 bg-gray-50 hover:bg-gray-100 transition-colors">
-    <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 sm:gap-4">
-      <div className="flex-1 min-w-0 w-full lg:w-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2 sm:mb-3">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-            <h3 className="text-sm sm:text-base font-semibold text-gray-900 truncate">
-              {invoice.id}
-            </h3>
-            <Badge className={`${getStatusColor(invoice.status)} text-xs w-fit`}>
-              {invoice.daysOverdue} jours de retard
+const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle }: any) => (
+  <div className="border rounded-lg p-4 bg-white hover:shadow-md transition-all duration-200 animate-fade-in">
+    <div className="flex flex-col lg:flex-row gap-4">
+      {/* En-tête avec numéro de facture et statut */}
+      <div className="flex-1">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <h3 className="text-lg font-semibold text-gray-900">{invoice.id}</h3>
+            <Badge className={`${invoice.relanceTypeColor} text-xs font-medium`}>
+              {invoice.relanceType}
             </Badge>
           </div>
-          <p className="text-lg sm:text-xl font-bold text-gray-900">{invoice.amount}</p>
+          <p className="text-xl font-bold text-gray-900">{invoice.amount}</p>
         </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">
-          <p><span className="font-medium">Client:</span> {invoice.client}</p>
-          <p><span className="font-medium">Échéance:</span> {invoice.dueDate}</p>
+
+        {/* Informations client et véhicule */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+          <div>
+            <p className="text-sm text-gray-600">Client</p>
+            <p className="font-medium text-gray-900">{invoice.client}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600">Véhicule</p>
+            <div>
+              <p className="font-medium text-gray-900">{invoice.vehicle}</p>
+              <p className="text-xs text-gray-500">{invoice.vehicleRef}</p>
+            </div>
+          </div>
         </div>
-        
-        <p className="text-xs sm:text-sm text-blue-600 font-medium mb-3">
-          {invoice.lastAction}
-        </p>
+
+        {/* Informations garage et dates */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+          <div>
+            <p className="text-sm text-gray-600">Garage</p>
+            <div>
+              <p className="font-medium text-gray-900">{invoice.garage}</p>
+              <p className="text-xs text-gray-500">{invoice.garageRef}</p>
+            </div>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600">Échéance</p>
+            <p className="font-medium text-gray-900">{invoice.dueDate}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600">Prochaine action</p>
+            <p className="font-medium text-gray-900">{invoice.lastRelanceDate}</p>
+          </div>
+        </div>
+
+        {/* Actions de relance */}
+        <div className="space-y-2">
+          <p className="text-sm text-gray-600">Moyens de relance utilisés :</p>
+          <div className="flex flex-wrap gap-2">
+            {invoice.availableActions.map((action: string, actionIndex: number) => (
+              <Button
+                key={actionIndex}
+                variant="outline"
+                size="sm"
+                className={`text-xs px-3 py-1 ${getActionStyle(action)} hover:opacity-80 transition-opacity`}
+              >
+                {getActionIcon(action)}
+                <span className="ml-1">{getActionLabel(action)}</span>
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Dernière relance */}
+        <div className="mt-3 pt-3 border-t border-gray-100">
+          <p className="text-xs text-gray-500">
+            Dernière relance: {invoice.lastRelanceDate}
+          </p>
+        </div>
       </div>
-      
-      <div className="flex flex-row lg:flex-col items-center gap-2 w-full lg:w-auto">
-        <div className="flex gap-1 sm:gap-2 flex-1 lg:flex-none justify-center">
-          {invoice.actions.map((action: string, actionIndex: number) => (
-            <Button key={actionIndex} variant="outline" size="sm" className="p-1.5 sm:p-2">
-              {getActionIcon(action)}
-            </Button>
-          ))}
-        </div>
-        <div className="flex gap-1 sm:gap-2">
-          <Button variant="outline" size="sm" className="p-1.5 sm:p-2">
-            <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
-          </Button>
-          <Button variant="outline" size="sm" className="p-1.5 sm:p-2">
-            <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
-          </Button>
-        </div>
+
+      {/* Actions */}
+      <div className="flex lg:flex-col items-center gap-2 lg:w-auto justify-end">
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-blue-600 border-blue-200 hover:bg-blue-50"
+        >
+          Actions
+        </Button>
       </div>
     </div>
   </div>
