@@ -252,7 +252,7 @@ export const RepairOrderBasicInfoSection = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label htmlFor="arrival_date">Date d'arrivée</Label>
             <Input
@@ -272,6 +272,43 @@ export const RepairOrderBasicInfoSection = ({
             )}
           </div>
 
+          <div>
+            <Label htmlFor="cleanliness_condition">État de propreté</Label>
+            <Select
+              value={formData.cleanliness_condition || ''}
+              onValueChange={(value) => onFieldChange('cleanliness_condition', value)}
+            >
+              <SelectTrigger
+                id="cleanliness_condition"
+                className={cn(
+                  errors.cleanliness_condition && "border-red-500 focus-visible:ring-red-500"
+                )}
+              >
+                <SelectValue placeholder="Sélectionner un état de propreté" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border border-border shadow-md z-50">
+                <SelectItem value="Immaculé">Immaculé - Véhicule parfaitement propre, comme neuf</SelectItem>
+                <SelectItem value="Très propre">Très propre - Légère couche de poussière fine à peine visible</SelectItem>
+                <SelectItem value="Propre">Propre - Carrosserie avec légère saleté visible mais conservant son éclat</SelectItem>
+                <SelectItem value="Acceptable">Acceptable - Saleté visible sur la carrosserie mais sans accumulation majeure</SelectItem>
+                <SelectItem value="Négligé">Négligé - Couche évidente de poussière/saleté sur l'extérieur</SelectItem>
+                <SelectItem value="Sale">Sale - Carrosserie recouverte de poussière/boue/sel</SelectItem>
+                <SelectItem value="Très sale">Très sale - Boue/saleté épaisse sur l'extérieur</SelectItem>
+                <SelectItem value="Extrêmement sale">Extrêmement sale - Véhicule visiblement non nettoyé depuis longtemps</SelectItem>
+                <SelectItem value="Insalubre">Insalubre - État de saleté extrême présentant des risques sanitaires</SelectItem>
+                <SelectItem value="État d'abandon">État d'abandon - Véhicule non entretenu depuis des mois/années</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.cleanliness_condition && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.cleanliness_condition}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <Label htmlFor="start_date">Date de début</Label>
             <Input
@@ -341,41 +378,6 @@ export const RepairOrderBasicInfoSection = ({
               <p className="text-sm text-red-500 mt-1 flex items-center">
                 <AlertCircle className="h-4 w-4 mr-1" />
                 {errors.general_condition}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="cleanliness_condition">État de propreté</Label>
-            <Select
-              value={formData.cleanliness_condition || ''}
-              onValueChange={(value) => onFieldChange('cleanliness_condition', value)}
-            >
-              <SelectTrigger
-                id="cleanliness_condition"
-                className={cn(
-                  errors.cleanliness_condition && "border-red-500 focus-visible:ring-red-500"
-                )}
-              >
-                <SelectValue placeholder="Sélectionner un état de propreté" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border border-border shadow-md z-50">
-                <SelectItem value="Immaculé">Immaculé - Véhicule parfaitement propre, comme neuf</SelectItem>
-                <SelectItem value="Très propre">Très propre - Légère couche de poussière fine à peine visible</SelectItem>
-                <SelectItem value="Propre">Propre - Carrosserie avec légère saleté visible mais conservant son éclat</SelectItem>
-                <SelectItem value="Acceptable">Acceptable - Saleté visible sur la carrosserie mais sans accumulation majeure</SelectItem>
-                <SelectItem value="Négligé">Négligé - Couche évidente de poussière/saleté sur l'extérieur</SelectItem>
-                <SelectItem value="Sale">Sale - Carrosserie recouverte de poussière/boue/sel</SelectItem>
-                <SelectItem value="Très sale">Très sale - Boue/saleté épaisse sur l'extérieur</SelectItem>
-                <SelectItem value="Extrêmement sale">Extrêmement sale - Véhicule visiblement non nettoyé depuis longtemps</SelectItem>
-                <SelectItem value="Insalubre">Insalubre - État de saleté extrême présentant des risques sanitaires</SelectItem>
-                <SelectItem value="État d'abandon">État d'abandon - Véhicule non entretenu depuis des mois/années</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.cleanliness_condition && (
-              <p className="text-sm text-red-500 mt-1 flex items-center">
-                <AlertCircle className="h-4 w-4 mr-1" />
-                {errors.cleanliness_condition}
               </p>
             )}
           </div>
