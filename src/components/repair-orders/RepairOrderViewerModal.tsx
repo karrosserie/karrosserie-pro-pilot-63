@@ -1,14 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { toast } from '@/hooks/use-toast';
+import { useConfirmation } from '@/hooks/use-confirmation';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { useCompany } from '@/hooks/use-company';
 import { useCompanyPreferences } from '@/hooks/use-company-preferences';
+import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { calculateOrderAmount } from './utils/orderCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { Edit, Trash2, Printer, Download, Mail, FileText, DollarSign } from 'lucide-react';
 import DefaultRepairOrderPreview from './templates/DefaultRepairOrderPreview';
 import AlternativeRepairOrderPreview from './templates/AlternativeRepairOrderPreview';
+import RepairOrderDialog from './RepairOrderDialog';
+import RepairOrderEmailDialog from './RepairOrderEmailDialog';
+import InvoiceDialog from '../invoices/InvoiceDialog';
 
 interface RepairOrderViewerModalProps {
   repairOrder: RepairOrder | null;
@@ -19,8 +28,15 @@ interface RepairOrderViewerModalProps {
 const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrderViewerModalProps) => {
   const { companyData } = useCompany();
   const { preferences } = useCompanyPreferences();
+  const { deleteOrder } = useRepairOrders();
+  const { confirm } = useConfirmation();
   const [clientData, setClientData] = useState<any>(null);
   const [vehicleData, setVehicleData] = useState<any>(null);
+  
+  // States for dialogs
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
   
   // Récupérer les données client et véhicule depuis la base de données
   useEffect(() => {
@@ -186,32 +202,229 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
     totalTTC: `${totalTTC.toFixed(2).replace('.', ',')} €`
   };
 
+  // Action handlers
+  const handleEdit = () => {
+    setEditDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
+    const confirmed = await confirm({
+      title: "Supprimer l'ordre de réparation",
+      description: `Êtes-vous sûr de vouloir supprimer l'ordre de réparation ${repairOrder.reference} ? Cette action est irréversible.`,
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
+      try {
+        await deleteOrder.mutateAsync(repairOrder.id);
+        onOpenChange(false);
+        toast({
+          title: "Ordre de réparation supprimé",
+          description: `L'ordre de réparation ${repairOrder.reference} a été supprimé avec succès.`,
+        });
+      } catch (error: any) {
+        console.error('Error deleting repair order:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de supprimer l'ordre de réparation.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const handleDownload = async () => {
+    const { generateRepairOrderPDFWithTemplate } = await import('@/utils/repairOrderPDFGeneration');
+    const result = await generateRepairOrderPDFWithTemplate(repairOrder, {});
+    if (result.success) {
+      toast({
+        title: "Téléchargement réussi",
+        description: `L'ordre de réparation ${repairOrder.reference} a été téléchargé.`
+      });
+    } else {
+      toast({
+        title: "Erreur",
+        description: "Impossible de télécharger l'ordre de réparation.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handlePrint = async () => {
+    const { printRepairOrderPDFWithTemplate } = await import('@/utils/repairOrderPDFGeneration');
+    const result = await printRepairOrderPDFWithTemplate(repairOrder, {});
+    if (result.success) {
+      toast({
+        title: "Impression",
+        description: `L'ordre de réparation ${repairOrder.reference} a été ouvert pour impression.`
+      });
+    } else {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'imprimer l'ordre de réparation.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSendEmail = () => {
+    setEmailDialogOpen(true);
+  };
+
+  const handleRequestDocuments = async () => {
+    try {
+      const { tokensService } = await import('@/services/supabase/tokens');
+      
+      await tokensService.createToken({
+        company_id: repairOrder.company_id!,
+        client_id: repairOrder.client_id,
+        vehicule_id: repairOrder.vehicle_id
+      });
+
+      toast({
+        title: "Demande de justificatifs",
+        description: `Demande de justificatifs envoyée pour l'ordre de réparation ${repairOrder.reference}. Token créé avec succès.`
+      });
+    } catch (error) {
+      console.error('Erreur lors de la création du token:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer le token pour la demande de justificatifs.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleConvertToInvoice = () => {
+    setInvoiceDialogOpen(true);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
-        <div className="w-full h-full">
-          {template === 'default' ? (
-            <DefaultRepairOrderPreview 
-              companyData={companyData}
-              orderData={orderData}
-              clientData={clientDataForTemplate}
-              vehicleData={vehicleDataForTemplate}
-              items={items}
-              totals={totalsData}
-            />
-          ) : (
-            <AlternativeRepairOrderPreview 
-              companyData={companyData}
-              orderData={orderData}
-              clientData={clientDataForTemplate}
-              vehicleData={vehicleDataForTemplate}
-              items={items}
-              totals={totalsData}
-            />
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+          {/* Barre d'actions en haut */}
+          <div className="flex items-center justify-between gap-2 p-4 pr-16 border-b bg-background">
+            <h2 className="text-lg font-semibold">Aperçu de l'ordre de réparation {repairOrder.reference}</h2>
+            <div className="flex items-center gap-1 mr-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleEdit}
+                className="h-10 w-10 p-0"
+                title="Modifier"
+              >
+                <Edit className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleDelete}
+                className="h-10 w-10 p-0 text-destructive hover:text-destructive"
+                title="Supprimer"
+              >
+                <Trash2 className="h-5 w-5" />
+              </Button>
+              <Separator orientation="vertical" className="h-8 mx-1" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handlePrint}
+                className="h-10 w-10 p-0"
+                title="Imprimer"
+              >
+                <Printer className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleDownload}
+                className="h-10 w-10 p-0"
+                title="Télécharger"
+              >
+                <Download className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSendEmail}
+                className="h-10 w-10 p-0"
+                title="Envoyer par e-mail"
+              >
+                <Mail className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRequestDocuments}
+                className="h-10 w-10 p-0"
+                title="Demander les justificatifs"
+              >
+                <FileText className="h-5 w-5" />
+              </Button>
+              <Separator orientation="vertical" className="h-8 mx-1" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleConvertToInvoice}
+                className="h-10 w-10 p-0"
+                title="Convertir en facture"
+              >
+                <DollarSign className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+          <div className="w-full h-full">
+            {template === 'default' ? (
+              <DefaultRepairOrderPreview 
+                companyData={companyData}
+                orderData={orderData}
+                clientData={clientDataForTemplate}
+                vehicleData={vehicleDataForTemplate}
+                items={items}
+                totals={totalsData}
+              />
+            ) : (
+              <AlternativeRepairOrderPreview 
+                companyData={companyData}
+                orderData={orderData}
+                clientData={clientDataForTemplate}
+                vehicleData={vehicleDataForTemplate}
+                items={items}
+                totals={totalsData}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialogues pour les actions */}
+      <RepairOrderDialog
+        order={repairOrder}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
+
+      <RepairOrderEmailDialog
+        repairOrder={repairOrder}
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+      />
+
+      <InvoiceDialog
+        open={invoiceDialogOpen}
+        onOpenChange={setInvoiceDialogOpen}
+        onSuccess={() => {
+          setInvoiceDialogOpen(false);
+          toast({
+            title: "Facture créée",
+            description: `La facture a été créée à partir de l'ordre de réparation ${repairOrder.reference}.`
+          });
+        }}
+      />
+    </>
   );
 };
 

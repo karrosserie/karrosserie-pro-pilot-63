@@ -1,14 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { toast } from '@/hooks/use-toast';
+import { useConfirmation } from '@/hooks/use-confirmation';
 import { Invoice } from '@/services/supabase/invoices';
 import { useCompany } from '@/hooks/use-company';
 import { useCompanyPreferences } from '@/hooks/use-company-preferences';
+import { useInvoices } from '@/hooks/use-invoices';
 import { calculateInvoiceTotals } from '@/utils/invoiceCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { Edit, Trash2, Printer, Download, Mail, FileText, CreditCard } from 'lucide-react';
 import DefaultInvoicePreview from './templates/DefaultInvoicePreview';
 import AlternativeInvoicePreview from './templates/AlternativeInvoicePreview';
+import InvoiceDialog from './InvoiceDialog';
+import InvoiceEmailDialog from './InvoiceEmailDialog';
+import ReceiptDialog from '../receipts/ReceiptDialog';
 
 interface InvoiceViewerModalProps {
   invoice: Invoice | null;
@@ -19,9 +28,16 @@ interface InvoiceViewerModalProps {
 const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalProps) => {
   const { companyData } = useCompany();
   const { preferences } = useCompanyPreferences();
+  const { deleteInvoice } = useInvoices();
+  const { confirm } = useConfirmation();
   const [clientData, setClientData] = useState<any>(null);
   const [vehicleData, setVehicleData] = useState<any>(null);
   const [receiptsData, setReceiptsData] = useState<any[]>([]);
+  
+  // States for dialogs
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
   
   // Récupérer les données client et véhicule depuis la base de données
   useEffect(() => {
@@ -166,36 +182,230 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
   const totalPaidAmount = receiptsData.reduce((sum, receipt) => sum + receipt.amount, 0);
   const remainingAmount = invoice.amount - totalPaidAmount;
 
+  // Action handlers
+  const handleEdit = () => {
+    setEditDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
+    const confirmed = await confirm({
+      title: 'Supprimer la facture',
+      description: `Êtes-vous sûr de vouloir supprimer la facture ${invoice.reference} ? Cette action est irréversible.`,
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
+      try {
+        await deleteInvoice.mutateAsync(invoice.id);
+        onOpenChange(false);
+        toast({
+          title: "Facture supprimée",
+          description: `La facture ${invoice.reference} a été supprimée avec succès.`,
+        });
+      } catch (error: any) {
+        console.error('Error deleting invoice:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de supprimer la facture.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const handleDownload = async () => {
+    const { generateInvoicePDFWithTemplate } = await import('@/utils/invoicePDFGeneration');
+    const result = await generateInvoicePDFWithTemplate(invoice, {});
+    if (result.success) {
+      toast({
+        title: "Téléchargement réussi",
+        description: `La facture ${invoice.reference} a été téléchargée.`
+      });
+    } else {
+      toast({
+        title: "Erreur",
+        description: "Impossible de télécharger la facture.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handlePrint = async () => {
+    const { printInvoicePDFWithTemplate } = await import('@/utils/invoicePDFGeneration');
+    const result = await printInvoicePDFWithTemplate(invoice, {});
+    if (result.success) {
+      toast({
+        title: "Impression",
+        description: `La facture ${invoice.reference} a été ouverte pour impression.`
+      });
+    } else {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'imprimer la facture.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSendEmail = () => {
+    setEmailDialogOpen(true);
+  };
+
+  const handleRequestDocuments = async () => {
+    try {
+      const { tokensService } = await import('@/services/supabase/tokens');
+      
+      await tokensService.createToken({
+        company_id: invoice.company_id!,
+        client_id: invoice.client_id,
+        vehicule_id: invoice.vehicle_id
+      });
+
+      toast({
+        title: "Demande de justificatifs",
+        description: `Demande de justificatifs envoyée pour la facture ${invoice.reference}. Token créé avec succès.`
+      });
+    } catch (error) {
+      console.error('Erreur lors de la création du token:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer le token pour la demande de justificatifs.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCreateReceipt = () => {
+    setReceiptDialogOpen(true);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
-        <div className="w-full h-full">
-          {template === 'default' ? (
-            <DefaultInvoicePreview 
-              companyData={companyData}
-              invoiceData={invoiceData}
-              clientData={clientDataForTemplate}
-              items={items}
-              totals={totalsData}
-              payments={receiptsData}
-              totalPaidAmount={totalPaidAmount}
-              remainingAmount={remainingAmount}
-            />
-          ) : (
-            <AlternativeInvoicePreview 
-              companyData={companyData}
-              invoiceData={invoiceData}
-              clientData={clientDataForTemplate}
-              items={items}
-              totals={totalsData}
-              payments={receiptsData}
-              totalPaidAmount={totalPaidAmount}
-              remainingAmount={remainingAmount}
-            />
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+          {/* Barre d'actions en haut */}
+          <div className="flex items-center justify-between gap-2 p-4 pr-16 border-b bg-background">
+            <h2 className="text-lg font-semibold">Aperçu de la facture {invoice.reference}</h2>
+            <div className="flex items-center gap-1 mr-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleEdit}
+                className="h-10 w-10 p-0"
+                title="Modifier"
+              >
+                <Edit className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleDelete}
+                className="h-10 w-10 p-0 text-destructive hover:text-destructive"
+                title="Supprimer"
+              >
+                <Trash2 className="h-5 w-5" />
+              </Button>
+              <Separator orientation="vertical" className="h-8 mx-1" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handlePrint}
+                className="h-10 w-10 p-0"
+                title="Imprimer"
+              >
+                <Printer className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleDownload}
+                className="h-10 w-10 p-0"
+                title="Télécharger"
+              >
+                <Download className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSendEmail}
+                className="h-10 w-10 p-0"
+                title="Envoyer par e-mail"
+              >
+                <Mail className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRequestDocuments}
+                className="h-10 w-10 p-0"
+                title="Demander les justificatifs"
+              >
+                <FileText className="h-5 w-5" />
+              </Button>
+              <Separator orientation="vertical" className="h-8 mx-1" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCreateReceipt}
+                className="h-10 w-10 p-0"
+                title="Créer un encaissement"
+              >
+                <CreditCard className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+          <div className="w-full h-full">
+            {template === 'default' ? (
+              <DefaultInvoicePreview 
+                companyData={companyData}
+                invoiceData={invoiceData}
+                clientData={clientDataForTemplate}
+                items={items}
+                totals={totalsData}
+                payments={receiptsData}
+                totalPaidAmount={totalPaidAmount}
+                remainingAmount={remainingAmount}
+              />
+            ) : (
+              <AlternativeInvoicePreview 
+                companyData={companyData}
+                invoiceData={invoiceData}
+                clientData={clientDataForTemplate}
+                items={items}
+                totals={totalsData}
+                payments={receiptsData}
+                totalPaidAmount={totalPaidAmount}
+                remainingAmount={remainingAmount}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialogues pour les actions */}
+      <InvoiceDialog
+        invoice={invoice}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
+
+      <InvoiceEmailDialog
+        invoice={invoice}
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+      />
+
+      <ReceiptDialog
+        open={receiptDialogOpen}
+        onOpenChange={setReceiptDialogOpen}
+        preselectedInvoice={{
+          id: invoice.id,
+          amount: remainingAmount > 0 ? remainingAmount : invoice.amount,
+        }}
+      />
+    </>
   );
 };
 
