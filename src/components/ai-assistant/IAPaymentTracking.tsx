@@ -236,15 +236,8 @@ const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle }:
           </div>
         </div>
 
-        {/* Informations garage et dates */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-          <div>
-            <p className="text-sm text-gray-600">Garage</p>
-            <div>
-              <p className="font-medium text-gray-900">{invoice.garage}</p>
-              <p className="text-xs text-gray-500">{invoice.garageRef}</p>
-            </div>
-          </div>
+        {/* Informations dates */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
           <div>
             <p className="text-sm text-gray-600">Échéance</p>
             <p className="font-medium text-gray-900">{invoice.dueDate}</p>
