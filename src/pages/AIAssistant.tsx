@@ -10,7 +10,7 @@ import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 const AIAssistant = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAIPanelMinimized, setIsAIPanelMinimized] = useState(false);
-  const [showAIPanel, setShowAIPanel] = useState(true);
+  const [showAIPanel, setShowAIPanel] = useState(false);
 
   // Configurer les raccourcis clavier
   useKeyboardShortcuts([
