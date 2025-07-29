@@ -382,7 +382,7 @@ const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, o
               {invoice.relanceType}
             </Badge>
           </div>
-          <p className="text-xl font-bold text-gray-900 ml-4 text-right">{invoice.amount}</p>
+          <p className="text-xl font-bold text-orange-600 ml-4 text-right">{invoice.amount}</p>
         </div>
 
         {/* Informations client et véhicule */}
