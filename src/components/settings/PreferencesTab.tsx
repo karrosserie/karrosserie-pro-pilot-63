@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useCompany } from '@/hooks/use-company';
 import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 import { useToast } from '@/hooks/use-toast';
@@ -33,6 +34,14 @@ const PreferencesTab = () => {
   const [nextRepairOrderRef, setNextRepairOrderRef] = useState('47');
   const [nextInvoiceRef, setNextInvoiceRef] = useState('8');
   const [nextCreditRef, setNextCreditRef] = useState('2');
+  
+  // Mentions fields
+  const [paymentDetails, setPaymentDetails] = useState('');
+  const [invoiceNonEngagementClause, setInvoiceNonEngagementClause] = useState('');
+  const [repairOrderNonEngagementClause, setRepairOrderNonEngagementClause] = useState('');
+  const [paymentConditions, setPaymentConditions] = useState('');
+  const [latePaymentPenalties, setLatePaymentPenalties] = useState('');
+  const [companyDetails, setCompanyDetails] = useState('');
 
   useEffect(() => {
     if (preferences) {
@@ -467,6 +476,95 @@ const PreferencesTab = () => {
                )}
              </div>
            </div>
+        </CardContent>
+      </Card>
+
+      {/* Mentions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Mentions</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div>
+            <Label htmlFor="payment-details-text" className="text-sm font-medium mb-2 block">Détails de paiement</Label>
+            <Textarea
+              id="payment-details-text"
+              placeholder="Modes de paiement"
+              value={paymentDetails}
+              onChange={(e) => setPaymentDetails(e.target.value)}
+              className="min-h-[80px]"
+            />
+            <p className="text-sm text-muted-foreground mt-1">
+              Les détails de paiement seront imprimés sur la facture
+            </p>
+          </div>
+
+          <div>
+            <Label htmlFor="invoice-non-engagement" className="text-sm font-medium mb-2 block">Clause de non-engagement pour les factures</Label>
+            <Textarea
+              id="invoice-non-engagement"
+              placeholder="Clause de non-engagement pour les factures"
+              value={invoiceNonEngagementClause}
+              onChange={(e) => setInvoiceNonEngagementClause(e.target.value)}
+              className="min-h-[80px]"
+            />
+            <p className="text-sm text-muted-foreground mt-1">
+              Les détails de paiement seront imprimés sur la facture
+            </p>
+          </div>
+
+          <div>
+            <Label htmlFor="repair-order-non-engagement" className="text-sm font-medium mb-2 block">Clause de non-engagement pour les ordres de réparation</Label>
+            <Textarea
+              id="repair-order-non-engagement"
+              placeholder="Clause de non-engagement"
+              value={repairOrderNonEngagementClause}
+              onChange={(e) => setRepairOrderNonEngagementClause(e.target.value)}
+              className="min-h-[80px]"
+            />
+            <p className="text-sm text-muted-foreground mt-1">
+              Les détails de paiement seront imprimés sur l'ordre de réparation
+            </p>
+          </div>
+
+          <div>
+            <Label htmlFor="payment-conditions" className="text-sm font-medium mb-2 block">Les conditions de paiement</Label>
+            <Textarea
+              id="payment-conditions"
+              placeholder="Modalités de paiement"
+              value={paymentConditions}
+              onChange={(e) => setPaymentConditions(e.target.value)}
+              className="min-h-[80px]"
+            />
+            <p className="text-sm text-muted-foreground mt-1">
+              Modalités de paiement : délai d'encaissement et conditions d'encaissement à un prix de paiement anticipé sur les services
+            </p>
+          </div>
+
+          <div>
+            <Label htmlFor="late-payment-penalties" className="text-sm font-medium mb-2 block">En cas de retard de paiement</Label>
+            <Textarea
+              id="late-payment-penalties"
+              placeholder="Indication des pénalités"
+              value={latePaymentPenalties}
+              onChange={(e) => setLatePaymentPenalties(e.target.value)}
+              className="min-h-[80px]"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="company-details" className="text-sm font-medium mb-2 block">Veuillez indiquer les informations à afficher en bas de la facture et devis</Label>
+            <Textarea
+              id="company-details"
+              placeholder="Détails de la société"
+              value={companyDetails}
+              onChange={(e) => setCompanyDetails(e.target.value)}
+              className="min-h-[80px]"
+            />
+            <p className="text-sm text-muted-foreground mt-1">
+              Veuillez indiquer les informations de votre société à afficher en bas de la facture incluant détenteurs de numéro SIRET à compris sous informations comptables obligatoires
+            </p>
+          </div>
         </CardContent>
       </Card>
 
