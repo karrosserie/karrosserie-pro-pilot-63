@@ -12,11 +12,12 @@ import { calculateOrderAmount } from './utils/orderCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Edit, Trash2, Printer, Download, Mail, FileText, DollarSign, PenTool } from 'lucide-react';
+import { Edit, Trash2, Printer, Download, Mail, FileText, DollarSign, Signature } from 'lucide-react';
 import DefaultRepairOrderPreview from './templates/DefaultRepairOrderPreview';
 import AlternativeRepairOrderPreview from './templates/AlternativeRepairOrderPreview';
 import RepairOrderDialog from './RepairOrderDialog';
 import RepairOrderEmailDialog from './RepairOrderEmailDialog';
+import RepairOrderSignatureDialog from './RepairOrderSignatureDialog';
 import InvoiceDialog from '../invoices/InvoiceDialog';
 
 interface RepairOrderViewerModalProps {
@@ -37,6 +38,7 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
+  const [signatureDialogOpen, setSignatureDialogOpen] = useState(false);
   
   // Récupérer les données client et véhicule depuis la base de données
   useEffect(() => {
@@ -302,10 +304,7 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
   };
 
   const handleClientSignature = () => {
-    toast({
-      title: "Signature du client",
-      description: "Fonctionnalité de signature du client à venir."
-    });
+    setSignatureDialogOpen(true);
   };
 
   return (
@@ -379,7 +378,7 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
                 className="h-10 w-10 p-0"
                 title="Signature du client"
               >
-                <PenTool className="h-5 w-5" />
+                <Signature className="h-5 w-5" />
               </Button>
               <Button
                 variant="ghost"
@@ -439,6 +438,12 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
             description: `La facture a été créée à partir de l'ordre de réparation ${repairOrder.reference}.`
           });
         }}
+      />
+
+      <RepairOrderSignatureDialog
+        repairOrder={repairOrder}
+        open={signatureDialogOpen}
+        onOpenChange={setSignatureDialogOpen}
       />
     </>
   );
