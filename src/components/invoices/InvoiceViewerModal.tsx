@@ -321,20 +321,20 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={handleCreateCredit}
-                className="h-10 w-10 p-0"
-                title="Ajouter un avoir"
-              >
-                <FileX className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
                 onClick={handleCreateReceipt}
                 className="h-10 w-10 p-0"
                 title="Créer un encaissement"
               >
                 <CreditCard className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCreateCredit}
+                className="h-10 w-10 p-0"
+                title="Ajouter un avoir"
+              >
+                <FileX className="h-5 w-5" />
               </Button>
             </div>
           </div>
