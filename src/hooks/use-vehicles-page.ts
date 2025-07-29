@@ -115,9 +115,6 @@ export function useVehiclesPage() {
         mileage: data.mileage ? parseInt(data.mileage) : null,
         insurance_company_id: data.insuranceCompanyId || null, // Convert empty string to null
         insurance_expiry_date: data.insuranceExpiryDate || null,
-        start_date: data.startDate || null,
-        arrival_date: data.arrivalDate || null,
-        end_date: data.endDate || null,
         status: data.status || 'En attente',
         road_test: data.roadTest,
         road_test_notes: data.roadTestNotes,
