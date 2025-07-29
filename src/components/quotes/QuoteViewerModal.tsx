@@ -314,66 +314,66 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
                 variant="ghost"
                 size="sm"
                 onClick={handleEdit}
-                className="h-8 w-8 p-0"
+                className="h-10 w-10 p-0"
                 title="Modifier"
               >
-                <Edit className="h-4 w-4" />
+                <Edit className="h-5 w-5" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleDelete}
-                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                className="h-10 w-10 p-0 text-destructive hover:text-destructive"
                 title="Supprimer"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-5 w-5" />
               </Button>
-              <Separator orientation="vertical" className="h-6 mx-1" />
+              <Separator orientation="vertical" className="h-8 mx-1" />
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handlePrint}
-                className="h-8 w-8 p-0"
+                className="h-10 w-10 p-0"
                 title="Imprimer"
               >
-                <Printer className="h-4 w-4" />
+                <Printer className="h-5 w-5" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleDownload}
-                className="h-8 w-8 p-0"
+                className="h-10 w-10 p-0"
                 title="Télécharger"
               >
-                <Download className="h-4 w-4" />
+                <Download className="h-5 w-5" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleSendEmail}
-                className="h-8 w-8 p-0"
+                className="h-10 w-10 p-0"
                 title="Envoyer par e-mail"
               >
-                <Mail className="h-4 w-4" />
+                <Mail className="h-5 w-5" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleRequestDocuments}
-                className="h-8 w-8 p-0"
+                className="h-10 w-10 p-0"
                 title="Demander les justificatifs"
               >
-                <FileText className="h-4 w-4" />
+                <FileText className="h-5 w-5" />
               </Button>
-              <Separator orientation="vertical" className="h-6 mx-1" />
+              <Separator orientation="vertical" className="h-8 mx-1" />
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleConvertToRepairOrder}
-                className="h-8 w-8 p-0"
+                className="h-10 w-10 p-0"
                 title="Convertir en ordre de réparation"
               >
-                <Wrench className="h-4 w-4" />
+                <Wrench className="h-5 w-5" />
               </Button>
             </div>
           </div>
