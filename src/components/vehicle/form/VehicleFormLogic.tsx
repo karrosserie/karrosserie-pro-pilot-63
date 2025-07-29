@@ -21,9 +21,6 @@ export interface VehicleFormData {
   mileage: string;
   insuranceCompanyId: string;
   insuranceExpiryDate: string;
-  startDate: string;
-  arrivalDate: string;
-  endDate: string;
   status: string;
   roadTest: string;
   roadTestNotes: string;
@@ -110,9 +107,6 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
     mileage: safeDefaultValues.mileage?.toString() || '',
     insuranceCompanyId: safeDefaultValues.insurance_company_id || '',
     insuranceExpiryDate: safeDefaultValues.insurance_expiry_date || '',
-    startDate: safeDefaultValues.start_date || '',
-    arrivalDate: safeDefaultValues.arrival_date || '',
-    endDate: safeDefaultValues.end_date || '',
     status: safeDefaultValues.status || 'En attente',
     roadTest: safeDefaultValues.road_test || '',
     roadTestNotes: safeDefaultValues.road_test_notes || '',
