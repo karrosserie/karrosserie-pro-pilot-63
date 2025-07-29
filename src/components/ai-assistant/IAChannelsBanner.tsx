@@ -63,7 +63,7 @@ const IAChannelsBanner = () => {
       <CardContent className="p-3 sm:p-4 lg:p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
           <div>
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Canaux de Communication IA</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Canaux de communication</h2>
             <p className="text-sm text-gray-600 mt-1">Gestion automatisée des interactions clients</p>
           </div>
           <Dialog open={isConfigOpen} onOpenChange={setIsConfigOpen}>

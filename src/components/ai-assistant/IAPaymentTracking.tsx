@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Eye, Phone, Mail, MessageCircle, MoreHorizontal, Filter, Download, FileText } from 'lucide-react';
 
 const IAPaymentTracking = () => {
-  const [selectedTab, setSelectedTab] = useState('urgent');
+  const [selectedTab, setSelectedTab] = useState('relance1');
 
   const unpaidInvoices = [
     {
@@ -22,7 +22,7 @@ const IAPaymentTracking = () => {
       lastRelanceDate: '19/05/2025',
       relanceType: 'Relance 1',
       relanceTypeColor: 'bg-blue-100 text-blue-800',
-      status: 'urgent',
+      status: 'relance1',
       availableActions: ['sms', 'email', 'courrier', 'recommande']
     },
     {
@@ -37,7 +37,7 @@ const IAPaymentTracking = () => {
       lastRelanceDate: '17/05/2025',
       relanceType: 'Relance 2',
       relanceTypeColor: 'bg-orange-100 text-orange-800',
-      status: 'urgent',
+      status: 'relance2',
       availableActions: ['sms', 'email', 'courrier', 'recommande']
     },
     {
@@ -52,7 +52,7 @@ const IAPaymentTracking = () => {
       lastRelanceDate: '12/05/2025',
       relanceType: 'Relance 3',
       relanceTypeColor: 'bg-orange-100 text-orange-800',
-      status: 'critical',
+      status: 'relance3',
       availableActions: ['sms', 'email', 'courrier', 'recommande']
     },
     {
@@ -67,7 +67,7 @@ const IAPaymentTracking = () => {
       lastRelanceDate: '08/05/2025',
       relanceType: 'Relance 4',
       relanceTypeColor: 'bg-red-100 text-red-800',
-      status: 'critical',
+      status: 'relance4',
       availableActions: ['sms', 'email', 'courrier', 'recommande']
     },
     {
@@ -82,7 +82,7 @@ const IAPaymentTracking = () => {
       lastRelanceDate: '25/04/2025',
       relanceType: 'Contentieux',
       relanceTypeColor: 'bg-red-100 text-red-800',
-      status: 'critical',
+      status: 'contentieux',
       availableActions: ['email', 'courrier', 'recommande']
     }
   ];
@@ -123,7 +123,7 @@ const IAPaymentTracking = () => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <CardTitle className="text-lg sm:text-xl font-semibold text-gray-900">
-              Suivi des Impayés IA
+              Suivi des impayés
             </CardTitle>
             <p className="text-sm text-gray-600 mt-1">
               Gestion automatique des relances et actions de recouvrement
@@ -144,26 +144,53 @@ const IAPaymentTracking = () => {
 
       <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-4 sm:mb-6">
-            <TabsTrigger value="urgent" className="text-xs sm:text-sm">
-              Urgent ({unpaidInvoices.filter(i => i.status === 'urgent').length})
+          <TabsList className="grid w-full grid-cols-6 mb-4 sm:mb-6">
+            <TabsTrigger value="relance1" className="text-xs sm:text-sm">
+              Relance 1 ({unpaidInvoices.filter(i => i.status === 'relance1').length})
             </TabsTrigger>
-            <TabsTrigger value="critical" className="text-xs sm:text-sm">
-              Critique ({unpaidInvoices.filter(i => i.status === 'critical').length})
+            <TabsTrigger value="relance2" className="text-xs sm:text-sm">
+              Relance 2 ({unpaidInvoices.filter(i => i.status === 'relance2').length})
+            </TabsTrigger>
+            <TabsTrigger value="relance3" className="text-xs sm:text-sm">
+              Relance 3 ({unpaidInvoices.filter(i => i.status === 'relance3').length})
+            </TabsTrigger>
+            <TabsTrigger value="relance4" className="text-xs sm:text-sm">
+              Relance 4 ({unpaidInvoices.filter(i => i.status === 'relance4').length})
+            </TabsTrigger>
+            <TabsTrigger value="contentieux" className="text-xs sm:text-sm">
+              Contentieux ({unpaidInvoices.filter(i => i.status === 'contentieux').length})
             </TabsTrigger>
             <TabsTrigger value="all" className="text-xs sm:text-sm">
               Tous ({unpaidInvoices.length})
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="urgent" className="space-y-3 sm:space-y-4">
-            {unpaidInvoices.filter(invoice => invoice.status === 'urgent').map((invoice, index) => (
+          <TabsContent value="relance1" className="space-y-3 sm:space-y-4">
+            {unpaidInvoices.filter(invoice => invoice.status === 'relance1').map((invoice, index) => (
               <InvoiceCard key={index} invoice={invoice} getActionIcon={getActionIcon} getActionLabel={getActionLabel} getActionStyle={getActionStyle} />
             ))}
           </TabsContent>
 
-          <TabsContent value="critical" className="space-y-3 sm:space-y-4">
-            {unpaidInvoices.filter(invoice => invoice.status === 'critical').map((invoice, index) => (
+          <TabsContent value="relance2" className="space-y-3 sm:space-y-4">
+            {unpaidInvoices.filter(invoice => invoice.status === 'relance2').map((invoice, index) => (
+              <InvoiceCard key={index} invoice={invoice} getActionIcon={getActionIcon} getActionLabel={getActionLabel} getActionStyle={getActionStyle} />
+            ))}
+          </TabsContent>
+
+          <TabsContent value="relance3" className="space-y-3 sm:space-y-4">
+            {unpaidInvoices.filter(invoice => invoice.status === 'relance3').map((invoice, index) => (
+              <InvoiceCard key={index} invoice={invoice} getActionIcon={getActionIcon} getActionLabel={getActionLabel} getActionStyle={getActionStyle} />
+            ))}
+          </TabsContent>
+
+          <TabsContent value="relance4" className="space-y-3 sm:space-y-4">
+            {unpaidInvoices.filter(invoice => invoice.status === 'relance4').map((invoice, index) => (
+              <InvoiceCard key={index} invoice={invoice} getActionIcon={getActionIcon} getActionLabel={getActionLabel} getActionStyle={getActionStyle} />
+            ))}
+          </TabsContent>
+
+          <TabsContent value="contentieux" className="space-y-3 sm:space-y-4">
+            {unpaidInvoices.filter(invoice => invoice.status === 'contentieux').map((invoice, index) => (
               <InvoiceCard key={index} invoice={invoice} getActionIcon={getActionIcon} getActionLabel={getActionLabel} getActionStyle={getActionStyle} />
             ))}
           </TabsContent>
