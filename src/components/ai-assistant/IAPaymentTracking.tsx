@@ -262,7 +262,10 @@ const IAPaymentTracking = () => {
                       className={`flex items-center justify-between p-2 rounded cursor-pointer hover:bg-gray-50 ${
                         filterStatus === option.value ? 'bg-blue-50 border border-blue-200' : ''
                       }`}
-                      onClick={() => setFilterStatus(option.value)}
+                       onClick={() => {
+                         setFilterStatus(option.value);
+                         setIsFilterOpen(false);
+                       }}
                     >
                       <span className="text-sm">{option.label}</span>
                       <Badge className="bg-orange-500 text-white text-xs">{option.count}</Badge>
