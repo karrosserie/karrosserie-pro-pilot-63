@@ -13,6 +13,21 @@ interface CompanyPreferences {
   show_client_signature: boolean;
   show_repair_order_details: boolean;
   show_zero_price_products: boolean;
+  show_repair_order_on_documents: boolean;
+  show_client_signature_repair_orders: boolean;
+  use_date_based_reference: boolean;
+  show_payment_details: boolean;
+  set_activities_as_homepage: boolean;
+  show_warning_text: boolean;
+  next_repair_order_ref: string;
+  next_invoice_ref: string;
+  next_credit_ref: string;
+  payment_details?: string;
+  invoice_non_engagement_clause?: string;
+  repair_order_non_engagement_clause?: string;
+  payment_conditions?: string;
+  late_payment_penalties?: string;
+  company_details?: string;
 }
 
 export function useCompanyPreferences() {
@@ -51,6 +66,21 @@ export function useCompanyPreferences() {
             show_client_signature: true,
             show_repair_order_details: true,
             show_zero_price_products: false,
+            show_repair_order_on_documents: false,
+            show_client_signature_repair_orders: true,
+            use_date_based_reference: false,
+            show_payment_details: true,
+            set_activities_as_homepage: true,
+            show_warning_text: true,
+            next_repair_order_ref: '1',
+            next_invoice_ref: '1',
+            next_credit_ref: '1',
+            payment_details: '',
+            invoice_non_engagement_clause: '',
+            repair_order_non_engagement_clause: '',
+            payment_conditions: '',
+            late_payment_penalties: '',
+            company_details: '',
           };
 
           const { data: newData, error: insertError } = await supabase

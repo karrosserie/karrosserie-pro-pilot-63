@@ -51,6 +51,21 @@ const PreferencesTab = () => {
       setCurrency(preferences.currency || 'EUR');
       setShowClientSignatureInvoices(preferences.show_client_signature ?? true);
       setShowZeroPriceProducts(preferences.show_zero_price_products ?? true);
+      setShowRepairOrderOnDocuments(preferences.show_repair_order_on_documents ?? false);
+      setShowClientSignatureRepairOrders(preferences.show_client_signature_repair_orders ?? true);
+      setUseDateBasedReference(preferences.use_date_based_reference ?? false);
+      setShowPaymentDetails(preferences.show_payment_details ?? true);
+      setSetActivitiesAsHomePage(preferences.set_activities_as_homepage ?? true);
+      setShowWarningText(preferences.show_warning_text ?? true);
+      setNextRepairOrderRef(preferences.next_repair_order_ref || '1');
+      setNextInvoiceRef(preferences.next_invoice_ref || '1');
+      setNextCreditRef(preferences.next_credit_ref || '1');
+      setPaymentDetails(preferences.payment_details || '');
+      setInvoiceNonEngagementClause(preferences.invoice_non_engagement_clause || '');
+      setRepairOrderNonEngagementClause(preferences.repair_order_non_engagement_clause || '');
+      setPaymentConditions(preferences.payment_conditions || '');
+      setLatePaymentPenalties(preferences.late_payment_penalties || '');
+      setCompanyDetails(preferences.company_details || '');
     }
   }, [preferences]);
 
@@ -66,6 +81,21 @@ const PreferencesTab = () => {
         invoice_template: selectedTemplate,
         show_client_signature: showClientSignatureInvoices,
         show_zero_price_products: showZeroPriceProducts,
+        show_repair_order_on_documents: showRepairOrderOnDocuments,
+        show_client_signature_repair_orders: showClientSignatureRepairOrders,
+        use_date_based_reference: useDateBasedReference,
+        show_payment_details: showPaymentDetails,
+        set_activities_as_homepage: setActivitiesAsHomePage,
+        show_warning_text: showWarningText,
+        next_repair_order_ref: nextRepairOrderRef,
+        next_invoice_ref: nextInvoiceRef,
+        next_credit_ref: nextCreditRef,
+        payment_details: paymentDetails,
+        invoice_non_engagement_clause: invoiceNonEngagementClause,
+        repair_order_non_engagement_clause: repairOrderNonEngagementClause,
+        payment_conditions: paymentConditions,
+        late_payment_penalties: latePaymentPenalties,
+        company_details: companyDetails,
       };
 
       const { error } = await supabase

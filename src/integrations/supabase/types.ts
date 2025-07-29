@@ -318,43 +318,88 @@ export type Database = {
       }
       company_preferences: {
         Row: {
+          company_details: string | null
           company_id: string
           created_at: string
           currency: string
           id: string
+          invoice_non_engagement_clause: string | null
           invoice_template: string
           language: string
+          late_payment_penalties: string | null
+          next_credit_ref: string
+          next_invoice_ref: string
+          next_repair_order_ref: string
+          payment_conditions: string | null
+          payment_details: string | null
+          repair_order_non_engagement_clause: string | null
+          set_activities_as_homepage: boolean
           show_client_signature: boolean
+          show_client_signature_repair_orders: boolean
+          show_payment_details: boolean
           show_repair_order_details: boolean
+          show_repair_order_on_documents: boolean
+          show_warning_text: boolean
           show_zero_price_products: boolean
           timezone: string
           updated_at: string
+          use_date_based_reference: boolean
         }
         Insert: {
+          company_details?: string | null
           company_id: string
           created_at?: string
           currency?: string
           id?: string
+          invoice_non_engagement_clause?: string | null
           invoice_template?: string
           language?: string
+          late_payment_penalties?: string | null
+          next_credit_ref?: string
+          next_invoice_ref?: string
+          next_repair_order_ref?: string
+          payment_conditions?: string | null
+          payment_details?: string | null
+          repair_order_non_engagement_clause?: string | null
+          set_activities_as_homepage?: boolean
           show_client_signature?: boolean
+          show_client_signature_repair_orders?: boolean
+          show_payment_details?: boolean
           show_repair_order_details?: boolean
+          show_repair_order_on_documents?: boolean
+          show_warning_text?: boolean
           show_zero_price_products?: boolean
           timezone?: string
           updated_at?: string
+          use_date_based_reference?: boolean
         }
         Update: {
+          company_details?: string | null
           company_id?: string
           created_at?: string
           currency?: string
           id?: string
+          invoice_non_engagement_clause?: string | null
           invoice_template?: string
           language?: string
+          late_payment_penalties?: string | null
+          next_credit_ref?: string
+          next_invoice_ref?: string
+          next_repair_order_ref?: string
+          payment_conditions?: string | null
+          payment_details?: string | null
+          repair_order_non_engagement_clause?: string | null
+          set_activities_as_homepage?: boolean
           show_client_signature?: boolean
+          show_client_signature_repair_orders?: boolean
+          show_payment_details?: boolean
           show_repair_order_details?: boolean
+          show_repair_order_on_documents?: boolean
+          show_warning_text?: boolean
           show_zero_price_products?: boolean
           timezone?: string
           updated_at?: string
+          use_date_based_reference?: boolean
         }
         Relationships: []
       }
