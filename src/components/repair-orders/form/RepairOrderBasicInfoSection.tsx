@@ -251,6 +251,65 @@ export const RepairOrderBasicInfoSection = ({
             )}
           </div>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <Label htmlFor="arrival_date">Date d'arrivée</Label>
+            <Input
+              id="arrival_date"
+              type="date"
+              value={formData.arrival_date || ''}
+              onChange={(e) => onFieldChange('arrival_date', e.target.value)}
+              className={cn(
+                errors.arrival_date && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
+              )}
+            />
+            {errors.arrival_date && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.arrival_date}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="start_date">Date de début</Label>
+            <Input
+              id="start_date"
+              type="date"
+              value={formData.start_date || ''}
+              onChange={(e) => onFieldChange('start_date', e.target.value)}
+              className={cn(
+                errors.start_date && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
+              )}
+            />
+            {errors.start_date && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.start_date}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="end_date">Date de fin</Label>
+            <Input
+              id="end_date"
+              type="date"
+              value={formData.end_date || ''}
+              onChange={(e) => onFieldChange('end_date', e.target.value)}
+              className={cn(
+                errors.end_date && "border-red-500 focus-visible:ring-red-500 ring-red-500/20"
+              )}
+            />
+            {errors.end_date && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.end_date}
+              </p>
+            )}
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

@@ -70,8 +70,8 @@ export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, com
             vehicle: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim(),
             licensePlate: vehicle.license_plate || '',
             mileage: vehicle.mileage ? vehicle.mileage.toLocaleString() + ' km' : '',
-            start_date: vehicle.start_date,
-            end_date: vehicle.end_date
+            start_date: repairOrder.start_date,
+            end_date: repairOrder.end_date
           };
         }
       } catch (error) {

@@ -1352,6 +1352,7 @@ export type Database = {
       }
       repair_orders: {
         Row: {
+          arrival_date: string | null
           claim_number: string | null
           client_id: string | null
           client_name_signature: string | null
@@ -1360,6 +1361,7 @@ export type Database = {
           created_at: string
           discounts_data: Json | null
           document_url: string | null
+          end_date: string | null
           expert_name: string | null
           id: string
           incident_date: string | null
@@ -1373,11 +1375,13 @@ export type Database = {
           report_date: string | null
           report_number: string | null
           signature_date: string | null
+          start_date: string | null
           status: string | null
           updated_at: string
           vehicle_id: string | null
         }
         Insert: {
+          arrival_date?: string | null
           claim_number?: string | null
           client_id?: string | null
           client_name_signature?: string | null
@@ -1386,6 +1390,7 @@ export type Database = {
           created_at?: string
           discounts_data?: Json | null
           document_url?: string | null
+          end_date?: string | null
           expert_name?: string | null
           id?: string
           incident_date?: string | null
@@ -1399,11 +1404,13 @@ export type Database = {
           report_date?: string | null
           report_number?: string | null
           signature_date?: string | null
+          start_date?: string | null
           status?: string | null
           updated_at?: string
           vehicle_id?: string | null
         }
         Update: {
+          arrival_date?: string | null
           claim_number?: string | null
           client_id?: string | null
           client_name_signature?: string | null
@@ -1412,6 +1419,7 @@ export type Database = {
           created_at?: string
           discounts_data?: Json | null
           document_url?: string | null
+          end_date?: string | null
           expert_name?: string | null
           id?: string
           incident_date?: string | null
@@ -1425,6 +1433,7 @@ export type Database = {
           report_date?: string | null
           report_number?: string | null
           signature_date?: string | null
+          start_date?: string | null
           status?: string | null
           updated_at?: string
           vehicle_id?: string | null
@@ -1550,13 +1559,11 @@ export type Database = {
       }
       vehicles: {
         Row: {
-          arrival_date: string | null
           brand_id: string | null
           client_id: string | null
           color: string | null
           company_id: string | null
           created_at: string
-          end_date: string | null
           engine_number: string | null
           fuel_level: number | null
           id: string
@@ -1570,7 +1577,6 @@ export type Database = {
           registration_document_front_url: string | null
           road_test: string | null
           road_test_notes: string | null
-          start_date: string | null
           status: string | null
           updated_at: string
           vehicle_image_url: string | null
@@ -1580,13 +1586,11 @@ export type Database = {
           year: number | null
         }
         Insert: {
-          arrival_date?: string | null
           brand_id?: string | null
           client_id?: string | null
           color?: string | null
           company_id?: string | null
           created_at?: string
-          end_date?: string | null
           engine_number?: string | null
           fuel_level?: number | null
           id?: string
@@ -1600,7 +1604,6 @@ export type Database = {
           registration_document_front_url?: string | null
           road_test?: string | null
           road_test_notes?: string | null
-          start_date?: string | null
           status?: string | null
           updated_at?: string
           vehicle_image_url?: string | null
@@ -1610,13 +1613,11 @@ export type Database = {
           year?: number | null
         }
         Update: {
-          arrival_date?: string | null
           brand_id?: string | null
           client_id?: string | null
           color?: string | null
           company_id?: string | null
           created_at?: string
-          end_date?: string | null
           engine_number?: string | null
           fuel_level?: number | null
           id?: string
@@ -1630,7 +1631,6 @@ export type Database = {
           registration_document_front_url?: string | null
           road_test?: string | null
           road_test_notes?: string | null
-          start_date?: string | null
           status?: string | null
           updated_at?: string
           vehicle_image_url?: string | null
