@@ -306,71 +306,77 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
-          <DialogHeader className="p-4 pb-0">
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="text-lg font-semibold">Aperçu du devis {quote.reference}</h2>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleEdit}
-                  className="h-8 w-8 p-0"
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleDelete}
-                  className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-                <Separator orientation="vertical" className="h-6" />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handlePrint}
-                  className="h-8 w-8 p-0"
-                >
-                  <Printer className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleDownload}
-                  className="h-8 w-8 p-0"
-                >
-                  <Download className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleSendEmail}
-                  className="h-8 w-8 p-0"
-                >
-                  <Mail className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleRequestDocuments}
-                  className="h-8 w-8 p-0"
-                >
-                  <FileText className="h-4 w-4" />
-                </Button>
-                <Separator orientation="vertical" className="h-6" />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleConvertToRepairOrder}
-                  className="h-8 w-8 p-0"
-                >
-                  <Wrench className="h-4 w-4" />
-                </Button>
-              </div>
+          {/* Barre d'actions en haut */}
+          <div className="flex items-center justify-between gap-2 p-4 border-b bg-background">
+            <h2 className="text-lg font-semibold">Aperçu du devis {quote.reference}</h2>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleEdit}
+                className="h-8 w-8 p-0"
+                title="Modifier"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleDelete}
+                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                title="Supprimer"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+              <Separator orientation="vertical" className="h-6 mx-1" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handlePrint}
+                className="h-8 w-8 p-0"
+                title="Imprimer"
+              >
+                <Printer className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleDownload}
+                className="h-8 w-8 p-0"
+                title="Télécharger"
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSendEmail}
+                className="h-8 w-8 p-0"
+                title="Envoyer par e-mail"
+              >
+                <Mail className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRequestDocuments}
+                className="h-8 w-8 p-0"
+                title="Demander les justificatifs"
+              >
+                <FileText className="h-4 w-4" />
+              </Button>
+              <Separator orientation="vertical" className="h-6 mx-1" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleConvertToRepairOrder}
+                className="h-8 w-8 p-0"
+                title="Convertir en ordre de réparation"
+              >
+                <Wrench className="h-4 w-4" />
+              </Button>
             </div>
-          </DialogHeader>
+          </div>
           <div className="w-full h-full">
             {template === 'default' ? (
               <DefaultQuotePreview 
