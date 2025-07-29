@@ -137,14 +137,14 @@ const Quotes = () => {
     return quote.amount || 0;
   };
 
-  // Effet pour ouvrir automatiquement un devis depuis l'URL
+  // Effet pour ouvrir automatiquement l'aperçu d'un devis depuis l'URL
   useEffect(() => {
     const openQuoteId = searchParams.get('openQuote');
     if (openQuoteId && quotes && quotes.length > 0) {
       const quoteToOpen = quotes.find(quote => quote.id === openQuoteId);
       if (quoteToOpen) {
         setSelectedQuote(quoteToOpen);
-        setEditDialogOpen(true);
+        setViewerModalOpen(true); // Ouvrir l'aperçu au lieu de l'édition
         // Nettoyer le paramètre URL après ouverture
         setSearchParams(params => {
           params.delete('openQuote');
