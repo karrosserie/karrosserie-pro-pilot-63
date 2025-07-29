@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Phone, Mail, MessageCircle, FileText, Settings, MessageSquare, Clock, Target, Zap, AlertTriangle, Calendar } from 'lucide-react';
+import { Phone, Mail, MessageCircle, FileText, Settings, MessageSquare, Calendar, Zap, AlertTriangle } from 'lucide-react';
 
 const IAChannelsBanner = () => {
   const [isConfigOpen, setIsConfigOpen] = useState(false);
@@ -184,140 +184,129 @@ const IAChannelsBanner = () => {
                 </DialogTitle>
               </DialogHeader>
               
-              <Tabs defaultValue="cycle" className="w-full">
-                <TabsList className="grid w-full grid-cols-1">
-                  <TabsTrigger value="cycle" className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Cycle de relance
-                  </TabsTrigger>
-                </TabsList>
+              <div className="space-y-6 mt-6">
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <p className="text-sm text-blue-800 font-medium mb-2">
+                    📅 Délai = jours depuis la date d'échéance du paiement
+                  </p>
+                  <p className="text-xs text-blue-600">
+                    Calendrier progressif avec montée en intensité automatique
+                  </p>
+                </div>
 
-                <TabsContent value="cycle" className="space-y-6 mt-6">
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <p className="text-sm text-blue-800 font-medium mb-2">
-                      📅 Délai = jours depuis la date d'échéance du paiement
-                    </p>
-                    <p className="text-xs text-blue-600">
-                      Calendrier progressif avec montée en intensité automatique
+                <div className="space-y-4">
+                  {relanceConfig.steps.map((step, index) => (
+                    <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                            {index + 1}
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-gray-900">
+                              Jour J+{step.day}
+                            </h4>
+                            <Badge className={getToneColor(step.tone)}>
+                              Ton {step.tone}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium text-gray-900">{step.message}</p>
+                          <p className="text-xs text-gray-600">{step.objective}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {step.channels.map((channel, channelIndex) => (
+                          <div key={channelIndex} className="flex items-center gap-1 bg-white px-2 py-1 rounded border text-xs">
+                            {getChannelIcon(channel)}
+                            <span>{getChannelLabel(channel)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Section Escalade Express */}
+                <div className="mt-8 space-y-6">
+                  <div className="bg-red-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-red-800 mb-2 flex items-center gap-2">
+                      <Zap className="h-4 w-4" />
+                      Option "Escalade Express"
+                    </h4>
+                    <p className="text-sm text-red-700">
+                      Passage accéléré pour les montants élevés ou clients récidivistes
                     </p>
                   </div>
 
                   <div className="space-y-4">
-                    {relanceConfig.steps.map((step, index) => (
-                      <div key={index} className="border rounded-lg p-4 bg-gray-50">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                              {index + 1}
-                            </div>
-                            <div>
-                              <h4 className="font-semibold text-gray-900">
-                                Jour J+{step.day}
-                              </h4>
-                              <Badge className={getToneColor(step.tone)}>
-                                Ton {step.tone}
-                              </Badge>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm font-medium text-gray-900">{step.message}</p>
-                            <p className="text-xs text-gray-600">{step.objective}</p>
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium">Activer l'escalade express</Label>
+                      <Switch 
+                        checked={relanceConfig.escaladeExpress.enabled}
+                        onCheckedChange={(checked) => setRelanceConfig(prev => ({
+                          ...prev,
+                          escaladeExpress: { ...prev.escaladeExpress, enabled: checked }
+                        }))}
+                      />
+                    </div>
+
+                    {relanceConfig.escaladeExpress.enabled && (
+                      <div className="space-y-4 ml-6">
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium">Montant minimum</Label>
+                          <div className="flex items-center gap-2">
+                            <Input 
+                              type="number"
+                              value={relanceConfig.escaladeExpress.minAmount}
+                              onChange={(e) => setRelanceConfig(prev => ({
+                                ...prev,
+                                escaladeExpress: { ...prev.escaladeExpress, minAmount: parseInt(e.target.value) || 5000 }
+                              }))}
+                              className="w-32"
+                            />
+                            <span className="text-sm text-gray-600">€</span>
                           </div>
                         </div>
-                        
-                        <div className="flex flex-wrap gap-2 mt-3">
-                          {step.channels.map((channel, channelIndex) => (
-                            <div key={channelIndex} className="flex items-center gap-1 bg-white px-2 py-1 rounded border text-xs">
-                              {getChannelIcon(channel)}
-                              <span>{getChannelLabel(channel)}</span>
-                            </div>
-                          ))}
+
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium">Passer directement au jour</Label>
+                          <Select 
+                            value={relanceConfig.escaladeExpress.skipToDay.toString()}
+                            onValueChange={(value) => setRelanceConfig(prev => ({
+                              ...prev,
+                              escaladeExpress: { ...prev.escaladeExpress, skipToDay: parseInt(value) }
+                            }))}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="3">J+3</SelectItem>
+                              <SelectItem value="7">J+7</SelectItem>
+                              <SelectItem value="10">J+10</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
-                       </div>
-                     ))}
-                   </div>
 
-                   {/* Section Escalade Express déplacée */}
-                   <div className="mt-8 space-y-6">
-                     <div className="bg-red-50 p-4 rounded-lg">
-                       <h4 className="font-semibold text-red-800 mb-2 flex items-center gap-2">
-                         <Zap className="h-4 w-4" />
-                         Option "Escalade Express"
-                       </h4>
-                       <p className="text-sm text-red-700">
-                         Passage accéléré pour les montants élevés ou clients récidivistes
-                       </p>
-                     </div>
-
-                     <div className="space-y-4">
-                       <div className="flex items-center justify-between">
-                         <Label className="text-sm font-medium">Activer l'escalade express</Label>
-                         <Switch 
-                           checked={relanceConfig.escaladeExpress.enabled}
-                           onCheckedChange={(checked) => setRelanceConfig(prev => ({
-                             ...prev,
-                             escaladeExpress: { ...prev.escaladeExpress, enabled: checked }
-                           }))}
-                         />
-                       </div>
-
-                       {relanceConfig.escaladeExpress.enabled && (
-                         <div className="space-y-4 ml-6">
-                           <div className="space-y-2">
-                             <Label className="text-sm font-medium">Montant minimum</Label>
-                             <div className="flex items-center gap-2">
-                               <Input 
-                                 type="number"
-                                 value={relanceConfig.escaladeExpress.minAmount}
-                                 onChange={(e) => setRelanceConfig(prev => ({
-                                   ...prev,
-                                   escaladeExpress: { ...prev.escaladeExpress, minAmount: parseInt(e.target.value) || 5000 }
-                                 }))}
-                                 className="w-32"
-                               />
-                               <span className="text-sm text-gray-600">€</span>
-                             </div>
-                           </div>
-
-                           <div className="space-y-2">
-                             <Label className="text-sm font-medium">Passer directement au jour</Label>
-                             <Select 
-                               value={relanceConfig.escaladeExpress.skipToDay.toString()}
-                               onValueChange={(value) => setRelanceConfig(prev => ({
-                                 ...prev,
-                                 escaladeExpress: { ...prev.escaladeExpress, skipToDay: parseInt(value) }
-                               }))}
-                             >
-                               <SelectTrigger className="w-32">
-                                 <SelectValue />
-                               </SelectTrigger>
-                               <SelectContent>
-                                 <SelectItem value="3">J+3</SelectItem>
-                                 <SelectItem value="7">J+7</SelectItem>
-                                 <SelectItem value="10">J+10</SelectItem>
-                               </SelectContent>
-                             </Select>
-                           </div>
-
-                           <div className="bg-yellow-50 p-3 rounded border">
-                             <p className="text-sm text-yellow-800">
-                               <AlertTriangle className="h-4 w-4 inline mr-1" />
-                               <strong>Conditions d'activation :</strong>
-                             </p>
-                             <ul className="text-xs text-yellow-700 mt-1 space-y-1">
-                               <li>• Montant &gt; {relanceConfig.escaladeExpress.minAmount}€</li>
-                               <li>• Historique de retards de paiement</li>
-                               <li>• Client en liste de surveillance</li>
-                             </ul>
-                           </div>
-                         </div>
-                       )}
-                     </div>
-                   </div>
-                 </TabsContent>
-
-
-              </Tabs>
+                        <div className="bg-yellow-50 p-3 rounded border">
+                          <p className="text-sm text-yellow-800">
+                            <AlertTriangle className="h-4 w-4 inline mr-1" />
+                            <strong>Conditions d'activation :</strong>
+                          </p>
+                          <ul className="text-xs text-yellow-700 mt-1 space-y-1">
+                            <li>• Montant &gt; {relanceConfig.escaladeExpress.minAmount}€</li>
+                            <li>• Historique de retards de paiement</li>
+                            <li>• Client en liste de surveillance</li>
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
 
               <div className="flex justify-end space-x-2 pt-6 border-t">
                 <Button variant="outline" onClick={() => setIsConfigOpen(false)}>
