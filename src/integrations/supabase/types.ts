@@ -1354,6 +1354,7 @@ export type Database = {
         Row: {
           arrival_date: string | null
           claim_number: string | null
+          cleanliness_condition: string | null
           client_id: string | null
           client_name_signature: string | null
           client_signature: string | null
@@ -1363,6 +1364,7 @@ export type Database = {
           document_url: string | null
           end_date: string | null
           expert_name: string | null
+          general_condition: string | null
           id: string
           incident_date: string | null
           notes: string | null
@@ -1383,6 +1385,7 @@ export type Database = {
         Insert: {
           arrival_date?: string | null
           claim_number?: string | null
+          cleanliness_condition?: string | null
           client_id?: string | null
           client_name_signature?: string | null
           client_signature?: string | null
@@ -1392,6 +1395,7 @@ export type Database = {
           document_url?: string | null
           end_date?: string | null
           expert_name?: string | null
+          general_condition?: string | null
           id?: string
           incident_date?: string | null
           notes?: string | null
@@ -1412,6 +1416,7 @@ export type Database = {
         Update: {
           arrival_date?: string | null
           claim_number?: string | null
+          cleanliness_condition?: string | null
           client_id?: string | null
           client_name_signature?: string | null
           client_signature?: string | null
@@ -1421,6 +1426,7 @@ export type Database = {
           document_url?: string | null
           end_date?: string | null
           expert_name?: string | null
+          general_condition?: string | null
           id?: string
           incident_date?: string | null
           notes?: string | null

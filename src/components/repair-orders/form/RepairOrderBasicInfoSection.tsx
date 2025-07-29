@@ -310,6 +310,78 @@ export const RepairOrderBasicInfoSection = ({
             )}
           </div>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="general_condition">État général</Label>
+            <Select
+              value={formData.general_condition || ''}
+              onValueChange={(value) => onFieldChange('general_condition', value)}
+            >
+              <SelectTrigger
+                id="general_condition"
+                className={cn(
+                  errors.general_condition && "border-red-500 focus-visible:ring-red-500"
+                )}
+              >
+                <SelectValue placeholder="Sélectionner un état général" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border border-border shadow-md z-50">
+                <SelectItem value="État neuf">État neuf - Véhicule sans aucun défaut, comme sorti d'usine</SelectItem>
+                <SelectItem value="Excellent état">Excellent état - Quasi neuf avec signes d'utilisation minimes</SelectItem>
+                <SelectItem value="Très bon état">Très bon état - Légères traces d'utilisation normales</SelectItem>
+                <SelectItem value="Bon état">Bon état - Signes d'usure visibles mais bien entretenu</SelectItem>
+                <SelectItem value="État correct">État correct - Usure générale visible</SelectItem>
+                <SelectItem value="État moyen">État moyen - Défauts esthétiques notables</SelectItem>
+                <SelectItem value="État médiocre">État médiocre - Dégradation significative</SelectItem>
+                <SelectItem value="Mauvais état">Mauvais état - Détérioration importante</SelectItem>
+                <SelectItem value="Très mauvais état">Très mauvais état - Véhicule fortement détérioré</SelectItem>
+                <SelectItem value="État d'épave">État d'épave - Véhicule non roulant ou dangereux</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.general_condition && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.general_condition}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="cleanliness_condition">État de propreté</Label>
+            <Select
+              value={formData.cleanliness_condition || ''}
+              onValueChange={(value) => onFieldChange('cleanliness_condition', value)}
+            >
+              <SelectTrigger
+                id="cleanliness_condition"
+                className={cn(
+                  errors.cleanliness_condition && "border-red-500 focus-visible:ring-red-500"
+                )}
+              >
+                <SelectValue placeholder="Sélectionner un état de propreté" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border border-border shadow-md z-50">
+                <SelectItem value="Immaculé">Immaculé - Véhicule parfaitement propre, comme neuf</SelectItem>
+                <SelectItem value="Très propre">Très propre - Légère couche de poussière fine à peine visible</SelectItem>
+                <SelectItem value="Propre">Propre - Carrosserie avec légère saleté visible mais conservant son éclat</SelectItem>
+                <SelectItem value="Acceptable">Acceptable - Saleté visible sur la carrosserie mais sans accumulation majeure</SelectItem>
+                <SelectItem value="Négligé">Négligé - Couche évidente de poussière/saleté sur l'extérieur</SelectItem>
+                <SelectItem value="Sale">Sale - Carrosserie recouverte de poussière/boue/sel</SelectItem>
+                <SelectItem value="Très sale">Très sale - Boue/saleté épaisse sur l'extérieur</SelectItem>
+                <SelectItem value="Extrêmement sale">Extrêmement sale - Véhicule visiblement non nettoyé depuis longtemps</SelectItem>
+                <SelectItem value="Insalubre">Insalubre - État de saleté extrême présentant des risques sanitaires</SelectItem>
+                <SelectItem value="État d'abandon">État d'abandon - Véhicule non entretenu depuis des mois/années</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.cleanliness_condition && (
+              <p className="text-sm text-red-500 mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {errors.cleanliness_condition}
+              </p>
+            )}
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
