@@ -12,7 +12,7 @@ import { calculateInvoiceTotals } from '@/utils/invoiceCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Edit, Trash2, Printer, Download, Mail, CreditCard, Minus } from 'lucide-react';
+import { Edit, Trash2, Printer, Download, Mail, CreditCard, FileX } from 'lucide-react';
 import DefaultInvoicePreview from './templates/DefaultInvoicePreview';
 import AlternativeInvoicePreview from './templates/AlternativeInvoicePreview';
 import InvoiceDialog from './InvoiceDialog';
@@ -325,7 +325,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
                 className="h-10 w-10 p-0"
                 title="Ajouter un avoir"
               >
-                <Minus className="h-5 w-5" />
+                <FileX className="h-5 w-5" />
               </Button>
               <Button
                 variant="ghost"
