@@ -11,7 +11,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
-import { Receipt, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { Receipt, Eye, Pencil, Trash, Download, Printer, Mail, CreditCard, FileX } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
@@ -29,7 +29,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Download, Printer, Mail, CreditCard, FileX } from 'lucide-react';
+
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import InvoiceViewerModal from '@/components/invoices/InvoiceViewerModal';
 import InvoiceEmailDialog from '@/components/invoices/InvoiceEmailDialog';
@@ -269,7 +269,7 @@ const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) =>
                 const invoiceCredits = getInvoiceCredits(invoice.id);
                 return (
                 <React.Fragment key={invoice.id}>
-                  <TableRow className="border-b-0">
+                  <TableRow className="hover:bg-gray-50 border-b-0">
                     <TableCell className="font-medium">{invoice.reference}</TableCell>
                     <TableCell>{formatDate(invoice.created_at)}</TableCell>
                     <TableCell>
@@ -297,68 +297,33 @@ const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) =>
                   <TableRow className="border-t-0">
                     <TableCell colSpan={7} className="py-3 border-t-0">
                       <div className="flex flex-wrap gap-2 justify-end px-4">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleView(invoice)}
-                          title="Visualiser"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handleView(invoice)}>
                           <Eye className="h-4 w-4 mr-1" />
-                          Visualiser
+                          Voir
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleEdit(invoice)}
-                          title="Modifier"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handleEdit(invoice)}>
                           <Pencil className="h-4 w-4 mr-1" />
                           Modifier
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleDownload(invoice)}
-                          title="Télécharger"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handleDownload(invoice)}>
                           <Download className="h-4 w-4 mr-1" />
                           Télécharger
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handlePrint(invoice)}
-                          title="Imprimer"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handlePrint(invoice)}>
                           <Printer className="h-4 w-4 mr-1" />
                           Imprimer
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleSendEmail(invoice)}
-                          title="Envoyer par e-mail"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(invoice)}>
                           <Mail className="h-4 w-4 mr-1" />
-                          Envoyer par e-mail
+                          Envoyer
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleAddPayment(invoice)}
-                          title="Ajouter un paiement"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handleAddPayment(invoice)}>
                           <CreditCard className="h-4 w-4 mr-1" />
-                          Ajouter un paiement
+                          Créer un paiement
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleAddCredit(invoice)}
-                          title="Ajouter un avoir"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handleAddCredit(invoice)}>
                           <FileX className="h-4 w-4 mr-1" />
-                          Ajouter un avoir
+                          Créer un avoir
                         </Button>
                         <Button 
                           variant="outline" 
