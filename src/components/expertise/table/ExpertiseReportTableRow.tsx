@@ -97,22 +97,6 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
       <TableRow className="border-t-0">
         <TableCell colSpan={6} className="py-3 border-t-0">
           <div className="flex flex-wrap gap-2 justify-end px-4">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => onEditReport(report)}
-                  disabled={isConverted}
-                >
-                  <Pencil className="h-4 w-4 mr-1" />
-                  Modifier
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {isConverted ? 'Impossible de modifier un rapport converti' : 'Modifier le rapport'}
-              </TooltipContent>
-            </Tooltip>
 
             <Tooltip>
               <TooltipTrigger asChild>

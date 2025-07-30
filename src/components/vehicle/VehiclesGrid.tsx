@@ -156,33 +156,36 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
               </div>
             </div>
             
-            <div className="border-t border-gray-100 mt-4 pt-4 flex justify-center">
-              <div className="flex items-center space-x-1">
-                <Button variant="ghost" size="icon" onClick={() => onViewVehicle(vehicle)}>
-                  <Eye className="h-4 w-4" />
+            <div className="border-t border-gray-100 mt-4 pt-3">
+              <div className="flex flex-wrap gap-2 justify-center">
+                <Button variant="outline" size="sm" onClick={() => onViewVehicle(vehicle)}>
+                  <Eye className="h-4 w-4 mr-1" />
+                  Voir
                 </Button>
-                <Button variant="ghost" size="icon" onClick={() => onEditVehicle(vehicle)}>
-                  <Pencil className="h-4 w-4" />
+                <Button variant="outline" size="sm" onClick={() => onEditVehicle(vehicle)}>
+                  <Pencil className="h-4 w-4 mr-1" />
+                  Modifier
                 </Button>
-                
-                {/* Boutons déplacés du menu contextuel */}
-                <Button variant="ghost" size="icon" onClick={(e) => handleCreateQuote(e, vehicle)}>
-                  <FileText className="h-4 w-4" />
+                <Button variant="outline" size="sm" onClick={(e) => handleCreateQuote(e, vehicle)}>
+                  <FileText className="h-4 w-4 mr-1" />
+                  Créer devis
                 </Button>
-                <Button variant="ghost" size="icon" onClick={(e) => handleCreateInvoice(e, vehicle)}>
-                  <Receipt className="h-4 w-4" />
+                <Button variant="outline" size="sm" onClick={(e) => handleCreateInvoice(e, vehicle)}>
+                  <Receipt className="h-4 w-4 mr-1" />
+                  Créer facture
                 </Button>
-                <Button variant="ghost" size="icon" onClick={(e) => handleCreateIntervention(e, vehicle)}>
-                  <Wrench className="h-4 w-4" />
+                <Button variant="outline" size="sm" onClick={(e) => handleCreateIntervention(e, vehicle)}>
+                  <Wrench className="h-4 w-4 mr-1" />
+                  Créer fiche
                 </Button>
-                
                 <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className="text-red-500 hover:text-red-700" 
+                  variant="outline" 
+                  size="sm"
+                  className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700" 
                   onClick={() => onDeleteVehicle(vehicle.id)}
                 >
-                  <Trash className="h-4 w-4" />
+                  <Trash className="h-4 w-4 mr-1" />
+                  Supprimer
                 </Button>
               </div>
             </div>
