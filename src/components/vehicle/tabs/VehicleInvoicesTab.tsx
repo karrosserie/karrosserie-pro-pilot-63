@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useCredits } from '@/hooks/use-credits';
+import { useTableSorting } from '@/hooks/use-table-sorting';
 import { 
   Table, 
   TableBody, 
@@ -9,6 +10,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { Receipt, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -65,6 +67,7 @@ const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) =>
   }
 
   const vehicleInvoices = invoices?.filter(invoice => invoice.vehicle_id === vehicleId) || [];
+  const { sortedData, sortConfig, handleSort } = useTableSorting(vehicleInvoices, 'reference');
 
   const handleView = (invoice: Invoice) => {
     setSelectedInvoice(invoice);
@@ -241,99 +244,141 @@ const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) =>
               <Table>
                 <TableHeader>
                   <TableRow>
-              <TableHead>Numéro</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Client</TableHead>
-              <TableHead>Véhicule</TableHead>
-              <TableHead>Montant</TableHead>
-              <TableHead>Avoirs</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+                    <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
+                      Numéro
+                    </SortableTableHeader>
+                    <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
+                      Date
+                    </SortableTableHeader>
+                    <SortableTableHeader sortKey="clients.first_name" sortConfig={sortConfig} onSort={handleSort}>
+                      Client
+                    </SortableTableHeader>
+                    <TableHead>Véhicule</TableHead>
+                    <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
+                      Montant
+                    </SortableTableHeader>
+                    <TableHead>Avoirs</TableHead>
+                    <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                      Statut
+                    </SortableTableHeader>
                   </TableRow>
                 </TableHeader>
           <TableBody>
-            {vehicleInvoices.length > 0 ? (
-              vehicleInvoices.map((invoice) => {
+            {sortedData.length > 0 ? (
+              sortedData.map((invoice) => {
                 const invoiceCredits = getInvoiceCredits(invoice.id);
                 return (
-                <TableRow key={invoice.id}>
-                        <TableCell className="font-medium">{invoice.reference}</TableCell>
-                        <TableCell>{formatDate(invoice.created_at)}</TableCell>
-                        <TableCell>
-                          {invoice.clients 
-                            ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
-                            : '-'
-                          }
-                        </TableCell>
-                        <TableCell>
-                          {invoice.vehicles 
-                            ? `${invoice.vehicles.car_brands?.name || 'Marque inconnue'} ${invoice.vehicles.car_models?.name || 'Modèle inconnu'} - ${invoice.vehicles.license_plate}`
-                            : '-'
-                          }
-                        </TableCell>
-                        <TableCell>{formatAmount(invoice.amount || 0)}</TableCell>
-                        <TableCell>
-                          {renderCreditsBadges(invoiceCredits)}
-                        </TableCell>
-                        <TableCell>
-                          <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente de paiement')}`}>
-                            {invoice.status || 'En attente de paiement'}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end space-x-1">
-                            <Button variant="ghost" size="icon" onClick={() => handleView(invoice)}>
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => handleEdit(invoice)}>
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="text-red-500 hover:text-red-700"
-                              onClick={() => handleDelete(invoice)}
-                            >
-                              <Trash className="h-4 w-4" />
-                            </Button>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent className="w-56">
-                                <DropdownMenuItem onClick={() => handleDownload(invoice)}>
-                                  <Download className="mr-2 h-4 w-4" />
-                                  Télécharger
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handlePrint(invoice)}>
-                                  <Printer className="mr-2 h-4 w-4" />
-                                  Imprimer
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleSendEmail(invoice)}>
-                                  <Mail className="mr-2 h-4 w-4" />
-                                  Envoyer par e-mail
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => handleAddPayment(invoice)}>
-                                  <CreditCard className="mr-2 h-4 w-4" />
-                                  Ajouter un paiement
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleAddCredit(invoice)}>
-                                  <FileX className="mr-2 h-4 w-4" />
-                                  Ajouter un avoir
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                  </div>
-                </TableCell>
-              </TableRow>
-              );
+                <React.Fragment key={invoice.id}>
+                  <TableRow className="border-b-0">
+                    <TableCell className="font-medium">{invoice.reference}</TableCell>
+                    <TableCell>{formatDate(invoice.created_at)}</TableCell>
+                    <TableCell>
+                      {invoice.clients 
+                        ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
+                        : '-'
+                      }
+                    </TableCell>
+                    <TableCell>
+                      {invoice.vehicles 
+                        ? `${invoice.vehicles.car_brands?.name || 'Marque inconnue'} ${invoice.vehicles.car_models?.name || 'Modèle inconnu'} - ${invoice.vehicles.license_plate}`
+                        : '-'
+                      }
+                    </TableCell>
+                    <TableCell>{formatAmount(invoice.amount || 0)}</TableCell>
+                    <TableCell>
+                      {renderCreditsBadges(invoiceCredits)}
+                    </TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente de paiement')}`}>
+                        {invoice.status || 'En attente de paiement'}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="border-t-0">
+                    <TableCell colSpan={7} className="py-3 border-t-0">
+                      <div className="flex flex-wrap gap-2 justify-end px-4">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleView(invoice)}
+                          title="Visualiser"
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          Visualiser
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleEdit(invoice)}
+                          title="Modifier"
+                        >
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleDownload(invoice)}
+                          title="Télécharger"
+                        >
+                          <Download className="h-4 w-4 mr-1" />
+                          Télécharger
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handlePrint(invoice)}
+                          title="Imprimer"
+                        >
+                          <Printer className="h-4 w-4 mr-1" />
+                          Imprimer
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleSendEmail(invoice)}
+                          title="Envoyer par e-mail"
+                        >
+                          <Mail className="h-4 w-4 mr-1" />
+                          Envoyer par e-mail
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleAddPayment(invoice)}
+                          title="Ajouter un paiement"
+                        >
+                          <CreditCard className="h-4 w-4 mr-1" />
+                          Ajouter un paiement
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleAddCredit(invoice)}
+                          title="Ajouter un avoir"
+                        >
+                          <FileX className="h-4 w-4 mr-1" />
+                          Ajouter un avoir
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                          onClick={() => handleDelete(invoice)}
+                          title="Supprimer"
+                        >
+                          <Trash className="h-4 w-4 mr-1" />
+                          Supprimer
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </React.Fragment>
+                );
               })
             ) : (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-4">
+                      <TableCell colSpan={7} className="text-center py-4">
                         <div className="flex flex-col items-center justify-center py-8">
                           <Receipt className="h-10 w-10 text-gray-400 mb-2" />
                           <h3 className="font-medium text-gray-900">Aucune facture</h3>

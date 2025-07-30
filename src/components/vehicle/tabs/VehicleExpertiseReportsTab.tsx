@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useReportToQuote } from '@/hooks/use-report-to-quote';
+import { useTableSorting } from '@/hooks/use-table-sorting';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { FileText, Pencil, Trash, MoreVertical, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -31,6 +33,7 @@ const VehicleExpertiseReportsTab: React.FC<VehicleExpertiseReportsTabProps> = ({
   const [selectedReport, setSelectedReport] = useState<ExpertiseReport | null>(null);
 
   const vehicleReports = reports?.filter(report => report.vehicle_id === vehicleId) || [];
+  const { sortedData, sortConfig, handleSort } = useTableSorting(vehicleReports, 'report_number');
 
   // Vérifier le statut de conversion des rapports quand ils changent
   useEffect(() => {
@@ -127,105 +130,107 @@ const VehicleExpertiseReportsTab: React.FC<VehicleExpertiseReportsTabProps> = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[200px]">Numéro</TableHead>
-              <TableHead className="w-[120px]">Date</TableHead>
-              <TableHead>Client</TableHead>
+              <SortableTableHeader sortKey="report_number" sortConfig={sortConfig} onSort={handleSort}>
+                Numéro
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
+                Date
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="clients.first_name" sortConfig={sortConfig} onSort={handleSort}>
+                Client
+              </SortableTableHeader>
               <TableHead>Véhicule</TableHead>
-              <TableHead className="w-[120px]">Montant</TableHead>
-              <TableHead className="w-[120px]">Statut</TableHead>
-              <TableHead className="text-right w-[160px]">Actions</TableHead>
+              <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
+                Montant
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                Statut
+              </SortableTableHeader>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {vehicleReports.length > 0 ? (
-              vehicleReports.map((report) => (
-                <TableRow key={report.id} className="hover:bg-gray-50">
-                  <TableCell>
-                    {report.report_number || 'Non spécifié'}
-                  </TableCell>
-                  <TableCell>
-                    {report.report_date ? new Date(report.report_date).toLocaleDateString('fr-FR') : 'Non spécifiée'}
-                  </TableCell>
-                  <TableCell>
-                    {report.clients ? (
-                      <span>
-                        {report.clients.first_name} {report.clients.last_name}
-                      </span>
-                    ) : (
-                      <span className="text-gray-400 italic">Non assigné</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {report.vehicles 
-                      ? `${report.vehicles.car_brands?.name || 'Marque inconnue'} ${report.vehicles.car_models?.name || 'Modèle inconnu'} - ${report.vehicles.license_plate || 'Plaque non spécifiée'}`
-                      : 'Non assigné'
-                    }
-                  </TableCell>
-                  <TableCell>
-                    {formatAmount(report.amount)}
-                  </TableCell>
-                  <TableCell>
-                    {getStatusDisplay(report)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="icon"
-                            onClick={() => handleEditReport(report)}
-                            disabled={isConverted(report.id)}
-                            className="h-8 w-8"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          {isConverted(report.id) ? 'Impossible de modifier un rapport converti' : 'Modifier le rapport'}
-                        </TooltipContent>
-                      </Tooltip>
-
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="text-red-500 hover:text-red-700 h-8 w-8"
-                            onClick={() => handleDeleteReport(report.id)}
-                            disabled={isConverted(report.id)}
-                          >
-                            <Trash className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          {isConverted(report.id) ? 'Impossible de supprimer un rapport converti' : 'Supprimer le rapport'}
-                        </TooltipContent>
-                      </Tooltip>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem 
-                            onClick={() => window.open(report.document_url, '_blank')}
-                            disabled={!report.document_url}
-                          >
-                            <Download className="mr-2 h-4 w-4" />
-                            Télécharger
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </TableCell>
-                </TableRow>
+            {sortedData.length > 0 ? (
+              sortedData.map((report) => (
+                <React.Fragment key={report.id}>
+                  <TableRow className="border-b-0">
+                    <TableCell className="font-medium">{report.report_number || 'Non spécifié'}</TableCell>
+                    <TableCell>{report.report_date ? new Date(report.report_date).toLocaleDateString('fr-FR') : 'Non spécifiée'}</TableCell>
+                    <TableCell>
+                      {report.clients ? (
+                        <span>
+                          {report.clients.first_name} {report.clients.last_name}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 italic">Non assigné</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {report.vehicles 
+                        ? `${report.vehicles.car_brands?.name || 'Marque inconnue'} ${report.vehicles.car_models?.name || 'Modèle inconnu'} - ${report.vehicles.license_plate || 'Plaque non spécifiée'}`
+                        : 'Non assigné'
+                      }
+                    </TableCell>
+                    <TableCell>
+                      {formatAmount(report.amount)}
+                    </TableCell>
+                    <TableCell>
+                      {getStatusDisplay(report)}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="border-t-0">
+                    <TableCell colSpan={6} className="py-3 border-t-0">
+                      <div className="flex flex-wrap gap-2 justify-end px-4">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => window.open(report.document_url, '_blank')}
+                              disabled={!report.document_url}
+                              title="Télécharger"
+                            >
+                              <Download className="h-4 w-4 mr-1" />
+                              Télécharger
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Télécharger</TooltipContent>
+                        </Tooltip>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleEditReport(report)}
+                          disabled={isConverted(report.id)}
+                          title={isConverted(report.id) ? 'Impossible de modifier un rapport converti' : 'Modifier le rapport'}
+                        >
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                              onClick={() => handleDeleteReport(report.id)}
+                              disabled={isConverted(report.id)}
+                              title={isConverted(report.id) ? 'Impossible de supprimer un rapport converti' : 'Supprimer le rapport'}
+                            >
+                              <Trash className="h-4 w-4 mr-1" />
+                              Supprimer
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {isConverted(report.id) ? 'Impossible de supprimer un rapport converti' : 'Supprimer le rapport'}
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </React.Fragment>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-4">
+                <TableCell colSpan={6} className="text-center py-4">
                   <div className="flex flex-col items-center justify-center py-8">
                     <FileText className="h-10 w-10 text-gray-400 mb-2" />
                     <h3 className="font-medium text-gray-900">Aucun rapport d'expertise</h3>

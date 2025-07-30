@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
+import { useTableSorting } from '@/hooks/use-table-sorting';
 import { 
   Table, 
   TableBody, 
@@ -8,7 +9,8 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Wrench, Eye, Pencil, Trash } from 'lucide-react';
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
+import { Wrench, Eye, Pencil, Trash, Download, Printer, Mail, FileX, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { RepairOrderActionsDropdown } from '@/components/repair-orders/RepairOrderActionsDropdown';
@@ -50,6 +52,7 @@ const VehicleRepairOrdersTab: React.FC<VehicleRepairOrdersTabProps> = ({ vehicle
   }
 
   const vehicleOrders = orders?.filter(order => order.vehicle_id === vehicleId) || [];
+  const { sortedData, sortConfig, handleSort } = useTableSorting(vehicleOrders, 'reference');
 
   const handleViewOrder = (order: RepairOrder) => {
     setSelectedOrder(order);
@@ -233,61 +236,141 @@ const VehicleRepairOrdersTab: React.FC<VehicleRepairOrdersTabProps> = ({ vehicle
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Numéro</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Client</TableHead>
+              <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
+                Numéro
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
+                Date
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="clients.first_name" sortConfig={sortConfig} onSort={handleSort}>
+                Client
+              </SortableTableHeader>
               <TableHead>Véhicule</TableHead>
-              <TableHead>Montant</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
+                Montant
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                Statut
+              </SortableTableHeader>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {vehicleOrders.length > 0 ? (
-              vehicleOrders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell className="font-medium">{order.reference}</TableCell>
-                  <TableCell>{formatDate(order.created_at)}</TableCell>
-                  <TableCell>
-                    {order.clients 
-                      ? `${order.clients.first_name} ${order.clients.last_name}`
-                      : '-'
-                    }
-                  </TableCell>
-                  <TableCell>
-                    {order.vehicles 
-                      ? `${order.vehicles.car_brands?.name || 'Marque inconnue'} ${order.vehicles.car_models?.name || 'Modèle inconnu'} - ${order.vehicles.license_plate}`
-                      : '-'
-                    }
-                  </TableCell>
-                  <TableCell>{formatAmount(calculateOrderAmount(order))}</TableCell>
-                  <TableCell>
-                    <StatusBadge status={order.status || 'En cours'} />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1">
-                      <Button variant="ghost" size="icon" onClick={() => handleViewOrder(order)}>
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleEditOrder(order)}>
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-red-500 hover:text-red-700"
-                        onClick={() => handleDeleteOrder(order)}
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                      <RepairOrderActionsDropdown order={order} contextMenuProps={contextMenuProps} />
-                    </div>
-                  </TableCell>
-                </TableRow>
+            {sortedData.length > 0 ? (
+              sortedData.map((order) => (
+                <React.Fragment key={order.id}>
+                  <TableRow className="border-b-0">
+                    <TableCell className="font-medium">{order.reference}</TableCell>
+                    <TableCell>{formatDate(order.created_at)}</TableCell>
+                    <TableCell>
+                      {order.clients 
+                        ? `${order.clients.first_name} ${order.clients.last_name}`
+                        : '-'
+                      }
+                    </TableCell>
+                    <TableCell>
+                      {order.vehicles 
+                        ? `${order.vehicles.car_brands?.name || 'Marque inconnue'} ${order.vehicles.car_models?.name || 'Modèle inconnu'} - ${order.vehicles.license_plate}`
+                        : '-'
+                      }
+                    </TableCell>
+                    <TableCell>{formatAmount(calculateOrderAmount(order))}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={order.status || 'En cours'} />
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="border-t-0">
+                    <TableCell colSpan={6} className="py-3 border-t-0">
+                      <div className="flex flex-wrap gap-2 justify-end px-4">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleViewOrder(order)}
+                          title="Visualiser"
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          Visualiser
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleEditOrder(order)}
+                          title="Modifier"
+                        >
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleDownload(order)}
+                          title="Télécharger"
+                        >
+                          <Download className="h-4 w-4 mr-1" />
+                          Télécharger
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handlePrint(order)}
+                          title="Imprimer"
+                        >
+                          <Printer className="h-4 w-4 mr-1" />
+                          Imprimer
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleSendEmail(order)}
+                          title="Envoyer par e-mail"
+                        >
+                          <Mail className="h-4 w-4 mr-1" />
+                          Envoyer par e-mail
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleSignOrder(order)}
+                          title="Signer"
+                        >
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Signer
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleRequestDocuments(order)}
+                          title="Demander justificatifs"
+                        >
+                          <FileX className="h-4 w-4 mr-1" />
+                          Demander justificatifs
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleConvertToInvoice(order)}
+                          title="Convertir en facture"
+                        >
+                          <Receipt className="h-4 w-4 mr-1" />
+                          Convertir en facture
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                          onClick={() => handleDeleteOrder(order)}
+                          title="Supprimer"
+                        >
+                          <Trash className="h-4 w-4 mr-1" />
+                          Supprimer
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </React.Fragment>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-4">
+                <TableCell colSpan={6} className="text-center py-4">
                   <div className="flex flex-col items-center justify-center py-8">
                     <Wrench className="h-10 w-10 text-gray-400 mb-2" />
                     <h3 className="font-medium text-gray-900">Aucun ordre de réparation</h3>

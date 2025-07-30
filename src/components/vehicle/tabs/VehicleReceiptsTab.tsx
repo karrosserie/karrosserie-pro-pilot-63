@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
+import { useTableSorting } from '@/hooks/use-table-sorting';
 import { 
   Table, 
   TableBody, 
@@ -8,6 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { Banknote, Pencil, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -44,6 +46,7 @@ const VehicleReceiptsTab: React.FC<VehicleReceiptsTabProps> = ({ vehicleId }) =>
     }
     return false;
   }) || [];
+  const { sortedData, sortConfig, handleSort } = useTableSorting(vehicleReceipts, 'reference');
 
   const getInvoiceDisplay = (invoiceId: string | null) => {
     if (!invoiceId || !invoices) {
@@ -179,7 +182,7 @@ const VehicleReceiptsTab: React.FC<VehicleReceiptsTabProps> = ({ vehicleId }) =>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-4">
+                <TableCell colSpan={6} className="text-center py-4">
                   <div className="flex flex-col items-center justify-center py-8">
                     <Banknote className="h-10 w-10 text-gray-400 mb-2" />
                     <h3 className="font-medium text-gray-900">Aucun encaissement</h3>
