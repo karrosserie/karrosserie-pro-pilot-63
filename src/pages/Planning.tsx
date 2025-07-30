@@ -537,9 +537,6 @@ const Planning = () => {
                     <BarChart className="w-4 h-4 mr-2" />
                     Exporter
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setShowWaitingVehiclesModal(false)}>
-                    <X className="w-4 h-4" />
-                  </Button>
                 </div>
               </div>
             </div>
