@@ -111,12 +111,16 @@ export function useImportNotification() {
                     const newQuote = await quotesService.createFromReport(fullReport);
                     
                     console.log('✅ Quote created automatically:', newQuote);
+                    console.log('🔄 Attempting redirect to:', `/documents/devis?openQuote=${newQuote.id}`);
                     
                     // Invalider le cache des devis
                     queryClient.invalidateQueries({ queryKey: ['quotes'] });
                     
                     // Rediriger vers la page des devis avec l'aperçu ouvert
-                    window.location.href = `/documents/devis?openQuote=${newQuote.id}`;
+                    setTimeout(() => {
+                      console.log('🚀 Executing redirect...');
+                      window.location.href = `/documents/devis?openQuote=${newQuote.id}`;
+                    }, 100);
                     
                     // Afficher un toast de succès pour la conversion
                     toast({
