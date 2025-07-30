@@ -269,7 +269,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
           {/* Barre d'actions en haut */}
           <div className="flex items-center justify-between gap-2 p-4 pr-16 border-b bg-background">
-            <h2 className="text-lg font-semibold">Aperçu de la facture {invoice.reference}</h2>
+            <h2 className="text-lg font-semibold">Aperçu de la facture n°{invoice.reference}</h2>
             <div className="flex items-center gap-1 mr-4">
               <Button
                 variant="ghost"
