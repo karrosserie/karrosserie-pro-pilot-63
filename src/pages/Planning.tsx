@@ -1,18 +1,90 @@
 import { useState } from "react";
-import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog } from "lucide-react";
+import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const Planning = () => {
   const [activeView, setActiveView] = useState("manager");
+  const [showWaitingVehiclesModal, setShowWaitingVehiclesModal] = useState(false);
 
   const stats = {
     vehicles: 8,
     completed: 0,
     waiting: 5,
     revenue: 18700
+  };
+
+  const waitingVehicles = [
+    {
+      id: 1,
+      model: "Peugeot 308",
+      licensePlate: "AB-123-CD",
+      status: "Normale",
+      client: "M. Dupont",
+      price: "2500€",
+      blockedStep: "Réparation carrosserie",
+      waitingDays: 210,
+      blockageReason: "Attente pièces",
+      blockageDetails: "Pare-chocs avant en commande - Délai 5-7 jours"
+    },
+    {
+      id: 2,
+      model: "Renault Clio",
+      licensePlate: "FG-456-GH",
+      status: "Urgent",
+      client: "Mme Martin",
+      price: "1200€",
+      blockedStep: "Expertise",
+      waitingDays: 211,
+      blockageReason: "Accord expert assurance",
+      blockageDetails: "En attente validation devis par expert AXA"
+    },
+    {
+      id: 3,
+      model: "BMW Série 3",
+      licensePlate: "PQ-012-UV",
+      status: "Normale",
+      client: "M. Bernard",
+      price: "3200€",
+      blockedStep: "Peinture",
+      waitingDays: 5,
+      blockageReason: "Disponibilité technicien",
+      blockageDetails: "En attente d'un slot libre cabine peinture"
+    },
+    {
+      id: 4,
+      model: "Volkswagen Golf",
+      licensePlate: "WX-789-YZ",
+      status: "Normale",
+      client: "Mme Rousseau",
+      price: "850€",
+      blockedStep: "Débosselage",
+      waitingDays: 12,
+      blockageReason: "Validation client",
+      blockageDetails: "Devis en attente d'approbation client"
+    },
+    {
+      id: 5,
+      model: "Ford Focus",
+      licensePlate: "ST-345-UV",
+      status: "Urgent",
+      client: "M. Leblanc",
+      price: "1800€",
+      blockedStep: "Réparation",
+      waitingDays: 45,
+      blockageReason: "Problème technique",
+      blockageDetails: "Dommage structurel nécessitant expertise complémentaire"
+    }
+  ];
+
+  const blockageStats = {
+    pieces: 2,
+    expertise: 1,
+    technicien: 1,
+    problemes: 1
   };
 
   const workflowSteps = [
@@ -227,7 +299,7 @@ const Planning = () => {
             </div>
 
             {/* Alert */}
-            <Card className="bg-yellow-50 border-yellow-200">
+            <Card className="bg-yellow-50 border-yellow-200 cursor-pointer hover:bg-yellow-100 transition-colors" onClick={() => setShowWaitingVehiclesModal(true)}>
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 text-yellow-800">
                   <AlertTriangle className="w-5 h-5" />
@@ -344,6 +416,118 @@ const Planning = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Modal des véhicules en attente */}
+        <Dialog open={showWaitingVehiclesModal} onOpenChange={setShowWaitingVehiclesModal}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+            <DialogHeader className="flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div>
+                  <DialogTitle className="text-xl font-semibold">Véhicules en Attente</DialogTitle>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {waitingVehicles.length} véhicule(s) bloqué(s) dans les étapes atelier
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setShowWaitingVehiclesModal(false)}>
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Retour
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setShowWaitingVehiclesModal(false)}>
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </DialogHeader>
+            
+            <div className="flex-1 overflow-y-auto space-y-4 mt-4">
+              {waitingVehicles.map((vehicle) => (
+                <Card key={vehicle.id} className="border border-border">
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div>
+                          <h3 className="font-semibold text-lg">{vehicle.model}</h3>
+                          <p className="text-sm text-muted-foreground">{vehicle.licensePlate}</p>
+                        </div>
+                        <Badge 
+                          variant={vehicle.status === "Urgent" ? "destructive" : "secondary"}
+                          className={vehicle.status === "Urgent" ? "bg-red-500 text-white" : ""}
+                        >
+                          {vehicle.status}
+                        </Badge>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Débloquer
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <Calendar className="w-4 h-4 mr-2" />
+                          Planifier
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <Edit className="w-4 h-4 mr-2" />
+                          Modifier
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-6 mb-4">
+                      <div>
+                        <p className="text-sm font-medium">Client :</p>
+                        <p className="text-sm text-muted-foreground">{vehicle.client}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">Prix :</p>
+                        <p className="text-sm font-semibold text-green-600">{vehicle.price}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">Étape bloquée :</p>
+                        <p className="text-sm text-muted-foreground">{vehicle.blockedStep}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">En attente depuis :</p>
+                        <p className="text-sm text-red-600 font-medium">{vehicle.waitingDays} jour(s)</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                        <span className="text-sm font-medium text-yellow-800">
+                          Raison du blocage : {vehicle.blockageReason}
+                        </span>
+                      </div>
+                      <p className="text-sm text-yellow-700">{vehicle.blockageDetails}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="flex-shrink-0 border-t pt-4 mt-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4 text-sm">
+                  <span className="font-medium">Répartition des blocages :</span>
+                  <Badge variant="outline" className="bg-blue-50">Pièces: {blockageStats.pieces}</Badge>
+                  <Badge variant="outline" className="bg-orange-50">Expertise: {blockageStats.expertise}</Badge>
+                  <Badge variant="outline" className="bg-green-50">Technicien: {blockageStats.technicien}</Badge>
+                  <Badge variant="outline" className="bg-red-50">Problèmes: {blockageStats.problemes}</Badge>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm">
+                    <BarChart className="w-4 h-4 mr-2" />
+                    Exporter
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setShowWaitingVehiclesModal(false)}>
+                    Fermer
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
