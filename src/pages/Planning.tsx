@@ -694,7 +694,7 @@ const Planning = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="font-medium">450€</span>
-                            <Badge className="bg-orange-600 text-white text-xs">Terminé</Badge>
+                            <Badge className="bg-green-600 text-white text-xs">Terminé</Badge>
                           </div>
                         </div>
                         
@@ -740,7 +740,7 @@ const Planning = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="font-medium">180€</span>
-                            <Badge className="bg-orange-600 text-white text-xs">disponible</Badge>
+                            <Badge className="bg-yellow-600 text-white text-xs">Disponible</Badge>
                           </div>
                         </div>
                         
@@ -751,7 +751,7 @@ const Planning = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="font-medium">95€</span>
-                            <Badge variant="outline" className="text-xs">commande</Badge>
+                            <Badge variant="outline" className="text-xs">Commande</Badge>
                           </div>
                         </div>
                         
@@ -762,7 +762,7 @@ const Planning = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="font-medium">45€</span>
-                            <Badge className="bg-orange-600 text-white text-xs">disponible</Badge>
+                            <Badge className="bg-yellow-600 text-white text-xs">Disponible</Badge>
                           </div>
                         </div>
                       </div>
