@@ -429,11 +429,9 @@ const Planning = () => {
                     {waitingVehicles.length} véhicule(s) bloqué(s) dans les étapes atelier
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="sm" onClick={() => setShowWaitingVehiclesModal(false)}>
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
+                <Button variant="ghost" size="sm" onClick={() => setShowWaitingVehiclesModal(false)}>
+                  <X className="w-4 h-4" />
+                </Button>
               </div>
             </DialogHeader>
             
@@ -482,7 +480,7 @@ const Planning = () => {
 
                       {/* Section droite - Boutons d'action */}
                       <div className="flex flex-col gap-2 ml-4">
-                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white h-8 px-3">
+                        <Button size="sm" className="bg-orange-600 hover:bg-orange-700 text-white h-8 px-3">
                           <CheckCircle className="w-3 h-3 mr-1" />
                           Débloquer
                         </Button>
@@ -522,12 +520,12 @@ const Planning = () => {
                   <Badge variant="outline" className="bg-red-50">Problèmes: {blockageStats.problemes}</Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="bg-orange-600 hover:bg-orange-700 text-white border-orange-600">
                     <BarChart className="w-4 h-4 mr-2" />
                     Exporter
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => setShowWaitingVehiclesModal(false)}>
-                    Fermer
+                  <Button variant="ghost" size="sm" onClick={() => setShowWaitingVehiclesModal(false)}>
+                    <X className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
