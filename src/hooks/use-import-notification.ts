@@ -2,10 +2,13 @@ import { useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { quotesService } from '@/services/supabase/quotes';
 
 export function useImportNotification() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Fonction pour jouer un son de notification simple
@@ -43,7 +46,16 @@ export function useImportNotification() {
         
         const { data: imports } = await supabase
           .from('imports')
-          .select('id, status')
+          .select(`
+            id, 
+            status,
+            expertise_reports (
+              id,
+              client_id,
+              vehicle_id,
+              report_number
+            )
+          `)
           .in('status', ['Importé', 'Terminé']);
 
         console.log('📊 useImportNotification - Found imports:', imports);
@@ -62,9 +74,9 @@ export function useImportNotification() {
           }
           
           // Vérifier s'il y a de nouveaux imports terminés
-          currentImportIds.forEach(id => {
-            if (!lastImportIds.has(id)) {
-              console.log('🎉 New import completed:', id);
+          for (const import_item of imports) {
+            if (!lastImportIds.has(import_item.id)) {
+              console.log('🎉 New import completed:', import_item.id);
               
               // Jouer le signal sonore
               playNotificationSound();
@@ -75,11 +87,60 @@ export function useImportNotification() {
                 description: "Un rapport d'expertise a été importé avec succès",
               });
               
+              // Conversion automatique en devis si le rapport a un client et un véhicule
+              if (import_item.expertise_reports?.client_id && import_item.expertise_reports?.vehicle_id) {
+                try {
+                  console.log('🔄 Converting report to quote automatically...');
+                  
+                  // Vérifier si un devis n'existe pas déjà pour ce rapport
+                  const existingQuote = await quotesService.getByReportId(import_item.expertise_reports.id);
+                  
+                  if (!existingQuote) {
+                    // Récupérer le rapport d'expertise complet pour la conversion
+                    const { data: fullReport, error: reportError } = await supabase
+                      .from('expertise_reports')
+                      .select('*')
+                      .eq('id', import_item.expertise_reports.id)
+                      .single();
+                    
+                    if (reportError || !fullReport) {
+                      throw new Error('Impossible de récupérer le rapport d\'expertise complet');
+                    }
+                    
+                    // Créer le devis à partir du rapport
+                    const newQuote = await quotesService.createFromReport(fullReport);
+                    
+                    console.log('✅ Quote created automatically:', newQuote);
+                    
+                    // Invalider le cache des devis
+                    queryClient.invalidateQueries({ queryKey: ['quotes'] });
+                    
+                    // Rediriger vers la page des devis avec l'aperçu ouvert
+                    navigate(`/documents/devis?openQuote=${newQuote.id}`);
+                    
+                    // Afficher un toast de succès pour la conversion
+                    toast({
+                      title: "Conversion automatique réussie",
+                      description: `Le rapport ${import_item.expertise_reports.report_number} a été automatiquement converti en devis ${newQuote.reference}.`,
+                    });
+                  } else {
+                    console.log('📋 Quote already exists for this report');
+                  }
+                } catch (error: any) {
+                  console.error('❌ Error during automatic conversion:', error);
+                  toast({
+                    title: "Erreur de conversion automatique",
+                    description: `Impossible de convertir automatiquement le rapport: ${error.message}`,
+                    variant: "destructive"
+                  });
+                }
+              }
+              
               // Invalider les caches pour rafraîchir les données
               queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
               queryClient.invalidateQueries({ queryKey: ['imports', 'pending'] });
             }
-          });
+          }
           
           lastImportIds = currentImportIds;
         }
