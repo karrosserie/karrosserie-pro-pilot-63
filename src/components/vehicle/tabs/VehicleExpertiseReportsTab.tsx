@@ -195,16 +195,6 @@ const VehicleExpertiseReportsTab: React.FC<VehicleExpertiseReportsTabProps> = ({
                           </TooltipTrigger>
                           <TooltipContent>Télécharger</TooltipContent>
                         </Tooltip>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleEditReport(report)}
-                          disabled={isConverted(report.id)}
-                          title={isConverted(report.id) ? 'Impossible de modifier un rapport converti' : 'Modifier le rapport'}
-                        >
-                          <Pencil className="h-4 w-4 mr-1" />
-                          Modifier
-                        </Button>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button 
