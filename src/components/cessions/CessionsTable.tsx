@@ -448,7 +448,7 @@ export const CessionsTable = ({
                           }}
                         >
                           <Eye className="h-4 w-4 mr-1" />
-                          Aperçu
+                          Voir
                         </Button>
                       )}
                       {cession.status !== 'en_attente' && cession.status !== 'en_attente_signature' && (
