@@ -23,7 +23,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from '@/hooks/use-toast';
 import { repairOrdersService } from '@/services/supabase/repair-orders';
-import { validateRepairOrderData } from '@/components/cessions/form/utils/dataValidation';
+import { validateCessionProcedureData } from '@/components/cessions/form/utils/dataValidation';
 import { CessionPreview } from './CessionPreview';
 import { generateAndUploadCessionPDF } from '@/services/pdf/pdfService';
 import { updateCession } from '@/services/supabase/cessions';
@@ -190,8 +190,8 @@ export const CessionsTable = ({
       // Récupérer les données complètes de l'ordre de réparation avec client et véhicule
       const repairOrderData = await repairOrdersService.getById(cession.repair_order_id);
       
-      // Valider que toutes les photos sont présentes
-      const validationError = validateRepairOrderData(
+      // Valider que toutes les photos sont présentes (validation complète pour la procédure)
+      const validationError = validateCessionProcedureData(
         repairOrderData,
         repairOrderData.clients,
         repairOrderData.vehicles
