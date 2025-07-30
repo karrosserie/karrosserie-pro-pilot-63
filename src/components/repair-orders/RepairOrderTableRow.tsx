@@ -107,10 +107,10 @@ export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onViewO
             {order.status !== 'Signé' && (
               <Button variant="outline" size="sm" onClick={() => contextMenuProps?.onSignOrder?.(order)}>
                 <Signature className="h-4 w-4 mr-1" />
-                Signer
+                Signature du client
               </Button>
             )}
-            <Button variant="outline" size="sm" onClick={() => contextMenuProps?.onRequestDocuments?.(order)}>
+            <Button variant="outline" size="sm" onClick={() => contextMenuProps?.onRequestDocuments?.(order)} className="hidden">
               <FileCheck className="h-4 w-4 mr-1" />
               Demander docs
             </Button>
