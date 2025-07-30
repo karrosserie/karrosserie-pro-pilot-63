@@ -8,9 +8,20 @@ interface QuoteFormActionsProps {
   quote?: Quote | null;
   isSubmitting: boolean;
   onCancel: () => void;
+  isConversionFromReport?: boolean;
 }
 
-export const QuoteFormActions = ({ quote, isSubmitting, onCancel }: QuoteFormActionsProps) => {
+export const QuoteFormActions = ({ quote, isSubmitting, onCancel, isConversionFromReport }: QuoteFormActionsProps) => {
+  // Déterminer si c'est une modification (devis existant avec ID)
+  const isEditing = quote && quote.id;
+  
+  const getButtonText = () => {
+    if (isSubmitting) return 'Enregistrement...';
+    if (isEditing) return 'Mettre à jour';
+    if (isConversionFromReport) return 'Convertir en devis';
+    return 'Créer le devis';
+  };
+
   return (
     <>
       <Separator />
@@ -28,7 +39,7 @@ export const QuoteFormActions = ({ quote, isSubmitting, onCancel }: QuoteFormAct
           disabled={isSubmitting}
           className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
         >
-          {isSubmitting ? 'Enregistrement...' : quote ? 'Mettre à jour' : 'Créer le devis'}
+          {getButtonText()}
         </Button>
       </div>
     </>

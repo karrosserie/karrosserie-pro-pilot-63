@@ -18,6 +18,7 @@ interface QuoteFormProps {
   onCancel: () => void;
   isSubmitting: boolean;
   prefillData?: any;
+  isConversionFromReport?: boolean;
 }
 
 export const QuoteForm = ({
@@ -25,7 +26,8 @@ export const QuoteForm = ({
   onSubmit,
   onCancel,
   isSubmitting,
-  prefillData
+  prefillData,
+  isConversionFromReport
 }: QuoteFormProps) => {
   const { toast } = useToast();
   const { clients, isLoading: isLoadingClients } = useClients();
@@ -137,6 +139,7 @@ export const QuoteForm = ({
         quote={quote}
         isSubmitting={isSubmitting}
         onCancel={onCancel}
+        isConversionFromReport={isConversionFromReport}
       />
     </form>
   );

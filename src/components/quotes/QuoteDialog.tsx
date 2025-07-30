@@ -35,9 +35,11 @@ const QuoteDialog = ({
     setIsSubmitting(true);
     
     try {
+      // Si c'est une modification d'un devis existant (quote avec un ID)
       if (quote && quote.id) {
         await updateQuote.mutateAsync({ id: quote.id, data: formData });
       } else {
+        // Sinon c'est une création (nouveau devis ou conversion depuis rapport)
         await createQuote.mutateAsync(formData as any);
       }
       onOpenChange(false);
@@ -50,17 +52,29 @@ const QuoteDialog = ({
     }
   };
 
+  // Déterminer si c'est une conversion depuis un rapport d'expertise
+  const isConversionFromReport = prefillData?.report_number;
+  // Déterminer si c'est une modification (devis existant avec ID)
+  const isEditing = quote && quote.id;
+
   return (
     <Dialog open={open} onOpenChange={!isSubmitting ? onOpenChange : undefined}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {quote ? "Modifier le devis" : "Créer un nouveau devis"}
+            {isEditing 
+              ? "Modifier le devis" 
+              : isConversionFromReport 
+                ? "Convertir en devis" 
+                : "Créer un nouveau devis"
+            }
           </DialogTitle>
           <DialogDescription>
-            {quote
+            {isEditing
               ? "Modifiez les détails du devis."
-              : "Créez un nouveau devis en remplissant les informations ci-dessous."
+              : isConversionFromReport
+                ? "Convertissez ce rapport d'expertise en devis en ajustant les informations si nécessaire."
+                : "Créez un nouveau devis en remplissant les informations ci-dessous."
             }
           </DialogDescription>
         </DialogHeader>
@@ -71,6 +85,7 @@ const QuoteDialog = ({
           onCancel={() => onOpenChange(false)}
           isSubmitting={isSubmitting}
           prefillData={prefillData}
+          isConversionFromReport={isConversionFromReport}
         />
       </DialogContent>
     </Dialog>
