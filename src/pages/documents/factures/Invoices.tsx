@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -38,6 +39,7 @@ import {
 import { Printer, Mail, Signature, CreditCard, FileX, Download } from 'lucide-react';
 
 const Invoices = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
@@ -215,6 +217,23 @@ const Invoices = () => {
     setSelectedInvoice(invoice);
     setViewerModalOpen(true);
   };
+
+  // Effet pour ouvrir automatiquement une facture depuis l'URL
+  useEffect(() => {
+    const openInvoiceId = searchParams.get('openInvoice');
+    if (openInvoiceId && invoices && invoices.length > 0) {
+      const invoiceToOpen = invoices.find(invoice => invoice.id === openInvoiceId);
+      if (invoiceToOpen) {
+        setSelectedInvoice(invoiceToOpen);
+        setViewerModalOpen(true); // Ouvrir la fenêtre d'aperçu
+        // Nettoyer le paramètre URL après ouverture
+        setSearchParams(params => {
+          params.delete('openInvoice');
+          return params;
+        });
+      }
+    }
+  }, [invoices, searchParams, setSearchParams]);
 
   if (isLoading) {
     return (
