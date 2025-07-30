@@ -353,82 +353,50 @@ const Quotes = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-1">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="ghost" size="icon" onClick={() => handleViewQuote(quote)} className="h-8 w-8">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Aperçu</TooltipContent>
-                      </Tooltip>
+                      <Button variant="outline" size="sm" onClick={() => handleViewQuote(quote)}>
+                        <Eye className="h-4 w-4 mr-1" />
+                        Aperçu
+                      </Button>
 
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="ghost" size="icon" onClick={() => handleEditQuote(quote)} className="h-8 w-8">
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Modifier</TooltipContent>
-                      </Tooltip>
+                      <Button variant="outline" size="sm" onClick={() => handleEditQuote(quote)}>
+                        <Pencil className="h-4 w-4 mr-1" />
+                        Modifier
+                      </Button>
 
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="ghost" size="icon" onClick={() => handleDownload(quote)} className="h-8 w-8">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Télécharger</TooltipContent>
-                      </Tooltip>
+                      <Button variant="outline" size="sm" onClick={() => handleDownload(quote)}>
+                        <Download className="h-4 w-4 mr-1" />
+                        Télécharger
+                      </Button>
 
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="ghost" size="icon" onClick={() => handlePrint(quote)} className="h-8 w-8">
-                            <Printer className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Imprimer</TooltipContent>
-                      </Tooltip>
+                      <Button variant="outline" size="sm" onClick={() => handlePrint(quote)}>
+                        <Printer className="h-4 w-4 mr-1" />
+                        Imprimer
+                      </Button>
 
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="ghost" size="icon" onClick={() => handleSendEmail(quote)} className="h-8 w-8">
-                            <Mail className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Envoyer par e-mail</TooltipContent>
-                      </Tooltip>
+                      <Button variant="outline" size="sm" onClick={() => handleSendEmail(quote)}>
+                        <Mail className="h-4 w-4 mr-1" />
+                        E-mail
+                      </Button>
 
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="ghost" size="icon" onClick={() => handleRequestDocuments(quote)} className="h-8 w-8">
-                            <FileCheck className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Demander les justificatifs</TooltipContent>
-                      </Tooltip>
+                      <Button variant="outline" size="sm" onClick={() => handleRequestDocuments(quote)}>
+                        <FileCheck className="h-4 w-4 mr-1" />
+                        Justificatifs
+                      </Button>
 
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="ghost" size="icon" onClick={() => handleConvertToRepairOrder(quote)} className="h-8 w-8">
-                            <ArrowRight className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Convertir en ordre de réparation</TooltipContent>
-                      </Tooltip>
+                      <Button variant="outline" size="sm" onClick={() => handleConvertToRepairOrder(quote)}>
+                        <ArrowRight className="h-4 w-4 mr-1" />
+                        Ordre
+                      </Button>
 
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="text-red-500 hover:text-red-700 h-8 w-8" 
-                            onClick={() => handleDeleteQuote(quote.id)}
-                          >
-                            <Trash className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Supprimer</TooltipContent>
-                      </Tooltip>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700" 
+                        onClick={() => handleDeleteQuote(quote.id)}
+                      >
+                        <Trash className="h-4 w-4 mr-1" />
+                        Supprimer
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
