@@ -8,10 +8,9 @@ export const validateRepairOrderData = (order: any, client: any, repairOrderVehi
   const missingClientFields = [];
   const missingVehicleDocuments = [];
 
-  // Vérifier les champs obligatoires du client (sans l'email)
+  // Vérifier les champs obligatoires du client (sans l'email et sans le téléphone)
   if (!client.first_name) missingClientFields.push("Prénom");
   if (!client.last_name) missingClientFields.push("Nom");
-  if (!client.phone) missingClientFields.push("Téléphone");
   if (!client.address) missingClientFields.push("Adresse");
   if (!client.city) missingClientFields.push("Ville");
   if (!client.postal_code) missingClientFields.push("Code postal");
