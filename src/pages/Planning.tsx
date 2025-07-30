@@ -276,25 +276,25 @@ const Planning = () => {
             {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <StatsCard 
-                title="véhicules" 
+                title="Véhicules" 
                 value={stats.vehicles}
                 icon={<Car className="h-8 w-8 text-blue-600" />}
                 iconBg="bg-blue-100"
               />
               <StatsCard 
-                title="terminés" 
+                title="Terminés" 
                 value={stats.completed}
                 icon={<CheckCircle className="h-8 w-8 text-green-600" />}
                 iconBg="bg-green-100"
               />
               <StatsCard 
-                title="en attente" 
+                title="En attente" 
                 value={stats.waiting}
                 icon={<Clock className="h-8 w-8 text-yellow-600" />}
                 iconBg="bg-yellow-100"
               />
               <StatsCard 
-                title="ca en cours" 
+                title="CA en cours" 
                 value={`${stats.revenue}€`}
                 icon={<Euro className="h-8 w-8 text-orange-600" />}
                 iconBg="bg-orange-100"
