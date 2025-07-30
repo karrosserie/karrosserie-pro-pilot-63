@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCredits } from '@/hooks/use-credits';
 import { useInvoices } from '@/hooks/use-invoices';
+import { useTableSorting } from '@/hooks/use-table-sorting';
 import { generateCreditPDFWithTemplate, printCreditPDFWithTemplate } from '@/utils/creditPDFGeneration';
 import { 
   Table, 
@@ -10,6 +11,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { CreditCard, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -57,6 +59,7 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
     }
     return false;
   }) || [];
+  const { sortedData, sortConfig, handleSort } = useTableSorting(clientCredits, 'reference');
 
   const formatVehicleDisplay = (credit: any) => {
     // First, try to get vehicle data from the credit itself
@@ -280,18 +283,26 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Numéro</TableHead>
-              <TableHead>Date</TableHead>
+              <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
+                Numéro
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="created_date" sortConfig={sortConfig} onSort={handleSort}>
+                Date
+              </SortableTableHeader>
               <TableHead>Véhicule</TableHead>
               <TableHead>Facture d'origine</TableHead>
-              <TableHead>Montant</TableHead>
-              <TableHead>Statut</TableHead>
+              <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
+                Montant
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                Statut
+              </SortableTableHeader>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {clientCredits.length > 0 ? (
-              clientCredits.map((credit) => (
+            {sortedData.length > 0 ? (
+              sortedData.map((credit) => (
                 <TableRow key={credit.id}>
                   <TableCell className="font-medium">{credit.reference}</TableCell>
                   <TableCell>{formatDate(credit.created_date || credit.created_at)}</TableCell>
@@ -308,21 +319,24 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1">
-                      <Button variant="ghost" size="icon" onClick={() => handleView(credit)}>
-                        <Eye className="h-4 w-4" />
+                    <div className="flex justify-end gap-1">
+                      <Button variant="outline" size="sm" onClick={() => handleView(credit)}>
+                        <Eye className="h-4 w-4 mr-1" />
+                        Voir
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(credit)}>
-                        <Pencil className="h-4 w-4" />
+                      <Button variant="outline" size="sm" onClick={() => handleEdit(credit)}>
+                        <Pencil className="h-4 w-4 mr-1" />
+                        Modifier
                       </Button>
                       <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-red-500 hover:text-red-700"
+                        variant="outline" 
+                        size="sm" 
+                        className="text-red-500 hover:text-red-700 border-red-200 hover:border-red-300"
                         onClick={() => handleDelete(credit)}
                         disabled={deleteCredit.isPending}
                       >
-                        <Trash className="h-4 w-4" />
+                        <Trash className="h-4 w-4 mr-1" />
+                        Supprimer
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

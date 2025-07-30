@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
+import { useTableSorting } from '@/hooks/use-table-sorting';
 import { 
   Table, 
   TableBody, 
@@ -9,6 +10,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { Wrench, Eye, Pencil, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
@@ -51,6 +53,7 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
   }
 
   const clientOrders = orders?.filter(order => order.client_id === clientId) || [];
+  const { sortedData, sortConfig, handleSort } = useTableSorting(clientOrders, 'reference');
 
   const handleViewOrder = (order: RepairOrder) => {
     setSelectedOrder(order);
@@ -234,18 +237,30 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Numéro</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Client</TableHead>
-              <TableHead>Véhicule</TableHead>
-              <TableHead>Montant</TableHead>
-              <TableHead>Statut</TableHead>
+              <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
+                Numéro
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
+                Date
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="clients.last_name" sortConfig={sortConfig} onSort={handleSort}>
+                Client
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="vehicles.license_plate" sortConfig={sortConfig} onSort={handleSort}>
+                Véhicule
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
+                Montant
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                Statut
+              </SortableTableHeader>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {clientOrders.length > 0 ? (
-              clientOrders.map((order) => (
+            {sortedData.length > 0 ? (
+              sortedData.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell className="font-medium">{order.reference}</TableCell>
                   <TableCell>{formatDate(order.created_at)}</TableCell>
@@ -266,20 +281,23 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
                     <StatusBadge status={order.status || 'En cours'} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1">
-                      <Button variant="ghost" size="icon" onClick={() => handleViewOrder(order)}>
-                        <Eye className="h-4 w-4" />
+                    <div className="flex justify-end gap-1">
+                      <Button variant="outline" size="sm" onClick={() => handleViewOrder(order)}>
+                        <Eye className="h-4 w-4 mr-1" />
+                        Voir
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleEditOrder(order)}>
-                        <Pencil className="h-4 w-4" />
+                      <Button variant="outline" size="sm" onClick={() => handleEditOrder(order)}>
+                        <Pencil className="h-4 w-4 mr-1" />
+                        Modifier
                       </Button>
                       <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-red-500 hover:text-red-700"
+                        variant="outline" 
+                        size="sm" 
+                        className="text-red-500 hover:text-red-700 border-red-200 hover:border-red-300"
                         onClick={() => handleDeleteOrder(order)}
                       >
-                        <Trash className="h-4 w-4" />
+                        <Trash className="h-4 w-4 mr-1" />
+                        Supprimer
                       </Button>
                       <RepairOrderActionsDropdown order={order} contextMenuProps={contextMenuProps} />
                     </div>

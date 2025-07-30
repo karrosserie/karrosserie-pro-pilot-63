@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useQuotes } from '@/hooks/use-quotes';
+import { useTableSorting } from '@/hooks/use-table-sorting';
 import { 
   Table, 
   TableBody, 
@@ -9,6 +10,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { FileText, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
@@ -54,6 +56,7 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
   }
 
   const clientQuotes = quotes?.filter(quote => quote.client_id === clientId) || [];
+  const { sortedData, sortConfig, handleSort } = useTableSorting(clientQuotes, 'reference');
 
   const handleView = (quote: Quote) => {
     setSelectedQuote(quote);
@@ -206,18 +209,30 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Numéro</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Client</TableHead>
-              <TableHead>Véhicule</TableHead>
-              <TableHead>Montant</TableHead>
-              <TableHead>Statut</TableHead>
+              <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
+                Numéro
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
+                Date
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="clients.last_name" sortConfig={sortConfig} onSort={handleSort}>
+                Client
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="vehicles.license_plate" sortConfig={sortConfig} onSort={handleSort}>
+                Véhicule
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
+                Montant
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                Statut
+              </SortableTableHeader>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {clientQuotes.length > 0 ? (
-              clientQuotes.map((quote) => (
+            {sortedData.length > 0 ? (
+              sortedData.map((quote) => (
                 <TableRow key={quote.id}>
                   <TableCell className="font-medium">{quote.reference}</TableCell>
                   <TableCell>{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
@@ -233,20 +248,23 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
                     <StatusBadge status={quote.status === 'draft' ? 'En attente' : (quote.status || 'En attente')} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1">
-                      <Button variant="ghost" size="icon" onClick={() => handleView(quote)}>
-                        <Eye className="h-4 w-4" />
+                    <div className="flex justify-end gap-1">
+                      <Button variant="outline" size="sm" onClick={() => handleView(quote)}>
+                        <Eye className="h-4 w-4 mr-1" />
+                        Voir
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(quote)}>
-                        <Pencil className="h-4 w-4" />
+                      <Button variant="outline" size="sm" onClick={() => handleEdit(quote)}>
+                        <Pencil className="h-4 w-4 mr-1" />
+                        Modifier
                       </Button>
                       <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-red-500 hover:text-red-700" 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-red-500 hover:text-red-700 border-red-200 hover:border-red-300" 
                         onClick={() => handleDelete(quote)}
                       >
-                        <Trash className="h-4 w-4" />
+                        <Trash className="h-4 w-4 mr-1" />
+                        Supprimer
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

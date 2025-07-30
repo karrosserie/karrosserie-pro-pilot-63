@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useCredits } from '@/hooks/use-credits';
+import { useTableSorting } from '@/hooks/use-table-sorting';
 import { 
   Table, 
   TableBody, 
@@ -9,6 +10,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { Receipt, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -65,6 +67,7 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
   }
 
   const clientInvoices = invoices?.filter(invoice => invoice.client_id === clientId) || [];
+  const { sortedData, sortConfig, handleSort } = useTableSorting(clientInvoices, 'reference');
 
   const handleView = (invoice: Invoice) => {
     setSelectedInvoice(invoice);
@@ -241,19 +244,31 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
               <Table>
                 <TableHeader>
                   <TableRow>
-              <TableHead>Numéro</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Client</TableHead>
-              <TableHead>Véhicule</TableHead>
-              <TableHead>Montant</TableHead>
+              <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
+                Numéro
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
+                Date
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="clients.last_name" sortConfig={sortConfig} onSort={handleSort}>
+                Client
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="vehicles.license_plate" sortConfig={sortConfig} onSort={handleSort}>
+                Véhicule
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
+                Montant
+              </SortableTableHeader>
               <TableHead>Avoirs</TableHead>
-              <TableHead>Statut</TableHead>
+              <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                Statut
+              </SortableTableHeader>
               <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
           <TableBody>
-            {clientInvoices.length > 0 ? (
-              clientInvoices.map((invoice) => {
+            {sortedData.length > 0 ? (
+              sortedData.map((invoice) => {
                 const invoiceCredits = getInvoiceCredits(invoice.id);
                 return (
                 <TableRow key={invoice.id}>
@@ -281,20 +296,23 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
                           </span>
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex justify-end space-x-1">
-                            <Button variant="ghost" size="icon" onClick={() => handleView(invoice)}>
-                              <Eye className="h-4 w-4" />
+                          <div className="flex justify-end gap-1">
+                            <Button variant="outline" size="sm" onClick={() => handleView(invoice)}>
+                              <Eye className="h-4 w-4 mr-1" />
+                              Voir
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => handleEdit(invoice)}>
-                              <Pencil className="h-4 w-4" />
+                            <Button variant="outline" size="sm" onClick={() => handleEdit(invoice)}>
+                              <Pencil className="h-4 w-4 mr-1" />
+                              Modifier
                             </Button>
                             <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="text-red-500 hover:text-red-700"
+                              variant="outline" 
+                              size="sm" 
+                              className="text-red-500 hover:text-red-700 border-red-200 hover:border-red-300"
                               onClick={() => handleDelete(invoice)}
                             >
-                              <Trash className="h-4 w-4" />
+                              <Trash className="h-4 w-4 mr-1" />
+                              Supprimer
                             </Button>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>

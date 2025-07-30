@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
+import { useTableSorting } from '@/hooks/use-table-sorting';
 import { 
   Table, 
   TableBody, 
@@ -9,6 +10,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { Banknote, Pencil, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -44,6 +46,7 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
     }
     return false;
   }) || [];
+  const { sortedData, sortConfig, handleSort } = useTableSorting(clientReceipts, 'reference');
 
   const getInvoiceDisplay = (invoiceId: string | null) => {
     if (!invoiceId || !invoices) {
@@ -127,18 +130,28 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Numéro</TableHead>
-              <TableHead>Date</TableHead>
+              <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
+                Numéro
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="date" sortConfig={sortConfig} onSort={handleSort}>
+                Date
+              </SortableTableHeader>
               <TableHead>Facture</TableHead>
-              <TableHead>Montant</TableHead>
-              <TableHead>Méthode de paiement</TableHead>
-              <TableHead>Statut</TableHead>
+              <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
+                Montant
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="payment_method" sortConfig={sortConfig} onSort={handleSort}>
+                Méthode de paiement
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                Statut
+              </SortableTableHeader>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {clientReceipts.length > 0 ? (
-              clientReceipts.map((receipt) => (
+            {sortedData.length > 0 ? (
+              sortedData.map((receipt) => (
                 <TableRow key={receipt.id}>
                   <TableCell>{receipt.reference || 'N/A'}</TableCell>
                   <TableCell>{formatDate(receipt.date)}</TableCell>
@@ -155,23 +168,25 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1">
+                    <div className="flex justify-end gap-1">
                       <Button 
-                        variant="ghost" 
-                        size="icon" 
+                        variant="outline" 
+                        size="sm" 
                         onClick={() => handleEdit(receipt)}
                         title="Modifier"
                       >
-                        <Pencil className="h-4 w-4" />
+                        <Pencil className="h-4 w-4 mr-1" />
+                        Modifier
                       </Button>
                       <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-red-500 hover:text-red-700"
+                        variant="outline" 
+                        size="sm" 
+                        className="text-red-500 hover:text-red-700 border-red-200 hover:border-red-300"
                         onClick={() => handleDelete(receipt)}
                         title="Supprimer"
                       >
-                        <Trash className="h-4 w-4" />
+                        <Trash className="h-4 w-4 mr-1" />
+                        Supprimer
                       </Button>
                     </div>
                   </TableCell>

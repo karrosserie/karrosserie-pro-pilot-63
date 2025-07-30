@@ -176,37 +176,43 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
       </div>
       
       <div className="border-t border-gray-100 mt-4 pt-4 flex justify-center">
-        <div className="flex items-center space-x-1">
+        <div className="flex items-center gap-2 flex-wrap">
           {onView && (
-            <Button variant="ghost" size="icon" onClick={handleView}>
-              <Eye className="h-4 w-4" />
+            <Button variant="outline" size="sm" onClick={handleView}>
+              <Eye className="h-4 w-4 mr-1" />
+              Voir
             </Button>
           )}
           {onEdit && (
-            <Button variant="ghost" size="icon" onClick={handleEdit}>
-              <Pencil className="h-4 w-4" />
+            <Button variant="outline" size="sm" onClick={handleEdit}>
+              <Pencil className="h-4 w-4 mr-1" />
+              Modifier
             </Button>
           )}
           
           {/* Boutons déplacés du menu contextuel */}
-          <Button variant="ghost" size="icon" onClick={handleCreateQuote}>
-            <FileText className="h-4 w-4" />
+          <Button variant="outline" size="sm" onClick={handleCreateQuote}>
+            <FileText className="h-4 w-4 mr-1" />
+            Devis
           </Button>
-          <Button variant="ghost" size="icon" onClick={handleCreateInvoice}>
-            <Receipt className="h-4 w-4" />
+          <Button variant="outline" size="sm" onClick={handleCreateInvoice}>
+            <Receipt className="h-4 w-4 mr-1" />
+            Facture
           </Button>
-          <Button variant="ghost" size="icon" onClick={handleCreateIntervention}>
-            <Wrench className="h-4 w-4" />
+          <Button variant="outline" size="sm" onClick={handleCreateIntervention}>
+            <Wrench className="h-4 w-4 mr-1" />
+            Intervention
           </Button>
           
           {onDelete && (
             <Button 
-              variant="ghost" 
-              size="icon"
-              className="text-red-500 hover:text-red-700" 
+              variant="outline" 
+              size="sm"
+              className="text-red-500 hover:text-red-700 border-red-200 hover:border-red-300" 
               onClick={handleDelete}
             >
-              <Trash className="h-4 w-4" />
+              <Trash className="h-4 w-4 mr-1" />
+              Supprimer
             </Button>
           )}
         </div>
