@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -18,6 +17,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Pencil, Trash, CreditCard, Building, Wallet, RefreshCw, Link } from 'lucide-react';
+import { useTableSorting } from '@/hooks/use-table-sorting';
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 
 interface Account {
   id: string;
@@ -42,6 +43,8 @@ interface AccountsTableProps {
 
 export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTableProps) => {
   const [showBankConnectDialog, setShowBankConnectDialog] = useState(false);
+  const { sortedData, sortConfig, handleSort } = useTableSorting(accounts, 'name');
+  
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Actif':
@@ -75,7 +78,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
     }).format(amount);
   };
 
-  if (accounts.length === 0) {
+  if (sortedData.length === 0) {
     return (
       <div className="card-container">
         <EmptyState
@@ -136,16 +139,28 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Nom du compte</TableHead>
-            <TableHead>Banque</TableHead>
-            <TableHead>IBAN</TableHead>
-            <TableHead>BIC</TableHead>
-            <TableHead>Solde</TableHead>
-            <TableHead>Statut</TableHead>
+            <SortableTableHeader sortKey="name" sortConfig={sortConfig} onSort={handleSort}>
+              Nom du compte
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="bank" sortConfig={sortConfig} onSort={handleSort}>
+              Banque
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="iban" sortConfig={sortConfig} onSort={handleSort}>
+              IBAN
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="bic" sortConfig={sortConfig} onSort={handleSort}>
+              BIC
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="balance" sortConfig={sortConfig} onSort={handleSort}>
+              Solde
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+              Statut
+            </SortableTableHeader>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {accounts.map((account) => (
+          {sortedData.map((account) => (
             <React.Fragment key={account.id}>
               <TableRow className="hover:bg-gray-50 border-b-0">
                 <TableCell>
