@@ -12,7 +12,6 @@ export const ExpertiseReportTableHeader: React.FC = () => {
         <TableHead>Véhicule</TableHead>        
         <TableHead className="w-[120px]">Montant</TableHead>
         <TableHead className="w-[120px]">Statut</TableHead>
-        <TableHead className="text-right w-[160px]">Actions</TableHead>
       </TableRow>
     </TableHeader>
   );

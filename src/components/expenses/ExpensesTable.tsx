@@ -54,51 +54,60 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete, isLoading }: Expense
             <TableHead>Statut</TableHead>
             <TableHead>Montant TVA</TableHead>
             <TableHead>Montant TTC</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {expenses.length > 0 ? (
             expenses.map((expense) => (
-              <TableRow key={expense.id}>
-                <TableCell>{expense.type}</TableCell>
-                <TableCell>{new Date(expense.date).toLocaleDateString('fr-FR')}</TableCell>
-                <TableCell>{expense.supplier}</TableCell>
-                <TableCell>{expense.category}</TableCell>
-                <TableCell>
-                  {expense.vehicle ? (
-                    <span className="text-sm">
-                      {expense.vehicle.license_plate} - {expense.vehicle.car_brands?.name || 'Marque inconnue'} {expense.vehicle.car_models?.name || 'Modèle inconnu'}
-                    </span>
-                  ) : (
-                    <span className="text-gray-400 text-sm">Non assigné</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={expense.status} />
-                </TableCell>
-                <TableCell>{formatAmount(expense.vat_amount)}</TableCell>
-                <TableCell>{formatAmount(expense.total_amount)}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end space-x-1">
-                    <Button variant="ghost" size="icon" onClick={() => onEdit(expense)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="text-red-500 hover:text-red-700"
-                      onClick={() => onDelete(expense)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
+              <React.Fragment key={expense.id}>
+                <TableRow className="border-b-0">
+                  <TableCell>{expense.type}</TableCell>
+                  <TableCell>{new Date(expense.date).toLocaleDateString('fr-FR')}</TableCell>
+                  <TableCell>{expense.supplier}</TableCell>
+                  <TableCell>{expense.category}</TableCell>
+                  <TableCell>
+                    {expense.vehicle ? (
+                      <span className="text-sm">
+                        {expense.vehicle.license_plate} - {expense.vehicle.car_brands?.name || 'Marque inconnue'} {expense.vehicle.car_models?.name || 'Modèle inconnu'}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400 text-sm">Non assigné</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={expense.status} />
+                  </TableCell>
+                  <TableCell>{formatAmount(expense.vat_amount)}</TableCell>
+                  <TableCell>{formatAmount(expense.total_amount)}</TableCell>
+                </TableRow>
+                <TableRow className="border-t-0">
+                  <TableCell colSpan={8} className="py-3 border-t-0">
+                    <div className="flex flex-wrap gap-2 justify-end px-4">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => onEdit(expense)}
+                      >
+                        <Pencil className="h-4 w-4 mr-1" />
+                        Modifier
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                        onClick={() => onDelete(expense)}
+                      >
+                        <Trash className="h-4 w-4 mr-1" />
+                        Supprimer
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              </React.Fragment>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={9} className="text-center py-4">
+              <TableCell colSpan={8} className="text-center py-4">
                 <div className="flex flex-col items-center justify-center py-8">
                   <TrendingDown className="h-10 w-10 text-gray-400 mb-2" />
                   <h3 className="font-medium text-gray-900">Aucune dépense</h3>

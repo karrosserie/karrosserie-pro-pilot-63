@@ -64,116 +64,121 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
   };
 
   return (
-    <TableRow className="hover:bg-gray-50">
-      <TableCell>
-        {report.report_number || 'Non spécifié'}
-      </TableCell>
-      <TableCell>
-        {report.report_date ? new Date(report.report_date).toLocaleDateString('fr-FR') : 'Non spécifiée'}
-      </TableCell>
-      <TableCell>
-        {report.clients ? (
-          <span>
-            {report.clients.first_name} {report.clients.last_name}
-          </span>
-        ) : (
-          <span className="text-gray-400 italic">Non assigné</span>
-        )}
-      </TableCell>
-      <TableCell>
-        {report.vehicles 
-          ? `${report.vehicles.car_brands?.name || 'Marque inconnue'} ${report.vehicles.car_models?.name || 'Modèle inconnu'} - ${report.vehicles.license_plate || 'Plaque non spécifiée'}`
-          : 'Non assigné'
-        }
-      </TableCell>
-      <TableCell>
-        {formatAmount(report.amount)}
-      </TableCell>
-      <TableCell>
-        {getStatusDisplay()}
-      </TableCell>
-      <TableCell className="text-right">
-        <div className="flex justify-end space-x-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => onEditReport(report)}
-                disabled={isConverted}
-                className="h-8 w-8"
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              {isConverted ? 'Impossible de modifier un rapport converti' : 'Modifier le rapport'}
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => window.open(report.document_url, '_blank')}
-                disabled={!report.document_url}
-                className="h-8 w-8"
-              >
-                <Download className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              {!report.document_url ? 'Aucun document disponible' : 'Télécharger le rapport'}
-            </TooltipContent>
-          </Tooltip>
-
-          {onConvertToQuote && !isConverted && (
+    <React.Fragment>
+      <TableRow className="hover:bg-gray-50 border-b-0">
+        <TableCell>
+          {report.report_number || 'Non spécifié'}
+        </TableCell>
+        <TableCell>
+          {report.report_date ? new Date(report.report_date).toLocaleDateString('fr-FR') : 'Non spécifiée'}
+        </TableCell>
+        <TableCell>
+          {report.clients ? (
+            <span>
+              {report.clients.first_name} {report.clients.last_name}
+            </span>
+          ) : (
+            <span className="text-gray-400 italic">Non assigné</span>
+          )}
+        </TableCell>
+        <TableCell>
+          {report.vehicles 
+            ? `${report.vehicles.car_brands?.name || 'Marque inconnue'} ${report.vehicles.car_models?.name || 'Modèle inconnu'} - ${report.vehicles.license_plate || 'Plaque non spécifiée'}`
+            : 'Non assigné'
+          }
+        </TableCell>
+        <TableCell>
+          {formatAmount(report.amount)}
+        </TableCell>
+        <TableCell>
+          {getStatusDisplay()}
+        </TableCell>
+      </TableRow>
+      <TableRow className="border-t-0">
+        <TableCell colSpan={6} className="py-3 border-t-0">
+          <div className="flex flex-wrap gap-2 justify-end px-4">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={() => onConvertToQuote(report)}
-                  disabled={isConverting || !report.client_id || !report.vehicle_id}
-                  className="h-8 w-8"
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => onEditReport(report)}
+                  disabled={isConverted}
                 >
-                  {isConverting ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <FileCheck className="h-4 w-4" />
-                  )}
+                  <Pencil className="h-4 w-4 mr-1" />
+                  Modifier
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                {isConverting 
-                  ? 'Conversion en cours...' 
-                  : !report.client_id || !report.vehicle_id 
-                    ? 'Client et véhicule requis pour la conversion' 
-                    : 'Convertir en devis'
-                }
+                {isConverted ? 'Impossible de modifier un rapport converti' : 'Modifier le rapport'}
               </TooltipContent>
             </Tooltip>
-          )}
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="text-red-500 hover:text-red-700 h-8 w-8"
-                onClick={() => onDeleteReport(report.id)}
-                disabled={isConverted}
-              >
-                <Trash className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              {isConverted ? 'Impossible de supprimer un rapport converti' : 'Supprimer le rapport'}
-            </TooltipContent>
-          </Tooltip>
-        </div>
-      </TableCell>
-    </TableRow>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => window.open(report.document_url, '_blank')}
+                  disabled={!report.document_url}
+                >
+                  <Download className="h-4 w-4 mr-1" />
+                  Télécharger
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {!report.document_url ? 'Aucun document disponible' : 'Télécharger le rapport'}
+              </TooltipContent>
+            </Tooltip>
+
+            {onConvertToQuote && !isConverted && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => onConvertToQuote(report)}
+                    disabled={isConverting || !report.client_id || !report.vehicle_id}
+                  >
+                    {isConverting ? (
+                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                    ) : (
+                      <FileCheck className="h-4 w-4 mr-1" />
+                    )}
+                    {isConverting ? 'Conversion...' : 'Convertir'}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {isConverting 
+                    ? 'Conversion en cours...' 
+                    : !report.client_id || !report.vehicle_id 
+                      ? 'Client et véhicule requis pour la conversion' 
+                      : 'Convertir en devis'
+                  }
+                </TooltipContent>
+              </Tooltip>
+            )}
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                  onClick={() => onDeleteReport(report.id)}
+                  disabled={isConverted}
+                >
+                  <Trash className="h-4 w-4 mr-1" />
+                  Supprimer
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {isConverted ? 'Impossible de supprimer un rapport converti' : 'Supprimer le rapport'}
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </TableCell>
+      </TableRow>
+    </React.Fragment>
   );
 };

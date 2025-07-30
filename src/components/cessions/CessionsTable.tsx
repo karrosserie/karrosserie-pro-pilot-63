@@ -399,95 +399,106 @@ export const CessionsTable = ({
             <TableHead>Ordre de réparation</TableHead>
             <TableHead>Assurance</TableHead>
             <TableHead>Statut</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {cessions.length > 0 ? (
             cessions.map((cession) => (
-              <TableRow key={cession.id}>
-                <TableCell>
-                  {format(new Date(cession.created_at), 'dd/MM/yyyy', { locale: fr })}
-                </TableCell>
-                <TableCell>
-                  {formatRepairOrderDisplay(cession)}
-                </TableCell>
-                <TableCell>
-                  {cession.insurance_companies ? 
-                    cession.insurance_companies.name 
-                    : '-'
-                  }
-                </TableCell>
-                <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(cession.status || '')}`}>
-                    {getStatusLabel(cession.status || '')}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end space-x-1">
-                    {cession.status === 'en_attente' && (
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => {
-                          setSelectedCession(cession);
-                          setPreviewOpen(true);
-                        }}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    )}
-                    {cession.status !== 'en_attente' && cession.status !== 'en_attente_signature' && (
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => handleDownloadPDF(cession)}
-                        title="Télécharger le PDF"
-                      >
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    )}
-                    {cession.status === 'en_attente' && (
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => onEditCession(cession)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                    )}
-                    {cession.status === 'en_attente' && (
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-red-500 hover:text-red-700"
-                        onClick={() => onDeleteCession(cession.id)}
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    )}
-                    {cession.status === 'en_attente' && (
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => handleInitializeProcedure(cession)}
-                        title="Initialiser la procédure"
-                        disabled={isGeneratingPDF}
-                      >
-                        {isGeneratingPDF ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Play className="h-4 w-4" />
-                        )}
-                      </Button>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
+              <React.Fragment key={cession.id}>
+                <TableRow className="border-b-0">
+                  <TableCell>
+                    {format(new Date(cession.created_at), 'dd/MM/yyyy', { locale: fr })}
+                  </TableCell>
+                  <TableCell>
+                    {formatRepairOrderDisplay(cession)}
+                  </TableCell>
+                  <TableCell>
+                    {cession.insurance_companies ? 
+                      cession.insurance_companies.name 
+                      : '-'
+                    }
+                  </TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(cession.status || '')}`}>
+                      {getStatusLabel(cession.status || '')}
+                    </span>
+                  </TableCell>
+                </TableRow>
+                <TableRow className="border-t-0">
+                  <TableCell colSpan={4} className="py-3 border-t-0">
+                    <div className="flex flex-wrap gap-2 justify-end px-4">
+                      {cession.status === 'en_attente' && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setSelectedCession(cession);
+                            setPreviewOpen(true);
+                          }}
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          Aperçu
+                        </Button>
+                      )}
+                      {cession.status !== 'en_attente' && cession.status !== 'en_attente_signature' && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDownloadPDF(cession)}
+                        >
+                          <Download className="h-4 w-4 mr-1" />
+                          Télécharger
+                        </Button>
+                      )}
+                      {cession.status === 'en_attente' && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => onEditCession(cession)}
+                        >
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
+                      )}
+                      {cession.status === 'en_attente' && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleInitializeProcedure(cession)}
+                          disabled={isGeneratingPDF}
+                        >
+                          {isGeneratingPDF ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                              Génération...
+                            </>
+                          ) : (
+                            <>
+                              <Play className="h-4 w-4 mr-1" />
+                              Initialiser
+                            </>
+                          )}
+                        </Button>
+                      )}
+                      {cession.status === 'en_attente' && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                          onClick={() => onDeleteCession(cession.id)}
+                        >
+                          <Trash className="h-4 w-4 mr-1" />
+                          Supprimer
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              </React.Fragment>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-4">
+              <TableCell colSpan={4} className="text-center py-4">
                 <div className="flex flex-col items-center justify-center py-8">
                   <FileText className="h-10 w-10 text-gray-400 mb-2" />
                   <h3 className="font-medium text-gray-900">Aucun résultat</h3>
