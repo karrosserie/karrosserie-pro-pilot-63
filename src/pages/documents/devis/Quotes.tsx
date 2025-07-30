@@ -319,7 +319,7 @@ const Quotes = () => {
               <TableHead>Véhicule</TableHead>
               <TableHead>Montant</TableHead>
               <TableHead>Statut</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-right w-1/5">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
