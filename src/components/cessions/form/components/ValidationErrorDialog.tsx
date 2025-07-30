@@ -31,7 +31,10 @@ export const ValidationErrorDialog = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogAction onClick={onClose}>
+          <AlertDialogAction 
+            onClick={onClose}
+            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+          >
             Compris
           </AlertDialogAction>
         </AlertDialogFooter>
