@@ -114,7 +114,11 @@ export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onViewO
               <FileCheck className="h-4 w-4 mr-1" />
               Demander docs
             </Button>
-            <Button variant="outline" size="sm" onClick={() => contextMenuProps?.onConvertToInvoice?.(order)}>
+            <Button 
+              size="sm"
+              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+              onClick={() => contextMenuProps?.onConvertToInvoice?.(order)}
+            >
               <ArrowRight className="h-4 w-4 mr-1" />
               Convertir
             </Button>

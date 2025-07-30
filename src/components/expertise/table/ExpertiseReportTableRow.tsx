@@ -118,19 +118,19 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
             {onConvertToQuote && !isConverted && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => onConvertToQuote(report)}
-                    disabled={isConverting || !report.client_id || !report.vehicle_id}
-                  >
-                    {isConverting ? (
-                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                    ) : (
-                      <FileCheck className="h-4 w-4 mr-1" />
-                    )}
-                    {isConverting ? 'Conversion...' : 'Convertir'}
-                  </Button>
+            <Button 
+              size="sm"
+              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+              onClick={() => onConvertToQuote(report)}
+              disabled={isConverting || !report.client_id || !report.vehicle_id}
+            >
+              {isConverting ? (
+                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+              ) : (
+                <FileCheck className="h-4 w-4 mr-1" />
+              )}
+              {isConverting ? 'Conversion...' : 'Convertir'}
+            </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   {isConverting 
