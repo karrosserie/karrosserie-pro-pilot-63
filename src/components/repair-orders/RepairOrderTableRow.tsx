@@ -61,65 +61,75 @@ export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onViewO
   };
 
   return (
-    <TableRow>
-      <TableCell className="font-medium">{order.reference}</TableCell>
-      <TableCell>{formatDate(order.created_at)}</TableCell>
-      <TableCell>
-        {order.clients 
-          ? `${order.clients.first_name} ${order.clients.last_name}`
-          : '-'
-        }
-      </TableCell>
-      <TableCell>
-        {formatVehicleDisplay(order)}
-      </TableCell>
-      <TableCell>{formatAmount(calculateOrderAmount(order))}</TableCell>
-      <TableCell>
-        <Badge className={getStatusColor(order.status || 'En attente')}>
-          {order.status || 'En attente'}
-        </Badge>
-      </TableCell>
-      <TableCell className="text-right">
-        <div className="flex justify-end space-x-1">
-          <Button variant="ghost" size="icon" onClick={() => onViewOrder?.(order)}>
-            <Eye className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => onEditOrder(order)}>
-            <Pencil className="h-4 w-4" />
-          </Button>
-          
-          {/* Boutons déplacés du menu contextuel */}
-          <Button variant="ghost" size="icon" onClick={() => contextMenuProps?.onDownload(order)}>
-            <Download className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => contextMenuProps?.onPrint(order)}>
-            <Printer className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => contextMenuProps?.onSendEmail(order)}>
-            <Mail className="h-4 w-4" />
-          </Button>
-          {order.status !== 'Signé' && (
-            <Button variant="ghost" size="icon" onClick={() => contextMenuProps?.onSignOrder?.(order)}>
-              <Signature className="h-4 w-4" />
+    <React.Fragment>
+      <TableRow className="hover:bg-gray-50 border-b-0">
+        <TableCell className="font-medium">{order.reference}</TableCell>
+        <TableCell>{formatDate(order.created_at)}</TableCell>
+        <TableCell>
+          {order.clients 
+            ? `${order.clients.first_name} ${order.clients.last_name}`
+            : '-'
+          }
+        </TableCell>
+        <TableCell>
+          {formatVehicleDisplay(order)}
+        </TableCell>
+        <TableCell>{formatAmount(calculateOrderAmount(order))}</TableCell>
+        <TableCell>
+          <Badge className={getStatusColor(order.status || 'En attente')}>
+            {order.status || 'En attente'}
+          </Badge>
+        </TableCell>
+      </TableRow>
+      <TableRow className="border-t-0">
+        <TableCell colSpan={6} className="py-3 border-t-0">
+          <div className="flex flex-wrap gap-2 justify-end px-4">
+            <Button variant="outline" size="sm" onClick={() => onViewOrder?.(order)}>
+              <Eye className="h-4 w-4 mr-1" />
+              Voir
             </Button>
-          )}
-          <Button variant="ghost" size="icon" onClick={() => contextMenuProps?.onRequestDocuments?.(order)}>
-            <FileCheck className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => contextMenuProps?.onConvertToInvoice?.(order)}>
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-          
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-red-500 hover:text-red-700"
-            onClick={() => onDeleteOrder(order)}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        </div>
-      </TableCell>
-    </TableRow>
+            <Button variant="outline" size="sm" onClick={() => onEditOrder(order)}>
+              <Pencil className="h-4 w-4 mr-1" />
+              Modifier
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => contextMenuProps?.onDownload(order)}>
+              <Download className="h-4 w-4 mr-1" />
+              Télécharger
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => contextMenuProps?.onPrint(order)}>
+              <Printer className="h-4 w-4 mr-1" />
+              Imprimer
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => contextMenuProps?.onSendEmail(order)}>
+              <Mail className="h-4 w-4 mr-1" />
+              Envoyer
+            </Button>
+            {order.status !== 'Signé' && (
+              <Button variant="outline" size="sm" onClick={() => contextMenuProps?.onSignOrder?.(order)}>
+                <Signature className="h-4 w-4 mr-1" />
+                Signer
+              </Button>
+            )}
+            <Button variant="outline" size="sm" onClick={() => contextMenuProps?.onRequestDocuments?.(order)}>
+              <FileCheck className="h-4 w-4 mr-1" />
+              Demander docs
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => contextMenuProps?.onConvertToInvoice?.(order)}>
+              <ArrowRight className="h-4 w-4 mr-1" />
+              Convertir
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+              onClick={() => onDeleteOrder(order)}
+            >
+              <Trash className="h-4 w-4 mr-1" />
+              Supprimer
+            </Button>
+          </div>
+        </TableCell>
+      </TableRow>
+    </React.Fragment>
   );
 };

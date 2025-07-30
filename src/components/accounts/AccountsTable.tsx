@@ -142,67 +142,70 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
             <TableHead>BIC</TableHead>
             <TableHead>Solde</TableHead>
             <TableHead>Statut</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {accounts.map((account) => (
-            <TableRow key={account.id}>
-              <TableCell>
-                <div className="flex items-center">
-                  <span>{account.name}</span>
-                </div>
-              </TableCell>
-              <TableCell>{account.bank}</TableCell>
-              <TableCell className="font-mono text-sm">{account.iban}</TableCell>
-              <TableCell className="font-mono text-sm">{account.bic}</TableCell>
-              <TableCell>
-                {formatAmount(account.balance)}
-              </TableCell>
-              <TableCell>
-                <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(account.status)}`}>
-                  {account.status}
-                </span>
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end space-x-1">
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={() => setShowBankConnectDialog(true)}
-                    title="Connecter le compte bancaire"
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    <Link className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={() => onSync(account)}
-                    title="Synchroniser"
-                  >
-                    <RefreshCw className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => onEdit(account)}
-                    title="Modifier"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="text-red-500 hover:text-red-700"
-                    onClick={() => onDelete(account)}
-                    title="Supprimer"
-                  >
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
+            <React.Fragment key={account.id}>
+              <TableRow className="hover:bg-gray-50 border-b-0">
+                <TableCell>
+                  <div className="flex items-center">
+                    <span>{account.name}</span>
+                  </div>
+                </TableCell>
+                <TableCell>{account.bank}</TableCell>
+                <TableCell className="font-mono text-sm">{account.iban}</TableCell>
+                <TableCell className="font-mono text-sm">{account.bic}</TableCell>
+                <TableCell>
+                  {formatAmount(account.balance)}
+                </TableCell>
+                <TableCell>
+                  <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(account.status)}`}>
+                    {account.status}
+                  </span>
+                </TableCell>
+              </TableRow>
+              <TableRow className="border-t-0">
+                <TableCell colSpan={6} className="py-3 border-t-0">
+                  <div className="flex flex-wrap gap-2 justify-end px-4">
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowBankConnectDialog(true)}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      <Link className="h-4 w-4 mr-1" />
+                      Connecter
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onSync(account)}
+                    >
+                      <RefreshCw className="h-4 w-4 mr-1" />
+                      Synchroniser
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      size="sm" 
+                      onClick={() => onEdit(account)}
+                    >
+                      <Pencil className="h-4 w-4 mr-1" />
+                      Modifier
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      size="sm" 
+                      className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                      onClick={() => onDelete(account)}
+                    >
+                      <Trash className="h-4 w-4 mr-1" />
+                      Supprimer
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            </React.Fragment>
           ))}
         </TableBody>
       </Table>

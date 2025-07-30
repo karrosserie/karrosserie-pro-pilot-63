@@ -46,7 +46,6 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
             <TableHead>Téléphone</TableHead>
             <TableHead>Ville</TableHead>
             <TableHead>Permis de conduire</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -86,58 +85,66 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
               };
               
               return (
-                <TableRow key={client.id}>
-                  <TableCell className="font-medium">
-                    {client.first_name} {client.last_name}
-                  </TableCell>
-                  <TableCell>{client.email || '-'}</TableCell>
-                  <TableCell>{client.phone}</TableCell>
-                  <TableCell>{client.city}</TableCell>
-                  <TableCell>
-                    <StatusBadge 
-                      status={hasCompleteLicense ? "Permis importé" : "Pas de permis"}
-                      className={hasCompleteLicense ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-amber-100 text-amber-800 hover:bg-amber-100"}
-                    />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1">
-                      <Button variant="ghost" size="icon" onClick={() => onViewClient(client)}>
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => onEditClient(client)}>
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      
-                      {/* Boutons déplacés du menu contextuel */}
-                      <Button variant="ghost" size="icon" onClick={handleCreateQuote}>
-                        <FileText className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={handleCreateInvoice}>
-                        <Receipt className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={handleCreateCredit}>
-                        <CreditCard className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={handleCreateIntervention}>
-                        <Wrench className="h-4 w-4" />
-                      </Button>
-                      
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-red-500 hover:text-red-700" 
-                        onClick={() => onDeleteClient(client)}
-                        >
-                        <Trash className="h-4 w-4" />
-                      </Button>                      
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <React.Fragment key={client.id}>
+                  <TableRow className="hover:bg-gray-50 border-b-0">
+                    <TableCell className="font-medium">
+                      {client.first_name} {client.last_name}
+                    </TableCell>
+                    <TableCell>{client.email || '-'}</TableCell>
+                    <TableCell>{client.phone}</TableCell>
+                    <TableCell>{client.city}</TableCell>
+                    <TableCell>
+                      <StatusBadge 
+                        status={hasCompleteLicense ? "Permis importé" : "Pas de permis"}
+                        className={hasCompleteLicense ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-amber-100 text-amber-800 hover:bg-amber-100"}
+                      />
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="border-t-0">
+                    <TableCell colSpan={5} className="py-3 border-t-0">
+                      <div className="flex flex-wrap gap-2 justify-end px-4">
+                        <Button variant="outline" size="sm" onClick={() => onViewClient(client)}>
+                          <Eye className="h-4 w-4 mr-1" />
+                          Voir
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => onEditClient(client)}>
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={handleCreateQuote}>
+                          <FileText className="h-4 w-4 mr-1" />
+                          Créer devis
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={handleCreateInvoice}>
+                          <Receipt className="h-4 w-4 mr-1" />
+                          Créer facture
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={handleCreateCredit}>
+                          <CreditCard className="h-4 w-4 mr-1" />
+                          Créer avoir
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={handleCreateIntervention}>
+                          <Wrench className="h-4 w-4 mr-1" />
+                          Créer fiche
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700" 
+                          onClick={() => onDeleteClient(client)}
+                          >
+                          <Trash className="h-4 w-4 mr-1" />
+                          Supprimer
+                        </Button>                      
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </React.Fragment>
               );
             })
           ) : (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-4">
+              <TableCell colSpan={5} className="text-center py-4">
                 <div className="flex flex-col items-center justify-center py-8">
                   <UserPlus className="h-10 w-10 text-gray-400 mb-2" />
                   <h3 className="font-medium text-gray-900">Aucun résultat</h3>

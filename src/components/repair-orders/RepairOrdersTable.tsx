@@ -32,7 +32,6 @@ export const RepairOrdersTable = ({ orders, onEditOrder, onDeleteOrder, onViewOr
             <TableHead>Véhicule</TableHead>
             <TableHead>Montant</TableHead>
             <TableHead>Statut</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -49,7 +48,7 @@ export const RepairOrdersTable = ({ orders, onEditOrder, onDeleteOrder, onViewOr
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-4">
+              <TableCell colSpan={6} className="text-center py-4">
                 <div className="flex flex-col items-center justify-center py-8">
                   <FileText className="h-10 w-10 text-gray-400 mb-2" />
                   <h3 className="font-medium text-gray-900">Aucun résultat</h3>

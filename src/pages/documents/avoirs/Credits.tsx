@@ -411,63 +411,69 @@ const Credits = () => {
               <TableHead>Facture d'origine</TableHead>
               <TableHead>Montant</TableHead>
               <TableHead>Statut</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredCredits.length > 0 ? (
               filteredCredits.map((credit) => (
-                <TableRow key={credit.id}>
-                  <TableCell className="font-medium">{credit.reference}</TableCell>
-                  <TableCell>{formatDate(credit.created_date || credit.created_at)}</TableCell>
-                  <TableCell>
-                    {formatVehicleDisplay(credit)}
-                  </TableCell>
-                  <TableCell>
-                    {getInvoiceDisplay(credit.invoice_id)}
-                  </TableCell>
-                  <TableCell>{formatAmount(credit.amount)}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(credit.status || 'En attente')}`}>
-                      {credit.status || 'En attente'}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1">
-                      <Button variant="ghost" size="icon" onClick={() => handleViewCredit(credit)}>
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleEditCredit(credit)}>
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      
-                      {/* Boutons déplacés du menu contextuel */}
-                      <Button variant="ghost" size="icon" onClick={() => handleDownload(credit)}>
-                        <Download className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handlePrint(credit)}>
-                        <Printer className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleSendEmail(credit)}>
-                        <Mail className="h-4 w-4" />
-                      </Button>
-                      
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-red-500 hover:text-red-700"
-                        onClick={() => handleDelete(credit)}
-                        disabled={deleteCredit.isPending}
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <React.Fragment key={credit.id}>
+                  <TableRow className="hover:bg-gray-50 border-b-0">
+                    <TableCell className="font-medium">{credit.reference}</TableCell>
+                    <TableCell>{formatDate(credit.created_date || credit.created_at)}</TableCell>
+                    <TableCell>
+                      {formatVehicleDisplay(credit)}
+                    </TableCell>
+                    <TableCell>
+                      {getInvoiceDisplay(credit.invoice_id)}
+                    </TableCell>
+                    <TableCell>{formatAmount(credit.amount)}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(credit.status || 'En attente')}`}>
+                        {credit.status || 'En attente'}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="border-t-0">
+                    <TableCell colSpan={6} className="py-3 border-t-0">
+                      <div className="flex flex-wrap gap-2 justify-end px-4">
+                        <Button variant="outline" size="sm" onClick={() => handleViewCredit(credit)}>
+                          <Eye className="h-4 w-4 mr-1" />
+                          Voir
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleEditCredit(credit)}>
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleDownload(credit)}>
+                          <Download className="h-4 w-4 mr-1" />
+                          Télécharger
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handlePrint(credit)}>
+                          <Printer className="h-4 w-4 mr-1" />
+                          Imprimer
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(credit)}>
+                          <Mail className="h-4 w-4 mr-1" />
+                          Envoyer
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                          onClick={() => handleDelete(credit)}
+                          disabled={deleteCredit.isPending}
+                        >
+                          <Trash className="h-4 w-4 mr-1" />
+                          Supprimer
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </React.Fragment>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-4">
+                <TableCell colSpan={6} className="text-center py-4">
                   <div className="flex flex-col items-center justify-center py-8">
                     <FileText className="h-10 w-10 text-gray-400 mb-2" />
                     <h3 className="font-medium text-gray-900">Aucun résultat</h3>

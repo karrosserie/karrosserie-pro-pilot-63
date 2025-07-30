@@ -299,7 +299,6 @@ const Invoices = () => {
               <TableHead>Montant</TableHead>
               <TableHead>Avoirs</TableHead>
               <TableHead>Statut</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -307,72 +306,81 @@ const Invoices = () => {
               filteredInvoices.map((invoice) => {
                 const invoiceCredits = getInvoiceCredits(invoice.id);
                 return (
-                <TableRow key={invoice.id}>
-                  <TableCell className="font-medium">{invoice.reference}</TableCell>
-                  <TableCell>{formatDate(invoice.created_at)}</TableCell>
-                  <TableCell>
-                    {invoice.clients 
-                      ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
-                      : '-'
-                    }
-                  </TableCell>
-                  <TableCell>
-                    {invoice.vehicles 
-                      ? `${invoice.vehicles.car_brands?.name || 'Marque inconnue'} ${invoice.vehicles.car_models?.name || 'Modèle inconnu'} - ${invoice.vehicles.license_plate}`
-                      : '-'
-                    }
-                  </TableCell>
-                  <TableCell>{formatAmount(invoice.amount || 0)}</TableCell>
-                  <TableCell>
-                    {renderCreditsBadges(invoiceCredits)}
-                  </TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente de paiement')}`}>
-                      {invoice.status || 'En attente de paiement'}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1">
-                      <Button variant="ghost" size="icon" onClick={() => handleViewInvoice(invoice)}>
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleEditInvoice(invoice)}>
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      
-                      {/* Boutons déplacés du menu contextuel */}
-                      <Button variant="ghost" size="icon" onClick={() => handleDownload(invoice)}>
-                        <Download className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handlePrint(invoice)}>
-                        <Printer className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleSendEmail(invoice)}>
-                        <Mail className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleAddPayment(invoice)}>
-                        <CreditCard className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleAddCredit(invoice)}>
-                        <FileX className="h-4 w-4" />
-                      </Button>
-                      
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-red-500 hover:text-red-700"
-                        onClick={() => handleDelete(invoice)}
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <React.Fragment key={invoice.id}>
+                  <TableRow className="hover:bg-gray-50 border-b-0">
+                    <TableCell className="font-medium">{invoice.reference}</TableCell>
+                    <TableCell>{formatDate(invoice.created_at)}</TableCell>
+                    <TableCell>
+                      {invoice.clients 
+                        ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
+                        : '-'
+                      }
+                    </TableCell>
+                    <TableCell>
+                      {invoice.vehicles 
+                        ? `${invoice.vehicles.car_brands?.name || 'Marque inconnue'} ${invoice.vehicles.car_models?.name || 'Modèle inconnu'} - ${invoice.vehicles.license_plate}`
+                        : '-'
+                      }
+                    </TableCell>
+                    <TableCell>{formatAmount(invoice.amount || 0)}</TableCell>
+                    <TableCell>
+                      {renderCreditsBadges(invoiceCredits)}
+                    </TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente de paiement')}`}>
+                        {invoice.status || 'En attente de paiement'}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="border-t-0">
+                    <TableCell colSpan={7} className="py-3 border-t-0">
+                      <div className="flex flex-wrap gap-2 justify-end px-4">
+                        <Button variant="outline" size="sm" onClick={() => handleViewInvoice(invoice)}>
+                          <Eye className="h-4 w-4 mr-1" />
+                          Voir
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleEditInvoice(invoice)}>
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleDownload(invoice)}>
+                          <Download className="h-4 w-4 mr-1" />
+                          Télécharger
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handlePrint(invoice)}>
+                          <Printer className="h-4 w-4 mr-1" />
+                          Imprimer
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(invoice)}>
+                          <Mail className="h-4 w-4 mr-1" />
+                          Envoyer
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleAddPayment(invoice)}>
+                          <CreditCard className="h-4 w-4 mr-1" />
+                          Ajouter paiement
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleAddCredit(invoice)}>
+                          <FileX className="h-4 w-4 mr-1" />
+                          Créer avoir
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                          onClick={() => handleDelete(invoice)}
+                        >
+                          <Trash className="h-4 w-4 mr-1" />
+                          Supprimer
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </React.Fragment>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-4">
+                <TableCell colSpan={7} className="text-center py-4">
                   <div className="flex flex-col items-center justify-center py-8">
                     <FileText className="h-10 w-10 text-gray-400 mb-2" />
                     <h3 className="font-medium text-gray-900">Aucun résultat</h3>
