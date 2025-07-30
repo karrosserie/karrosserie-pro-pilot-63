@@ -187,6 +187,18 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
               <Pencil className="h-4 w-4" />
             </Button>
           )}
+          
+          {/* Boutons déplacés du menu contextuel */}
+          <Button variant="ghost" size="icon" onClick={handleCreateQuote}>
+            <FileText className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={handleCreateInvoice}>
+            <Receipt className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={handleCreateIntervention}>
+            <Wrench className="h-4 w-4" />
+          </Button>
+          
           {onDelete && (
             <Button 
               variant="ghost" 
@@ -197,28 +209,6 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
               <Trash className="h-4 w-4" />
             </Button>
           )}
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuItem onClick={handleCreateQuote}>
-                <FileText className="h-4 w-4 mr-2" />
-                Créer un devis
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleCreateInvoice}>
-                <Receipt className="h-4 w-4 mr-2" />
-                Créer une facture
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleCreateIntervention}>
-                <Wrench className="h-4 w-4 mr-2" />
-                Créer une fiche
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
     </div>
