@@ -33,6 +33,8 @@ import { sendForSignature } from '@/services/api/signatureService';
 import { companyService } from '@/services/supabase/company';
 import { supabase } from '@/integrations/supabase/client';
 import { clientsService } from '@/services/supabase/clients';
+import { useTableSorting } from '@/hooks/use-table-sorting';
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 
 interface CessionsTableProps {
   cessions: Cession[];
@@ -55,6 +57,7 @@ export const CessionsTable = ({
   
   const { companyData } = useCompany();
   const { insuranceCompanies } = useInsuranceCompanies();
+  const { sortedData, sortConfig, handleSort } = useTableSorting(cessions, 'created_at');
 
   
   const parseValidationError = (validationError: string) => {

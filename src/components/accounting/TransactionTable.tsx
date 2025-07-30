@@ -17,6 +17,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { TransactionDetailsDialog } from './TransactionDetailsDialog';
 import { TransactionActionsMenu } from './TransactionActionsMenu';
 import { Receipt } from 'lucide-react';
+import { useTableSorting } from '@/hooks/use-table-sorting';
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 
 interface TransactionTableProps {
   transactions: Transaction[];
@@ -25,6 +27,7 @@ interface TransactionTableProps {
 export const TransactionTable = ({ transactions }: TransactionTableProps) => {
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const { sortedData, sortConfig, handleSort } = useTableSorting(transactions, 'date');
 
   const handleViewDetails = (transaction: Transaction) => {
     setSelectedTransaction(transaction);

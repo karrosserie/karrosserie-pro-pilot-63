@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Search, Car } from 'lucide-react';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { Loading } from '@/components/ui/loading';
+import { useTableSorting } from '@/hooks/use-table-sorting';
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
+import { Table, TableHeader, TableRow, TableBody, TableCell } from '@/components/ui/table';
 
 interface FleetVehiclesTableProps {
   vehicles: FleetVehicle[];
