@@ -28,6 +28,7 @@ export const SimpleReceiptsTable = ({
   onDelete
 }: SimpleReceiptsTableProps) => {
   const { invoices } = useInvoices();
+  const { sortedData, sortConfig, handleSort } = useTableSorting(receipts, 'date');
 
   const getStatusColor = (status: string) => {
     switch (status) {
