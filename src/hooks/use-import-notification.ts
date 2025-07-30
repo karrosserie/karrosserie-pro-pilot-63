@@ -116,7 +116,7 @@ export function useImportNotification() {
                     queryClient.invalidateQueries({ queryKey: ['quotes'] });
                     
                     // Rediriger vers la page des devis avec l'aperçu ouvert
-                    navigate(`/documents/devis?openQuote=${newQuote.id}`);
+                    window.location.href = `/documents/devis?openQuote=${newQuote.id}`;
                     
                     // Afficher un toast de succès pour la conversion
                     toast({
