@@ -352,8 +352,8 @@ const Quotes = () => {
                       <StatusBadge status={quote.status === 'draft' ? 'En attente' : (quote.status || 'En attente')} />
                     </TableCell>
                   </TableRow>
-                  <TableRow className="border-0">
-                    <TableCell colSpan={6} className="py-3 border-0">
+                  <TableRow className="border-t-0">
+                    <TableCell colSpan={6} className="py-3 border-t-0">
                       <div className="flex flex-wrap gap-2 justify-end">
                         <Button variant="outline" size="sm" onClick={() => handleViewQuote(quote)}>
                           <Eye className="h-4 w-4 mr-1" />
