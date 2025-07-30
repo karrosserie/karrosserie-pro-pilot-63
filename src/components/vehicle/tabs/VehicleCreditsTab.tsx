@@ -12,7 +12,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
-import { CreditCard, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { CreditCard, Eye, Pencil, Trash, Download, Printer, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
@@ -22,7 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Download, Printer, Mail } from 'lucide-react';
+
 import { EditCreditDialog } from '@/components/credits/EditCreditDialog';
 import InvoiceViewerModal from '@/components/invoices/InvoiceViewerModal';
 import { CreditEmailDialog } from '@/components/credits/email/CreditEmailDialog';
@@ -302,7 +302,7 @@ const VehicleCreditsTab: React.FC<VehicleCreditsTabProps> = ({ vehicleId }) => {
             {sortedData.length > 0 ? (
               sortedData.map((credit) => (
                 <React.Fragment key={credit.id}>
-                  <TableRow className="border-b-0">
+                  <TableRow className="hover:bg-gray-50 border-b-0">
                     <TableCell className="font-medium">{credit.reference}</TableCell>
                     <TableCell>{formatDate(credit.created_date || credit.created_at)}</TableCell>
                     <TableCell>
@@ -321,50 +321,25 @@ const VehicleCreditsTab: React.FC<VehicleCreditsTabProps> = ({ vehicleId }) => {
                   <TableRow className="border-t-0">
                     <TableCell colSpan={6} className="py-3 border-t-0">
                       <div className="flex flex-wrap gap-2 justify-end px-4">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleView(credit)}
-                          title="Visualiser"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handleView(credit)}>
                           <Eye className="h-4 w-4 mr-1" />
-                          Visualiser
+                          Voir
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleEdit(credit)}
-                          title="Modifier"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handleEdit(credit)}>
                           <Pencil className="h-4 w-4 mr-1" />
                           Modifier
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleDownload(credit)}
-                          title="Télécharger"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handleDownload(credit)}>
                           <Download className="h-4 w-4 mr-1" />
                           Télécharger
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handlePrint(credit)}
-                          title="Imprimer"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handlePrint(credit)}>
                           <Printer className="h-4 w-4 mr-1" />
                           Imprimer
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleSendEmail(credit)}
-                          title="Envoyer par e-mail"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(credit)}>
                           <Mail className="h-4 w-4 mr-1" />
-                          Envoyer par e-mail
+                          Envoyer
                         </Button>
                         <Button 
                           variant="outline" 
