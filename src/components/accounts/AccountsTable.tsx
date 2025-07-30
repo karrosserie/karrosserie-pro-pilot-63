@@ -172,7 +172,6 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                       variant="outline"
                       size="sm"
                       onClick={() => setShowBankConnectDialog(true)}
-                      className="text-blue-600 hover:text-blue-800"
                     >
                       <Link className="h-4 w-4 mr-1" />
                       Connecter

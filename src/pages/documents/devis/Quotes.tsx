@@ -357,7 +357,7 @@ const Quotes = () => {
                       <div className="flex flex-wrap gap-2 justify-end px-4">
                         <Button variant="outline" size="sm" onClick={() => handleViewQuote(quote)}>
                           <Eye className="h-4 w-4 mr-1" />
-                          Aperçu
+                          Voir
                         </Button>
 
                         <Button variant="outline" size="sm" onClick={() => handleEditQuote(quote)}>
