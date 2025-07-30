@@ -65,11 +65,56 @@ export function useImportNotification() {
           console.log('🆔 Current import IDs:', Array.from(currentImportIds));
           console.log('🆔 Last import IDs:', Array.from(lastImportIds));
           
-          // Au premier chargement, initialiser sans notification
+          // Au premier chargement, initialiser et traiter les imports existants sans client/véhicule
           if (!isInitialized) {
+            // Traiter les imports existants qui ont un client et un véhicule
+            for (const import_item of imports) {
+              if (import_item.expertise_reports?.client_id && import_item.expertise_reports?.vehicle_id) {
+                try {
+                  console.log('🔄 Processing existing import for auto-conversion:', import_item.id);
+                  
+                  // Vérifier si un devis n'existe pas déjà pour ce rapport
+                  const existingQuote = await quotesService.getByReportId(import_item.expertise_reports.id);
+                  
+                  if (!existingQuote) {
+                    console.log('📋 No existing quote found, creating one for existing import');
+                    
+                    // Récupérer le rapport d'expertise complet pour la conversion
+                    const { data: fullReport, error: reportError } = await supabase
+                      .from('expertise_reports')
+                      .select('*')
+                      .eq('id', import_item.expertise_reports.id)
+                      .single();
+                    
+                    if (reportError || !fullReport) {
+                      throw new Error('Impossible de récupérer le rapport d\'expertise complet');
+                    }
+                    
+                    // Créer le devis à partir du rapport
+                    const newQuote = await quotesService.createFromReport(fullReport);
+                    
+                    console.log('✅ Quote created from existing import:', newQuote);
+                    
+                    // Invalider le cache des devis
+                    queryClient.invalidateQueries({ queryKey: ['quotes'] });
+                    
+                    // Afficher un toast de succès pour la conversion
+                    toast({
+                      title: "Conversion automatique réussie",
+                      description: `Le rapport ${import_item.expertise_reports.report_number} a été automatiquement converti en devis ${newQuote.reference}.`,
+                    });
+                  } else {
+                    console.log('📋 Quote already exists for this existing import');
+                  }
+                } catch (error: any) {
+                  console.error('❌ Error during existing import conversion:', error);
+                }
+              }
+            }
+            
             lastImportIds = currentImportIds;
             isInitialized = true;
-            console.log('🔧 Initialized with existing imports, no notifications sent');
+            console.log('🔧 Initialized with existing imports, processed eligible ones');
             return;
           }
           
