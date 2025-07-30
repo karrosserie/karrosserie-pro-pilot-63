@@ -353,8 +353,8 @@ const Quotes = () => {
                     </TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell colSpan={6} className="py-3 bg-gray-50/50">
-                      <div className="flex flex-wrap gap-2 justify-start">
+                    <TableCell colSpan={6} className="py-3 border-t-0">
+                      <div className="flex flex-wrap gap-2 justify-end">
                         <Button variant="outline" size="sm" onClick={() => handleViewQuote(quote)}>
                           <Eye className="h-4 w-4 mr-1" />
                           Aperçu
