@@ -47,7 +47,7 @@ export const ClientDetailsSidebar: React.FC<ClientDetailsSidebarProps> = ({
                 className={cn(
                   "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors",
                   isActive
-                    ? "bg-blue-100 text-blue-700 border border-blue-200"
+                    ? "bg-karrosserie-orange/10 text-karrosserie-orange border border-karrosserie-orange/20"
                     : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                 )}
               >
@@ -55,7 +55,7 @@ export const ClientDetailsSidebar: React.FC<ClientDetailsSidebarProps> = ({
                   <Icon 
                     className={cn(
                       "h-4 w-4 flex-shrink-0",
-                      isActive ? "text-blue-600" : "text-gray-500"
+                      isActive ? "text-karrosserie-orange" : "text-gray-500"
                     )}
                   />
                   <span className="truncate">{item.label}</span>
@@ -63,12 +63,11 @@ export const ClientDetailsSidebar: React.FC<ClientDetailsSidebarProps> = ({
                 
                 {item.count > 0 && (
                   <Badge 
-                    variant="secondary" 
                     className={cn(
-                      "text-xs min-w-[20px] h-5 flex items-center justify-center",
+                      "text-xs min-w-[20px] h-5 flex items-center justify-center text-white font-medium",
                       isActive 
-                        ? "bg-blue-200 text-blue-800" 
-                        : "bg-orange-100 text-orange-700"
+                        ? "bg-karrosserie-orange text-white" 
+                        : "bg-karrosserie-orange text-white"
                     )}
                   >
                     {item.count}
