@@ -274,7 +274,7 @@ const Planning = () => {
 
           <TabsContent value="workshop" className="space-y-6">
             {/* Stats Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <StatsCard 
                 title="Véhicules" 
                 value={stats.vehicles}
@@ -292,12 +292,6 @@ const Planning = () => {
                 value={stats.waiting}
                 icon={<Clock className="h-8 w-8 text-yellow-600" />}
                 iconBg="bg-yellow-100"
-              />
-              <StatsCard 
-                title="CA en cours" 
-                value={`${stats.revenue}€`}
-                icon={<Euro className="h-8 w-8 text-orange-600" />}
-                iconBg="bg-orange-100"
               />
             </div>
 
