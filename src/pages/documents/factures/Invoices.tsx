@@ -339,6 +339,24 @@ const Invoices = () => {
                       <Button variant="ghost" size="icon" onClick={() => handleEditInvoice(invoice)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
+                      
+                      {/* Boutons déplacés du menu contextuel */}
+                      <Button variant="ghost" size="icon" onClick={() => handleDownload(invoice)}>
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handlePrint(invoice)}>
+                        <Printer className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleSendEmail(invoice)}>
+                        <Mail className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleAddPayment(invoice)}>
+                        <CreditCard className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleAddCredit(invoice)}>
+                        <FileX className="h-4 w-4" />
+                      </Button>
+                      
                       <Button 
                         variant="ghost" 
                         size="icon" 
@@ -347,36 +365,6 @@ const Invoices = () => {
                       >
                         <Trash className="h-4 w-4" />
                       </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56">
-                          <DropdownMenuItem onClick={() => handleDownload(invoice)}>
-                            <Download className="mr-2 h-4 w-4" />
-                            Télécharger
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handlePrint(invoice)}>
-                            <Printer className="mr-2 h-4 w-4" />
-                            Imprimer
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleSendEmail(invoice)}>
-                            <Mail className="mr-2 h-4 w-4" />
-                            Envoyer par e-mail
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleAddPayment(invoice)}>
-                            <CreditCard className="mr-2 h-4 w-4" />
-                            Ajouter un paiement
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleAddCredit(invoice)}>
-                            <FileX className="mr-2 h-4 w-4" />
-                            Ajouter un avoir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </div>
                   </TableCell>
                 </TableRow>

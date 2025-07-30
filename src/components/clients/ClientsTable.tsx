@@ -107,6 +107,21 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                       <Button variant="ghost" size="icon" onClick={() => onEditClient(client)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
+                      
+                      {/* Boutons déplacés du menu contextuel */}
+                      <Button variant="ghost" size="icon" onClick={handleCreateQuote}>
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={handleCreateInvoice}>
+                        <Receipt className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={handleCreateCredit}>
+                        <CreditCard className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={handleCreateIntervention}>
+                        <Wrench className="h-4 w-4" />
+                      </Button>
+                      
                       <Button 
                         variant="ghost" 
                         size="icon" 
@@ -115,31 +130,6 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                         >
                         <Trash className="h-4 w-4" />
                       </Button>                      
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56">
-                          <DropdownMenuItem onClick={handleCreateQuote} className="cursor-pointer">
-                            <FileText className="h-4 w-4 mr-2" />
-                            Créer un devis
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={handleCreateInvoice} className="cursor-pointer">
-                            <Receipt className="h-4 w-4 mr-2" />
-                            Créer une facture
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={handleCreateCredit} className="cursor-pointer">
-                            <CreditCard className="h-4 w-4 mr-2" />
-                            Créer un avoir
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={handleCreateIntervention} className="cursor-pointer">
-                            <Wrench className="h-4 w-4 mr-2" />
-                            Créer une fiche
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </div>
                   </TableCell>
                 </TableRow>

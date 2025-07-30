@@ -440,6 +440,18 @@ const Credits = () => {
                       <Button variant="ghost" size="icon" onClick={() => handleEditCredit(credit)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
+                      
+                      {/* Boutons déplacés du menu contextuel */}
+                      <Button variant="ghost" size="icon" onClick={() => handleDownload(credit)}>
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handlePrint(credit)}>
+                        <Printer className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleSendEmail(credit)}>
+                        <Mail className="h-4 w-4" />
+                      </Button>
+                      
                       <Button 
                         variant="ghost" 
                         size="icon" 
@@ -449,27 +461,6 @@ const Credits = () => {
                       >
                         <Trash className="h-4 w-4" />
                       </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56">
-                          <DropdownMenuItem onClick={() => handleDownload(credit)}>
-                            <Download className="mr-2 h-4 w-4" />
-                            Télécharger
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handlePrint(credit)}>
-                            <Printer className="mr-2 h-4 w-4" />
-                            Imprimer
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleSendEmail(credit)}>
-                            <Mail className="mr-2 h-4 w-4" />
-                            Envoyer par e-mail
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </div>
                   </TableCell>
                 </TableRow>

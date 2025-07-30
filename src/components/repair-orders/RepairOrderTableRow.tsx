@@ -2,7 +2,7 @@ import React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Pencil, Trash } from 'lucide-react';
+import { Eye, Pencil, Trash, Download, Printer, Mail, Signature, FileCheck, ArrowRight } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { RepairOrderActionsDropdown } from './RepairOrderActionsDropdown';
 import { calculateOrderAmount, formatAmount } from './utils/orderCalculations';
@@ -87,6 +87,29 @@ export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onViewO
           <Button variant="ghost" size="icon" onClick={() => onEditOrder(order)}>
             <Pencil className="h-4 w-4" />
           </Button>
+          
+          {/* Boutons déplacés du menu contextuel */}
+          <Button variant="ghost" size="icon" onClick={() => contextMenuProps?.onDownload(order)}>
+            <Download className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => contextMenuProps?.onPrint(order)}>
+            <Printer className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => contextMenuProps?.onSendEmail(order)}>
+            <Mail className="h-4 w-4" />
+          </Button>
+          {order.status !== 'Signé' && (
+            <Button variant="ghost" size="icon" onClick={() => contextMenuProps?.onSignOrder?.(order)}>
+              <Signature className="h-4 w-4" />
+            </Button>
+          )}
+          <Button variant="ghost" size="icon" onClick={() => contextMenuProps?.onRequestDocuments?.(order)}>
+            <FileCheck className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => contextMenuProps?.onConvertToInvoice?.(order)}>
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+          
           <Button 
             variant="ghost" 
             size="icon" 
@@ -95,7 +118,6 @@ export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onViewO
           >
             <Trash className="h-4 w-4" />
           </Button>
-          <RepairOrderActionsDropdown order={order} contextMenuProps={contextMenuProps} />
         </div>
       </TableCell>
     </TableRow>
