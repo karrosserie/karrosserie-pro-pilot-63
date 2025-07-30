@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Search, Car, Edit, HandCoins } from 'lucide-react';
+import { Search, Car, Pencil, HandCoins } from 'lucide-react';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { Loading } from '@/components/ui/loading';
 import { useTableSorting } from '@/hooks/use-table-sorting';
@@ -122,7 +122,7 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
                         size="sm"
                         onClick={() => onEditVehicle(vehicle)}
                       >
-                        <Edit className="h-4 w-4 mr-1" />
+                        <Pencil className="h-4 w-4 mr-1" />
                         Modifier
                       </Button>
                     </TableCell>
