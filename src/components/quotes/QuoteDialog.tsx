@@ -11,7 +11,6 @@ import { QuoteForm } from '@/components/quotes/QuoteForm';
 import { useQuotes } from '@/hooks/use-quotes';
 import { Quote } from '@/services/supabase/quotes';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
 
 interface QuoteDialogProps {
   quote?: Quote | null;
@@ -27,7 +26,6 @@ const QuoteDialog = ({
   prefillData
 }: QuoteDialogProps) => {
   const { toast } = useToast();
-  const navigate = useNavigate();
   const { updateQuote, createQuote } = useQuotes();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -37,21 +35,12 @@ const QuoteDialog = ({
     setIsSubmitting(true);
     
     try {
-      let createdQuote;
       if (quote && quote.id) {
         await updateQuote.mutateAsync({ id: quote.id, data: formData });
       } else {
-        createdQuote = await createQuote.mutateAsync(formData as any);
+        await createQuote.mutateAsync(formData as any);
       }
       onOpenChange(false);
-      
-      // Si c'est une conversion depuis un rapport d'expertise (prefillData contient report_number)
-      if (!quote && prefillData?.report_number && createdQuote) {
-        setTimeout(() => {
-          navigate(`/documents/devis?openQuote=${createdQuote.id}`);
-        }, 100);
-      }
-      
       // Don't show toast here as it's already handled in the hooks
     } catch (error: any) {
       // Only show error toast here, success toasts are handled in hooks
