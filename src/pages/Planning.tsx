@@ -214,7 +214,7 @@ const Planning = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
+    <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -273,30 +273,38 @@ const Planning = () => {
           <TabsContent value="workshop" className="space-y-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <StatsCard 
-                title="VÉHICULES" 
-                value={stats.vehicles}
-                icon={<Car className="h-8 w-8 text-blue-600" />}
-                iconBg="bg-blue-100"
-              />
-              <StatsCard 
-                title="TERMINÉS" 
-                value={stats.completed}
-                icon={<CheckCircle className="h-8 w-8 text-green-600" />}
-                iconBg="bg-green-100"
-              />
-              <StatsCard 
-                title="EN ATTENTE" 
-                value={stats.waiting}
-                icon={<Clock className="h-8 w-8 text-yellow-600" />}
-                iconBg="bg-yellow-100"
-              />
-              <StatsCard 
-                title="CA EN COURS" 
-                value={`${stats.revenue}€`}
-                icon={<Euro className="h-8 w-8 text-orange-600" />}
-                iconBg="bg-orange-100"
-              />
+              <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                <StatsCard 
+                  title="VÉHICULES" 
+                  value={stats.vehicles}
+                  icon={<Car className="h-6 w-6 text-blue-600" />}
+                  iconBg="bg-blue-100"
+                />
+              </div>
+              <div className="bg-green-50 rounded-lg p-4 border border-green-100">
+                <StatsCard 
+                  title="TERMINÉS" 
+                  value={stats.completed}
+                  icon={<CheckCircle className="h-6 w-6 text-green-600" />}
+                  iconBg="bg-green-100"
+                />
+              </div>
+              <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-100">
+                <StatsCard 
+                  title="EN ATTENTE" 
+                  value={stats.waiting}
+                  icon={<Clock className="h-6 w-6 text-yellow-600" />}
+                  iconBg="bg-yellow-100"
+                />
+              </div>
+              <div className="bg-orange-50 rounded-lg p-4 border border-orange-100">
+                <StatsCard 
+                  title="CA EN COURS" 
+                  value={`${stats.revenue}€`}
+                  icon={<Euro className="h-6 w-6 text-orange-600" />}
+                  iconBg="bg-orange-100"
+                />
+              </div>
             </div>
 
             {/* Alert */}
