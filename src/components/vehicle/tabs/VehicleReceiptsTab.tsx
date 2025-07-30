@@ -130,55 +130,70 @@ const VehicleReceiptsTab: React.FC<VehicleReceiptsTabProps> = ({ vehicleId }) =>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Numéro</TableHead>
-              <TableHead>Date</TableHead>
+              <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
+                Numéro
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="date" sortConfig={sortConfig} onSort={handleSort}>
+                Date
+              </SortableTableHeader>
               <TableHead>Facture</TableHead>
-              <TableHead>Montant</TableHead>
-              <TableHead>Méthode de paiement</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
+                Montant
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="payment_method" sortConfig={sortConfig} onSort={handleSort}>
+                Méthode de paiement
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                Statut
+              </SortableTableHeader>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {vehicleReceipts.length > 0 ? (
-              vehicleReceipts.map((receipt) => (
-                <TableRow key={receipt.id}>
-                  <TableCell>{receipt.reference || 'N/A'}</TableCell>
-                  <TableCell>{formatDate(receipt.date)}</TableCell>
-                  <TableCell>
-                    {getInvoiceDisplay(receipt.invoice_id)}
-                  </TableCell>
-                  <TableCell>
-                    {formatAmount(receipt.amount)}
-                  </TableCell>
-                  <TableCell>{receipt.payment_method}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(receipt.status)}`}>
-                      {receipt.status}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1">
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => handleEdit(receipt)}
-                        title="Modifier"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-red-500 hover:text-red-700"
-                        onClick={() => handleDelete(receipt)}
-                        title="Supprimer"
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+            {sortedData.length > 0 ? (
+              sortedData.map((receipt) => (
+                <React.Fragment key={receipt.id}>
+                  <TableRow className="hover:bg-gray-50 border-b-0">
+                    <TableCell>{receipt.reference || 'N/A'}</TableCell>
+                    <TableCell>{formatDate(receipt.date)}</TableCell>
+                    <TableCell>
+                      {getInvoiceDisplay(receipt.invoice_id)}
+                    </TableCell>
+                    <TableCell>
+                      {formatAmount(receipt.amount)}
+                    </TableCell>
+                    <TableCell>{receipt.payment_method}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(receipt.status)}`}>
+                        {receipt.status}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="border-t-0">
+                    <TableCell colSpan={6} className="py-3 border-t-0">
+                      <div className="flex flex-wrap gap-2 justify-end px-4">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleEdit(receipt)}
+                          title="Modifier"
+                        >
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                          onClick={() => handleDelete(receipt)}
+                          title="Supprimer"
+                        >
+                          <Trash className="h-4 w-4 mr-1" />
+                          Supprimer
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </React.Fragment>
               ))
             ) : (
               <TableRow>
