@@ -23,7 +23,7 @@ import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
 import { Quote } from '@/services/supabase/quotes';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { StatusBadge } from '@/components/ui/status-badge';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 const Quotes = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -272,6 +272,7 @@ const Quotes = () => {
   };
   
   return (
+    <TooltipProvider>
     <div className="p-6 space-y-6">
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Devis</h1>
@@ -482,6 +483,7 @@ const Quotes = () => {
         onOpenChange={setViewerModalOpen}
       />
     </div>
+    </TooltipProvider>
   );
 };
 
