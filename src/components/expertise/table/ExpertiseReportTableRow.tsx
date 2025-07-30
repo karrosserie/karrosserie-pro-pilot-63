@@ -1,18 +1,11 @@
 
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
-import { FileText, Pencil, Trash, Download, User, Car, FileCheck, Loader2, MoreVertical } from 'lucide-react';
+import { Pencil, Trash, Download, FileCheck, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 interface ExpertiseReportTableRowProps {
   report: ExpertiseReport;
@@ -123,6 +116,51 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
               <Button 
                 variant="ghost" 
                 size="icon" 
+                onClick={() => window.open(report.document_url, '_blank')}
+                disabled={!report.document_url}
+                className="h-8 w-8"
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {!report.document_url ? 'Aucun document disponible' : 'Télécharger le rapport'}
+            </TooltipContent>
+          </Tooltip>
+
+          {onConvertToQuote && !isConverted && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => onConvertToQuote(report)}
+                  disabled={isConverting || !report.client_id || !report.vehicle_id}
+                  className="h-8 w-8"
+                >
+                  {isConverting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <FileCheck className="h-4 w-4" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {isConverting 
+                  ? 'Conversion en cours...' 
+                  : !report.client_id || !report.vehicle_id 
+                    ? 'Client et véhicule requis pour la conversion' 
+                    : 'Convertir en devis'
+                }
+              </TooltipContent>
+            </Tooltip>
+          )}
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
                 className="text-red-500 hover:text-red-700 h-8 w-8"
                 onClick={() => onDeleteReport(report.id)}
                 disabled={isConverted}
@@ -134,40 +172,6 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
               {isConverted ? 'Impossible de supprimer un rapport converti' : 'Supprimer le rapport'}
             </TooltipContent>
           </Tooltip>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem 
-                onClick={() => window.open(report.document_url, '_blank')}
-                disabled={!report.document_url}
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Télécharger
-              </DropdownMenuItem>
-              
-              {onConvertToQuote && !isConverted && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem 
-                    onClick={() => onConvertToQuote(report)}
-                    disabled={isConverting || !report.client_id || !report.vehicle_id}
-                  >
-                    {isConverting ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <FileCheck className="mr-2 h-4 w-4" />
-                    )}
-                    Convertir en devis
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </TableCell>
     </TableRow>
