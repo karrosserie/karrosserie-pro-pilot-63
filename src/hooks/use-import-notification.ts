@@ -173,7 +173,18 @@ export function useImportNotification() {
                       description: `Le rapport ${import_item.expertise_reports.report_number} a été automatiquement converti en devis ${newQuote.reference}.`,
                     });
                   } else {
-                    console.log('📋 Quote already exists for this report');
+                    console.log('📋 Quote already exists for this report:', existingQuote);
+                    
+                    // Même si le devis existe déjà, rediriger vers celui-ci
+                    setTimeout(() => {
+                      console.log('🚀 Redirecting to existing quote:', existingQuote.id);
+                      window.location.href = `/documents/devis?openQuote=${existingQuote.id}`;
+                    }, 100);
+                    
+                    toast({
+                      title: "Rapport déjà converti",
+                      description: `Le rapport ${import_item.expertise_reports.report_number} a déjà un devis existant.`,
+                    });
                   }
                 } catch (error: any) {
                   console.error('❌ Error during automatic conversion:', error);
