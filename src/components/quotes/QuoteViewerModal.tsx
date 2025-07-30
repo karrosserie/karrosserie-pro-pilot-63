@@ -307,9 +307,9 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
           {/* Barre d'actions en haut */}
-          <div className="flex items-center justify-between gap-2 p-4 pr-16 border-b bg-background">
-            <h2 className="text-lg font-semibold">Aperçu du devis n°{quote.reference}</h2>
-            <div className="flex items-center gap-2 mr-4 flex-wrap">
+          <div className="p-4 pr-16 border-b bg-background">
+            <h2 className="text-lg font-semibold mb-3">Aperçu du devis n°{quote.reference}</h2>
+            <div className="flex items-center gap-2 flex-wrap">
               <Button variant="outline" size="sm" onClick={handleEdit}>
                 <Pencil className="h-4 w-4 mr-1" />
                 Modifier
