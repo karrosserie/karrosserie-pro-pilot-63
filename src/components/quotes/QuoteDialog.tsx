@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -26,6 +27,7 @@ const QuoteDialog = ({
   prefillData
 }: QuoteDialogProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { updateQuote, createQuote } = useQuotes();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -35,14 +37,26 @@ const QuoteDialog = ({
     setIsSubmitting(true);
     
     try {
+      let createdQuote;
+      
       // Si c'est une modification d'un devis existant (quote avec un ID)
       if (quote && quote.id) {
         await updateQuote.mutateAsync({ id: quote.id, data: formData });
       } else {
         // Sinon c'est une création (nouveau devis ou conversion depuis rapport)
-        await createQuote.mutateAsync(formData as any);
+        createdQuote = await createQuote.mutateAsync(formData as any);
       }
+      
       onOpenChange(false);
+      
+      // Si c'est une conversion depuis un rapport d'expertise et qu'un devis a été créé,
+      // rediriger vers la page des devis avec le devis ouvert
+      if (isConversionFromReport && createdQuote) {
+        setTimeout(() => {
+          navigate(`/documents/devis?openQuote=${createdQuote.id}`);
+        }, 100);
+      }
+      
       // Don't show toast here as it's already handled in the hooks
     } catch (error: any) {
       // Only show error toast here, success toasts are handled in hooks
