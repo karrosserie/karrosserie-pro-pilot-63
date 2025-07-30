@@ -8,6 +8,7 @@ const corsHeaders = {
 
 interface EmailRequest {
   tokenId: string;
+  targetEmail?: string; // Email de destination optionnel pour override
 }
 
 const sendEmail = async (to: string, subject: string, html: string) => {
@@ -37,7 +38,7 @@ const sendEmail = async (to: string, subject: string, html: string) => {
     
     const nodemailer = await import("npm:nodemailer@6.9.13");
     
-    const transporter = nodemailer.createTransport({
+    const transporter = nodemailer.createTransporter({
       host: smtpHost,
       port: smtpPort,
       secure: false, // true pour port 465, false pour autres ports
@@ -72,6 +73,13 @@ const sendEmail = async (to: string, subject: string, html: string) => {
   }
 };
 
+const detectEnvironment = () => {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+  const isLovable = supabaseUrl.includes('lovable') || supabaseUrl.includes('localhost');
+  console.log('🌍 Environnement détecté:', { supabaseUrl, isLovable });
+  return isLovable;
+};
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -81,8 +89,8 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     console.log('Début de la fonction send-documents-request-email');
     
-    const { tokenId }: EmailRequest = await req.json();
-    console.log('Token ID reçu:', tokenId);
+    const { tokenId, targetEmail }: EmailRequest = await req.json();
+    console.log('Paramètres reçus:', { tokenId, targetEmail });
 
     if (!tokenId) {
       throw new Error('Token ID manquant');
@@ -169,8 +177,27 @@ const handler = async (req: Request): Promise<Response> => {
     console.log('Modèle:', modelData);
     console.log('Entreprise:', companyData);
 
-    if (!clientData.email) {
-      throw new Error('Email du client non trouvé');
+    // Déterminer l'email de destination
+    let finalEmail: string;
+    
+    if (targetEmail) {
+      // Si un email cible est spécifié, l'utiliser
+      finalEmail = targetEmail;
+      console.log('📧 Email cible spécifié:', finalEmail);
+    } else {
+      // Sinon, utiliser la logique de détection d'environnement
+      const isLovable = detectEnvironment();
+      
+      if (isLovable) {
+        finalEmail = 'karrosseriepro@yopmail.com';
+        console.log('📧 Environnement Lovable détecté, utilisation de l\'email de test');
+      } else {
+        if (!clientData.email) {
+          throw new Error('Email du client non trouvé');
+        }
+        finalEmail = clientData.email;
+        console.log('📧 Environnement de production, utilisation de l\'email client');
+      }
     }
 
     // Construire le contenu de l'email
@@ -212,11 +239,11 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
-    console.log('Envoi de l\'email à:', clientData.email);
+    console.log('Envoi de l\'email à:', finalEmail);
     
     // Envoyer l'email
     console.log('Tentative d\'envoi de l\'email...');
-    const emailResult = await sendEmail(clientData.email, subject, emailContent);
+    const emailResult = await sendEmail(finalEmail, subject, emailContent);
     console.log('Résultat de l\'envoi email:', emailResult);
 
     console.log('Email envoyé avec succès');
@@ -225,7 +252,8 @@ const handler = async (req: Request): Promise<Response> => {
       JSON.stringify({ 
         success: true, 
         message: 'Email envoyé avec succès',
-        recipient: clientData.email
+        recipient: finalEmail,
+        originalClientEmail: clientData.email
       }),
       {
         status: 200,
