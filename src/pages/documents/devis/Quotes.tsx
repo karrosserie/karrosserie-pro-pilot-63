@@ -319,7 +319,7 @@ const Quotes = () => {
               <TableHead>Véhicule</TableHead>
               <TableHead>Montant</TableHead>
               <TableHead>Statut</TableHead>
-              <TableHead className="text-right w-1/5 max-w-[20%]">Actions</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -351,8 +351,8 @@ const Quotes = () => {
                   <TableCell>
                     <StatusBadge status={quote.status === 'draft' ? 'En attente' : (quote.status || 'En attente')} />
                   </TableCell>
-                  <TableCell className="text-right w-1/5 max-w-[20%]">
-                    <div className="flex flex-wrap justify-end gap-1 max-w-[20vw]">
+                  <TableCell className="text-right">
+                    <div className="flex justify-end space-x-1">
                       <Button variant="outline" size="sm" onClick={() => handleViewQuote(quote)}>
                         <Eye className="h-4 w-4 mr-1" />
                         Aperçu
