@@ -387,7 +387,7 @@ const Quotes = () => {
 
                         <Button variant="outline" size="sm" onClick={() => handleConvertToRepairOrder(quote)}>
                           <ArrowRight className="h-4 w-4 mr-1" />
-                          Ordre
+                          Convertir
                         </Button>
 
                         <Button 
