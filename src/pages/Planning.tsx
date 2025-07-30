@@ -249,7 +249,7 @@ const Planning = () => {
 
         {/* Navigation Tabs */}
         <Tabs defaultValue="workshop" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-5 mb-6">
             <TabsTrigger value="workshop" className="flex items-center gap-2">
               <Wrench className="w-4 h-4" />
               Étapes atelier
