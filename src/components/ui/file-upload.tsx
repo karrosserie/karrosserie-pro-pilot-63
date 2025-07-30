@@ -1,9 +1,10 @@
 
 import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { FileIcon, UploadCloud, X } from 'lucide-react';
+import { FileIcon, UploadCloud, X, Camera } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { useMobileDetection } from '@/hooks/use-mobile-detection';
 
 interface FileUploadProps {
   onUpload: (file: File) => void;
@@ -22,6 +23,8 @@ export function FileUpload({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
+  const isMobile = useMobileDetection();
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -94,6 +97,12 @@ export function FileUpload({
     fileInputRef.current?.click();
   };
 
+  const handleCameraClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    cameraInputRef.current?.click();
+  };
+
   const handleRemove = () => {
     setSelectedFile(null);
     if (fileInputRef.current) {
@@ -117,25 +126,48 @@ export function FileUpload({
         className="hidden"
       />
       
+      <input
+        type="file"
+        ref={cameraInputRef}
+        onChange={handleChange}
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+      />
+      
       {!selectedFile ? (
-        <div
-          className={cn(
-            "border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer transition-colors",
-            isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400",
+        <div className="space-y-4">
+          <div
+            className={cn(
+              "border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer transition-colors",
+              isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400",
+            )}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={handleClick}
+          >
+            <UploadCloud className="h-12 w-12 text-gray-400 mb-4" />
+            <p className="text-sm font-medium text-gray-700">
+              Glisser-déposer un fichier ou{" "}
+              <span className="text-karrosserie-orange">parcourir</span>
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              {getFormattedAcceptTypes()} jusqu'à {maxSize} MB
+            </p>
+          </div>
+          
+          {isMobile && accept.includes('image') && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleCameraClick}
+              className="w-full flex items-center gap-2"
+            >
+              <Camera className="h-4 w-4" />
+              Prendre une photo
+            </Button>
           )}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          onClick={handleClick}
-        >
-          <UploadCloud className="h-12 w-12 text-gray-400 mb-4" />
-          <p className="text-sm font-medium text-gray-700">
-            Glisser-déposer un fichier ou{" "}
-            <span className="text-karrosserie-orange">parcourir</span>
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            {getFormattedAcceptTypes()} jusqu'à {maxSize} MB
-          </p>
         </div>
       ) : (
         <div className="flex items-center justify-between p-3 border rounded-lg bg-gray-50">
