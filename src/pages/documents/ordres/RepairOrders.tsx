@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RepairOrdersHeader } from '@/components/repair-orders/RepairOrdersHeader';
 import { RepairOrdersTable } from '@/components/repair-orders/RepairOrdersTable';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const RepairOrders = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -70,6 +71,23 @@ const RepairOrders = () => {
     
     return false;
   }) || [];
+
+  // Effet pour ouvrir automatiquement un ordre de réparation depuis l'URL
+  useEffect(() => {
+    const openOrderId = searchParams.get('openOrder');
+    if (openOrderId && orders && orders.length > 0) {
+      const orderToOpen = orders.find(order => order.id === openOrderId);
+      if (orderToOpen) {
+        setSelectedOrder(orderToOpen);
+        setViewerModalOpen(true); // Ouvrir la fenêtre d'aperçu
+        // Nettoyer le paramètre URL après ouverture
+        setSearchParams(params => {
+          params.delete('openOrder');
+          return params;
+        });
+      }
+    }
+  }, [orders, searchParams, setSearchParams]);
 
   const handleCreateOrder = () => {
     setSelectedOrder(null);

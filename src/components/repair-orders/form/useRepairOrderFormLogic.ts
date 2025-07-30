@@ -8,7 +8,7 @@ import { useDataPreparation } from './hooks/useDataPreparation';
 import { useFormValidation } from './hooks/useFormValidation';
 import { useFormHandlers } from './hooks/useFormHandlers';
 
-export const useRepairOrderFormLogic = ({ order }: UseRepairOrderFormLogicProps) => {
+export const useRepairOrderFormLogic = ({ order, prefillData }: UseRepairOrderFormLogicProps) => {
   const {
     formData,
     setFormData,

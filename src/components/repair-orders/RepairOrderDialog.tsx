@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -16,19 +17,24 @@ interface RepairOrderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
+  prefillData?: any;
 }
 
 const RepairOrderDialog = ({
   order,
   open,
   onOpenChange,
-  onSuccess
+  onSuccess,
+  prefillData
 }: RepairOrderDialogProps) => {
   const { updateOrder, createOrder } = useRepairOrders();
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Déterminer si c'est une conversion depuis un devis
+  const isConversionFromQuote = prefillData?.quote_id;
   // Déterminer s'il s'agit d'un ordre existant (avec ID) ou d'une création
-  const isExistingOrder = order && order.id;
+  const isEditing = order && order.id;
 
   const handleSubmit = async (formData: Partial<RepairOrder>) => {
     if (isSubmitting) return;
@@ -36,13 +42,25 @@ const RepairOrderDialog = ({
     setIsSubmitting(true);
     
     try {
-      if (isExistingOrder) {
+      let createdOrder;
+      
+      if (isEditing) {
         await updateOrder.mutateAsync({ id: order.id, data: formData });
       } else {
-        await createOrder.mutateAsync(formData as any);
+        createdOrder = await createOrder.mutateAsync(formData as any);
       }
+      
       onOpenChange(false);
-      onSuccess?.();
+      
+      // Si c'est une conversion depuis un devis et qu'un ordre a été créé,
+      // rediriger vers la page des ordres de réparation avec l'ordre ouvert
+      if (isConversionFromQuote && createdOrder) {
+        setTimeout(() => {
+          navigate(`/documents/ordres?openOrder=${createdOrder.id}`);
+        }, 100);
+      } else {
+        onSuccess?.();
+      }
     } catch (error: any) {
       console.error('Dialog submission error:', error);
     } finally {
@@ -55,12 +73,19 @@ const RepairOrderDialog = ({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle>
-            {isExistingOrder ? "Modifier l'ordre de réparation" : "Créer un nouvel ordre de réparation"}
+            {isEditing 
+              ? "Modifier l'ordre de réparation" 
+              : isConversionFromQuote 
+                ? "Convertir en ordre de réparation" 
+                : "Créer un nouvel ordre de réparation"
+            }
           </DialogTitle>
           <DialogDescription>
-            {isExistingOrder
+            {isEditing
               ? "Modifiez les détails de l'ordre de réparation."
-              : "Créez un nouvel ordre de réparation en remplissant les informations ci-dessous."
+              : isConversionFromQuote
+                ? "Convertissez ce devis en ordre de réparation en ajustant les informations si nécessaire."
+                : "Créez un nouvel ordre de réparation en remplissant les informations ci-dessous."
             }
           </DialogDescription>
         </DialogHeader>
@@ -70,6 +95,8 @@ const RepairOrderDialog = ({
           onSubmit={handleSubmit}
           onCancel={() => onOpenChange(false)}
           isSubmitting={isSubmitting}
+          prefillData={prefillData}
+          isConversionFromQuote={isConversionFromQuote}
         />
       </DialogContent>
     </Dialog>

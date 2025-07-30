@@ -437,7 +437,7 @@ const Quotes = () => {
       />
 
       <RepairOrderDialog
-        order={prefilledRepairOrder as RepairOrder}
+        order={null}
         open={repairOrderDialogOpen}
         onOpenChange={(open) => {
           setRepairOrderDialogOpen(open);
@@ -445,6 +445,7 @@ const Quotes = () => {
             setPrefilledRepairOrder(null);
           }
         }}
+        prefillData={prefilledRepairOrder}
         onSuccess={() => {
           navigate('/documents/ordres');
         }}

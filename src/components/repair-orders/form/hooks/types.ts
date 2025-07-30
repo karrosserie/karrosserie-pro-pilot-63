@@ -4,6 +4,7 @@ import { RepairOrderRepairItem, RepairOrderPartItem, RepairOrderDiscountItem } f
 
 export interface UseRepairOrderFormLogicProps {
   order?: RepairOrder | null;
+  prefillData?: any;
 }
 
 export interface RepairOrderFormState {

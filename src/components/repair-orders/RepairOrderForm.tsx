@@ -18,13 +18,17 @@ interface RepairOrderFormProps {
   onSubmit: (formData: Partial<RepairOrder>) => Promise<void>;
   onCancel: () => void;
   isSubmitting: boolean;
+  prefillData?: any;
+  isConversionFromQuote?: boolean;
 }
 
 export const RepairOrderForm = ({
   order,
   onSubmit,
   onCancel,
-  isSubmitting
+  isSubmitting,
+  prefillData,
+  isConversionFromQuote
 }: RepairOrderFormProps) => {
   const { toast } = useToast();
   const { clients, isLoading: isLoadingClients } = useClients();
@@ -45,7 +49,7 @@ export const RepairOrderForm = ({
     validateForm,
     calculateGlobalTotals,
     prepareSubmitData
-  } = useRepairOrderFormLogic({ order });
+  } = useRepairOrderFormLogic({ order, prefillData });
 
   const globalTotals = calculateGlobalTotals();
 
@@ -122,6 +126,7 @@ export const RepairOrderForm = ({
         order={order}
         isSubmitting={isSubmitting}
         onCancel={onCancel}
+        isConversionFromQuote={isConversionFromQuote}
       />
     </form>
   );
