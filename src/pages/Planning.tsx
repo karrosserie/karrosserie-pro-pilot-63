@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, Clock, User, Car, Euro, AlertTriangle } from "lucide-react";
+import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -175,11 +175,26 @@ const Planning = () => {
         {/* Navigation Tabs */}
         <Tabs defaultValue="workshop" className="w-full">
           <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="workshop">Étapes atelier</TabsTrigger>
-            <TabsTrigger value="planning">Planning</TabsTrigger>
-            <TabsTrigger value="employees">Planning Employés</TabsTrigger>
-            <TabsTrigger value="staff">Employés</TabsTrigger>
-            <TabsTrigger value="process">Process</TabsTrigger>
+            <TabsTrigger value="workshop" className="flex items-center gap-2">
+              <Wrench className="w-4 h-4" />
+              Étapes atelier
+            </TabsTrigger>
+            <TabsTrigger value="planning" className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Planning
+            </TabsTrigger>
+            <TabsTrigger value="employees" className="flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              Planning Employés
+            </TabsTrigger>
+            <TabsTrigger value="staff" className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              Employés
+            </TabsTrigger>
+            <TabsTrigger value="process" className="flex items-center gap-2">
+              <Cog className="w-4 h-4" />
+              Process
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="workshop" className="space-y-6">
