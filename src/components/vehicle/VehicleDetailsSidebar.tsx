@@ -89,8 +89,7 @@ export const getVehicleSidebarItems = (
   vehicleOrders: any[],
   vehicleInvoices: any[],
   vehicleCredits: any[],
-  vehicleReceipts: any[],
-  vehicleInterventionSheets: any[]
+  vehicleReceipts: any[]
 ): SidebarItem[] => [
   {
     id: 'details',
@@ -133,11 +132,5 @@ export const getVehicleSidebarItems = (
     label: 'Encaissements',
     icon: Banknote,
     count: vehicleReceipts.length
-  },
-  {
-    id: 'interventions',
-    label: 'Fiches d\'intervention',
-    icon: ClipboardList,
-    count: vehicleInterventionSheets.length
   }
 ];

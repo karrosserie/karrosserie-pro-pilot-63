@@ -91,8 +91,7 @@ export const getSidebarItems = (
   clientOrders: any[],
   clientInvoices: any[],
   clientCredits: any[],
-  clientReceipts: any[],
-  clientInterventionSheets: any[]
+  clientReceipts: any[]
 ): SidebarItem[] => [
   {
     id: 'details',
@@ -141,11 +140,5 @@ export const getSidebarItems = (
     label: 'Encaissements',
     icon: Banknote,
     count: clientReceipts.length
-  },
-  {
-    id: 'interventions',
-    label: 'Fiches d\'intervention',
-    icon: ClipboardList,
-    count: clientInterventionSheets.length
   }
 ];

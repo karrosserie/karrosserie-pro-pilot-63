@@ -9,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Eye, Pencil, Trash, UserPlus, MoreVertical, FileText, Receipt, CreditCard, Wrench } from 'lucide-react';
+import { Eye, Pencil, Trash, UserPlus, MoreVertical, FileText, Receipt, CreditCard } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Client } from '@/services/supabase/clients';
@@ -22,7 +22,6 @@ interface ClientsTableProps {
   onCreateQuote?: (client: Client) => void;
   onCreateInvoice?: (client: Client) => void;
   onCreateCredit?: (client: Client) => void;
-  onCreateIntervention?: (client: Client) => void;
 }
 
 const ClientsTable: React.FC<ClientsTableProps> = ({
@@ -32,8 +31,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
   onDeleteClient,
   onCreateQuote,
   onCreateInvoice,
-  onCreateCredit,
-  onCreateIntervention
+  onCreateCredit
 }) => {
   
   return (
@@ -77,12 +75,6 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                 onCreateCredit?.(client);
               };
 
-              const handleCreateIntervention = (e: React.MouseEvent) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Creating intervention for client:', client);
-                onCreateIntervention?.(client);
-              };
               
               return (
                 <React.Fragment key={client.id}>
@@ -122,10 +114,6 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                         <Button variant="outline" size="sm" onClick={handleCreateCredit}>
                           <CreditCard className="h-4 w-4 mr-1" />
                           Créer avoir
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={handleCreateIntervention}>
-                          <Wrench className="h-4 w-4 mr-1" />
-                          Créer fiche
                         </Button>
                         <Button 
                           variant="outline" 

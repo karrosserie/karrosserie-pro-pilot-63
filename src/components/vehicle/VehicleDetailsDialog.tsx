@@ -13,7 +13,7 @@ import VehicleRepairOrdersTab from './tabs/VehicleRepairOrdersTab';
 import VehicleInvoicesTab from './tabs/VehicleInvoicesTab';
 import VehicleCreditsTab from './tabs/VehicleCreditsTab';
 import VehicleReceiptsTab from './tabs/VehicleReceiptsTab';
-import VehicleInterventionSheetsTab from './tabs/VehicleInterventionSheetsTab';
+
 import { VehicleDetailsSidebar, getVehicleSidebarItems } from './VehicleDetailsSidebar';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useQuotes } from '@/hooks/use-quotes';
@@ -21,7 +21,7 @@ import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useCredits } from '@/hooks/use-credits';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
-import { useInterventionSheetsByClient } from '@/hooks/use-intervention-sheets';
+
 
 interface VehicleDetailsDialogProps {
   open: boolean;
@@ -48,7 +48,7 @@ const VehicleDetailsDialog: React.FC<VehicleDetailsDialogProps> = ({
   const { invoices } = useInvoices();
   const { credits } = useCredits();
   const { receipts } = useReceiptsData();
-  const { data: interventionSheets } = useInterventionSheetsByClient(defaultValues?.client_id || '');
+  
 
   const handleCancel = () => {
     onOpenChange(false);
@@ -82,7 +82,7 @@ const VehicleDetailsDialog: React.FC<VehicleDetailsDialogProps> = ({
     return false;
   }) || [];
 
-  const vehicleInterventionSheets = interventionSheets?.filter(sheet => sheet.vehicle_id === defaultValues?.id) || [];
+  
 
   // État pour gérer l'onglet actif dans la sidebar
   const [activeTab, setActiveTab] = useState('details');
@@ -94,8 +94,7 @@ const VehicleDetailsDialog: React.FC<VehicleDetailsDialogProps> = ({
     vehicleOrders,
     vehicleInvoices,
     vehicleCredits,
-    vehicleReceipts,
-    vehicleInterventionSheets
+    vehicleReceipts
   );
 
   // Fonction pour rendre le contenu selon l'onglet actif
@@ -122,8 +121,6 @@ const VehicleDetailsDialog: React.FC<VehicleDetailsDialogProps> = ({
         return <VehicleCreditsTab vehicleId={defaultValues?.id} />;
       case 'receipts':
         return <VehicleReceiptsTab vehicleId={defaultValues?.id} />;
-      case 'interventions':
-        return <VehicleInterventionSheetsTab vehicleId={defaultValues?.id} vehicle={defaultValues} />;
       default:
         return null;
     }

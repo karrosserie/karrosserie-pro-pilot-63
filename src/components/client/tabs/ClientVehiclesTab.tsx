@@ -5,7 +5,7 @@ import { useConfirmation } from '@/hooks/use-confirmation';
 import VehicleCardAdapter from '@/components/vehicle/VehicleCardAdapter';
 import VehicleDetailsDialog from '@/components/vehicle/VehicleDetailsDialog';
 import VehicleDocumentDialogs from '@/components/vehicle/VehicleDocumentDialogs';
-import VehicleInterventionDialog from '@/components/vehicle/VehicleInterventionDialog';
+
 import { Car } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -22,7 +22,7 @@ const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
-  const [interventionDialogOpen, setInterventionDialogOpen] = useState(false);
+  
   const [selectedVehicleForDocument, setSelectedVehicleForDocument] = useState<any>(null);
 
   if (isLoading) {
@@ -81,10 +81,6 @@ const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
     setInvoiceDialogOpen(true);
   };
 
-  const handleCreateIntervention = (vehicle: any) => {
-    setSelectedVehicleForDocument(vehicle);
-    setInterventionDialogOpen(true);
-  };
 
   const handleVehicleSubmit = (data: any) => {
     // This will be handled by the VehicleDialog component
@@ -103,7 +99,6 @@ const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
             onDelete={() => handleDeleteVehicle(vehicle)}
             onCreateQuote={() => handleCreateQuote(vehicle)}
             onCreateInvoice={() => handleCreateInvoice(vehicle)}
-            onCreateIntervention={() => handleCreateIntervention(vehicle)}
           />
         ))}
       </div>
@@ -139,11 +134,6 @@ const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
         setSelectedVehicleForDocument={setSelectedVehicleForDocument}
       />
 
-      <VehicleInterventionDialog
-        open={interventionDialogOpen}
-        onOpenChange={setInterventionDialogOpen}
-        selectedVehicle={selectedVehicleForDocument}
-      />
     </>
   );
 };

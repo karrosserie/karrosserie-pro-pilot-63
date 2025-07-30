@@ -77,9 +77,7 @@ const ClientsPage = () => {
         onEditClient={handleEditClient}
         onDeleteClient={handleDeleteClient}
         onCreateQuote={handleCreateQuote}
-        onCreateInvoice={handleCreateInvoice}
         onCreateCredit={handleCreateCredit}
-        onCreateIntervention={handleCreateIntervention}
       />
 
       <ClientDialogs
@@ -94,8 +92,6 @@ const ClientsPage = () => {
         setInvoiceDialogOpen={setInvoiceDialogOpen}
         creditDialogOpen={creditDialogOpen}
         setCreditDialogOpen={setCreditDialogOpen}
-        interventionDialogOpen={interventionDialogOpen}
-        setInterventionDialogOpen={setInterventionDialogOpen}
         selectedClientForDocument={selectedClientForDocument}
         setSelectedClientForDocument={setSelectedClientForDocument}
       />

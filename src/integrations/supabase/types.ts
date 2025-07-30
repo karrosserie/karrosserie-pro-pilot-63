@@ -1010,45 +1010,6 @@ export type Database = {
         }
         Relationships: []
       }
-      intervention_sheets: {
-        Row: {
-          carrosserie_reports: Json | null
-          client_id: string
-          company_id: string | null
-          created_at: string
-          electrique_reports: Json | null
-          id: string
-          is_approved: boolean | null
-          mecanique_reports: Json | null
-          updated_at: string
-          vehicle_id: string
-        }
-        Insert: {
-          carrosserie_reports?: Json | null
-          client_id: string
-          company_id?: string | null
-          created_at?: string
-          electrique_reports?: Json | null
-          id?: string
-          is_approved?: boolean | null
-          mecanique_reports?: Json | null
-          updated_at?: string
-          vehicle_id: string
-        }
-        Update: {
-          carrosserie_reports?: Json | null
-          client_id?: string
-          company_id?: string | null
-          created_at?: string
-          electrique_reports?: Json | null
-          id?: string
-          is_approved?: boolean | null
-          mecanique_reports?: Json | null
-          updated_at?: string
-          vehicle_id?: string
-        }
-        Relationships: []
-      }
       invoices: {
         Row: {
           amount: number

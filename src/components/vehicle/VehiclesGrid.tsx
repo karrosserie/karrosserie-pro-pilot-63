@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Pencil, Trash, MoreVertical, FileText, Receipt, Car, User, Wrench } from 'lucide-react';
+import { Eye, Pencil, Trash, MoreVertical, FileText, Receipt, Car, User } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { StatusBadge } from '@/components/ui/status-badge';
 
@@ -41,7 +41,6 @@ interface VehiclesGridProps {
   onDeleteVehicle: (vehicleId: string) => void;
   onCreateQuote?: (vehicle: Vehicle) => void;
   onCreateInvoice?: (vehicle: Vehicle) => void;
-  onCreateIntervention?: (vehicle: Vehicle) => void;
 }
 
 const VehiclesGrid: React.FC<VehiclesGridProps> = ({
@@ -50,8 +49,7 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
   onEditVehicle,
   onDeleteVehicle,
   onCreateQuote,
-  onCreateInvoice,
-  onCreateIntervention
+  onCreateInvoice
 }) => {
   const handleCreateQuote = (e: React.MouseEvent, vehicle: Vehicle) => {
     e.preventDefault();
@@ -67,12 +65,6 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
     onCreateInvoice?.(vehicle);
   };
 
-  const handleCreateIntervention = (e: React.MouseEvent, vehicle: Vehicle) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('Creating intervention for vehicle:', vehicle);
-    onCreateIntervention?.(vehicle);
-  };
 
   const getFirstImage = (vehicle: Vehicle) => {
     if (vehicle.vehicle_image_url) return vehicle.vehicle_image_url;
@@ -173,10 +165,6 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
                 <Button variant="outline" size="sm" onClick={(e) => handleCreateInvoice(e, vehicle)}>
                   <Receipt className="h-4 w-4 mr-1" />
                   Créer facture
-                </Button>
-                <Button variant="outline" size="sm" onClick={(e) => handleCreateIntervention(e, vehicle)}>
-                  <Wrench className="h-4 w-4 mr-1" />
-                  Créer fiche
                 </Button>
                 <Button 
                   variant="outline" 

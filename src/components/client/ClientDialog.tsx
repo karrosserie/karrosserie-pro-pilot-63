@@ -15,7 +15,7 @@ import ClientRepairOrdersTab from './tabs/ClientRepairOrdersTab';
 import ClientInvoicesTab from './tabs/ClientInvoicesTab';
 import ClientCreditsTab from './tabs/ClientCreditsTab';
 import ClientReceiptsTab from './tabs/ClientReceiptsTab';
-import ClientInterventionSheetsTab from './tabs/ClientInterventionSheetsTab';
+
 import { ClientDetailsSidebar, getSidebarItems } from './ClientDetailsSidebar';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
@@ -24,7 +24,7 @@ import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useCredits } from '@/hooks/use-credits';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
-import { useInterventionSheetsByClient } from '@/hooks/use-intervention-sheets';
+
 
 interface ClientDialogProps {
   open: boolean;
@@ -52,7 +52,7 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
   const { invoices } = useInvoices();
   const { credits } = useCredits();
   const { receipts } = useReceiptsData();
-  const { data: interventionSheets } = useInterventionSheetsByClient(defaultValues?.id || '');
+  
 
   const handleCancel = () => {
     onOpenChange(false);
@@ -86,7 +86,7 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
     return false;
   }) || [];
   
-  const clientInterventionSheets = interventionSheets || [];
+  
 
   // État pour gérer l'onglet actif dans la sidebar
   const [activeTab, setActiveTab] = useState('details');
@@ -99,8 +99,7 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
     clientOrders,
     clientInvoices,
     clientCredits,
-    clientReceipts,
-    clientInterventionSheets
+    clientReceipts
   );
 
   // Fonction pour rendre le contenu selon l'onglet actif
@@ -129,8 +128,6 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
         return <ClientCreditsTab clientId={defaultValues?.id} />;
       case 'receipts':
         return <ClientReceiptsTab clientId={defaultValues?.id} />;
-      case 'interventions':
-        return <ClientInterventionSheetsTab clientId={defaultValues?.id} client={defaultValues} />;
       default:
         return null;
     }

@@ -4,7 +4,7 @@ import ClientDialog from '@/components/client/ClientDialog';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import { CreditDialog } from '@/components/credits/CreditDialog';
-import InterventionDialog from '@/components/intervention/InterventionDialog';
+
 import { Client } from '@/services/supabase/clients';
 
 interface ClientDialogsProps {
@@ -22,8 +22,6 @@ interface ClientDialogsProps {
   setInvoiceDialogOpen: (open: boolean) => void;
   creditDialogOpen: boolean;
   setCreditDialogOpen: (open: boolean) => void;
-  interventionDialogOpen: boolean;
-  setInterventionDialogOpen: (open: boolean) => void;
   selectedClientForDocument: Client | null;
   setSelectedClientForDocument: (client: Client | null) => void;
 }
@@ -40,8 +38,6 @@ const ClientDialogs: React.FC<ClientDialogsProps> = ({
   setInvoiceDialogOpen,
   creditDialogOpen,
   setCreditDialogOpen,
-  interventionDialogOpen,
-  setInterventionDialogOpen,
   selectedClientForDocument,
   setSelectedClientForDocument
 }) => {
@@ -135,18 +131,6 @@ const ClientDialogs: React.FC<ClientDialogsProps> = ({
         credit={null}
       />
 
-      {/* Dialogue de création de fiche d'intervention */}
-      <InterventionDialog
-        client={selectedClientForDocument}
-        open={interventionDialogOpen}
-        onOpenChange={(open) => {
-          console.log('Intervention dialog open state changing to:', open);
-          setInterventionDialogOpen(open);
-          if (!open) {
-            setSelectedClientForDocument(null);
-          }
-        }}
-      />
     </>
   );
 };
