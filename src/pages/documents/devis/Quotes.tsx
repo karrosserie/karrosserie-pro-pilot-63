@@ -385,7 +385,7 @@ const Quotes = () => {
                           Justificatifs
                         </Button>
 
-                        <Button variant="outline" size="sm" className="text-karrosserie-orange border-karrosserie-orange hover:bg-karrosserie-orange hover:text-white" onClick={() => handleConvertToRepairOrder(quote)}>
+                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={() => handleConvertToRepairOrder(quote)}>
                           <ArrowRight className="h-4 w-4 mr-1" />
                           Convertir
                         </Button>
