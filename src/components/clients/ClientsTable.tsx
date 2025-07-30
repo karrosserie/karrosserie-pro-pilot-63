@@ -12,6 +12,8 @@ import {
 import { Eye, Pencil, Trash, UserPlus, MoreVertical, FileText, Receipt, CreditCard } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
+import { useTableSorting } from '@/hooks/use-table-sorting';
 import { Client } from '@/services/supabase/clients';
 
 interface ClientsTableProps {
@@ -33,22 +35,31 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
   onCreateInvoice,
   onCreateCredit
 }) => {
+  const { sortedData: sortedClients, sortConfig, handleSort } = useTableSorting(clients, 'last_name');
   
   return (
     <div className="card-container">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Nom</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Téléphone</TableHead>
-            <TableHead>Ville</TableHead>
+            <SortableTableHeader sortKey="last_name" sortConfig={sortConfig} onSort={handleSort}>
+              Nom
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="email" sortConfig={sortConfig} onSort={handleSort}>
+              Email
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="phone" sortConfig={sortConfig} onSort={handleSort}>
+              Téléphone
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="city" sortConfig={sortConfig} onSort={handleSort}>
+              Ville
+            </SortableTableHeader>
             <TableHead>Permis de conduire</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {clients.length > 0 ? (
-            clients.map((client) => {
+          {sortedClients.length > 0 ? (
+            sortedClients.map((client) => {
               const clientData = client as any;
               const hasFrontLicense = clientData.driver_license_front_url;
               const hasBackLicense = clientData.driver_license_back_url;

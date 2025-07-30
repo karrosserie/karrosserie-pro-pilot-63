@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/table";
 import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
+import { useTableSorting } from '@/hooks/use-table-sorting';
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import InvoiceEmailDialog from '@/components/invoices/InvoiceEmailDialog';
 import ReceiptDialog from '@/components/receipts/ReceiptDialog';
@@ -54,13 +56,14 @@ const Invoices = () => {
   const { credits } = useCredits();
   const { receipts } = useReceiptsData();
   const { companyData } = useCompany();
+  const { sortedData: sortedInvoices, sortConfig, handleSort } = useTableSorting(invoices || [], 'reference');
   
   console.log('=== DONNÉES FACTURES DANS LE COMPOSANT ===');
   console.log('invoices:', invoices);
   console.log('Premier invoice (si existant):', invoices?.[0]);
   console.log('Premier invoice.clients:', invoices?.[0]?.clients);
   
-  const filteredInvoices = invoices?.filter(invoice => 
+  const filteredInvoices = sortedInvoices?.filter(invoice => 
     invoice.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (invoice.clients && `${invoice.clients.first_name} ${invoice.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (invoice.vehicles && `${invoice.vehicles.car_brands?.name || 'Marque inconnue'} ${invoice.vehicles.car_models?.name || 'Modèle inconnu'} - ${invoice.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -292,13 +295,25 @@ const Invoices = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Numéro</TableHead>
-              <TableHead>Date de création</TableHead>
-              <TableHead>Client</TableHead>
-              <TableHead>Véhicule</TableHead>
-              <TableHead>Montant</TableHead>
+              <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
+                Numéro
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
+                Date de création
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="clients.last_name" sortConfig={sortConfig} onSort={handleSort}>
+                Client
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="vehicles.license_plate" sortConfig={sortConfig} onSort={handleSort}>
+                Véhicule
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
+                Montant
+              </SortableTableHeader>
               <TableHead>Avoirs</TableHead>
-              <TableHead>Statut</TableHead>
+              <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                Statut
+              </SortableTableHeader>
             </TableRow>
           </TableHeader>
           <TableBody>

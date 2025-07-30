@@ -14,6 +14,8 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, Download, Printer, Mail, FileCheck, ArrowRight } from 'lucide-react';
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
+import { useTableSorting } from '@/hooks/use-table-sorting';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useToast } from '@/hooks/use-toast';
 import QuoteViewerModal from '@/components/quotes/QuoteViewerModal';
@@ -30,6 +32,7 @@ const Quotes = () => {
   const navigate = useNavigate();
   const { confirm } = useConfirmation();
   const { quotes, isLoading, error, deleteQuote } = useQuotes();
+  const { sortedData: sortedQuotes, sortConfig, handleSort } = useTableSorting(quotes || [], 'reference');
   const [searchTerm, setSearchTerm] = useState('');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
@@ -40,7 +43,7 @@ const Quotes = () => {
   const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const { toast } = useToast();
   
-  const filteredQuotes = quotes?.filter(quote => 
+  const filteredQuotes = sortedQuotes?.filter(quote => 
     quote.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (quote.clients && `${quote.clients.first_name} ${quote.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (quote.vehicles && `${quote.vehicles.car_brands?.name || 'Marque inconnue'} ${quote.vehicles.car_models?.name || 'Modèle inconnu'} - ${quote.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -313,12 +316,24 @@ const Quotes = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Numéro</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Client</TableHead>
-              <TableHead>Véhicule</TableHead>
-              <TableHead>Montant</TableHead>
-              <TableHead>Statut</TableHead>
+              <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
+                Numéro
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
+                Date
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="clients.last_name" sortConfig={sortConfig} onSort={handleSort}>
+                Client
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="vehicles.license_plate" sortConfig={sortConfig} onSort={handleSort}>
+                Véhicule
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
+                Montant
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                Statut
+              </SortableTableHeader>
             </TableRow>
           </TableHeader>
           <TableBody>
