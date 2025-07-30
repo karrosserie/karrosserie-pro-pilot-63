@@ -655,22 +655,24 @@ const Planning = () => {
                         Assurance
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Compagnie:</span>
-                        <span className="font-medium">AXA Assurance</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">N° Sinistre:</span>
-                        <span className="font-medium">SIN-2025-001234</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Expert:</span>
-                        <span className="font-medium">M. Dupont</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Franchise:</span>
-                        <span className="font-medium">300€</span>
+                    <CardContent className="space-y-3">
+                      <div className="space-y-2">
+                        <div>
+                          <span className="text-sm text-muted-foreground">Compagnie:</span>
+                          <div className="font-medium">AXA Assurance</div>
+                        </div>
+                        <div>
+                          <span className="text-sm text-muted-foreground">N° Sinistre:</span>
+                          <div className="font-medium">SIN-2025-001234</div>
+                        </div>
+                        <div>
+                          <span className="text-sm text-muted-foreground">Expert:</span>
+                          <div className="font-medium">M. Dupont</div>
+                        </div>
+                        <div>
+                          <span className="text-sm text-muted-foreground">Franchise:</span>
+                          <div className="font-medium">300€</div>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -683,25 +685,39 @@ const Planning = () => {
                         Réparations
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-2 text-sm">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <div className="font-medium">Pare-chocs avant</div>
-                          <div className="text-xs text-muted-foreground">Remplacement</div>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="font-medium">Pare-chocs avant</div>
+                            <div className="text-sm text-muted-foreground">Remplacement</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">450€</span>
+                            <Badge className="bg-blue-600 text-white text-xs">Terminé</Badge>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">450€</span>
-                          <Badge variant="outline" className="bg-green-50 text-green-700">Terminé</Badge>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="font-medium">Aile avant droite</div>
+                            <div className="text-sm text-muted-foreground">Débosselage + peinture</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">680€</span>
+                            <Badge className="bg-orange-600 text-white text-xs">En cours</Badge>
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <div className="font-medium">Aile avant droite</div>
-                          <div className="text-xs text-muted-foreground">Débosselage + peinture</div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">680€</span>
-                          <Badge className="bg-orange-600 text-white">En cours</Badge>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="font-medium">Optique avant</div>
+                            <div className="text-sm text-muted-foreground">Remplacement</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">220€</span>
+                            <Badge variant="secondary" className="text-xs">À planifier</Badge>
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -715,25 +731,39 @@ const Planning = () => {
                         Pièces
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-2 text-sm">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <div className="font-medium">Pare-chocs avant</div>
-                          <div className="text-xs text-muted-foreground">PC-AV-001</div>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="font-medium">Pare-chocs avant</div>
+                            <div className="text-sm text-muted-foreground">PC-AV-001</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">180€</span>
+                            <Badge className="bg-blue-600 text-white text-xs">disponible</Badge>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">180€</span>
-                          <Badge className="bg-orange-600 text-white">disponible</Badge>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="font-medium">Optique avant droite</div>
+                            <div className="text-sm text-muted-foreground">OPT-AV-R</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">95€</span>
+                            <Badge variant="outline" className="text-xs">commande</Badge>
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <div className="font-medium">Optique avant droite</div>
-                          <div className="text-xs text-muted-foreground">OPT-AV-R</div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">95€</span>
-                          <Badge variant="outline">commande</Badge>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="font-medium">Peinture RAL 9003</div>
+                            <div className="text-sm text-muted-foreground">PEIN-RAL</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">45€</span>
+                            <Badge className="bg-blue-600 text-white text-xs">disponible</Badge>
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -747,18 +777,39 @@ const Planning = () => {
                         Historique
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-2 text-sm">
-                      <div className="border-l-2 border-orange-600 pl-3">
-                        <div className="font-medium">Réception véhicule</div>
-                        <div className="text-xs text-muted-foreground">08/01/2025 09:00 - Martin Dubois</div>
-                      </div>
-                      <div className="border-l-2 border-orange-600 pl-3">
-                        <div className="font-medium">Début démontage pare-chocs</div>
-                        <div className="text-xs text-muted-foreground">08/01/2025 10:30 - Martin Dubois</div>
-                      </div>
-                      <div className="border-l-2 border-gray-300 pl-3">
-                        <div className="font-medium text-muted-foreground">Démontage terminé</div>
-                        <div className="text-xs text-muted-foreground">08/01/2025 14:00 - Martin Dubois</div>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-3">
+                          <div className="w-1 h-12 bg-orange-600 rounded-full flex-shrink-0 mt-1"></div>
+                          <div className="flex-1">
+                            <div className="font-medium">Réception véhicule</div>
+                            <div className="text-sm text-muted-foreground">08/01/2025 09:00 - Martin Dubois</div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start gap-3">
+                          <div className="w-1 h-12 bg-orange-600 rounded-full flex-shrink-0 mt-1"></div>
+                          <div className="flex-1">
+                            <div className="font-medium">Début démontage pare-chocs</div>
+                            <div className="text-sm text-muted-foreground">08/01/2025 10:30 - Martin Dubois</div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start gap-3">
+                          <div className="w-1 h-12 bg-orange-600 rounded-full flex-shrink-0 mt-1"></div>
+                          <div className="flex-1">
+                            <div className="font-medium">Démontage terminé</div>
+                            <div className="text-sm text-muted-foreground">08/01/2025 14:00 - Martin Dubois</div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start gap-3">
+                          <div className="w-1 h-12 bg-orange-600 rounded-full flex-shrink-0 mt-1"></div>
+                          <div className="flex-1">
+                            <div className="font-medium">Début débosselage aile</div>
+                            <div className="text-sm text-muted-foreground">09/01/2025 08:00 - Sophie Martin</div>
+                          </div>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
