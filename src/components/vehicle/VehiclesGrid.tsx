@@ -160,11 +160,11 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
                 </Button>
                 <Button variant="outline" size="sm" onClick={(e) => handleCreateQuote(e, vehicle)}>
                   <FileText className="h-4 w-4 mr-1" />
-                  Créer devis
+                  Créer un devis
                 </Button>
                 <Button variant="outline" size="sm" onClick={(e) => handleCreateInvoice(e, vehicle)}>
                   <Receipt className="h-4 w-4 mr-1" />
-                  Créer facture
+                  Créer une facture
                 </Button>
                 <Button 
                   variant="outline" 

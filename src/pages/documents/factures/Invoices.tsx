@@ -357,11 +357,11 @@ const Invoices = () => {
                         </Button>
                         <Button variant="outline" size="sm" onClick={() => handleAddPayment(invoice)}>
                           <CreditCard className="h-4 w-4 mr-1" />
-                          Ajouter paiement
+                          Créer un paiement
                         </Button>
                         <Button variant="outline" size="sm" onClick={() => handleAddCredit(invoice)}>
                           <FileX className="h-4 w-4 mr-1" />
-                          Créer avoir
+                          Créer un avoir
                         </Button>
                         <Button 
                           variant="outline" 

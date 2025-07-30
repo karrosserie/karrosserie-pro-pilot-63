@@ -105,15 +105,15 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                         </Button>
                         <Button variant="outline" size="sm" onClick={handleCreateQuote}>
                           <FileText className="h-4 w-4 mr-1" />
-                          Créer devis
+                          Créer un devis
                         </Button>
                         <Button variant="outline" size="sm" onClick={handleCreateInvoice}>
                           <Receipt className="h-4 w-4 mr-1" />
-                          Créer facture
+                          Créer une facture
                         </Button>
                         <Button variant="outline" size="sm" onClick={handleCreateCredit}>
                           <CreditCard className="h-4 w-4 mr-1" />
-                          Créer avoir
+                          Créer un avoir
                         </Button>
                         <Button 
                           variant="outline" 
