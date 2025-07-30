@@ -254,10 +254,10 @@ const VehicleQuotesTab: React.FC<VehicleQuotesTabProps> = ({ vehicleId }) => {
                           variant="outline" 
                           size="sm" 
                           onClick={() => handleView(quote)}
-                          title="Visualiser"
+                          title="Voir"
                         >
                           <Eye className="h-4 w-4 mr-1" />
-                          Visualiser
+                          Voir
                         </Button>
                         <Button 
                           variant="outline" 
@@ -290,29 +290,17 @@ const VehicleQuotesTab: React.FC<VehicleQuotesTabProps> = ({ vehicleId }) => {
                           variant="outline" 
                           size="sm" 
                           onClick={() => handleSendEmail(quote)}
-                          title="Envoyer par e-mail"
+                          title="E-mail"
                         >
                           <Mail className="h-4 w-4 mr-1" />
-                          Envoyer par e-mail
+                          E-mail
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleRequestDocuments(quote)}
-                          title="Demander justificatifs"
-                        >
-                          <FileCheck className="h-4 w-4 mr-1" />
-                          Demander justificatifs
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleConvertToRepairOrder(quote)}
-                          title="Convertir en ordre de réparation"
-                        >
-                          <ArrowRight className="h-4 w-4 mr-1" />
-                          Convertir en ordre de réparation
-                        </Button>
+                        {!quote.repair_orders || quote.repair_orders.length === 0 ? (
+                          <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={() => handleConvertToRepairOrder(quote)}>
+                            <ArrowRight className="h-4 w-4 mr-1" />
+                            Convertir
+                          </Button>
+                        ) : null}
                         <Button 
                           variant="outline" 
                           size="sm" 
