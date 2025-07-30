@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import StatsCard from '@/components/dashboard/StatsCard';
 
 const Planning = () => {
   const [activeView, setActiveView] = useState("manager");
@@ -272,30 +273,30 @@ const Planning = () => {
           <TabsContent value="workshop" className="space-y-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-600">{stats.vehicles}</div>
-                  <div className="text-sm text-muted-foreground">VÉHICULES</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
-                  <div className="text-sm text-muted-foreground">TERMINÉS</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-yellow-600">{stats.waiting}</div>
-                  <div className="text-sm text-muted-foreground">EN ATTENTE</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-orange-600">{stats.revenue}€</div>
-                  <div className="text-sm text-muted-foreground">CA EN COURS</div>
-                </CardContent>
-              </Card>
+              <StatsCard 
+                title="VÉHICULES" 
+                value={stats.vehicles}
+                icon={<Car className="h-8 w-8 text-blue-600" />}
+                iconBg="bg-blue-100"
+              />
+              <StatsCard 
+                title="TERMINÉS" 
+                value={stats.completed}
+                icon={<CheckCircle className="h-8 w-8 text-green-600" />}
+                iconBg="bg-green-100"
+              />
+              <StatsCard 
+                title="EN ATTENTE" 
+                value={stats.waiting}
+                icon={<Clock className="h-8 w-8 text-yellow-600" />}
+                iconBg="bg-yellow-100"
+              />
+              <StatsCard 
+                title="CA EN COURS" 
+                value={`${stats.revenue}€`}
+                icon={<Euro className="h-8 w-8 text-orange-600" />}
+                iconBg="bg-orange-100"
+              />
             </div>
 
             {/* Alert */}
