@@ -380,7 +380,7 @@ const Quotes = () => {
                           E-mail
                         </Button>
 
-                        <Button variant="outline" size="sm" onClick={() => handleRequestDocuments(quote)}>
+                        <Button variant="outline" size="sm" className="hidden" onClick={() => handleRequestDocuments(quote)}>
                           <FileCheck className="h-4 w-4 mr-1" />
                           Justificatifs
                         </Button>
