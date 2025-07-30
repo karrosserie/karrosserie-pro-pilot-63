@@ -526,7 +526,7 @@ export const CessionsTable = ({
       <AlertDialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
         <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>Documents manquants</AlertDialogTitle>
+            <AlertDialogTitle>Données manquantes</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-4">
                 <p>Des informations obligatoires sont manquantes :</p>

@@ -20,8 +20,8 @@ export const validateCessionProcedureData = (order: any, client: any, repairOrde
   if (!client.last_name) missingClientFields.push("Nom");
   if (!client.phone) missingClientFields.push("Téléphone");
   if (!client.address) missingClientFields.push("Adresse");
-  if (!client.city) missingClientFields.push("Ville");
   if (!client.postal_code) missingClientFields.push("Code postal");
+  if (!client.city) missingClientFields.push("Ville");
 
   // Vérifier les photos du permis de conduire
   if (!client.driver_license_front_url) missingClientFields.push("Photo recto du permis de conduire");
