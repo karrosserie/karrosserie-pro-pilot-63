@@ -427,16 +427,11 @@ const Planning = () => {
         <Dialog open={showWaitingVehiclesModal} onOpenChange={setShowWaitingVehiclesModal}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
             <DialogHeader className="flex-shrink-0">
-              <div className="flex items-center justify-between">
-                <div>
-                  <DialogTitle className="text-xl font-semibold">Véhicules en attente</DialogTitle>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {waitingVehicles.length} véhicule(s) bloqué(s) dans les étapes atelier
-                  </p>
-                </div>
-                <Button variant="ghost" size="sm" onClick={() => setShowWaitingVehiclesModal(false)}>
-                  <X className="w-4 h-4" />
-                </Button>
+              <div>
+                <DialogTitle className="text-xl font-semibold">Véhicules en attente</DialogTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {waitingVehicles.length} véhicule(s) bloqué(s) dans les étapes atelier
+                </p>
               </div>
             </DialogHeader>
             
@@ -540,16 +535,11 @@ const Planning = () => {
         <Dialog open={showVehicleDetailModal} onOpenChange={setShowVehicleDetailModal}>
           <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
             <DialogHeader className="flex-shrink-0">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <DialogTitle className="text-xl font-semibold">
-                    Détail du véhicule - {selectedVehicle?.plate}
-                  </DialogTitle>
-                  <Badge className="bg-blue-600 text-white">En cours</Badge>
-                </div>
-                <Button variant="ghost" size="sm" onClick={() => setShowVehicleDetailModal(false)}>
-                  <X className="w-4 h-4" />
-                </Button>
+              <div className="flex items-center gap-3">
+                <DialogTitle className="text-xl font-semibold">
+                  Détail du véhicule - {selectedVehicle?.plate}
+                </DialogTitle>
+                <Badge className="bg-blue-600 text-white">En cours</Badge>
               </div>
             </DialogHeader>
             
