@@ -398,15 +398,23 @@ export const CessionsTable = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Ordre de réparation</TableHead>
-            <TableHead>Assurance</TableHead>
-            <TableHead>Statut</TableHead>
+            <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
+              Date
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="repair_order" sortConfig={sortConfig} onSort={handleSort}>
+              Ordre de réparation
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="insurance" sortConfig={sortConfig} onSort={handleSort}>
+              Assurance
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+              Statut
+            </SortableTableHeader>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {cessions.length > 0 ? (
-            cessions.map((cession) => (
+          {sortedData.length > 0 ? (
+            sortedData.map((cession) => (
               <React.Fragment key={cession.id}>
                 <TableRow className="border-b-0">
                   <TableCell>

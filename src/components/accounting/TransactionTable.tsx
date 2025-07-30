@@ -123,18 +123,30 @@ export const TransactionTable = ({ transactions }: TransactionTableProps) => {
             <Table>
               <TableHeader>
                 <TableRow className="border-b border-gray-200">
-                  <TableHead className="font-semibold">Date</TableHead>
-                  <TableHead className="font-semibold">Description</TableHead>
-                  <TableHead className="font-semibold">Client</TableHead>
-                  <TableHead className="font-semibold">Type</TableHead>
-                  <TableHead className="font-semibold">Méthode</TableHead>
-                  <TableHead className="font-semibold text-right">Montant</TableHead>
+                  <SortableTableHeader sortKey="date" sortConfig={sortConfig} onSort={handleSort} className="font-semibold">
+                    Date
+                  </SortableTableHeader>
+                  <SortableTableHeader sortKey="description" sortConfig={sortConfig} onSort={handleSort} className="font-semibold">
+                    Description
+                  </SortableTableHeader>
+                  <SortableTableHeader sortKey="client" sortConfig={sortConfig} onSort={handleSort} className="font-semibold">
+                    Client
+                  </SortableTableHeader>
+                  <SortableTableHeader sortKey="type" sortConfig={sortConfig} onSort={handleSort} className="font-semibold">
+                    Type
+                  </SortableTableHeader>
+                  <SortableTableHeader sortKey="method" sortConfig={sortConfig} onSort={handleSort} className="font-semibold">
+                    Méthode
+                  </SortableTableHeader>
+                  <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort} className="font-semibold text-right">
+                    Montant
+                  </SortableTableHeader>
                   <TableHead className="font-semibold text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {transactions.map((transaction) => (
-                  <TableRow 
+                {sortedData.map((transaction) => (
+                  <TableRow
                     key={transaction.id}
                     className="hover:bg-gray-50 transition-colors duration-200"
                   >

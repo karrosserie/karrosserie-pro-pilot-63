@@ -6,7 +6,7 @@ import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { Loading } from '@/components/ui/loading';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
-import { Table, TableHeader, TableRow, TableBody, TableCell } from '@/components/ui/table';
+import { Table, TableHeader, TableRow, TableBody, TableCell, TableHead } from '@/components/ui/table';
 
 interface FleetVehiclesTableProps {
   vehicles: FleetVehicle[];
@@ -29,7 +29,9 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
   onEditVehicle,
   onLendVehicle
 }) => {
-  const filteredVehicles = vehicles?.filter(vehicle =>
+  const { sortedData, sortConfig, handleSort } = useTableSorting(vehicles, 'license_plate');
+  
+  const filteredVehicles = sortedData?.filter(vehicle =>
     vehicle.car_brands?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     vehicle.car_models?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     vehicle.license_plate?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -63,26 +65,34 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
         <Loading text="Chargement des véhicules..." />
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3">Véhicule</th>
-                <th scope="col" className="px-6 py-3">Immatriculation</th>
-                <th scope="col" className="px-6 py-3">Année</th>
-                <th scope="col" className="px-6 py-3">Statut</th>
-                <th scope="col" className="px-6 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <SortableTableHeader sortKey="vehicle" sortConfig={sortConfig} onSort={handleSort}>
+                  Véhicule
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="license_plate" sortConfig={sortConfig} onSort={handleSort}>
+                  Immatriculation
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="year" sortConfig={sortConfig} onSort={handleSort}>
+                  Année
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                  Statut
+                </SortableTableHeader>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {filteredVehicles.length > 0 ? (
                 filteredVehicles.map((vehicle) => (
-                  <tr key={vehicle.id} className="bg-white border-b hover:bg-gray-50">
-                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                  <TableRow key={vehicle.id} className="hover:bg-gray-50">
+                    <TableCell className="font-medium">
                       {vehicle.car_brands?.name} {vehicle.car_models?.name}
-                    </td>
-                    <td className="px-6 py-4">{vehicle.license_plate}</td>
-                    <td className="px-6 py-4">{vehicle.year || '-'}</td>
-                    <td className="px-6 py-4">
+                    </TableCell>
+                    <TableCell>{vehicle.license_plate}</TableCell>
+                    <TableCell>{vehicle.year || '-'}</TableCell>
+                    <TableCell>
                       <span 
                         className={`text-xs font-medium px-2.5 py-0.5 rounded ${
                           vehicle.status === 'Disponible' 
@@ -96,8 +106,8 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
                       >
                         {vehicle.status || 'Disponible'}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 space-x-2">
+                    </TableCell>
+                    <TableCell className="space-x-2">
                       {vehicle.status === 'Disponible' && (
                         <Button 
                           className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
@@ -114,18 +124,18 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
                       >
                         Modifier
                       </Button>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))
               ) : (
-                <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-gray-500 py-8">
                     {searchTerm ? 'Aucun véhicule trouvé' : 'Aucun véhicule de courtoisie'}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>
