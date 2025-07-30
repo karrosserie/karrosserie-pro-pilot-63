@@ -8,13 +8,20 @@ interface InvoiceFormActionsProps {
   invoice?: Invoice | null;
   isSubmitting: boolean;
   onCancel: () => void;
+  isConversionFromRepairOrder?: boolean;
 }
 
-export const InvoiceFormActions = ({ invoice, isSubmitting, onCancel }: InvoiceFormActionsProps) => {
+export const InvoiceFormActions = ({ invoice, isSubmitting, onCancel, isConversionFromRepairOrder }: InvoiceFormActionsProps) => {
   // Déterminer s'il s'agit d'une modification d'une facture existante ou d'une création
-  // Si la facture a un ID, c'est une modification, sinon c'est une création
-  const isExistingInvoice = invoice && invoice.id;
+  const isEditing = invoice && invoice.id;
   
+  const getButtonText = () => {
+    if (isSubmitting) return 'Enregistrement...';
+    if (isEditing) return 'Mettre à jour';
+    if (isConversionFromRepairOrder) return 'Convertir en facture';
+    return 'Créer la facture';
+  };
+
   return (
     <>
       <Separator />
@@ -32,7 +39,7 @@ export const InvoiceFormActions = ({ invoice, isSubmitting, onCancel }: InvoiceF
           disabled={isSubmitting}
           className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
         >
-          {isSubmitting ? 'Enregistrement...' : isExistingInvoice ? 'Mettre à jour' : 'Créer la facture'}
+          {getButtonText()}
         </Button>
       </div>
     </>

@@ -18,13 +18,17 @@ interface InvoiceFormProps {
   onSubmit: (formData: Partial<Invoice>) => Promise<void>;
   onCancel: () => void;
   isSubmitting: boolean;
+  prefillData?: any;
+  isConversionFromRepairOrder?: boolean;
 }
 
 export const InvoiceForm = ({
   invoice,
   onSubmit,
   onCancel,
-  isSubmitting
+  isSubmitting,
+  prefillData,
+  isConversionFromRepairOrder
 }: InvoiceFormProps) => {
   const { toast } = useToast();
   const { clients, isLoading: isLoadingClients } = useClients();
@@ -126,6 +130,7 @@ export const InvoiceForm = ({
         invoice={invoice}
         isSubmitting={isSubmitting}
         onCancel={onCancel}
+        isConversionFromRepairOrder={isConversionFromRepairOrder}
       />
     </form>
   );
