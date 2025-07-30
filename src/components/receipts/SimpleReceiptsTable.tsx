@@ -13,6 +13,8 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Pencil, Trash, Receipt } from "lucide-react";
 import { ReceiptWithClient } from '@/services/supabase/receipts/types';
 import { useInvoices } from '@/hooks/use-invoices';
+import { useTableSorting } from '@/hooks/use-table-sorting';
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 
 interface SimpleReceiptsTableProps {
   receipts: ReceiptWithClient[];
@@ -72,7 +74,7 @@ export const SimpleReceiptsTable = ({
     return `Facture n°${invoice.reference} - ${clientName} - ${amount} €`;
   };
 
-  if (receipts.length === 0) {
+  if (sortedData.length === 0) {
     return (
       <EmptyState
         icon={Receipt}
@@ -86,16 +88,28 @@ export const SimpleReceiptsTable = ({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Numéro</TableHead>
-          <TableHead>Date</TableHead>
-          <TableHead>Facture</TableHead>
-          <TableHead>Montant</TableHead>
-          <TableHead>Méthode de paiement</TableHead>
-          <TableHead>Statut</TableHead>
+          <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
+            Numéro
+          </SortableTableHeader>
+          <SortableTableHeader sortKey="date" sortConfig={sortConfig} onSort={handleSort}>
+            Date
+          </SortableTableHeader>
+          <SortableTableHeader sortKey="invoice" sortConfig={sortConfig} onSort={handleSort}>
+            Facture
+          </SortableTableHeader>
+          <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
+            Montant
+          </SortableTableHeader>
+          <SortableTableHeader sortKey="payment_method" sortConfig={sortConfig} onSort={handleSort}>
+            Méthode de paiement
+          </SortableTableHeader>
+          <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+            Statut
+          </SortableTableHeader>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {receipts.map((receipt) => (
+        {sortedData.map((receipt) => (
           <React.Fragment key={receipt.id}>
             <TableRow className="border-b-0">
               <TableCell>{receipt.reference || 'N/A'}</TableCell>

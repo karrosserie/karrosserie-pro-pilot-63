@@ -27,6 +27,8 @@ import { EditCreditDialog } from '@/components/credits/EditCreditDialog';
 import { CreditEmailDialog } from '@/components/credits/email/CreditEmailDialog';
 import { useCredits } from '@/hooks/use-credits';
 import { useInvoices } from '@/hooks/use-invoices';
+import { useTableSorting } from '@/hooks/use-table-sorting';
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 
 // Mock data for credits - to be replaced with real data later
 const mockCredits = [
@@ -91,6 +93,7 @@ const Credits = () => {
   
   const { credits = [], isLoading, deleteCredit, error } = useCredits();
   const { invoices } = useInvoices();
+  const { sortedData, sortConfig, handleSort } = useTableSorting(credits, 'created_at');
   
   const formatVehicleDisplay = (credit: any) => {
     console.log('Formatting vehicle display for credit:', credit.id, 'credit data:', credit);
@@ -154,7 +157,7 @@ const Credits = () => {
     return '-';
   };
   
-  const filteredCredits = credits?.filter(credit => 
+  const filteredCredits = sortedData?.filter(credit => 
     credit.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (credit.clients && `${credit.clients.first_name} ${credit.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
     formatVehicleDisplay(credit).toLowerCase().includes(searchTerm.toLowerCase())
@@ -405,12 +408,24 @@ const Credits = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Numéro</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Véhicule</TableHead>
-              <TableHead>Facture d'origine</TableHead>
-              <TableHead>Montant</TableHead>
-              <TableHead>Statut</TableHead>
+              <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
+                Numéro
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
+                Date
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="vehicle" sortConfig={sortConfig} onSort={handleSort}>
+                Véhicule
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="invoice" sortConfig={sortConfig} onSort={handleSort}>
+                Facture d'origine
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
+                Montant
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                Statut
+              </SortableTableHeader>
             </TableRow>
           </TableHeader>
           <TableBody>

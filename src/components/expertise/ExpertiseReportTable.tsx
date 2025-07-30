@@ -12,6 +12,7 @@ import ExpertiseReportMobileCard from './ExpertiseReportMobileCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { FileText } from 'lucide-react';
 import { TableCell, TableRow } from "@/components/ui/table";
+import { useTableSorting } from '@/hooks/use-table-sorting';
 
 interface ExpertiseReportTableProps {
   reports: ExpertiseReport[];
@@ -35,12 +36,13 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
   convertedReports = {}
 }) => {
   const isMobile = useIsMobile();
+  const { sortedData, sortConfig, handleSort } = useTableSorting(reports, 'created_at');
 
   // Mobile view: cards
   if (isMobile) {
     return (
       <div className="space-y-3 p-4">
-        {reports.map((report) => (
+        {sortedData.map((report) => (
           <ExpertiseReportMobileCard
             key={report.id}
             report={report}
@@ -57,7 +59,10 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
     <TooltipProvider>
       <div className="overflow-x-auto">
         <Table>
-          <ExpertiseReportTableHeader />
+          <ExpertiseReportTableHeader 
+            sortConfig={sortConfig}
+            onSort={handleSort}
+          />
           <TableBody>
             {isLoading ? (
               <TableRow>
@@ -71,8 +76,8 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
                   Erreur lors du chargement des rapports: {error.message}
                 </TableCell>
               </TableRow>
-            ) : reports.length > 0 ? (
-              reports.map((report) => (
+            ) : sortedData.length > 0 ? (
+              sortedData.map((report) => (
                 <ExpertiseReportTableRow
                   key={report.id}
                   report={report}

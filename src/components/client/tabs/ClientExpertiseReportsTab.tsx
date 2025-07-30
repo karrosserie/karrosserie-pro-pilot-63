@@ -12,6 +12,7 @@ import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog'
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 import { ExpertiseReportTableHeader } from '@/components/expertise/table/ExpertiseReportTableHeader';
 import { TableCell, TableRow } from '@/components/ui/table';
+import { useTableSorting } from '@/hooks/use-table-sorting';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { 
   DropdownMenu, 
@@ -34,13 +35,14 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
   const [selectedReport, setSelectedReport] = useState<ExpertiseReport | null>(null);
 
   const clientReports = reports?.filter(report => report.client_id === clientId) || [];
+  const { sortedData, sortConfig, handleSort } = useTableSorting(clientReports, 'created_at');
 
   // Vérifier le statut de conversion des rapports quand ils changent
   useEffect(() => {
-    if (clientReports && clientReports.length > 0) {
-      checkMultipleReports(clientReports);
+    if (sortedData && sortedData.length > 0) {
+      checkMultipleReports(sortedData);
     }
-  }, [clientReports, checkMultipleReports]);
+  }, [sortedData, checkMultipleReports]);
 
   if (isLoading) {
     return (
@@ -114,7 +116,7 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
     );
   };
 
-  if (clientReports.length === 0) {
+  if (sortedData.length === 0) {
     return (
       <div className="text-center py-8">
         <FileText className="mx-auto h-12 w-12 text-gray-400" />
@@ -128,10 +130,13 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
     <>
       <div className="card-container p-0">
           <Table>
-            <ExpertiseReportTableHeader />
+            <ExpertiseReportTableHeader 
+              sortConfig={sortConfig}
+              onSort={handleSort}
+            />
             <TableBody>
-              {clientReports.length > 0 ? (
-                clientReports.map((report) => (
+              {sortedData.length > 0 ? (
+                sortedData.map((report) => (
                   <TableRow key={report.id} className="hover:bg-gray-50">
                     <TableCell>
                       {report.report_number || 'Non spécifié'}

@@ -12,6 +12,8 @@ import {
 import { Pencil, Trash, TrendingDown } from 'lucide-react';
 import { ExpenseWithRelations } from '@/services/supabase/expenses';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { useTableSorting } from '@/hooks/use-table-sorting';
+import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 
 interface ExpensesTableProps {
   expenses: ExpenseWithRelations[];
@@ -21,6 +23,8 @@ interface ExpensesTableProps {
 }
 
 export const ExpensesTable = ({ expenses, onEdit, onDelete, isLoading }: ExpensesTableProps) => {
+  const { sortedData, sortConfig, handleSort } = useTableSorting(expenses, 'date');
+  
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
@@ -46,19 +50,35 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete, isLoading }: Expense
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Type</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Fournisseur</TableHead>
-            <TableHead>Catégorie</TableHead>
-            <TableHead>Véhicule</TableHead>
-            <TableHead>Statut</TableHead>
-            <TableHead>Montant TVA</TableHead>
-            <TableHead>Montant TTC</TableHead>
+            <SortableTableHeader sortKey="type" sortConfig={sortConfig} onSort={handleSort}>
+              Type
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="date" sortConfig={sortConfig} onSort={handleSort}>
+              Date
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="supplier" sortConfig={sortConfig} onSort={handleSort}>
+              Fournisseur
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="category" sortConfig={sortConfig} onSort={handleSort}>
+              Catégorie
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="vehicle" sortConfig={sortConfig} onSort={handleSort}>
+              Véhicule
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+              Statut
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="vat_amount" sortConfig={sortConfig} onSort={handleSort}>
+              Montant TVA
+            </SortableTableHeader>
+            <SortableTableHeader sortKey="total_amount" sortConfig={sortConfig} onSort={handleSort}>
+              Montant TTC
+            </SortableTableHeader>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {expenses.length > 0 ? (
-            expenses.map((expense) => (
+          {sortedData.length > 0 ? (
+            sortedData.map((expense) => (
               <React.Fragment key={expense.id}>
                 <TableRow className="border-b-0">
                   <TableCell>{expense.type}</TableCell>
