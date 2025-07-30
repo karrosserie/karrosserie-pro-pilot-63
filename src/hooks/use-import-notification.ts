@@ -65,7 +65,7 @@ export function useImportNotification() {
           }
           
           // Vérifier s'il y a de nouveaux imports terminés
-          currentImportIds.forEach(async (id) => {
+          for (const id of currentImportIds) {
             if (!lastImportIds.has(id)) {
               console.log('🎉 New import completed:', id);
               
@@ -100,6 +100,7 @@ export function useImportNotification() {
                     
                     if (existingQuote) {
                       console.log('📄 Quote already exists for report:', report.id, 'Quote ID:', existingQuote.id);
+                      console.log('🚀 Navigating to quote:', `/documents/devis?openQuote=${existingQuote.id}`);
                       
                       // Rediriger vers le devis existant
                       setTimeout(() => {
@@ -116,6 +117,7 @@ export function useImportNotification() {
                       // Convertir le rapport en devis
                       const newQuote = await quotesService.createFromReport(report);
                       console.log('✅ Quote created:', newQuote);
+                      console.log('🚀 Navigating to new quote:', `/documents/devis?openQuote=${newQuote.id}`);
                       
                       // Rediriger vers le nouveau devis
                       setTimeout(() => {
@@ -154,7 +156,7 @@ export function useImportNotification() {
               queryClient.invalidateQueries({ queryKey: ['imports', 'pending'] });
               queryClient.invalidateQueries({ queryKey: ['quotes'] });
             }
-          });
+          }
           
           lastImportIds = currentImportIds;
         }
