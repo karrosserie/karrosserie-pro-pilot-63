@@ -10,7 +10,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
-import { Wrench, Eye, Pencil, Trash, Download, Printer, Mail, FileX, Receipt } from 'lucide-react';
+import { Wrench, Eye, Pencil, Trash, Download, Printer, Mail, Signature, FileCheck, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { RepairOrderActionsDropdown } from '@/components/repair-orders/RepairOrderActionsDropdown';
@@ -281,78 +281,46 @@ const VehicleRepairOrdersTab: React.FC<VehicleRepairOrdersTabProps> = ({ vehicle
                   <TableRow className="border-t-0">
                     <TableCell colSpan={6} className="py-3 border-t-0">
                       <div className="flex flex-wrap gap-2 justify-end px-4">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleViewOrder(order)}
-                          title="Visualiser"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handleViewOrder(order)}>
                           <Eye className="h-4 w-4 mr-1" />
-                          Visualiser
+                          Voir
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleEditOrder(order)}
-                          title="Modifier"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handleEditOrder(order)}>
                           <Pencil className="h-4 w-4 mr-1" />
                           Modifier
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleDownload(order)}
-                          title="Télécharger"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handleDownload(order)}>
                           <Download className="h-4 w-4 mr-1" />
                           Télécharger
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handlePrint(order)}
-                          title="Imprimer"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handlePrint(order)}>
                           <Printer className="h-4 w-4 mr-1" />
                           Imprimer
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleSendEmail(order)}
-                          title="Envoyer par e-mail"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(order)}>
                           <Mail className="h-4 w-4 mr-1" />
-                          Envoyer par e-mail
+                          Envoyer
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleSignOrder(order)}
-                          title="Signer"
-                        >
-                          <Pencil className="h-4 w-4 mr-1" />
-                          Signer
+                        {order.status !== 'Signé' && (
+                          <Button variant="outline" size="sm" onClick={() => handleSignOrder(order)}>
+                            <Signature className="h-4 w-4 mr-1" />
+                            Signature du client
+                          </Button>
+                        )}
+                        <Button variant="outline" size="sm" onClick={() => handleRequestDocuments(order)} className="hidden">
+                          <FileCheck className="h-4 w-4 mr-1" />
+                          Demander docs
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleRequestDocuments(order)}
-                          title="Demander justificatifs"
-                        >
-                          <FileX className="h-4 w-4 mr-1" />
-                          Demander justificatifs
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleConvertToInvoice(order)}
-                          title="Convertir en facture"
-                        >
-                          <Receipt className="h-4 w-4 mr-1" />
-                          Convertir en facture
-                        </Button>
+                        {!order.invoices || order.invoices.length === 0 ? (
+                          <Button 
+                            size="sm"
+                            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+                            onClick={() => handleConvertToInvoice(order)}
+                          >
+                            <ArrowRight className="h-4 w-4 mr-1" />
+                            Convertir
+                          </Button>
+                        ) : null}
                         <Button 
                           variant="outline" 
                           size="sm" 
