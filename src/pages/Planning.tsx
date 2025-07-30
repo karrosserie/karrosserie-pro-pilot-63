@@ -574,7 +574,7 @@ const Planning = () => {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Prix total:</span>
-                        <span className="font-medium text-blue-600">{selectedVehicle.price}</span>
+                        <span className="font-medium text-orange-600">{selectedVehicle.price}</span>
                       </div>
                     </CardContent>
                   </Card>
@@ -618,21 +618,21 @@ const Planning = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                      <div className="bg-blue-600 h-2 rounded-full" style={{ width: "27%" }}></div>
+                      <div className="bg-orange-600 h-2 rounded-full" style={{ width: "27%" }}></div>
                     </div>
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
                         <span className="font-medium">Accueil & Préparation</span>
                         <div className="flex items-center gap-2">
-                          <Badge className="bg-blue-600 text-white">100%</Badge>
-                          <CheckCircle className="w-4 h-4 text-blue-600" />
+                          <Badge className="bg-orange-600 text-white">100%</Badge>
+                          <CheckCircle className="w-4 h-4 text-orange-600" />
                         </div>
                       </div>
-                      <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
                         <span className="font-medium">Remplacement ou débosselage</span>
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="bg-blue-100 text-blue-800">60%</Badge>
-                          <Clock className="w-4 h-4 text-blue-600" />
+                          <Badge variant="outline" className="bg-orange-100 text-orange-800">60%</Badge>
+                          <Clock className="w-4 h-4 text-orange-600" />
                         </div>
                       </div>
                       {["Préparation peinture", "Mise en peinture", "Finitions & remontage", "Clôture & livraison"].map((step, index) => (
@@ -646,7 +646,7 @@ const Planning = () => {
                 </Card>
 
                 {/* Section inférieure avec 4 colonnes */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Assurance */}
                   <Card>
                     <CardHeader>
@@ -701,7 +701,7 @@ const Planning = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="font-medium">680€</span>
-                          <Badge className="bg-blue-600 text-white">En cours</Badge>
+                          <Badge className="bg-orange-600 text-white">En cours</Badge>
                         </div>
                       </div>
                     </CardContent>
@@ -723,7 +723,7 @@ const Planning = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="font-medium">180€</span>
-                          <Badge className="bg-blue-600 text-white">disponible</Badge>
+                          <Badge className="bg-orange-600 text-white">disponible</Badge>
                         </div>
                       </div>
                       <div className="flex justify-between items-center">
@@ -748,11 +748,11 @@ const Planning = () => {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2 text-sm">
-                      <div className="border-l-2 border-blue-600 pl-3">
+                      <div className="border-l-2 border-orange-600 pl-3">
                         <div className="font-medium">Réception véhicule</div>
                         <div className="text-xs text-muted-foreground">08/01/2025 09:00 - Martin Dubois</div>
                       </div>
-                      <div className="border-l-2 border-blue-600 pl-3">
+                      <div className="border-l-2 border-orange-600 pl-3">
                         <div className="font-medium">Début démontage pare-chocs</div>
                         <div className="text-xs text-muted-foreground">08/01/2025 10:30 - Martin Dubois</div>
                       </div>
@@ -764,15 +764,12 @@ const Planning = () => {
                   </Card>
                 </div>
 
-                {/* Footer avec technicien et bouton fermer */}
-                <div className="flex items-center justify-between pt-4 border-t">
+                {/* Footer avec technicien */}
+                <div className="pt-4 border-t">
                   <div className="flex items-center gap-2 text-sm">
                     <User className="w-4 h-4" />
                     <span className="font-medium">Technicien: {selectedVehicle.technician || "Non assigné"}</span>
                   </div>
-                  <Button variant="outline" onClick={() => setShowVehicleDetailModal(false)}>
-                    Fermer
-                  </Button>
                 </div>
               </div>
             )}
