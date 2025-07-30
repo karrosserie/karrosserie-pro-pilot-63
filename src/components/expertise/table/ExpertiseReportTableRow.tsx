@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Pencil, Trash, Download, FileCheck, Loader2 } from 'lucide-react';
+import { Pencil, Trash, Download, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
@@ -127,7 +127,7 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
               {isConverting ? (
                 <Loader2 className="h-4 w-4 mr-1 animate-spin" />
               ) : (
-                <FileCheck className="h-4 w-4 mr-1" />
+                <ArrowRight className="h-4 w-4 mr-1" />
               )}
               {isConverting ? 'Conversion...' : 'Convertir'}
             </Button>
