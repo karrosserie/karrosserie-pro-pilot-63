@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart } from "lucide-react";
+import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +10,8 @@ import StatsCard from '@/components/dashboard/StatsCard';
 const Planning = () => {
   const [activeView, setActiveView] = useState("manager");
   const [showWaitingVehiclesModal, setShowWaitingVehiclesModal] = useState(false);
+  const [showVehicleDetailModal, setShowVehicleDetailModal] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
 
   const stats = {
     vehicles: 8,
@@ -219,7 +221,7 @@ const Planning = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Planning Atelier</h1>
+            <h1 className="text-3xl font-bold">Planning atelier</h1>
             <p className="text-muted-foreground">Parcours complet avec synchronisation planning automatique</p>
           </div>
           
@@ -333,7 +335,10 @@ const Planning = () => {
                   <CardContent>
                     <div className="grid gap-4 md:grid-cols-2">
                       {step.vehicles.map((vehicle, vehicleIndex) => (
-                        <Card key={vehicleIndex} className="p-4">
+                        <Card key={vehicleIndex} className="p-4 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                          setSelectedVehicle(vehicle);
+                          setShowVehicleDetailModal(true);
+                        }}>
                           <div className="space-y-3">
                             <div className="flex items-start justify-between">
                               <div>
@@ -538,6 +543,260 @@ const Planning = () => {
                 </div>
               </div>
             </div>
+          </DialogContent>
+        </Dialog>
+
+
+        {/* Modal détail véhicule */}
+        <Dialog open={showVehicleDetailModal} onOpenChange={setShowVehicleDetailModal}>
+          <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+            <DialogHeader className="flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <DialogTitle className="text-xl font-semibold">
+                    Détail du véhicule - {selectedVehicle?.plate}
+                  </DialogTitle>
+                  <Badge className="bg-blue-600 text-white">En cours</Badge>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setShowVehicleDetailModal(false)}>
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </DialogHeader>
+            
+            {selectedVehicle && (
+              <div className="flex-1 overflow-y-auto space-y-6 mt-4">
+                {/* Section informations principales */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Informations véhicule */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Car className="w-5 h-5" />
+                        Informations véhicule
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Modèle:</span>
+                        <span className="font-medium">{selectedVehicle.brand}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Plaque:</span>
+                        <span className="font-medium">{selectedVehicle.plate}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Étape actuelle:</span>
+                        <span className="font-medium">{selectedVehicle.status}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Temps estimé:</span>
+                        <span className="font-medium">{selectedVehicle.duration}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Prix total:</span>
+                        <span className="font-medium text-blue-600">{selectedVehicle.price}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Informations client */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <User className="w-5 h-5" />
+                        Informations client
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4 text-muted-foreground" />
+                        <span className="font-medium">{selectedVehicle.client}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Phone className="w-4 h-4 text-muted-foreground" />
+                        <span>06.12.34.56.78</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-4 h-4 text-muted-foreground" />
+                        <span>client@example.com</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-muted-foreground" />
+                        <span>123 Rue de la République, 75001 Paris</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Progression des étapes atelier */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5" />
+                      Progression des étapes atelier (27%)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                      <div className="bg-blue-600 h-2 rounded-full" style={{ width: "27%" }}></div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <span className="font-medium">Accueil & Préparation</span>
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-blue-600 text-white">100%</Badge>
+                          <CheckCircle className="w-4 h-4 text-blue-600" />
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <span className="font-medium">Remplacement ou débosselage</span>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="bg-blue-100 text-blue-800">60%</Badge>
+                          <Clock className="w-4 h-4 text-blue-600" />
+                        </div>
+                      </div>
+                      {["Préparation peinture", "Mise en peinture", "Finitions & remontage", "Clôture & livraison"].map((step, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                          <span className="text-muted-foreground">{step}</span>
+                          <Badge variant="outline">0%</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Section inférieure avec 4 colonnes */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {/* Assurance */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <FileText className="w-4 h-4" />
+                        Assurance
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Compagnie:</span>
+                        <span className="font-medium">AXA Assurance</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">N° Sinistre:</span>
+                        <span className="font-medium">SIN-2025-001234</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Expert:</span>
+                        <span className="font-medium">M. Dupont</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Franchise:</span>
+                        <span className="font-medium">300€</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Réparations */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <Settings className="w-4 h-4" />
+                        Réparations
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2 text-sm">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <div className="font-medium">Pare-chocs avant</div>
+                          <div className="text-xs text-muted-foreground">Remplacement</div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">450€</span>
+                          <Badge variant="outline" className="bg-green-50 text-green-700">Terminé</Badge>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <div className="font-medium">Aile avant droite</div>
+                          <div className="text-xs text-muted-foreground">Débosselage + peinture</div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">680€</span>
+                          <Badge className="bg-blue-600 text-white">En cours</Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Pièces */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <Package className="w-4 h-4" />
+                        Pièces
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2 text-sm">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <div className="font-medium">Pare-chocs avant</div>
+                          <div className="text-xs text-muted-foreground">PC-AV-001</div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">180€</span>
+                          <Badge className="bg-blue-600 text-white">disponible</Badge>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <div className="font-medium">Optique avant droite</div>
+                          <div className="text-xs text-muted-foreground">OPT-AV-R</div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">95€</span>
+                          <Badge variant="outline">commande</Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Historique */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <History className="w-4 h-4" />
+                        Historique
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2 text-sm">
+                      <div className="border-l-2 border-blue-600 pl-3">
+                        <div className="font-medium">Réception véhicule</div>
+                        <div className="text-xs text-muted-foreground">08/01/2025 09:00 - Martin Dubois</div>
+                      </div>
+                      <div className="border-l-2 border-blue-600 pl-3">
+                        <div className="font-medium">Début démontage pare-chocs</div>
+                        <div className="text-xs text-muted-foreground">08/01/2025 10:30 - Martin Dubois</div>
+                      </div>
+                      <div className="border-l-2 border-gray-300 pl-3">
+                        <div className="font-medium text-muted-foreground">Démontage terminé</div>
+                        <div className="text-xs text-muted-foreground">08/01/2025 14:00 - Martin Dubois</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Footer avec technicien et bouton fermer */}
+                <div className="flex items-center justify-between pt-4 border-t">
+                  <div className="flex items-center gap-2 text-sm">
+                    <User className="w-4 h-4" />
+                    <span className="font-medium">Technicien: {selectedVehicle.technician || "Non assigné"}</span>
+                  </div>
+                  <Button variant="outline" onClick={() => setShowVehicleDetailModal(false)}>
+                    Fermer
+                  </Button>
+                </div>
+              </div>
+            )}
           </DialogContent>
         </Dialog>
       </div>
