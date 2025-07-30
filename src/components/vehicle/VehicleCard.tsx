@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Car, User, Eye, Pencil, Trash, MoreVertical, FileText, Receipt, Wrench } from 'lucide-react';
+import { Car, User, Eye, Pencil, Trash, FileText, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -21,7 +21,6 @@ interface VehicleCardProps {
   onDelete?: () => void;
   onCreateQuote?: () => void;
   onCreateInvoice?: () => void;
-  onCreateIntervention?: () => void;
 }
 
 const VehicleCard: React.FC<VehicleCardProps> = ({
@@ -38,8 +37,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
   onEdit,
   onDelete,
   onCreateQuote,
-  onCreateInvoice,
-  onCreateIntervention
+  onCreateInvoice
 }) => {
   // Détermine la couleur du statut
   const getStatusColor = () => {
@@ -103,14 +101,6 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
     }
   };
 
-  const handleCreateIntervention = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onCreateIntervention) {
-      onCreateIntervention();
-    } else {
-      console.log('Create intervention for vehicle:', licensePlate);
-    }
-  };
 
   const handleView = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -190,18 +180,14 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
             </Button>
           )}
           
-          {/* Boutons déplacés du menu contextuel */}
+          {/* Boutons pour créer des documents */}
           <Button variant="outline" size="sm" onClick={handleCreateQuote}>
             <FileText className="h-4 w-4 mr-1" />
-            Devis
+            Créer un devis
           </Button>
           <Button variant="outline" size="sm" onClick={handleCreateInvoice}>
             <Receipt className="h-4 w-4 mr-1" />
-            Facture
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleCreateIntervention}>
-            <Wrench className="h-4 w-4 mr-1" />
-            Intervention
+            Créer une facture
           </Button>
           
           {onDelete && (
