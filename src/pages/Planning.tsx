@@ -539,7 +539,7 @@ const Planning = () => {
                 <DialogTitle className="text-xl font-semibold">
                   Détail du véhicule - {selectedVehicle?.plate}
                 </DialogTitle>
-                <Badge className="bg-orange-600 text-white">En cours</Badge>
+                <Badge className="bg-blue-100 text-blue-800">En cours</Badge>
               </div>
             </DialogHeader>
             
@@ -694,7 +694,7 @@ const Planning = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="font-medium">450€</span>
-                            <Badge className="bg-green-600 text-white text-xs">Terminé</Badge>
+                            <Badge className="bg-green-100 text-green-800 text-xs">Terminé</Badge>
                           </div>
                         </div>
                         
@@ -705,7 +705,7 @@ const Planning = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="font-medium">680€</span>
-                            <Badge className="bg-orange-600 text-white text-xs">En cours</Badge>
+                            <Badge className="bg-blue-100 text-blue-800 text-xs">En cours</Badge>
                           </div>
                         </div>
                         
@@ -740,7 +740,7 @@ const Planning = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="font-medium">180€</span>
-                            <Badge className="bg-yellow-600 text-white text-xs">Disponible</Badge>
+                            <Badge className="bg-orange-100 text-orange-800 text-xs">Disponible</Badge>
                           </div>
                         </div>
                         
@@ -762,7 +762,7 @@ const Planning = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="font-medium">45€</span>
-                            <Badge className="bg-yellow-600 text-white text-xs">Disponible</Badge>
+                            <Badge className="bg-orange-100 text-orange-800 text-xs">Disponible</Badge>
                           </div>
                         </div>
                       </div>
