@@ -441,66 +441,75 @@ const Planning = () => {
               </div>
             </DialogHeader>
             
-            <div className="flex-1 overflow-y-auto space-y-4 mt-4">
+            <div className="flex-1 overflow-y-auto space-y-3 mt-4">
               {waitingVehicles.map((vehicle) => (
                 <Card key={vehicle.id} className="border border-border">
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      {/* Section gauche - Informations véhicule */}
+                      <div className="flex items-center gap-4 flex-1">
                         <div>
-                          <h3 className="font-semibold text-lg">{vehicle.model}</h3>
-                          <p className="text-sm text-muted-foreground">{vehicle.licensePlate}</p>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-base">{vehicle.model}</h3>
+                            <span className="text-sm text-muted-foreground">{vehicle.licensePlate}</span>
+                            <Badge 
+                              variant={vehicle.status === "Urgent" ? "destructive" : "secondary"}
+                              className={`text-xs ${vehicle.status === "Urgent" ? "bg-red-500 text-white" : ""}`}
+                            >
+                              {vehicle.status}
+                            </Badge>
+                          </div>
+                          
+                          <div className="flex items-center gap-6 text-sm">
+                            <div>
+                              <span className="text-muted-foreground">Client :</span>
+                              <span className="ml-1 font-medium">{vehicle.client}</span>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Prix :</span>
+                              <span className="ml-1 font-semibold text-green-600">{vehicle.price}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-6 text-sm mt-1">
+                            <div>
+                              <span className="text-muted-foreground">Étape bloquée :</span>
+                              <span className="ml-1">{vehicle.blockedStep}</span>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">En attente depuis :</span>
+                              <span className="ml-1 text-red-600 font-medium">{vehicle.waitingDays} jour(s)</span>
+                            </div>
+                          </div>
                         </div>
-                        <Badge 
-                          variant={vehicle.status === "Urgent" ? "destructive" : "secondary"}
-                          className={vehicle.status === "Urgent" ? "bg-red-500 text-white" : ""}
-                        >
-                          {vehicle.status}
-                        </Badge>
                       </div>
-                      <div className="flex flex-col gap-2">
-                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
-                          <CheckCircle className="w-4 h-4 mr-2" />
+
+                      {/* Section droite - Boutons d'action */}
+                      <div className="flex flex-col gap-2 ml-4">
+                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white h-8 px-3">
+                          <CheckCircle className="w-3 h-3 mr-1" />
                           Débloquer
                         </Button>
-                        <Button variant="outline" size="sm">
-                          <Calendar className="w-4 h-4 mr-2" />
+                        <Button variant="outline" size="sm" className="h-8 px-3">
+                          <Calendar className="w-3 h-3 mr-1" />
                           Planifier
                         </Button>
-                        <Button variant="outline" size="sm">
-                          <Edit className="w-4 h-4 mr-2" />
+                        <Button variant="outline" size="sm" className="h-8 px-3">
+                          <Edit className="w-3 h-3 mr-1" />
                           Modifier
                         </Button>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-6 mb-4">
-                      <div>
-                        <p className="text-sm font-medium">Client :</p>
-                        <p className="text-sm text-muted-foreground">{vehicle.client}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Prix :</p>
-                        <p className="text-sm font-semibold text-green-600">{vehicle.price}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Étape bloquée :</p>
-                        <p className="text-sm text-muted-foreground">{vehicle.blockedStep}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">En attente depuis :</p>
-                        <p className="text-sm text-red-600 font-medium">{vehicle.waitingDays} jour(s)</p>
-                      </div>
-                    </div>
-
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                      <div className="flex items-center gap-2 mb-2">
-                        <AlertTriangle className="w-4 h-4 text-yellow-600" />
-                        <span className="text-sm font-medium text-yellow-800">
+                    {/* Section blocage - plus compacte */}
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-md p-2 mt-3">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="w-3 h-3 text-yellow-600 flex-shrink-0" />
+                        <span className="text-xs font-medium text-yellow-800">
                           Raison du blocage : {vehicle.blockageReason}
                         </span>
                       </div>
-                      <p className="text-sm text-yellow-700">{vehicle.blockageDetails}</p>
+                      <p className="text-xs text-yellow-700 mt-1 ml-5">{vehicle.blockageDetails}</p>
                     </div>
                   </CardContent>
                 </Card>
