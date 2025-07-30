@@ -17,17 +17,25 @@ interface InvoiceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
+  prefillData?: any;
 }
 
 const InvoiceDialog = ({
   invoice,
   open,
   onOpenChange,
-  onSuccess
+  onSuccess,
+  prefillData
 }: InvoiceDialogProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { updateInvoice, createInvoice } = useInvoices();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Déterminer si c'est une conversion depuis un ordre de réparation
+  const isConversionFromRepairOrder = prefillData?.repair_order_id;
+  // Déterminer si c'est une modification (facture existante avec ID)
+  const isEditing = invoice && invoice.id;
 
   const handleSubmit = async (formData: any) => {
     if (isSubmitting) return;
@@ -35,13 +43,25 @@ const InvoiceDialog = ({
     setIsSubmitting(true);
     
     try {
-      if (invoice && invoice.id) {
+      let createdInvoice;
+      
+      if (isEditing) {
         await updateInvoice.mutateAsync({ id: invoice.id, data: formData });
       } else {
-        await createInvoice.mutateAsync(formData);
+        createdInvoice = await createInvoice.mutateAsync(formData);
       }
+      
       onOpenChange(false);
-      onSuccess?.();
+      
+      // Si c'est une conversion depuis un ordre de réparation et qu'une facture a été créée,
+      // rediriger vers la page des factures avec la facture ouverte
+      if (isConversionFromRepairOrder && createdInvoice) {
+        setTimeout(() => {
+          navigate(`/documents/factures?openInvoice=${createdInvoice.id}`);
+        }, 100);
+      } else {
+        onSuccess?.();
+      }
     } catch (error: any) {
       console.error('Dialog submission error:', error);
     } finally {
@@ -54,12 +74,19 @@ const InvoiceDialog = ({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {invoice && invoice.id ? "Modifier la facture" : "Créer une nouvelle facture"}
+            {isEditing 
+              ? "Modifier la facture" 
+              : isConversionFromRepairOrder 
+                ? "Convertir en facture" 
+                : "Créer une nouvelle facture"
+            }
           </DialogTitle>
           <DialogDescription>
-            {invoice && invoice.id
+            {isEditing
               ? "Modifiez les détails de la facture."
-              : "Créez une nouvelle facture en remplissant les informations ci-dessous."
+              : isConversionFromRepairOrder
+                ? "Convertissez cet ordre de réparation en facture en ajustant les informations si nécessaire."
+                : "Créez une nouvelle facture en remplissant les informations ci-dessous."
             }
           </DialogDescription>
         </DialogHeader>

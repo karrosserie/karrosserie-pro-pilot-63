@@ -295,6 +295,7 @@ const RepairOrders = () => {
       />
 
       <InvoiceDialog
+        invoice={null}
         open={invoiceDialogOpen}
         onOpenChange={(open) => {
           setInvoiceDialogOpen(open);
@@ -302,7 +303,7 @@ const RepairOrders = () => {
             setPrefilledInvoice(null);
           }
         }}
-        invoice={prefilledInvoice as Invoice}
+        prefillData={prefilledInvoice}
         onSuccess={() => {
           navigate('/documents/factures');
         }}
