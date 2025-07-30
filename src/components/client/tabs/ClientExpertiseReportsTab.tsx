@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useReportToQuote } from '@/hooks/use-report-to-quote';
 import { Table, TableBody } from '@/components/ui/table';
-import { FileText, Pencil, Trash, MoreVertical, Download } from 'lucide-react';
+import { FileText, Trash, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -14,13 +14,6 @@ import { ExpertiseReportTableHeader } from '@/components/expertise/table/Experti
 import { TableCell, TableRow } from '@/components/ui/table';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger,
-  DropdownMenuSeparator 
-} from '@/components/ui/dropdown-menu';
 
 interface ClientExpertiseReportsTabProps {
   clientId: string;
@@ -127,103 +120,92 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
   }
 
   return (
-    <>
-      <div className="card-container p-0">
-          <Table>
-            <ExpertiseReportTableHeader 
-              sortConfig={sortConfig}
-              onSort={handleSort}
-            />
+    <TooltipProvider>
+      <>
+        <div className="card-container p-0">
+            <Table>
+              <ExpertiseReportTableHeader 
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
             <TableBody>
               {sortedData.length > 0 ? (
                 sortedData.map((report) => (
-                  <TableRow key={report.id} className="hover:bg-gray-50">
-                    <TableCell>
-                      {report.report_number || 'Non spécifié'}
-                    </TableCell>
-                    <TableCell>
-                      {report.report_date ? new Date(report.report_date).toLocaleDateString('fr-FR') : 'Non spécifiée'}
-                    </TableCell>
-                    <TableCell>
-                      {report.clients ? (
-                        <span>
-                          {report.clients.first_name} {report.clients.last_name}
-                        </span>
-                      ) : (
-                        <span className="text-gray-400 italic">Non assigné</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {report.vehicles 
-                        ? `${report.vehicles.car_brands?.name || 'Marque inconnue'} ${report.vehicles.car_models?.name || 'Modèle inconnu'} - ${report.vehicles.license_plate || 'Plaque non spécifiée'}`
-                        : 'Non assigné'
-                      }
-                    </TableCell>
-                    <TableCell>
-                      {formatAmount(report.amount)}
-                    </TableCell>
-                    <TableCell>
-                      {getStatusDisplay(report)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end space-x-1">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => handleEditReport(report)}
-                              disabled={isConverted(report.id)}
-                              className="h-8 w-8"
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            {isConverted(report.id) ? 'Impossible de modifier un rapport converti' : 'Modifier le rapport'}
-                          </TooltipContent>
-                        </Tooltip>
+                  <React.Fragment key={report.id}>
+                    <TableRow className="hover:bg-gray-50 border-b-0">
+                      <TableCell>
+                        {report.report_number || 'Non spécifié'}
+                      </TableCell>
+                      <TableCell>
+                        {report.report_date ? new Date(report.report_date).toLocaleDateString('fr-FR') : 'Non spécifiée'}
+                      </TableCell>
+                      <TableCell>
+                        {report.clients ? (
+                          <span>
+                            {report.clients.first_name} {report.clients.last_name}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 italic">Non assigné</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {report.vehicles 
+                          ? `${report.vehicles.car_brands?.name || 'Marque inconnue'} ${report.vehicles.car_models?.name || 'Modèle inconnu'} - ${report.vehicles.license_plate || 'Plaque non spécifiée'}`
+                          : 'Non assigné'
+                        }
+                      </TableCell>
+                      <TableCell>
+                        {formatAmount(report.amount)}
+                      </TableCell>
+                      <TableCell>
+                        {getStatusDisplay(report)}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow className="border-t-0">
+                      <TableCell colSpan={6} className="py-3 border-t-0">
+                        <div className="flex flex-wrap gap-2 justify-end px-4">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => window.open(report.document_url, '_blank')}
+                                disabled={!report.document_url}
+                              >
+                                <Download className="h-4 w-4 mr-1" />
+                                Télécharger
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {!report.document_url ? 'Aucun document disponible' : 'Télécharger le rapport'}
+                            </TooltipContent>
+                          </Tooltip>
 
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="text-red-500 hover:text-red-700 h-8 w-8"
-                              onClick={() => handleDeleteReport(report.id)}
-                              disabled={isConverted(report.id)}
-                            >
-                              <Trash className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            {isConverted(report.id) ? 'Impossible de supprimer un rapport converti' : 'Supprimer le rapport'}
-                          </TooltipContent>
-                        </Tooltip>
-
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem 
-                              onClick={() => window.open(report.document_url, '_blank')}
-                              disabled={!report.document_url}
-                            >
-                              <Download className="mr-2 h-4 w-4" />
-                              Télécharger
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                                onClick={() => handleDeleteReport(report.id)}
+                                disabled={isConverted(report.id)}
+                              >
+                                <Trash className="h-4 w-4 mr-1" />
+                                Supprimer
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {isConverted(report.id) ? 'Impossible de supprimer un rapport converti' : 'Supprimer le rapport'}
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  </React.Fragment>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-4">
+                  <TableCell colSpan={6} className="text-center py-4">
                     <div className="flex flex-col items-center justify-center py-8">
                       <FileText className="h-10 w-10 text-gray-400 mb-2" />
                       <h3 className="font-medium text-gray-900">Aucun rapport d'expertise</h3>
@@ -238,13 +220,14 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
           </Table>
         </div>
 
-      {/* Edit Report Dialog */}
-      <ExpertiseReportDialog
-        report={selectedReport}
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-      />
-    </>
+        {/* Edit Report Dialog */}
+        <ExpertiseReportDialog
+          report={selectedReport}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+        />
+      </>
+    </TooltipProvider>
   );
 };
 
