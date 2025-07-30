@@ -11,7 +11,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
-import { FileText, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { FileText, Eye, Pencil, Trash, Download, Printer, Mail, FileCheck, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import {
@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Download, Printer, Mail, FileCheck, ArrowRight } from 'lucide-react';
+
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import QuoteViewerModal from '@/components/quotes/QuoteViewerModal';
 import QuoteEmailDialog from '@/components/quotes/QuoteEmailDialog';
@@ -227,82 +227,77 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
               <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
                 Statut
               </SortableTableHeader>
-              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {sortedData.length > 0 ? (
               sortedData.map((quote) => (
-                <TableRow key={quote.id}>
-                  <TableCell className="font-medium">{quote.reference}</TableCell>
-                  <TableCell>{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
-                  <TableCell>{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
-                  <TableCell>
-                    {quote.vehicles 
-                      ? `${quote.vehicles.car_brands?.name || 'Marque inconnue'} ${quote.vehicles.car_models?.name || 'Modèle inconnu'} - ${quote.vehicles.license_plate}`
-                      : '-'
-                    }
-                  </TableCell>
-                  <TableCell>{formatAmount(quote.amount)}</TableCell>
-                  <TableCell>
-                    <StatusBadge status={quote.status === 'draft' ? 'En attente' : (quote.status || 'En attente')} />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button variant="outline" size="sm" onClick={() => handleView(quote)}>
-                        <Eye className="h-4 w-4 mr-1" />
-                        Voir
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => handleEdit(quote)}>
-                        <Pencil className="h-4 w-4 mr-1" />
-                        Modifier
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="text-red-500 hover:text-red-700 border-red-200 hover:border-red-300" 
-                        onClick={() => handleDelete(quote)}
-                      >
-                        <Trash className="h-4 w-4 mr-1" />
-                        Supprimer
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreVertical className="h-4 w-4" />
+                <React.Fragment key={quote.id}>
+                  <TableRow className="border-b-0">
+                    <TableCell className="font-medium">{quote.reference}</TableCell>
+                    <TableCell>{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
+                    <TableCell>{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
+                    <TableCell>
+                      {quote.vehicles 
+                        ? `${quote.vehicles.car_brands?.name || 'Marque inconnue'} ${quote.vehicles.car_models?.name || 'Modèle inconnu'} - ${quote.vehicles.license_plate}`
+                        : '-'
+                      }
+                    </TableCell>
+                    <TableCell>{formatAmount(quote.amount)}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={quote.status === 'draft' ? 'En attente' : (quote.status || 'En attente')} />
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="border-t-0">
+                    <TableCell colSpan={6} className="py-3 border-t-0">
+                      <div className="flex flex-wrap gap-2 justify-end px-4">
+                        <Button variant="outline" size="sm" onClick={() => handleView(quote)}>
+                          <Eye className="h-4 w-4 mr-1" />
+                          Voir
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleEdit(quote)}>
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleDownload(quote)}>
+                          <Download className="h-4 w-4 mr-1" />
+                          Télécharger
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handlePrint(quote)}>
+                          <Printer className="h-4 w-4 mr-1" />
+                          Imprimer
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(quote)}>
+                          <Mail className="h-4 w-4 mr-1" />
+                          E-mail
+                        </Button>
+                        <Button variant="outline" size="sm" className="hidden" onClick={() => handleRequestDocuments(quote)}>
+                          <FileCheck className="h-4 w-4 mr-1" />
+                          Justificatifs
+                        </Button>
+                        {!quote.repair_orders || quote.repair_orders.length === 0 ? (
+                          <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={() => handleConvertToRepairOrder(quote)}>
+                            <ArrowRight className="h-4 w-4 mr-1" />
+                            Convertir
                           </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56">
-                          <DropdownMenuItem onClick={() => handleDownload(quote)}>
-                            <Download className="mr-2 h-4 w-4" />
-                            Télécharger
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handlePrint(quote)}>
-                            <Printer className="mr-2 h-4 w-4" />
-                            Imprimer
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleSendEmail(quote)}>
-                            <Mail className="mr-2 h-4 w-4" />
-                            Envoyer par e-mail
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleRequestDocuments(quote)}>
-                            <FileCheck className="mr-2 h-4 w-4" />
-                            Demander les justificatifs
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleConvertToRepairOrder(quote)}>
-                            <ArrowRight className="mr-2 h-4 w-4" />
-                            Convertir en ordre de réparation
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                        ) : null}
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700" 
+                          onClick={() => handleDelete(quote)}
+                        >
+                          <Trash className="h-4 w-4 mr-1" />
+                          Supprimer
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </React.Fragment>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-4">
+                <TableCell colSpan={6} className="text-center py-4">
                   <div className="flex flex-col items-center justify-center py-8">
                     <FileText className="h-10 w-10 text-gray-400 mb-2" />
                     <h3 className="font-medium text-gray-900">Aucun devis</h3>

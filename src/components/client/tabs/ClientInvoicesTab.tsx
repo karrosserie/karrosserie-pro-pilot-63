@@ -11,7 +11,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
-import { Receipt, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { Receipt, Eye, Pencil, Trash, Download, Printer, Mail, CreditCard, FileX } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
@@ -29,7 +29,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Download, Printer, Mail, CreditCard, FileX } from 'lucide-react';
+
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import InvoiceViewerModal from '@/components/invoices/InvoiceViewerModal';
 import InvoiceEmailDialog from '@/components/invoices/InvoiceEmailDialog';
@@ -263,7 +263,6 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
               <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
                 Statut
               </SortableTableHeader>
-              <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
           <TableBody>
@@ -271,7 +270,8 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
               sortedData.map((invoice) => {
                 const invoiceCredits = getInvoiceCredits(invoice.id);
                 return (
-                <TableRow key={invoice.id}>
+                <React.Fragment key={invoice.id}>
+                  <TableRow className="hover:bg-gray-50 border-b-0">
                         <TableCell className="font-medium">{invoice.reference}</TableCell>
                         <TableCell>{formatDate(invoice.created_at)}</TableCell>
                         <TableCell>
@@ -295,63 +295,56 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
                             {invoice.status || 'En attente de paiement'}
                           </span>
                         </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-1">
-                            <Button variant="outline" size="sm" onClick={() => handleView(invoice)}>
-                              <Eye className="h-4 w-4 mr-1" />
-                              Voir
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleEdit(invoice)}>
-                              <Pencil className="h-4 w-4 mr-1" />
-                              Modifier
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="text-red-500 hover:text-red-700 border-red-200 hover:border-red-300"
-                              onClick={() => handleDelete(invoice)}
-                            >
-                              <Trash className="h-4 w-4 mr-1" />
-                              Supprimer
-                            </Button>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent className="w-56">
-                                <DropdownMenuItem onClick={() => handleDownload(invoice)}>
-                                  <Download className="mr-2 h-4 w-4" />
-                                  Télécharger
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handlePrint(invoice)}>
-                                  <Printer className="mr-2 h-4 w-4" />
-                                  Imprimer
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleSendEmail(invoice)}>
-                                  <Mail className="mr-2 h-4 w-4" />
-                                  Envoyer par e-mail
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => handleAddPayment(invoice)}>
-                                  <CreditCard className="mr-2 h-4 w-4" />
-                                  Ajouter un paiement
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleAddCredit(invoice)}>
-                                  <FileX className="mr-2 h-4 w-4" />
-                                  Ajouter un avoir
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                  </div>
-                </TableCell>
-              </TableRow>
-              );
+                  </TableRow>
+                  <TableRow className="border-t-0">
+                    <TableCell colSpan={7} className="py-3 border-t-0">
+                      <div className="flex flex-wrap gap-2 justify-end px-4">
+                        <Button variant="outline" size="sm" onClick={() => handleView(invoice)}>
+                          <Eye className="h-4 w-4 mr-1" />
+                          Voir
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleEdit(invoice)}>
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleDownload(invoice)}>
+                          <Download className="h-4 w-4 mr-1" />
+                          Télécharger
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handlePrint(invoice)}>
+                          <Printer className="h-4 w-4 mr-1" />
+                          Imprimer
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(invoice)}>
+                          <Mail className="h-4 w-4 mr-1" />
+                          Envoyer
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleAddPayment(invoice)}>
+                          <CreditCard className="h-4 w-4 mr-1" />
+                          Créer un paiement
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleAddCredit(invoice)}>
+                          <FileX className="h-4 w-4 mr-1" />
+                          Créer un avoir
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                          onClick={() => handleDelete(invoice)}
+                        >
+                          <Trash className="h-4 w-4 mr-1" />
+                          Supprimer
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </React.Fragment>
+                );
               })
             ) : (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-4">
+                      <TableCell colSpan={7} className="text-center py-4">
                         <div className="flex flex-col items-center justify-center py-8">
                           <Receipt className="h-10 w-10 text-gray-400 mb-2" />
                           <h3 className="font-medium text-gray-900">Aucune facture</h3>

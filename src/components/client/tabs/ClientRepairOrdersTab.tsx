@@ -11,7 +11,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
-import { Wrench, Eye, Pencil, Trash } from 'lucide-react';
+import { Wrench, Eye, Pencil, Trash, Download, Printer, Mail, Signature, FileCheck, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { RepairOrderActionsDropdown } from '@/components/repair-orders/RepairOrderActionsDropdown';
@@ -255,58 +255,92 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
               <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
                 Statut
               </SortableTableHeader>
-              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {sortedData.length > 0 ? (
               sortedData.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell className="font-medium">{order.reference}</TableCell>
-                  <TableCell>{formatDate(order.created_at)}</TableCell>
-                  <TableCell>
-                    {order.clients 
-                      ? `${order.clients.first_name} ${order.clients.last_name}`
-                      : '-'
-                    }
-                  </TableCell>
-                  <TableCell>
-                    {order.vehicles 
-                      ? `${order.vehicles.car_brands?.name || 'Marque inconnue'} ${order.vehicles.car_models?.name || 'Modèle inconnu'} - ${order.vehicles.license_plate}`
-                      : '-'
-                    }
-                  </TableCell>
-                  <TableCell>{formatAmount(calculateOrderAmount(order))}</TableCell>
-                  <TableCell>
-                    <StatusBadge status={order.status || 'En cours'} />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button variant="outline" size="sm" onClick={() => handleViewOrder(order)}>
-                        <Eye className="h-4 w-4 mr-1" />
-                        Voir
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => handleEditOrder(order)}>
-                        <Pencil className="h-4 w-4 mr-1" />
-                        Modifier
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="text-red-500 hover:text-red-700 border-red-200 hover:border-red-300"
-                        onClick={() => handleDeleteOrder(order)}
-                      >
-                        <Trash className="h-4 w-4 mr-1" />
-                        Supprimer
-                      </Button>
-                      <RepairOrderActionsDropdown order={order} contextMenuProps={contextMenuProps} />
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <React.Fragment key={order.id}>
+                  <TableRow className="hover:bg-gray-50 border-b-0">
+                    <TableCell className="font-medium">{order.reference}</TableCell>
+                    <TableCell>{formatDate(order.created_at)}</TableCell>
+                    <TableCell>
+                      {order.clients 
+                        ? `${order.clients.first_name} ${order.clients.last_name}`
+                        : '-'
+                      }
+                    </TableCell>
+                    <TableCell>
+                      {order.vehicles 
+                        ? `${order.vehicles.car_brands?.name || 'Marque inconnue'} ${order.vehicles.car_models?.name || 'Modèle inconnu'} - ${order.vehicles.license_plate}`
+                        : '-'
+                      }
+                    </TableCell>
+                    <TableCell>{formatAmount(calculateOrderAmount(order))}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={order.status || 'En cours'} />
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="border-t-0">
+                    <TableCell colSpan={6} className="py-3 border-t-0">
+                      <div className="flex flex-wrap gap-2 justify-end px-4">
+                        <Button variant="outline" size="sm" onClick={() => handleViewOrder(order)}>
+                          <Eye className="h-4 w-4 mr-1" />
+                          Voir
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleEditOrder(order)}>
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleDownload(order)}>
+                          <Download className="h-4 w-4 mr-1" />
+                          Télécharger
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handlePrint(order)}>
+                          <Printer className="h-4 w-4 mr-1" />
+                          Imprimer
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(order)}>
+                          <Mail className="h-4 w-4 mr-1" />
+                          Envoyer
+                        </Button>
+                        {order.status !== 'Signé' && (
+                          <Button variant="outline" size="sm" onClick={() => handleSignOrder(order)}>
+                            <Signature className="h-4 w-4 mr-1" />
+                            Signature du client
+                          </Button>
+                        )}
+                        <Button variant="outline" size="sm" onClick={() => handleRequestDocuments(order)} className="hidden">
+                          <FileCheck className="h-4 w-4 mr-1" />
+                          Demander docs
+                        </Button>
+                        {!order.invoices || order.invoices.length === 0 ? (
+                          <Button 
+                            size="sm"
+                            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+                            onClick={() => handleConvertToInvoice(order)}
+                          >
+                            <ArrowRight className="h-4 w-4 mr-1" />
+                            Convertir
+                          </Button>
+                        ) : null}
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                          onClick={() => handleDeleteOrder(order)}
+                        >
+                          <Trash className="h-4 w-4 mr-1" />
+                          Supprimer
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </React.Fragment>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-4">
+                <TableCell colSpan={6} className="text-center py-4">
                   <div className="flex flex-col items-center justify-center py-8">
                     <Wrench className="h-10 w-10 text-gray-400 mb-2" />
                     <h3 className="font-medium text-gray-900">Aucun ordre de réparation</h3>

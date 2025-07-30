@@ -12,7 +12,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
-import { CreditCard, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { CreditCard, Eye, Pencil, Trash, Download, Printer, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
@@ -22,7 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Download, Printer, Mail } from 'lucide-react';
+
 import { EditCreditDialog } from '@/components/credits/EditCreditDialog';
 import InvoiceViewerModal from '@/components/invoices/InvoiceViewerModal';
 import { CreditEmailDialog } from '@/components/credits/email/CreditEmailDialog';
@@ -297,75 +297,69 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
               <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
                 Statut
               </SortableTableHeader>
-              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {sortedData.length > 0 ? (
               sortedData.map((credit) => (
-                <TableRow key={credit.id}>
-                  <TableCell className="font-medium">{credit.reference}</TableCell>
-                  <TableCell>{formatDate(credit.created_date || credit.created_at)}</TableCell>
-                  <TableCell>
-                    {formatVehicleDisplay(credit)}
-                  </TableCell>
-                  <TableCell>
-                    {getInvoiceDisplay(credit.invoice_id)}
-                  </TableCell>
-                  <TableCell>{formatAmount(credit.amount)}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(credit.status || 'En attente')}`}>
-                      {credit.status || 'En attente'}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button variant="outline" size="sm" onClick={() => handleView(credit)}>
-                        <Eye className="h-4 w-4 mr-1" />
-                        Voir
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => handleEdit(credit)}>
-                        <Pencil className="h-4 w-4 mr-1" />
-                        Modifier
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="text-red-500 hover:text-red-700 border-red-200 hover:border-red-300"
-                        onClick={() => handleDelete(credit)}
-                        disabled={deleteCredit.isPending}
-                      >
-                        <Trash className="h-4 w-4 mr-1" />
-                        Supprimer
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56">
-                          <DropdownMenuItem onClick={() => handleDownload(credit)}>
-                            <Download className="mr-2 h-4 w-4" />
-                            Télécharger
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handlePrint(credit)}>
-                            <Printer className="mr-2 h-4 w-4" />
-                            Imprimer
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleSendEmail(credit)}>
-                            <Mail className="mr-2 h-4 w-4" />
-                            Envoyer par e-mail
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <React.Fragment key={credit.id}>
+                  <TableRow className="hover:bg-gray-50 border-b-0">
+                    <TableCell className="font-medium">{credit.reference}</TableCell>
+                    <TableCell>{formatDate(credit.created_date || credit.created_at)}</TableCell>
+                    <TableCell>
+                      {formatVehicleDisplay(credit)}
+                    </TableCell>
+                    <TableCell>
+                      {getInvoiceDisplay(credit.invoice_id)}
+                    </TableCell>
+                    <TableCell>{formatAmount(credit.amount)}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(credit.status || 'En attente')}`}>
+                        {credit.status || 'En attente'}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="border-t-0">
+                    <TableCell colSpan={6} className="py-3 border-t-0">
+                      <div className="flex flex-wrap gap-2 justify-end px-4">
+                        <Button variant="outline" size="sm" onClick={() => handleView(credit)}>
+                          <Eye className="h-4 w-4 mr-1" />
+                          Voir
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleEdit(credit)}>
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleDownload(credit)}>
+                          <Download className="h-4 w-4 mr-1" />
+                          Télécharger
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handlePrint(credit)}>
+                          <Printer className="h-4 w-4 mr-1" />
+                          Imprimer
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(credit)}>
+                          <Mail className="h-4 w-4 mr-1" />
+                          Envoyer
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                          onClick={() => handleDelete(credit)}
+                          disabled={deleteCredit.isPending}
+                        >
+                          <Trash className="h-4 w-4 mr-1" />
+                          Supprimer
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </React.Fragment>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-4">
+                <TableCell colSpan={6} className="text-center py-4">
                   <div className="flex flex-col items-center justify-center py-8">
                     <CreditCard className="h-10 w-10 text-gray-400 mb-2" />
                     <h3 className="font-medium text-gray-900">Aucun avoir</h3>
