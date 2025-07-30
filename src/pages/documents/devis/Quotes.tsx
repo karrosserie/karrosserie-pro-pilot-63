@@ -319,91 +319,94 @@ const Quotes = () => {
               <TableHead>Véhicule</TableHead>
               <TableHead>Montant</TableHead>
               <TableHead>Statut</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-4">
+                <TableCell colSpan={6} className="text-center py-4">
                   Chargement des devis...
                 </TableCell>
               </TableRow>
             ) : error ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-4 text-red-500">
+                <TableCell colSpan={6} className="text-center py-4 text-red-500">
                   Erreur lors du chargement des devis: {error.message}
                 </TableCell>
               </TableRow>
             ) : filteredQuotes.length > 0 ? (
               filteredQuotes.map((quote) => (
-                <TableRow key={quote.id}>
-                  <TableCell className="font-medium">{quote.reference}</TableCell>
-                  <TableCell>{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
-                  <TableCell>{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
-                  <TableCell>
-                    {quote.vehicles 
-                      ? `${quote.vehicles.car_brands?.name || 'Marque inconnue'} ${quote.vehicles.car_models?.name || 'Modèle inconnu'} - ${quote.vehicles.license_plate}`
-                      : '-'
-                    }
-                  </TableCell>
-                  <TableCell>{formatAmount(calculateQuoteAmount(quote))}</TableCell>
-                  <TableCell>
-                    <StatusBadge status={quote.status === 'draft' ? 'En attente' : (quote.status || 'En attente')} />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1">
-                      <Button variant="outline" size="sm" onClick={() => handleViewQuote(quote)}>
-                        <Eye className="h-4 w-4 mr-1" />
-                        Aperçu
-                      </Button>
+                <React.Fragment key={quote.id}>
+                  <TableRow>
+                    <TableCell className="font-medium">{quote.reference}</TableCell>
+                    <TableCell>{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
+                    <TableCell>{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
+                    <TableCell>
+                      {quote.vehicles 
+                        ? `${quote.vehicles.car_brands?.name || 'Marque inconnue'} ${quote.vehicles.car_models?.name || 'Modèle inconnu'} - ${quote.vehicles.license_plate}`
+                        : '-'
+                      }
+                    </TableCell>
+                    <TableCell>{formatAmount(calculateQuoteAmount(quote))}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={quote.status === 'draft' ? 'En attente' : (quote.status || 'En attente')} />
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell colSpan={6} className="py-3 bg-gray-50/50">
+                      <div className="flex flex-wrap gap-2 justify-start">
+                        <Button variant="outline" size="sm" onClick={() => handleViewQuote(quote)}>
+                          <Eye className="h-4 w-4 mr-1" />
+                          Aperçu
+                        </Button>
 
-                      <Button variant="outline" size="sm" onClick={() => handleEditQuote(quote)}>
-                        <Pencil className="h-4 w-4 mr-1" />
-                        Modifier
-                      </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleEditQuote(quote)}>
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
 
-                      <Button variant="outline" size="sm" onClick={() => handleDownload(quote)}>
-                        <Download className="h-4 w-4 mr-1" />
-                        Télécharger
-                      </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleDownload(quote)}>
+                          <Download className="h-4 w-4 mr-1" />
+                          Télécharger
+                        </Button>
 
-                      <Button variant="outline" size="sm" onClick={() => handlePrint(quote)}>
-                        <Printer className="h-4 w-4 mr-1" />
-                        Imprimer
-                      </Button>
+                        <Button variant="outline" size="sm" onClick={() => handlePrint(quote)}>
+                          <Printer className="h-4 w-4 mr-1" />
+                          Imprimer
+                        </Button>
 
-                      <Button variant="outline" size="sm" onClick={() => handleSendEmail(quote)}>
-                        <Mail className="h-4 w-4 mr-1" />
-                        E-mail
-                      </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(quote)}>
+                          <Mail className="h-4 w-4 mr-1" />
+                          E-mail
+                        </Button>
 
-                      <Button variant="outline" size="sm" onClick={() => handleRequestDocuments(quote)}>
-                        <FileCheck className="h-4 w-4 mr-1" />
-                        Justificatifs
-                      </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleRequestDocuments(quote)}>
+                          <FileCheck className="h-4 w-4 mr-1" />
+                          Justificatifs
+                        </Button>
 
-                      <Button variant="outline" size="sm" onClick={() => handleConvertToRepairOrder(quote)}>
-                        <ArrowRight className="h-4 w-4 mr-1" />
-                        Ordre
-                      </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleConvertToRepairOrder(quote)}>
+                          <ArrowRight className="h-4 w-4 mr-1" />
+                          Ordre
+                        </Button>
 
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700" 
-                        onClick={() => handleDeleteQuote(quote.id)}
-                      >
-                        <Trash className="h-4 w-4 mr-1" />
-                        Supprimer
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700" 
+                          onClick={() => handleDeleteQuote(quote.id)}
+                        >
+                          <Trash className="h-4 w-4 mr-1" />
+                          Supprimer
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </React.Fragment>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-4">
+                <TableCell colSpan={6} className="text-center py-4">
                   <div className="flex flex-col items-center justify-center py-8">
                     <FileText className="h-10 w-10 text-gray-400 mb-2" />
                     <h3 className="font-medium text-gray-900">Aucun résultat</h3>
