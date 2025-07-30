@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { toast } from '@/hooks/use-toast';
+import { useConfirmation } from '@/hooks/use-confirmation';
 import { Credit } from '@/services/supabase/credits';
 import { useCompany } from '@/hooks/use-company';
 import { useCompanyPreferences } from '@/hooks/use-company-preferences';
+import { useCredits } from '@/hooks/use-credits';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { Pencil, Download, Printer, Mail, Trash } from 'lucide-react';
 import DefaultCreditPreview from './templates/DefaultCreditPreview';
 import AlternativeCreditPreview from './templates/AlternativeCreditPreview';
+import { EditCreditDialog } from './EditCreditDialog';
+import { CreditEmailDialog } from './email/CreditEmailDialog';
+import { generateCreditPDFWithTemplate, printCreditPDFWithTemplate } from '@/utils/creditPDFGeneration';
 
 interface CreditViewerModalProps {
   credit: Credit | null;
@@ -18,9 +26,15 @@ interface CreditViewerModalProps {
 const CreditViewerModal = ({ credit, open, onOpenChange }: CreditViewerModalProps) => {
   const { companyData } = useCompany();
   const { preferences } = useCompanyPreferences();
+  const { deleteCredit } = useCredits();
+  const { confirm } = useConfirmation();
   const [clientData, setClientData] = useState<any>(null);
   const [vehicleData, setVehicleData] = useState<any>(null);
   const [invoiceData, setInvoiceData] = useState<any>(null);
+  
+  // States for dialogs
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   
   // Récupérer les données client, véhicule et facture depuis la base de données
   useEffect(() => {
@@ -144,30 +158,173 @@ const CreditViewerModal = ({ credit, open, onOpenChange }: CreditViewerModalProp
     totalTTC: `${totalTTC.toFixed(2).replace('.', ',')} €`
   };
 
+  // Action handlers
+  const handleEdit = () => {
+    setEditDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
+    const confirmed = await confirm({
+      title: "Supprimer l'avoir",
+      description: `Êtes-vous sûr de vouloir supprimer l'avoir ${credit.reference} ? Cette action est irréversible.`,
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
+      try {
+        await deleteCredit.mutateAsync(credit.id);
+        onOpenChange(false);
+        toast({
+          title: "Avoir supprimé",
+          description: `L'avoir ${credit.reference} a été supprimé avec succès.`,
+        });
+      } catch (error: any) {
+        console.error('Error deleting credit:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de supprimer l'avoir.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const handleDownload = async () => {
+    try {
+      toast({
+        title: "Génération du PDF",
+        description: "Génération du PDF en cours..."
+      });
+
+      const result = await generateCreditPDFWithTemplate(credit, companyData);
+      
+      if (result.success) {
+        toast({
+          title: "Téléchargement réussi",
+          description: `L'avoir ${credit.reference} a été téléchargé.`
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors du téléchargement:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer le PDF. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handlePrint = async () => {
+    try {
+      toast({
+        title: "Ouverture pour impression",
+        description: `Ouverture de l'avoir ${credit.reference} pour impression...`
+      });
+
+      const result = await printCreditPDFWithTemplate(credit, companyData);
+      
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'impression:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ouvrir le PDF pour impression. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSendEmail = () => {
+    setEmailDialogOpen(true);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
-        <div className="w-full h-full">
-          {template === 'default' ? (
-            <DefaultCreditPreview 
-              companyData={companyData}
-              creditData={creditData}
-              clientData={clientDataForTemplate}
-              items={processedItems}
-              totals={totalsData}
-            />
-          ) : (
-            <AlternativeCreditPreview 
-              companyData={companyData}
-              creditData={creditData}
-              clientData={clientDataForTemplate}
-              items={processedItems}
-              totals={totalsData}
-            />
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+          {/* Barre d'actions en haut */}
+          <div className="p-4 pr-16 border-b bg-background">
+            <h2 className="text-lg font-semibold mb-3">Aperçu de l'avoir n°{credit.reference}</h2>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button variant="outline" size="sm" onClick={handleEdit}>
+                <Pencil className="h-4 w-4 mr-1" />
+                Modifier
+              </Button>
+
+              <Button variant="outline" size="sm" onClick={handleDownload}>
+                <Download className="h-4 w-4 mr-1" />
+                Télécharger
+              </Button>
+
+              <Button variant="outline" size="sm" onClick={handlePrint}>
+                <Printer className="h-4 w-4 mr-1" />
+                Imprimer
+              </Button>
+
+              <Button variant="outline" size="sm" onClick={handleSendEmail}>
+                <Mail className="h-4 w-4 mr-1" />
+                Envoyer
+              </Button>
+
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700" 
+                onClick={handleDelete}
+              >
+                <Trash className="h-4 w-4 mr-1" />
+                Supprimer
+              </Button>
+            </div>
+          </div>
+          <div className="w-full h-full">
+            {template === 'default' ? (
+              <DefaultCreditPreview 
+                companyData={companyData}
+                creditData={creditData}
+                clientData={clientDataForTemplate}
+                items={processedItems}
+                totals={totalsData}
+              />
+            ) : (
+              <AlternativeCreditPreview 
+                companyData={companyData}
+                creditData={creditData}
+                clientData={clientDataForTemplate}
+                items={processedItems}
+                totals={totalsData}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialogues pour les actions */}
+      <EditCreditDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        creditId={credit.id}
+        initialData={{
+          reference: credit.reference,
+          invoice_id: credit.invoice_id,
+          status: credit.status as "En attente" | "Payé",
+          notes: credit.notes,
+          items: items
+        }}
+      />
+
+      <CreditEmailDialog
+        credit={credit}
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+      />
+    </>
   );
 };
 

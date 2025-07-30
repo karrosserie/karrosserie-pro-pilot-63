@@ -12,7 +12,7 @@ import { calculateInvoiceTotals } from '@/utils/invoiceCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Edit, Trash2, Printer, Download, Mail, CreditCard, FileX } from 'lucide-react';
+import { Edit, Trash2, Printer, Download, Mail, CreditCard, FileX, Pencil, Trash } from 'lucide-react';
 import DefaultInvoicePreview from './templates/DefaultInvoicePreview';
 import AlternativeInvoicePreview from './templates/AlternativeInvoicePreview';
 import InvoiceDialog from './InvoiceDialog';
@@ -268,73 +268,47 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
           {/* Barre d'actions en haut */}
-          <div className="flex items-center justify-between gap-2 p-4 pr-16 border-b bg-background">
-            <h2 className="text-lg font-semibold">Aperçu de la facture n°{invoice.reference}</h2>
-            <div className="flex items-center gap-1 mr-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleEdit}
-                className="h-10 w-10 p-0"
-                title="Modifier"
-              >
-                <Edit className="h-5 w-5" />
+          <div className="p-4 pr-16 border-b bg-background">
+            <h2 className="text-lg font-semibold mb-3">Aperçu de la facture n°{invoice.reference}</h2>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button variant="outline" size="sm" onClick={handleEdit}>
+                <Pencil className="h-4 w-4 mr-1" />
+                Modifier
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
+
+              <Button variant="outline" size="sm" onClick={handleDownload}>
+                <Download className="h-4 w-4 mr-1" />
+                Télécharger
+              </Button>
+
+              <Button variant="outline" size="sm" onClick={handlePrint}>
+                <Printer className="h-4 w-4 mr-1" />
+                Imprimer
+              </Button>
+
+              <Button variant="outline" size="sm" onClick={handleSendEmail}>
+                <Mail className="h-4 w-4 mr-1" />
+                Envoyer
+              </Button>
+
+              <Button variant="outline" size="sm" onClick={handleCreateReceipt}>
+                <CreditCard className="h-4 w-4 mr-1" />
+                Créer un paiement
+              </Button>
+
+              <Button variant="outline" size="sm" onClick={handleCreateCredit}>
+                <FileX className="h-4 w-4 mr-1" />
+                Créer un avoir
+              </Button>
+
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700" 
                 onClick={handleDelete}
-                className="h-10 w-10 p-0 text-destructive hover:text-destructive"
-                title="Supprimer"
               >
-                <Trash2 className="h-5 w-5" />
-              </Button>
-              <Separator orientation="vertical" className="h-8 mx-1" />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handlePrint}
-                className="h-10 w-10 p-0"
-                title="Imprimer"
-              >
-                <Printer className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleDownload}
-                className="h-10 w-10 p-0"
-                title="Télécharger"
-              >
-                <Download className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleSendEmail}
-                className="h-10 w-10 p-0"
-                title="Envoyer par e-mail"
-              >
-                <Mail className="h-5 w-5" />
-              </Button>
-              <Separator orientation="vertical" className="h-8 mx-1" />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleCreateReceipt}
-                className="h-10 w-10 p-0"
-                title="Créer un encaissement"
-              >
-                <CreditCard className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleCreateCredit}
-                className="h-10 w-10 p-0"
-                title="Ajouter un avoir"
-              >
-                <FileX className="h-5 w-5" />
+                <Trash className="h-4 w-4 mr-1" />
+                Supprimer
               </Button>
             </div>
           </div>

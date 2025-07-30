@@ -12,7 +12,7 @@ import { calculateOrderAmount } from './utils/orderCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Edit, Trash2, Printer, Download, Mail, FileText, DollarSign, Signature } from 'lucide-react';
+import { Edit, Trash2, Printer, Download, Mail, FileText, DollarSign, Signature, Pencil, ArrowRight, Trash, FileCheck } from 'lucide-react';
 import DefaultRepairOrderPreview from './templates/DefaultRepairOrderPreview';
 import AlternativeRepairOrderPreview from './templates/AlternativeRepairOrderPreview';
 import RepairOrderDialog from './RepairOrderDialog';
@@ -312,82 +312,54 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
           {/* Barre d'actions en haut */}
-          <div className="flex items-center justify-between gap-2 p-4 pr-16 border-b bg-background">
-            <h2 className="text-lg font-semibold">Aperçu de l'ordre de réparation n°{repairOrder.reference}</h2>
-            <div className="flex items-center gap-1 mr-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleEdit}
-                className="h-10 w-10 p-0"
-                title="Modifier"
-              >
-                <Edit className="h-5 w-5" />
+          <div className="p-4 pr-16 border-b bg-background">
+            <h2 className="text-lg font-semibold mb-3">Aperçu de l'ordre de réparation n°{repairOrder.reference}</h2>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button variant="outline" size="sm" onClick={handleEdit}>
+                <Pencil className="h-4 w-4 mr-1" />
+                Modifier
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
+
+              <Button variant="outline" size="sm" onClick={handleDownload}>
+                <Download className="h-4 w-4 mr-1" />
+                Télécharger
+              </Button>
+
+              <Button variant="outline" size="sm" onClick={handlePrint}>
+                <Printer className="h-4 w-4 mr-1" />
+                Imprimer
+              </Button>
+
+              <Button variant="outline" size="sm" onClick={handleSendEmail}>
+                <Mail className="h-4 w-4 mr-1" />
+                Envoyer
+              </Button>
+
+              {repairOrder.status !== 'Signé' && (
+                <Button variant="outline" size="sm" onClick={handleClientSignature}>
+                  <Signature className="h-4 w-4 mr-1" />
+                  Signature du client
+                </Button>
+              )}
+
+              <Button variant="outline" size="sm" className="hidden">
+                <FileCheck className="h-4 w-4 mr-1" />
+                Demander docs
+              </Button>
+
+              <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={handleConvertToInvoice}>
+                <ArrowRight className="h-4 w-4 mr-1" />
+                Convertir
+              </Button>
+
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700" 
                 onClick={handleDelete}
-                className="h-10 w-10 p-0 text-destructive hover:text-destructive"
-                title="Supprimer"
               >
-                <Trash2 className="h-5 w-5" />
-              </Button>
-              <Separator orientation="vertical" className="h-8 mx-1" />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handlePrint}
-                className="h-10 w-10 p-0"
-                title="Imprimer"
-              >
-                <Printer className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleDownload}
-                className="h-10 w-10 p-0"
-                title="Télécharger"
-              >
-                <Download className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleSendEmail}
-                className="h-10 w-10 p-0"
-                title="Envoyer par e-mail"
-              >
-                <Mail className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleRequestDocuments}
-                className="h-10 w-10 p-0"
-                title="Demander les justificatifs"
-              >
-                <FileText className="h-5 w-5" />
-              </Button>
-              <Separator orientation="vertical" className="h-8 mx-1" />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClientSignature}
-                className="h-10 w-10 p-0"
-                title="Signature du client"
-              >
-                <Signature className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleConvertToInvoice}
-                className="h-10 w-10 p-0"
-                title="Convertir en facture"
-              >
-                <DollarSign className="h-5 w-5" />
+                <Trash className="h-4 w-4 mr-1" />
+                Supprimer
               </Button>
             </div>
           </div>
