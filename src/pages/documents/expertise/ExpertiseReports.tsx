@@ -213,7 +213,7 @@ const ExpertiseReports = () => {
 
       {/* Quote Dialog for conversion */}
       <QuoteDialog
-        quote={prefilledQuoteData as Quote}
+        quote={null}
         open={quoteDialogOpen}
         onOpenChange={(open) => {
           setQuoteDialogOpen(open);
@@ -221,6 +221,7 @@ const ExpertiseReports = () => {
             setPrefilledQuoteData(null);
           }
         }}
+        prefillData={prefilledQuoteData}
       />
 
     </div>
