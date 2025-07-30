@@ -12,7 +12,7 @@ import { calculateGlobalTotals } from '@/components/quotes/form/utils/calculatio
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Edit, Trash2, Printer, Download, Mail, FileText, Wrench, Eye, Pencil, FileCheck, ArrowRight } from 'lucide-react';
+import { Edit, Trash, Printer, Download, Mail, FileText, Wrench, Eye, Pencil, FileCheck, ArrowRight } from 'lucide-react';
 import DefaultQuotePreview from './templates/DefaultQuotePreview';
 import AlternativeQuotePreview from './templates/AlternativeQuotePreview';
 import QuoteDialog from './QuoteDialog';
@@ -348,7 +348,7 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
                 className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700" 
                 onClick={handleDelete}
               >
-                <Trash2 className="h-4 w-4 mr-1" />
+                <Trash className="h-4 w-4 mr-1" />
                 Supprimer
               </Button>
             </div>
