@@ -424,16 +424,12 @@ const Planning = () => {
             <DialogHeader className="flex-shrink-0">
               <div className="flex items-center justify-between">
                 <div>
-                  <DialogTitle className="text-xl font-semibold">Véhicules en Attente</DialogTitle>
+                  <DialogTitle className="text-xl font-semibold">Véhicules en attente</DialogTitle>
                   <p className="text-sm text-muted-foreground mt-1">
                     {waitingVehicles.length} véhicule(s) bloqué(s) dans les étapes atelier
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setShowWaitingVehiclesModal(false)}>
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Retour
-                  </Button>
                   <Button variant="ghost" size="sm" onClick={() => setShowWaitingVehiclesModal(false)}>
                     <X className="w-4 h-4" />
                   </Button>
@@ -445,7 +441,7 @@ const Planning = () => {
               {waitingVehicles.map((vehicle) => (
                 <Card key={vehicle.id} className="border border-border">
                   <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-start justify-between">
                       {/* Section gauche - Informations véhicule */}
                       <div className="flex items-center gap-4 flex-1">
                         <div>
