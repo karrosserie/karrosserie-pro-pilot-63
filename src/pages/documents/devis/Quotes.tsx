@@ -337,7 +337,7 @@ const Quotes = () => {
             ) : filteredQuotes.length > 0 ? (
               filteredQuotes.map((quote) => (
                 <React.Fragment key={quote.id}>
-                  <TableRow>
+                  <TableRow className="border-b-0">
                     <TableCell className="font-medium">{quote.reference}</TableCell>
                     <TableCell>{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
                     <TableCell>{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
