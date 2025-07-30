@@ -36,6 +36,13 @@ const QuoteDialog = ({
   // Déterminer si c'est une modification (devis existant avec ID)
   const isEditing = quote && quote.id;
 
+  console.log('🔧 QuoteDialog - Component render:', { 
+    isConversionFromReport, 
+    isEditing, 
+    prefillData: !!prefillData,
+    quote: !!quote 
+  });
+
   const handleSubmit = async (formData: Partial<Quote>) => {
     if (isSubmitting) return; // Prevent multiple submissions
     
