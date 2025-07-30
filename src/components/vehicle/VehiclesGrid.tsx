@@ -164,6 +164,18 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
                 <Button variant="ghost" size="icon" onClick={() => onEditVehicle(vehicle)}>
                   <Pencil className="h-4 w-4" />
                 </Button>
+                
+                {/* Boutons déplacés du menu contextuel */}
+                <Button variant="ghost" size="icon" onClick={(e) => handleCreateQuote(e, vehicle)}>
+                  <FileText className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={(e) => handleCreateInvoice(e, vehicle)}>
+                  <Receipt className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={(e) => handleCreateIntervention(e, vehicle)}>
+                  <Wrench className="h-4 w-4" />
+                </Button>
+                
                 <Button 
                   variant="ghost" 
                   size="icon"
@@ -172,28 +184,6 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
                 >
                   <Trash className="h-4 w-4" />
                 </Button>
-                
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56 bg-white border shadow-lg z-50" align="end">
-                    <DropdownMenuItem onClick={(e) => handleCreateQuote(e, vehicle)} className="cursor-pointer">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Créer un devis
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => handleCreateInvoice(e, vehicle)} className="cursor-pointer">
-                      <Receipt className="h-4 w-4 mr-2" />
-                      Créer une facture
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => handleCreateIntervention(e, vehicle)} className="cursor-pointer">
-                      <Wrench className="h-4 w-4 mr-2" />
-                      Créer une fiche
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </div>
             </div>
           </div>
