@@ -24,7 +24,8 @@ export function useQuotes() {
             license_plate,
             car_brands(id, name),
             car_models(id, name)
-          )
+          ),
+          repair_orders!quote_id(id, reference)
         `)
         .order('created_at', { ascending: false });
 

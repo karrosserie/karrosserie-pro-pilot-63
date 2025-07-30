@@ -27,6 +27,10 @@ export type RepairOrder = Database['public']['Tables']['repair_orders']['Row'] &
     reference: string;
     amount: number;
   } | null;
+  invoices?: {
+    id: string;
+    reference: string;
+  }[] | null;
   signature_date?: string | null;
   claim_number?: string | null;
   report_number?: string | null;

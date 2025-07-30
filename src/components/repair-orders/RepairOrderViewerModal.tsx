@@ -347,10 +347,12 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
                 Demander docs
               </Button>
 
-              <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={handleConvertToInvoice}>
-                <ArrowRight className="h-4 w-4 mr-1" />
-                Convertir
-              </Button>
+              {!repairOrder.invoices || repairOrder.invoices.length === 0 ? (
+                <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={handleConvertToInvoice}>
+                  <ArrowRight className="h-4 w-4 mr-1" />
+                  Convertir
+                </Button>
+              ) : null}
 
               <Button 
                 variant="outline" 

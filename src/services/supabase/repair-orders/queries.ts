@@ -27,7 +27,8 @@ export const getRepairOrders = async (): Promise<RepairOrder[]> => {
           id,
           name
         )
-      )
+      ),
+      invoices!repair_order_id(id, reference)
     `)
     .order('created_at', { ascending: false });
 
