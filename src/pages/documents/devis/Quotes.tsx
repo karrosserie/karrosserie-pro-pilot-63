@@ -144,7 +144,7 @@ const Quotes = () => {
       const quoteToOpen = quotes.find(quote => quote.id === openQuoteId);
       if (quoteToOpen) {
         setSelectedQuote(quoteToOpen);
-        setEditDialogOpen(true);
+        setViewerModalOpen(true); // Ouvrir la fenêtre d'aperçu au lieu de modification
         // Nettoyer le paramètre URL après ouverture
         setSearchParams(params => {
           params.delete('openQuote');
