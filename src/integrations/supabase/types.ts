@@ -62,6 +62,7 @@ export type Database = {
       bridge: {
         Row: {
           access_token: string
+          account_id: string | null
           bridge_id: string
           company_id: string | null
           created_at: string
@@ -70,6 +71,7 @@ export type Database = {
         }
         Insert: {
           access_token: string
+          account_id?: string | null
           bridge_id: string
           company_id?: string | null
           created_at?: string
@@ -78,13 +80,22 @@ export type Database = {
         }
         Update: {
           access_token?: string
+          account_id?: string | null
           bridge_id?: string
           company_id?: string | null
           created_at?: string
           id?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "bridge_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       car_brands: {
         Row: {
