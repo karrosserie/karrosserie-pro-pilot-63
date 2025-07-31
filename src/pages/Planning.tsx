@@ -2950,7 +2950,7 @@ const Planning = () => {
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Ajout immédiat au planning</DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="mb-4">
                 Ajouter un véhicule en urgence avec traitement prioritaire.
               </DialogDescription>
               <div className="flex justify-center mt-2">
