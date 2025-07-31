@@ -243,6 +243,7 @@ const Planning = () => {
               variant={activeView === "manager" ? "default" : "outline"}
               onClick={() => setActiveView("manager")}
               size="sm"
+              className={activeView === "manager" ? "bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white" : ""}
             >
               Vue Manager
             </Button>
@@ -250,6 +251,7 @@ const Planning = () => {
               variant={activeView === "employee" ? "default" : "outline"}
               onClick={() => setActiveView("employee")}
               size="sm"
+              className={activeView === "employee" ? "bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white" : ""}
             >
               Vue Employé
             </Button>
@@ -260,7 +262,36 @@ const Planning = () => {
           </div>
         </div>
 
-        {/* Navigation Tabs */}
+        {/* Vue Employé - Liste déroulante simplifiée */}
+        {activeView === "employee" && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Sélectionnez votre employé</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-4">
+                  <Label htmlFor="employee_select_simple">Employé :</Label>
+                  <Select defaultValue="sophie">
+                    <SelectTrigger
+                      id="employee_select_simple"
+                      className="w-[200px]"
+                    >
+                      <SelectValue placeholder="Sélectionner un employé" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border border-border shadow-md z-50">
+                      <SelectItem value="sophie">Sophie Martin</SelectItem>
+                      <SelectItem value="martin">Martin Dubois</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Vue Manager - Onglets complets */}
+        {activeView === "manager" && (
         <Tabs defaultValue="workshop" className="w-full">
           <TabsList className="grid w-full grid-cols-5 mb-6">
             <TabsTrigger value="workshop" className="flex items-center gap-2">
@@ -2223,6 +2254,7 @@ const Planning = () => {
             </div>
           </TabsContent>
         </Tabs>
+        )}
 
         {/* Modal des véhicules en attente */}
         <Dialog open={showWaitingVehiclesModal} onOpenChange={setShowWaitingVehiclesModal}>
