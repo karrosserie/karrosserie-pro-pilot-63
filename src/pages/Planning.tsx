@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash } from "lucide-react";
+import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash, Eye, Play } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +26,173 @@ const Planning = () => {
     phone: "",
     qualifications: [] as string[]
   });
+
+  // Données de planning pour Martin
+  const martinPlanningData = [
+    {
+      id: 1,
+      plate: "08-148-ST",
+      time: "8h-9h",
+      duration: "1h estimée",
+      task: "Expertise assurance",
+      description: "Accueil & Préparation du dossier",
+      status: "pending",
+      client: "M. Dupont"
+    },
+    {
+      id: 2,
+      plate: "5C-787-AL",
+      time: "9h-11h",
+      duration: "2h estimées",
+      task: "Accueil & Préparation du dossier",
+      description: "Accueil & Préparation du dossier",
+      status: "pending",
+      client: "Mme Martin"
+    },
+    {
+      id: 3,
+      plate: "AB-789-XY",
+      time: "11h-14h",
+      duration: "3h estimées",
+      task: "Débosselage léger",
+      description: "Remplacement ou débosselage",
+      status: "planned",
+      client: "M. Bernard"
+    },
+    {
+      id: 4,
+      plate: "CD-123-ZW",
+      time: "14h-15h30",
+      duration: "1h30 estimées",
+      task: "Contrôle qualité",
+      description: "Finitions & remontage",
+      status: "in_progress",
+      client: "M. Petit"
+    },
+    {
+      id: 5,
+      plate: "EF-456-UV",
+      time: "15h30-16h",
+      duration: "30min estimées",
+      task: "Livraison final",
+      description: "Clôture du dossier et livraison",
+      status: "pending",
+      client: "Mme Blanc"
+    },
+    {
+      id: 6,
+      plate: "GH-789-ST",
+      time: "16h-18h",
+      duration: "2h estimées",
+      task: "Débosselage léger",
+      description: "Remplacement ou débosselage",
+      status: "completed",
+      client: "M. Roux"
+    },
+    {
+      id: 7,
+      plate: "IJ-012-KL",
+      time: "18h-18h30",
+      duration: "30min estimées",
+      task: "Livraison final",
+      description: "Clôture du dossier et livraison",
+      status: "completed",
+      client: "Mme Durand"
+    }
+  ];
+
+  // Données de planning pour Sophie
+  const sophiePlanningData = [
+    {
+      id: 1,
+      plate: "AB-123-CD",
+      time: "8h-10h",
+      duration: "2h estimées",
+      task: "Préparation peinture",
+      description: "Préparation peinture",
+      status: "in_progress",
+      client: "M. Laurent"
+    },
+    {
+      id: 2,
+      plate: "FG-456-GH",
+      time: "10h-14h",
+      duration: "4h estimées",
+      task: "Mise en peinture",
+      description: "Mise en peinture",
+      status: "planned",
+      client: "Mme Rousseau"
+    },
+    {
+      id: 3,
+      plate: "HI-789-JK",
+      time: "14h-16h",
+      duration: "2h estimées",
+      task: "Finitions peinture",
+      description: "Finitions & remontage",
+      status: "pending",
+      client: "M. Leblanc"
+    }
+  ];
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "completed":
+        return <Badge className="bg-green-100 text-green-800">Terminé</Badge>;
+      case "in_progress":
+        return <Badge className="bg-orange-100 text-karrosserie-orange">En cours</Badge>;
+      case "planned":
+        return <Badge className="bg-blue-100 text-blue-800">Planifié</Badge>;
+      default:
+        return <Badge variant="outline">En attente</Badge>;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "border-l-green-500";
+      case "in_progress":
+        return "border-l-karrosserie-orange";
+      case "planned":
+        return "border-l-blue-500";
+      default:
+        return "border-l-gray-400";
+    }
+  };
+
+  const getActionButton = (status: string, taskId: number) => {
+    switch (status) {
+      case "completed":
+        return (
+          <Button size="sm" variant="outline" className="text-green-600 border-green-600 hover:bg-green-50">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            Terminé
+          </Button>
+        );
+      case "in_progress":
+        return (
+          <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            Terminer
+          </Button>
+        );
+      case "planned":
+        return (
+          <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white">
+            <Play className="w-3 h-3 mr-1" />
+            Planifier
+          </Button>
+        );
+      default:
+        return (
+          <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white">
+            <Play className="w-3 h-3 mr-1" />
+            Planifier
+          </Button>
+        );
+    }
+  };
 
   const stats = {
     vehicles: 8,
@@ -340,95 +507,146 @@ const Planning = () => {
           {/* Vue Employé - Planning personnel */}
           {activeView === "employee" && selectedEmployee && (
             <div className="space-y-6">
+              {/* Header */}
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <Button 
                     variant="outline" 
-                    size="sm"
                     onClick={() => setSelectedEmployee(null)}
+                    size="sm"
                   >
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    Retour à la sélection
+                    Retour
                   </Button>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-karrosserie-orange/10 rounded-full flex items-center justify-center">
-                      <User className="w-4 h-4 text-karrosserie-orange" />
-                    </div>
-                    <h2 className="text-xl font-semibold">Planning de {selectedEmployee.name}</h2>
+                  <div>
+                    <h1 className="text-3xl font-bold">Mon Planning - {selectedEmployee.name}</h1>
+                    <p className="text-muted-foreground">{selectedEmployee.role}</p>
                   </div>
                 </div>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={() => setActiveView("manager")}
+                  size="sm"
+                  className="bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90"
+                >
+                  Vue Manager
+                </Button>
               </div>
 
-              {/* Planning employé simplifié */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                {["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"].map((day, index) => (
-                  <Card key={day}>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-lg text-karrosserie-orange">{day}</CardTitle>
-                      <p className="text-sm text-muted-foreground">
-                        {selectedEmployee.id === "martin" ? 
-                          (index === 0 ? "2 tâche(s)" : index === 4 ? "3 tâche(s)" : "1 tâche") :
-                          (index === 1 ? "2 tâche(s)" : index === 4 ? "1 tâche" : "1 tâche")
-                        }
-                      </p>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      {selectedEmployee.id === "martin" && index === 0 && (
-                        <>
-                          <Card className="border-l-4 border-l-karrosserie-orange p-3">
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2 text-sm text-karrosserie-orange">
-                                <Clock className="w-3 h-3" />
-                                9h-10h
-                              </div>
-                              <div className="font-semibold text-sm">EZ-787-KL</div>
-                              <div className="text-xs text-muted-foreground">Accueil & Préparation</div>
-                              <Badge className="bg-orange-100 text-karrosserie-orange text-xs">En cours</Badge>
+              {/* Planning Tasks */}
+              <div className="space-y-4">
+                {selectedEmployee.id === "martin" && martinPlanningData.map((task) => (
+                  <Card key={task.id} className={`border-l-4 ${getStatusColor(task.status)}`}>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-4">
+                            <div className="text-lg font-bold text-karrosserie-orange">
+                              {task.plate}
                             </div>
-                          </Card>
-                          <Card className="border-l-4 border-l-green-500 p-3">
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2 text-sm text-green-600">
-                                <Clock className="w-3 h-3" />
-                                14h-16h
-                              </div>
-                              <div className="font-semibold text-sm">EZ-787-KL</div>
-                              <div className="text-xs text-muted-foreground">Débosselage léger</div>
-                              <Badge className="bg-green-100 text-green-800 text-xs">Planifié</Badge>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Clock className="w-4 h-4" />
+                              {task.time} • {task.duration}
                             </div>
-                          </Card>
-                        </>
-                      )}
-                      {selectedEmployee.id === "sophie" && index === 1 && (
-                        <>
-                          <Card className="border-l-4 border-l-karrosserie-orange p-3">
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2 text-sm text-karrosserie-orange">
-                                <Clock className="w-3 h-3" />
-                                8h-10h
-                              </div>
-                              <div className="font-semibold text-sm">HT-556-GH</div>
-                              <div className="text-xs text-muted-foreground">Préparation peinture</div>
-                              <Badge className="bg-orange-100 text-karrosserie-orange text-xs">En cours</Badge>
+                            {getStatusBadge(task.status)}
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <div className="font-medium">{task.task}</div>
+                            <div className="text-sm text-muted-foreground">{task.description}</div>
+                            <div className="text-sm text-muted-foreground flex items-center gap-1">
+                              <User className="w-3 h-3" />
+                              Client: {task.client}
                             </div>
-                          </Card>
-                          <Card className="border-l-4 border-l-red-500 p-3">
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2 text-sm text-red-600">
-                                <Clock className="w-3 h-3" />
-                                14h-17h
-                              </div>
-                              <div className="font-semibold text-sm">CD-123-ZW</div>
-                              <div className="text-xs text-muted-foreground">Mise en peinture</div>
-                              <Badge className="bg-red-100 text-red-800 text-xs">Planifié</Badge>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <Button size="sm" variant="outline">
+                            <Eye className="w-3 h-3 mr-1" />
+                            Détails
+                          </Button>
+                          {getActionButton(task.status, task.id)}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+
+                {selectedEmployee.id === "sophie" && sophiePlanningData.map((task) => (
+                  <Card key={task.id} className={`border-l-4 ${getStatusColor(task.status)}`}>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-4">
+                            <div className="text-lg font-bold text-karrosserie-orange">
+                              {task.plate}
                             </div>
-                          </Card>
-                        </>
-                      )}
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Clock className="w-4 h-4" />
+                              {task.time} • {task.duration}
+                            </div>
+                            {getStatusBadge(task.status)}
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <div className="font-medium">{task.task}</div>
+                            <div className="text-sm text-muted-foreground">{task.description}</div>
+                            <div className="text-sm text-muted-foreground flex items-center gap-1">
+                              <User className="w-3 h-3" />
+                              Client: {task.client}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <Button size="sm" variant="outline">
+                            <Eye className="w-3 h-3 mr-1" />
+                            Détails
+                          </Button>
+                          {getActionButton(task.status, task.id)}
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
                 ))}
               </div>
+
+              {/* Notifications Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5 text-karrosserie-orange" />
+                    Notifications (2)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
+                    <div className="flex-1">
+                      <div className="font-medium">Tâche planifiée pour demain</div>
+                      <div className="text-sm text-muted-foreground">
+                        Accueil & Préparation du dossier pour le véhicule PQ-012-UV à 9h
+                      </div>
+                    </div>
+                    <Button size="sm" variant="outline" className="text-karrosserie-orange border-karrosserie-orange">
+                      Marquer comme lu
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
+                    <div className="flex-1">
+                      <div className="font-medium">Tâche terminée avec succès</div>
+                      <div className="text-sm text-muted-foreground">
+                        Débosselage terminé pour le véhicule ST-345-UV hier à 16h30
+                      </div>
+                    </div>
+                    <Button size="sm" variant="outline" className="text-karrosserie-orange border-karrosserie-orange">
+                      Marquer comme lu
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           )}
 
