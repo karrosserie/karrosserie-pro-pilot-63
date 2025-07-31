@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash, Eye, Play } from "lucide-react";
+import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +13,6 @@ import StatsCard from '@/components/dashboard/StatsCard';
 
 const Planning = () => {
   const [activeView, setActiveView] = useState("manager");
-  const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
   const [activeProcessStep, setActiveProcessStep] = useState("accueil");
   const [showWaitingVehiclesModal, setShowWaitingVehiclesModal] = useState(false);
   const [showVehicleDetailModal, setShowVehicleDetailModal] = useState(false);
@@ -26,173 +25,6 @@ const Planning = () => {
     phone: "",
     qualifications: [] as string[]
   });
-
-  // Données de planning pour Martin
-  const martinPlanningData = [
-    {
-      id: 1,
-      plate: "08-148-ST",
-      time: "8h-9h",
-      duration: "1h estimée",
-      task: "Expertise assurance",
-      description: "Accueil & Préparation du dossier",
-      status: "pending",
-      client: "M. Dupont"
-    },
-    {
-      id: 2,
-      plate: "5C-787-AL",
-      time: "9h-11h",
-      duration: "2h estimées",
-      task: "Accueil & Préparation du dossier",
-      description: "Accueil & Préparation du dossier",
-      status: "pending",
-      client: "Mme Martin"
-    },
-    {
-      id: 3,
-      plate: "AB-789-XY",
-      time: "11h-14h",
-      duration: "3h estimées",
-      task: "Débosselage léger",
-      description: "Remplacement ou débosselage",
-      status: "planned",
-      client: "M. Bernard"
-    },
-    {
-      id: 4,
-      plate: "CD-123-ZW",
-      time: "14h-15h30",
-      duration: "1h30 estimées",
-      task: "Contrôle qualité",
-      description: "Finitions & remontage",
-      status: "in_progress",
-      client: "M. Petit"
-    },
-    {
-      id: 5,
-      plate: "EF-456-UV",
-      time: "15h30-16h",
-      duration: "30min estimées",
-      task: "Livraison final",
-      description: "Clôture du dossier et livraison",
-      status: "pending",
-      client: "Mme Blanc"
-    },
-    {
-      id: 6,
-      plate: "GH-789-ST",
-      time: "16h-18h",
-      duration: "2h estimées",
-      task: "Débosselage léger",
-      description: "Remplacement ou débosselage",
-      status: "completed",
-      client: "M. Roux"
-    },
-    {
-      id: 7,
-      plate: "IJ-012-KL",
-      time: "18h-18h30",
-      duration: "30min estimées",
-      task: "Livraison final",
-      description: "Clôture du dossier et livraison",
-      status: "completed",
-      client: "Mme Durand"
-    }
-  ];
-
-  // Données de planning pour Sophie
-  const sophiePlanningData = [
-    {
-      id: 1,
-      plate: "AB-123-CD",
-      time: "8h-10h",
-      duration: "2h estimées",
-      task: "Préparation peinture",
-      description: "Préparation peinture",
-      status: "in_progress",
-      client: "M. Laurent"
-    },
-    {
-      id: 2,
-      plate: "FG-456-GH",
-      time: "10h-14h",
-      duration: "4h estimées",
-      task: "Mise en peinture",
-      description: "Mise en peinture",
-      status: "planned",
-      client: "Mme Rousseau"
-    },
-    {
-      id: 3,
-      plate: "HI-789-JK",
-      time: "14h-16h",
-      duration: "2h estimées",
-      task: "Finitions peinture",
-      description: "Finitions & remontage",
-      status: "pending",
-      client: "M. Leblanc"
-    }
-  ];
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "completed":
-        return <Badge className="bg-green-100 text-green-800">Terminé</Badge>;
-      case "in_progress":
-        return <Badge className="bg-orange-100 text-karrosserie-orange">En cours</Badge>;
-      case "planned":
-        return <Badge className="bg-blue-100 text-blue-800">Planifié</Badge>;
-      default:
-        return <Badge variant="outline">En attente</Badge>;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "border-l-green-500";
-      case "in_progress":
-        return "border-l-karrosserie-orange";
-      case "planned":
-        return "border-l-blue-500";
-      default:
-        return "border-l-gray-400";
-    }
-  };
-
-  const getActionButton = (status: string, taskId: number) => {
-    switch (status) {
-      case "completed":
-        return (
-          <Button size="sm" variant="outline" className="text-green-600 border-green-600 hover:bg-green-50">
-            <CheckCircle className="w-3 h-3 mr-1" />
-            Terminé
-          </Button>
-        );
-      case "in_progress":
-        return (
-          <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
-            <CheckCircle className="w-3 h-3 mr-1" />
-            Terminer
-          </Button>
-        );
-      case "planned":
-        return (
-          <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white">
-            <Play className="w-3 h-3 mr-1" />
-            Planifier
-          </Button>
-        );
-      default:
-        return (
-          <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white">
-            <Play className="w-3 h-3 mr-1" />
-            Planifier
-          </Button>
-        );
-    }
-  };
 
   const stats = {
     vehicles: 8,
@@ -408,17 +240,14 @@ const Planning = () => {
           
           <div className="flex items-center gap-2">
             <Button
-              variant={activeView === "manager" ? "validation" : "outline"}
-              onClick={() => {
-                setActiveView("manager");
-                setSelectedEmployee(null);
-              }}
+              variant={activeView === "manager" ? "default" : "outline"}
+              onClick={() => setActiveView("manager")}
               size="sm"
             >
               Vue Manager
             </Button>
             <Button
-              variant={activeView === "employee" ? "validation" : "outline"}
+              variant={activeView === "employee" ? "default" : "outline"}
               onClick={() => setActiveView("employee")}
               size="sm"
             >
@@ -456,203 +285,7 @@ const Planning = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Vue Employé - Sélection du profil */}
-          {activeView === "employee" && !selectedEmployee && (
-            <div className="w-full">
-              <Card className="w-full">
-                <CardContent className="p-8 text-center">
-                  <div className="space-y-6">
-                    <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center">
-                      <User className="w-8 h-8 text-muted-foreground" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <h2 className="text-2xl font-semibold">Sélectionnez votre profil employé</h2>
-                      <p className="text-muted-foreground">
-                        Choisissez un employé dans le sélecteur ci-dessous pour accéder à son planning personnel
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 max-w-4xl mx-auto">
-                      <Card 
-                        className="p-6 cursor-pointer hover:shadow-md transition-all border-2 hover:border-karrosserie-orange/50"
-                        onClick={() => window.location.href = '/employee-planning/martin'}
-                      >
-                        <div className="flex flex-col items-center space-y-3">
-                          <div className="w-12 h-12 bg-karrosserie-orange/10 rounded-full flex items-center justify-center">
-                            <User className="w-6 h-6 text-karrosserie-orange" />
-                          </div>
-                          <span className="font-medium text-lg">Martin Dubois</span>
-                        </div>
-                      </Card>
-
-                      <Card 
-                        className="p-6 cursor-pointer hover:shadow-md transition-all border-2 hover:border-karrosserie-orange/50"
-                        onClick={() => window.location.href = '/employee-planning/sophie'}
-                      >
-                        <div className="flex flex-col items-center space-y-3">
-                          <div className="w-12 h-12 bg-karrosserie-orange/10 rounded-full flex items-center justify-center">
-                            <User className="w-6 h-6 text-karrosserie-orange" />
-                          </div>
-                          <span className="font-medium text-lg">Sophie Martin</span>
-                        </div>
-                      </Card>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {/* Vue Employé - Planning personnel */}
-          {activeView === "employee" && selectedEmployee && (
-            <div className="space-y-6">
-              {/* Header */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setSelectedEmployee(null)}
-                    size="sm"
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Retour
-                  </Button>
-                  <div>
-                    <h1 className="text-3xl font-bold">Mon Planning - {selectedEmployee.name}</h1>
-                    <p className="text-muted-foreground">{selectedEmployee.role}</p>
-                  </div>
-                </div>
-                
-                <Button 
-                  variant="outline" 
-                  onClick={() => setActiveView("manager")}
-                  size="sm"
-                  className="bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90"
-                >
-                  Vue Manager
-                </Button>
-              </div>
-
-              {/* Planning Tasks */}
-              <div className="space-y-4">
-                {selectedEmployee.id === "martin" && martinPlanningData.map((task) => (
-                  <Card key={task.id} className={`border-l-4 ${getStatusColor(task.status)}`}>
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1 space-y-2">
-                          <div className="flex items-center gap-4">
-                            <div className="text-lg font-bold text-karrosserie-orange">
-                              {task.plate}
-                            </div>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <Clock className="w-4 h-4" />
-                              {task.time} • {task.duration}
-                            </div>
-                            {getStatusBadge(task.status)}
-                          </div>
-                          
-                          <div className="space-y-1">
-                            <div className="font-medium">{task.task}</div>
-                            <div className="text-sm text-muted-foreground">{task.description}</div>
-                            <div className="text-sm text-muted-foreground flex items-center gap-1">
-                              <User className="w-3 h-3" />
-                              Client: {task.client}
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <Button size="sm" variant="outline">
-                            <Eye className="w-3 h-3 mr-1" />
-                            Détails
-                          </Button>
-                          {getActionButton(task.status, task.id)}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-
-                {selectedEmployee.id === "sophie" && sophiePlanningData.map((task) => (
-                  <Card key={task.id} className={`border-l-4 ${getStatusColor(task.status)}`}>
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1 space-y-2">
-                          <div className="flex items-center gap-4">
-                            <div className="text-lg font-bold text-karrosserie-orange">
-                              {task.plate}
-                            </div>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <Clock className="w-4 h-4" />
-                              {task.time} • {task.duration}
-                            </div>
-                            {getStatusBadge(task.status)}
-                          </div>
-                          
-                          <div className="space-y-1">
-                            <div className="font-medium">{task.task}</div>
-                            <div className="text-sm text-muted-foreground">{task.description}</div>
-                            <div className="text-sm text-muted-foreground flex items-center gap-1">
-                              <User className="w-3 h-3" />
-                              Client: {task.client}
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <Button size="sm" variant="outline">
-                            <Eye className="w-3 h-3 mr-1" />
-                            Détails
-                          </Button>
-                          {getActionButton(task.status, task.id)}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-
-              {/* Notifications Section */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-karrosserie-orange" />
-                    Notifications (2)
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
-                    <div className="flex-1">
-                      <div className="font-medium">Tâche planifiée pour demain</div>
-                      <div className="text-sm text-muted-foreground">
-                        Accueil & Préparation du dossier pour le véhicule PQ-012-UV à 9h
-                      </div>
-                    </div>
-                    <Button size="sm" variant="outline" className="text-karrosserie-orange border-karrosserie-orange">
-                      Marquer comme lu
-                    </Button>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
-                    <div className="flex-1">
-                      <div className="font-medium">Tâche terminée avec succès</div>
-                      <div className="text-sm text-muted-foreground">
-                        Débosselage terminé pour le véhicule ST-345-UV hier à 16h30
-                      </div>
-                    </div>
-                    <Button size="sm" variant="outline" className="text-karrosserie-orange border-karrosserie-orange">
-                      Marquer comme lu
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {activeView === "manager" && (
-            <>
-            <TabsContent value="workshop" className="space-y-6">
+          <TabsContent value="workshop" className="space-y-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <StatsCard 
@@ -1837,97 +1470,63 @@ const Planning = () => {
 
               {/* REMPLACEMENT OU DÉBOSSELAGE */}
               {activeProcessStep === "remplacement" && (
-                <div className="space-y-6">
-                  <Card className="border-l-4 border-l-karrosserie-orange">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div className="lg:col-span-2">
+                    <Card className="border-l-4 border-l-green-500">
                       <CardHeader>
                         <CardTitle className="text-lg">REMPLACEMENT OU DÉBOSSELAGE</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="space-y-3">
-                        <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                          <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                             <div>
                               <div className="font-medium">Petit impact (grêle, parking)</div>
                               <div className="text-sm text-muted-foreground">Impact débosselage sans peinture</div>
                             </div>
-                            <Badge variant="secondary" className="bg-orange-100 text-karrosserie-orange">30 min - 1h</Badge>
+                            <Badge variant="secondary" className="bg-green-100 text-green-800">30 min - 1h</Badge>
                           </div>
                           
-                        <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                          <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                             <div>
                               <div className="font-medium">Bosse moyenne</div>
                               <div className="text-sm text-muted-foreground">Débosselage traditionnel ou à la ventouse</div>
                             </div>
-                            <Badge variant="secondary" className="bg-orange-100 text-karrosserie-orange">1-3 heures</Badge>
+                            <Badge variant="secondary" className="bg-green-100 text-green-800">1-3 heures</Badge>
                           </div>
                           
-                          <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                          <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                             <div>
                               <div className="font-medium">Grosse déformation</div>
                               <div className="text-sm text-muted-foreground">Marteaux, planage, multiples passes</div>
                             </div>
-                            <Badge variant="secondary" className="bg-orange-100 text-karrosserie-orange">3-6 heures</Badge>
+                            <Badge variant="secondary" className="bg-green-100 text-green-800">3-6 heures</Badge>
                           </div>
                           
-                          <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                          <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                             <div>
                               <div className="font-medium">Pare-chocs avant/arrière</div>
                               <div className="text-sm text-muted-foreground">Démontage, préparation, montage</div>
                             </div>
-                            <Badge variant="secondary" className="bg-orange-100 text-karrosserie-orange">2-4 heures</Badge>
+                            <Badge variant="secondary" className="bg-green-100 text-green-800">2-4 heures</Badge>
                           </div>
                           
-                          <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                          <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                             <div>
                               <div className="font-medium">Aile avant</div>
                               <div className="text-sm text-muted-foreground">Soudure nécessaire</div>
                             </div>
-                            <Badge variant="secondary" className="bg-orange-100 text-karrosserie-orange">3-5 heures</Badge>
+                            <Badge variant="secondary" className="bg-green-100 text-green-800">3-5 heures</Badge>
                           </div>
                         </div>
                       </CardContent>
                     </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-base">
-                          <AlertTriangle className="w-4 h-4" />
-                          Facteurs d'allongement des délais
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <div className="font-medium text-orange-600">Attente pièces</div>
-                            <div className="text-2xl font-bold text-orange-600">+2-15 jours</div>
-                            <div className="text-xs text-muted-foreground">Véhicules salon constructeur/modèle</div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <div className="font-medium text-orange-600">Expertise assurance</div>
-                            <div className="text-2xl font-bold text-orange-600">+1-5 jours</div>
-                            <div className="text-xs text-muted-foreground">Rendez-vous expert</div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <div className="font-medium text-orange-600">Pièces sur commande</div>
-                            <div className="text-2xl font-bold text-orange-600">+3-30 jours</div>
-                            <div className="text-xs text-muted-foreground">Véhicules anciens/rares</div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <div className="font-medium text-orange-600">Problèmes découverts</div>
-                            <div className="text-2xl font-bold text-orange-600">+20-100%</div>
-                            <div className="text-xs text-muted-foreground">Dégâts cachés révélés</div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
+                  </div>
+                  <div className="space-y-6">
                     <Card>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base">
                           <BarChart className="w-4 h-4" />
-                          Récapitulatif par type de sinistre
+                          Récapitulatif par Type de Sinistre
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
@@ -1990,6 +1589,43 @@ const Planning = () => {
                         </div>
                       </CardContent>
                     </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base">
+                          <AlertTriangle className="w-4 h-4" />
+                          Facteurs d'Allongement des Délais
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <div className="font-medium text-orange-600">Attente pièces</div>
+                            <div className="text-2xl font-bold text-orange-600">+2-15 jours</div>
+                            <div className="text-xs text-muted-foreground">Véhicules salon constructeur/modèle</div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <div className="font-medium text-orange-600">Expertise assurance</div>
+                            <div className="text-2xl font-bold text-orange-600">+1-5 jours</div>
+                            <div className="text-xs text-muted-foreground">Rendez-vous expert</div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <div className="font-medium text-orange-600">Pièces sur commande</div>
+                            <div className="text-2xl font-bold text-orange-600">+3-30 jours</div>
+                            <div className="text-xs text-muted-foreground">Véhicules anciens/rares</div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <div className="font-medium text-orange-600">Problèmes découverts</div>
+                            <div className="text-2xl font-bold text-orange-600">+20-100%</div>
+                            <div className="text-xs text-muted-foreground">Dégâts cachés révélés</div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
               )}
 
@@ -2598,8 +2234,6 @@ const Planning = () => {
               )}
             </div>
           </TabsContent>
-          </>
-          )}
         </Tabs>
 
         {/* Modal des véhicules en attente */}

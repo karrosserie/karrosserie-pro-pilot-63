@@ -14,7 +14,6 @@ import Cessions from "@/pages/Cessions";
 import Help from "@/pages/Help";
 import Planning from "@/pages/Planning";
 
-
 export const coreRoutes = [
   {
     path: "/",
