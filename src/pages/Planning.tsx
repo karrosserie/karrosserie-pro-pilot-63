@@ -377,11 +377,6 @@ const Planning = () => {
           </TabsContent>
 
           <TabsContent value="planning" className="space-y-6">
-            {/* Header */}
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold">Planning Détaillé</h2>
-              <p className="text-muted-foreground">Toutes les tâches par véhicule et jour par jour</p>
-            </div>
 
             {/* Planning Grid */}
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
