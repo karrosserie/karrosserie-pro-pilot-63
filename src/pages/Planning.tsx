@@ -1606,32 +1606,32 @@ const Planning = () => {
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base">
                           <AlertTriangle className="w-4 h-4" />
-                          Facteurs d'allongement des délais
+                          Facteurs d'Allongement des Délais
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <div className="font-medium text-orange-600">Attente pièces</div>
-                            <div className="text-2xl font-bold text-orange-600">+2-15 jours</div>
-                            <div className="text-xs text-muted-foreground">Véhicules salon constructeur/modèle</div>
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Attente pièces</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+2-15 jours</div>
+                            <div className="text-xs text-muted-foreground">Variable selon constructeur/modèle</div>
                           </div>
                           
-                          <div className="space-y-2">
-                            <div className="font-medium text-orange-600">Expertise assurance</div>
-                            <div className="text-2xl font-bold text-orange-600">+1-5 jours</div>
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Expertise assurance</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+1-5 jours</div>
                             <div className="text-xs text-muted-foreground">Rendez-vous expert</div>
                           </div>
                           
-                          <div className="space-y-2">
-                            <div className="font-medium text-orange-600">Pièces sur commande</div>
-                            <div className="text-2xl font-bold text-orange-600">+3-30 jours</div>
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Pièces sur commande</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+3-30 jours</div>
                             <div className="text-xs text-muted-foreground">Véhicules anciens/rares</div>
                           </div>
                           
-                          <div className="space-y-2">
-                            <div className="font-medium text-orange-600">Problèmes découverts</div>
-                            <div className="text-2xl font-bold text-orange-600">+20-100%</div>
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Problèmes découverts</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+20-100%</div>
                             <div className="text-xs text-muted-foreground">Dégâts cachés révélés</div>
                           </div>
                         </div>
@@ -1747,41 +1747,41 @@ const Planning = () => {
                     </CardContent>
                   </Card>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <AlertTriangle className="w-4 h-4" />
-                        Facteurs d'Allongement des Délais
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Attente pièces</div>
-                          <div className="text-2xl font-bold text-orange-600">+2-15 jours</div>
-                          <div className="text-xs text-muted-foreground">Véhicules salon constructeur/modèle</div>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base">
+                          <AlertTriangle className="w-4 h-4" />
+                          Facteurs d'Allongement des Délais
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Attente pièces</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+2-15 jours</div>
+                            <div className="text-xs text-muted-foreground">Variable selon constructeur/modèle</div>
+                          </div>
+                          
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Expertise assurance</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+1-5 jours</div>
+                            <div className="text-xs text-muted-foreground">Rendez-vous expert</div>
+                          </div>
+                          
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Pièces sur commande</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+3-30 jours</div>
+                            <div className="text-xs text-muted-foreground">Véhicules anciens/rares</div>
+                          </div>
+                          
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Problèmes découverts</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+20-100%</div>
+                            <div className="text-xs text-muted-foreground">Dégâts cachés révélés</div>
+                          </div>
                         </div>
-                        
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Expertise assurance</div>
-                          <div className="text-2xl font-bold text-orange-600">+1-5 jours</div>
-                          <div className="text-xs text-muted-foreground">Rendez-vous expert</div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Pièces sur commande</div>
-                          <div className="text-2xl font-bold text-orange-600">+3-30 jours</div>
-                          <div className="text-xs text-muted-foreground">Véhicules anciens/rares</div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Problèmes découverts</div>
-                          <div className="text-2xl font-bold text-orange-600">+20-100%</div>
-                          <div className="text-xs text-muted-foreground">Dégâts cachés révélés</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
                 </div>
               )}
 
@@ -1883,41 +1883,41 @@ const Planning = () => {
                     </CardContent>
                   </Card>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <AlertTriangle className="w-4 h-4" />
-                        Facteurs d'Allongement des Délais
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Attente pièces</div>
-                          <div className="text-2xl font-bold text-orange-600">+2-15 jours</div>
-                          <div className="text-xs text-muted-foreground">Véhicules salon constructeur/modèle</div>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base">
+                          <AlertTriangle className="w-4 h-4" />
+                          Facteurs d'Allongement des Délais
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Attente pièces</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+2-15 jours</div>
+                            <div className="text-xs text-muted-foreground">Variable selon constructeur/modèle</div>
+                          </div>
+                          
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Expertise assurance</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+1-5 jours</div>
+                            <div className="text-xs text-muted-foreground">Rendez-vous expert</div>
+                          </div>
+                          
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Pièces sur commande</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+3-30 jours</div>
+                            <div className="text-xs text-muted-foreground">Véhicules anciens/rares</div>
+                          </div>
+                          
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Problèmes découverts</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+20-100%</div>
+                            <div className="text-xs text-muted-foreground">Dégâts cachés révélés</div>
+                          </div>
                         </div>
-                        
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Expertise assurance</div>
-                          <div className="text-2xl font-bold text-orange-600">+1-5 jours</div>
-                          <div className="text-xs text-muted-foreground">Rendez-vous expert</div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Pièces sur commande</div>
-                          <div className="text-2xl font-bold text-orange-600">+3-30 jours</div>
-                          <div className="text-xs text-muted-foreground">Véhicules anciens/rares</div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Problèmes découverts</div>
-                          <div className="text-2xl font-bold text-orange-600">+20-100%</div>
-                          <div className="text-xs text-muted-foreground">Dégâts cachés révélés</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
                 </div>
               )}
 
@@ -2027,41 +2027,41 @@ const Planning = () => {
                     </CardContent>
                   </Card>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <AlertTriangle className="w-4 h-4" />
-                        Facteurs d'Allongement des Délais
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Attente pièces</div>
-                          <div className="text-2xl font-bold text-orange-600">+2-15 jours</div>
-                          <div className="text-xs text-muted-foreground">Véhicules salon constructeur/modèle</div>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base">
+                          <AlertTriangle className="w-4 h-4" />
+                          Facteurs d'Allongement des Délais
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Attente pièces</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+2-15 jours</div>
+                            <div className="text-xs text-muted-foreground">Variable selon constructeur/modèle</div>
+                          </div>
+                          
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Expertise assurance</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+1-5 jours</div>
+                            <div className="text-xs text-muted-foreground">Rendez-vous expert</div>
+                          </div>
+                          
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Pièces sur commande</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+3-30 jours</div>
+                            <div className="text-xs text-muted-foreground">Véhicules anciens/rares</div>
+                          </div>
+                          
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Problèmes découverts</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+20-100%</div>
+                            <div className="text-xs text-muted-foreground">Dégâts cachés révélés</div>
+                          </div>
                         </div>
-                        
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Expertise assurance</div>
-                          <div className="text-2xl font-bold text-orange-600">+1-5 jours</div>
-                          <div className="text-xs text-muted-foreground">Rendez-vous expert</div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Pièces sur commande</div>
-                          <div className="text-2xl font-bold text-orange-600">+3-30 jours</div>
-                          <div className="text-xs text-muted-foreground">Véhicules anciens/rares</div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Problèmes découverts</div>
-                          <div className="text-2xl font-bold text-orange-600">+20-100%</div>
-                          <div className="text-xs text-muted-foreground">Dégâts cachés révélés</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
                 </div>
               )}
 
@@ -2155,41 +2155,41 @@ const Planning = () => {
                     </CardContent>
                   </Card>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <AlertTriangle className="w-4 h-4" />
-                        Facteurs d'Allongement des Délais
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Attente pièces</div>
-                          <div className="text-2xl font-bold text-orange-600">+2-15 jours</div>
-                          <div className="text-xs text-muted-foreground">Véhicules salon constructeur/modèle</div>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base">
+                          <AlertTriangle className="w-4 h-4" />
+                          Facteurs d'Allongement des Délais
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Attente pièces</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+2-15 jours</div>
+                            <div className="text-xs text-muted-foreground">Variable selon constructeur/modèle</div>
+                          </div>
+                          
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Expertise assurance</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+1-5 jours</div>
+                            <div className="text-xs text-muted-foreground">Rendez-vous expert</div>
+                          </div>
+                          
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Pièces sur commande</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+3-30 jours</div>
+                            <div className="text-xs text-muted-foreground">Véhicules anciens/rares</div>
+                          </div>
+                          
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Problèmes découverts</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+20-100%</div>
+                            <div className="text-xs text-muted-foreground">Dégâts cachés révélés</div>
+                          </div>
                         </div>
-                        
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Expertise assurance</div>
-                          <div className="text-2xl font-bold text-orange-600">+1-5 jours</div>
-                          <div className="text-xs text-muted-foreground">Rendez-vous expert</div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Pièces sur commande</div>
-                          <div className="text-2xl font-bold text-orange-600">+3-30 jours</div>
-                          <div className="text-xs text-muted-foreground">Véhicules anciens/rares</div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Problèmes découverts</div>
-                          <div className="text-2xl font-bold text-orange-600">+20-100%</div>
-                          <div className="text-xs text-muted-foreground">Dégâts cachés révélés</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
                 </div>
               )}
 
@@ -2283,41 +2283,41 @@ const Planning = () => {
                     </CardContent>
                   </Card>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <AlertTriangle className="w-4 h-4" />
-                        Facteurs d'Allongement des Délais
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Attente pièces</div>
-                          <div className="text-2xl font-bold text-orange-600">+2-15 jours</div>
-                          <div className="text-xs text-muted-foreground">Véhicules salon constructeur/modèle</div>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base">
+                          <AlertTriangle className="w-4 h-4" />
+                          Facteurs d'Allongement des Délais
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Attente pièces</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+2-15 jours</div>
+                            <div className="text-xs text-muted-foreground">Variable selon constructeur/modèle</div>
+                          </div>
+                          
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Expertise assurance</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+1-5 jours</div>
+                            <div className="text-xs text-muted-foreground">Rendez-vous expert</div>
+                          </div>
+                          
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Pièces sur commande</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+3-30 jours</div>
+                            <div className="text-xs text-muted-foreground">Véhicules anciens/rares</div>
+                          </div>
+                          
+                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="font-medium text-gray-800 mb-2">Problèmes découverts</div>
+                            <div className="text-2xl font-bold text-karrosserie-orange mb-1">+20-100%</div>
+                            <div className="text-xs text-muted-foreground">Dégâts cachés révélés</div>
+                          </div>
                         </div>
-                        
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Expertise assurance</div>
-                          <div className="text-2xl font-bold text-orange-600">+1-5 jours</div>
-                          <div className="text-xs text-muted-foreground">Rendez-vous expert</div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Pièces sur commande</div>
-                          <div className="text-2xl font-bold text-orange-600">+3-30 jours</div>
-                          <div className="text-xs text-muted-foreground">Véhicules anciens/rares</div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="font-medium text-orange-600">Problèmes découverts</div>
-                          <div className="text-2xl font-bold text-orange-600">+20-100%</div>
-                          <div className="text-xs text-muted-foreground">Dégâts cachés révélés</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
                 </div>
               )}
             </div>
