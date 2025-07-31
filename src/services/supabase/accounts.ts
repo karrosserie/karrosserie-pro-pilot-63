@@ -68,6 +68,9 @@ export const accountsService = {
 
     // Récupérer les données bridge pour tous les comptes de cette company
     const accountIds = accounts?.map(account => account.id) || [];
+    console.log('=== FETCHING BRIDGE DATA ===');
+    console.log('Account IDs to search:', accountIds);
+    
     const { data: bridgeData, error: bridgeError } = await supabase
       .from('bridge')
       .select('*')
