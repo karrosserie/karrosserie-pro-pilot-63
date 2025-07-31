@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Pencil, Trash, CreditCard, Building, Wallet, RefreshCw, Link } from 'lucide-react';
+import { Pencil, Trash, CreditCard, Building, Wallet, Link } from 'lucide-react';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { useCompanyId } from '@/hooks/use-company-id';
@@ -108,6 +108,19 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
     console.log('Updated > Created:', updatedAt > createdAt);
     
     return updatedAt > createdAt;
+  };
+
+  const formatLastSync = (account: Account) => {
+    if (!account.bridge || !isAccountConnected(account)) return null;
+    
+    const updatedAt = new Date(account.bridge.updated_at);
+    return updatedAt.toLocaleString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   const handleBankConnection = async () => {
@@ -267,56 +280,60 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
               </TableRow>
               <TableRow className="border-t-0">
                 <TableCell colSpan={6} className="py-3 border-t-0">
-                  <div className="flex flex-wrap gap-2 justify-end px-4">
-                    {isAccountConnected(account) ? (
+                  <div className="flex flex-wrap gap-2 justify-between items-center px-4">
+                    {/* Zone d'information de synchronisation */}
+                    <div className="flex items-center">
+                      {isAccountConnected(account) && formatLastSync(account) && (
+                        <span className="text-sm text-gray-600">
+                          Dernière synchronisation : {formatLastSync(account)}
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* Zone des boutons d'action */}
+                    <div className="flex flex-wrap gap-2">
+                      {isAccountConnected(account) ? (
+                        <Button 
+                          variant="outline"
+                          size="sm"
+                          className="border-green-500 text-green-600 hover:bg-green-50"
+                          disabled
+                        >
+                          <Link className="h-4 w-4 mr-1" />
+                          Connecté
+                        </Button>
+                      ) : (
+                        <Button 
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            console.log('Bouton Connecter cliqué pour:', account);
+                            setSelectedAccount(account);
+                            setShowBankConnectDialog(true);
+                          }}
+                        >
+                          <Link className="h-4 w-4 mr-1" />
+                          Connecter
+                        </Button>
+                      )}
                       <Button 
                         variant="outline"
-                        size="sm"
-                        className="border-green-500 text-green-600 hover:bg-green-50"
-                        disabled
+                        size="sm" 
+                        onClick={() => onEdit(account)}
                       >
-                        <Link className="h-4 w-4 mr-1" />
-                        Connecté
+                        <Pencil className="h-4 w-4 mr-1" />
+                        Modifier
                       </Button>
-                    ) : (
                       <Button 
                         variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          console.log('Bouton Connecter cliqué pour:', account);
-                          setSelectedAccount(account);
-                          setShowBankConnectDialog(true);
-                        }}
+                        size="sm" 
+                        className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                        onClick={() => onDelete(account)}
                       >
-                        <Link className="h-4 w-4 mr-1" />
-                        Connecter
+                        <Trash className="h-4 w-4 mr-1" />
+                        Supprimer
                       </Button>
-                    )}
-                    <Button 
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onSync(account)}
-                    >
-                      <RefreshCw className="h-4 w-4 mr-1" />
-                      Synchroniser
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      size="sm" 
-                      onClick={() => onEdit(account)}
-                    >
-                      <Pencil className="h-4 w-4 mr-1" />
-                      Modifier
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      size="sm" 
-                      className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                      onClick={() => onDelete(account)}
-                    >
-                      <Trash className="h-4 w-4 mr-1" />
-                      Supprimer
-                    </Button>
+                    </div>
                   </div>
                 </TableCell>
               </TableRow>
