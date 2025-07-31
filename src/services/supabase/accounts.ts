@@ -7,12 +7,9 @@ import { getCurrentUserCompanyId } from './auth-company';
 type BankAccountRow = Database['public']['Tables']['bank_accounts']['Row'];
 type BankAccountInsert = Database['public']['Tables']['bank_accounts']['Insert'];
 type BankAccountUpdate = Database['public']['Tables']['bank_accounts']['Update'];
-type BridgeRow = Database['public']['Tables']['bridge']['Row'];
 
 // Types for compatibility with existing components
-export interface Account extends BankAccountRow {
-  bridge?: BridgeRow | null;
-}
+export interface Account extends BankAccountRow {}
 
 export interface NewAccount {
   name: string;
@@ -35,9 +32,9 @@ export interface UpdateAccount {
 }
 
 export const accountsService = {
-  // Get all accounts for the current user with bridge data
+  // Get all accounts for the current user
   async getAll(): Promise<Account[]> {
-    console.log('Fetching bank accounts with bridge data from Supabase...');
+    console.log('Fetching bank accounts from Supabase...');
     
     const { data: session } = await supabase.auth.getSession();
     if (!session?.session?.user) {
@@ -48,10 +45,7 @@ export const accountsService = {
     
     const { data, error } = await supabase
       .from('bank_accounts')
-      .select(`
-        *,
-        bridge:bridge!account_id(*)
-      `)
+      .select('*')
       .eq('company_id', companyId)
       .order('created_at', { ascending: false });
 
@@ -60,14 +54,8 @@ export const accountsService = {
       throw error;
     }
 
-    // Transform the data to handle the bridge relationship properly
-    const transformedData = data?.map(account => ({
-      ...account,
-      bridge: account.bridge && account.bridge.length > 0 ? account.bridge[0] : null
-    })) || [];
-
-    console.log('Successfully fetched accounts with bridge data from Supabase:', transformedData);
-    return transformedData;
+    console.log('Successfully fetched accounts from Supabase:', data);
+    return data || [];
   },
 
   // Get a single account by ID
