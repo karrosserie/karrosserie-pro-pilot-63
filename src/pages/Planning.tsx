@@ -107,7 +107,7 @@ const Planning = () => {
     {
       title: "Accueil & Préparation du dossier",
       count: 2,
-      color: "border-l-blue-500",
+      color: "border-l-karrosserie-orange",
       vehicles: [
         {
           brand: "Citroën C4",
@@ -365,7 +365,7 @@ const Planning = () => {
                             
                             <div className="flex items-center justify-between">
                               {vehicle.inProgress ? (
-                                <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+                                <Badge className="bg-orange-100 text-karrosserie-orange hover:bg-orange-100">
                                   En cours
                                 </Badge>
                               ) : (
@@ -963,7 +963,7 @@ const Planning = () => {
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-2">
-                          <Badge className="bg-blue-100 text-blue-800">En cours</Badge>
+                          <Badge className="bg-orange-100 text-karrosserie-orange">En cours</Badge>
                           <Button size="sm" className="bg-orange-600 hover:bg-orange-700 text-white">
                             <CheckCircle className="w-3 h-3 mr-1" />
                             Terminer
@@ -1262,7 +1262,7 @@ const Planning = () => {
               {/* Navigation des étapes */}
               <div className="flex flex-wrap gap-2 mb-6">
                 <Button
-                  variant={activeProcessStep === "accueil" ? "default" : "outline"}
+                  variant={activeProcessStep === "accueil" ? "validation" : "outline"}
                   onClick={() => setActiveProcessStep("accueil")}
                   size="sm"
                   className="text-xs"
@@ -1270,7 +1270,7 @@ const Planning = () => {
                   ACCUEIL & PRÉPARATION DU DOSSIER
                 </Button>
                 <Button
-                  variant={activeProcessStep === "remplacement" ? "default" : "outline"}
+                  variant={activeProcessStep === "remplacement" ? "validation" : "outline"}
                   onClick={() => setActiveProcessStep("remplacement")}
                   size="sm"
                   className="text-xs"
@@ -1278,7 +1278,7 @@ const Planning = () => {
                   REMPLACEMENT OU DÉBOSSELAGE
                 </Button>
                 <Button
-                  variant={activeProcessStep === "preparation" ? "default" : "outline"}
+                  variant={activeProcessStep === "preparation" ? "validation" : "outline"}
                   onClick={() => setActiveProcessStep("preparation")}
                   size="sm"
                   className="text-xs"
@@ -1286,7 +1286,7 @@ const Planning = () => {
                   PRÉPARATION PEINTURE
                 </Button>
                 <Button
-                  variant={activeProcessStep === "peinture" ? "default" : "outline"}
+                  variant={activeProcessStep === "peinture" ? "validation" : "outline"}
                   onClick={() => setActiveProcessStep("peinture")}
                   size="sm"
                   className="text-xs"
@@ -1294,7 +1294,7 @@ const Planning = () => {
                   MISE EN PEINTURE
                 </Button>
                 <Button
-                  variant={activeProcessStep === "finitions" ? "default" : "outline"}
+                  variant={activeProcessStep === "finitions" ? "validation" : "outline"}
                   onClick={() => setActiveProcessStep("finitions")}
                   size="sm"
                   className="text-xs"
@@ -1302,7 +1302,7 @@ const Planning = () => {
                   FINITIONS & REMONTAGE
                 </Button>
                 <Button
-                  variant={activeProcessStep === "cloture" ? "default" : "outline"}
+                  variant={activeProcessStep === "cloture" ? "validation" : "outline"}
                   onClick={() => setActiveProcessStep("cloture")}
                   size="sm"
                   className="text-xs"
@@ -1314,55 +1314,53 @@ const Planning = () => {
               {/* ACCUEIL & PRÉPARATION */}
               {activeProcessStep === "accueil" && (
                 <div className="space-y-6">
-                  <div className="lg:col-span-2">
-                    <Card className="border-l-4 border-l-blue-500">
-                      <CardHeader>
-                        <CardTitle className="text-lg">ACCUEIL & PRÉPARATION DU DOSSIER</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                            <div>
-                              <div className="font-medium">Sinistre simple (rayure, petite bosse)</div>
-                              <div className="text-sm text-muted-foreground">Devis rapide, photos basiques</div>
-                            </div>
-                            <Badge variant="secondary" className="bg-blue-100 text-blue-800">30-45 min</Badge>
+                  <Card className="border-l-4 border-l-karrosserie-orange">
+                    <CardHeader>
+                      <CardTitle className="text-lg">ACCUEIL & PRÉPARATION DU DOSSIER</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                          <div>
+                            <div className="font-medium">Sinistre simple (rayure, petite bosse)</div>
+                            <div className="text-sm text-muted-foreground">Devis rapide, photos basiques</div>
                           </div>
-                          
-                          <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                            <div>
-                              <div className="font-medium">Sinistre moyen (plusieurs éléments)</div>
-                              <div className="text-sm text-muted-foreground">Devis détaillé, multiples photos, recherche pièces</div>
-                            </div>
-                            <Badge variant="secondary" className="bg-blue-100 text-blue-800">45-75 min</Badge>
-                          </div>
-                          
-                          <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                            <div>
-                              <div className="font-medium">Gros sinistre (structure touchée)</div>
-                              <div className="text-sm text-muted-foreground">Expertise approfondie, mesures, diagnostique expert</div>
-                            </div>
-                            <Badge variant="secondary" className="bg-blue-100 text-blue-800">1-2 heures</Badge>
-                          </div>
-                          
-                          <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                            <div>
-                              <div className="font-medium">Véhicule de luxe/collection</div>
-                              <div className="text-sm text-muted-foreground">Documentation spéciale, photos détaillées, recherche pièces spécifiques</div>
-                            </div>
-                            <Badge variant="secondary" className="bg-blue-100 text-blue-800">1-3 heures</Badge>
-                          </div>
+                          <Badge variant="secondary" className="bg-orange-100 text-karrosserie-orange">30-45 min</Badge>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                        
+                        <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                          <div>
+                            <div className="font-medium">Sinistre moyen (plusieurs éléments)</div>
+                            <div className="text-sm text-muted-foreground">Devis détaillé, multiples photos, recherche pièces</div>
+                          </div>
+                          <Badge variant="secondary" className="bg-orange-100 text-karrosserie-orange">45-75 min</Badge>
+                        </div>
+                        
+                        <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                          <div>
+                            <div className="font-medium">Gros sinistre (structure touchée)</div>
+                            <div className="text-sm text-muted-foreground">Expertise approfondie, mesures, diagnostique expert</div>
+                          </div>
+                          <Badge variant="secondary" className="bg-orange-100 text-karrosserie-orange">1-2 heures</Badge>
+                        </div>
+                        
+                        <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                          <div>
+                            <div className="font-medium">Véhicule de luxe/collection</div>
+                            <div className="text-sm text-muted-foreground">Documentation spéciale, photos détaillées, recherche pièces spécifiques</div>
+                          </div>
+                          <Badge variant="secondary" className="bg-orange-100 text-karrosserie-orange">1-3 heures</Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                   {/* Section récapitulatif commune */}
                   <div className="space-y-6">
                     <Card>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base">
                           <BarChart className="w-4 h-4" />
-                          Récapitulatif par Type de Sinistre
+                          Récapitulatif par type de sinistre
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
@@ -1378,7 +1376,7 @@ const Planning = () => {
                           <div className="flex justify-between items-center py-2 border-b">
                             <span className="font-medium">Micro rayure/retouche</span>
                             <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">2-4 heures</span>
+                              <span className="text-karrosserie-orange font-medium">2-4 heures</span>
                               <span className="text-muted-foreground">1 jour</span>
                             </div>
                           </div>
@@ -1386,7 +1384,7 @@ const Planning = () => {
                           <div className="flex justify-between items-center py-2 border-b">
                             <span className="font-medium">Sinistre léger (pare-chocs, rayures)</span>
                             <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">6-12 heures</span>
+                              <span className="text-karrosserie-orange font-medium">6-12 heures</span>
                               <span className="text-muted-foreground">1-2 jours</span>
                             </div>
                           </div>
@@ -1394,7 +1392,7 @@ const Planning = () => {
                           <div className="flex justify-between items-center py-2 border-b">
                             <span className="font-medium">Sinistre moyen (1-2 éléments)</span>
                             <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">12-20 heures</span>
+                              <span className="text-karrosserie-orange font-medium">12-20 heures</span>
                               <span className="text-muted-foreground">2-3 jours</span>
                             </div>
                           </div>
@@ -1402,7 +1400,7 @@ const Planning = () => {
                           <div className="flex justify-between items-center py-2 border-b">
                             <span className="font-medium">Sinistre important (3+ éléments)</span>
                             <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">20-40 heures</span>
+                              <span className="text-karrosserie-orange font-medium">20-40 heures</span>
                               <span className="text-muted-foreground">3-7 jours</span>
                             </div>
                           </div>
@@ -1410,7 +1408,7 @@ const Planning = () => {
                           <div className="flex justify-between items-center py-2 border-b">
                             <span className="font-medium">Gros sinistre (structure touchée)</span>
                             <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">40-80 heures</span>
+                              <span className="text-karrosserie-orange font-medium">40-80 heures</span>
                               <span className="text-muted-foreground">1-3 semaines</span>
                             </div>
                           </div>
@@ -1418,7 +1416,7 @@ const Planning = () => {
                           <div className="flex justify-between items-center py-2">
                             <span className="font-medium">Sinistre majeur (reconstruction)</span>
                             <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">80-200 heures</span>
+                              <span className="text-karrosserie-orange font-medium">80-200 heures</span>
                               <span className="text-muted-foreground">3-8 semaines</span>
                             </div>
                           </div>
@@ -1430,7 +1428,7 @@ const Planning = () => {
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base">
                           <AlertTriangle className="w-4 h-4" />
-                          Facteurs d'Allongement des Délais
+                          Facteurs d'allongement des délais
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
@@ -1539,7 +1537,7 @@ const Planning = () => {
                           <div className="flex justify-between items-center py-2 border-b">
                             <span className="font-medium">Micro rayure/retouche</span>
                             <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">2-4 heures</span>
+                              <span className="text-karrosserie-orange font-medium">2-4 heures</span>
                               <span className="text-muted-foreground">1 jour</span>
                             </div>
                           </div>
@@ -1547,7 +1545,7 @@ const Planning = () => {
                           <div className="flex justify-between items-center py-2 border-b">
                             <span className="font-medium">Sinistre léger (pare-chocs, rayures)</span>
                             <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">6-12 heures</span>
+                              <span className="text-karrosserie-orange font-medium">6-12 heures</span>
                               <span className="text-muted-foreground">1-2 jours</span>
                             </div>
                           </div>
@@ -1555,7 +1553,7 @@ const Planning = () => {
                           <div className="flex justify-between items-center py-2 border-b">
                             <span className="font-medium">Sinistre moyen (1-2 éléments)</span>
                             <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">12-20 heures</span>
+                              <span className="text-karrosserie-orange font-medium">12-20 heures</span>
                               <span className="text-muted-foreground">2-3 jours</span>
                             </div>
                           </div>
@@ -1563,7 +1561,7 @@ const Planning = () => {
                           <div className="flex justify-between items-center py-2 border-b">
                             <span className="font-medium">Sinistre important (3+ éléments)</span>
                             <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">20-40 heures</span>
+                              <span className="text-karrosserie-orange font-medium">20-40 heures</span>
                               <span className="text-muted-foreground">3-7 jours</span>
                             </div>
                           </div>
@@ -1571,7 +1569,7 @@ const Planning = () => {
                           <div className="flex justify-between items-center py-2 border-b">
                             <span className="font-medium">Gros sinistre (structure touchée)</span>
                             <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">40-80 heures</span>
+                              <span className="text-karrosserie-orange font-medium">40-80 heures</span>
                               <span className="text-muted-foreground">1-3 semaines</span>
                             </div>
                           </div>
@@ -1579,7 +1577,7 @@ const Planning = () => {
                           <div className="flex justify-between items-center py-2">
                             <span className="font-medium">Sinistre majeur (reconstruction)</span>
                             <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">80-200 heures</span>
+                              <span className="text-karrosserie-orange font-medium">80-200 heures</span>
                               <span className="text-muted-foreground">3-8 semaines</span>
                             </div>
                           </div>
@@ -2324,7 +2322,7 @@ const Planning = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4 text-sm">
                   <span className="font-medium">Répartition des blocages :</span>
-                  <Badge variant="outline" className="bg-blue-50">Pièces: {blockageStats.pieces}</Badge>
+                  <Badge variant="outline" className="bg-orange-50">Pièces: {blockageStats.pieces}</Badge>
                   <Badge variant="outline" className="bg-orange-50">Expertise: {blockageStats.expertise}</Badge>
                   <Badge variant="outline" className="bg-green-50">Technicien: {blockageStats.technicien}</Badge>
                   <Badge variant="outline" className="bg-red-50">Problèmes: {blockageStats.problemes}</Badge>
@@ -2349,7 +2347,7 @@ const Planning = () => {
                 <DialogTitle className="text-xl font-semibold">
                   Détails du véhicule - {selectedVehicle?.plate}
                 </DialogTitle>
-                <Badge className="bg-blue-100 text-blue-800">En cours</Badge>
+                <Badge className="bg-orange-100 text-karrosserie-orange">En cours</Badge>
               </div>
             </DialogHeader>
             
@@ -2519,7 +2517,7 @@ const Planning = () => {
                             <span className="font-medium">680€</span>
                           </div>
                           <div className="flex justify-end">
-                            <Badge className="bg-blue-100 text-blue-800 text-xs">En cours</Badge>
+                            <Badge className="bg-orange-100 text-karrosserie-orange text-xs">En cours</Badge>
                           </div>
                         </div>
                         
