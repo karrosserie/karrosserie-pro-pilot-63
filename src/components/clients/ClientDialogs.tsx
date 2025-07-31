@@ -102,7 +102,9 @@ const ClientDialogs: React.FC<ClientDialogsProps> = ({
       <InvoiceDialog
         open={invoiceDialogOpen}
         onOpenChange={(open) => {
+          console.log('=== INVOICE DIALOG OPEN CHANGE ===');
           console.log('Invoice dialog open state changing to:', open);
+          console.log('Current invoiceDialogOpen value:', invoiceDialogOpen);
           setInvoiceDialogOpen(open);
           if (!open) {
             setSelectedClientForDocument(null);

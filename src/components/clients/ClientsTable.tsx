@@ -75,9 +75,17 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
               const handleCreateInvoice = (e: React.MouseEvent) => {
                 e.preventDefault();
                 e.stopPropagation();
+                console.log('=== CREATING INVOICE ===');
                 console.log('Creating invoice for client:', client);
                 console.log('onCreateInvoice function exists:', !!onCreateInvoice);
-                onCreateInvoice?.(client);
+                console.log('onCreateInvoice function type:', typeof onCreateInvoice);
+                if (onCreateInvoice) {
+                  console.log('Calling onCreateInvoice...');
+                  onCreateInvoice(client);
+                  console.log('onCreateInvoice called successfully');
+                } else {
+                  console.error('onCreateInvoice is not defined!');
+                }
               };
 
               const handleCreateCredit = (e: React.MouseEvent) => {

@@ -51,9 +51,13 @@ export const useClientActions = () => {
   };
 
   const handleCreateInvoice = (client: Client) => {
+    console.log('=== HANDLE CREATE INVOICE ===');
     console.log('Opening invoice dialog for client:', client);
+    console.log('Current invoiceDialogOpen state:', invoiceDialogOpen);
+    console.log('setInvoiceDialogOpen function:', typeof setInvoiceDialogOpen);
     setSelectedClientForDocument(client);
     setInvoiceDialogOpen(true);
+    console.log('Invoice dialog state should now be true');
   };
 
   const handleCreateCredit = (client: Client) => {
