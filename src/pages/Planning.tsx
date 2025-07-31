@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash } from "lucide-react";
+import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash, Play } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -302,9 +302,20 @@ const Planning = () => {
                       <div className="text-sm text-muted-foreground">Accord Préparation dossier</div>
                     </div>
                     <div className="flex flex-col gap-2">
-                      <Button variant="outline" size="sm">Détails</Button>
+                      <Button variant="outline" size="sm" onClick={() => {
+                        setSelectedVehicle({
+                          brand: "Citroën C4",
+                          plate: "EZ-787-KL",
+                          client: "M. Durand",
+                          technician: "Martin Dubois"
+                        });
+                        setShowVehicleDetailModal(true);
+                      }}>Détails</Button>
                       <div className="flex gap-2">
-                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">Commencer</Button>
+                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
+                          <Play className="w-4 h-4 mr-2" />
+                          Démarrer
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -327,9 +338,20 @@ const Planning = () => {
                       <div className="text-sm text-muted-foreground">Accord Préparation dossier</div>
                     </div>
                     <div className="flex flex-col gap-2">
-                      <Button variant="outline" size="sm">Détails</Button>
+                      <Button variant="outline" size="sm" onClick={() => {
+                        setSelectedVehicle({
+                          brand: "Mercedes Classe C",
+                          plate: "QR-345-ST",
+                          client: "Mme Leclerc",
+                          technician: null
+                        });
+                        setShowVehicleDetailModal(true);
+                      }}>Détails</Button>
                       <div className="flex gap-2">
-                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">Commencer</Button>
+                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
+                          <Play className="w-4 h-4 mr-2" />
+                          Démarrer
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -352,9 +374,20 @@ const Planning = () => {
                       <div className="text-sm text-muted-foreground">Accord Finitions</div>
                     </div>
                     <div className="flex flex-col gap-2">
-                      <Button variant="outline" size="sm">Détails</Button>
+                      <Button variant="outline" size="sm" onClick={() => {
+                        setSelectedVehicle({
+                          brand: "Audi A3",
+                          plate: "EZ-757-AL",
+                          client: "M. Durand",
+                          technician: "Martin Dubois"
+                        });
+                        setShowVehicleDetailModal(true);
+                      }}>Détails</Button>
                       <div className="flex gap-2">
-                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">Commencer</Button>
+                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
+                          <Play className="w-4 h-4 mr-2" />
+                          Démarrer
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -377,7 +410,15 @@ const Planning = () => {
                       <div className="text-sm text-muted-foreground">Accord dossier livraison</div>
                     </div>
                     <div className="flex flex-col gap-2">
-                      <Button variant="outline" size="sm">Détails</Button>
+                      <Button variant="outline" size="sm" onClick={() => {
+                        setSelectedVehicle({
+                          brand: "BMW X1",
+                          plate: "AB-783-KY",
+                          client: "M. Durand",
+                          technician: "Martin Dubois"
+                        });
+                        setShowVehicleDetailModal(true);
+                      }}>Détails</Button>
                       <div className="flex gap-2">
                         <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white">
                           <CheckCircle className="w-4 h-4 mr-2" />
@@ -405,9 +446,20 @@ const Planning = () => {
                       <div className="text-sm text-muted-foreground">Accord Remontage</div>
                     </div>
                     <div className="flex flex-col gap-2">
-                      <Button variant="outline" size="sm">Détails</Button>
+                      <Button variant="outline" size="sm" onClick={() => {
+                        setSelectedVehicle({
+                          brand: "Volkswagen Golf",
+                          plate: "SF-345-UV",
+                          client: "M. Durand",
+                          technician: "Martin Dubois"
+                        });
+                        setShowVehicleDetailModal(true);
+                      }}>Détails</Button>
                       <div className="flex gap-2">
-                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">Commencer</Button>
+                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
+                          <Play className="w-4 h-4 mr-2" />
+                          Démarrer
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -430,7 +482,15 @@ const Planning = () => {
                       <div className="text-sm text-muted-foreground">Accord dossier livraison</div>
                     </div>
                     <div className="flex flex-col gap-2">
-                      <Button variant="outline" size="sm">Détails</Button>
+                      <Button variant="outline" size="sm" onClick={() => {
+                        setSelectedVehicle({
+                          brand: "Ford Focus",
+                          plate: "EF-345-UV",
+                          client: "M. Durand",
+                          technician: "Martin Dubois"
+                        });
+                        setShowVehicleDetailModal(true);
+                      }}>Détails</Button>
                       <div className="flex gap-2">
                         <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white">
                           <CheckCircle className="w-4 h-4 mr-2" />
