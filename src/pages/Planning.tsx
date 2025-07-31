@@ -16,6 +16,10 @@ import { useCompanyId } from '@/hooks/use-company-id';
 
 const Planning = () => {
   const { companyId } = useCompanyId();
+  const { user } = useAuth();
+
+  console.log('Planning component - user:', user);
+  console.log('Planning component - companyId:', companyId);
   const [activeView, setActiveView] = useState("manager");
   const [activeProcessStep, setActiveProcessStep] = useState("accueil");
   const [showWaitingVehiclesModal, setShowWaitingVehiclesModal] = useState(false);
@@ -33,7 +37,12 @@ const Planning = () => {
   // Récupérer les membres de l'équipe
   useEffect(() => {
     const fetchTeamMembers = async () => {
-      if (!companyId) return;
+      if (!companyId) {
+        console.log('No companyId available');
+        return;
+      }
+      
+      console.log('Fetching team members for companyId:', companyId);
       
       try {
         const { data, error } = await supabase
@@ -52,7 +61,14 @@ const Planning = () => {
           .eq('company_id', companyId)
           .eq('active', true);
 
-        if (error) throw error;
+        console.log('Team members query result:', { data, error });
+
+        if (error) {
+          console.error('Error fetching team members:', error);
+          throw error;
+        }
+        
+        console.log('Team members data:', data);
         setTeamMembers(data || []);
       } catch (error) {
         console.error('Erreur lors du chargement des membres de l\'équipe:', error);
@@ -2875,19 +2891,38 @@ const Planning = () => {
               {/* Membre de l'équipe */}
               <div className="space-y-2">
                 <Label htmlFor="teamMember">Membre de l'équipe <span className="text-red-500">*</span></Label>
+                {/* Debug info temporaire */}
+                <div className="text-xs text-gray-500 mb-2">
+                  Debug: {teamMembers.length} membre(s) trouvé(s) | CompanyId: {companyId || 'Non défini'}
+                </div>
                 <Select 
                   value={employeeFormData.teamMemberId}
-                  onValueChange={(value) => setEmployeeFormData(prev => ({ ...prev, teamMemberId: value }))}
+                  onValueChange={(value) => {
+                    console.log('Selected team member:', value);
+                    setEmployeeFormData(prev => ({ ...prev, teamMemberId: value }));
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner un membre de l'équipe" />
                   </SelectTrigger>
                   <SelectContent className="bg-background border border-border shadow-md z-50">
-                    {teamMembers.map((member) => (
-                      <SelectItem key={member.id} value={member.id}>
-                        {member.profiles?.first_name} {member.profiles?.last_name} - {member.role}
-                      </SelectItem>
-                    ))}
+                    {(() => {
+                      console.log('Rendering team members options:', teamMembers);
+                      return teamMembers.length === 0 ? (
+                        <SelectItem value="no-members" disabled>
+                          Aucun membre d'équipe trouvé
+                        </SelectItem>
+                      ) : (
+                        teamMembers.map((member) => {
+                          console.log('Rendering member:', member);
+                          return (
+                            <SelectItem key={member.id} value={member.id}>
+                              {member.profiles?.first_name} {member.profiles?.last_name} - {member.role}
+                            </SelectItem>
+                          );
+                        })
+                      );
+                    })()}
                   </SelectContent>
                 </Select>
               </div>
