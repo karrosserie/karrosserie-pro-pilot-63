@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Pencil, Trash, CreditCard, Building, Wallet, Link } from 'lucide-react';
+import { Pencil, Trash, CreditCard, Building, Wallet, Link, RefreshCw } from 'lucide-react';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { useCompanyId } from '@/hooks/use-company-id';
@@ -328,7 +328,8 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                     
                     {/* Zone d'information de synchronisation */}
                     {isAccountConnected(account) && formatLastSync(account) && (
-                      <div className="text-sm text-gray-600 text-right">
+                      <div className="text-sm text-gray-600 text-right flex items-center justify-end gap-1">
+                        <RefreshCw className="h-4 w-4" />
                         Dernière synchronisation : {formatLastSync(account)}
                       </div>
                     )}
