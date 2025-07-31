@@ -24,15 +24,51 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Extract company_id from query parameters or request body
+    let companyId: string;
+    
+    if (req.method === 'GET') {
+      const url = new URL(req.url);
+      companyId = url.searchParams.get('company_id') || '';
+    } else if (req.method === 'POST') {
+      const body = await req.json();
+      companyId = body.company_id || '';
+    } else {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Method not allowed. Use GET or POST.',
+          details: 'Only GET and POST methods are supported'
+        }),
+        { 
+          status: 405, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    // Validate company_id parameter
+    if (!companyId) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Missing required parameter: company_id',
+          details: 'Please provide a valid company_id in query parameters (GET) or request body (POST)'
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
     // Create Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     
     const supabase = createClient<Database>(supabaseUrl, supabaseKey)
 
-    console.log('Fetching active repair orders...')
+    console.log(`Fetching active repair orders for company: ${companyId}`)
 
-    // Fetch repair orders with status "En cours" and join with related data
+    // Fetch repair orders with status "En cours" and filter by company_id
     const { data: repairOrders, error } = await supabase
       .from('repair_orders')
       .select(`
@@ -60,6 +96,7 @@ Deno.serve(async (req) => {
         )
       `)
       .eq('status', 'En cours')
+      .eq('company_id', companyId)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -76,7 +113,7 @@ Deno.serve(async (req) => {
       )
     }
 
-    console.log(`Found ${repairOrders?.length || 0} active repair orders`)
+    console.log(`Found ${repairOrders?.length || 0} active repair orders for company ${companyId}`)
 
     // Transform the data to have a cleaner structure
     const enrichedOrders = repairOrders?.map(order => ({
@@ -94,6 +131,7 @@ Deno.serve(async (req) => {
       signature_date: order.signature_date,
       created_at: order.created_at,
       updated_at: order.updated_at,
+      company_id: order.company_id,
       
       // Additional repair order fields
       report_number: order.report_number,
@@ -154,7 +192,8 @@ Deno.serve(async (req) => {
       JSON.stringify({ 
         success: true,
         data: enrichedOrders,
-        count: enrichedOrders.length
+        count: enrichedOrders.length,
+        company_id: companyId
       }),
       { 
         status: 200, 
