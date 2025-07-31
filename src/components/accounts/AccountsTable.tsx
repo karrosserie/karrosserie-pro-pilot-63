@@ -92,9 +92,21 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
   };
 
   const isAccountConnected = (account: Account) => {
-    if (!account.bridge) return false;
+    console.log('=== CHECKING CONNECTION STATUS ===');
+    console.log('Account:', account.name);
+    console.log('Bridge data:', account.bridge);
+    
+    if (!account.bridge) {
+      console.log('No bridge data found');
+      return false;
+    }
+    
     const updatedAt = new Date(account.bridge.updated_at);
     const createdAt = new Date(account.bridge.created_at);
+    console.log('Created at:', createdAt);
+    console.log('Updated at:', updatedAt);
+    console.log('Updated > Created:', updatedAt > createdAt);
+    
     return updatedAt > createdAt;
   };
 

@@ -66,6 +66,10 @@ export const accountsService = {
       .eq('company_id', companyId)
       .order('created_at', { ascending: false });
 
+    console.log('=== RAW SUPABASE RESPONSE ===');
+    console.log('Data:', data);
+    console.log('Error:', error);
+
     if (error) {
       console.error('Supabase error:', error);
       throw error;
@@ -74,12 +78,23 @@ export const accountsService = {
     console.log('Successfully fetched accounts from Supabase:', data);
     
     // Transform data to handle bridge relationship properly
-    const transformedData = data?.map(account => ({
-      ...account,
-      bridge: Array.isArray(account.bridge) && account.bridge.length > 0 
+    const transformedData = data?.map(account => {
+      const bridgeData = Array.isArray(account.bridge) && account.bridge.length > 0 
         ? account.bridge[0] 
-        : null
-    })) || [];
+        : null;
+      
+      console.log(`=== TRANSFORMING ACCOUNT ${account.name} ===`);
+      console.log('Original bridge data:', account.bridge);
+      console.log('Transformed bridge data:', bridgeData);
+      
+      return {
+        ...account,
+        bridge: bridgeData
+      };
+    }) || [];
+    
+    console.log('=== FINAL TRANSFORMED DATA ===');
+    console.log(transformedData);
     
     return transformedData;
   },
