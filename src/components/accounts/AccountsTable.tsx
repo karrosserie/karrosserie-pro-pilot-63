@@ -87,34 +87,47 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
   };
 
   const handleBankConnection = async () => {
+    console.log('handleBankConnection appelée');
+    console.log('companyId:', companyId);
+    console.log('selectedAccount:', selectedAccount);
+    console.log('user email:', user?.email);
+
     if (!companyId || !selectedAccount || !user?.email) {
       toast.error('Informations manquantes pour la connexion bancaire');
       return;
     }
 
     try {
+      const payload = {
+        companyId: companyId,
+        accountId: selectedAccount.id,
+        email: user.email
+      };
+
+      console.log('Payload envoyé:', payload);
+
       const response = await fetch('https://n8n.karrosserie.pro/webhook/55668c4e-89f9-4987-91df-c1e05b12693d', {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          companyId: companyId,
-          accountId: selectedAccount.id,
-          email: user.email
-        })
+        body: JSON.stringify(payload)
       });
 
+      console.log('Réponse reçue:', response);
+
       if (!response.ok) {
-        throw new Error('Erreur lors de la connexion bancaire');
+        throw new Error(`Erreur HTTP: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('Données reçues:', data);
       
       if (data.url) {
         setIframeUrl(data.url);
         setShowBankConnectDialog(false);
         setShowIframeDialog(true);
+        toast.success('Connexion bancaire initiée');
       } else {
         toast.error('URL de connexion non reçue');
       }
@@ -253,6 +266,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                       variant="outline"
                       size="sm"
                       onClick={() => {
+                        console.log('Bouton Connecter cliqué pour:', account);
                         setSelectedAccount(account);
                         setShowBankConnectDialog(true);
                       }}
