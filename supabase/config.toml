@@ -2,3 +2,6 @@ project_id = "jukdsypvuehnniskgpfd"
 
 [functions.update-user]
 verify_jwt = true
+
+[functions.get-active-repair-orders]
+verify_jwt = true
