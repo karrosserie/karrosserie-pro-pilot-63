@@ -329,20 +329,26 @@ export type Database = {
       }
       company_preferences: {
         Row: {
+          accueil_preparation_time: string | null
+          cloture_livraison_time: string | null
           company_details: string | null
           company_id: string
           created_at: string
           currency: string
+          finitions_remontage_time: string | null
           id: string
           invoice_non_engagement_clause: string | null
           invoice_template: string
           language: string
           late_payment_penalties: string | null
+          mise_en_peinture_time: string | null
           next_credit_ref: string
           next_invoice_ref: string
           next_repair_order_ref: string
           payment_conditions: string | null
           payment_details: string | null
+          preparation_peinture_time: string | null
+          remplacement_debosselage_time: string | null
           repair_order_non_engagement_clause: string | null
           set_activities_as_homepage: boolean
           show_client_signature: boolean
@@ -357,20 +363,26 @@ export type Database = {
           use_date_based_reference: boolean
         }
         Insert: {
+          accueil_preparation_time?: string | null
+          cloture_livraison_time?: string | null
           company_details?: string | null
           company_id: string
           created_at?: string
           currency?: string
+          finitions_remontage_time?: string | null
           id?: string
           invoice_non_engagement_clause?: string | null
           invoice_template?: string
           language?: string
           late_payment_penalties?: string | null
+          mise_en_peinture_time?: string | null
           next_credit_ref?: string
           next_invoice_ref?: string
           next_repair_order_ref?: string
           payment_conditions?: string | null
           payment_details?: string | null
+          preparation_peinture_time?: string | null
+          remplacement_debosselage_time?: string | null
           repair_order_non_engagement_clause?: string | null
           set_activities_as_homepage?: boolean
           show_client_signature?: boolean
@@ -385,20 +397,26 @@ export type Database = {
           use_date_based_reference?: boolean
         }
         Update: {
+          accueil_preparation_time?: string | null
+          cloture_livraison_time?: string | null
           company_details?: string | null
           company_id?: string
           created_at?: string
           currency?: string
+          finitions_remontage_time?: string | null
           id?: string
           invoice_non_engagement_clause?: string | null
           invoice_template?: string
           language?: string
           late_payment_penalties?: string | null
+          mise_en_peinture_time?: string | null
           next_credit_ref?: string
           next_invoice_ref?: string
           next_repair_order_ref?: string
           payment_conditions?: string | null
           payment_details?: string | null
+          preparation_peinture_time?: string | null
+          remplacement_debosselage_time?: string | null
           repair_order_non_engagement_clause?: string | null
           set_activities_as_homepage?: boolean
           show_client_signature?: boolean

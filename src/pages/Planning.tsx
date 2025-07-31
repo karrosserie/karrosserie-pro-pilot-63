@@ -36,14 +36,46 @@ const Planning = () => {
   });
   const [configData, setConfigData] = useState({
     accueil: "01:00",
-    debosselage: "02:30",
-    preparation: "01:30",
-    peinture: "03:00",
+    debosselage: "02:30", 
+    preparation: "02:30",
+    peinture: "05:00",
     finitions: "02:00",
     cloture: "00:30"
   });
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const { employees, createEmployee, updateEmployee } = useEmployees();
+
+  // Charger les temps de configuration depuis la base de données
+  useEffect(() => {
+    const loadConfigData = async () => {
+      if (!companyInfo?.id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('company_preferences')
+          .select('accueil_preparation_time, remplacement_debosselage_time, preparation_peinture_time, mise_en_peinture_time, finitions_remontage_time, cloture_livraison_time')
+          .eq('company_id', companyInfo.id)
+          .single();
+
+        if (error) throw error;
+        
+        if (data) {
+          setConfigData({
+            accueil: data.accueil_preparation_time?.slice(0, 5) || "01:00",
+            debosselage: data.remplacement_debosselage_time?.slice(0, 5) || "02:30",
+            preparation: data.preparation_peinture_time?.slice(0, 5) || "02:30",
+            peinture: data.mise_en_peinture_time?.slice(0, 5) || "05:00",
+            finitions: data.finitions_remontage_time?.slice(0, 5) || "02:00",
+            cloture: data.cloture_livraison_time?.slice(0, 5) || "00:30"
+          });
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des temps de configuration:', error);
+      }
+    };
+
+    loadConfigData();
+  }, [companyInfo?.id]);
 
   // Récupérer les membres de l'équipe
   useEffect(() => {
@@ -3167,13 +3199,53 @@ const Planning = () => {
               <Button 
                 type="button" 
                 className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-                onClick={() => {
-                  // Ici on pourrait sauvegarder les configurations
-                  toast({
-                    title: "Configuration sauvegardée",
-                    description: "Les temps par défaut ont été mis à jour"
-                  });
-                  setShowConfigModal(false);
+                onClick={async () => {
+                  try {
+                    if (!companyInfo?.id) {
+                      toast({
+                        title: "Erreur",
+                        description: "Informations de l'entreprise non trouvées",
+                        variant: "destructive"
+                      });
+                      return;
+                    }
+
+                    // Convertir les temps au format TIME PostgreSQL (HH:MM:SS)
+                    const timeData = {
+                      accueil_preparation_time: `${configData.accueil}:00`,
+                      remplacement_debosselage_time: `${configData.debosselage}:00`,
+                      preparation_peinture_time: `${configData.preparation}:00`,
+                      mise_en_peinture_time: `${configData.peinture}:00`,
+                      finitions_remontage_time: `${configData.finitions}:00`,
+                      cloture_livraison_time: `${configData.cloture}:00`
+                    };
+
+                    const { error } = await supabase
+                      .from('company_preferences')
+                      .upsert([
+                        {
+                          company_id: companyInfo.id,
+                          ...timeData
+                        }
+                      ], {
+                        onConflict: 'company_id'
+                      });
+
+                    if (error) throw error;
+
+                    toast({
+                      title: "Configuration sauvegardée",
+                      description: "Les temps par défaut ont été mis à jour avec succès"
+                    });
+                    setShowConfigModal(false);
+                  } catch (error) {
+                    console.error('Erreur lors de la sauvegarde:', error);
+                    toast({
+                      title: "Erreur",
+                      description: "Impossible de sauvegarder la configuration",
+                      variant: "destructive"
+                    });
+                  }
                 }}
               >
                 Sauvegarder
