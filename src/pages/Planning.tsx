@@ -1250,11 +1250,16 @@ const Planning = () => {
           <TabsContent value="process" className="space-y-6">
             {/* Header */}
             <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Settings className="w-5 h-5 text-muted-foreground" />
-                <h3 className="text-xl font-semibold">Process de réparation</h3>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Settings className="w-5 h-5 text-muted-foreground" />
+                  <h3 className="text-xl font-semibold">Process de réparation</h3>
+                </div>
+                <div className="flex items-center gap-2 bg-orange-100 text-karrosserie-orange px-3 py-1 rounded-full text-sm">
+                  <AlertTriangle className="w-4 h-4" />
+                  <span className="font-medium">Temps indicatifs - Variables selon complexité</span>
+                </div>
               </div>
-              <p className="text-muted-foreground">Temps estimés par type d'intervention</p>
             </div>
 
             {/* Processus avec navigation */}
