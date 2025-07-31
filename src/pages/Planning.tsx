@@ -16,6 +16,7 @@ const Planning = () => {
   const [activeProcessStep, setActiveProcessStep] = useState("accueil");
   const [showWaitingVehiclesModal, setShowWaitingVehiclesModal] = useState(false);
   const [showVehicleDetailModal, setShowVehicleDetailModal] = useState(false);
+  const [showUrgentVehicleModal, setShowUrgentVehicleModal] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<any>(null);
@@ -24,6 +25,13 @@ const Planning = () => {
     email: "",
     phone: "",
     qualifications: [] as string[]
+  });
+  const [urgentVehicleFormData, setUrgentVehicleFormData] = useState({
+    licensePlate: "",
+    assignmentTime: "",
+    clientFirstName: "",
+    clientLastName: "",
+    assignedEmployee: ""
   });
 
   const stats = {
@@ -255,9 +263,9 @@ const Planning = () => {
             >
               Vue Employé
             </Button>
-            <Button variant="destructive" size="sm">
+            <Button variant="destructive" size="sm" onClick={() => setShowUrgentVehicleModal(true)}>
               <AlertTriangle className="w-4 h-4 mr-2" />
-              Véhicule Urgence
+              Véhicule en urgence
             </Button>
           </div>
         </div>
@@ -2932,6 +2940,142 @@ const Planning = () => {
                 }}
               >
                 {editingEmployee ? "Modifier" : "Créer"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal Véhicule en urgence */}
+        <Dialog open={showUrgentVehicleModal} onOpenChange={setShowUrgentVehicleModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader className="space-y-3">
+              <div className="flex items-center gap-2 text-orange-600">
+                <AlertTriangle className="w-5 h-5" />
+                <DialogTitle className="text-lg">Ajout immédiat au planning - Traitement prioritaire</DialogTitle>
+              </div>
+              <div className="flex justify-center">
+                <Badge className="bg-red-600 text-white px-3 py-1 text-sm font-medium">
+                  URGENCE - Traitement immédiat
+                </Badge>
+              </div>
+            </DialogHeader>
+            
+            <div className="space-y-4 py-4">
+              {/* Plaque d'immatriculation */}
+              <div className="space-y-2">
+                <Label htmlFor="licensePlate" className="flex items-center gap-2">
+                  <Car className="w-4 h-4" />
+                  Plaque d'immatriculation <span className="text-red-500">*</span>
+                </Label>
+                <Input 
+                  id="licensePlate" 
+                  value={urgentVehicleFormData.licensePlate}
+                  onChange={(e) => setUrgentVehicleFormData(prev => ({ ...prev, licensePlate: e.target.value }))}
+                  placeholder="XX-123-XX"
+                  className="uppercase"
+                />
+              </div>
+
+              {/* Heure d'affectation */}
+              <div className="space-y-2">
+                <Label htmlFor="assignmentTime" className="flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  Heure d'affectation <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={urgentVehicleFormData.assignmentTime}
+                  onValueChange={(value) => setUrgentVehicleFormData(prev => ({ ...prev, assignmentTime: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner l'heure" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border border-border shadow-md z-50">
+                    <SelectItem value="08:00">08:00</SelectItem>
+                    <SelectItem value="08:30">08:30</SelectItem>
+                    <SelectItem value="09:00">09:00</SelectItem>
+                    <SelectItem value="09:30">09:30</SelectItem>
+                    <SelectItem value="10:00">10:00</SelectItem>
+                    <SelectItem value="10:30">10:30</SelectItem>
+                    <SelectItem value="11:00">11:00</SelectItem>
+                    <SelectItem value="11:30">11:30</SelectItem>
+                    <SelectItem value="12:00">12:00</SelectItem>
+                    <SelectItem value="13:00">13:00</SelectItem>
+                    <SelectItem value="13:30">13:30</SelectItem>
+                    <SelectItem value="14:00">14:00</SelectItem>
+                    <SelectItem value="14:30">14:30</SelectItem>
+                    <SelectItem value="15:00">15:00</SelectItem>
+                    <SelectItem value="15:30">15:30</SelectItem>
+                    <SelectItem value="16:00">16:00</SelectItem>
+                    <SelectItem value="16:30">16:30</SelectItem>
+                    <SelectItem value="17:00">17:00</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Nom et Prénom du client */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="clientLastName">Nom du client <span className="text-red-500">*</span></Label>
+                  <Input 
+                    id="clientLastName" 
+                    value={urgentVehicleFormData.clientLastName}
+                    onChange={(e) => setUrgentVehicleFormData(prev => ({ ...prev, clientLastName: e.target.value }))}
+                    placeholder="Nom"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="clientFirstName">Prénom du client <span className="text-red-500">*</span></Label>
+                  <Input 
+                    id="clientFirstName" 
+                    value={urgentVehicleFormData.clientFirstName}
+                    onChange={(e) => setUrgentVehicleFormData(prev => ({ ...prev, clientFirstName: e.target.value }))}
+                    placeholder="Prénom"
+                  />
+                </div>
+              </div>
+
+              {/* Employé assigné */}
+              <div className="space-y-2">
+                <Label htmlFor="assignedEmployee" className="flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  Employé assigné <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={urgentVehicleFormData.assignedEmployee}
+                  onValueChange={(value) => setUrgentVehicleFormData(prev => ({ ...prev, assignedEmployee: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner un employé" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border border-border shadow-md z-50">
+                    <SelectItem value="sophie">Sophie Martin</SelectItem>
+                    <SelectItem value="martin">Martin Dubois</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Boutons */}
+            <div className="flex justify-between pt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setUrgentVehicleFormData({
+                    licensePlate: "",
+                    assignmentTime: "",
+                    clientFirstName: "",
+                    clientLastName: "",
+                    assignedEmployee: ""
+                  });
+                }}
+              >
+                Réinitialiser
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowUrgentVehicleModal(false)}
+              >
+                Annuler
               </Button>
             </div>
           </DialogContent>
