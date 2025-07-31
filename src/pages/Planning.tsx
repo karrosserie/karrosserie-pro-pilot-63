@@ -681,35 +681,41 @@ const Planning = () => {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="font-medium">Pare-chocs avant</div>
-                            <div className="text-sm text-muted-foreground">Remplacement</div>
-                          </div>
-                          <div className="flex items-center gap-2">
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="font-medium">Pare-chocs avant</div>
+                              <div className="text-sm text-muted-foreground">Remplacement</div>
+                            </div>
                             <span className="font-medium">450€</span>
+                          </div>
+                          <div className="flex justify-end">
                             <Badge className="bg-green-100 text-green-800 text-xs">Terminé</Badge>
                           </div>
                         </div>
                         
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="font-medium">Aile avant droite</div>
-                            <div className="text-sm text-muted-foreground">Débosselage + peinture</div>
-                          </div>
-                          <div className="flex items-center gap-2">
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="font-medium">Aile avant droite</div>
+                              <div className="text-sm text-muted-foreground">Débosselage + peinture</div>
+                            </div>
                             <span className="font-medium">680€</span>
+                          </div>
+                          <div className="flex justify-end">
                             <Badge className="bg-blue-100 text-blue-800 text-xs">En cours</Badge>
                           </div>
                         </div>
                         
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="font-medium">Optique avant</div>
-                            <div className="text-sm text-muted-foreground">Remplacement</div>
-                          </div>
-                          <div className="flex items-center gap-2">
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="font-medium">Optique avant</div>
+                              <div className="text-sm text-muted-foreground">Remplacement</div>
+                            </div>
                             <span className="font-medium">220€</span>
+                          </div>
+                          <div className="flex justify-end">
                             <Badge variant="secondary" className="text-xs">À planifier</Badge>
                           </div>
                         </div>
@@ -727,35 +733,41 @@ const Planning = () => {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="font-medium">Pare-chocs avant</div>
-                            <div className="text-sm text-muted-foreground">PC-AV-001</div>
-                          </div>
-                          <div className="flex items-center gap-2">
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="font-medium">Pare-chocs avant</div>
+                              <div className="text-sm text-muted-foreground">PC-AV-001</div>
+                            </div>
                             <span className="font-medium">180€</span>
+                          </div>
+                          <div className="flex justify-end">
                             <Badge className="bg-orange-100 text-orange-800 text-xs">Disponible</Badge>
                           </div>
                         </div>
                         
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="font-medium">Optique avant droite</div>
-                            <div className="text-sm text-muted-foreground">OPT-AV-R</div>
-                          </div>
-                          <div className="flex items-center gap-2">
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="font-medium">Optique avant droite</div>
+                              <div className="text-sm text-muted-foreground">OPT-AV-R</div>
+                            </div>
                             <span className="font-medium">95€</span>
+                          </div>
+                          <div className="flex justify-end">
                             <Badge variant="outline" className="text-xs">Commande</Badge>
                           </div>
                         </div>
                         
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="font-medium">Peinture RAL 9003</div>
-                            <div className="text-sm text-muted-foreground">PEIN-RAL</div>
-                          </div>
-                          <div className="flex items-center gap-2">
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="font-medium">Peinture RAL 9003</div>
+                              <div className="text-sm text-muted-foreground">PEIN-RAL</div>
+                            </div>
                             <span className="font-medium">45€</span>
+                          </div>
+                          <div className="flex justify-end">
                             <Badge className="bg-orange-100 text-orange-800 text-xs">Disponible</Badge>
                           </div>
                         </div>
