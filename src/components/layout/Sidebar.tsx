@@ -69,7 +69,7 @@ const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems
         onClick={toggleSubMenu}
         className={`flex items-center py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
           isActive 
-            ? 'bg-karrosserie-orange bg-opacity-10 text-karrosserie-orange' 
+            ? 'bg-karrosserie-orange/10 text-karrosserie-orange border border-karrosserie-orange/20' 
             : 'text-gray-600 hover:bg-gray-100 active:bg-gray-200'
         }`}
       >
