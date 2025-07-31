@@ -291,8 +291,8 @@ const Planning = () => {
 
           {/* Vue Employé - Sélection du profil */}
           {activeView === "employee" && !selectedEmployee && (
-            <div className="flex items-center justify-center min-h-[400px]">
-              <Card className="w-full max-w-2xl">
+            <div className="w-full">
+              <Card className="w-full">
                 <CardContent className="p-8 text-center">
                   <div className="space-y-6">
                     <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center">
@@ -306,10 +306,10 @@ const Planning = () => {
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 max-w-4xl mx-auto">
                       <Card 
                         className="p-6 cursor-pointer hover:shadow-md transition-all border-2 hover:border-karrosserie-orange/50"
-                        onClick={() => setSelectedEmployee({ name: "Martin Dubois", id: "martin" })}
+                        onClick={() => window.location.href = '/employee-planning/martin'}
                       >
                         <div className="flex flex-col items-center space-y-3">
                           <div className="w-12 h-12 bg-karrosserie-orange/10 rounded-full flex items-center justify-center">
@@ -321,7 +321,7 @@ const Planning = () => {
 
                       <Card 
                         className="p-6 cursor-pointer hover:shadow-md transition-all border-2 hover:border-karrosserie-orange/50"
-                        onClick={() => setSelectedEmployee({ name: "Sophie Martin", id: "sophie" })}
+                        onClick={() => window.location.href = '/employee-planning/sophie'}
                       >
                         <div className="flex flex-col items-center space-y-3">
                           <div className="w-12 h-12 bg-karrosserie-orange/10 rounded-full flex items-center justify-center">

@@ -13,6 +13,7 @@ import Accounting from "@/pages/Accounting";
 import Cessions from "@/pages/Cessions";
 import Help from "@/pages/Help";
 import Planning from "@/pages/Planning";
+import EmployeePlanning from "@/pages/EmployeePlanning";
 
 export const coreRoutes = [
   {
@@ -131,6 +132,16 @@ export const coreRoutes = [
       <ProtectedRoute>
         <AppLayout>
           <Planning />
+        </AppLayout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/employee-planning/:employeeId",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <EmployeePlanning />
         </AppLayout>
       </ProtectedRoute>
     )
