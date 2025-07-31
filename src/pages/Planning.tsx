@@ -1606,7 +1606,7 @@ const Planning = () => {
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base">
                           <AlertTriangle className="w-4 h-4" />
-                          Facteurs d'Allongement des Délais
+                          Facteurs d'allongement des délais
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
@@ -1697,7 +1697,7 @@ const Planning = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-base">
                         <BarChart className="w-4 h-4" />
-                        Récapitulatif par Type de Sinistre
+                         Récapitulatif par type de sinistre
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
@@ -1751,7 +1751,7 @@ const Planning = () => {
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base">
                           <AlertTriangle className="w-4 h-4" />
-                          Facteurs d'Allongement des Délais
+                          Facteurs d'allongement des délais
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
@@ -1833,7 +1833,7 @@ const Planning = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-base">
                         <BarChart className="w-4 h-4" />
-                        Récapitulatif par Type de Sinistre
+                         Récapitulatif par type de sinistre
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
@@ -1887,7 +1887,7 @@ const Planning = () => {
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base">
                           <AlertTriangle className="w-4 h-4" />
-                          Facteurs d'Allongement des Délais
+                          Facteurs d'allongement des délais
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
@@ -1977,7 +1977,7 @@ const Planning = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-base">
                         <BarChart className="w-4 h-4" />
-                        Récapitulatif par Type de Sinistre
+                         Récapitulatif par type de sinistre
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
@@ -2031,7 +2031,7 @@ const Planning = () => {
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base">
                           <AlertTriangle className="w-4 h-4" />
-                          Facteurs d'Allongement des Délais
+                          Facteurs d'allongement des délais
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
@@ -2105,7 +2105,7 @@ const Planning = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-base">
                         <BarChart className="w-4 h-4" />
-                        Récapitulatif par Type de Sinistre
+                         Récapitulatif par type de sinistre
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
@@ -2159,7 +2159,7 @@ const Planning = () => {
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base">
                           <AlertTriangle className="w-4 h-4" />
-                          Facteurs d'Allongement des Délais
+                          Facteurs d'allongement des délais
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
@@ -2233,7 +2233,7 @@ const Planning = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-base">
                         <BarChart className="w-4 h-4" />
-                        Récapitulatif par Type de Sinistre
+                        Récapitulatif par type de sinistre
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
@@ -2287,7 +2287,7 @@ const Planning = () => {
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base">
                           <AlertTriangle className="w-4 h-4" />
-                          Facteurs d'Allongement des Délais
+                          Facteurs d'allongement des délais
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
