@@ -102,7 +102,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
           <div className="space-y-4 py-4">
             <div className="space-y-3 text-sm text-gray-700">
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold">
+                <div className="w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-base font-bold">
                   1
                 </div>
                 <p>
@@ -110,7 +110,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold">
+                <div className="w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-base font-bold">
                   2
                 </div>
                 <p>
@@ -118,7 +118,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold">
+                <div className="w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-base font-bold">
                   3
                 </div>
                 <p>
