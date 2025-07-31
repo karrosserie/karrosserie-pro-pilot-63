@@ -301,9 +301,11 @@ const Planning = () => {
                       <div className="text-sm">Expertise assurance</div>
                       <div className="text-sm text-muted-foreground">Accord Préparation dossier</div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2">
                       <Button variant="outline" size="sm">Détails</Button>
-                      <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">Commencer</Button>
+                      <div className="flex gap-2">
+                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">Commencer</Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -324,9 +326,11 @@ const Planning = () => {
                       <div className="text-sm">Remplacement</div>
                       <div className="text-sm text-muted-foreground">Accord Préparation dossier</div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2">
                       <Button variant="outline" size="sm">Détails</Button>
-                      <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">Commencer</Button>
+                      <div className="flex gap-2">
+                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">Commencer</Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -347,9 +351,11 @@ const Planning = () => {
                       <div className="text-sm">Ponçage & retouches</div>
                       <div className="text-sm text-muted-foreground">Accord Finitions</div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2">
                       <Button variant="outline" size="sm">Détails</Button>
-                      <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">Commencer</Button>
+                      <div className="flex gap-2">
+                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">Commencer</Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -370,9 +376,14 @@ const Planning = () => {
                       <div className="text-sm">Ponçage final</div>
                       <div className="text-sm text-muted-foreground">Accord dossier livraison</div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2">
                       <Button variant="outline" size="sm">Détails</Button>
-                      <Button variant="secondary" size="sm" className="bg-green-600 hover:bg-green-700 text-white">Terminer</Button>
+                      <div className="flex gap-2">
+                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white">
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Terminer
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -393,9 +404,11 @@ const Planning = () => {
                       <div className="text-sm">Accueil client</div>
                       <div className="text-sm text-muted-foreground">Accord Remontage</div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2">
                       <Button variant="outline" size="sm">Détails</Button>
-                      <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">Commencer</Button>
+                      <div className="flex gap-2">
+                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">Commencer</Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -416,9 +429,14 @@ const Planning = () => {
                       <div className="text-sm">Débosselage léger</div>
                       <div className="text-sm text-muted-foreground">Accord dossier livraison</div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2">
                       <Button variant="outline" size="sm">Détails</Button>
-                      <Button variant="secondary" size="sm" className="bg-green-600 hover:bg-green-700 text-white">Terminer</Button>
+                      <div className="flex gap-2">
+                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white">
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Terminer
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
