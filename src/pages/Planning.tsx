@@ -150,7 +150,7 @@ const Planning = () => {
     {
       title: "Préparation peinture",
       count: 1,
-      color: "border-l-yellow-500",
+      color: "border-l-orange-500",
       vehicles: [
         {
           brand: "Peugeot 308",
@@ -292,19 +292,19 @@ const Planning = () => {
               <StatsCard 
                 title="En attente" 
                 value={stats.waiting}
-                icon={<Clock className="h-8 w-8 text-yellow-600" />}
-                iconBg="bg-yellow-100"
+                icon={<Clock className="h-8 w-8 text-orange-600" />}
+                iconBg="bg-orange-100"
               />
             </div>
 
             {/* Alert */}
-            <Card className="bg-yellow-50 border-yellow-200 cursor-pointer hover:bg-yellow-100 transition-colors" onClick={() => setShowWaitingVehiclesModal(true)}>
+            <Card className="bg-orange-50 border-orange-200 cursor-pointer hover:bg-orange-100 transition-colors" onClick={() => setShowWaitingVehiclesModal(true)}>
               <CardContent className="p-4">
-                <div className="flex items-center gap-2 text-yellow-800">
+                <div className="flex items-center gap-2 text-orange-800">
                   <AlertTriangle className="w-5 h-5" />
                   <span className="font-medium">5 véhicules en attente</span>
                 </div>
-                <p className="text-sm text-yellow-700 mt-1">
+                <p className="text-sm text-orange-700 mt-1">
                   Pièces: 2 • Approbations: 1 • Techniciens: 1
                 </p>
               </CardContent>
@@ -479,7 +479,7 @@ const Planning = () => {
                   </Card>
 
                   {/* Tâche 3 */}
-                  <Card className="border-l-4 border-l-yellow-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                  <Card className="border-l-4 border-l-orange-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
                     setSelectedVehicle({
                       brand: "Peugeot 308",
                       plate: "AB-789-XY",
@@ -489,7 +489,7 @@ const Planning = () => {
                     setShowVehicleDetailModal(true);
                   }}>
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm text-yellow-600">
+                      <div className="flex items-center gap-2 text-sm text-orange-600">
                         <Clock className="w-3 h-3" />
                         14h-16h30
                       </div>
@@ -501,7 +501,7 @@ const Planning = () => {
                         Sophie Martin
                       </div>
                       <div className="text-xs text-muted-foreground">Client: Mme Moreau</div>
-                      <Badge className="bg-yellow-100 text-yellow-800 text-xs">Préparation peinture</Badge>
+                      <Badge className="bg-orange-100 text-orange-800 text-xs">Préparation peinture</Badge>
                     </div>
                   </Card>
                 </CardContent>
@@ -695,7 +695,7 @@ const Planning = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Tâche 1 */}
-                  <Card className="border-l-4 border-l-yellow-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                  <Card className="border-l-4 border-l-orange-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
                     setSelectedVehicle({
                       brand: "Peugeot 308",
                       plate: "AB-789-XY",
@@ -705,7 +705,7 @@ const Planning = () => {
                     setShowVehicleDetailModal(true);
                   }}>
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm text-yellow-600">
+                      <div className="flex items-center gap-2 text-sm text-orange-600">
                         <Clock className="w-3 h-3" />
                         9h-12h
                       </div>
@@ -717,7 +717,7 @@ const Planning = () => {
                         Sophie Martin
                       </div>
                       <div className="text-xs text-muted-foreground">Client: Mme Moreau</div>
-                      <Badge className="bg-yellow-100 text-yellow-800 text-xs">Mise en peinture</Badge>
+                      <Badge className="bg-orange-100 text-orange-800 text-xs">Mise en peinture</Badge>
                     </div>
                   </Card>
 
@@ -758,7 +758,7 @@ const Planning = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Tâche 1 */}
-                  <Card className="border-l-4 border-l-yellow-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                  <Card className="border-l-4 border-l-orange-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
                     setSelectedVehicle({
                       brand: "BMW Série 1",
                       plate: "HT-556-GH",
@@ -768,7 +768,7 @@ const Planning = () => {
                     setShowVehicleDetailModal(true);
                   }}>
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm text-yellow-600">
+                      <div className="flex items-center gap-2 text-sm text-orange-600">
                         <Clock className="w-3 h-3" />
                         8h-10h
                       </div>
@@ -780,7 +780,7 @@ const Planning = () => {
                         Sophie Martin
                       </div>
                       <div className="text-xs text-muted-foreground">Client: M. Rousseau</div>
-                      <Badge className="bg-yellow-100 text-yellow-800 text-xs">Préparation peinture</Badge>
+                      <Badge className="bg-orange-100 text-orange-800 text-xs">Préparation peinture</Badge>
                     </div>
                   </Card>
 
@@ -1169,14 +1169,14 @@ const Planning = () => {
                     </div>
 
                     {/* Section blocage - plus compacte */}
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-md p-2 mt-3">
+                    <div className="bg-orange-50 border border-orange-200 rounded-md p-2 mt-3">
                       <div className="flex items-center gap-2">
-                        <AlertTriangle className="w-3 h-3 text-yellow-600 flex-shrink-0" />
-                        <span className="text-xs font-medium text-yellow-800">
+                        <AlertTriangle className="w-3 h-3 text-orange-600 flex-shrink-0" />
+                        <span className="text-xs font-medium text-orange-800">
                           Raison du blocage : {vehicle.blockageReason}
                         </span>
                       </div>
-                      <p className="text-xs text-yellow-700 mt-1 ml-5">{vehicle.blockageDetails}</p>
+                      <p className="text-xs text-orange-700 mt-1 ml-5">{vehicle.blockageDetails}</p>
                     </div>
                   </CardContent>
                 </Card>
