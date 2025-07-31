@@ -17,6 +17,7 @@ import { useEmployees, Employee } from '@/hooks/use-employees';
 import { EmployeesList } from '@/components/planning/EmployeesList';
 import { toast } from '@/hooks/use-toast';
 import { useCompanyId } from '@/hooks/use-company-id';
+import { useVehicleWorkflow } from '@/hooks/use-vehicle-workflow';
 
 const Planning = () => {
   const { companyInfo } = useCompany();
@@ -44,6 +45,7 @@ const Planning = () => {
   });
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const { employees, createEmployee, updateEmployee } = useEmployees();
+  const { workflowSteps } = useVehicleWorkflow(companyInfo?.id);
 
   // Charger les temps de configuration depuis la base de données
   useEffect(() => {
@@ -75,6 +77,115 @@ const Planning = () => {
     };
 
     loadConfigData();
+  }, [companyInfo?.id]);
+
+  // Charger les données des étapes de workflow depuis la base de données
+  useEffect(() => {
+    const loadWorkflowData = async () => {
+      if (!companyInfo?.id) return;
+      
+      try {
+        // Récupérer les véhicules avec leurs étapes de workflow
+        const { data: vehiclesData, error: vehiclesError } = await supabase
+          .from('vehicles')
+          .select(`
+            id,
+            license_plate,
+            client_id,
+            brand_id,
+            model_id,
+            clients (
+              first_name,
+              last_name
+            ),
+            car_brands (
+              name
+            ),
+            car_models (
+              name
+            )
+          `)
+          .eq('company_id', companyInfo.id);
+
+        if (vehiclesError) throw vehiclesError;
+
+        // Récupérer les étapes de workflow pour ces véhicules
+        const { data: workflowData, error: workflowError } = await supabase
+          .from('vehicle_workflow_steps')
+          .select('*')
+          .eq('company_id', companyInfo.id);
+
+        if (workflowError) throw workflowError;
+
+        // Organiser les données par étapes
+        const stepMap = {
+          'accueil_preparation': {
+            title: "Accueil & Préparation du dossier",
+            color: "border-l-karrosserie-orange",
+            vehicles: []
+          },
+          'remplacement_debosselage': {
+            title: "Remplacement ou débosselage",
+            color: "border-l-green-500",
+            vehicles: []
+          },
+          'preparation_peinture': {
+            title: "Préparation peinture",
+            color: "border-l-yellow-500",
+            vehicles: []
+          },
+          'mise_en_peinture': {
+            title: "Mise en peinture",
+            color: "border-l-blue-500",
+            vehicles: []
+          },
+          'finitions_remontage': {
+            title: "Finitions & remontage",
+            color: "border-l-purple-500",
+            vehicles: []
+          },
+          'cloture_livraison': {
+            title: "Clôture du dossier et livraison",
+            color: "border-l-red-500",
+            vehicles: []
+          }
+        };
+
+        // Associer chaque véhicule à sa bonne étape
+        vehiclesData?.forEach(vehicle => {
+          const workflowStep = workflowData?.find(w => w.vehicle_id === vehicle.id);
+          const currentStep = workflowStep?.current_step || 'accueil_preparation';
+          
+          if (stepMap[currentStep]) {
+            stepMap[currentStep].vehicles.push({
+              id: vehicle.id,
+              brand: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim() || 'Véhicule',
+              plate: vehicle.license_plate,
+              client: `${vehicle.clients?.first_name || ''} ${vehicle.clients?.last_name || ''}`.trim() || 'Client inconnu',
+              price: "0€", // À calculer depuis les devis/factures
+              duration: "0h", // À calculer selon la configuration
+              status: "En attente",
+              inProgress: workflowStep?.progress_percentage > 0,
+              technician: workflowStep?.technician_id ? "Assigné" : null,
+              workflowId: workflowStep?.id
+            });
+          }
+        });
+
+        // Convertir en array avec les counts
+        const steps = Object.values(stepMap).map(step => ({
+          ...step,
+          count: step.vehicles.length
+        }));
+
+        // Les steps sont maintenant gérés par le hook useVehicleWorkflow
+        
+      } catch (error) {
+        console.error('Erreur lors du chargement des données de workflow:', error);
+      }
+    };
+
+    loadWorkflowData();
   }, [companyInfo?.id]);
 
   // Récupérer les membres de l'équipe
@@ -206,130 +317,114 @@ const Planning = () => {
     problemes: 1
   };
 
-  const workflowSteps = [
-    {
-      title: "Accueil & Préparation du dossier",
-      count: 2,
-      color: "border-l-karrosserie-orange",
-      vehicles: [
-        {
-          brand: "Citroën C4",
-          plate: "EZ-787-KL",
-          client: "M. Durand",
-          price: "800€",
-          duration: "0.5h",
-          status: "Devis en cours",
-          technician: "Martin Dubois",
-          inProgress: true
-        },
-        {
-          brand: "Mercedes Classe C",
-          plate: "QR-345-ST",
-          client: "Mme Leclerc",
-          price: "400€",
-          duration: "1h",
-          status: "Expertise assurance",
-          technician: null,
-          inProgress: false
-        }
-      ]
-    },
-    {
-      title: "Remplacement ou débosselage",
-      count: 2,
-      color: "border-l-green-500",
-      vehicles: [
-        {
-          brand: "Audi A4",
-          plate: "VS-901-AB",
-          client: "M. Bernard",
-          price: "520€",
-          duration: "2h",
-          status: "Débosselage portière",
-          technician: "Sophie Martin",
-          inProgress: true
-        },
-        {
-          brand: "BMW Série 1",
-          plate: "HT-556-GH",
-          client: "M. Rousseau",
-          price: "950€",
-          duration: "3h",
-          status: "Remplacement pare-chocs",
-          technician: null,
-          inProgress: false
-        }
-      ]
-    },
-    {
-      title: "Préparation peinture",
-      count: 1,
-      color: "border-l-orange-500",
-      vehicles: [
-        {
-          brand: "Peugeot 308",
-          plate: "AB-789-XY",
-          client: "Mme Moreau",
-          price: "680€",
-          duration: "2.5h",
-          status: "Ponçage aile avant",
-          technician: "Sophie Martin",
-          inProgress: true
-        }
-      ]
-    },
-    {
-      title: "Mise en peinture",
-      count: 1,
-      color: "border-l-orange-500",
-      vehicles: [
-        {
-          brand: "Renault Clio",
-          plate: "CD-123-ZW",
-          client: "M. Petit",
-          price: "1200€",
-          duration: "4h",
-          status: "Application base",
-          technician: "Sophie Martin",
-          inProgress: true
-        }
-      ]
-    },
-    {
-      title: "Finitions & remontage",
-      count: 1,
-      color: "border-l-purple-500",
-      vehicles: [
-        {
-          brand: "Volkswagen Golf",
-          plate: "EF-456-UV",
-          client: "Mme Blanc",
-          price: "350€",
-          duration: "1.5h",
-          status: "Polissage final",
-          technician: "Martin Dubois",
-          inProgress: true
-        }
-      ]
-    },
-    {
-      title: "Clôture du dossier et livraison",
-      count: 1,
-      color: "border-l-red-500",
-      vehicles: [
-        {
-          brand: "Ford Focus",
-          plate: "GH-789-ST",
-          client: "M. Roux",
-          price: "80€",
-          duration: "0.5h",
-          status: "Contrôle qualité",
-          technician: "Martin Dubois",
-          inProgress: true
-        }
-      ]
-    }
-  ];
+  // Charger les données des étapes de workflow depuis la base de données
+  useEffect(() => {
+    const loadWorkflowData = async () => {
+      if (!companyInfo?.id) return;
+      
+      try {
+        // Récupérer les véhicules avec leurs étapes de workflow
+        const { data: vehiclesData, error: vehiclesError } = await supabase
+          .from('vehicles')
+          .select(`
+            id,
+            license_plate,
+            client_id,
+            brand_id,
+            model_id,
+            clients (
+              first_name,
+              last_name
+            ),
+            car_brands (
+              name
+            ),
+            car_models (
+              name
+            )
+          `)
+          .eq('company_id', companyInfo.id);
+
+        if (vehiclesError) throw vehiclesError;
+
+        // Récupérer les étapes de workflow pour ces véhicules
+        const { data: workflowData, error: workflowError } = await supabase
+          .from('vehicle_workflow_steps')
+          .select('*')
+          .eq('company_id', companyInfo.id);
+
+        if (workflowError) throw workflowError;
+
+        // Organiser les données par étapes
+        const stepMap = {
+          'accueil_preparation': {
+            title: "Accueil & Préparation du dossier",
+            color: "border-l-karrosserie-orange",
+            vehicles: []
+          },
+          'remplacement_debosselage': {
+            title: "Remplacement ou débosselage",
+            color: "border-l-green-500",
+            vehicles: []
+          },
+          'preparation_peinture': {
+            title: "Préparation peinture",
+            color: "border-l-yellow-500",
+            vehicles: []
+          },
+          'mise_en_peinture': {
+            title: "Mise en peinture",
+            color: "border-l-blue-500",
+            vehicles: []
+          },
+          'finitions_remontage': {
+            title: "Finitions & remontage",
+            color: "border-l-purple-500",
+            vehicles: []
+          },
+          'cloture_livraison': {
+            title: "Clôture du dossier et livraison",
+            color: "border-l-red-500",
+            vehicles: []
+          }
+        };
+
+        // Associer chaque véhicule à sa bonne étape
+        vehiclesData?.forEach(vehicle => {
+          const workflowStep = workflowData?.find(w => w.vehicle_id === vehicle.id);
+          const currentStep = workflowStep?.current_step || 'accueil_preparation';
+          
+          if (stepMap[currentStep]) {
+            stepMap[currentStep].vehicles.push({
+              id: vehicle.id,
+              brand: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim(),
+              plate: vehicle.license_plate,
+              client: `${vehicle.clients?.first_name || ''} ${vehicle.clients?.last_name || ''}`.trim(),
+              price: "0€", // À calculer depuis les devis/factures
+              duration: "0h", // À calculer selon la configuration
+              status: "En attente",
+              inProgress: workflowStep?.progress_percentage > 0,
+              technician: workflowStep?.technician_id ? "Assigné" : null,
+              workflowId: workflowStep?.id
+            });
+          }
+        });
+
+        // Convertir en array avec les counts
+        const steps = Object.values(stepMap).map(step => ({
+          ...step,
+          count: step.vehicles.length
+        }));
+
+        // Les steps sont maintenant gérés par le hook useVehicleWorkflow
+        
+      } catch (error) {
+        console.error('Erreur lors du chargement des données de workflow:', error);
+      }
+    };
+
+    loadWorkflowData();
+  }, [companyInfo?.id]);
 
   return (
     <div className="min-h-screen bg-muted/20 p-4">
@@ -3110,7 +3205,7 @@ const Planning = () => {
                 Configuration des temps par défaut
               </DialogTitle>
               <DialogDescription>
-                Définissez les temps moyens par défaut pour chaque étape du workflow (format hh:mm)
+                Définissez les temps moyens par défaut pour chaque étape du workflow
               </DialogDescription>
             </DialogHeader>
             

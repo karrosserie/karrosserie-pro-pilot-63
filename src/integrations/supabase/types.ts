@@ -1591,6 +1591,45 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicle_workflow_steps: {
+        Row: {
+          company_id: string
+          created_at: string
+          current_step: string
+          estimated_completion_date: string | null
+          id: string
+          notes: string | null
+          progress_percentage: number
+          technician_id: string | null
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          current_step?: string
+          estimated_completion_date?: string | null
+          id?: string
+          notes?: string | null
+          progress_percentage?: number
+          technician_id?: string | null
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          current_step?: string
+          estimated_completion_date?: string | null
+          id?: string
+          notes?: string | null
+          progress_percentage?: number
+          technician_id?: string | null
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: []
+      }
       vehicles: {
         Row: {
           brand_id: string | null
