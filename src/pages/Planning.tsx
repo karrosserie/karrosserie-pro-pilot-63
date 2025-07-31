@@ -376,14 +376,326 @@ const Planning = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="planning">
-            <Card>
-              <CardContent className="p-8 text-center">
-                <Calendar className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Vue Planning</h3>
-                <p className="text-muted-foreground">Interface de planning détaillée en cours de développement</p>
-              </CardContent>
-            </Card>
+          <TabsContent value="planning" className="space-y-6">
+            {/* Header */}
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold">Planning Détaillé</h2>
+              <p className="text-muted-foreground">Toutes les tâches par véhicule et jour par jour</p>
+            </div>
+
+            {/* Planning Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              {/* Lundi */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg text-blue-600">Lundi</CardTitle>
+                  <p className="text-sm text-muted-foreground">3 tâche(s)</p>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {/* Tâche 1 */}
+                  <Card className="border-l-4 border-l-blue-500 p-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-blue-600">
+                        <Clock className="w-3 h-3" />
+                        9h-10h
+                      </div>
+                      <div className="font-semibold text-sm">EZ-787-KL</div>
+                      <div className="text-xs text-muted-foreground">Citroën C4</div>
+                      <div className="text-xs text-muted-foreground">Accueil & Préparation</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        Martin Dubois
+                      </div>
+                      <div className="text-xs text-muted-foreground">Client: M. Durand</div>
+                      <Badge className="bg-blue-100 text-blue-800 text-xs">Accueil & Préparation du dossier</Badge>
+                    </div>
+                  </Card>
+
+                  {/* Tâche 2 */}
+                  <Card className="border-l-4 border-l-green-500 p-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-green-600">
+                        <Clock className="w-3 h-3" />
+                        10h-12h
+                      </div>
+                      <div className="font-semibold text-sm">VS-901-AB</div>
+                      <div className="text-xs text-muted-foreground">Audi A4</div>
+                      <div className="text-xs text-muted-foreground">Débosselage portière</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        Sophie Martin
+                      </div>
+                      <div className="text-xs text-muted-foreground">Client: M. Bernard</div>
+                      <Badge className="bg-green-100 text-green-800 text-xs">Remplacement ou débosselage</Badge>
+                    </div>
+                  </Card>
+
+                  {/* Tâche 3 */}
+                  <Card className="border-l-4 border-l-yellow-500 p-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-yellow-600">
+                        <Clock className="w-3 h-3" />
+                        14h-16h30
+                      </div>
+                      <div className="font-semibold text-sm">AB-789-XY</div>
+                      <div className="text-xs text-muted-foreground">Peugeot 308</div>
+                      <div className="text-xs text-muted-foreground">Ponçage aile avant</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        Sophie Martin
+                      </div>
+                      <div className="text-xs text-muted-foreground">Client: Mme Moreau</div>
+                      <Badge className="bg-yellow-100 text-yellow-800 text-xs">Préparation peinture</Badge>
+                    </div>
+                  </Card>
+                </CardContent>
+              </Card>
+
+              {/* Mardi */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg text-blue-600">Mardi</CardTitle>
+                  <p className="text-sm text-muted-foreground">3 tâche(s)</p>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {/* Tâche 1 */}
+                  <Card className="border-l-4 border-l-blue-500 p-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-blue-600">
+                        <Clock className="w-3 h-3" />
+                        8h-9h
+                      </div>
+                      <div className="font-semibold text-sm">QR-345-ST</div>
+                      <div className="text-xs text-muted-foreground">Mercedes Classe C</div>
+                      <div className="text-xs text-muted-foreground">Expertise assurance</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        Martin Dubois
+                      </div>
+                      <div className="text-xs text-muted-foreground">Client: Mme Leclerc</div>
+                      <Badge className="bg-blue-100 text-blue-800 text-xs">Accueil & Préparation du dossier</Badge>
+                    </div>
+                  </Card>
+
+                  {/* Tâche 2 */}
+                  <Card className="border-l-4 border-l-orange-500 p-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-orange-600">
+                        <Clock className="w-3 h-3" />
+                        9h-13h
+                      </div>
+                      <div className="font-semibold text-sm">CD-123-ZW</div>
+                      <div className="text-xs text-muted-foreground">Renault Clio</div>
+                      <div className="text-xs text-muted-foreground">Application base peinture</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        Sophie Martin
+                      </div>
+                      <div className="text-xs text-muted-foreground">Client: M. Petit</div>
+                      <Badge className="bg-orange-100 text-orange-800 text-xs">Mise en peinture</Badge>
+                    </div>
+                  </Card>
+
+                  {/* Tâche 3 */}
+                  <Card className="border-l-4 border-l-purple-500 p-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-purple-600">
+                        <Clock className="w-3 h-3" />
+                        14h-15h30
+                      </div>
+                      <div className="font-semibold text-sm">EF-456-UV</div>
+                      <div className="text-xs text-muted-foreground">Volkswagen Golf</div>
+                      <div className="text-xs text-muted-foreground">Polissage final</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        Martin Dubois
+                      </div>
+                      <div className="text-xs text-muted-foreground">Client: Mme Blanc</div>
+                      <Badge className="bg-purple-100 text-purple-800 text-xs">Finitions & remontage</Badge>
+                    </div>
+                  </Card>
+                </CardContent>
+              </Card>
+
+              {/* Mercredi */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg text-blue-600">Mercredi</CardTitle>
+                  <p className="text-sm text-muted-foreground">3 tâche(s)</p>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {/* Tâche 1 */}
+                  <Card className="border-l-4 border-l-green-500 p-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-green-600">
+                        <Clock className="w-3 h-3" />
+                        8h-11h
+                      </div>
+                      <div className="font-semibold text-sm">HT-556-GH</div>
+                      <div className="text-xs text-muted-foreground">BMW Série 1</div>
+                      <div className="text-xs text-muted-foreground">Remplacement pare-chocs</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        Sophie Martin
+                      </div>
+                      <div className="text-xs text-muted-foreground">Client: M. Rousseau</div>
+                      <Badge className="bg-green-100 text-green-800 text-xs">Remplacement ou débosselage</Badge>
+                    </div>
+                  </Card>
+
+                  {/* Tâche 2 */}
+                  <Card className="border-l-4 border-l-red-500 p-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-red-600">
+                        <Clock className="w-3 h-3" />
+                        11h-11h30
+                      </div>
+                      <div className="font-semibold text-sm">GH-789-ST</div>
+                      <div className="text-xs text-muted-foreground">Ford Focus</div>
+                      <div className="text-xs text-muted-foreground">Contrôle qualité</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        Martin Dubois
+                      </div>
+                      <div className="text-xs text-muted-foreground">Client: M. Roux</div>
+                      <Badge className="bg-red-100 text-red-800 text-xs">Clôture du dossier et livraison</Badge>
+                    </div>
+                  </Card>
+
+                  {/* Tâche 3 */}
+                  <Card className="border-l-4 border-l-purple-500 p-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-purple-600">
+                        <Clock className="w-3 h-3" />
+                        14h-15h
+                      </div>
+                      <div className="font-semibold text-sm">CD-123-ZW</div>
+                      <div className="text-xs text-muted-foreground">Renault Clio</div>
+                      <div className="text-xs text-muted-foreground">Finitions peinture</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        Sophie Martin
+                      </div>
+                      <div className="text-xs text-muted-foreground">Client: M. Petit</div>
+                      <Badge className="bg-purple-100 text-purple-800 text-xs">Finitions & remontage</Badge>
+                    </div>
+                  </Card>
+                </CardContent>
+              </Card>
+
+              {/* Jeudi */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg text-blue-600">Jeudi</CardTitle>
+                  <p className="text-sm text-muted-foreground">2 tâche(s)</p>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {/* Tâche 1 */}
+                  <Card className="border-l-4 border-l-yellow-500 p-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-yellow-600">
+                        <Clock className="w-3 h-3" />
+                        9h-12h
+                      </div>
+                      <div className="font-semibold text-sm">AB-789-XY</div>
+                      <div className="text-xs text-muted-foreground">Peugeot 308</div>
+                      <div className="text-xs text-muted-foreground">Application peinture</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        Sophie Martin
+                      </div>
+                      <div className="text-xs text-muted-foreground">Client: Mme Moreau</div>
+                      <Badge className="bg-yellow-100 text-yellow-800 text-xs">Mise en peinture</Badge>
+                    </div>
+                  </Card>
+
+                  {/* Tâche 2 */}
+                  <Card className="border-l-4 border-l-green-500 p-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-green-600">
+                        <Clock className="w-3 h-3" />
+                        14h-16h
+                      </div>
+                      <div className="font-semibold text-sm">EZ-787-KL</div>
+                      <div className="text-xs text-muted-foreground">Citroën C4</div>
+                      <div className="text-xs text-muted-foreground">Débosselage léger</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        Martin Dubois
+                      </div>
+                      <div className="text-xs text-muted-foreground">Client: M. Durand</div>
+                      <Badge className="bg-green-100 text-green-800 text-xs">Remplacement ou débosselage</Badge>
+                    </div>
+                  </Card>
+                </CardContent>
+              </Card>
+
+              {/* Vendredi */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg text-blue-600">Vendredi</CardTitle>
+                  <p className="text-sm text-muted-foreground">3 tâche(s)</p>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {/* Tâche 1 */}
+                  <Card className="border-l-4 border-l-yellow-500 p-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-yellow-600">
+                        <Clock className="w-3 h-3" />
+                        8h-10h
+                      </div>
+                      <div className="font-semibold text-sm">HT-556-GH</div>
+                      <div className="text-xs text-muted-foreground">BMW Série 1</div>
+                      <div className="text-xs text-muted-foreground">Préparation peinture</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        Sophie Martin
+                      </div>
+                      <div className="text-xs text-muted-foreground">Client: M. Rousseau</div>
+                      <Badge className="bg-yellow-100 text-yellow-800 text-xs">Préparation peinture</Badge>
+                    </div>
+                  </Card>
+
+                  {/* Tâche 2 */}
+                  <Card className="border-l-4 border-l-purple-500 p-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-purple-600">
+                        <Clock className="w-3 h-3" />
+                        10h-12h
+                      </div>
+                      <div className="font-semibold text-sm">AB-789-XY</div>
+                      <div className="text-xs text-muted-foreground">Peugeot 308</div>
+                      <div className="text-xs text-muted-foreground">Finitions & remontage</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        Martin Dubois
+                      </div>
+                      <div className="text-xs text-muted-foreground">Client: Mme Moreau</div>
+                      <Badge className="bg-purple-100 text-purple-800 text-xs">Finitions & remontage</Badge>
+                    </div>
+                  </Card>
+
+                  {/* Tâche 3 */}
+                  <Card className="border-l-4 border-l-red-500 p-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-red-600">
+                        <Clock className="w-3 h-3" />
+                        14h-14h30
+                      </div>
+                      <div className="font-semibold text-sm">EZ-787-KL</div>
+                      <div className="text-xs text-muted-foreground">Citroën C4</div>
+                      <div className="text-xs text-muted-foreground">Livraison client</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        Martin Dubois
+                      </div>
+                      <div className="text-xs text-muted-foreground">Client: M. Durand</div>
+                      <Badge className="bg-red-100 text-red-800 text-xs">Clôture du dossier et livraison</Badge>
+                    </div>
+                  </Card>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="employees">
