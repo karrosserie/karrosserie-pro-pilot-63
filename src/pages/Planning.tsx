@@ -12,14 +12,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import StatsCard from '@/components/dashboard/StatsCard';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCompany } from '@/hooks/use-company';
 import { useCompanyId } from '@/hooks/use-company-id';
 
 const Planning = () => {
-  const { companyId } = useCompanyId();
+  const { companyInfo } = useCompany();
   const { user } = useAuth();
 
   console.log('Planning component - user:', user);
-  console.log('Planning component - companyId:', companyId);
+  console.log('Planning component - companyInfo:', companyInfo);
   const [activeView, setActiveView] = useState("manager");
   const [activeProcessStep, setActiveProcessStep] = useState("accueil");
   const [showWaitingVehiclesModal, setShowWaitingVehiclesModal] = useState(false);
@@ -37,14 +38,16 @@ const Planning = () => {
   // Récupérer les membres de l'équipe
   useEffect(() => {
     const fetchTeamMembers = async () => {
-      if (!companyId) {
-        console.log('No companyId available');
+      if (!companyInfo?.id) {
+        console.log('No companyInfo.id available');
         return;
       }
       
-      console.log('Fetching team members for companyId:', companyId);
+      console.log('Fetching team members for companyId:', companyInfo.id);
+      console.log('Current user:', user);
       
       try {
+        // Requête principale pour les membres de l'équipe (même approche que TeamTab)
         const { data, error } = await supabase
           .from('user_companies')
           .select(`
@@ -52,14 +55,9 @@ const Planning = () => {
             user_id,
             role,
             active,
-            profiles (
-              first_name,
-              last_name,
-              email
-            )
+            created_at
           `)
-          .eq('company_id', companyId)
-          .eq('active', true);
+          .eq('company_id', companyInfo.id);
 
         console.log('Team members query result:', { data, error });
 
@@ -68,15 +66,35 @@ const Planning = () => {
           throw error;
         }
         
-        console.log('Team members data:', data);
-        setTeamMembers(data || []);
+        // Récupérer les profils séparément pour chaque utilisateur (comme dans TeamTab)
+        const membersWithProfiles = await Promise.all(
+          (data || []).map(async (member) => {
+            console.log('Fetching profile for user:', member.user_id);
+            const { data: profile, error: profileError } = await supabase
+              .from('profiles')
+              .select('first_name, last_name, email, phone_number')
+              .eq('id', member.user_id)
+              .single();
+            
+            console.log('Profile data for', member.user_id, ':', { profile, profileError });
+            
+            return {
+              ...member,
+              profiles: profile || null
+            };
+          })
+        );
+        
+        console.log('Members with profiles:', membersWithProfiles);
+        setTeamMembers(membersWithProfiles);
       } catch (error) {
         console.error('Erreur lors du chargement des membres de l\'équipe:', error);
+        setTeamMembers([]);
       }
     };
 
     fetchTeamMembers();
-  }, [companyId]);
+  }, [companyInfo?.id, user]);
   const [urgentVehicleFormData, setUrgentVehicleFormData] = useState({
     licensePlate: "",
     assignmentTime: "",
@@ -2893,7 +2911,7 @@ const Planning = () => {
                 <Label htmlFor="teamMember">Membre de l'équipe <span className="text-red-500">*</span></Label>
                 {/* Debug info temporaire */}
                 <div className="text-xs text-gray-500 mb-2">
-                  Debug: {teamMembers.length} membre(s) trouvé(s) | CompanyId: {companyId || 'Non défini'}
+                  Debug: {teamMembers.length} membre(s) trouvé(s) | CompanyId: {companyInfo?.id || 'Non défini'}
                 </div>
                 <Select 
                   value={employeeFormData.teamMemberId}
