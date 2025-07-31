@@ -850,7 +850,7 @@ const Planning = () => {
               <Select defaultValue="sophie">
                 <SelectTrigger
                   id="employee_select"
-                  className="min-w-[200px]"
+                  className="w-[200px]"
                 >
                   <SelectValue placeholder="Sélectionner un employé" />
                 </SelectTrigger>
@@ -986,7 +986,7 @@ const Planning = () => {
                         </div>
                         <div className="flex flex-col items-end gap-2">
                           <Badge className="bg-orange-100 text-orange-800">Planifié</Badge>
-                          <Button size="sm" className="bg-primary hover:bg-primary/90">
+                          <Button size="sm" className="bg-orange-600 hover:bg-orange-700 text-white">
                             <CheckCircle className="w-3 h-3 mr-1" />
                             Terminer
                           </Button>
