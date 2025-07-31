@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash, Play } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import StatsCard from '@/components/dashboard/StatsCard';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCompanyId } from '@/hooks/use-company-id';
 
 const Planning = () => {
+  const { companyId } = useCompanyId();
   const [activeView, setActiveView] = useState("manager");
   const [activeProcessStep, setActiveProcessStep] = useState("accueil");
   const [showWaitingVehiclesModal, setShowWaitingVehiclesModal] = useState(false);
@@ -21,11 +25,42 @@ const Planning = () => {
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<any>(null);
   const [employeeFormData, setEmployeeFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
+    teamMemberId: "",
     qualifications: [] as string[]
   });
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+
+  // Récupérer les membres de l'équipe
+  useEffect(() => {
+    const fetchTeamMembers = async () => {
+      if (!companyId) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('user_companies')
+          .select(`
+            id,
+            user_id,
+            role,
+            active,
+            profiles (
+              first_name,
+              last_name,
+              email
+            )
+          `)
+          .eq('company_id', companyId)
+          .eq('active', true);
+
+        if (error) throw error;
+        setTeamMembers(data || []);
+      } catch (error) {
+        console.error('Erreur lors du chargement des membres de l\'équipe:', error);
+      }
+    };
+
+    fetchTeamMembers();
+  }, [companyId]);
   const [urgentVehicleFormData, setUrgentVehicleFormData] = useState({
     licensePlate: "",
     assignmentTime: "",
@@ -1372,9 +1407,7 @@ const Planning = () => {
                   onClick={() => {
                     setEditingEmployee(null);
                     setEmployeeFormData({
-                      fullName: "",
-                      email: "",
-                      phone: "",
+                      teamMemberId: "",
                       qualifications: []
                     });
                     setShowEmployeeDialog(true);
@@ -1409,9 +1442,7 @@ const Planning = () => {
                               qualifications: ["Accueil & Préparation du dossier", "Remplacement ou débosselage", "Finitions & remontage"]
                             });
                             setEmployeeFormData({
-                              fullName: "Martin Dubois",
-                              email: "martin.dubois@carrosserie.fr",
-                              phone: "06.12.34.56.78",
+                              teamMemberId: "", // On laisse vide car c'est un employé statique
                               qualifications: ["Accueil & Préparation du dossier", "Remplacement ou débosselage", "Finitions & remontage"]
                             });
                             setShowEmployeeDialog(true);
@@ -1475,9 +1506,7 @@ const Planning = () => {
                               qualifications: ["Préparation peinture", "Mise en peinture", "Finitions & remontage"]
                             });
                             setEmployeeFormData({
-                              fullName: "Sophie Martin",
-                              email: "sophie.martin@carrosserie.fr",
-                              phone: "06.23.45.67.89",
+                              teamMemberId: "", // On laisse vide car c'est un employé statique
                               qualifications: ["Préparation peinture", "Mise en peinture", "Finitions & remontage"]
                             });
                             setShowEmployeeDialog(true);
@@ -2843,38 +2872,24 @@ const Planning = () => {
             </DialogHeader>
             
             <div className="space-y-4 py-4">
-              {/* Nom complet */}
+              {/* Membre de l'équipe */}
               <div className="space-y-2">
-                <Label htmlFor="fullName">Nom complet <span className="text-red-500">*</span></Label>
-                <Input 
-                  id="fullName" 
-                  value={employeeFormData.fullName}
-                  onChange={(e) => setEmployeeFormData(prev => ({ ...prev, fullName: e.target.value }))}
-                  placeholder="Martin Dubois"
-                />
-              </div>
-
-              {/* Email */}
-              <div className="space-y-2">
-                <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
-                <Input 
-                  id="email" 
-                  type="email"
-                  value={employeeFormData.email}
-                  onChange={(e) => setEmployeeFormData(prev => ({ ...prev, email: e.target.value }))}
-                  placeholder="martin.dubois@carrosserie.fr"
-                />
-              </div>
-
-              {/* Téléphone */}
-              <div className="space-y-2">
-                <Label htmlFor="phone">Téléphone</Label>
-                <Input 
-                  id="phone" 
-                  value={employeeFormData.phone}
-                  onChange={(e) => setEmployeeFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  placeholder="06.12.34.56.78"
-                />
+                <Label htmlFor="teamMember">Membre de l'équipe <span className="text-red-500">*</span></Label>
+                <Select 
+                  value={employeeFormData.teamMemberId}
+                  onValueChange={(value) => setEmployeeFormData(prev => ({ ...prev, teamMemberId: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner un membre de l'équipe" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border border-border shadow-md z-50">
+                    {teamMembers.map((member) => (
+                      <SelectItem key={member.id} value={member.id}>
+                        {member.profiles?.first_name} {member.profiles?.last_name} - {member.role}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Qualifications */}
