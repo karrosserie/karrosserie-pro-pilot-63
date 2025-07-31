@@ -19,6 +19,9 @@ import {
 import { Pencil, Trash, CreditCard, Building, Wallet, RefreshCw, Link } from 'lucide-react';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
+import { useCompanyId } from '@/hooks/use-company-id';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 interface Account {
   id: string;
@@ -43,7 +46,12 @@ interface AccountsTableProps {
 
 export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTableProps) => {
   const [showBankConnectDialog, setShowBankConnectDialog] = useState(false);
+  const [showIframeDialog, setShowIframeDialog] = useState(false);
+  const [iframeUrl, setIframeUrl] = useState('');
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const { sortedData, sortConfig, handleSort } = useTableSorting(accounts, 'name');
+  const { companyId } = useCompanyId();
+  const { user, profile } = useAuth();
   
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -76,6 +84,44 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
       style: 'currency',
       currency: 'EUR'
     }).format(amount);
+  };
+
+  const handleBankConnection = async () => {
+    if (!companyId || !selectedAccount || !user?.email) {
+      toast.error('Informations manquantes pour la connexion bancaire');
+      return;
+    }
+
+    try {
+      const response = await fetch('https://n8n.karrosserie.pro/webhook/55668c4e-89f9-4987-91df-c1e05b12693d', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          companyId: companyId,
+          accountId: selectedAccount.id,
+          email: user.email
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la connexion bancaire');
+      }
+
+      const data = await response.json();
+      
+      if (data.url) {
+        setIframeUrl(data.url);
+        setShowBankConnectDialog(false);
+        setShowIframeDialog(true);
+      } else {
+        toast.error('URL de connexion non reçue');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la connexion bancaire:', error);
+      toast.error('Erreur lors de la connexion bancaire');
+    }
   };
 
   if (sortedData.length === 0) {
@@ -129,16 +175,29 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
             </div>
             <div className="pt-4 border-t">
               <Button 
-                className="w-full bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
-                onClick={() => {
-                  // Ici vous pouvez ajouter la logique de connexion bancaire
-                  console.log('Connexion bancaire Bridge');
-                  setShowBankConnectDialog(false);
-                }}
+                className="w-full bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white mt-2"
+                onClick={handleBankConnection}
               >
                 Je relie mon compte en 30 secondes →
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showIframeDialog} onOpenChange={setShowIframeDialog}>
+        <DialogContent className="sm:max-w-4xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Connexion bancaire</DialogTitle>
+          </DialogHeader>
+          <div className="h-[600px] w-full">
+            {iframeUrl && (
+              <iframe
+                src={iframeUrl}
+                className="w-full h-full border-0 rounded-lg"
+                title="Connexion bancaire"
+              />
+            )}
           </div>
         </DialogContent>
       </Dialog>
@@ -193,7 +252,10 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                     <Button 
                       variant="outline"
                       size="sm"
-                      onClick={() => setShowBankConnectDialog(true)}
+                      onClick={() => {
+                        setSelectedAccount(account);
+                        setShowBankConnectDialog(true);
+                      }}
                     >
                       <Link className="h-4 w-4 mr-1" />
                       Connecter
