@@ -1075,14 +1075,125 @@ const Planning = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="staff">
-            <Card>
-              <CardContent className="p-8 text-center">
-                <User className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Employés</h3>
-                <p className="text-muted-foreground">Gestion des employés et de leurs compétences</p>
-              </CardContent>
-            </Card>
+          <TabsContent value="staff" className="space-y-6">
+            <div className="space-y-6">
+              {/* En-tête avec bouton d'ajout */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800">Gestion des Employés</h2>
+                  <p className="text-gray-600 mt-1">Créer et gérer les profils avec leurs qualifications</p>
+                </div>
+                <Button className="bg-primary hover:bg-primary/90">
+                  <User className="w-4 h-4 mr-2" />
+                  Ajouter un employé
+                </Button>
+              </div>
+
+              {/* Qualifications disponibles */}
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold mb-4">Qualifications disponibles :</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge className="bg-primary/10 text-primary border border-primary/20">
+                      Accueil & Préparation du dossier
+                    </Badge>
+                    <Badge className="bg-green-100 text-green-800 border border-green-200">
+                      Remplacement ou débosselage
+                    </Badge>
+                    <Badge className="bg-orange-100 text-orange-800 border border-orange-200">
+                      Préparation peinture
+                    </Badge>
+                    <Badge className="bg-red-100 text-red-800 border border-red-200">
+                      Mise en peinture
+                    </Badge>
+                    <Badge className="bg-gray-100 text-gray-800 border border-gray-200">
+                      Finitions & remontage
+                    </Badge>
+                    <Badge className="bg-gray-100 text-gray-800 border border-gray-200">
+                      Clôture du dossier et livraison
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Liste des employés */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Martin Dubois */}
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="text-xl font-semibold text-gray-800">Martin Dubois</h3>
+                        <p className="text-sm text-gray-600">martin.dubois@carrosserie.fr</p>
+                        <p className="text-sm text-gray-600">06.12.34.56.78</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" className="p-2">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button size="sm" variant="outline" className="p-2 text-red-600 hover:text-red-700">
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Qualifications :</h4>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge className="bg-primary/10 text-primary border border-primary/20 text-xs">
+                          Accueil & Préparation du dossier
+                        </Badge>
+                        <Badge className="bg-green-100 text-green-800 border border-green-200 text-xs">
+                          Remplacement ou débosselage
+                        </Badge>
+                        <Badge className="bg-gray-100 text-gray-800 border border-gray-200 text-xs">
+                          Finitions & remontage
+                        </Badge>
+                        <Badge className="bg-gray-100 text-gray-800 border border-gray-200 text-xs">
+                          Clôture du dossier et livraison
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Sophie Martin */}
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="text-xl font-semibold text-gray-800">Sophie Martin</h3>
+                        <p className="text-sm text-gray-600">sophie.martin@carrosserie.fr</p>
+                        <p className="text-sm text-gray-600">06.23.45.67.89</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" className="p-2">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button size="sm" variant="outline" className="p-2 text-red-600 hover:text-red-700">
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Qualifications :</h4>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge className="bg-orange-100 text-orange-800 border border-orange-200 text-xs">
+                          Préparation peinture
+                        </Badge>
+                        <Badge className="bg-red-100 text-red-800 border border-red-200 text-xs">
+                          Mise en peinture
+                        </Badge>
+                        <Badge className="bg-gray-100 text-gray-800 border border-gray-200 text-xs">
+                          Finitions & remontage
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="process">
