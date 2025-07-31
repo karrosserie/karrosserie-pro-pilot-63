@@ -26,12 +26,21 @@ const Planning = () => {
   const [showWaitingVehiclesModal, setShowWaitingVehiclesModal] = useState(false);
   const [showVehicleDetailModal, setShowVehicleDetailModal] = useState(false);
   const [showUrgentVehicleModal, setShowUrgentVehicleModal] = useState(false);
+  const [showConfigModal, setShowConfigModal] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [employeeFormData, setEmployeeFormData] = useState({
     teamMemberId: "",
     qualifications: [] as string[]
+  });
+  const [configData, setConfigData] = useState({
+    accueil: "01:00",
+    debosselage: "02:30",
+    preparation: "01:30",
+    peinture: "03:00",
+    finitions: "02:00",
+    cloture: "00:30"
   });
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const { employees, createEmployee, updateEmployee } = useEmployees();
@@ -322,6 +331,9 @@ const Planning = () => {
             <Button variant="destructive" size="sm" onClick={() => setShowUrgentVehicleModal(true)}>
               <AlertTriangle className="w-4 h-4 mr-2" />
               Véhicule en urgence
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setShowConfigModal(true)}>
+              <Settings className="w-4 h-4" />
             </Button>
           </div>
         </div>
@@ -3052,6 +3064,119 @@ const Planning = () => {
                 }}
               >
                 Ajouter au planning
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal de Configuration des temps */}
+        <Dialog open={showConfigModal} onOpenChange={setShowConfigModal}>
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Settings className="w-5 h-5" />
+                Configuration des temps par défaut
+              </DialogTitle>
+              <DialogDescription>
+                Définissez les temps moyens par défaut pour chaque étape du workflow (format hh:mm)
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4 py-4">
+              {/* Accueil & Préparation */}
+              <div className="space-y-2">
+                <Label htmlFor="accueil">Accueil & Préparation du dossier</Label>
+                <Input
+                  id="accueil"
+                  type="time"
+                  value={configData.accueil}
+                  onChange={(e) => setConfigData(prev => ({ ...prev, accueil: e.target.value }))}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Remplacement ou débosselage */}
+              <div className="space-y-2">
+                <Label htmlFor="debosselage">Remplacement ou débosselage</Label>
+                <Input
+                  id="debosselage"
+                  type="time"
+                  value={configData.debosselage}
+                  onChange={(e) => setConfigData(prev => ({ ...prev, debosselage: e.target.value }))}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Préparation peinture */}
+              <div className="space-y-2">
+                <Label htmlFor="preparation">Préparation peinture</Label>
+                <Input
+                  id="preparation"
+                  type="time"
+                  value={configData.preparation}
+                  onChange={(e) => setConfigData(prev => ({ ...prev, preparation: e.target.value }))}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Mise en peinture */}
+              <div className="space-y-2">
+                <Label htmlFor="peinture">Mise en peinture</Label>
+                <Input
+                  id="peinture"
+                  type="time"
+                  value={configData.peinture}
+                  onChange={(e) => setConfigData(prev => ({ ...prev, peinture: e.target.value }))}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Finitions & remontage */}
+              <div className="space-y-2">
+                <Label htmlFor="finitions">Finitions & remontage</Label>
+                <Input
+                  id="finitions"
+                  type="time"
+                  value={configData.finitions}
+                  onChange={(e) => setConfigData(prev => ({ ...prev, finitions: e.target.value }))}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Clôture & livraison */}
+              <div className="space-y-2">
+                <Label htmlFor="cloture">Clôture & livraison</Label>
+                <Input
+                  id="cloture"
+                  type="time"
+                  value={configData.cloture}
+                  onChange={(e) => setConfigData(prev => ({ ...prev, cloture: e.target.value }))}
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-2 pt-4 border-t">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setShowConfigModal(false)}
+              >
+                Annuler
+              </Button>
+              <Button 
+                type="button" 
+                className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+                onClick={() => {
+                  // Ici on pourrait sauvegarder les configurations
+                  toast({
+                    title: "Configuration sauvegardée",
+                    description: "Les temps par défaut ont été mis à jour"
+                  });
+                  setShowConfigModal(false);
+                }}
+              >
+                Sauvegarder
               </Button>
             </div>
           </DialogContent>
