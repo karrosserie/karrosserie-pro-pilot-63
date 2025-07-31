@@ -406,8 +406,15 @@ const Planning = () => {
               </div>
             </div>
 
-            {/* Planning Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            {/* Planning détaillé */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-muted-foreground" />
+                <h3 className="text-lg font-semibold">Planning détaillé</h3>
+              </div>
+
+              {/* Planning Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               {/* Lundi */}
               <Card>
                 <CardHeader className="pb-3">
