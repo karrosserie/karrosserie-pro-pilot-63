@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import StatsCard from '@/components/dashboard/StatsCard';
 
 const Planning = () => {
@@ -844,11 +846,19 @@ const Planning = () => {
           <TabsContent value="employees" className="space-y-6">
             {/* Sélecteur d'employé */}
             <div className="flex items-center gap-4">
-              <label className="text-sm font-medium">Employé :</label>
-              <select className="px-3 py-2 border border-input rounded-md bg-background text-sm min-w-[200px]">
-                <option value="sophie">Sophie Martin</option>
-                <option value="martin">Martin Dubois</option>
-              </select>
+              <Label htmlFor="employee_select">Employé :</Label>
+              <Select defaultValue="sophie">
+                <SelectTrigger
+                  id="employee_select"
+                  className="min-w-[200px]"
+                >
+                  <SelectValue placeholder="Sélectionner un employé" />
+                </SelectTrigger>
+                <SelectContent className="bg-background border border-border shadow-md z-50">
+                  <SelectItem value="sophie">Sophie Martin</SelectItem>
+                  <SelectItem value="martin">Martin Dubois</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <Card data-lov-id="src/pages/Planning.tsx:844:10">
@@ -942,8 +952,8 @@ const Planning = () => {
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-2">
-                          <Badge className="bg-primary text-primary-foreground">En cours</Badge>
-                          <Button size="sm" className="bg-primary hover:bg-primary/90">
+                          <Badge className="bg-blue-100 text-blue-800">En cours</Badge>
+                          <Button size="sm" className="bg-orange-600 hover:bg-orange-700 text-white">
                             <CheckCircle className="w-3 h-3 mr-1" />
                             Terminer
                           </Button>
@@ -975,7 +985,7 @@ const Planning = () => {
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-2">
-                          <Badge variant="outline" className="border-orange-200 text-orange-700">Planifié</Badge>
+                          <Badge className="bg-orange-100 text-orange-800">Planifié</Badge>
                           <Button size="sm" className="bg-primary hover:bg-primary/90">
                             <CheckCircle className="w-3 h-3 mr-1" />
                             Terminer
@@ -1014,10 +1024,7 @@ const Planning = () => {
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-2">
-                          <Badge className="bg-green-600 text-white">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Terminé
-                          </Badge>
+                          <Badge className="bg-green-100 text-green-800">Terminé</Badge>
                           <Button size="sm" variant="outline">
                             Voir détails
                           </Button>
@@ -1039,10 +1046,7 @@ const Planning = () => {
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-2">
-                          <Badge className="bg-green-600 text-white">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Terminé
-                          </Badge>
+                          <Badge className="bg-green-100 text-green-800">Terminé</Badge>
                           <Button size="sm" variant="outline">
                             Voir détails
                           </Button>
