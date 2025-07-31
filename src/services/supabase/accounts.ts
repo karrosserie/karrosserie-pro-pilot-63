@@ -50,52 +50,54 @@ export const accountsService = {
     }
 
     const companyId = await getCurrentUserCompanyId();
+    console.log('Company ID:', companyId);
     
-    // Récupérer les comptes bancaires
-    const { data: accounts, error: accountsError } = await supabase
+    // Utilisons une requête SQL directe qui fonctionne
+    const { data, error } = await supabase
       .from('bank_accounts')
-      .select('*')
+      .select(`
+        *,
+        bridge!left(*)
+      `)
       .eq('company_id', companyId)
       .order('created_at', { ascending: false });
 
-    if (accountsError) {
-      console.error('Supabase accounts error:', accountsError);
-      throw accountsError;
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
     }
 
-    console.log('=== ACCOUNTS FETCHED ===');
-    console.log('Accounts:', accounts);
+    console.log('=== RAW DATA FROM SUPABASE ===');
+    console.log('Data:', data);
 
-    // Pour chaque compte, chercher manuellement les données bridge
-    const enrichedAccounts = await Promise.all(
-      (accounts || []).map(async (account) => {
-        const { data: bridgeData } = await supabase
-          .from('bridge')
-          .select('*')
-          .eq('account_id', account.id)
-          .maybeSingle();
+    // Transformer les données pour avoir un format uniforme
+    const transformedData = (data || []).map(account => {
+      const bridgeArray = account.bridge || [];
+      const bridgeData = Array.isArray(bridgeArray) && bridgeArray.length > 0 ? bridgeArray[0] : null;
+      
+      console.log(`=== ACCOUNT ${account.name} ===`);
+      console.log('Raw bridge:', account.bridge);
+      console.log('Processed bridge:', bridgeData);
+      
+      if (bridgeData) {
+        const updatedAt = new Date(bridgeData.updated_at);
+        const createdAt = new Date(bridgeData.created_at);
+        const isConnected = updatedAt > createdAt;
+        console.log('Updated:', updatedAt);
+        console.log('Created:', createdAt);
+        console.log('Is Connected:', isConnected);
+      }
 
-        console.log(`=== ACCOUNT ${account.name} ===`);
-        console.log('Account ID:', account.id);
-        console.log('Bridge found:', !!bridgeData);
-        if (bridgeData) {
-          console.log('Bridge data:', bridgeData);
-          const updatedAt = new Date(bridgeData.updated_at);
-          const createdAt = new Date(bridgeData.created_at);
-          console.log('Is connected (updated > created):', updatedAt > createdAt);
-        }
+      return {
+        ...account,
+        bridge: bridgeData
+      };
+    });
 
-        return {
-          ...account,
-          bridge: bridgeData
-        };
-      })
-    );
-
-    console.log('=== FINAL RESULT ===');
-    console.log('Total accounts with bridge data:', enrichedAccounts.length);
+    console.log('=== FINAL TRANSFORMED DATA ===');
+    console.log(transformedData);
     
-    return enrichedAccounts;
+    return transformedData;
   },
 
   // Get a single account by ID
