@@ -159,7 +159,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
               <div>Vérification bancaire 100 % sécurisée</div>
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 pt-4">
             <div className="space-y-3 text-sm text-gray-700">
               <div className="flex items-start gap-3">
                 <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
