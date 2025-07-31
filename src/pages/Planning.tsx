@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash, Play } from "lucide-react";
+import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash, Play, Crown, UserCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,9 +18,6 @@ import { useCompanyId } from '@/hooks/use-company-id';
 const Planning = () => {
   const { companyInfo } = useCompany();
   const { user } = useAuth();
-
-  console.log('Planning component - user:', user);
-  console.log('Planning component - companyInfo:', companyInfo);
   const [activeView, setActiveView] = useState("manager");
   const [activeProcessStep, setActiveProcessStep] = useState("accueil");
   const [showWaitingVehiclesModal, setShowWaitingVehiclesModal] = useState(false);
@@ -38,16 +35,9 @@ const Planning = () => {
   // Récupérer les membres de l'équipe
   useEffect(() => {
     const fetchTeamMembers = async () => {
-      if (!companyInfo?.id) {
-        console.log('No companyInfo.id available');
-        return;
-      }
-      
-      console.log('Fetching team members for companyId:', companyInfo.id);
-      console.log('Current user:', user);
+      if (!companyInfo?.id) return;
       
       try {
-        // Requête principale pour les membres de l'équipe (même approche que TeamTab)
         const { data, error } = await supabase
           .from('user_companies')
           .select(`
@@ -59,24 +49,16 @@ const Planning = () => {
           `)
           .eq('company_id', companyInfo.id);
 
-        console.log('Team members query result:', { data, error });
-
-        if (error) {
-          console.error('Error fetching team members:', error);
-          throw error;
-        }
+        if (error) throw error;
         
-        // Récupérer les profils séparément pour chaque utilisateur (comme dans TeamTab)
+        // Récupérer les profils séparément pour chaque utilisateur
         const membersWithProfiles = await Promise.all(
           (data || []).map(async (member) => {
-            console.log('Fetching profile for user:', member.user_id);
-            const { data: profile, error: profileError } = await supabase
+            const { data: profile } = await supabase
               .from('profiles')
               .select('first_name, last_name, email, phone_number')
               .eq('id', member.user_id)
               .single();
-            
-            console.log('Profile data for', member.user_id, ':', { profile, profileError });
             
             return {
               ...member,
@@ -85,7 +67,6 @@ const Planning = () => {
           })
         );
         
-        console.log('Members with profiles:', membersWithProfiles);
         setTeamMembers(membersWithProfiles);
       } catch (error) {
         console.error('Erreur lors du chargement des membres de l\'équipe:', error);
@@ -322,6 +303,7 @@ const Planning = () => {
               size="sm"
               className={activeView === "manager" ? "bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white" : ""}
             >
+              <Crown className="w-4 h-4 mr-2" />
               Vue Manager
             </Button>
             <Button
@@ -330,6 +312,7 @@ const Planning = () => {
               size="sm"
               className={activeView === "employee" ? "bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white" : ""}
             >
+              <UserCheck className="w-4 h-4 mr-2" />
               Vue Employé
             </Button>
             <Button variant="destructive" size="sm" onClick={() => setShowUrgentVehicleModal(true)}>
@@ -2909,38 +2892,25 @@ const Planning = () => {
               {/* Membre de l'équipe */}
               <div className="space-y-2">
                 <Label htmlFor="teamMember">Membre de l'équipe <span className="text-red-500">*</span></Label>
-                {/* Debug info temporaire */}
-                <div className="text-xs text-gray-500 mb-2">
-                  Debug: {teamMembers.length} membre(s) trouvé(s) | CompanyId: {companyInfo?.id || 'Non défini'}
-                </div>
                 <Select 
                   value={employeeFormData.teamMemberId}
-                  onValueChange={(value) => {
-                    console.log('Selected team member:', value);
-                    setEmployeeFormData(prev => ({ ...prev, teamMemberId: value }));
-                  }}
+                  onValueChange={(value) => setEmployeeFormData(prev => ({ ...prev, teamMemberId: value }))}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner un membre de l'équipe" />
                   </SelectTrigger>
                   <SelectContent className="bg-background border border-border shadow-md z-50">
-                    {(() => {
-                      console.log('Rendering team members options:', teamMembers);
-                      return teamMembers.length === 0 ? (
-                        <SelectItem value="no-members" disabled>
-                          Aucun membre d'équipe trouvé
+                    {teamMembers.length === 0 ? (
+                      <SelectItem value="no-members" disabled>
+                        Aucun membre d'équipe trouvé
+                      </SelectItem>
+                    ) : (
+                      teamMembers.map((member) => (
+                        <SelectItem key={member.id} value={member.id}>
+                          {member.profiles?.first_name} {member.profiles?.last_name} - {member.role}
                         </SelectItem>
-                      ) : (
-                        teamMembers.map((member) => {
-                          console.log('Rendering member:', member);
-                          return (
-                            <SelectItem key={member.id} value={member.id}>
-                              {member.profiles?.first_name} {member.profiles?.last_name} - {member.role}
-                            </SelectItem>
-                          );
-                        })
-                      );
-                    })()}
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
               </div>
