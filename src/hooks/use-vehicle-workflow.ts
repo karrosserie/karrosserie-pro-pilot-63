@@ -125,7 +125,7 @@ export const useVehicleWorkflow = (companyId?: string) => {
             brand: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim() || 'Véhicule',
             plate: vehicle.license_plate,
             client: `${vehicle.clients?.first_name || ''} ${vehicle.clients?.last_name || ''}`.trim() || 'Client inconnu',
-            price: `${amountTTC.toFixed(2)}€`,
+            price: `${amountTTC.toFixed(2).replace('.', ',')}€`,
             duration: "0h", // À calculer selon la configuration
             status: "",
             inProgress: workflowStep?.progress_percentage > 0,

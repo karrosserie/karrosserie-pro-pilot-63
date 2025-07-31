@@ -3457,7 +3457,7 @@ const Planning = () => {
                          
                          {config.fullDay ? (
                            <div className="flex items-center gap-2">
-                             <span className="text-sm text-muted-foreground w-16">De</span>
+                             <span className="text-sm text-muted-foreground w-32">De</span>
                              <Input
                                type="time"
                                value={config.morning.start}
@@ -3470,7 +3470,7 @@ const Planning = () => {
                                    }
                                  }))
                                }
-                               className="w-20"
+                               className="w-30"
                              />
                              <span className="text-muted-foreground">à</span>
                              <Input
@@ -3485,13 +3485,13 @@ const Planning = () => {
                                    }
                                  }))
                                }
-                               className="w-20"
+                               className="w-30"
                              />
                            </div>
                          ) : (
                            <div className="space-y-2">
                              <div className="flex items-center gap-2">
-                               <span className="text-sm text-muted-foreground w-16">Matin</span>
+                               <span className="text-sm text-muted-foreground w-32">Matin</span>
                                <Input
                                  type="time"
                                  value={config.morning.start}
@@ -3504,7 +3504,7 @@ const Planning = () => {
                                      }
                                    }))
                                  }
-                                 className="w-20"
+                                 className="w-30"
                                />
                                <span className="text-muted-foreground">à</span>
                                <Input
@@ -3519,12 +3519,12 @@ const Planning = () => {
                                      }
                                    }))
                                  }
-                                 className="w-20"
+                                 className="w-30"
                                />
                              </div>
                              
                              <div className="flex items-center gap-2">
-                               <span className="text-sm text-muted-foreground w-16">Après-midi</span>
+                               <span className="text-sm text-muted-foreground w-32">Après-midi</span>
                                <Input
                                  type="time"
                                  value={config.afternoon.start}
@@ -3537,7 +3537,7 @@ const Planning = () => {
                                      }
                                    }))
                                  }
-                                 className="w-20"
+                                 className="w-30"
                                />
                                <span className="text-muted-foreground">à</span>
                                <Input
@@ -3552,7 +3552,7 @@ const Planning = () => {
                                      }
                                    }))
                                  }
-                                 className="w-20"
+                                 className="w-30"
                                />
                              </div>
                            </div>
