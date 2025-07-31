@@ -1111,32 +1111,6 @@ const Planning = () => {
                 </Button>
               </div>
 
-              {/* Qualifications disponibles */}
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Qualifications disponibles :</h3>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge className="bg-primary/10 text-primary border border-primary/20">
-                      Accueil & Préparation du dossier
-                    </Badge>
-                    <Badge className="bg-green-100 text-green-800 border border-green-200">
-                      Remplacement ou débosselage
-                    </Badge>
-                    <Badge className="bg-orange-100 text-orange-800 border border-orange-200">
-                      Préparation peinture
-                    </Badge>
-                    <Badge className="bg-red-100 text-red-800 border border-red-200">
-                      Mise en peinture
-                    </Badge>
-                    <Badge className="bg-gray-100 text-gray-800 border border-gray-200">
-                      Finitions & remontage
-                    </Badge>
-                    <Badge className="bg-gray-100 text-gray-800 border border-gray-200">
-                      Clôture du dossier et livraison
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
 
               {/* Liste des employés */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
