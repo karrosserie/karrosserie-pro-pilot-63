@@ -13,6 +13,9 @@ import StatsCard from '@/components/dashboard/StatsCard';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompany } from '@/hooks/use-company';
+import { useEmployees, Employee } from '@/hooks/use-employees';
+import { EmployeesList } from '@/components/planning/EmployeesList';
+import { toast } from '@/hooks/use-toast';
 import { useCompanyId } from '@/hooks/use-company-id';
 
 const Planning = () => {
@@ -25,12 +28,13 @@ const Planning = () => {
   const [showUrgentVehicleModal, setShowUrgentVehicleModal] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
-  const [editingEmployee, setEditingEmployee] = useState<any>(null);
+  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [employeeFormData, setEmployeeFormData] = useState({
     teamMemberId: "",
     qualifications: [] as string[]
   });
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const { createEmployee, updateEmployee } = useEmployees();
 
   // Récupérer les membres de l'équipe
   useEffect(() => {
@@ -1412,158 +1416,24 @@ const Planning = () => {
           </TabsContent>
 
           <TabsContent value="staff" className="space-y-6">
-            <div className="space-y-6">
-              {/* En-tête avec bouton d'ajout */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-800">Gestion des Employés</h2>
-                  <p className="text-gray-600 mt-1">Créer et gérer les profils avec leurs qualifications</p>
-                </div>
-                <Button 
-                  className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-                  onClick={() => {
-                    setEditingEmployee(null);
-                    setEmployeeFormData({
-                      teamMemberId: "",
-                      qualifications: []
-                    });
-                    setShowEmployeeDialog(true);
-                  }}
-                >
-                  <User className="w-4 h-4 mr-2" />
-                  Ajouter un employé
-                </Button>
-              </div>
-
-
-              {/* Liste des employés */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Martin Dubois */}
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-xl font-semibold text-gray-800">Martin Dubois</h3>
-                        <p className="text-sm text-gray-600">martin.dubois@carrosserie.fr</p>
-                        <p className="text-sm text-gray-600">06.12.34.56.78</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => {
-                            setEditingEmployee({
-                              fullName: "Martin Dubois",
-                              email: "martin.dubois@carrosserie.fr",
-                              phone: "06.12.34.56.78",
-                              qualifications: ["Accueil & Préparation du dossier", "Remplacement ou débosselage", "Finitions & remontage"]
-                            });
-                            setEmployeeFormData({
-                              teamMemberId: "", // On laisse vide car c'est un employé statique
-                              qualifications: ["Accueil & Préparation du dossier", "Remplacement ou débosselage", "Finitions & remontage"]
-                            });
-                            setShowEmployeeDialog(true);
-                          }}
-                        >
-                          <Pencil className="h-4 w-4 mr-1" />
-                          Modifier
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                          onClick={() => {
-                            // Handle delete
-                          }}
-                        >
-                          <Trash className="h-4 w-4 mr-1" />
-                          Supprimer
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Qualifications :</h4>
-                      <div className="flex flex-wrap gap-2">
-                        <Badge className="bg-primary/10 text-primary border border-primary/20 text-xs">
-                          Accueil & Préparation du dossier
-                        </Badge>
-                        <Badge className="bg-green-100 text-green-800 border border-green-200 text-xs">
-                          Remplacement ou débosselage
-                        </Badge>
-                        <Badge className="bg-gray-100 text-gray-800 border border-gray-200 text-xs">
-                          Finitions & remontage
-                        </Badge>
-                        <Badge className="bg-gray-100 text-gray-800 border border-gray-200 text-xs">
-                          Clôture du dossier et livraison
-                        </Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Sophie Martin */}
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-xl font-semibold text-gray-800">Sophie Martin</h3>
-                        <p className="text-sm text-gray-600">sophie.martin@carrosserie.fr</p>
-                        <p className="text-sm text-gray-600">06.23.45.67.89</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => {
-                            setEditingEmployee({
-                              fullName: "Sophie Martin",
-                              email: "sophie.martin@carrosserie.fr",
-                              phone: "06.23.45.67.89",
-                              qualifications: ["Préparation peinture", "Mise en peinture", "Finitions & remontage"]
-                            });
-                            setEmployeeFormData({
-                              teamMemberId: "", // On laisse vide car c'est un employé statique
-                              qualifications: ["Préparation peinture", "Mise en peinture", "Finitions & remontage"]
-                            });
-                            setShowEmployeeDialog(true);
-                          }}
-                        >
-                          <Pencil className="h-4 w-4 mr-1" />
-                          Modifier
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                          onClick={() => {
-                            // Handle delete
-                          }}
-                        >
-                          <Trash className="h-4 w-4 mr-1" />
-                          Supprimer
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Qualifications :</h4>
-                      <div className="flex flex-wrap gap-2">
-                        <Badge className="bg-orange-100 text-orange-800 border border-orange-200 text-xs">
-                          Préparation peinture
-                        </Badge>
-                        <Badge className="bg-red-100 text-red-800 border border-red-200 text-xs">
-                          Mise en peinture
-                        </Badge>
-                        <Badge className="bg-gray-100 text-gray-800 border border-gray-200 text-xs">
-                          Finitions & remontage
-                        </Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+            <EmployeesList
+              onAddEmployee={() => {
+                setEditingEmployee(null);
+                setEmployeeFormData({
+                  teamMemberId: "",
+                  qualifications: []
+                });
+                setShowEmployeeDialog(true);
+              }}
+              onEditEmployee={(employee) => {
+                setEditingEmployee(employee);
+                setEmployeeFormData({
+                  teamMemberId: employee.team_member_id || "",
+                  qualifications: employee.qualifications
+                });
+                setShowEmployeeDialog(true);
+              }}
+            />
           </TabsContent>
 
           <TabsContent value="process" className="space-y-6">
@@ -2971,10 +2841,53 @@ const Planning = () => {
               <Button 
                 type="button" 
                 className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-                onClick={() => {
-                  // Handle form submission
-                  console.log("Employee data:", employeeFormData);
-                  setShowEmployeeDialog(false);
+                onClick={async () => {
+                  // Validation
+                  if (!employeeFormData.teamMemberId) {
+                    toast({
+                      title: "Erreur",
+                      description: "Veuillez sélectionner un membre de l'équipe",
+                      variant: "destructive"
+                    });
+                    return;
+                  }
+
+                  if (employeeFormData.qualifications.length === 0) {
+                    toast({
+                      title: "Erreur", 
+                      description: "Veuillez sélectionner au moins une qualification",
+                      variant: "destructive"
+                    });
+                    return;
+                  }
+
+                  try {
+                    if (editingEmployee) {
+                      // Modification
+                      await updateEmployee.mutateAsync({
+                        id: editingEmployee.id,
+                        data: {
+                          team_member_id: employeeFormData.teamMemberId,
+                          qualifications: employeeFormData.qualifications
+                        }
+                      });
+                    } else {
+                      // Création
+                      await createEmployee.mutateAsync({
+                        team_member_id: employeeFormData.teamMemberId,
+                        qualifications: employeeFormData.qualifications
+                      });
+                    }
+                    
+                    setShowEmployeeDialog(false);
+                    setEmployeeFormData({
+                      teamMemberId: "",
+                      qualifications: []
+                    });
+                    setEditingEmployee(null);
+                  } catch (error) {
+                    // L'erreur est déjà gérée par les mutations
+                  }
                 }}
               >
                 {editingEmployee ? "Modifier" : "Créer"}

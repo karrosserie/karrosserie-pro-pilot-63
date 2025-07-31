@@ -461,6 +461,41 @@ export type Database = {
           },
         ]
       }
+      employees: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          qualifications: Json
+          team_member_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          qualifications?: Json
+          team_member_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          qualifications?: Json
+          team_member_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employees_team_member_id_fkey"
+            columns: ["team_member_id"]
+            isOneToOne: false
+            referencedRelation: "user_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       environment: {
         Row: {
           asynchronous_import: boolean
