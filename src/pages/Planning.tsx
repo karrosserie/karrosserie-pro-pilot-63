@@ -388,7 +388,15 @@ const Planning = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Tâche 1 */}
-                  <Card className="border-l-4 border-l-blue-500 p-3">
+                  <Card className="border-l-4 border-l-blue-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                    setSelectedVehicle({
+                      brand: "Citroën C4",
+                      plate: "EZ-787-KL",
+                      client: "M. Durand",
+                      technician: "Martin Dubois"
+                    });
+                    setShowVehicleDetailModal(true);
+                  }}>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm text-blue-600">
                         <Clock className="w-3 h-3" />
@@ -407,7 +415,15 @@ const Planning = () => {
                   </Card>
 
                   {/* Tâche 2 */}
-                  <Card className="border-l-4 border-l-green-500 p-3">
+                  <Card className="border-l-4 border-l-green-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                    setSelectedVehicle({
+                      brand: "Audi A4",
+                      plate: "VS-901-AB",
+                      client: "M. Bernard",
+                      technician: "Sophie Martin"
+                    });
+                    setShowVehicleDetailModal(true);
+                  }}>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm text-green-600">
                         <Clock className="w-3 h-3" />
@@ -426,7 +442,15 @@ const Planning = () => {
                   </Card>
 
                   {/* Tâche 3 */}
-                  <Card className="border-l-4 border-l-yellow-500 p-3">
+                  <Card className="border-l-4 border-l-yellow-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                    setSelectedVehicle({
+                      brand: "Peugeot 308",
+                      plate: "AB-789-XY",
+                      client: "Mme Moreau",
+                      technician: "Sophie Martin"
+                    });
+                    setShowVehicleDetailModal(true);
+                  }}>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm text-yellow-600">
                         <Clock className="w-3 h-3" />
@@ -454,7 +478,15 @@ const Planning = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Tâche 1 */}
-                  <Card className="border-l-4 border-l-blue-500 p-3">
+                  <Card className="border-l-4 border-l-blue-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                    setSelectedVehicle({
+                      brand: "Mercedes Classe C",
+                      plate: "QR-345-ST",
+                      client: "Mme Leclerc",
+                      technician: "Martin Dubois"
+                    });
+                    setShowVehicleDetailModal(true);
+                  }}>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm text-blue-600">
                         <Clock className="w-3 h-3" />
@@ -473,7 +505,15 @@ const Planning = () => {
                   </Card>
 
                   {/* Tâche 2 */}
-                  <Card className="border-l-4 border-l-orange-500 p-3">
+                  <Card className="border-l-4 border-l-orange-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                    setSelectedVehicle({
+                      brand: "Renault Clio",
+                      plate: "CD-123-ZW",
+                      client: "M. Petit",
+                      technician: "Sophie Martin"
+                    });
+                    setShowVehicleDetailModal(true);
+                  }}>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm text-orange-600">
                         <Clock className="w-3 h-3" />
@@ -492,7 +532,15 @@ const Planning = () => {
                   </Card>
 
                   {/* Tâche 3 */}
-                  <Card className="border-l-4 border-l-purple-500 p-3">
+                  <Card className="border-l-4 border-l-purple-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                    setSelectedVehicle({
+                      brand: "Volkswagen Golf",
+                      plate: "EF-456-UV",
+                      client: "Mme Blanc",
+                      technician: "Martin Dubois"
+                    });
+                    setShowVehicleDetailModal(true);
+                  }}>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm text-purple-600">
                         <Clock className="w-3 h-3" />
@@ -520,7 +568,15 @@ const Planning = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Tâche 1 */}
-                  <Card className="border-l-4 border-l-green-500 p-3">
+                  <Card className="border-l-4 border-l-green-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                    setSelectedVehicle({
+                      brand: "BMW Série 1",
+                      plate: "HT-556-GH",
+                      client: "M. Rousseau",
+                      technician: "Sophie Martin"
+                    });
+                    setShowVehicleDetailModal(true);
+                  }}>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm text-green-600">
                         <Clock className="w-3 h-3" />
@@ -539,7 +595,15 @@ const Planning = () => {
                   </Card>
 
                   {/* Tâche 2 */}
-                  <Card className="border-l-4 border-l-red-500 p-3">
+                  <Card className="border-l-4 border-l-red-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                    setSelectedVehicle({
+                      brand: "Ford Focus",
+                      plate: "GH-789-ST",
+                      client: "M. Roux",
+                      technician: "Martin Dubois"
+                    });
+                    setShowVehicleDetailModal(true);
+                  }}>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm text-red-600">
                         <Clock className="w-3 h-3" />
@@ -558,7 +622,15 @@ const Planning = () => {
                   </Card>
 
                   {/* Tâche 3 */}
-                  <Card className="border-l-4 border-l-purple-500 p-3">
+                  <Card className="border-l-4 border-l-purple-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                    setSelectedVehicle({
+                      brand: "Renault Clio",
+                      plate: "CD-123-ZW",
+                      client: "M. Petit",
+                      technician: "Sophie Martin"
+                    });
+                    setShowVehicleDetailModal(true);
+                  }}>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm text-purple-600">
                         <Clock className="w-3 h-3" />
@@ -586,7 +658,15 @@ const Planning = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Tâche 1 */}
-                  <Card className="border-l-4 border-l-yellow-500 p-3">
+                  <Card className="border-l-4 border-l-yellow-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                    setSelectedVehicle({
+                      brand: "Peugeot 308",
+                      plate: "AB-789-XY",
+                      client: "Mme Moreau",
+                      technician: "Sophie Martin"
+                    });
+                    setShowVehicleDetailModal(true);
+                  }}>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm text-yellow-600">
                         <Clock className="w-3 h-3" />
@@ -605,7 +685,15 @@ const Planning = () => {
                   </Card>
 
                   {/* Tâche 2 */}
-                  <Card className="border-l-4 border-l-green-500 p-3">
+                  <Card className="border-l-4 border-l-green-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                    setSelectedVehicle({
+                      brand: "Citroën C4",
+                      plate: "EZ-787-KL",
+                      client: "M. Durand",
+                      technician: "Martin Dubois"
+                    });
+                    setShowVehicleDetailModal(true);
+                  }}>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm text-green-600">
                         <Clock className="w-3 h-3" />
@@ -633,7 +721,15 @@ const Planning = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Tâche 1 */}
-                  <Card className="border-l-4 border-l-yellow-500 p-3">
+                  <Card className="border-l-4 border-l-yellow-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                    setSelectedVehicle({
+                      brand: "BMW Série 1",
+                      plate: "HT-556-GH",
+                      client: "M. Rousseau",
+                      technician: "Sophie Martin"
+                    });
+                    setShowVehicleDetailModal(true);
+                  }}>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm text-yellow-600">
                         <Clock className="w-3 h-3" />
@@ -652,7 +748,15 @@ const Planning = () => {
                   </Card>
 
                   {/* Tâche 2 */}
-                  <Card className="border-l-4 border-l-purple-500 p-3">
+                  <Card className="border-l-4 border-l-purple-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                    setSelectedVehicle({
+                      brand: "Peugeot 308",
+                      plate: "AB-789-XY",
+                      client: "Mme Moreau",
+                      technician: "Martin Dubois"
+                    });
+                    setShowVehicleDetailModal(true);
+                  }}>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm text-purple-600">
                         <Clock className="w-3 h-3" />
@@ -671,7 +775,15 @@ const Planning = () => {
                   </Card>
 
                   {/* Tâche 3 */}
-                  <Card className="border-l-4 border-l-red-500 p-3">
+                  <Card className="border-l-4 border-l-red-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                    setSelectedVehicle({
+                      brand: "Citroën C4",
+                      plate: "EZ-787-KL",
+                      client: "M. Durand",
+                      technician: "Martin Dubois"
+                    });
+                    setShowVehicleDetailModal(true);
+                  }}>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm text-red-600">
                         <Clock className="w-3 h-3" />
@@ -838,7 +950,7 @@ const Planning = () => {
             <DialogHeader className="flex-shrink-0">
               <div className="flex items-center gap-3">
                 <DialogTitle className="text-xl font-semibold">
-                  Détail du véhicule - {selectedVehicle?.plate}
+                  Détails du véhicule - {selectedVehicle?.plate}
                 </DialogTitle>
                 <Badge className="bg-blue-100 text-blue-800">En cours</Badge>
               </div>
