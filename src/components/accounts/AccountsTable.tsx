@@ -35,6 +35,15 @@ interface Account {
   created_at: string;
   updated_at: string;
   last_sync?: string;
+  bridge?: {
+    id: string;
+    created_at: string;
+    updated_at: string;
+    bridge_id: string;
+    access_token: string;
+    company_id: string | null;
+    account_id: string | null;
+  } | null;
 }
 
 interface AccountsTableProps {
@@ -82,6 +91,23 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
       style: 'currency',
       currency: 'EUR'
     }).format(amount);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const isAccountConnected = (account: Account) => {
+    if (!account.bridge) return false;
+    const updatedAt = new Date(account.bridge.updated_at);
+    const createdAt = new Date(account.bridge.created_at);
+    return updatedAt > createdAt;
   };
 
   const handleBankConnection = async () => {
@@ -194,99 +220,117 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
           </div>
         </DialogContent>
       </Dialog>
-    <div className="card-container">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <SortableTableHeader sortKey="name" sortConfig={sortConfig} onSort={handleSort}>
-              Nom du compte
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="bank" sortConfig={sortConfig} onSort={handleSort}>
-              Banque
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="iban" sortConfig={sortConfig} onSort={handleSort}>
-              IBAN
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="bic" sortConfig={sortConfig} onSort={handleSort}>
-              BIC
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="balance" sortConfig={sortConfig} onSort={handleSort}>
-              Solde
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
-              Statut
-            </SortableTableHeader>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortedData.map((account) => (
-            <React.Fragment key={account.id}>
-              <TableRow className="hover:bg-gray-50 border-b-0">
-                <TableCell>
-                  <div className="flex items-center">
-                    <span>{account.name}</span>
-                  </div>
-                </TableCell>
-                <TableCell>{account.bank}</TableCell>
-                <TableCell className="font-mono text-sm">{account.iban}</TableCell>
-                <TableCell className="font-mono text-sm">{account.bic}</TableCell>
-                <TableCell>
-                  {formatAmount(account.balance)}
-                </TableCell>
-                <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(account.status)}`}>
-                    {account.status}
-                  </span>
-                </TableCell>
-              </TableRow>
-              <TableRow className="border-t-0">
-                <TableCell colSpan={6} className="py-3 border-t-0">
-                  <div className="flex flex-wrap gap-2 justify-end px-4">
-                    <Button 
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        console.log('Bouton Connecter cliqué pour:', account);
-                        setSelectedAccount(account);
-                        setShowBankConnectDialog(true);
-                      }}
-                    >
-                      <Link className="h-4 w-4 mr-1" />
-                      Connecter
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onSync(account)}
-                    >
-                      <RefreshCw className="h-4 w-4 mr-1" />
-                      Synchroniser
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      size="sm" 
-                      onClick={() => onEdit(account)}
-                    >
-                      <Pencil className="h-4 w-4 mr-1" />
-                      Modifier
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      size="sm" 
-                      className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                      onClick={() => onDelete(account)}
-                    >
-                      <Trash className="h-4 w-4 mr-1" />
-                      Supprimer
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            </React.Fragment>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+
+      <div className="card-container">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <SortableTableHeader sortKey="name" sortConfig={sortConfig} onSort={handleSort}>
+                Nom du compte
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="bank" sortConfig={sortConfig} onSort={handleSort}>
+                Banque
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="iban" sortConfig={sortConfig} onSort={handleSort}>
+                IBAN
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="bic" sortConfig={sortConfig} onSort={handleSort}>
+                BIC
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="balance" sortConfig={sortConfig} onSort={handleSort}>
+                Solde
+              </SortableTableHeader>
+              <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                Statut
+              </SortableTableHeader>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {sortedData.map((account) => {
+              const connected = isAccountConnected(account);
+              
+              return (
+                <React.Fragment key={account.id}>
+                  <TableRow className="hover:bg-gray-50 border-b-0">
+                    <TableCell>
+                      <div className="flex items-center">
+                        <span>{account.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{account.bank}</TableCell>
+                    <TableCell className="font-mono text-sm">{account.iban}</TableCell>
+                    <TableCell className="font-mono text-sm">{account.bic}</TableCell>
+                    <TableCell>
+                      {formatAmount(account.balance)}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(account.status)}`}>
+                          {account.status}
+                        </span>
+                        {connected && (
+                          <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                            Connecté
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-2 justify-end">
+                        {!connected && (
+                          <Button 
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              console.log('Bouton Connecter cliqué pour:', account);
+                              setSelectedAccount(account);
+                              setShowBankConnectDialog(true);
+                            }}
+                          >
+                            <Link className="h-4 w-4 mr-1" />
+                            Connecter
+                          </Button>
+                        )}
+                        {connected && account.bridge && (
+                          <div className="text-xs text-gray-500">
+                            Connecté le {formatDate(account.bridge.updated_at)}
+                          </div>
+                        )}
+                        <Button 
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onSync(account)}
+                        >
+                          <RefreshCw className="h-4 w-4 mr-1" />
+                          Synchroniser
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          size="sm" 
+                          onClick={() => onEdit(account)}
+                        >
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          size="sm" 
+                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                          onClick={() => onDelete(account)}
+                        >
+                          <Trash className="h-4 w-4 mr-1" />
+                          Supprimer
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </React.Fragment>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
     </>
   );
 };
