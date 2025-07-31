@@ -51,7 +51,7 @@ export const accountsService = {
 
     const companyId = await getCurrentUserCompanyId();
     
-    // Récupérer d'abord les comptes bancaires
+    // Récupérer les comptes bancaires
     const { data: accounts, error: accountsError } = await supabase
       .from('bank_accounts')
       .select('*')
@@ -66,48 +66,36 @@ export const accountsService = {
     console.log('=== ACCOUNTS FETCHED ===');
     console.log('Accounts:', accounts);
 
-    // Récupérer les données bridge pour tous les comptes de cette company
-    const accountIds = accounts?.map(account => account.id) || [];
-    console.log('=== FETCHING BRIDGE DATA ===');
-    console.log('Account IDs to search:', accountIds);
+    // Pour chaque compte, chercher manuellement les données bridge
+    const enrichedAccounts = await Promise.all(
+      (accounts || []).map(async (account) => {
+        const { data: bridgeData } = await supabase
+          .from('bridge')
+          .select('*')
+          .eq('account_id', account.id)
+          .maybeSingle();
+
+        console.log(`=== ACCOUNT ${account.name} ===`);
+        console.log('Account ID:', account.id);
+        console.log('Bridge found:', !!bridgeData);
+        if (bridgeData) {
+          console.log('Bridge data:', bridgeData);
+          const updatedAt = new Date(bridgeData.updated_at);
+          const createdAt = new Date(bridgeData.created_at);
+          console.log('Is connected (updated > created):', updatedAt > createdAt);
+        }
+
+        return {
+          ...account,
+          bridge: bridgeData
+        };
+      })
+    );
+
+    console.log('=== FINAL RESULT ===');
+    console.log('Total accounts with bridge data:', enrichedAccounts.length);
     
-    const { data: bridgeData, error: bridgeError } = await supabase
-      .from('bridge')
-      .select('*')
-      .in('account_id', accountIds);
-
-    console.log('=== BRIDGE DATA FETCHED ===');
-    console.log('Bridge data:', bridgeData);
-    console.log('Bridge error:', bridgeError);
-
-    if (accountsError) {
-      console.error('Supabase error:', accountsError);
-      throw accountsError;
-    }
-
-    // Combiner les données
-    const transformedData = accounts?.map(account => {
-      const bridgeRecord = bridgeData?.find(bridge => bridge.account_id === account.id);
-      
-      console.log(`=== PROCESSING ACCOUNT ${account.name} ===`);
-      console.log('Account ID:', account.id);
-      console.log('Bridge record found:', bridgeRecord);
-      
-      return {
-        ...account,
-        bridge: bridgeRecord || null
-      };
-    }) || [];
-
-    console.log('=== FINAL TRANSFORMED DATA ===');
-    transformedData.forEach(account => {
-      console.log(`Account ${account.name}:`, {
-        id: account.id,
-        bridge: account.bridge
-      });
-    });
-    
-    return transformedData;
+    return enrichedAccounts;
   },
 
   // Get a single account by ID
