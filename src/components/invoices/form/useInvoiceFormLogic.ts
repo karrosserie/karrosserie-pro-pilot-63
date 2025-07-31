@@ -9,9 +9,10 @@ import { useInvoiceFormInitialization } from './hooks/useInvoiceFormInitializati
 
 interface UseInvoiceFormLogicProps {
   invoice?: Invoice | null;
+  prefillData?: any;
 }
 
-export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
+export const useInvoiceFormLogic = ({ invoice, prefillData }: UseInvoiceFormLogicProps) => {
   const {
     formData,
     setFormData,
@@ -52,6 +53,7 @@ export const useInvoiceFormLogic = ({ invoice }: UseInvoiceFormLogicProps) => {
 
   useInvoiceFormInitialization({
     invoice,
+    prefillData,
     setFormData,
     setClaimNumber,
     setRepairs,

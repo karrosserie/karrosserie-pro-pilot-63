@@ -49,7 +49,7 @@ export const InvoiceForm = ({
     validateForm,
     calculateGlobalTotals,
     prepareSubmitData
-  } = useInvoiceFormLogic({ invoice });
+  } = useInvoiceFormLogic({ invoice, prefillData });
 
   const globalTotals = calculateGlobalTotals();
 

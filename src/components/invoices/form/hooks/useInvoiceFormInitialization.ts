@@ -6,6 +6,7 @@ import { parseInvoiceNotes, generateNextInvoiceNumber } from '../utils/invoiceFo
 
 interface UseInvoiceFormInitializationProps {
   invoice?: Invoice | null;
+  prefillData?: any;
   setFormData: (updater: (prev: Partial<Invoice>) => Partial<Invoice>) => void;
   setClaimNumber: (value: string) => void;
   setRepairs: (value: InvoiceRepairItem[]) => void;
@@ -15,6 +16,7 @@ interface UseInvoiceFormInitializationProps {
 
 export const useInvoiceFormInitialization = ({
   invoice,
+  prefillData,
   setFormData,
   setClaimNumber,
   setRepairs,
@@ -24,6 +26,7 @@ export const useInvoiceFormInitialization = ({
   useEffect(() => {
     const initializeForm = async () => {
       console.log('Invoice form initializing with invoice:', invoice);
+      console.log('PrefillData:', prefillData);
       
       // Vérifier si c'est une facture existante (avec un ID) ou une nouvelle facture
       const isExistingInvoice = invoice && invoice.id;
@@ -122,7 +125,7 @@ export const useInvoiceFormInitialization = ({
           
           setFormData(prev => ({
             reference: nextNumber,
-            client_id: invoice?.client_id || '',
+            client_id: invoice?.client_id || prefillData?.client_id || '',
             vehicle_id: invoice?.vehicle_id || '',
             repair_order_id: invoice?.repair_order_id || null,
             status: 'En attente de paiement',
@@ -200,7 +203,7 @@ export const useInvoiceFormInitialization = ({
           console.error('Erreur lors de la génération du numéro de facture:', error);
           setFormData(prev => ({
             reference: '1',
-            client_id: invoice?.client_id || '',
+            client_id: invoice?.client_id || prefillData?.client_id || '',
             vehicle_id: invoice?.vehicle_id || '',
             repair_order_id: invoice?.repair_order_id || null,
             status: 'En attente de paiement',
@@ -255,5 +258,5 @@ export const useInvoiceFormInitialization = ({
     };
 
     initializeForm();
-  }, [invoice, setFormData, setClaimNumber, setRepairs, setParts, setDiscounts]);
+  }, [invoice, prefillData, setFormData, setClaimNumber, setRepairs, setParts, setDiscounts]);
 };
