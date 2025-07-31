@@ -76,6 +76,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('Creating invoice for client:', client);
+                console.log('onCreateInvoice function exists:', !!onCreateInvoice);
                 onCreateInvoice?.(client);
               };
 
