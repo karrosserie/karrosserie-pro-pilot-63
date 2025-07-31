@@ -265,28 +265,22 @@ const Planning = () => {
         {/* Vue Employé - Liste déroulante simplifiée */}
         {activeView === "employee" && (
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Sélectionnez votre employé</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-4">
-                  <Label htmlFor="employee_select_simple">Employé :</Label>
-                  <Select defaultValue="martin">
-                    <SelectTrigger
-                      id="employee_select_simple"
-                      className="w-[200px]"
-                    >
-                      <SelectValue placeholder="Sélectionner un employé" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background border border-border shadow-md z-50">
-                      <SelectItem value="sophie">Sophie Martin</SelectItem>
-                      <SelectItem value="martin">Martin Dubois</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Sélecteur d'employé */}
+            <div className="flex items-center gap-4">
+              <Label htmlFor="employee_select_simple">Employé :</Label>
+              <Select defaultValue="martin">
+                <SelectTrigger
+                  id="employee_select_simple"
+                  className="w-[200px]"
+                >
+                  <SelectValue placeholder="Sélectionner un employé" />
+                </SelectTrigger>
+                <SelectContent className="bg-background border border-border shadow-md z-50">
+                  <SelectItem value="sophie">Sophie Martin</SelectItem>
+                  <SelectItem value="martin">Martin Dubois</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             {/* Planning de l'employé */}
             <div className="space-y-4">
