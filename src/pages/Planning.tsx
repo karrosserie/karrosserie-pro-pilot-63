@@ -1556,63 +1556,49 @@ const Planning = () => {
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between items-center">
-                            <span className="text-muted-foreground">Catégorie de Sinistre</span>
-                            <div className="flex gap-4 text-xs">
-                              <span className="text-muted-foreground">Temps Total</span>
-                              <span className="text-muted-foreground">Durée Calendaire</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex justify-between items-center py-2 border-b">
-                            <span className="font-medium">Micro rayure/retouche</span>
-                            <div className="flex gap-4 text-xs">
-                              <span className="text-karrosserie-orange font-medium">2-4 heures</span>
-                              <span className="text-muted-foreground">1 jour</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex justify-between items-center py-2 border-b">
-                            <span className="font-medium">Sinistre léger (pare-chocs, rayures)</span>
-                            <div className="flex gap-4 text-xs">
-                              <span className="text-karrosserie-orange font-medium">6-12 heures</span>
-                              <span className="text-muted-foreground">1-2 jours</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex justify-between items-center py-2 border-b">
-                            <span className="font-medium">Sinistre moyen (1-2 éléments)</span>
-                            <div className="flex gap-4 text-xs">
-                              <span className="text-karrosserie-orange font-medium">12-20 heures</span>
-                              <span className="text-muted-foreground">2-3 jours</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex justify-between items-center py-2 border-b">
-                            <span className="font-medium">Sinistre important (3+ éléments)</span>
-                            <div className="flex gap-4 text-xs">
-                              <span className="text-karrosserie-orange font-medium">20-40 heures</span>
-                              <span className="text-muted-foreground">3-7 jours</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex justify-between items-center py-2 border-b">
-                            <span className="font-medium">Gros sinistre (structure touchée)</span>
-                            <div className="flex gap-4 text-xs">
-                              <span className="text-karrosserie-orange font-medium">40-80 heures</span>
-                              <span className="text-muted-foreground">1-3 semaines</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex justify-between items-center py-2">
-                            <span className="font-medium">Sinistre majeur (reconstruction)</span>
-                            <div className="flex gap-4 text-xs">
-                              <span className="text-karrosserie-orange font-medium">80-200 heures</span>
-                              <span className="text-muted-foreground">3-8 semaines</span>
-                            </div>
-                          </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="grid grid-cols-3 items-center gap-2 font-medium text-muted-foreground">
+                          <span>Catégorie de Sinistre</span>
+                          <span className="text-center text-xs">Temps Total</span>
+                          <span className="text-center text-xs">Durée Calendaire</span>
                         </div>
+                        
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
+                          <span className="font-medium">Micro rayure/retouche</span>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">2-4 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">1 jour</span>
+                        </div>
+                        
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
+                          <span className="font-medium">Sinistre léger (pare-chocs, rayures)</span>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">6-12 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">1-2 jours</span>
+                        </div>
+                        
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
+                          <span className="font-medium">Sinistre moyen (1-2 éléments)</span>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">12-20 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">2-3 jours</span>
+                        </div>
+                        
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
+                          <span className="font-medium">Sinistre important (3+ éléments)</span>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">20-40 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">3-7 jours</span>
+                        </div>
+                        
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
+                          <span className="font-medium">Gros sinistre (structure touchée)</span>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">40-80 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">1-3 semaines</span>
+                        </div>
+                        
+                        <div className="grid grid-cols-3 items-center gap-2 py-2">
+                          <span className="font-medium">Sinistre majeur (reconstruction)</span>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">80-200 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">3-8 semaines</span>
+                        </div>
+                      </div>
                       </CardContent>
                     </Card>
 
@@ -1866,60 +1852,46 @@ const Planning = () => {
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="space-y-2 text-sm">
-                        <div className="flex justify-between items-center">
-                          <span className="text-muted-foreground">Catégorie de Sinistre</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-muted-foreground">Temps Total</span>
-                            <span className="text-muted-foreground">Durée Calendaire</span>
-                          </div>
+                        <div className="grid grid-cols-3 items-center gap-2 font-medium text-muted-foreground">
+                          <span>Catégorie de Sinistre</span>
+                          <span className="text-center text-xs">Temps Total</span>
+                          <span className="text-center text-xs">Durée Calendaire</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Micro rayure/retouche</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">2-4 heures</span>
-                            <span className="text-muted-foreground">1 jour</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">2-4 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">1 jour</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Sinistre léger (pare-chocs, rayures)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">6-12 heures</span>
-                            <span className="text-muted-foreground">1-2 jours</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">6-12 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">1-2 jours</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Sinistre moyen (1-2 éléments)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">12-20 heures</span>
-                            <span className="text-muted-foreground">2-3 jours</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">12-20 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">2-3 jours</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Sinistre important (3+ éléments)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">20-40 heures</span>
-                            <span className="text-muted-foreground">3-7 jours</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">20-40 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">3-7 jours</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Gros sinistre (structure touchée)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">40-80 heures</span>
-                            <span className="text-muted-foreground">1-3 semaines</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">40-80 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">1-3 semaines</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2">
                           <span className="font-medium">Sinistre majeur (reconstruction)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">80-200 heures</span>
-                            <span className="text-muted-foreground">3-8 semaines</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">80-200 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">3-8 semaines</span>
                         </div>
                       </div>
                     </CardContent>
@@ -2024,60 +1996,46 @@ const Planning = () => {
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="space-y-2 text-sm">
-                        <div className="flex justify-between items-center">
-                          <span className="text-muted-foreground">Catégorie de Sinistre</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-muted-foreground">Temps Total</span>
-                            <span className="text-muted-foreground">Durée Calendaire</span>
-                          </div>
+                        <div className="grid grid-cols-3 items-center gap-2 font-medium text-muted-foreground">
+                          <span>Catégorie de Sinistre</span>
+                          <span className="text-center text-xs">Temps Total</span>
+                          <span className="text-center text-xs">Durée Calendaire</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Micro rayure/retouche</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">2-4 heures</span>
-                            <span className="text-muted-foreground">1 jour</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">2-4 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">1 jour</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Sinistre léger (pare-chocs, rayures)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">6-12 heures</span>
-                            <span className="text-muted-foreground">1-2 jours</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">6-12 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">1-2 jours</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Sinistre moyen (1-2 éléments)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">12-20 heures</span>
-                            <span className="text-muted-foreground">2-3 jours</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">12-20 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">2-3 jours</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Sinistre important (3+ éléments)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">20-40 heures</span>
-                            <span className="text-muted-foreground">3-7 jours</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">20-40 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">3-7 jours</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Gros sinistre (structure touchée)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">40-80 heures</span>
-                            <span className="text-muted-foreground">1-3 semaines</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">40-80 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">1-3 semaines</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2">
                           <span className="font-medium">Sinistre majeur (reconstruction)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">80-200 heures</span>
-                            <span className="text-muted-foreground">3-8 semaines</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">80-200 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">3-8 semaines</span>
                         </div>
                       </div>
                     </CardContent>
@@ -2166,60 +2124,46 @@ const Planning = () => {
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="space-y-2 text-sm">
-                        <div className="flex justify-between items-center">
-                          <span className="text-muted-foreground">Catégorie de Sinistre</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-muted-foreground">Temps Total</span>
-                            <span className="text-muted-foreground">Durée Calendaire</span>
-                          </div>
+                        <div className="grid grid-cols-3 items-center gap-2 font-medium text-muted-foreground">
+                          <span>Catégorie de Sinistre</span>
+                          <span className="text-center text-xs">Temps Total</span>
+                          <span className="text-center text-xs">Durée Calendaire</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Micro rayure/retouche</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">2-4 heures</span>
-                            <span className="text-muted-foreground">1 jour</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">2-4 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">1 jour</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Sinistre léger (pare-chocs, rayures)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">6-12 heures</span>
-                            <span className="text-muted-foreground">1-2 jours</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">6-12 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">1-2 jours</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Sinistre moyen (1-2 éléments)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">12-20 heures</span>
-                            <span className="text-muted-foreground">2-3 jours</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">12-20 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">2-3 jours</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Sinistre important (3+ éléments)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">20-40 heures</span>
-                            <span className="text-muted-foreground">3-7 jours</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">20-40 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">3-7 jours</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Gros sinistre (structure touchée)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">40-80 heures</span>
-                            <span className="text-muted-foreground">1-3 semaines</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">40-80 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">1-3 semaines</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2">
                           <span className="font-medium">Sinistre majeur (reconstruction)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">80-200 heures</span>
-                            <span className="text-muted-foreground">3-8 semaines</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">80-200 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">3-8 semaines</span>
                         </div>
                       </div>
                     </CardContent>
@@ -2308,60 +2252,46 @@ const Planning = () => {
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="space-y-2 text-sm">
-                        <div className="flex justify-between items-center">
-                          <span className="text-muted-foreground">Catégorie de Sinistre</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-muted-foreground">Temps Total</span>
-                            <span className="text-muted-foreground">Durée Calendaire</span>
-                          </div>
+                        <div className="grid grid-cols-3 items-center gap-2 font-medium text-muted-foreground">
+                          <span>Catégorie de Sinistre</span>
+                          <span className="text-center text-xs">Temps Total</span>
+                          <span className="text-center text-xs">Durée Calendaire</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Micro rayure/retouche</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">2-4 heures</span>
-                            <span className="text-muted-foreground">1 jour</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">2-4 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">1 jour</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Sinistre léger (pare-chocs, rayures)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">6-12 heures</span>
-                            <span className="text-muted-foreground">1-2 jours</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">6-12 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">1-2 jours</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Sinistre moyen (1-2 éléments)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">12-20 heures</span>
-                            <span className="text-muted-foreground">2-3 jours</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">12-20 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">2-3 jours</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Sinistre important (3+ éléments)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">20-40 heures</span>
-                            <span className="text-muted-foreground">3-7 jours</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">20-40 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">3-7 jours</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2 border-b">
                           <span className="font-medium">Gros sinistre (structure touchée)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">40-80 heures</span>
-                            <span className="text-muted-foreground">1-3 semaines</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">40-80 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">1-3 semaines</span>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2">
+                        <div className="grid grid-cols-3 items-center gap-2 py-2">
                           <span className="font-medium">Sinistre majeur (reconstruction)</span>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-blue-600 font-medium">80-200 heures</span>
-                            <span className="text-muted-foreground">3-8 semaines</span>
-                          </div>
+                          <span className="text-center text-karrosserie-orange font-medium text-xs">80-200 heures</span>
+                          <span className="text-center text-muted-foreground text-xs">3-8 semaines</span>
                         </div>
                       </div>
                     </CardContent>
