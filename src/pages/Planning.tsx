@@ -841,12 +841,216 @@ const Planning = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="employees">
-            <Card>
-              <CardContent className="p-8 text-center">
-                <User className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Planning Employés</h3>
-                <p className="text-muted-foreground">Gestion des plannings individuels des employés</p>
+          <TabsContent value="employees" className="space-y-6">
+            {/* Sélecteur d'employé */}
+            <div className="flex items-center gap-4">
+              <label className="text-sm font-medium">Employé :</label>
+              <select className="px-3 py-2 border border-input rounded-md bg-background text-sm min-w-[200px]">
+                <option value="sophie">Sophie Martin</option>
+                <option value="martin">Martin Dubois</option>
+              </select>
+            </div>
+
+            <Card data-lov-id="src/pages/Planning.tsx:844:10">
+              <CardContent className="p-6">
+                {/* En-tête employé */}
+                <div className="bg-muted/30 rounded-lg p-4 mb-6">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h2 className="text-xl font-semibold text-primary mb-1">Sophie Martin</h2>
+                      <p className="text-sm text-muted-foreground mb-3">sophie.martin@carrosserie.fr</p>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant="secondary" className="bg-orange-100 text-orange-800">Préparation peinture</Badge>
+                        <Badge variant="secondary" className="bg-orange-100 text-orange-800">Mise en peinture</Badge>
+                        <Badge variant="secondary" className="bg-orange-100 text-orange-800">Finitions & remontage</Badge>
+                      </div>
+                    </div>
+                    <div className="flex gap-6 text-center">
+                      <div>
+                        <div className="text-2xl font-bold text-primary">5</div>
+                        <div className="text-sm text-muted-foreground">En cours</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-green-600">2</div>
+                        <div className="text-sm text-muted-foreground">Terminées</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-orange-600">7</div>
+                        <div className="text-sm text-muted-foreground">Total</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section titre avec icône */}
+                <div className="flex items-center gap-2 mb-4">
+                  <User className="w-5 h-5 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold">Planning de Sophie Martin</h3>
+                </div>
+
+                {/* Statistiques détaillées */}
+                <div className="grid grid-cols-3 gap-4 mb-6">
+                  <div className="bg-primary/10 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-primary">5</div>
+                    <div className="text-sm text-muted-foreground">Tâches en cours</div>
+                  </div>
+                  <div className="bg-green-50 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-green-600">2</div>
+                    <div className="text-sm text-muted-foreground">Terminées aujourd'hui</div>
+                  </div>
+                  <div className="bg-orange-50 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-orange-600">7</div>
+                    <div className="text-sm text-muted-foreground">Total du jour</div>
+                  </div>
+                </div>
+
+                {/* Tâches en cours */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-orange-600" />
+                      <h4 className="font-semibold">Tâches en cours</h4>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button className="text-sm text-muted-foreground">Tri chronologique</button>
+                      <Badge variant="outline">5</Badge>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    {/* Tâche 1 */}
+                    <Card className="border-l-4 border-l-orange-500 p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 text-sm text-orange-600 mb-2">
+                            <Clock className="w-3 h-3" />
+                            8h-11h
+                          </div>
+                          <div className="font-semibold mb-1">Remplacement pare-chocs</div>
+                          <div className="text-sm text-muted-foreground mb-1">
+                            <span className="font-medium">Véhicule :</span> HT-556-GH
+                          </div>
+                          <div className="text-sm text-muted-foreground mb-1">
+                            <span className="font-medium">Modèle :</span> BMW Série 1
+                          </div>
+                          <div className="text-sm text-muted-foreground mb-2">
+                            <span className="font-medium">Client :</span> M. Rousseau
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Clock className="w-3 h-3" />
+                            <span className="font-medium">Durée estimée:</span> 3h
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          <Badge className="bg-primary text-primary-foreground">En cours</Badge>
+                          <Button size="sm" className="bg-primary hover:bg-primary/90">
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Terminer
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+
+                    {/* Tâche 2 */}
+                    <Card className="border-l-4 border-l-orange-500 p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 text-sm text-orange-600 mb-2">
+                            <Clock className="w-3 h-3" />
+                            14h-15h
+                          </div>
+                          <div className="font-semibold mb-1">Finitions peinture</div>
+                          <div className="text-sm text-muted-foreground mb-1">
+                            <span className="font-medium">Véhicule :</span> CD-123-ZW
+                          </div>
+                          <div className="text-sm text-muted-foreground mb-1">
+                            <span className="font-medium">Modèle :</span> Renault Clio
+                          </div>
+                          <div className="text-sm text-muted-foreground mb-2">
+                            <span className="font-medium">Client :</span> M. Petit
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Clock className="w-3 h-3" />
+                            <span className="font-medium">Durée estimée:</span> 1h
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          <Badge variant="outline" className="border-orange-200 text-orange-700">Planifié</Badge>
+                          <Button size="sm" className="bg-primary hover:bg-primary/90">
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Terminer
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
+
+                {/* Tâches terminées aujourd'hui */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <h4 className="font-semibold">Tâches terminées aujourd'hui</h4>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button className="text-sm text-muted-foreground">Tri chronologique</button>
+                      <Badge variant="outline">2</Badge>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    {/* Tâche terminée 1 */}
+                    <Card className="border-l-4 border-l-green-500 p-4 bg-green-50/30">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 text-sm text-green-600 mb-2">
+                            <Clock className="w-3 h-3" />
+                            8h-10h
+                          </div>
+                          <div className="font-semibold mb-1">Préparation peinture</div>
+                          <div className="text-sm text-muted-foreground">
+                            HT-556-GH - BMW Série 1 - M. Rousseau
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          <Badge className="bg-green-600 text-white">
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Terminé
+                          </Badge>
+                          <Button size="sm" variant="outline">
+                            Voir détails
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+
+                    {/* Tâche terminée 2 */}
+                    <Card className="border-l-4 border-l-green-500 p-4 bg-green-50/30">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 text-sm text-green-600 mb-2">
+                            <Clock className="w-3 h-3" />
+                            10h-12h
+                          </div>
+                          <div className="font-semibold mb-1">Débosselage portière</div>
+                          <div className="text-sm text-muted-foreground">
+                            VS-901-AB - Audi A4 - M. Bernard
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          <Badge className="bg-green-600 text-white">
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Terminé
+                          </Badge>
+                          <Button size="sm" variant="outline">
+                            Voir détails
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
