@@ -66,11 +66,12 @@ export const accountsService = {
     console.log('=== ACCOUNTS FETCHED ===');
     console.log('Accounts:', accounts);
 
-    // Récupérer les données bridge séparément
+    // Récupérer les données bridge pour tous les comptes de cette company
+    const accountIds = accounts?.map(account => account.id) || [];
     const { data: bridgeData, error: bridgeError } = await supabase
       .from('bridge')
       .select('*')
-      .eq('company_id', companyId);
+      .in('account_id', accountIds);
 
     console.log('=== BRIDGE DATA FETCHED ===');
     console.log('Bridge data:', bridgeData);
