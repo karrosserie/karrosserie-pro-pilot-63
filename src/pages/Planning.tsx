@@ -3083,77 +3083,77 @@ const Planning = () => {
             </DialogHeader>
             
             <div className="space-y-4 py-4">
-              {/* Accueil & Préparation */}
-              <div className="space-y-2">
-                <Label htmlFor="accueil">Accueil & Préparation du dossier</Label>
-                <Input
-                  id="accueil"
-                  type="time"
-                  value={configData.accueil}
-                  onChange={(e) => setConfigData(prev => ({ ...prev, accueil: e.target.value }))}
-                  className="w-full"
-                />
-              </div>
+               {/* Accueil & Préparation */}
+               <div className="space-y-2">
+                 <Label htmlFor="accueil">Accueil & Préparation du dossier</Label>
+                 <Input
+                   id="accueil"
+                   type="time"
+                   value={configData.accueil}
+                   onChange={(e) => setConfigData(prev => ({ ...prev, accueil: e.target.value }))}
+                   className="w-24"
+                 />
+               </div>
 
-              {/* Remplacement ou débosselage */}
-              <div className="space-y-2">
-                <Label htmlFor="debosselage">Remplacement ou débosselage</Label>
-                <Input
-                  id="debosselage"
-                  type="time"
-                  value={configData.debosselage}
-                  onChange={(e) => setConfigData(prev => ({ ...prev, debosselage: e.target.value }))}
-                  className="w-full"
-                />
-              </div>
+               {/* Remplacement ou débosselage */}
+               <div className="space-y-2">
+                 <Label htmlFor="debosselage">Remplacement ou débosselage</Label>
+                 <Input
+                   id="debosselage"
+                   type="time"
+                   value={configData.debosselage}
+                   onChange={(e) => setConfigData(prev => ({ ...prev, debosselage: e.target.value }))}
+                   className="w-24"
+                 />
+               </div>
 
-              {/* Préparation peinture */}
-              <div className="space-y-2">
-                <Label htmlFor="preparation">Préparation peinture</Label>
-                <Input
-                  id="preparation"
-                  type="time"
-                  value={configData.preparation}
-                  onChange={(e) => setConfigData(prev => ({ ...prev, preparation: e.target.value }))}
-                  className="w-full"
-                />
-              </div>
+               {/* Préparation peinture */}
+               <div className="space-y-2">
+                 <Label htmlFor="preparation">Préparation peinture</Label>
+                 <Input
+                   id="preparation"
+                   type="time"
+                   value={configData.preparation}
+                   onChange={(e) => setConfigData(prev => ({ ...prev, preparation: e.target.value }))}
+                   className="w-24"
+                 />
+               </div>
 
-              {/* Mise en peinture */}
-              <div className="space-y-2">
-                <Label htmlFor="peinture">Mise en peinture</Label>
-                <Input
-                  id="peinture"
-                  type="time"
-                  value={configData.peinture}
-                  onChange={(e) => setConfigData(prev => ({ ...prev, peinture: e.target.value }))}
-                  className="w-full"
-                />
-              </div>
+               {/* Mise en peinture */}
+               <div className="space-y-2">
+                 <Label htmlFor="peinture">Mise en peinture</Label>
+                 <Input
+                   id="peinture"
+                   type="time"
+                   value={configData.peinture}
+                   onChange={(e) => setConfigData(prev => ({ ...prev, peinture: e.target.value }))}
+                   className="w-24"
+                 />
+               </div>
 
-              {/* Finitions & remontage */}
-              <div className="space-y-2">
-                <Label htmlFor="finitions">Finitions & remontage</Label>
-                <Input
-                  id="finitions"
-                  type="time"
-                  value={configData.finitions}
-                  onChange={(e) => setConfigData(prev => ({ ...prev, finitions: e.target.value }))}
-                  className="w-full"
-                />
-              </div>
+               {/* Finitions & remontage */}
+               <div className="space-y-2">
+                 <Label htmlFor="finitions">Finitions & remontage</Label>
+                 <Input
+                   id="finitions"
+                   type="time"
+                   value={configData.finitions}
+                   onChange={(e) => setConfigData(prev => ({ ...prev, finitions: e.target.value }))}
+                   className="w-24"
+                 />
+               </div>
 
-              {/* Clôture & livraison */}
-              <div className="space-y-2">
-                <Label htmlFor="cloture">Clôture & livraison</Label>
-                <Input
-                  id="cloture"
-                  type="time"
-                  value={configData.cloture}
-                  onChange={(e) => setConfigData(prev => ({ ...prev, cloture: e.target.value }))}
-                  className="w-full"
-                />
-              </div>
+               {/* Clôture & livraison */}
+               <div className="space-y-2">
+                 <Label htmlFor="cloture">Clôture & livraison</Label>
+                 <Input
+                   id="cloture"
+                   type="time"
+                   value={configData.cloture}
+                   onChange={(e) => setConfigData(prev => ({ ...prev, cloture: e.target.value }))}
+                   className="w-24"
+                 />
+               </div>
             </div>
 
             <div className="flex justify-end space-x-2 pt-4 border-t">
