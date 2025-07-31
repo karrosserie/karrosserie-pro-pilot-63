@@ -1260,23 +1260,23 @@ const Planning = () => {
             <Tabs defaultValue="accueil" className="w-full">
               {/* Navigation des étapes */}
               <div className="flex flex-wrap gap-2 p-1 bg-muted rounded-lg mb-6">
-                <TabsList className="grid w-full grid-cols-6 bg-transparent">
-                  <TabsTrigger value="accueil" className="text-xs px-2 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsList className="grid w-full grid-cols-6">
+                  <TabsTrigger value="accueil" className="text-xs">
                     ACCUEIL & PRÉPARATION DU DOSSIER
                   </TabsTrigger>
-                  <TabsTrigger value="remplacement" className="text-xs px-2 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <TabsTrigger value="remplacement" className="text-xs">
                     REMPLACEMENT OU DÉBOSSELAGE
                   </TabsTrigger>
-                  <TabsTrigger value="preparation" className="text-xs px-2 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <TabsTrigger value="preparation" className="text-xs">
                     PRÉPARATION PEINTURE
                   </TabsTrigger>
-                  <TabsTrigger value="peinture" className="text-xs px-2 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <TabsTrigger value="peinture" className="text-xs">
                     MISE EN PEINTURE
                   </TabsTrigger>
-                  <TabsTrigger value="finitions" className="text-xs px-2 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <TabsTrigger value="finitions" className="text-xs">
                     FINITIONS & REMONTAGE
                   </TabsTrigger>
-                  <TabsTrigger value="cloture" className="text-xs px-2 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <TabsTrigger value="cloture" className="text-xs">
                     CLÔTURE & LIVRAISON
                   </TabsTrigger>
                 </TabsList>
