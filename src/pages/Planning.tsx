@@ -418,12 +418,12 @@ const Planning = () => {
               {/* Lundi */}
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-blue-600">Lundi</CardTitle>
+                  <CardTitle className="text-lg text-orange-600">Lundi</CardTitle>
                   <p className="text-sm text-muted-foreground">3 tâche(s)</p>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Tâche 1 */}
-                  <Card className="border-l-4 border-l-blue-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                  <Card className="border-l-4 border-l-orange-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
                     setSelectedVehicle({
                       brand: "Citroën C4",
                       plate: "EZ-787-KL",
@@ -433,7 +433,7 @@ const Planning = () => {
                     setShowVehicleDetailModal(true);
                   }}>
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm text-blue-600">
+                      <div className="flex items-center gap-2 text-sm text-orange-600">
                         <Clock className="w-3 h-3" />
                         9h-10h
                       </div>
@@ -445,7 +445,7 @@ const Planning = () => {
                         Martin Dubois
                       </div>
                       <div className="text-xs text-muted-foreground">Client: M. Durand</div>
-                      <Badge className="bg-blue-100 text-blue-800 text-xs">Accueil & Préparation du dossier</Badge>
+                      <Badge className="bg-orange-100 text-orange-800 text-xs">Accueil & Préparation du dossier</Badge>
                     </div>
                   </Card>
 
@@ -508,12 +508,12 @@ const Planning = () => {
               {/* Mardi */}
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-blue-600">Mardi</CardTitle>
+                  <CardTitle className="text-lg text-orange-600">Mardi</CardTitle>
                   <p className="text-sm text-muted-foreground">3 tâche(s)</p>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Tâche 1 */}
-                  <Card className="border-l-4 border-l-blue-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                  <Card className="border-l-4 border-l-orange-500 p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
                     setSelectedVehicle({
                       brand: "Mercedes Classe C",
                       plate: "QR-345-ST",
@@ -523,7 +523,7 @@ const Planning = () => {
                     setShowVehicleDetailModal(true);
                   }}>
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm text-blue-600">
+                      <div className="flex items-center gap-2 text-sm text-orange-600">
                         <Clock className="w-3 h-3" />
                         8h-9h
                       </div>
@@ -535,7 +535,7 @@ const Planning = () => {
                         Martin Dubois
                       </div>
                       <div className="text-xs text-muted-foreground">Client: Mme Leclerc</div>
-                      <Badge className="bg-blue-100 text-blue-800 text-xs">Accueil & Préparation du dossier</Badge>
+                      <Badge className="bg-orange-100 text-orange-800 text-xs">Accueil & Préparation du dossier</Badge>
                     </div>
                   </Card>
 
@@ -598,7 +598,7 @@ const Planning = () => {
               {/* Mercredi */}
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-blue-600">Mercredi</CardTitle>
+                  <CardTitle className="text-lg text-orange-600">Mercredi</CardTitle>
                   <p className="text-sm text-muted-foreground">3 tâche(s)</p>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -688,7 +688,7 @@ const Planning = () => {
               {/* Jeudi */}
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-blue-600">Jeudi</CardTitle>
+                  <CardTitle className="text-lg text-orange-600">Jeudi</CardTitle>
                   <p className="text-sm text-muted-foreground">2 tâche(s)</p>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -751,7 +751,7 @@ const Planning = () => {
               {/* Vendredi */}
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-blue-600">Vendredi</CardTitle>
+                  <CardTitle className="text-lg text-orange-600">Vendredi</CardTitle>
                   <p className="text-sm text-muted-foreground">3 tâche(s)</p>
                 </CardHeader>
                 <CardContent className="space-y-3">
