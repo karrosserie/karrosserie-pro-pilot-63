@@ -821,7 +821,7 @@ const Planning = () => {
                               <div>
                                 <h4 className="font-semibold">{vehicle.brand}</h4>
                                 <p className="text-sm text-muted-foreground">{vehicle.plate}</p>
-                                <p className="text-sm text-muted-foreground">{vehicle.client}</p>
+                                <p className="text-sm text-muted-foreground">Client : {vehicle.client}</p>
                               </div>
                               <div className="text-right">
                                 <div className="font-semibold text-green-600">{vehicle.price}</div>
@@ -831,8 +831,6 @@ const Planning = () => {
                                 </div>
                               </div>
                             </div>
-                            
-                            <div className="text-sm text-muted-foreground">{vehicle.status}</div>
                             
                             {vehicle.technician && (
                               <div className="flex items-center text-sm">
@@ -847,7 +845,7 @@ const Planning = () => {
                                   En cours
                                 </Badge>
                               ) : (
-                                <span className="text-sm text-muted-foreground">À planifier</span>
+                                <Badge variant="secondary">À planifier</Badge>
                               )}
                               
                               {!vehicle.inProgress && (

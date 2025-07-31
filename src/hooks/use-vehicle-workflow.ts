@@ -57,6 +57,15 @@ export const useVehicleWorkflow = (companyId?: string) => {
 
       if (vehiclesError) throw vehiclesError;
 
+      // Récupérer les devis pour calculer les montants
+      const { data: quotesData, error: quotesError } = await supabase
+        .from('quotes')
+        .select('vehicle_id, amount, tax_rate')
+        .eq('company_id', companyId)
+        .in('vehicle_id', vehiclesData?.map(v => v.id) || []);
+
+      if (quotesError) throw quotesError;
+
       // Récupérer les étapes de workflow pour ces véhicules
       const { data: workflowData, error: workflowError } = await supabase
         .from('vehicle_workflow_steps')
@@ -104,15 +113,21 @@ export const useVehicleWorkflow = (companyId?: string) => {
         const workflowStep = workflowData?.find(w => w.vehicle_id === vehicle.id);
         const currentStep = workflowStep?.current_step || 'accueil_preparation';
         
+        // Trouver le devis associé au véhicule
+        const quote = quotesData?.find(q => q.vehicle_id === vehicle.id);
+        const amountHT = quote?.amount || 0;
+        const taxRate = quote?.tax_rate || 20;
+        const amountTTC = amountHT * (1 + taxRate / 100);
+        
         if (stepMap[currentStep]) {
           stepMap[currentStep].vehicles.push({
             id: vehicle.id,
             brand: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim() || 'Véhicule',
             plate: vehicle.license_plate,
             client: `${vehicle.clients?.first_name || ''} ${vehicle.clients?.last_name || ''}`.trim() || 'Client inconnu',
-            price: "0€", // À calculer depuis les devis/factures
+            price: `${amountTTC.toFixed(2)}€`,
             duration: "0h", // À calculer selon la configuration
-            status: "En attente",
+            status: "",
             inProgress: workflowStep?.progress_percentage > 0,
             technician: workflowStep?.technician_id ? "Assigné" : null,
             workflowId: workflowStep?.id
