@@ -65,11 +65,11 @@ export default {
 				},
 				// Couleurs personnalisées pour Karrosserie Pro
 				karrosserie: {
-					orange: '#F97316',
+					orange: 'hsl(var(--karrosserie-orange))',
 					gray: {
-						DEFAULT: '#555555',
-						light: '#8E9196',
-						lighter: '#F1F1F1'
+						DEFAULT: 'hsl(var(--karrosserie-gray))',
+						light: 'hsl(var(--karrosserie-gray-light))',
+						lighter: 'hsl(var(--karrosserie-gray-lighter))'
 					}
 				}
 			},
