@@ -377,6 +377,34 @@ const Planning = () => {
           </TabsContent>
 
           <TabsContent value="planning" className="space-y-6">
+            {/* Résumé de la semaine */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <BarChart className="w-5 h-5 text-muted-foreground" />
+                <h3 className="text-lg font-semibold">Résumé de la semaine</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <StatsCard 
+                  title="Tâches totales" 
+                  value={14}
+                  icon={<CheckCircle className="h-8 w-8 text-blue-600" />}
+                  iconBg="bg-blue-100"
+                />
+                <StatsCard 
+                  title="Véhicules traités" 
+                  value={8}
+                  icon={<Car className="h-8 w-8 text-green-600" />}
+                  iconBg="bg-green-100"
+                />
+                <StatsCard 
+                  title="Techniciens mobilisés" 
+                  value={2}
+                  icon={<User className="h-8 w-8 text-orange-600" />}
+                  iconBg="bg-orange-100"
+                />
+              </div>
+            </div>
 
             {/* Planning Grid */}
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
