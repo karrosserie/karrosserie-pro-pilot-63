@@ -95,14 +95,15 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
       <Dialog open={showBankConnectDialog} onOpenChange={setShowBankConnectDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-center">
-              🔒 Vérification bancaire 100 % sécurisée
+            <DialogTitle className="text-lg font-semibold text-center space-y-2">
+              <div className="text-4xl">🔒</div>
+              <div>Vérification bancaire 100 % sécurisée</div>
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-3 text-sm text-gray-700">
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold">
+                <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                   1
                 </div>
                 <p>
@@ -110,7 +111,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold">
+                <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                   2
                 </div>
                 <p>
@@ -118,7 +119,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold">
+                <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                   3
                 </div>
                 <p>
