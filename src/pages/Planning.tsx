@@ -2271,146 +2271,143 @@ const Planning = () => {
 
               {/* CLÔTURE & LIVRAISON */}
               {activeProcessStep === "cloture" && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <div className="lg:col-span-2">
-                    <Card className="border-l-4 border-l-gray-500">
-                      <CardHeader>
-                        <CardTitle className="text-lg">CLÔTURE & LIVRAISON</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div>
-                              <div className="font-medium">Livraison simple</div>
-                              <div className="text-sm text-muted-foreground">Nettoyage, contrôle cité</div>
-                            </div>
-                            <Badge variant="secondary" className="bg-gray-100 text-gray-800">15-30 min</Badge>
+                <div className="space-y-6">
+                  <Card className="border-l-4 border-l-red-500">
+                    <CardHeader>
+                      <CardTitle className="text-lg">CLÔTURE DU DOSSIER ET LIVRAISON</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                          <div>
+                            <div className="font-medium">Contrôle qualité</div>
+                            <div className="text-sm text-muted-foreground">Vérification finale, checklist qualité</div>
                           </div>
-                          
-                          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div>
-                              <div className="font-medium">Livraison avec explications</div>
-                              <div className="text-sm text-muted-foreground">Tour du véhicule, conseils entretien</div>
-                            </div>
-                            <Badge variant="secondary" className="bg-gray-100 text-gray-800">30-45 min</Badge>
-                          </div>
-                          
-                          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div>
-                              <div className="font-medium">Formalités assurance</div>
-                              <div className="text-sm text-muted-foreground">Signatures, photos finales</div>
-                            </div>
-                            <Badge variant="secondary" className="bg-gray-100 text-gray-800">+15-30 min</Badge>
-                          </div>
+                          <Badge variant="secondary" className="bg-red-100 text-red-800">15-30 min</Badge>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                  <div className="space-y-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-base">
-                          <BarChart className="w-4 h-4" />
-                          Récapitulatif par Type de Sinistre
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between items-center">
-                            <span className="text-muted-foreground">Catégorie de Sinistre</span>
-                            <div className="flex gap-4 text-xs">
-                              <span className="text-muted-foreground">Temps Total</span>
-                              <span className="text-muted-foreground">Durée Calendaire</span>
-                            </div>
+                        
+                        <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                          <div>
+                            <div className="font-medium">Nettoyage véhicule</div>
+                            <div className="text-sm text-muted-foreground">Lavage complet, aspirateur intérieur</div>
                           </div>
-                          
-                          <div className="flex justify-between items-center py-2 border-b">
-                            <span className="font-medium">Micro rayure/retouche</span>
-                            <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">2-4 heures</span>
-                              <span className="text-muted-foreground">1 jour</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex justify-between items-center py-2 border-b">
-                            <span className="font-medium">Sinistre léger (pare-chocs, rayures)</span>
-                            <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">6-12 heures</span>
-                              <span className="text-muted-foreground">1-2 jours</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex justify-between items-center py-2 border-b">
-                            <span className="font-medium">Sinistre moyen (1-2 éléments)</span>
-                            <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">12-20 heures</span>
-                              <span className="text-muted-foreground">2-3 jours</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex justify-between items-center py-2 border-b">
-                            <span className="font-medium">Sinistre important (3+ éléments)</span>
-                            <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">20-40 heures</span>
-                              <span className="text-muted-foreground">3-7 jours</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex justify-between items-center py-2 border-b">
-                            <span className="font-medium">Gros sinistre (structure touchée)</span>
-                            <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">40-80 heures</span>
-                              <span className="text-muted-foreground">1-3 semaines</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex justify-between items-center py-2">
-                            <span className="font-medium">Sinistre majeur (reconstruction)</span>
-                            <div className="flex gap-4 text-xs">
-                              <span className="text-blue-600 font-medium">80-200 heures</span>
-                              <span className="text-muted-foreground">3-8 semaines</span>
-                            </div>
-                          </div>
+                          <Badge variant="secondary" className="bg-red-100 text-red-800">30-45 min</Badge>
                         </div>
-                      </CardContent>
-                    </Card>
+                        
+                        <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                          <div>
+                            <div className="font-medium">Livraison client</div>
+                            <div className="text-sm text-muted-foreground">Explication travaux, remise clés</div>
+                          </div>
+                          <Badge variant="secondary" className="bg-red-100 text-red-800">15-30 min</Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-base">
-                          <AlertTriangle className="w-4 h-4" />
-                          Facteurs d'Allongement des Délais
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <div className="font-medium text-orange-600">Attente pièces</div>
-                            <div className="text-2xl font-bold text-orange-600">+2-15 jours</div>
-                            <div className="text-xs text-muted-foreground">Véhicules salon constructeur/modèle</div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <div className="font-medium text-orange-600">Expertise assurance</div>
-                            <div className="text-2xl font-bold text-orange-600">+1-5 jours</div>
-                            <div className="text-xs text-muted-foreground">Rendez-vous expert</div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <div className="font-medium text-orange-600">Pièces sur commande</div>
-                            <div className="text-2xl font-bold text-orange-600">+3-30 jours</div>
-                            <div className="text-xs text-muted-foreground">Véhicules anciens/rares</div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <div className="font-medium text-orange-600">Problèmes découverts</div>
-                            <div className="text-2xl font-bold text-orange-600">+20-100%</div>
-                            <div className="text-xs text-muted-foreground">Dégâts cachés révélés</div>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <BarChart className="w-4 h-4" />
+                        Récapitulatif par Type de Sinistre
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">Catégorie de Sinistre</span>
+                          <div className="flex gap-4 text-xs">
+                            <span className="text-muted-foreground">Temps Total</span>
+                            <span className="text-muted-foreground">Durée Calendaire</span>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                        
+                        <div className="flex justify-between items-center py-2 border-b">
+                          <span className="font-medium">Micro rayure/retouche</span>
+                          <div className="flex gap-4 text-xs">
+                            <span className="text-blue-600 font-medium">2-4 heures</span>
+                            <span className="text-muted-foreground">1 jour</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center py-2 border-b">
+                          <span className="font-medium">Sinistre léger (pare-chocs, rayures)</span>
+                          <div className="flex gap-4 text-xs">
+                            <span className="text-blue-600 font-medium">6-12 heures</span>
+                            <span className="text-muted-foreground">1-2 jours</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center py-2 border-b">
+                          <span className="font-medium">Sinistre moyen (1-2 éléments)</span>
+                          <div className="flex gap-4 text-xs">
+                            <span className="text-blue-600 font-medium">12-20 heures</span>
+                            <span className="text-muted-foreground">2-3 jours</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center py-2 border-b">
+                          <span className="font-medium">Sinistre important (3+ éléments)</span>
+                          <div className="flex gap-4 text-xs">
+                            <span className="text-blue-600 font-medium">20-40 heures</span>
+                            <span className="text-muted-foreground">3-7 jours</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center py-2 border-b">
+                          <span className="font-medium">Gros sinistre (structure touchée)</span>
+                          <div className="flex gap-4 text-xs">
+                            <span className="text-blue-600 font-medium">40-80 heures</span>
+                            <span className="text-muted-foreground">1-3 semaines</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center py-2">
+                          <span className="font-medium">Sinistre majeur (reconstruction)</span>
+                          <div className="flex gap-4 text-xs">
+                            <span className="text-blue-600 font-medium">80-200 heures</span>
+                            <span className="text-muted-foreground">3-8 semaines</span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <AlertTriangle className="w-4 h-4" />
+                        Facteurs d'Allongement des Délais
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <div className="font-medium text-orange-600">Attente pièces</div>
+                          <div className="text-2xl font-bold text-orange-600">+2-15 jours</div>
+                          <div className="text-xs text-muted-foreground">Véhicules salon constructeur/modèle</div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="font-medium text-orange-600">Expertise assurance</div>
+                          <div className="text-2xl font-bold text-orange-600">+1-5 jours</div>
+                          <div className="text-xs text-muted-foreground">Rendez-vous expert</div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="font-medium text-orange-600">Pièces sur commande</div>
+                          <div className="text-2xl font-bold text-orange-600">+3-30 jours</div>
+                          <div className="text-xs text-muted-foreground">Véhicules anciens/rares</div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="font-medium text-orange-600">Problèmes découverts</div>
+                          <div className="text-2xl font-bold text-orange-600">+20-100%</div>
+                          <div className="text-xs text-muted-foreground">Dégâts cachés révélés</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               )}
             </div>
