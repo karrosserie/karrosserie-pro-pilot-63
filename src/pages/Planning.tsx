@@ -28,6 +28,7 @@ const Planning = () => {
   const [showVehicleDetailModal, setShowVehicleDetailModal] = useState(false);
   const [showUrgentVehicleModal, setShowUrgentVehicleModal] = useState(false);
   const [showConfigModal, setShowConfigModal] = useState(false);
+  const [showScheduleConfigModal, setShowScheduleConfigModal] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
@@ -42,6 +43,15 @@ const Planning = () => {
     peinture: "05:00",
     finitions: "02:00",
     cloture: "00:30"
+  });
+  const [scheduleConfig, setScheduleConfig] = useState({
+    monday: { enabled: true, start: "08:00", end: "18:00" },
+    tuesday: { enabled: true, start: "08:00", end: "18:00" },
+    wednesday: { enabled: true, start: "08:00", end: "18:00" },
+    thursday: { enabled: true, start: "08:00", end: "18:00" },
+    friday: { enabled: true, start: "08:00", end: "18:00" },
+    saturday: { enabled: false, start: "08:00", end: "12:00" },
+    sunday: { enabled: false, start: "08:00", end: "12:00" }
   });
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const { employees, createEmployee, updateEmployee } = useEmployees();
@@ -889,9 +899,14 @@ const Planning = () => {
 
             {/* Planning détaillé */}
             <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-muted-foreground" />
-                <h3 className="text-lg font-semibold">Planning détaillé</h3>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold">Planning détaillé</h3>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => setShowScheduleConfigModal(true)}>
+                  <Settings className="w-4 h-4" />
+                </Button>
               </div>
 
               {/* Planning Grid */}
@@ -3341,6 +3356,103 @@ const Planning = () => {
                       variant: "destructive"
                     });
                   }
+                }}
+              >
+                Sauvegarder
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal Configuration Horaires */}
+        <Dialog open={showScheduleConfigModal} onOpenChange={setShowScheduleConfigModal}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Configuration des horaires d'ouverture</DialogTitle>
+              <DialogDescription>
+                Configurez les jours et heures d'ouverture de votre atelier
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              {Object.entries(scheduleConfig).map(([day, config]) => {
+                const dayNames = {
+                  monday: "Lundi",
+                  tuesday: "Mardi", 
+                  wednesday: "Mercredi",
+                  thursday: "Jeudi",
+                  friday: "Vendredi",
+                  saturday: "Samedi",
+                  sunday: "Dimanche"
+                };
+                
+                return (
+                  <div key={day} className="flex items-center gap-4 p-3 border rounded-lg">
+                    <div className="flex items-center space-x-2 w-24">
+                      <Checkbox
+                        id={`${day}-enabled`}
+                        checked={config.enabled}
+                        onCheckedChange={(checked) => 
+                          setScheduleConfig(prev => ({
+                            ...prev,
+                            [day]: { ...config, enabled: !!checked }
+                          }))
+                        }
+                      />
+                      <Label htmlFor={`${day}-enabled`} className="text-sm font-medium">
+                        {dayNames[day]}
+                      </Label>
+                    </div>
+                    
+                    {config.enabled && (
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="time"
+                          value={config.start}
+                          onChange={(e) => 
+                            setScheduleConfig(prev => ({
+                              ...prev,
+                              [day]: { ...config, start: e.target.value }
+                            }))
+                          }
+                          className="w-32"
+                        />
+                        <span className="text-muted-foreground">à</span>
+                        <Input
+                          type="time"
+                          value={config.end}
+                          onChange={(e) => 
+                            setScheduleConfig(prev => ({
+                              ...prev,
+                              [day]: { ...config, end: e.target.value }
+                            }))
+                          }
+                          className="w-32"
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex justify-end space-x-2 pt-4 border-t">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setShowScheduleConfigModal(false)}
+              >
+                Annuler
+              </Button>
+              <Button 
+                type="button" 
+                className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+                onClick={() => {
+                  toast({
+                    title: "Configuration sauvegardée",
+                    description: "Les horaires d'ouverture ont été mis à jour avec succès"
+                  });
+                  setShowScheduleConfigModal(false);
                 }}
               >
                 Sauvegarder
