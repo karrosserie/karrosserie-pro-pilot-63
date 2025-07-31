@@ -34,7 +34,7 @@ const Planning = () => {
     qualifications: [] as string[]
   });
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
-  const { createEmployee, updateEmployee } = useEmployees();
+  const { employees, createEmployee, updateEmployee } = useEmployees();
 
   // Récupérer les membres de l'équipe
   useEffect(() => {
@@ -2762,27 +2762,45 @@ const Planning = () => {
               {/* Membre de l'équipe */}
               <div className="space-y-2">
                 <Label htmlFor="teamMember">Membre de l'équipe <span className="text-red-500">*</span></Label>
-                <Select 
-                  value={employeeFormData.teamMemberId}
-                  onValueChange={(value) => setEmployeeFormData(prev => ({ ...prev, teamMemberId: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un membre de l'équipe" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background border border-border shadow-md z-50">
-                    {teamMembers.length === 0 ? (
-                      <SelectItem value="no-members" disabled>
-                        Aucun membre d'équipe trouvé
-                      </SelectItem>
-                    ) : (
-                      teamMembers.map((member) => (
-                        <SelectItem key={member.id} value={member.id}>
-                          {member.profiles?.first_name} {member.profiles?.last_name} - {member.role}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
+                {editingEmployee ? (
+                  // Mode modification - lecture seule
+                  <div className="px-3 py-2 border rounded-md bg-muted text-muted-foreground">
+                    {teamMembers.find(member => member.id === employeeFormData.teamMemberId)?.profiles?.first_name}{' '}
+                    {teamMembers.find(member => member.id === employeeFormData.teamMemberId)?.profiles?.last_name} - {' '}
+                    {teamMembers.find(member => member.id === employeeFormData.teamMemberId)?.role}
+                  </div>
+                ) : (
+                  // Mode ajout - filtrer les membres déjà utilisés
+                  <Select 
+                    value={employeeFormData.teamMemberId}
+                    onValueChange={(value) => setEmployeeFormData(prev => ({ ...prev, teamMemberId: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un membre de l'équipe" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border border-border shadow-md z-50">
+                      {(() => {
+                        // Filtrer les membres déjà utilisés dans des employés existants
+                        const usedTeamMemberIds = employees.map(emp => emp.team_member_id).filter(Boolean);
+                        const availableMembers = teamMembers.filter(member => !usedTeamMemberIds.includes(member.id));
+                        
+                        if (availableMembers.length === 0) {
+                          return (
+                            <SelectItem value="no-members" disabled>
+                              Tous les membres d'équipe ont déjà un profil employé
+                            </SelectItem>
+                          );
+                        }
+                        
+                        return availableMembers.map((member) => (
+                          <SelectItem key={member.id} value={member.id}>
+                            {member.profiles?.first_name} {member.profiles?.last_name} - {member.role}
+                          </SelectItem>
+                        ));
+                      })()}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
               {/* Qualifications */}
