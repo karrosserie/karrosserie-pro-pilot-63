@@ -280,18 +280,9 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
               </TableRow>
               <TableRow className="border-t-0">
                 <TableCell colSpan={6} className="py-3 border-t-0">
-                  <div className="flex flex-wrap gap-2 justify-between items-center px-4">
-                    {/* Zone d'information de synchronisation */}
-                    <div className="flex items-center">
-                      {isAccountConnected(account) && formatLastSync(account) && (
-                        <span className="text-sm text-gray-600">
-                          Dernière synchronisation : {formatLastSync(account)}
-                        </span>
-                      )}
-                    </div>
-                    
+                  <div className="px-4 space-y-3">
                     {/* Zone des boutons d'action */}
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 justify-end">
                       {isAccountConnected(account) ? (
                         <Button 
                           variant="outline"
@@ -334,6 +325,13 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                         Supprimer
                       </Button>
                     </div>
+                    
+                    {/* Zone d'information de synchronisation */}
+                    {isAccountConnected(account) && formatLastSync(account) && (
+                      <div className="text-sm text-gray-600">
+                        Dernière synchronisation : {formatLastSync(account)}
+                      </div>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>
