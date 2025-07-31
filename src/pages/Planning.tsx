@@ -272,7 +272,7 @@ const Planning = () => {
               <CardContent>
                 <div className="flex items-center gap-4">
                   <Label htmlFor="employee_select_simple">Employé :</Label>
-                  <Select defaultValue="sophie">
+                  <Select defaultValue="martin">
                     <SelectTrigger
                       id="employee_select_simple"
                       className="w-[200px]"
@@ -284,6 +284,168 @@ const Planning = () => {
                       <SelectItem value="martin">Martin Dubois</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Planning de l'employé */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Mon Planning - Martin Dubois</h3>
+              
+              {/* Tâche 1 */}
+              <Card className="border-l-4 border-l-red-500">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        <Clock className="w-4 h-4 text-red-600" />
+                        <span className="text-red-600">08h-10h</span>
+                        <Badge variant="destructive" className="ml-2">Urgent</Badge>
+                      </div>
+                      <div className="font-semibold">CX-145-DT</div>
+                      <div className="text-sm text-muted-foreground">Citroën C4</div>
+                      <div className="text-sm">Expertise assurance</div>
+                      <div className="text-sm text-muted-foreground">Accord Préparation dossier</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">Détails</Button>
+                      <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">Commencer</Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Tâche 2 */}
+              <Card className="border-l-4 border-l-blue-500">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        <Clock className="w-4 h-4 text-blue-600" />
+                        <span className="text-blue-600">12h-14h</span>
+                        <Badge variant="secondary" className="ml-2">Normal</Badge>
+                      </div>
+                      <div className="font-semibold">EZ-757-AL</div>
+                      <div className="text-sm text-muted-foreground">Audi A3</div>
+                      <div className="text-sm">Remplacement</div>
+                      <div className="text-sm text-muted-foreground">Accord Préparation dossier</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">Détails</Button>
+                      <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">Commencer</Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Tâche 3 */}
+              <Card className="border-l-4 border-l-blue-500">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        <Clock className="w-4 h-4 text-blue-600" />
+                        <span className="text-blue-600">09h-12h</span>
+                        <Badge variant="secondary" className="ml-2">Normal</Badge>
+                      </div>
+                      <div className="font-semibold">AB-783-KY</div>
+                      <div className="text-sm text-muted-foreground">BMW X1</div>
+                      <div className="text-sm">Ponçage & retouches</div>
+                      <div className="text-sm text-muted-foreground">Accord Finitions</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">Détails</Button>
+                      <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">Commencer</Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Tâche 4 */}
+              <Card className="border-l-4 border-l-blue-500">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        <Clock className="w-4 h-4 text-blue-600" />
+                        <span className="text-blue-600">13h-15h30</span>
+                        <Badge variant="secondary" className="ml-2">Normal</Badge>
+                      </div>
+                      <div className="font-semibold">SF-345-UV</div>
+                      <div className="text-sm text-muted-foreground">Volkswagen Golf</div>
+                      <div className="text-sm">Ponçage final</div>
+                      <div className="text-sm text-muted-foreground">Accord dossier livraison</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">Détails</Button>
+                      <Button variant="secondary" size="sm" className="bg-green-600 hover:bg-green-700 text-white">Terminer</Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Tâche 5 */}
+              <Card className="border-l-4 border-l-red-500">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        <Clock className="w-4 h-4 text-red-600" />
+                        <span className="text-red-600">08h-10h30</span>
+                        <Badge variant="destructive" className="ml-2">Urgent</Badge>
+                      </div>
+                      <div className="font-semibold">EF-345-UV</div>
+                      <div className="text-sm text-muted-foreground">Ford Focus</div>
+                      <div className="text-sm">Accueil client</div>
+                      <div className="text-sm text-muted-foreground">Accord Remontage</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">Détails</Button>
+                      <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">Commencer</Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Tâche 6 */}
+              <Card className="border-l-4 border-l-blue-500">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        <Clock className="w-4 h-4 text-blue-600" />
+                        <span className="text-blue-600">08h-14h</span>
+                        <Badge variant="secondary" className="ml-2">Normal</Badge>
+                      </div>
+                      <div className="font-semibold">EZ-757-AL</div>
+                      <div className="text-sm text-muted-foreground">Citroën C3</div>
+                      <div className="text-sm">Débosselage léger</div>
+                      <div className="text-sm text-muted-foreground">Accord dossier livraison</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">Détails</Button>
+                      <Button variant="secondary" size="sm" className="bg-green-600 hover:bg-green-700 text-white">Terminer</Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Section Notifications */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-karrosserie-orange" />
+                  Notifications (1)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                  <div className="text-sm font-medium text-orange-800">Tâche reportée, voir le détail</div>
+                  <div className="text-sm text-orange-700 mt-1">Véhicule CX-145-DT nécessite validation expert</div>
+                  <Button variant="outline" size="sm" className="mt-2 text-karrosserie-orange border-karrosserie-orange hover:bg-karrosserie-orange hover:text-white">
+                    Marquer comme lu
+                  </Button>
                 </div>
               </CardContent>
             </Card>
