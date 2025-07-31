@@ -108,14 +108,15 @@ const ClientDialogs: React.FC<ClientDialogsProps> = ({
             setSelectedClientForDocument(null);
           }
         }}
-        invoice={selectedClientForDocument ? {
+        invoice={null}
+        prefillData={selectedClientForDocument ? {
           client_id: selectedClientForDocument.id,
           clients: {
             id: selectedClientForDocument.id,
             first_name: selectedClientForDocument.first_name,
             last_name: selectedClientForDocument.last_name
           }
-        } as any : null}
+        } : null}
       />
 
       {/* Dialogue de création d'avoir */}
