@@ -102,27 +102,33 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
           <div className="space-y-4 py-4">
             <div className="space-y-3 text-sm text-gray-700">
               <div className="flex items-start gap-3">
-                <span className="text-blue-600 font-semibold">1.</span>
+                <div className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold">
+                  1
+                </div>
                 <p>
-                  Karrosserie.pro <strong>ne peut ni voir vos codes ni déplacer un centime</strong>.
+                  Karrosserie.pro <strong className="text-karrosserie-orange">ne peut ni voir vos codes ni déplacer un centime</strong>.
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-blue-600 font-semibold">2.</span>
+                <div className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold">
+                  2
+                </div>
                 <p>
-                  Bridge, agréé ACPR par la Banque de France, se contente de <strong>lire vos lignes bancaires</strong> pour rapprocher automatiquement vos paiements reçus dans Karrosserie.pro.
+                  Bridge, agréé ACPR par la Banque de France, se contente de <strong className="text-karrosserie-orange">lire vos lignes bancaires</strong> pour rapprocher automatiquement vos paiements reçus dans Karrosserie.pro.
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-blue-600 font-semibold">3.</span>
+                <div className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold">
+                  3
+                </div>
                 <p>
-                  <strong>Aucun virement, aucun prélèvement</strong> : connexion strictement « consultation de paiement ».
+                  <strong className="text-karrosserie-orange">Aucun virement, aucun prélèvement</strong> : connexion strictement « consultation de paiement ».
                 </p>
               </div>
             </div>
             <div className="pt-4 border-t">
               <Button 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                className="w-full bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
                 onClick={() => {
                   // Ici vous pouvez ajouter la logique de connexion bancaire
                   console.log('Connexion bancaire Bridge');
