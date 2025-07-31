@@ -328,7 +328,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                     
                     {/* Zone d'information de synchronisation */}
                     {isAccountConnected(account) && formatLastSync(account) && (
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-600 text-right">
                         Dernière synchronisation : {formatLastSync(account)}
                       </div>
                     )}
