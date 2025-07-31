@@ -2948,13 +2948,14 @@ const Planning = () => {
         {/* Modal Véhicule en urgence */}
         <Dialog open={showUrgentVehicleModal} onOpenChange={setShowUrgentVehicleModal}>
           <DialogContent className="sm:max-w-md">
-            <DialogHeader className="space-y-3">
-              <div className="flex items-center gap-2 text-orange-600">
-                <AlertTriangle className="w-5 h-5" />
-                <DialogTitle className="text-lg">Ajout immédiat au planning - Traitement prioritaire</DialogTitle>
-              </div>
-              <div className="flex justify-center">
+            <DialogHeader>
+              <DialogTitle>Ajout immédiat au planning</DialogTitle>
+              <DialogDescription>
+                Ajouter un véhicule en urgence avec traitement prioritaire.
+              </DialogDescription>
+              <div className="flex justify-center mt-2">
                 <Badge className="bg-red-600 text-white px-3 py-1 text-sm font-medium">
+                  <AlertTriangle className="w-4 h-4 mr-2" />
                   URGENCE - Traitement immédiat
                 </Badge>
               </div>
@@ -3056,10 +3057,22 @@ const Planning = () => {
             </div>
 
             {/* Boutons */}
-            <div className="flex justify-between pt-4">
+            <div className="flex justify-end space-x-2 pt-4 border-t border-border mt-6">
               <Button 
+                type="button"
                 variant="outline" 
+                onClick={() => setShowUrgentVehicleModal(false)}
+                disabled={false}
+              >
+                Annuler
+              </Button>
+              <Button 
+                type="submit"
+                disabled={false}
+                className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
                 onClick={() => {
+                  // Ici on pourrait ajouter la logique de soumission
+                  setShowUrgentVehicleModal(false);
                   setUrgentVehicleFormData({
                     licensePlate: "",
                     assignmentTime: "",
@@ -3069,13 +3082,7 @@ const Planning = () => {
                   });
                 }}
               >
-                Réinitialiser
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => setShowUrgentVehicleModal(false)}
-              >
-                Annuler
+                Ajouter au planning
               </Button>
             </div>
           </DialogContent>
