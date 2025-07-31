@@ -46,8 +46,6 @@ interface AccountsTableProps {
 
 export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTableProps) => {
   const [showBankConnectDialog, setShowBankConnectDialog] = useState(false);
-  const [showIframeDialog, setShowIframeDialog] = useState(false);
-  const [iframeUrl, setIframeUrl] = useState('');
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const { sortedData, sortConfig, handleSort } = useTableSorting(accounts, 'name');
   const { companyId } = useCompanyId();
@@ -124,10 +122,9 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
       console.log('Données reçues:', data);
       
       if (data.url) {
-        setIframeUrl(data.url);
         setShowBankConnectDialog(false);
-        setShowIframeDialog(true);
-        toast.success('Connexion bancaire initiée');
+        toast.success('Redirection vers la connexion bancaire...');
+        window.location.href = data.url;
       } else {
         toast.error('URL de connexion non reçue');
       }
@@ -194,23 +191,6 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                 Je relie mon compte en 30 secondes →
               </Button>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showIframeDialog} onOpenChange={setShowIframeDialog}>
-        <DialogContent className="sm:max-w-4xl max-h-[80vh]">
-          <DialogHeader>
-            <DialogTitle>Connexion bancaire</DialogTitle>
-          </DialogHeader>
-          <div className="h-[600px] w-full">
-            {iframeUrl && (
-              <iframe
-                src={iframeUrl}
-                className="w-full h-full border-0 rounded-lg"
-                title="Connexion bancaire"
-              />
-            )}
           </div>
         </DialogContent>
       </Dialog>
