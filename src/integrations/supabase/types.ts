@@ -1743,6 +1743,48 @@ export type Database = {
           },
         ]
       }
+      workshop_schedule: {
+        Row: {
+          afternoon_end: string | null
+          afternoon_start: string | null
+          company_id: string
+          created_at: string
+          day_of_week: string
+          enabled: boolean
+          full_day: boolean
+          id: string
+          morning_end: string | null
+          morning_start: string | null
+          updated_at: string
+        }
+        Insert: {
+          afternoon_end?: string | null
+          afternoon_start?: string | null
+          company_id: string
+          created_at?: string
+          day_of_week: string
+          enabled?: boolean
+          full_day?: boolean
+          id?: string
+          morning_end?: string | null
+          morning_start?: string | null
+          updated_at?: string
+        }
+        Update: {
+          afternoon_end?: string | null
+          afternoon_start?: string | null
+          company_id?: string
+          created_at?: string
+          day_of_week?: string
+          enabled?: boolean
+          full_day?: boolean
+          id?: string
+          morning_end?: string | null
+          morning_start?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

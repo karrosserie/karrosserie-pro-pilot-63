@@ -102,7 +102,7 @@ const Planning = () => {
           .from('company_preferences')
           .select('accueil_preparation_time, remplacement_debosselage_time, preparation_peinture_time, mise_en_peinture_time, finitions_remontage_time, cloture_livraison_time')
           .eq('company_id', companyInfo.id)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
         
@@ -122,6 +122,48 @@ const Planning = () => {
     };
 
     loadConfigData();
+  }, [companyInfo?.id]);
+
+  // Charger les horaires d'ouverture depuis la base de données
+  useEffect(() => {
+    const loadScheduleData = async () => {
+      if (!companyInfo?.id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('workshop_schedule')
+          .select('*')
+          .eq('company_id', companyInfo.id);
+
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          const scheduleMap = {};
+          data.forEach(schedule => {
+            scheduleMap[schedule.day_of_week] = {
+              enabled: schedule.enabled,
+              fullDay: schedule.full_day,
+              morning: {
+                start: schedule.morning_start?.slice(0, 5) || "08:00",
+                end: schedule.morning_end?.slice(0, 5) || "12:00"
+              },
+              afternoon: {
+                start: schedule.afternoon_start?.slice(0, 5) || "14:00",
+                end: schedule.afternoon_end?.slice(0, 5) || "18:00"
+              }
+            };
+          });
+          setScheduleConfig(prevConfig => ({
+            ...prevConfig,
+            ...scheduleMap
+          }));
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des horaires d\'ouverture:', error);
+      }
+    };
+
+    loadScheduleData();
   }, [companyInfo?.id]);
 
   // Charger les données des étapes de workflow depuis la base de données
@@ -3575,12 +3617,56 @@ const Planning = () => {
               <Button 
                 type="button" 
                 className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-                onClick={() => {
-                  toast({
-                    title: "Configuration sauvegardée",
-                    description: "Les horaires d'ouverture ont été mis à jour avec succès"
-                  });
-                  setShowScheduleConfigModal(false);
+                onClick={async () => {
+                  try {
+                    if (!companyInfo?.id) {
+                      toast({
+                        title: "Erreur",
+                        description: "Informations de l'entreprise non trouvées",
+                        variant: "destructive"
+                      });
+                      return;
+                    }
+
+                    // Préparer les données à sauvegarder
+                    const scheduleData = Object.entries(scheduleConfig).map(([day, config]) => ({
+                      company_id: companyInfo.id,
+                      day_of_week: day,
+                      enabled: config.enabled,
+                      full_day: config.fullDay,
+                      morning_start: config.enabled ? `${config.morning.start}:00` : null,
+                      morning_end: config.enabled ? `${config.morning.end}:00` : null,
+                      afternoon_start: config.enabled ? `${config.afternoon.start}:00` : null,
+                      afternoon_end: config.enabled ? `${config.afternoon.end}:00` : null
+                    }));
+
+                    // Supprimer les anciens horaires et insérer les nouveaux
+                    const { error: deleteError } = await supabase
+                      .from('workshop_schedule')
+                      .delete()
+                      .eq('company_id', companyInfo.id);
+
+                    if (deleteError) throw deleteError;
+
+                    const { error: insertError } = await supabase
+                      .from('workshop_schedule')
+                      .insert(scheduleData);
+
+                    if (insertError) throw insertError;
+
+                    toast({
+                      title: "Configuration sauvegardée",
+                      description: "Les horaires d'ouverture ont été mis à jour avec succès"
+                    });
+                    setShowScheduleConfigModal(false);
+                  } catch (error) {
+                    console.error('Erreur lors de la sauvegarde:', error);
+                    toast({
+                      title: "Erreur",
+                      description: "Impossible de sauvegarder la configuration",
+                      variant: "destructive"
+                    });
+                  }
                 }}
               >
                 Sauvegarder
