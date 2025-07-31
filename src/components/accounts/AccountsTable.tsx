@@ -35,6 +35,13 @@ interface Account {
   created_at: string;
   updated_at: string;
   last_sync?: string;
+  bridge?: {
+    id: string;
+    created_at: string;
+    updated_at: string;
+    bridge_id: string;
+    access_token: string;
+  } | null;
 }
 
 interface AccountsTableProps {
@@ -82,6 +89,13 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
       style: 'currency',
       currency: 'EUR'
     }).format(amount);
+  };
+
+  const isAccountConnected = (account: Account) => {
+    if (!account.bridge) return false;
+    const updatedAt = new Date(account.bridge.updated_at);
+    const createdAt = new Date(account.bridge.created_at);
+    return updatedAt > createdAt;
   };
 
   const handleBankConnection = async () => {
@@ -242,18 +256,30 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
               <TableRow className="border-t-0">
                 <TableCell colSpan={6} className="py-3 border-t-0">
                   <div className="flex flex-wrap gap-2 justify-end px-4">
-                    <Button 
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        console.log('Bouton Connecter cliqué pour:', account);
-                        setSelectedAccount(account);
-                        setShowBankConnectDialog(true);
-                      }}
-                    >
-                      <Link className="h-4 w-4 mr-1" />
-                      Connecter
-                    </Button>
+                    {isAccountConnected(account) ? (
+                      <Button 
+                        variant="outline"
+                        size="sm"
+                        className="border-green-500 text-green-600 hover:bg-green-50"
+                        disabled
+                      >
+                        <Link className="h-4 w-4 mr-1" />
+                        Connecté
+                      </Button>
+                    ) : (
+                      <Button 
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          console.log('Bouton Connecter cliqué pour:', account);
+                          setSelectedAccount(account);
+                          setShowBankConnectDialog(true);
+                        }}
+                      >
+                        <Link className="h-4 w-4 mr-1" />
+                        Connecter
+                      </Button>
+                    )}
                     <Button 
                       variant="outline"
                       size="sm"

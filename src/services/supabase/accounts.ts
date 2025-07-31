@@ -9,7 +9,15 @@ type BankAccountInsert = Database['public']['Tables']['bank_accounts']['Insert']
 type BankAccountUpdate = Database['public']['Tables']['bank_accounts']['Update'];
 
 // Types for compatibility with existing components
-export interface Account extends BankAccountRow {}
+export interface Account extends BankAccountRow {
+  bridge?: {
+    id: string;
+    created_at: string;
+    updated_at: string;
+    bridge_id: string;
+    access_token: string;
+  } | null;
+}
 
 export interface NewAccount {
   name: string;
@@ -45,7 +53,16 @@ export const accountsService = {
     
     const { data, error } = await supabase
       .from('bank_accounts')
-      .select('*')
+      .select(`
+        *,
+        bridge(
+          id,
+          created_at,
+          updated_at,
+          bridge_id,
+          access_token
+        )
+      `)
       .eq('company_id', companyId)
       .order('created_at', { ascending: false });
 
@@ -55,7 +72,16 @@ export const accountsService = {
     }
 
     console.log('Successfully fetched accounts from Supabase:', data);
-    return data || [];
+    
+    // Transform data to handle bridge relationship properly
+    const transformedData = data?.map(account => ({
+      ...account,
+      bridge: Array.isArray(account.bridge) && account.bridge.length > 0 
+        ? account.bridge[0] 
+        : null
+    })) || [];
+    
+    return transformedData;
   },
 
   // Get a single account by ID
