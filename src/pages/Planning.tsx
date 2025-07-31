@@ -13,6 +13,7 @@ import StatsCard from '@/components/dashboard/StatsCard';
 
 const Planning = () => {
   const [activeView, setActiveView] = useState("manager");
+  const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
   const [activeProcessStep, setActiveProcessStep] = useState("accueil");
   const [showWaitingVehiclesModal, setShowWaitingVehiclesModal] = useState(false);
   const [showVehicleDetailModal, setShowVehicleDetailModal] = useState(false);
@@ -240,14 +241,17 @@ const Planning = () => {
           
           <div className="flex items-center gap-2">
             <Button
-              variant={activeView === "manager" ? "default" : "outline"}
-              onClick={() => setActiveView("manager")}
+              variant={activeView === "manager" ? "validation" : "outline"}
+              onClick={() => {
+                setActiveView("manager");
+                setSelectedEmployee(null);
+              }}
               size="sm"
             >
               Vue Manager
             </Button>
             <Button
-              variant={activeView === "employee" ? "default" : "outline"}
+              variant={activeView === "employee" ? "validation" : "outline"}
               onClick={() => setActiveView("employee")}
               size="sm"
             >
@@ -285,7 +289,152 @@ const Planning = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="workshop" className="space-y-6">
+          {/* Vue Employé - Sélection du profil */}
+          {activeView === "employee" && !selectedEmployee && (
+            <div className="flex items-center justify-center min-h-[400px]">
+              <Card className="w-full max-w-2xl">
+                <CardContent className="p-8 text-center">
+                  <div className="space-y-6">
+                    <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center">
+                      <User className="w-8 h-8 text-muted-foreground" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h2 className="text-2xl font-semibold">Sélectionnez votre profil employé</h2>
+                      <p className="text-muted-foreground">
+                        Choisissez un employé dans le sélecteur ci-dessous pour accéder à son planning personnel
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                      <Card 
+                        className="p-6 cursor-pointer hover:shadow-md transition-all border-2 hover:border-karrosserie-orange/50"
+                        onClick={() => setSelectedEmployee({ name: "Martin Dubois", id: "martin" })}
+                      >
+                        <div className="flex flex-col items-center space-y-3">
+                          <div className="w-12 h-12 bg-karrosserie-orange/10 rounded-full flex items-center justify-center">
+                            <User className="w-6 h-6 text-karrosserie-orange" />
+                          </div>
+                          <span className="font-medium text-lg">Martin Dubois</span>
+                        </div>
+                      </Card>
+
+                      <Card 
+                        className="p-6 cursor-pointer hover:shadow-md transition-all border-2 hover:border-karrosserie-orange/50"
+                        onClick={() => setSelectedEmployee({ name: "Sophie Martin", id: "sophie" })}
+                      >
+                        <div className="flex flex-col items-center space-y-3">
+                          <div className="w-12 h-12 bg-karrosserie-orange/10 rounded-full flex items-center justify-center">
+                            <User className="w-6 h-6 text-karrosserie-orange" />
+                          </div>
+                          <span className="font-medium text-lg">Sophie Martin</span>
+                        </div>
+                      </Card>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Vue Employé - Planning personnel */}
+          {activeView === "employee" && selectedEmployee && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setSelectedEmployee(null)}
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Retour à la sélection
+                  </Button>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-karrosserie-orange/10 rounded-full flex items-center justify-center">
+                      <User className="w-4 h-4 text-karrosserie-orange" />
+                    </div>
+                    <h2 className="text-xl font-semibold">Planning de {selectedEmployee.name}</h2>
+                  </div>
+                </div>
+              </div>
+
+              {/* Planning employé simplifié */}
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                {["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"].map((day, index) => (
+                  <Card key={day}>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg text-karrosserie-orange">{day}</CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedEmployee.id === "martin" ? 
+                          (index === 0 ? "2 tâche(s)" : index === 4 ? "3 tâche(s)" : "1 tâche") :
+                          (index === 1 ? "2 tâche(s)" : index === 4 ? "1 tâche" : "1 tâche")
+                        }
+                      </p>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {selectedEmployee.id === "martin" && index === 0 && (
+                        <>
+                          <Card className="border-l-4 border-l-karrosserie-orange p-3">
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 text-sm text-karrosserie-orange">
+                                <Clock className="w-3 h-3" />
+                                9h-10h
+                              </div>
+                              <div className="font-semibold text-sm">EZ-787-KL</div>
+                              <div className="text-xs text-muted-foreground">Accueil & Préparation</div>
+                              <Badge className="bg-orange-100 text-karrosserie-orange text-xs">En cours</Badge>
+                            </div>
+                          </Card>
+                          <Card className="border-l-4 border-l-green-500 p-3">
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 text-sm text-green-600">
+                                <Clock className="w-3 h-3" />
+                                14h-16h
+                              </div>
+                              <div className="font-semibold text-sm">EZ-787-KL</div>
+                              <div className="text-xs text-muted-foreground">Débosselage léger</div>
+                              <Badge className="bg-green-100 text-green-800 text-xs">Planifié</Badge>
+                            </div>
+                          </Card>
+                        </>
+                      )}
+                      {selectedEmployee.id === "sophie" && index === 1 && (
+                        <>
+                          <Card className="border-l-4 border-l-karrosserie-orange p-3">
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 text-sm text-karrosserie-orange">
+                                <Clock className="w-3 h-3" />
+                                8h-10h
+                              </div>
+                              <div className="font-semibold text-sm">HT-556-GH</div>
+                              <div className="text-xs text-muted-foreground">Préparation peinture</div>
+                              <Badge className="bg-orange-100 text-karrosserie-orange text-xs">En cours</Badge>
+                            </div>
+                          </Card>
+                          <Card className="border-l-4 border-l-red-500 p-3">
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 text-sm text-red-600">
+                                <Clock className="w-3 h-3" />
+                                14h-17h
+                              </div>
+                              <div className="font-semibold text-sm">CD-123-ZW</div>
+                              <div className="text-xs text-muted-foreground">Mise en peinture</div>
+                              <Badge className="bg-red-100 text-red-800 text-xs">Planifié</Badge>
+                            </div>
+                          </Card>
+                        </>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeView === "manager" && (
+            <>
+            <TabsContent value="workshop" className="space-y-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <StatsCard 
@@ -2234,6 +2383,8 @@ const Planning = () => {
               )}
             </div>
           </TabsContent>
+            </>
+          )}
         </Tabs>
 
         {/* Modal des véhicules en attente */}
