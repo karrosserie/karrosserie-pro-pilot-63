@@ -838,6 +838,7 @@ const Planning = () => {
                 </CardContent>
               </Card>
             </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="employees">
