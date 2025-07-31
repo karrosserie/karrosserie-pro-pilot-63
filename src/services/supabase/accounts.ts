@@ -51,50 +51,57 @@ export const accountsService = {
 
     const companyId = await getCurrentUserCompanyId();
     
-    const { data, error } = await supabase
+    // Récupérer d'abord les comptes bancaires
+    const { data: accounts, error: accountsError } = await supabase
       .from('bank_accounts')
-      .select(`
-        *,
-        bridge(
-          id,
-          created_at,
-          updated_at,
-          bridge_id,
-          access_token
-        )
-      `)
+      .select('*')
       .eq('company_id', companyId)
       .order('created_at', { ascending: false });
 
-    console.log('=== RAW SUPABASE RESPONSE ===');
-    console.log('Data:', data);
-    console.log('Error:', error);
-
-    if (error) {
-      console.error('Supabase error:', error);
-      throw error;
+    if (accountsError) {
+      console.error('Supabase accounts error:', accountsError);
+      throw accountsError;
     }
 
-    console.log('Successfully fetched accounts from Supabase:', data);
-    
-    // Transform data to handle bridge relationship properly
-    const transformedData = data?.map(account => {
-      const bridgeData = Array.isArray(account.bridge) && account.bridge.length > 0 
-        ? account.bridge[0] 
-        : null;
+    console.log('=== ACCOUNTS FETCHED ===');
+    console.log('Accounts:', accounts);
+
+    // Récupérer les données bridge séparément
+    const { data: bridgeData, error: bridgeError } = await supabase
+      .from('bridge')
+      .select('*')
+      .eq('company_id', companyId);
+
+    console.log('=== BRIDGE DATA FETCHED ===');
+    console.log('Bridge data:', bridgeData);
+    console.log('Bridge error:', bridgeError);
+
+    if (accountsError) {
+      console.error('Supabase error:', accountsError);
+      throw accountsError;
+    }
+
+    // Combiner les données
+    const transformedData = accounts?.map(account => {
+      const bridgeRecord = bridgeData?.find(bridge => bridge.account_id === account.id);
       
-      console.log(`=== TRANSFORMING ACCOUNT ${account.name} ===`);
-      console.log('Original bridge data:', account.bridge);
-      console.log('Transformed bridge data:', bridgeData);
+      console.log(`=== PROCESSING ACCOUNT ${account.name} ===`);
+      console.log('Account ID:', account.id);
+      console.log('Bridge record found:', bridgeRecord);
       
       return {
         ...account,
-        bridge: bridgeData
+        bridge: bridgeRecord || null
       };
     }) || [];
-    
+
     console.log('=== FINAL TRANSFORMED DATA ===');
-    console.log(transformedData);
+    transformedData.forEach(account => {
+      console.log(`Account ${account.name}:`, {
+        id: account.id,
+        bridge: account.bridge
+      });
+    });
     
     return transformedData;
   },
