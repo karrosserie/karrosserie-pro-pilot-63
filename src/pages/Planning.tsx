@@ -1025,7 +1025,15 @@ const Planning = () => {
                         </div>
                         <div className="flex flex-col items-end gap-2">
                           <Badge className="bg-green-100 text-green-800">Terminé</Badge>
-                          <Button size="sm" variant="outline">
+                          <Button size="sm" variant="outline" onClick={() => {
+                            setSelectedVehicle({
+                              brand: "BMW Série 1",
+                              plate: "HT-556-GH",
+                              client: "M. Rousseau",
+                              technician: "Sophie Martin"
+                            });
+                            setShowVehicleDetailModal(true);
+                          }}>
                             Voir détails
                           </Button>
                         </div>
@@ -1047,7 +1055,15 @@ const Planning = () => {
                         </div>
                         <div className="flex flex-col items-end gap-2">
                           <Badge className="bg-green-100 text-green-800">Terminé</Badge>
-                          <Button size="sm" variant="outline">
+                          <Button size="sm" variant="outline" onClick={() => {
+                            setSelectedVehicle({
+                              brand: "Audi A4",
+                              plate: "VS-901-AB",
+                              client: "M. Bernard",
+                              technician: "Sophie Martin"
+                            });
+                            setShowVehicleDetailModal(true);
+                          }}>
                             Voir détails
                           </Button>
                         </div>
