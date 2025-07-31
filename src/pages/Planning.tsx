@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History } from "lucide-react";
+import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import StatsCard from '@/components/dashboard/StatsCard';
 
 const Planning = () => {
@@ -14,6 +16,14 @@ const Planning = () => {
   const [showWaitingVehiclesModal, setShowWaitingVehiclesModal] = useState(false);
   const [showVehicleDetailModal, setShowVehicleDetailModal] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
+  const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState<any>(null);
+  const [employeeFormData, setEmployeeFormData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    qualifications: [] as string[]
+  });
 
   const stats = {
     vehicles: 8,
@@ -1083,7 +1093,19 @@ const Planning = () => {
                   <h2 className="text-2xl font-bold text-gray-800">Gestion des Employés</h2>
                   <p className="text-gray-600 mt-1">Créer et gérer les profils avec leurs qualifications</p>
                 </div>
-                <Button className="bg-primary hover:bg-primary/90">
+                <Button 
+                  className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+                  onClick={() => {
+                    setEditingEmployee(null);
+                    setEmployeeFormData({
+                      fullName: "",
+                      email: "",
+                      phone: "",
+                      qualifications: []
+                    });
+                    setShowEmployeeDialog(true);
+                  }}
+                >
                   <User className="w-4 h-4 mr-2" />
                   Ajouter un employé
                 </Button>
@@ -1128,11 +1150,38 @@ const Planning = () => {
                         <p className="text-sm text-gray-600">06.12.34.56.78</p>
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline" className="p-2">
-                          <Edit className="w-4 h-4" />
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => {
+                            setEditingEmployee({
+                              fullName: "Martin Dubois",
+                              email: "martin.dubois@carrosserie.fr",
+                              phone: "06.12.34.56.78",
+                              qualifications: ["Accueil & Préparation du dossier", "Remplacement ou débosselage", "Finitions & remontage"]
+                            });
+                            setEmployeeFormData({
+                              fullName: "Martin Dubois",
+                              email: "martin.dubois@carrosserie.fr",
+                              phone: "06.12.34.56.78",
+                              qualifications: ["Accueil & Préparation du dossier", "Remplacement ou débosselage", "Finitions & remontage"]
+                            });
+                            setShowEmployeeDialog(true);
+                          }}
+                        >
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Modifier
                         </Button>
-                        <Button size="sm" variant="outline" className="p-2 text-red-600 hover:text-red-700">
-                          <X className="w-4 h-4" />
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                          onClick={() => {
+                            // Handle delete
+                          }}
+                        >
+                          <Trash className="h-4 w-4 mr-1" />
+                          Supprimer
                         </Button>
                       </div>
                     </div>
@@ -1167,11 +1216,38 @@ const Planning = () => {
                         <p className="text-sm text-gray-600">06.23.45.67.89</p>
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline" className="p-2">
-                          <Edit className="w-4 h-4" />
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => {
+                            setEditingEmployee({
+                              fullName: "Sophie Martin",
+                              email: "sophie.martin@carrosserie.fr",
+                              phone: "06.23.45.67.89",
+                              qualifications: ["Préparation peinture", "Mise en peinture", "Finitions & remontage"]
+                            });
+                            setEmployeeFormData({
+                              fullName: "Sophie Martin",
+                              email: "sophie.martin@carrosserie.fr",
+                              phone: "06.23.45.67.89",
+                              qualifications: ["Préparation peinture", "Mise en peinture", "Finitions & remontage"]
+                            });
+                            setShowEmployeeDialog(true);
+                          }}
+                        >
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Modifier
                         </Button>
-                        <Button size="sm" variant="outline" className="p-2 text-red-600 hover:text-red-700">
-                          <X className="w-4 h-4" />
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                          onClick={() => {
+                            // Handle delete
+                          }}
+                        >
+                          <Trash className="h-4 w-4 mr-1" />
+                          Supprimer
                         </Button>
                       </div>
                     </div>
@@ -1620,6 +1696,124 @@ const Planning = () => {
                 </div>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Dialog d'ajout/modification d'employé */}
+        <Dialog open={showEmployeeDialog} onOpenChange={setShowEmployeeDialog}>
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                {editingEmployee ? "Modifier l'employé" : "Ajouter un employé"}
+              </DialogTitle>
+              <DialogDescription>
+                {editingEmployee 
+                  ? "Modifiez les informations de l'employé" 
+                  : "Créez un nouveau profil employé avec ses qualifications"
+                }
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4 py-4">
+              {/* Nom complet */}
+              <div className="space-y-2">
+                <Label htmlFor="fullName">Nom complet <span className="text-red-500">*</span></Label>
+                <Input 
+                  id="fullName" 
+                  value={employeeFormData.fullName}
+                  onChange={(e) => setEmployeeFormData(prev => ({ ...prev, fullName: e.target.value }))}
+                  placeholder="Martin Dubois"
+                />
+              </div>
+
+              {/* Email */}
+              <div className="space-y-2">
+                <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
+                <Input 
+                  id="email" 
+                  type="email"
+                  value={employeeFormData.email}
+                  onChange={(e) => setEmployeeFormData(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder="martin.dubois@carrosserie.fr"
+                />
+              </div>
+
+              {/* Téléphone */}
+              <div className="space-y-2">
+                <Label htmlFor="phone">Téléphone</Label>
+                <Input 
+                  id="phone" 
+                  value={employeeFormData.phone}
+                  onChange={(e) => setEmployeeFormData(prev => ({ ...prev, phone: e.target.value }))}
+                  placeholder="06.12.34.56.78"
+                />
+              </div>
+
+              {/* Qualifications */}
+              <div className="space-y-2">
+                <Label>Qualifications <span className="text-red-500">*</span> (sélectionnez une ou plusieurs)</Label>
+                <div className="max-h-40 overflow-y-auto border rounded-md p-3 space-y-2">
+                  {[
+                    "Accueil & Préparation du dossier",
+                    "Remplacement ou débosselage", 
+                    "Préparation peinture",
+                    "Mise en peinture",
+                    "Finitions & remontage",
+                    "Clôture du dossier et livraison"
+                  ].map((qualification) => (
+                    <div key={qualification} className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={qualification}
+                        checked={employeeFormData.qualifications.includes(qualification)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setEmployeeFormData(prev => ({
+                              ...prev,
+                              qualifications: [...prev.qualifications, qualification]
+                            }));
+                          } else {
+                            setEmployeeFormData(prev => ({
+                              ...prev,
+                              qualifications: prev.qualifications.filter(q => q !== qualification)
+                            }));
+                          }
+                        }}
+                      />
+                      <Label 
+                        htmlFor={qualification} 
+                        className="text-sm font-normal cursor-pointer flex-1"
+                      >
+                        {qualification}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {employeeFormData.qualifications.length} qualification(s) sélectionnée(s)
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-2 pt-4 border-t">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setShowEmployeeDialog(false)}
+              >
+                Annuler
+              </Button>
+              <Button 
+                type="button" 
+                className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+                onClick={() => {
+                  // Handle form submission
+                  console.log("Employee data:", employeeFormData);
+                  setShowEmployeeDialog(false);
+                }}
+              >
+                {editingEmployee ? "Modifier" : "Créer"}
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
