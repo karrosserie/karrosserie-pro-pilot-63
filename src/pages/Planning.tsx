@@ -1772,7 +1772,6 @@ const Planning = () => {
                         </div>
                       </CardContent>
                     </Card>
-                  </div>
                 </div>
               )}
 
@@ -2381,7 +2380,7 @@ const Planning = () => {
               )}
             </div>
           </TabsContent>
-            </>
+          </>
           )}
         </Tabs>
 
