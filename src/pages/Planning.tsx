@@ -45,13 +45,48 @@ const Planning = () => {
     cloture: "00:30"
   });
   const [scheduleConfig, setScheduleConfig] = useState({
-    monday: { enabled: true, start: "08:00", end: "18:00" },
-    tuesday: { enabled: true, start: "08:00", end: "18:00" },
-    wednesday: { enabled: true, start: "08:00", end: "18:00" },
-    thursday: { enabled: true, start: "08:00", end: "18:00" },
-    friday: { enabled: true, start: "08:00", end: "18:00" },
-    saturday: { enabled: false, start: "08:00", end: "12:00" },
-    sunday: { enabled: false, start: "08:00", end: "12:00" }
+    monday: { 
+      enabled: true, 
+      morning: { start: "08:00", end: "12:00" },
+      afternoon: { start: "14:00", end: "18:00" },
+      fullDay: false
+    },
+    tuesday: { 
+      enabled: true, 
+      morning: { start: "08:00", end: "12:00" },
+      afternoon: { start: "14:00", end: "18:00" },
+      fullDay: false
+    },
+    wednesday: { 
+      enabled: true, 
+      morning: { start: "08:00", end: "12:00" },
+      afternoon: { start: "14:00", end: "18:00" },
+      fullDay: false
+    },
+    thursday: { 
+      enabled: true, 
+      morning: { start: "08:00", end: "12:00" },
+      afternoon: { start: "14:00", end: "18:00" },
+      fullDay: false
+    },
+    friday: { 
+      enabled: true, 
+      morning: { start: "08:00", end: "12:00" },
+      afternoon: { start: "14:00", end: "18:00" },
+      fullDay: false
+    },
+    saturday: { 
+      enabled: false, 
+      morning: { start: "08:00", end: "12:00" },
+      afternoon: { start: "14:00", end: "18:00" },
+      fullDay: false
+    },
+    sunday: { 
+      enabled: false, 
+      morning: { start: "08:00", end: "12:00" },
+      afternoon: { start: "14:00", end: "18:00" },
+      fullDay: false
+    }
   });
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const { employees, createEmployee, updateEmployee } = useEmployees();
@@ -3384,53 +3419,148 @@ const Planning = () => {
                   sunday: "Dimanche"
                 };
                 
-                return (
-                  <div key={day} className="flex items-center gap-4 p-3 border rounded-lg">
-                    <div className="flex items-center space-x-2 w-24">
-                      <Checkbox
-                        id={`${day}-enabled`}
-                        checked={config.enabled}
-                        onCheckedChange={(checked) => 
-                          setScheduleConfig(prev => ({
-                            ...prev,
-                            [day]: { ...config, enabled: !!checked }
-                          }))
-                        }
-                      />
-                      <Label htmlFor={`${day}-enabled`} className="text-sm font-medium">
-                        {dayNames[day]}
-                      </Label>
-                    </div>
-                    
-                    {config.enabled && (
-                      <div className="flex items-center gap-2">
-                        <Input
-                          type="time"
-                          value={config.start}
-                          onChange={(e) => 
-                            setScheduleConfig(prev => ({
-                              ...prev,
-                              [day]: { ...config, start: e.target.value }
-                            }))
-                          }
-                          className="w-32"
-                        />
-                        <span className="text-muted-foreground">à</span>
-                        <Input
-                          type="time"
-                          value={config.end}
-                          onChange={(e) => 
-                            setScheduleConfig(prev => ({
-                              ...prev,
-                              [day]: { ...config, end: e.target.value }
-                            }))
-                          }
-                          className="w-32"
-                        />
-                      </div>
-                    )}
-                  </div>
-                );
+                 return (
+                   <div key={day} className="space-y-3 p-4 border rounded-lg">
+                     <div className="flex items-center space-x-2">
+                       <Checkbox
+                         id={`${day}-enabled`}
+                         checked={config.enabled}
+                         onCheckedChange={(checked) => 
+                           setScheduleConfig(prev => ({
+                             ...prev,
+                             [day]: { ...config, enabled: !!checked }
+                           }))
+                         }
+                       />
+                       <Label htmlFor={`${day}-enabled`} className="text-sm font-medium">
+                         {dayNames[day]}
+                       </Label>
+                     </div>
+                     
+                     {config.enabled && (
+                       <div className="space-y-3 pl-6">
+                         <div className="flex items-center space-x-2">
+                           <Checkbox
+                             id={`${day}-fullday`}
+                             checked={config.fullDay}
+                             onCheckedChange={(checked) => 
+                               setScheduleConfig(prev => ({
+                                 ...prev,
+                                 [day]: { ...config, fullDay: !!checked }
+                               }))
+                             }
+                           />
+                           <Label htmlFor={`${day}-fullday`} className="text-sm">
+                             Journée continue
+                           </Label>
+                         </div>
+                         
+                         {config.fullDay ? (
+                           <div className="flex items-center gap-2">
+                             <span className="text-sm text-muted-foreground w-16">De</span>
+                             <Input
+                               type="time"
+                               value={config.morning.start}
+                               onChange={(e) => 
+                                 setScheduleConfig(prev => ({
+                                   ...prev,
+                                   [day]: { 
+                                     ...config, 
+                                     morning: { ...config.morning, start: e.target.value }
+                                   }
+                                 }))
+                               }
+                               className="w-20"
+                             />
+                             <span className="text-muted-foreground">à</span>
+                             <Input
+                               type="time"
+                               value={config.afternoon.end}
+                               onChange={(e) => 
+                                 setScheduleConfig(prev => ({
+                                   ...prev,
+                                   [day]: { 
+                                     ...config, 
+                                     afternoon: { ...config.afternoon, end: e.target.value }
+                                   }
+                                 }))
+                               }
+                               className="w-20"
+                             />
+                           </div>
+                         ) : (
+                           <div className="space-y-2">
+                             <div className="flex items-center gap-2">
+                               <span className="text-sm text-muted-foreground w-16">Matin</span>
+                               <Input
+                                 type="time"
+                                 value={config.morning.start}
+                                 onChange={(e) => 
+                                   setScheduleConfig(prev => ({
+                                     ...prev,
+                                     [day]: { 
+                                       ...config, 
+                                       morning: { ...config.morning, start: e.target.value }
+                                     }
+                                   }))
+                                 }
+                                 className="w-20"
+                               />
+                               <span className="text-muted-foreground">à</span>
+                               <Input
+                                 type="time"
+                                 value={config.morning.end}
+                                 onChange={(e) => 
+                                   setScheduleConfig(prev => ({
+                                     ...prev,
+                                     [day]: { 
+                                       ...config, 
+                                       morning: { ...config.morning, end: e.target.value }
+                                     }
+                                   }))
+                                 }
+                                 className="w-20"
+                               />
+                             </div>
+                             
+                             <div className="flex items-center gap-2">
+                               <span className="text-sm text-muted-foreground w-16">Après-midi</span>
+                               <Input
+                                 type="time"
+                                 value={config.afternoon.start}
+                                 onChange={(e) => 
+                                   setScheduleConfig(prev => ({
+                                     ...prev,
+                                     [day]: { 
+                                       ...config, 
+                                       afternoon: { ...config.afternoon, start: e.target.value }
+                                     }
+                                   }))
+                                 }
+                                 className="w-20"
+                               />
+                               <span className="text-muted-foreground">à</span>
+                               <Input
+                                 type="time"
+                                 value={config.afternoon.end}
+                                 onChange={(e) => 
+                                   setScheduleConfig(prev => ({
+                                     ...prev,
+                                     [day]: { 
+                                       ...config, 
+                                       afternoon: { ...config.afternoon, end: e.target.value }
+                                     }
+                                   }))
+                                 }
+                                 className="w-20"
+                               />
+                             </div>
+                           </div>
+                         )}
+                       </div>
+                     )}
+                   </div>
+                 );
               })}
             </div>
 
