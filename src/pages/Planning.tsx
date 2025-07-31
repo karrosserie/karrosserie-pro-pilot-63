@@ -13,6 +13,7 @@ import StatsCard from '@/components/dashboard/StatsCard';
 
 const Planning = () => {
   const [activeView, setActiveView] = useState("manager");
+  const [activeProcessStep, setActiveProcessStep] = useState("accueil");
   const [showWaitingVehiclesModal, setShowWaitingVehiclesModal] = useState(false);
   const [showVehicleDetailModal, setShowVehicleDetailModal] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
@@ -1257,34 +1258,62 @@ const Planning = () => {
             </div>
 
             {/* Processus avec navigation */}
-            <Tabs defaultValue="accueil" className="w-full">
+            <div className="w-full">
               {/* Navigation des étapes */}
-              <div className="flex flex-wrap gap-2 p-1 bg-muted rounded-lg mb-6">
-                <TabsList className="grid w-full grid-cols-6">
-                  <TabsTrigger value="accueil" className="text-xs">
-                    ACCUEIL & PRÉPARATION DU DOSSIER
-                  </TabsTrigger>
-                  <TabsTrigger value="remplacement" className="text-xs">
-                    REMPLACEMENT OU DÉBOSSELAGE
-                  </TabsTrigger>
-                  <TabsTrigger value="preparation" className="text-xs">
-                    PRÉPARATION PEINTURE
-                  </TabsTrigger>
-                  <TabsTrigger value="peinture" className="text-xs">
-                    MISE EN PEINTURE
-                  </TabsTrigger>
-                  <TabsTrigger value="finitions" className="text-xs">
-                    FINITIONS & REMONTAGE
-                  </TabsTrigger>
-                  <TabsTrigger value="cloture" className="text-xs">
-                    CLÔTURE & LIVRAISON
-                  </TabsTrigger>
-                </TabsList>
+              <div className="flex flex-wrap gap-2 mb-6">
+                <Button
+                  variant={activeProcessStep === "accueil" ? "default" : "outline"}
+                  onClick={() => setActiveProcessStep("accueil")}
+                  size="sm"
+                  className="text-xs"
+                >
+                  ACCUEIL & PRÉPARATION DU DOSSIER
+                </Button>
+                <Button
+                  variant={activeProcessStep === "remplacement" ? "default" : "outline"}
+                  onClick={() => setActiveProcessStep("remplacement")}
+                  size="sm"
+                  className="text-xs"
+                >
+                  REMPLACEMENT OU DÉBOSSELAGE
+                </Button>
+                <Button
+                  variant={activeProcessStep === "preparation" ? "default" : "outline"}
+                  onClick={() => setActiveProcessStep("preparation")}
+                  size="sm"
+                  className="text-xs"
+                >
+                  PRÉPARATION PEINTURE
+                </Button>
+                <Button
+                  variant={activeProcessStep === "peinture" ? "default" : "outline"}
+                  onClick={() => setActiveProcessStep("peinture")}
+                  size="sm"
+                  className="text-xs"
+                >
+                  MISE EN PEINTURE
+                </Button>
+                <Button
+                  variant={activeProcessStep === "finitions" ? "default" : "outline"}
+                  onClick={() => setActiveProcessStep("finitions")}
+                  size="sm"
+                  className="text-xs"
+                >
+                  FINITIONS & REMONTAGE
+                </Button>
+                <Button
+                  variant={activeProcessStep === "cloture" ? "default" : "outline"}
+                  onClick={() => setActiveProcessStep("cloture")}
+                  size="sm"
+                  className="text-xs"
+                >
+                  CLÔTURE & LIVRAISON
+                </Button>
               </div>
 
               {/* ACCUEIL & PRÉPARATION */}
-              <TabsContent value="accueil" className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {activeProcessStep === "accueil" && (
+                <div className="space-y-6">
                   <div className="lg:col-span-2">
                     <Card className="border-l-4 border-l-blue-500">
                       <CardHeader>
@@ -1434,10 +1463,10 @@ const Planning = () => {
                     </Card>
                   </div>
                 </div>
-              </TabsContent>
+              )}
 
               {/* REMPLACEMENT OU DÉBOSSELAGE */}
-              <TabsContent value="remplacement" className="space-y-6">
+              {activeProcessStep === "remplacement" && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2">
                     <Card className="border-l-4 border-l-green-500">
@@ -1595,10 +1624,10 @@ const Planning = () => {
                     </Card>
                   </div>
                 </div>
-              </TabsContent>
+              )}
 
               {/* PRÉPARATION PEINTURE */}
-              <TabsContent value="preparation" className="space-y-6">
+              {activeProcessStep === "preparation" && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2">
                     <Card className="border-l-4 border-l-orange-500">
@@ -1748,10 +1777,10 @@ const Planning = () => {
                     </Card>
                   </div>
                 </div>
-              </TabsContent>
+              )}
 
               {/* MISE EN PEINTURE */}
-              <TabsContent value="peinture" className="space-y-6">
+              {activeProcessStep === "peinture" && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2">
                     <Card className="border-l-4 border-l-red-500">
@@ -1909,10 +1938,10 @@ const Planning = () => {
                     </Card>
                   </div>
                 </div>
-              </TabsContent>
+              )}
 
               {/* FINITIONS & REMONTAGE */}
-              <TabsContent value="finitions" className="space-y-6">
+              {activeProcessStep === "finitions" && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2">
                     <Card className="border-l-4 border-l-purple-500">
@@ -2054,10 +2083,10 @@ const Planning = () => {
                     </Card>
                   </div>
                 </div>
-              </TabsContent>
+              )}
 
               {/* CLÔTURE & LIVRAISON */}
-              <TabsContent value="cloture" className="space-y-6">
+              {activeProcessStep === "cloture" && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2">
                     <Card className="border-l-4 border-l-gray-500">
@@ -2199,8 +2228,8 @@ const Planning = () => {
                     </Card>
                   </div>
                 </div>
-              </TabsContent>
-            </Tabs>
+              )}
+            </div>
           </TabsContent>
         </Tabs>
 
