@@ -156,14 +156,18 @@ const TeamTab = () => {
   };
 
   const handleAddMember = async (data: AddMemberFormValues) => {
+    console.log('handleAddMember called with data:', data);
     if (!companyInfo?.id) return;
 
     setIsSubmitting(true);
 
     try {
+      console.log('Calling signUp...');
       // Créer l'utilisateur avec Supabase Auth
       const { user } = await signUp(data.email, data.password, data.firstName, data.lastName, data.phoneNumber);
+      console.log('SignUp completed, user:', user);
       
+      console.log('Adding user to team...');
       // Ajouter l'utilisateur à l'équipe
       const { error } = await supabase
         .from('user_companies')
@@ -175,12 +179,14 @@ const TeamTab = () => {
         });
 
       if (error) {
+        console.error('Error adding member to team:', error);
         toast({
           title: "Erreur",
           description: "Erreur lors de l'ajout du membre à l'équipe",
           variant: "destructive"
         });
       } else {
+        console.log('Member added successfully, closing dialog and refreshing...');
         setIsAddDialogOpen(false);
         addForm.reset();
         fetchTeamMembers();
@@ -193,6 +199,7 @@ const TeamTab = () => {
         variant: "destructive"
       });
     } finally {
+      console.log('handleAddMember completed');
       setIsSubmitting(false);
     }
   };
