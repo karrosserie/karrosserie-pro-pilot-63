@@ -42,8 +42,9 @@ export function useInvoices() {
     mutationFn: async ({ id, data }: { id: string, data: any }) => {
       return await invoicesService.update(id, data);
     },
-    onSuccess: () => {
+    onSuccess: (updatedInvoice, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      queryClient.invalidateQueries({ queryKey: ['invoice', id] });
       toast({
         title: "Facture mise à jour",
         description: "La facture a été mise à jour avec succès."
