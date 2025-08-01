@@ -52,6 +52,7 @@ const Planning = () => {
   const { companyInfo } = useCompany();
   const { user } = useAuth();
   const [activeView, setActiveView] = useState("manager");
+  const [activeTab, setActiveTab] = useState("workshop");
   const [showWaitingVehiclesModal, setShowWaitingVehiclesModal] = useState(false);
   const [showVehicleDetailModal, setShowVehicleDetailModal] = useState(false);
   const [showUrgentVehicleModal, setShowUrgentVehicleModal] = useState(false);
@@ -447,6 +448,33 @@ const Planning = () => {
   useEffect(() => {
     loadAllEmployeeSchedules();
   }, [companyInfo?.id, employees]);
+
+  // Fonction pour rafraîchir toutes les données
+  const refreshAllData = async () => {
+    console.log('🔄 Refreshing all planning data...');
+    
+    // Recharger les plannings des employés
+    await loadAllEmployeeSchedules();
+    
+    // Rafraîchir les données de workflow
+    refetchWorkflow();
+    
+    // Rafraîchir les schedules de l'employé sélectionné si applicable
+    if (selectedEmployeeId) {
+      refetchEmployeeSchedule();
+    }
+    
+    console.log('✅ All planning data refreshed');
+  };
+
+  // Fonction pour gérer le changement d'onglet
+  const handleTabChange = async (newTab: string) => {
+    console.log(`🔀 Changing tab from ${activeTab} to ${newTab}`);
+    setActiveTab(newTab);
+    
+    // Rafraîchir les données lors du changement d'onglet
+    await refreshAllData();
+  };
 
   // Charger les données des étapes de workflow depuis la base de données
   useEffect(() => {
@@ -903,7 +931,7 @@ const Planning = () => {
 
         {/* Vue Manager - Onglets complets */}
          {activeView === "manager" && (
-          <Tabs defaultValue="workshop" className="w-full">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="workshop" className="flex items-center gap-2">
               <Wrench className="w-4 h-4" />
