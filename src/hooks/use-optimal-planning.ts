@@ -29,8 +29,15 @@ const WORKFLOW_STEPS = [
 export function useOptimalPlanning(employees: any[] = [], companyId?: string) {
 
   // Fonction pour vérifier si un employé est disponible sur un créneau
-  const isEmployeeAvailable = async (employeeId: string, startDateTime: Date, endDateTime: Date): Promise<boolean> => {
+  const isEmployeeAvailable = async (
+    employeeId: string, 
+    startDateTime: Date, 
+    endDateTime: Date, 
+    excludeTemporary: Array<{employeeId: string, startDateTime: Date, endDateTime: Date}> = []
+  ): Promise<boolean> => {
     if (!companyId) return true;
+    
+    console.log(`🔍 Vérification disponibilité employé ${employeeId} de ${startDateTime.toLocaleString()} à ${endDateTime.toLocaleString()}`);
     
     try {
       const { data, error } = await (supabase as any)
@@ -42,17 +49,35 @@ export function useOptimalPlanning(employees: any[] = [], companyId?: string) {
 
       if (error) throw error;
 
-      // Vérifier les conflits de planning
+      console.log(`📅 Trouvé ${data?.length || 0} créneaux existants pour l'employé ${employeeId}`);
+
+      // Vérifier les conflits avec les créneaux en base
       for (const schedule of data || []) {
         const existingStart = new Date(schedule.start_datetime);
         const existingEnd = new Date(schedule.end_datetime);
         
+        console.log(`⏰ Conflit check: nouveau (${startDateTime.toLocaleString()} - ${endDateTime.toLocaleString()}) vs existant (${existingStart.toLocaleString()} - ${existingEnd.toLocaleString()})`);
+        
         // Vérifier si les créneaux se chevauchent
         if (startDateTime < existingEnd && endDateTime > existingStart) {
+          console.log(`❌ CONFLIT détecté avec créneau existant !`);
           return false; // Conflit détecté
         }
       }
+
+      // Vérifier les conflits avec les créneaux temporaires (planifiés dans cette session)
+      for (const tempSlot of excludeTemporary) {
+        if (tempSlot.employeeId === employeeId) {
+          console.log(`⏰ Conflit check temporaire: nouveau (${startDateTime.toLocaleString()} - ${endDateTime.toLocaleString()}) vs temporaire (${tempSlot.startDateTime.toLocaleString()} - ${tempSlot.endDateTime.toLocaleString()})`);
+          
+          if (startDateTime < tempSlot.endDateTime && endDateTime > tempSlot.startDateTime) {
+            console.log(`❌ CONFLIT détecté avec créneau temporaire !`);
+            return false;
+          }
+        }
+      }
       
+      console.log(`✅ Aucun conflit détecté, créneau disponible`);
       return true; // Pas de conflit
     } catch (error) {
       console.error('Erreur lors de la vérification de disponibilité:', error);
@@ -61,16 +86,28 @@ export function useOptimalPlanning(employees: any[] = [], companyId?: string) {
   };
 
   // Fonction pour trouver le prochain créneau disponible pour un employé
-  const findNextAvailableSlot = async (employeeId: string, startDateTime: Date, durationMinutes: number): Promise<Date> => {
+  const findNextAvailableSlot = async (
+    employeeId: string, 
+    startDateTime: Date, 
+    durationMinutes: number,
+    excludeTemporary: Array<{employeeId: string, startDateTime: Date, endDateTime: Date}> = []
+  ): Promise<Date> => {
     let currentSlot = new Date(startDateTime);
+    console.log(`🔍 Recherche créneau pour employé ${employeeId}, durée ${durationMinutes}min, à partir de ${startDateTime.toLocaleString()}`);
     
-    while (true) {
+    let iterations = 0;
+    const maxIterations = 100; // Protection contre les boucles infinies
+    
+    while (iterations < maxIterations) {
       const endSlot = new Date(currentSlot.getTime() + durationMinutes * 60 * 1000);
+      
+      console.log(`🕐 Test créneau: ${currentSlot.toLocaleString()} - ${endSlot.toLocaleString()}`);
       
       // Vérifier si le créneau respecte les heures ouvrables (8h-17h)
       if (currentSlot.getHours() >= 8 && endSlot.getHours() <= 17 && currentSlot.getDay() >= 1 && currentSlot.getDay() <= 5) {
-        const isAvailable = await isEmployeeAvailable(employeeId, currentSlot, endSlot);
+        const isAvailable = await isEmployeeAvailable(employeeId, currentSlot, endSlot, excludeTemporary);
         if (isAvailable) {
+          console.log(`✅ Créneau trouvé: ${currentSlot.toLocaleString()}`);
           return currentSlot;
         }
       }
@@ -92,10 +129,16 @@ export function useOptimalPlanning(employees: any[] = [], companyId?: string) {
         currentSlot.setDate(currentSlot.getDate() + 2);
         currentSlot.setHours(8, 0, 0, 0);
       }
+      
+      iterations++;
     }
+    
+    console.error(`❌ Impossible de trouver un créneau disponible après ${maxIterations} itérations`);
+    return currentSlot; // Retourner le dernier créneau testé en cas d'échec
   };
 
   const calculateOptimalPlanning = async (): Promise<OptimalPlanningData> => {
+    console.log(`🚀 Début de la planification automatique`);
     const now = new Date();
     
     // Calculer le prochain créneau disponible
@@ -130,6 +173,7 @@ export function useOptimalPlanning(employees: any[] = [], companyId?: string) {
     }
 
     let currentDateTime = new Date(nextAvailableDate);
+    console.log(`📅 Planification à partir de: ${currentDateTime.toLocaleString()}`);
     
     const planning: OptimalPlanningData = {
       accueil_preparation: { employeeId: '', duration: '01:00' },
@@ -140,11 +184,18 @@ export function useOptimalPlanning(employees: any[] = [], companyId?: string) {
       cloture_livraison: { employeeId: '', duration: '00:30' }
     };
 
+    // Tableau pour garder trace des créneaux temporaires planifiés dans cette session
+    const temporarySlots: Array<{employeeId: string, startDateTime: Date, endDateTime: Date}> = [];
+
     // Pour chaque étape, calculer le meilleur créneau
     for (const step of WORKFLOW_STEPS) {
+      console.log(`🔄 Planification de l'étape: ${step.qualification}`);
+      
       const qualifiedEmployees = employees.filter(emp => 
         emp.qualifications?.includes(step.qualification)
       );
+
+      console.log(`👥 ${qualifiedEmployees.length} employés qualifiés trouvés pour ${step.qualification}`);
 
       if (qualifiedEmployees.length > 0) {
         // Calculer la durée de l'étape en minutes
@@ -156,11 +207,13 @@ export function useOptimalPlanning(employees: any[] = [], companyId?: string) {
         
         // Trouver l'employé avec le créneau le plus tôt disponible à partir de currentDateTime
         for (const employee of qualifiedEmployees) {
-          const availableSlot = await findNextAvailableSlot(employee.id, currentDateTime, durationMinutes);
+          console.log(`👤 Test employé: ${employee.id}`);
+          const availableSlot = await findNextAvailableSlot(employee.id, currentDateTime, durationMinutes, temporarySlots);
           
           if (!bestStartDateTime || availableSlot < bestStartDateTime) {
             bestEmployee = employee;
             bestStartDateTime = availableSlot;
+            console.log(`🥇 Nouveau meilleur employé: ${employee.id} à ${availableSlot.toLocaleString()}`);
           }
         }
         
@@ -173,13 +226,27 @@ export function useOptimalPlanning(employees: any[] = [], companyId?: string) {
             startDateTime: new Date(bestStartDateTime),
             endDateTime: finalEndDateTime
           };
+
+          // Ajouter ce créneau aux créneaux temporaires pour éviter les conflits
+          temporarySlots.push({
+            employeeId: bestEmployee.id,
+            startDateTime: new Date(bestStartDateTime),
+            endDateTime: finalEndDateTime
+          });
+          
+          console.log(`✅ Étape planifiée: ${step.qualification} - Employé ${bestEmployee.id} de ${bestStartDateTime.toLocaleString()} à ${finalEndDateTime.toLocaleString()}`);
           
           // Préparer pour la prochaine étape : elle doit commencer au plus tôt après la fin de cette étape
           currentDateTime = new Date(finalEndDateTime);
+        } else {
+          console.error(`❌ Impossible de planifier l'étape: ${step.qualification}`);
         }
+      } else {
+        console.warn(`⚠️ Aucun employé qualifié pour: ${step.qualification}`);
       }
     }
 
+    console.log(`🏁 Planification terminée, ${temporarySlots.length} créneaux planifiés`);
     return planning;
   };
 
