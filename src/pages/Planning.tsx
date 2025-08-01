@@ -596,10 +596,6 @@ const Planning = () => {
               <AlertTriangle className="w-4 h-4 mr-2" />
               Véhicule en urgence
             </Button>
-            <Button variant="outline" size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white" onClick={() => setShowAddVehicleModal(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Ajouter véhicule
-            </Button>
             <Button variant="outline" size="sm" onClick={() => setShowConfigModal(true)}>
               <Settings className="w-4 h-4" />
             </Button>
@@ -932,6 +928,16 @@ const Planning = () => {
 
             {/* Workflow Steps */}
             <div className="space-y-6">
+              {/* Bouton Entrée véhicule */}
+              <div className="flex justify-end mb-4">
+                <Button 
+                  className="bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90"
+                  onClick={() => setShowAddVehicleModal(true)}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Entrée véhicule
+                </Button>
+              </div>
               {workflowSteps.map((step, stepIndex) => (
                 <Card key={stepIndex} className={`border-l-4 ${step.color}`}>
                   <CardHeader>
