@@ -1,9 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
 import { expertiseReportsService, NewExpertiseReport, UpdateExpertiseReport, ExpertiseReport } from '@/services/supabase/expertise-reports';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 
 export function useExpertiseReports() {
   const queryClient = useQueryClient();
@@ -20,29 +18,28 @@ export function useExpertiseReports() {
     refetchOnWindowFocus: true, // Refetch quand la fenêtre reprend le focus
   });
 
-  // Mise à jour en temps réel des rapports d'expertise
-  useEffect(() => {
-    const channel = supabase
-      .channel('expertise-reports-realtime')
-      .on(
-        'postgres_changes',
-        {
-          event: '*', // Écouter tous les événements (INSERT, UPDATE, DELETE)
-          schema: 'public',
-          table: 'expertise_reports'
-        },
-        (payload) => {
-          console.log('Expertise report updated:', payload);
-          // Invalider les données pour forcer un refetch
-          queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
-        }
-      )
-      .subscribe();
+  // Temporairement désactivé - la fonctionnalité temps réel sera réimplémentée plus tard
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel('expertise-reports-realtime')
+  //     .on(
+  //       'postgres_changes',
+  //       {
+  //         event: '*',
+  //         schema: 'public',
+  //         table: 'expertise_reports'
+  //       },
+  //       (payload) => {
+  //         console.log('Expertise report updated:', payload);
+  //         queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
+  //       }
+  //     )
+  //     .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
+  //   return () => {
+  //     supabase.removeChannel(channel);
+  //   };
+  // }, [queryClient]);
   
   const createReport = useMutation({
     mutationFn: (newReport: NewExpertiseReport) => expertiseReportsService.create(newReport),

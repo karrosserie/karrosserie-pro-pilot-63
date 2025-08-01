@@ -1,11 +1,7 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { importsService } from '@/services/supabase/imports';
-import { supabase } from '@/integrations/supabase/client';
 
 export function useImports() {
-  const queryClient = useQueryClient();
-  
   const {
     data: pendingImports,
     isLoading,
@@ -18,29 +14,28 @@ export function useImports() {
     refetchOnWindowFocus: true, // Refetch quand la fenêtre reprend le focus
   });
 
-  // Mise à jour en temps réel des imports
-  useEffect(() => {
-    const channel = supabase
-      .channel('imports-realtime')
-      .on(
-        'postgres_changes',
-        {
-          event: '*', // Écouter tous les événements (INSERT, UPDATE, DELETE)
-          schema: 'public',
-          table: 'imports'
-        },
-        (payload) => {
-          console.log('Import updated:', payload);
-          // Invalider les données pour forcer un refetch
-          queryClient.invalidateQueries({ queryKey: ['imports'] });
-        }
-      )
-      .subscribe();
+  // Temporairement désactivé - la fonctionnalité temps réel sera réimplémentée plus tard
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel('imports-realtime')
+  //     .on(
+  //       'postgres_changes',
+  //       {
+  //         event: '*',
+  //         schema: 'public',
+  //         table: 'imports'
+  //       },
+  //       (payload) => {
+  //         console.log('Import updated:', payload);
+  //         queryClient.invalidateQueries({ queryKey: ['imports'] });
+  //       }
+  //     )
+  //     .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
+  //   return () => {
+  //     supabase.removeChannel(channel);
+  //   };
+  // }, [queryClient]);
   
   return {
     pendingImports,
