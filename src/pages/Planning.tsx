@@ -891,7 +891,7 @@ const Planning = () => {
                                   En cours
                                 </Badge>
                               ) : (
-                                <Badge variant="secondary">À planifier</Badge>
+                                <Badge variant="secondary">À préparer</Badge>
                               )}
                               
                               <div className="flex items-center gap-2">
@@ -979,9 +979,15 @@ const Planning = () => {
                     
                     // Get schedules for this day
                     const daySchedules = employees?.flatMap(employee => {
-                      // We would need to get all employee schedules here
-                      // For now, let's use a placeholder approach
-                      return [];
+                      const { schedules } = useEmployeeSchedule(employee.id);
+                      return schedules.filter(schedule => {
+                        const scheduleDate = new Date(schedule.start_datetime);
+                        return scheduleDate.toDateString() === currentDate.toDateString();
+                      }).map(schedule => ({
+                        ...schedule,
+                        employee,
+                        vehicle: schedule.vehicles
+                      }));
                     }) || [];
                     
                     // Filter workshop schedule for this day
@@ -1023,21 +1029,41 @@ const Planning = () => {
                             <div className="text-center text-muted-foreground py-4">
                               Aucune tâche planifiée
                             </div>
-                          ) : (
-                            daySchedules.map((schedule, idx) => (
-                              <Card key={idx} className="border-l-4 border-l-orange-500 p-3 cursor-pointer hover:shadow-md transition-shadow">
-                                <div className="space-y-2">
-                                  <div className="flex items-center gap-2 text-sm text-orange-600">
-                                    <Clock className="w-3 h-3" />
-                                    Placeholder
+                           ) : (
+                            daySchedules.map((schedule, idx) => {
+                              const startTime = new Date(schedule.start_datetime);
+                              const endTime = new Date(schedule.end_datetime);
+                              return (
+                                <Card key={idx} className="border-l-4 border-l-orange-500 p-3 cursor-pointer hover:shadow-md transition-shadow">
+                                  <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-sm text-orange-600">
+                                      <Clock className="w-3 h-3" />
+                                      {startTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}-
+                                      {endTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                                    </div>
+                                    <div className="font-semibold text-sm">{schedule.vehicle?.license_plate || 'N/A'}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {schedule.vehicle?.car_brands?.name || ''} {schedule.vehicle?.car_models?.name || ''}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">{schedule.task_type}</div>
+                                    <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                      <User className="w-3 h-3" />
+                                      {schedule.employee?.user_companies?.profiles?.first_name && 
+                                       schedule.employee?.user_companies?.profiles?.last_name
+                                         ? `${schedule.employee.user_companies.profiles.first_name} ${schedule.employee.user_companies.profiles.last_name}`
+                                         : 'Employé'}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      Client: {schedule.vehicle?.clients 
+                                        ? `${schedule.vehicle.clients.first_name || ''} ${schedule.vehicle.clients.last_name || ''}`.trim() 
+                                        : 'Client inconnu'}
+                                    </div>
+                                    <Badge className="bg-orange-100 text-orange-800 text-xs">{schedule.task_type}</Badge>
                                   </div>
-                                  <div className="font-semibold text-sm">Placeholder</div>
-                                  <div className="text-xs text-muted-foreground">Placeholder</div>
-                                  <Badge className="bg-orange-100 text-orange-800 text-xs">Placeholder</Badge>
-                                </div>
-                              </Card>
-                            ))
-                          )}
+                                </Card>
+                              );
+                            })
+                           )}
                         </CardContent>
                       </Card>
                     );
@@ -2069,7 +2095,7 @@ const Planning = () => {
                             <span className="font-medium">220€</span>
                           </div>
                           <div className="flex justify-end">
-                            <Badge variant="secondary" className="text-xs">À planifier</Badge>
+                            <Badge variant="secondary" className="text-xs">À préparer</Badge>
                           </div>
                         </div>
                       </div>
