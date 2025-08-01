@@ -405,41 +405,68 @@ const Planning = () => {
   }, [companyInfo?.id]);
 
   // Load all employee schedules
-  useEffect(() => {
-    const loadAllEmployeeSchedules = async () => {
-      if (!companyInfo?.id || !employees || employees.length === 0) return;
+  const loadAllEmployeeSchedules = async () => {
+    if (!companyInfo?.id || !employees || employees.length === 0) return;
+    
+    console.log('🔄 Rechargement des plannings de tous les employés...');
+    
+    try {
+      const schedulesMap = {};
       
-      try {
-        const schedulesMap = {};
+      for (const employee of employees) {
+        const { data, error } = await (supabase as any)
+          .from('employee_schedule')
+          .select(`
+            *,
+            vehicles (
+              license_plate,
+              car_brands (name),
+              car_models (name),
+              clients (first_name, last_name)
+            )
+          `)
+          .eq('company_id', companyInfo.id)
+          .eq('employee_id', employee.id)
+          .order('start_datetime', { ascending: true });
         
-        for (const employee of employees) {
-          const { data, error } = await (supabase as any)
-            .from('employee_schedule')
-            .select(`
-              *,
-              vehicles (
-                license_plate,
-                car_brands (name),
-                car_models (name),
-                clients (first_name, last_name)
-              )
-            `)
-            .eq('company_id', companyInfo.id)
-            .eq('employee_id', employee.id)
-            .order('start_datetime', { ascending: true });
-          
-          if (error) throw error;
-          schedulesMap[employee.id] = data || [];
-        }
-        
-        setAllEmployeeSchedules(schedulesMap);
-      } catch (error) {
-        console.error('Error loading all employee schedules:', error);
+        if (error) throw error;
+        schedulesMap[employee.id] = data || [];
+        console.log(`📅 Employé ${employee.id}: ${data?.length || 0} tâches chargées`);
       }
-    };
+      
+      setAllEmployeeSchedules(schedulesMap);
+      console.log('✅ Tous les plannings d\'employés rechargés');
+    } catch (error) {
+      console.error('Error loading all employee schedules:', error);
+    }
+  };
 
+  useEffect(() => {
     loadAllEmployeeSchedules();
   }, [companyInfo?.id, employees]);
+
+  // Ajouter un système de rafraîchissement en temps réel
+  useEffect(() => {
+    if (!companyInfo?.id) return;
+
+    const channel = supabase
+      .channel('employee-schedule-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'employee_schedule',
+        filter: `company_id=eq.${companyInfo.id}`
+      }, (payload) => {
+        console.log('🔄 Changement détecté dans employee_schedule:', payload);
+        // Recharger les données quand il y a un changement
+        loadAllEmployeeSchedules();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [companyInfo?.id]);
 
   // Charger les données des étapes de workflow depuis la base de données
   useEffect(() => {
@@ -3214,8 +3241,10 @@ const Planning = () => {
                     }, 0);
                     
                     setShowPlanningModal(false);
-                    // Refresh workflow data
+                    // Refresh workflow data and employee schedules
                     refetchWorkflow();
+                    // Recharger les plannings de tous les employés pour voir les nouvelles tâches
+                    await loadAllEmployeeSchedules();
                   } catch (error) {
                     console.error('Erreur lors de la planification:', error);
                     // Utiliser setTimeout pour éviter l'erreur React de mise à jour avant le montage
