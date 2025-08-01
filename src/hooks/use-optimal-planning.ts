@@ -1,3 +1,5 @@
+import { supabase } from '@/integrations/supabase/client';
+
 interface OptimalPlanningData {
   accueil_preparation: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
   remplacement_debosselage: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
@@ -5,6 +7,14 @@ interface OptimalPlanningData {
   mise_en_peinture: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
   finitions_remontage: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
   cloture_livraison: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
+}
+
+interface EmployeeSchedule {
+  id: string;
+  employee_id: string;
+  start_datetime: string;
+  end_datetime: string;
+  status: string;
 }
 
 const WORKFLOW_STEPS = [
@@ -16,9 +26,79 @@ const WORKFLOW_STEPS = [
   { key: 'cloture_livraison', qualification: 'Clôture du dossier et livraison', defaultDuration: '00:30' }
 ];
 
-export function useOptimalPlanning(employees: any[] = []) {
+export function useOptimalPlanning(employees: any[] = [], companyId?: string) {
 
-  const calculateOptimalPlanning = (): OptimalPlanningData => {
+  // Fonction pour vérifier si un employé est disponible sur un créneau
+  const isEmployeeAvailable = async (employeeId: string, startDateTime: Date, endDateTime: Date): Promise<boolean> => {
+    if (!companyId) return true;
+    
+    try {
+      const { data, error } = await (supabase as any)
+        .from('employee_schedule')
+        .select('id, start_datetime, end_datetime, status')
+        .eq('employee_id', employeeId)
+        .eq('company_id', companyId)
+        .neq('status', 'Terminé'); // Ignorer les tâches terminées
+
+      if (error) throw error;
+
+      // Vérifier les conflits de planning
+      for (const schedule of data || []) {
+        const existingStart = new Date(schedule.start_datetime);
+        const existingEnd = new Date(schedule.end_datetime);
+        
+        // Vérifier si les créneaux se chevauchent
+        if (
+          (startDateTime < existingEnd && endDateTime > existingStart) ||
+          (existingStart < endDateTime && existingEnd > startDateTime)
+        ) {
+          return false; // Conflit détecté
+        }
+      }
+      
+      return true; // Pas de conflit
+    } catch (error) {
+      console.error('Erreur lors de la vérification de disponibilité:', error);
+      return true; // En cas d'erreur, considérer comme disponible
+    }
+  };
+
+  // Fonction pour trouver le prochain créneau disponible pour un employé
+  const findNextAvailableSlot = async (employeeId: string, startDateTime: Date, durationMinutes: number): Promise<Date> => {
+    let currentSlot = new Date(startDateTime);
+    
+    while (true) {
+      const endSlot = new Date(currentSlot.getTime() + durationMinutes * 60 * 1000);
+      
+      // Vérifier si le créneau respecte les heures ouvrables (8h-17h)
+      if (currentSlot.getHours() >= 8 && endSlot.getHours() <= 17 && currentSlot.getDay() >= 1 && currentSlot.getDay() <= 5) {
+        const isAvailable = await isEmployeeAvailable(employeeId, currentSlot, endSlot);
+        if (isAvailable) {
+          return currentSlot;
+        }
+      }
+      
+      // Passer au créneau suivant (par heure)
+      currentSlot = new Date(currentSlot.getTime() + 60 * 60 * 1000); // +1 heure
+      
+      // Si on dépasse 17h, aller au lendemain 8h
+      if (currentSlot.getHours() >= 17) {
+        currentSlot.setDate(currentSlot.getDate() + 1);
+        currentSlot.setHours(8, 0, 0, 0);
+      }
+      
+      // Si c'est le weekend, aller au lundi suivant
+      if (currentSlot.getDay() === 0) { // Dimanche
+        currentSlot.setDate(currentSlot.getDate() + 1);
+        currentSlot.setHours(8, 0, 0, 0);
+      } else if (currentSlot.getDay() === 6) { // Samedi
+        currentSlot.setDate(currentSlot.getDate() + 2);
+        currentSlot.setHours(8, 0, 0, 0);
+      }
+    }
+  };
+
+  const calculateOptimalPlanning = async (): Promise<OptimalPlanningData> => {
     const now = new Date();
     
     // Calculer le prochain créneau disponible
@@ -74,34 +154,32 @@ export function useOptimalPlanning(employees: any[] = []) {
         const [hours, minutes] = step.defaultDuration.split(':').map(Number);
         const durationMinutes = hours * 60 + minutes;
         
-        // Calculer l'heure de fin
-        const endDateTime = new Date(currentDateTime.getTime() + durationMinutes * 60 * 1000);
+        let bestEmployee = null;
+        let bestStartDateTime = null;
         
-        // Vérifier si on dépasse 17h, si oui passer au lendemain 8h
-        if (endDateTime.getHours() >= 17) {
-          currentDateTime.setDate(currentDateTime.getDate() + 1);
-          currentDateTime.setHours(8, 0, 0, 0);
+        // Trouver l'employé avec le créneau le plus tôt
+        for (const employee of qualifiedEmployees) {
+          const availableSlot = await findNextAvailableSlot(employee.id, currentDateTime, durationMinutes);
           
-          // Vérifier les weekends
-          if (currentDateTime.getDay() === 0) {
-            currentDateTime.setDate(currentDateTime.getDate() + 1);
-          } else if (currentDateTime.getDay() === 6) {
-            currentDateTime.setDate(currentDateTime.getDate() + 2);
+          if (!bestStartDateTime || availableSlot < bestStartDateTime) {
+            bestEmployee = employee;
+            bestStartDateTime = availableSlot;
           }
         }
         
-        // Recalculer l'heure de fin avec la nouvelle heure de début
-        const finalEndDateTime = new Date(currentDateTime.getTime() + durationMinutes * 60 * 1000);
-        
-        planning[step.key as keyof OptimalPlanningData] = {
-          employeeId: qualifiedEmployees[0].id,
-          duration: step.defaultDuration,
-          startDateTime: new Date(currentDateTime),
-          endDateTime: finalEndDateTime
-        };
-        
-        // Préparer pour la prochaine étape
-        currentDateTime = new Date(finalEndDateTime);
+        if (bestEmployee && bestStartDateTime) {
+          const finalEndDateTime = new Date(bestStartDateTime.getTime() + durationMinutes * 60 * 1000);
+          
+          planning[step.key as keyof OptimalPlanningData] = {
+            employeeId: bestEmployee.id,
+            duration: step.defaultDuration,
+            startDateTime: new Date(bestStartDateTime),
+            endDateTime: finalEndDateTime
+          };
+          
+          // Préparer pour la prochaine étape (commencer après la fin de cette étape)
+          currentDateTime = new Date(finalEndDateTime);
+        }
       }
     }
 

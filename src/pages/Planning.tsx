@@ -133,17 +133,17 @@ const Planning = () => {
   const { schedules: employeeSchedules, refetch: refetchEmployeeSchedule } = useEmployeeSchedule(selectedEmployeeId);
   const { schedules: planningEmployeeSchedules } = useEmployeeSchedule(selectedPlanningEmployeeId);
   const { schedules: workshopSchedules } = useWorkshopSchedule();
-  const { calculateOptimalPlanning } = useOptimalPlanning(employees);
+  const { calculateOptimalPlanning } = useOptimalPlanning(employees, companyInfo?.id);
 
   // Store all employee schedules data
   const [allEmployeeSchedules, setAllEmployeeSchedules] = useState({});
   const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
 
   // Helper function to recalculate following steps
-  const recalculateFollowingSteps = (fromStepIndex: number) => {
+  const recalculateFollowingSteps = async (fromStepIndex: number) => {
     if (!employees || employees.length === 0) return;
     
-    const optimalPlanning = calculateOptimalPlanning();
+    const optimalPlanning = await calculateOptimalPlanning();
     const stepKeys = ['accueil_preparation', 'remplacement_debosselage', 'preparation_peinture', 'mise_en_peinture', 'finitions_remontage', 'cloture_livraison'];
     
     setTimeout(() => {
@@ -2628,13 +2628,13 @@ const Planning = () => {
                 <Label htmlFor="vehicle_select" className="font-medium">Véhicule à planifier</Label>
                 <Select 
                   value={selectedVehicle?.id || ''}
-                  onValueChange={(vehicleId) => {
+                  onValueChange={async (vehicleId) => {
                     const vehicle = availableVehicles.find(v => v.id === vehicleId);
                     setSelectedVehicle(vehicle);
                     
                     // Exécuter le calcul optimal de planification pour le véhicule sélectionné
                     if (vehicle && employees && employees.length > 0) {
-                      const optimalPlanning = calculateOptimalPlanning();
+                      const optimalPlanning = await calculateOptimalPlanning();
                       setPlanningData(optimalPlanning);
                     }
                   }}
