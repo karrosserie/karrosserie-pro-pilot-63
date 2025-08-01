@@ -15,7 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCompany } from '@/hooks/use-company';
 import { useEmployees, Employee } from '@/hooks/use-employees';
 import { EmployeesList } from '@/components/planning/EmployeesList';
-import { AddVehicleToWorkshopForm } from '@/components/planning/AddVehicleToWorkshopForm';
+
 import { toast } from '@/hooks/use-toast';
 import { useCompanyId } from '@/hooks/use-company-id';
 import { useVehicleWorkflow } from '@/hooks/use-vehicle-workflow';
@@ -56,7 +56,7 @@ const Planning = () => {
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [showScheduleConfigModal, setShowScheduleConfigModal] = useState(false);
   const [showPlanningModal, setShowPlanningModal] = useState(false);
-  const [showAddVehicleModal, setShowAddVehicleModal] = useState(false);
+  const [availableVehicles, setAvailableVehicles] = useState<any[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
@@ -432,6 +432,59 @@ const Planning = () => {
 
     loadWorkflowData();
   }, [companyInfo?.id]);
+
+  // Charger les véhicules disponibles pour l'entrée atelier
+  useEffect(() => {
+    const loadAvailableVehicles = async () => {
+      if (!companyInfo?.id) return;
+
+      try {
+        // Récupérer les véhicules avec ordres de réparation qui ne sont pas dans l'atelier
+        const { data: vehiclesWithOrders, error: vehiclesError } = await supabase
+          .from('vehicles')
+          .select(`
+            id,
+            license_plate,
+            car_brands (name),
+            car_models (name),
+            clients (first_name, last_name),
+            repair_orders!inner (reference, status)
+          `)
+          .eq('company_id', companyInfo.id)
+          .in('repair_orders.status', ['pending', 'in_progress']);
+
+        if (vehiclesError) throw vehiclesError;
+
+        // Récupérer les véhicules déjà dans l'atelier
+        const { data: vehiclesInWorkshop, error: workshopError } = await supabase
+          .from('vehicle_workflow_steps')
+          .select('vehicle_id')
+          .eq('company_id', companyInfo.id);
+
+        if (workshopError) throw workshopError;
+
+        const vehicleIdsInWorkshop = new Set(vehiclesInWorkshop?.map(item => item.vehicle_id) || []);
+
+        // Filtrer les véhicules disponibles
+        const available = vehiclesWithOrders
+          ?.filter(vehicle => !vehicleIdsInWorkshop.has(vehicle.id))
+          .map(vehicle => ({
+            id: vehicle.id,
+            license_plate: vehicle.license_plate,
+            brand_name: vehicle.car_brands?.name || 'Marque inconnue',
+            model_name: vehicle.car_models?.name || 'Modèle inconnu',
+            client_name: `${vehicle.clients?.first_name || ''} ${vehicle.clients?.last_name || ''}`.trim(),
+            repair_order_reference: vehicle.repair_orders?.[0]?.reference || 'N/A'
+          })) || [];
+
+        setAvailableVehicles(available);
+      } catch (error) {
+        console.error('Erreur lors du chargement des véhicules:', error);
+      }
+    };
+
+    loadAvailableVehicles();
+  }, [companyInfo?.id, showPlanningModal]);
 
   // Récupérer les membres de l'équipe
   useEffect(() => {
@@ -932,7 +985,7 @@ const Planning = () => {
               <div className="flex justify-end mb-4">
                 <Button 
                   className="bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90"
-                  onClick={() => setShowAddVehicleModal(true)}
+                  onClick={() => setShowPlanningModal(true)}
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Entrée véhicule
@@ -4263,14 +4316,27 @@ const Planning = () => {
               <Button 
                 onClick={async () => {
                   try {
-                    if (!selectedVehicle?.id || !companyInfo?.id) {
+                    if (!selectedVehicle) {
                       toast({
                         title: "Erreur",
-                        description: "Informations manquantes pour la planification",
+                        description: "Veuillez sélectionner un véhicule",
                         variant: "destructive"
                       });
                       return;
                     }
+
+                    // Créer une entrée dans vehicle_workflow_steps
+                    const { error: workflowError } = await supabase
+                      .from('vehicle_workflow_steps')
+                      .insert({
+                        company_id: companyInfo?.id,
+                        vehicle_id: selectedVehicle.id,
+                        current_step: 'Accueil & Préparation du dossier',
+                        progress_percentage: 0,
+                        notes: 'Véhicule ajouté via entrée manuelle'
+                      });
+
+                    if (workflowError) throw workflowError;
 
                     // Supprimer les anciennes planifications pour ce véhicule
                     await (supabase as any)
@@ -4387,29 +4453,6 @@ const Planning = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Modal pour ajouter un véhicule à l'atelier */}
-        <Dialog open={showAddVehicleModal} onOpenChange={setShowAddVehicleModal}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Ajouter un véhicule à l'atelier</DialogTitle>
-              <DialogDescription>
-                Sélectionnez un véhicule avec un ordre de réparation qui n'est pas encore dans l'atelier
-              </DialogDescription>
-            </DialogHeader>
-            <AddVehicleToWorkshopForm 
-              companyId={companyInfo?.id}
-              onSuccess={() => {
-                setShowAddVehicleModal(false);
-                refetchWorkflow();
-                toast({
-                  title: "Véhicule ajouté",
-                  description: "Le véhicule a été ajouté à l'atelier avec succès"
-                });
-              }}
-              employees={employees}
-            />
-          </DialogContent>
-        </Dialog>
       </div>
     </div>
   );
