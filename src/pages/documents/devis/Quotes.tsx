@@ -461,7 +461,10 @@ const Quotes = () => {
         }}
         prefillData={prefilledRepairOrder}
         onSuccess={() => {
-          navigate('/documents/ordres');
+          // La redirection est gérée dans le RepairOrderDialog pour les conversions
+          if (!prefilledRepairOrder?.quote_id) {
+            navigate('/documents/ordres');
+          }
         }}
       />
 
