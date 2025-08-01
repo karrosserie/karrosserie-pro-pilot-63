@@ -3773,8 +3773,8 @@ const Planning = () => {
               {/* Accueil & Préparation du dossier */}
               <div className="border rounded-lg p-4">
                 <h3 className="font-medium text-sm mb-3 text-karrosserie-orange">Accueil & Préparation du dossier</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
+                <div className="flex items-end gap-4">
+                  <div className="flex-shrink-0">
                     <Label htmlFor="accueil_duration">Durée</Label>
                     <Input
                       id="accueil_duration"
@@ -3784,10 +3784,10 @@ const Planning = () => {
                         ...prev,
                         accueil_preparation: { ...prev.accueil_preparation, duration: e.target.value }
                       }))}
-                      className="w-32"
+                      className="w-[80px]"
                     />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <Label htmlFor="accueil_employee">Employé</Label>
                     <Select 
                       value={planningData.accueil_preparation.employeeId}
@@ -3799,7 +3799,7 @@ const Planning = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-background border border-border shadow-md z-[100]">
                         {employees?.filter(emp => 
                           emp.qualifications.includes('Accueil') || 
                           emp.qualifications.includes('Réception') ||
@@ -3818,8 +3818,8 @@ const Planning = () => {
               {/* Remplacement ou débosselage */}
               <div className="border rounded-lg p-4">
                 <h3 className="font-medium text-sm mb-3 text-green-500">Remplacement ou débosselage</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
+                <div className="flex items-end gap-4">
+                  <div className="flex-shrink-0">
                     <Label htmlFor="remplacement_duration">Durée</Label>
                     <Input
                       id="remplacement_duration"
@@ -3829,10 +3829,10 @@ const Planning = () => {
                         ...prev,
                         remplacement_debosselage: { ...prev.remplacement_debosselage, duration: e.target.value }
                       }))}
-                      className="w-32"
+                      className="w-[80px]"
                     />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <Label htmlFor="remplacement_employee">Employé</Label>
                     <Select 
                       value={planningData.remplacement_debosselage.employeeId}
@@ -3844,7 +3844,7 @@ const Planning = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-background border border-border shadow-md z-[100]">
                         {employees?.filter(emp => 
                           emp.qualifications.includes('Débosselage') || 
                           emp.qualifications.includes('Remplacement de pièces') ||
@@ -3864,8 +3864,8 @@ const Planning = () => {
               {/* Préparation peinture */}
               <div className="border rounded-lg p-4">
                 <h3 className="font-medium text-sm mb-3 text-yellow-500">Préparation peinture</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
+                <div className="flex items-end gap-4">
+                  <div className="flex-shrink-0">
                     <Label htmlFor="preparation_duration">Durée</Label>
                     <Input
                       id="preparation_duration"
@@ -3875,10 +3875,10 @@ const Planning = () => {
                         ...prev,
                         preparation_peinture: { ...prev.preparation_peinture, duration: e.target.value }
                       }))}
-                      className="w-32"
+                      className="w-[80px]"
                     />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <Label htmlFor="preparation_employee">Employé</Label>
                     <Select 
                       value={planningData.preparation_peinture.employeeId}
@@ -3890,7 +3890,7 @@ const Planning = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-background border border-border shadow-md z-[100]">
                         {employees?.filter(emp => 
                           emp.qualifications.includes('Préparation peinture') ||
                           emp.qualifications.includes('Peinture') ||
@@ -3909,8 +3909,8 @@ const Planning = () => {
               {/* Mise en peinture */}
               <div className="border rounded-lg p-4">
                 <h3 className="font-medium text-sm mb-3 text-blue-500">Mise en peinture</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
+                <div className="flex items-end gap-4">
+                  <div className="flex-shrink-0">
                     <Label htmlFor="peinture_duration">Durée</Label>
                     <Input
                       id="peinture_duration"
@@ -3920,10 +3920,10 @@ const Planning = () => {
                         ...prev,
                         mise_en_peinture: { ...prev.mise_en_peinture, duration: e.target.value }
                       }))}
-                      className="w-32"
+                      className="w-[80px]"
                     />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <Label htmlFor="peinture_employee">Employé</Label>
                     <Select 
                       value={planningData.mise_en_peinture.employeeId}
@@ -3935,7 +3935,7 @@ const Planning = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-background border border-border shadow-md z-[100]">
                         {employees?.filter(emp => 
                           emp.qualifications.includes('Peinture') ||
                           emp.qualifications.includes('Mise en peinture') ||
@@ -3954,8 +3954,8 @@ const Planning = () => {
               {/* Finitions & remontage */}
               <div className="border rounded-lg p-4">
                 <h3 className="font-medium text-sm mb-3 text-purple-500">Finitions & remontage</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
+                <div className="flex items-end gap-4">
+                  <div className="flex-shrink-0">
                     <Label htmlFor="finitions_duration">Durée</Label>
                     <Input
                       id="finitions_duration"
@@ -3965,10 +3965,10 @@ const Planning = () => {
                         ...prev,
                         finitions_remontage: { ...prev.finitions_remontage, duration: e.target.value }
                       }))}
-                      className="w-32"
+                      className="w-[80px]"
                     />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <Label htmlFor="finitions_employee">Employé</Label>
                     <Select 
                       value={planningData.finitions_remontage.employeeId}
@@ -3980,7 +3980,7 @@ const Planning = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-background border border-border shadow-md z-[100]">
                         {employees?.filter(emp => 
                           emp.qualifications.includes('Finitions') || 
                           emp.qualifications.includes('Remontage') ||
@@ -4000,8 +4000,8 @@ const Planning = () => {
               {/* Clôture & livraison */}
               <div className="border rounded-lg p-4">
                 <h3 className="font-medium text-sm mb-3 text-red-500">Clôture & livraison</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
+                <div className="flex items-end gap-4">
+                  <div className="flex-shrink-0">
                     <Label htmlFor="cloture_duration">Durée</Label>
                     <Input
                       id="cloture_duration"
@@ -4011,10 +4011,10 @@ const Planning = () => {
                         ...prev,
                         cloture_livraison: { ...prev.cloture_livraison, duration: e.target.value }
                       }))}
-                      className="w-32"
+                      className="w-[80px]"
                     />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <Label htmlFor="cloture_employee">Employé</Label>
                     <Select 
                       value={planningData.cloture_livraison.employeeId}
@@ -4026,7 +4026,7 @@ const Planning = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-background border border-border shadow-md z-[100]">
                         {employees?.filter(emp => 
                           emp.qualifications.includes('Livraison') || 
                           emp.qualifications.includes('Accueil') ||
