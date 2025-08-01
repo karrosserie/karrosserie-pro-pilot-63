@@ -88,15 +88,15 @@ export const EmployeesList: React.FC<EmployeesListProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {employees
             .sort((a, b) => {
-              const firstNameA = a.user_companies?.[0]?.profiles?.first_name || '';
-              const lastNameA = a.user_companies?.[0]?.profiles?.last_name || '';
-              const firstNameB = b.user_companies?.[0]?.profiles?.first_name || '';
-              const lastNameB = b.user_companies?.[0]?.profiles?.last_name || '';
+              const firstNameA = a.user_companies?.profiles?.first_name || '';
+              const lastNameA = a.user_companies?.profiles?.last_name || '';
+              const firstNameB = b.user_companies?.profiles?.first_name || '';
+              const lastNameB = b.user_companies?.profiles?.last_name || '';
               
-              // Tri par prénom d'abord, puis par nom
-              const firstNameComparison = firstNameA.localeCompare(firstNameB);
-              if (firstNameComparison !== 0) return firstNameComparison;
-              return lastNameA.localeCompare(lastNameB);
+              const fullNameA = `${firstNameA} ${lastNameA}`.trim();
+              const fullNameB = `${firstNameB} ${lastNameB}`.trim();
+              
+              return fullNameA.localeCompare(fullNameB);
             })
             .map((employee) => (
             <EmployeeCard

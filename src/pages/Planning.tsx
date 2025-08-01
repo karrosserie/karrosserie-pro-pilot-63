@@ -18,6 +18,7 @@ import { EmployeesList } from '@/components/planning/EmployeesList';
 import { toast } from '@/hooks/use-toast';
 import { useCompanyId } from '@/hooks/use-company-id';
 import { useVehicleWorkflow } from '@/hooks/use-vehicle-workflow';
+import { useOptimalPlanning } from '@/hooks/use-optimal-planning';
 
 const Planning = () => {
   const { companyInfo } = useCompany();
@@ -100,6 +101,7 @@ const Planning = () => {
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const { employees, createEmployee, updateEmployee } = useEmployees();
   const { workflowSteps, refetch: refetchWorkflow } = useVehicleWorkflow(companyInfo?.id);
+  const { calculateOptimalPlanning } = useOptimalPlanning(employees);
 
   // Charger les temps de configuration depuis la base de données
   useEffect(() => {
@@ -964,6 +966,12 @@ const Planning = () => {
                                     variant="outline"
                                     onClick={() => {
                                       setSelectedVehicle(vehicle);
+                                      // Calculer la planification optimale
+                                      const optimalPlanning = calculateOptimalPlanning();
+                                      setPlanningData(prev => ({
+                                        ...prev,
+                                        ...optimalPlanning
+                                      }));
                                       setShowPlanningModal(true);
                                     }}
                                   >
