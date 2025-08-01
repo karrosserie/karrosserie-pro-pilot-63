@@ -66,6 +66,7 @@ const Planning = () => {
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
   const [showTaskDetailsModal, setShowTaskDetailsModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
+  const [canStartTasks, setCanStartTasks] = useState<{ [key: string]: boolean }>({});
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [employeeFormData, setEmployeeFormData] = useState({
     teamMemberId: "",
@@ -449,6 +450,11 @@ const Planning = () => {
     loadAllEmployeeSchedules();
   }, [companyInfo?.id, employees]);
 
+  // Charger les autorisations de démarrage quand les schedules changent
+  useEffect(() => {
+    loadCanStartTasks();
+  }, [employeeSchedules]);
+
   // Fonction pour rafraîchir toutes les données
   const refreshAllData = async () => {
     console.log('🔄 Refreshing all planning data...');
@@ -464,6 +470,9 @@ const Planning = () => {
       refetchEmployeeSchedule();
     }
     
+    // Charger les autorisations de démarrage
+    await loadCanStartTasks();
+    
     console.log('✅ All planning data refreshed');
   };
 
@@ -474,6 +483,54 @@ const Planning = () => {
     
     // Rafraîchir les données lors du changement d'onglet
     await refreshAllData();
+  };
+
+  // Fonction pour vérifier si une tâche peut être démarrée
+  const canStartTask = async (schedule: any) => {
+    if (!schedule.vehicle_id || !companyInfo?.id) return false;
+    
+    try {
+      // Récupérer le current_step du véhicule depuis la table vehicle_workflow_steps
+      const { data: workflowStep, error } = await supabase
+        .from('vehicle_workflow_steps')
+        .select('current_step')
+        .eq('vehicle_id', schedule.vehicle_id)
+        .eq('company_id', companyInfo.id)
+        .single();
+      
+      if (error || !workflowStep) return false;
+      
+      // Mapping des types de tâches vers les étapes du workflow
+      const taskTypeToWorkflowStep: { [key: string]: string } = {
+        'Accueil et préparation': 'accueil_preparation',
+        'Remplacement/débosselage': 'remplacement_debosselage', 
+        'Préparation peinture': 'preparation_peinture',
+        'Mise en peinture': 'mise_en_peinture',
+        'Finitions et remontage': 'finitions_remontage',
+        'Clôture et livraison': 'cloture_livraison'
+      };
+      
+      // Vérifier si le véhicule est sur cette étape (current_step)
+      const expectedStep = taskTypeToWorkflowStep[schedule.task_type];
+      return workflowStep.current_step === expectedStep;
+      
+    } catch (error) {
+      console.error('Erreur lors de la vérification du current_step:', error);
+      return false;
+    }
+  };
+
+  // Fonction pour charger les autorisations de démarrage pour tous les schedules
+  const loadCanStartTasks = async () => {
+    if (!employeeSchedules || employeeSchedules.length === 0) return;
+    
+    const permissions: { [key: string]: boolean } = {};
+    
+    for (const schedule of employeeSchedules) {
+      permissions[schedule.id] = await canStartTask(schedule);
+    }
+    
+    setCanStartTasks(permissions);
   };
 
   // Charger les données des étapes de workflow depuis la base de données
@@ -904,19 +961,25 @@ const Planning = () => {
                                   });
                                   setShowVehicleDetailModal(true);
                                 }
-                              }}>Détails</Button>
-                               <div className="flex gap-2">
-                                <Button 
-                                  size="sm" 
-                                  className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-                                  onClick={() => handleStartTask(schedule)}
-                                  disabled={schedule.status === 'En cours' || schedule.status === 'Terminé'}
-                                >
-                                  <Play className="w-4 h-4 mr-2" />
-                                  {schedule.status === 'En attente' ? 'Démarrer' : 
-                                   schedule.status === 'En cours' ? 'En cours' : 'Terminé'}
-                                </Button>
-                              </div>
+                               }}>
+                                 <Eye className="w-4 h-4 mr-2" />
+                                 Détails
+                               </Button>
+                                <div className="flex gap-2">
+                                 {/* Le bouton Démarrer n'apparaît que si le véhicule est sur la bonne étape */}
+                                 {canStartTasks[schedule.id] && (
+                                   <Button 
+                                     size="sm" 
+                                     className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+                                     onClick={() => handleStartTask(schedule)}
+                                     disabled={schedule.status === 'En cours' || schedule.status === 'Terminé'}
+                                   >
+                                     <Play className="w-4 h-4 mr-2" />
+                                     {schedule.status === 'En attente' ? 'Démarrer' : 
+                                      schedule.status === 'En cours' ? 'En cours' : 'Terminé'}
+                                   </Button>
+                                 )}
+                               </div>
                             </div>
                           </div>
                         </CardContent>
