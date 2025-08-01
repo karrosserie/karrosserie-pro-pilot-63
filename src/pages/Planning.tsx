@@ -772,10 +772,6 @@ const Planning = () => {
               <UserCheck className="w-4 h-4 mr-2" />
               Vue Employé
             </Button>
-            <Button variant="destructive" size="sm" onClick={() => setShowUrgentVehicleModal(true)}>
-              <AlertTriangle className="w-4 h-4 mr-2" />
-              Véhicule en urgence
-            </Button>
             <Button variant="outline" size="sm" onClick={() => setShowConfigModal(true)}>
               <Settings className="w-4 h-4" />
             </Button>
