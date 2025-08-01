@@ -44,32 +44,37 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
     setCurrentRepairOrder(repairOrder);
   }, [repairOrder]);
 
-  // Écouter les changements dans le cache React Query pour mettre à jour l'affichage
+  // Écouter les mises à jour du cache React Query pour cet ordre de réparation spécifique
   useEffect(() => {
-    if (!repairOrder?.id) return;
+    if (!currentRepairOrder?.id) return;
 
-    const updateFromCache = () => {
-      const cachedOrders = queryClient.getQueryData(['repairOrders']) as RepairOrder[] | undefined;
-      if (cachedOrders) {
-        const updatedOrder = cachedOrders.find(order => order.id === repairOrder.id);
-        if (updatedOrder) {
-          setCurrentRepairOrder(updatedOrder);
+    const refetchRepairOrderData = async () => {
+      try {
+        // Récupérer les données mises à jour depuis le cache React Query
+        const cachedOrders = queryClient.getQueryData(['repairOrders']) as RepairOrder[] | undefined;
+        if (cachedOrders) {
+          const updatedOrder = cachedOrders.find(order => order.id === currentRepairOrder.id);
+          if (updatedOrder) {
+            console.log('Repair order updated from cache:', updatedOrder);
+            setCurrentRepairOrder(updatedOrder);
+          }
         }
+      } catch (error) {
+        console.error('Error refreshing repair order data:', error);
       }
     };
 
-    // Mettre à jour immédiatement si les données sont déjà en cache
-    updateFromCache();
-
-    // Écouter les changements futurs du cache
+    // Écouter les invalidations du cache des ordres de réparation
     const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
-      if (event?.query?.queryKey?.[0] === 'repairOrders') {
-        updateFromCache();
+      if (event?.query?.queryKey?.[0] === 'repairOrders' && event.type === 'updated') {
+        refetchRepairOrderData();
       }
     });
 
-    return unsubscribe;
-  }, [repairOrder?.id, queryClient]);
+    return () => {
+      unsubscribe();
+    };
+  }, [currentRepairOrder?.id, queryClient]);
   
   // States for dialogs
   const [editDialogOpen, setEditDialogOpen] = useState(false);
