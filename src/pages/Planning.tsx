@@ -3806,7 +3806,10 @@ const Planning = () => {
                           emp.qualifications.length === 0  // Inclure les employés sans qualifications spécifiques
                         ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
-                            {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
+                            {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
+                              ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              : `Employé #${emp.id.slice(0, 8)}`
+                            }
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -3852,7 +3855,10 @@ const Planning = () => {
                           emp.qualifications.length === 0
                         ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
-                            {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
+                            {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
+                              ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              : `Employé #${emp.id.slice(0, 8)}`
+                            }
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -3897,7 +3903,10 @@ const Planning = () => {
                           emp.qualifications.length === 0
                         ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
-                            {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
+                            {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
+                              ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              : `Employé #${emp.id.slice(0, 8)}`
+                            }
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -3942,7 +3951,10 @@ const Planning = () => {
                           emp.qualifications.length === 0
                         ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
-                            {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
+                            {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
+                              ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              : `Employé #${emp.id.slice(0, 8)}`
+                            }
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -3988,7 +4000,10 @@ const Planning = () => {
                           emp.qualifications.length === 0
                         ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
-                            {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
+                            {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
+                              ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              : `Employé #${emp.id.slice(0, 8)}`
+                            }
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -4034,7 +4049,10 @@ const Planning = () => {
                           emp.qualifications.length === 0
                         ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
-                            {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
+                            {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
+                              ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              : `Employé #${emp.id.slice(0, 8)}`
+                            }
                           </SelectItem>
                         ))}
                       </SelectContent>
