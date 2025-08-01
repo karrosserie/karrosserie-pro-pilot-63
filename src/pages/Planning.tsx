@@ -1099,7 +1099,7 @@ const Planning = () => {
               </div>
 
               {/* Planning Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-7 gap-4 w-full min-w-0 flex-1">
+              <div className="grid grid-cols-1 lg:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 w-full">
                 {(() => {
                   const today = new Date();
                   const weekDays = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
