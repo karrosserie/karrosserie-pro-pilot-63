@@ -965,7 +965,6 @@ const Planning = () => {
                 {(() => {
                   const today = new Date();
                   const weekDays = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-                  const dayNumbers = [1, 2, 3, 4, 5, 6, 0]; // Monday = 1, Sunday = 0
                   
                   // Get start of current week (Monday)
                   const currentDay = today.getDay();
@@ -977,31 +976,17 @@ const Planning = () => {
                     const currentDate = new Date(monday);
                     currentDate.setDate(monday.getDate() + index);
                     
-                    // Get schedules for this day
-                    const daySchedules = employees?.flatMap(employee => {
-                      // We would need to get all employee schedules here
-                      // For now, let's use a placeholder approach
-                      return [];
+                    // Get all employee schedules for this day
+                    const allSchedules = employees?.flatMap(employee => {
+                      const { schedules } = useEmployeeSchedule(employee.id);
+                      return schedules.filter(schedule => {
+                        const scheduleDate = new Date(schedule.start_datetime);
+                        return scheduleDate.toDateString() === currentDate.toDateString();
+                      }).map(schedule => ({
+                        ...schedule,
+                        employeeName: employee.user_companies?.profiles?.first_name + ' ' + employee.user_companies?.profiles?.last_name
+                      }));
                     }) || [];
-                    
-                    // Filter workshop schedule for this day
-                    const dayOfWeekMap = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-                    const dayOfWeek = dayOfWeekMap[currentDate.getDay()];
-                    const workshopDay = workshopSchedules.find(ws => ws.day_of_week.toLowerCase() === dayOfWeek);
-                    
-                    if (!workshopDay?.enabled) {
-                      return (
-                        <Card key={dayName} className="opacity-50">
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-lg text-muted-foreground">{dayName}</CardTitle>
-                            <p className="text-sm text-muted-foreground">
-                              {currentDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
-                            </p>
-                            <p className="text-sm text-muted-foreground">Fermé</p>
-                          </CardHeader>
-                        </Card>
-                      );
-                    }
                     
                     return (
                       <Card key={dayName}>
@@ -1010,30 +995,36 @@ const Planning = () => {
                           <p className="text-sm text-muted-foreground">
                             {currentDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
                           </p>
-                          <p className="text-sm text-muted-foreground">
-                            {workshopDay?.morning_start && workshopDay?.morning_end && 
-                             `${workshopDay.morning_start}-${workshopDay.morning_end}`}
-                            {workshopDay?.afternoon_start && workshopDay?.afternoon_end && 
-                             ` / ${workshopDay.afternoon_start}-${workshopDay.afternoon_end}`}
-                          </p>
-                          <p className="text-sm text-muted-foreground">{daySchedules.length} tâche(s)</p>
+                          <p className="text-sm text-muted-foreground">{allSchedules.length} tâche(s)</p>
                         </CardHeader>
                         <CardContent className="space-y-3">
-                          {daySchedules.length === 0 ? (
+                          {allSchedules.length === 0 ? (
                             <div className="text-center text-muted-foreground py-4">
                               Aucune tâche planifiée
                             </div>
                           ) : (
-                            daySchedules.map((schedule, idx) => (
-                              <Card key={idx} className="border-l-4 border-l-orange-500 p-3 cursor-pointer hover:shadow-md transition-shadow">
+                            allSchedules.map((schedule) => (
+                              <Card key={schedule.id} className="border-l-4 border-l-orange-500 p-3 cursor-pointer hover:shadow-md transition-shadow">
                                 <div className="space-y-2">
                                   <div className="flex items-center gap-2 text-sm text-orange-600">
                                     <Clock className="w-3 h-3" />
-                                    Placeholder
+                                    {new Date(schedule.start_datetime).toLocaleTimeString('fr-FR', { 
+                                      hour: '2-digit', 
+                                      minute: '2-digit' 
+                                    })}-{new Date(schedule.end_datetime).toLocaleTimeString('fr-FR', { 
+                                      hour: '2-digit', 
+                                      minute: '2-digit' 
+                                    })}
                                   </div>
-                                  <div className="font-semibold text-sm">Placeholder</div>
-                                  <div className="text-xs text-muted-foreground">Placeholder</div>
-                                  <Badge className="bg-orange-100 text-orange-800 text-xs">Placeholder</Badge>
+                                  <div className="font-semibold text-sm">{schedule.vehicles?.license_plate}</div>
+                                  <div className="text-xs text-muted-foreground">{schedule.vehicles?.car_brands?.name} {schedule.vehicles?.car_models?.name}</div>
+                                  <div className="text-xs text-muted-foreground">{schedule.task_type}</div>
+                                  <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                    <User className="w-3 h-3" />
+                                    {schedule.employeeName}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">Client: {schedule.vehicles?.clients?.first_name} {schedule.vehicles?.clients?.last_name}</div>
+                                  <Badge className="bg-orange-100 text-orange-800 text-xs">{schedule.task_type}</Badge>
                                 </div>
                               </Card>
                             ))
@@ -1043,6 +1034,7 @@ const Planning = () => {
                     );
                   });
                 })()}
+              </div>
               </div>
               {/* Lundi */}
               <Card>
