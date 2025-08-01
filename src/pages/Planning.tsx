@@ -3797,29 +3797,34 @@ const Planning = () => {
                   </div>
                   <div className="flex-1">
                     <Label htmlFor="accueil_employee">Employé</Label>
-                    <Select 
-                      value={planningData.accueil_preparation.employeeId}
-                      onValueChange={(value) => setPlanningData(prev => ({
-                        ...prev,
-                        accueil_preparation: { ...prev.accueil_preparation, employeeId: value }
-                      }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner un employé" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
-                        {employees?.filter(emp => 
-                          emp.qualifications.includes('Accueil & Préparation du dossier')
-                        ).map(emp => (
-                          <SelectItem key={emp.id} value={emp.id}>
-                            {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                              ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
-                              : `Employé #${emp.id.slice(0, 8)}`
-                            }
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex gap-2 items-end">
+                      <Select 
+                        value={planningData.accueil_preparation.employeeId}
+                        onValueChange={(value) => setPlanningData(prev => ({
+                          ...prev,
+                          accueil_preparation: { ...prev.accueil_preparation, employeeId: value }
+                        }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner un employé" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
+                          {employees?.filter(emp => 
+                            emp.qualifications.includes('Accueil & Préparation du dossier')
+                          ).map(emp => (
+                            <SelectItem key={emp.id} value={emp.id}>
+                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
+                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                                : `Employé #${emp.id.slice(0, 8)}`
+                              }
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div className="text-sm text-muted-foreground whitespace-nowrap">
+                        {planningData.accueil_preparation.employeeId && "9h00 - 10h00"}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -3843,29 +3848,34 @@ const Planning = () => {
                   </div>
                   <div className="flex-1">
                     <Label htmlFor="remplacement_employee">Employé</Label>
-                    <Select 
-                      value={planningData.remplacement_debosselage.employeeId}
-                      onValueChange={(value) => setPlanningData(prev => ({
-                        ...prev,
-                        remplacement_debosselage: { ...prev.remplacement_debosselage, employeeId: value }
-                      }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner un employé" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
-                        {employees?.filter(emp => 
-                          emp.qualifications.includes('Remplacement ou débosselage')
-                        ).map(emp => (
-                          <SelectItem key={emp.id} value={emp.id}>
-                            {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                              ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
-                              : `Employé #${emp.id.slice(0, 8)}`
-                            }
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex gap-2 items-end">
+                      <Select 
+                        value={planningData.remplacement_debosselage.employeeId}
+                        onValueChange={(value) => setPlanningData(prev => ({
+                          ...prev,
+                          remplacement_debosselage: { ...prev.remplacement_debosselage, employeeId: value }
+                        }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner un employé" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
+                          {employees?.filter(emp => 
+                            emp.qualifications.includes('Remplacement ou débosselage')
+                          ).map(emp => (
+                            <SelectItem key={emp.id} value={emp.id}>
+                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
+                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                                : `Employé #${emp.id.slice(0, 8)}`
+                              }
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div className="text-sm text-muted-foreground whitespace-nowrap">
+                        {planningData.remplacement_debosselage.employeeId && "10h00 - 12h30"}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -3889,29 +3899,34 @@ const Planning = () => {
                   </div>
                   <div className="flex-1">
                     <Label htmlFor="preparation_employee">Employé</Label>
-                    <Select 
-                      value={planningData.preparation_peinture.employeeId}
-                      onValueChange={(value) => setPlanningData(prev => ({
-                        ...prev,
-                        preparation_peinture: { ...prev.preparation_peinture, employeeId: value }
-                      }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner un employé" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
-                        {employees?.filter(emp => 
-                          emp.qualifications.includes('Préparation peinture')
-                        ).map(emp => (
-                          <SelectItem key={emp.id} value={emp.id}>
-                            {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                              ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
-                              : `Employé #${emp.id.slice(0, 8)}`
-                            }
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex gap-2 items-end">
+                      <Select 
+                        value={planningData.preparation_peinture.employeeId}
+                        onValueChange={(value) => setPlanningData(prev => ({
+                          ...prev,
+                          preparation_peinture: { ...prev.preparation_peinture, employeeId: value }
+                        }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner un employé" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
+                          {employees?.filter(emp => 
+                            emp.qualifications.includes('Préparation peinture')
+                          ).map(emp => (
+                            <SelectItem key={emp.id} value={emp.id}>
+                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
+                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                                : `Employé #${emp.id.slice(0, 8)}`
+                              }
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div className="text-sm text-muted-foreground whitespace-nowrap">
+                        {planningData.preparation_peinture.employeeId && "14h00 - 16h30"}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -3935,29 +3950,34 @@ const Planning = () => {
                   </div>
                   <div className="flex-1">
                     <Label htmlFor="peinture_employee">Employé</Label>
-                    <Select 
-                      value={planningData.mise_en_peinture.employeeId}
-                      onValueChange={(value) => setPlanningData(prev => ({
-                        ...prev,
-                        mise_en_peinture: { ...prev.mise_en_peinture, employeeId: value }
-                      }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner un employé" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
-                        {employees?.filter(emp => 
-                          emp.qualifications.includes('Mise en peinture')
-                        ).map(emp => (
-                          <SelectItem key={emp.id} value={emp.id}>
-                            {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                              ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
-                              : `Employé #${emp.id.slice(0, 8)}`
-                            }
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex gap-2 items-end">
+                      <Select 
+                        value={planningData.mise_en_peinture.employeeId}
+                        onValueChange={(value) => setPlanningData(prev => ({
+                          ...prev,
+                          mise_en_peinture: { ...prev.mise_en_peinture, employeeId: value }
+                        }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner un employé" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
+                          {employees?.filter(emp => 
+                            emp.qualifications.includes('Mise en peinture')
+                          ).map(emp => (
+                            <SelectItem key={emp.id} value={emp.id}>
+                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
+                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                                : `Employé #${emp.id.slice(0, 8)}`
+                              }
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div className="text-sm text-muted-foreground whitespace-nowrap">
+                        {planningData.mise_en_peinture.employeeId && "9h00 - 14h00"}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -3981,29 +4001,34 @@ const Planning = () => {
                   </div>
                   <div className="flex-1">
                     <Label htmlFor="finitions_employee">Employé</Label>
-                    <Select 
-                      value={planningData.finitions_remontage.employeeId}
-                      onValueChange={(value) => setPlanningData(prev => ({
-                        ...prev,
-                        finitions_remontage: { ...prev.finitions_remontage, employeeId: value }
-                      }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner un employé" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
-                        {employees?.filter(emp => 
-                          emp.qualifications.includes('Finitions & remontage')
-                        ).map(emp => (
-                          <SelectItem key={emp.id} value={emp.id}>
-                            {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                              ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
-                              : `Employé #${emp.id.slice(0, 8)}`
-                            }
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex gap-2 items-end">
+                      <Select 
+                        value={planningData.finitions_remontage.employeeId}
+                        onValueChange={(value) => setPlanningData(prev => ({
+                          ...prev,
+                          finitions_remontage: { ...prev.finitions_remontage, employeeId: value }
+                        }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner un employé" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
+                          {employees?.filter(emp => 
+                            emp.qualifications.includes('Finitions & remontage')
+                          ).map(emp => (
+                            <SelectItem key={emp.id} value={emp.id}>
+                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
+                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                                : `Employé #${emp.id.slice(0, 8)}`
+                              }
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div className="text-sm text-muted-foreground whitespace-nowrap">
+                        {planningData.finitions_remontage.employeeId && "14h00 - 16h00"}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -4027,29 +4052,34 @@ const Planning = () => {
                   </div>
                   <div className="flex-1">
                     <Label htmlFor="cloture_employee">Employé</Label>
-                    <Select 
-                      value={planningData.cloture_livraison.employeeId}
-                      onValueChange={(value) => setPlanningData(prev => ({
-                        ...prev,
-                        cloture_livraison: { ...prev.cloture_livraison, employeeId: value }
-                      }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner un employé" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
-                        {employees?.filter(emp => 
-                          emp.qualifications.includes('Clôture du dossier et livraison')
-                        ).map(emp => (
-                          <SelectItem key={emp.id} value={emp.id}>
-                            {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                              ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
-                              : `Employé #${emp.id.slice(0, 8)}`
-                            }
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex gap-2 items-end">
+                      <Select 
+                        value={planningData.cloture_livraison.employeeId}
+                        onValueChange={(value) => setPlanningData(prev => ({
+                          ...prev,
+                          cloture_livraison: { ...prev.cloture_livraison, employeeId: value }
+                        }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner un employé" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
+                          {employees?.filter(emp => 
+                            emp.qualifications.includes('Clôture du dossier et livraison')
+                          ).map(emp => (
+                            <SelectItem key={emp.id} value={emp.id}>
+                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
+                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                                : `Employé #${emp.id.slice(0, 8)}`
+                              }
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div className="text-sm text-muted-foreground whitespace-nowrap">
+                        {planningData.cloture_livraison.employeeId && "16h00 - 16h30"}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -4102,6 +4132,7 @@ const Planning = () => {
                     });
                   }
                 }}
+                variant="validation"
               >
                 Sauvegarder
               </Button>
