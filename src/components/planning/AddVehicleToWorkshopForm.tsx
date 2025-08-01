@@ -60,8 +60,8 @@ export function AddVehicleToWorkshopForm({ companyId, employees, onSuccess }: Ad
         if (vehiclesError) throw vehiclesError;
 
         // Récupérer les véhicules déjà dans l'atelier
-        const { data: vehiclesInWorkshop, error: workshopError } = await (supabase as any)
-          .from('employee_schedule')
+        const { data: vehiclesInWorkshop, error: workshopError } = await supabase
+          .from('vehicle_workflow_steps')
           .select('vehicle_id')
           .eq('company_id', companyId);
 
@@ -100,36 +100,18 @@ export function AddVehicleToWorkshopForm({ companyId, employees, onSuccess }: Ad
 
     setIsLoading(true);
     try {
-      // Calculer le planning optimal
-      const optimalPlanning = calculateOptimalPlanning();
-      
-      // Créer les entrées de planning pour chaque étape
-      const schedulePromises = WORKFLOW_STEPS.map(step => {
-        const planningStep = optimalPlanning[step.key as keyof typeof optimalPlanning];
-        
-        if (!planningStep?.employeeId || !planningStep?.startDateTime || !planningStep?.endDateTime) {
-          throw new Error(`Planning incomplet pour l'étape: ${step.qualification}`);
-        }
+      // Créer une entrée dans vehicle_workflow_steps pour commencer le workflow
+      const { error: workflowError } = await supabase
+        .from('vehicle_workflow_steps')
+        .insert({
+          company_id: companyId,
+          vehicle_id: selectedVehicleId,
+          current_step: 'Accueil & Préparation du dossier',
+          progress_percentage: 0,
+          notes: 'Véhicule ajouté manuellement à l\'atelier'
+        });
 
-        return (supabase as any)
-          .from('employee_schedule')
-          .insert({
-            company_id: companyId,
-            employee_id: planningStep.employeeId,
-            vehicle_id: selectedVehicleId,
-            task_type: step.task_type,
-            start_datetime: planningStep.startDateTime.toISOString(),
-            end_datetime: planningStep.endDateTime.toISOString()
-          });
-      });
-
-      const results = await Promise.all(schedulePromises);
-      
-      // Vérifier s'il y a des erreurs
-      const errors = results.filter(result => result.error);
-      if (errors.length > 0) {
-        throw new Error('Erreur lors de la création de certaines planifications');
-      }
+      if (workflowError) throw workflowError;
 
       onSuccess();
     } catch (error) {

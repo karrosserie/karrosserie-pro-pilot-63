@@ -347,24 +347,15 @@ const Planning = () => {
 
         if (vehiclesError) throw vehiclesError;
 
-        // Récupérer les planifications d'employés pour ces véhicules
-        const { data: scheduleData, error: scheduleError } = await (supabase as any)
-          .from('employee_schedule')
+        // Récupérer les étapes de workflow pour ces véhicules
+        const { data: workflowData, error: workflowError } = await supabase
+          .from('vehicle_workflow_steps')
           .select(`
-            *,
-            employees (
-              id,
-              user_companies (
-                profiles (
-                  first_name,
-                  last_name
-                )
-              )
-            )
+            *
           `)
           .eq('company_id', companyInfo.id);
 
-        if (scheduleError) throw scheduleError;
+        if (workflowError) throw workflowError;
 
         // Organiser les données par étapes
         const stepMap = {
@@ -400,52 +391,31 @@ const Planning = () => {
           }
         };
 
-        // Associer chaque véhicule à sa bonne étape selon le planning
-        vehiclesData?.forEach(vehicle => {
-          const vehicleSchedules = scheduleData?.filter(s => s.vehicle_id === vehicle.id) || [];
+        // Organiser les véhicules par étapes selon vehicle_workflow_steps
+        for (const workflowStep of workflowData || []) {
+          // Récupérer les données du véhicule correspondant
+          const vehicle = vehiclesData?.find(v => v.id === workflowStep.vehicle_id);
+          if (!vehicle) continue;
           
-          // Si pas de planification, mettre en première étape
-          if (vehicleSchedules.length === 0) {
-            stepMap['Accueil & Préparation du dossier'].vehicles.push({
+          const stepKey = workflowStep.current_step;
+          
+          if (stepMap[stepKey]) {
+            stepMap[stepKey].vehicles.push({
               id: vehicle.id,
               brand: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim() || 'Véhicule',
               plate: vehicle.license_plate,
               client: `${vehicle.clients?.first_name || ''} ${vehicle.clients?.last_name || ''}`.trim() || 'Client inconnu',
               price: "0€",
               duration: "0h",
-              status: "En attente",
-              inProgress: false,
-              technician: null,
-              scheduleId: null
+              status: workflowStep.progress_percentage === 100 ? "Terminé" : "En cours",
+              inProgress: workflowStep.progress_percentage > 0 && workflowStep.progress_percentage < 100,
+              technician: null, // On peut ajouter le technicien plus tard si nécessaire
+              scheduleId: workflowStep.id,
+              progress: workflowStep.progress_percentage,
+              notes: workflowStep.notes
             });
-          } else {
-            // Trouver l'étape en cours (la plus récente non terminée)
-            const currentSchedule = vehicleSchedules
-              .sort((a, b) => new Date(a.start_datetime).getTime() - new Date(b.start_datetime).getTime())
-              .find(s => new Date(s.end_datetime) > new Date()) || vehicleSchedules[vehicleSchedules.length - 1];
-            
-            const stepKey = currentSchedule.task_type;
-            
-            if (stepMap[stepKey]) {
-              const technicianName = currentSchedule.employees?.user_companies?.profiles 
-                ? `${currentSchedule.employees.user_companies.profiles.first_name} ${currentSchedule.employees.user_companies.profiles.last_name}`
-                : 'Employé assigné';
-                
-              stepMap[stepKey].vehicles.push({
-                id: vehicle.id,
-                brand: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim() || 'Véhicule',
-                plate: vehicle.license_plate,
-                client: `${vehicle.clients?.first_name || ''} ${vehicle.clients?.last_name || ''}`.trim() || 'Client inconnu',
-                price: "0€",
-                duration: calculateDuration(currentSchedule.start_datetime, currentSchedule.end_datetime),
-                status: new Date(currentSchedule.start_datetime) <= new Date() && new Date() <= new Date(currentSchedule.end_datetime) ? "En cours" : "En attente",
-                inProgress: new Date(currentSchedule.start_datetime) <= new Date() && new Date() <= new Date(currentSchedule.end_datetime),
-                technician: technicianName,
-                scheduleId: currentSchedule.id
-              });
-            }
           }
-        });
+        }
 
         // Convertir en array avec les counts
         const steps = Object.values(stepMap).map(step => ({
@@ -592,151 +562,6 @@ const Planning = () => {
     problemes: 1
   };
 
-  // Charger les données des étapes de workflow depuis la base de données
-  useEffect(() => {
-    const loadWorkflowData = async () => {
-      if (!companyInfo?.id) return;
-      
-      try {
-        // Récupérer les véhicules avec leurs étapes de workflow
-        const { data: vehiclesData, error: vehiclesError } = await supabase
-          .from('vehicles')
-          .select(`
-            id,
-            license_plate,
-            client_id,
-            brand_id,
-            model_id,
-            clients (
-              first_name,
-              last_name
-            ),
-            car_brands (
-              name
-            ),
-            car_models (
-              name
-            )
-          `)
-          .eq('company_id', companyInfo.id);
-
-        if (vehiclesError) throw vehiclesError;
-
-        // Récupérer les planifications d'employés pour ces véhicules  
-        const { data: scheduleData, error: scheduleError } = await (supabase as any)
-          .from('employee_schedule')
-          .select(`
-            *,
-            employees (
-              id,
-              user_companies (
-                profiles (
-                  first_name,
-                  last_name
-                )
-              )
-            )
-          `)
-          .eq('company_id', companyInfo.id);
-
-        if (scheduleError) throw scheduleError;
-
-        // Organiser les données par étapes
-        const stepMap = {
-          'Accueil & Préparation du dossier': {
-            title: "Accueil & Préparation du dossier",
-            color: "border-l-karrosserie-orange",
-            vehicles: []
-          },
-          'Remplacement ou débosselage': {
-            title: "Remplacement ou débosselage",
-            color: "border-l-green-500",
-            vehicles: []
-          },
-          'Préparation peinture': {
-            title: "Préparation peinture",
-            color: "border-l-yellow-500",
-            vehicles: []
-          },
-          'Mise en peinture': {
-            title: "Mise en peinture",
-            color: "border-l-blue-500",
-            vehicles: []
-          },
-          'Finitions & remontage': {
-            title: "Finitions & remontage",
-            color: "border-l-purple-500",
-            vehicles: []
-          },
-          'Clôture & livraison': {
-            title: "Clôture du dossier et livraison",
-            color: "border-l-red-500",
-            vehicles: []
-          }
-        };
-
-        // Associer chaque véhicule à sa bonne étape selon le planning
-        vehiclesData?.forEach(vehicle => {
-          const vehicleSchedules = scheduleData?.filter(s => s.vehicle_id === vehicle.id) || [];
-          
-          // Si pas de planification, mettre en première étape
-          if (vehicleSchedules.length === 0) {
-            stepMap['Accueil & Préparation du dossier'].vehicles.push({
-              id: vehicle.id,
-              brand: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim(),
-              plate: vehicle.license_plate,
-              client: `${vehicle.clients?.first_name || ''} ${vehicle.clients?.last_name || ''}`.trim(),
-              price: "0€",
-              duration: "0h",
-              status: "En attente",
-              inProgress: false,
-              technician: null,
-              scheduleId: null
-            });
-          } else {
-            // Trouver l'étape en cours (la plus récente non terminée)
-            const currentSchedule = vehicleSchedules
-              .sort((a, b) => new Date(a.start_datetime).getTime() - new Date(b.start_datetime).getTime())
-              .find(s => new Date(s.end_datetime) > new Date()) || vehicleSchedules[vehicleSchedules.length - 1];
-            
-            const stepKey = currentSchedule.task_type;
-            
-            if (stepMap[stepKey]) {
-              const technicianName = currentSchedule.employees?.user_companies?.profiles 
-                ? `${currentSchedule.employees.user_companies.profiles.first_name} ${currentSchedule.employees.user_companies.profiles.last_name}`
-                : 'Employé assigné';
-                
-              stepMap[stepKey].vehicles.push({
-                id: vehicle.id,
-                brand: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim(),
-                plate: vehicle.license_plate,
-                client: `${vehicle.clients?.first_name || ''} ${vehicle.clients?.last_name || ''}`.trim(),
-                price: "0€",
-                duration: calculateDuration(currentSchedule.start_datetime, currentSchedule.end_datetime),
-                status: new Date(currentSchedule.start_datetime) <= new Date() && new Date() <= new Date(currentSchedule.end_datetime) ? "En cours" : "En attente",
-                inProgress: new Date(currentSchedule.start_datetime) <= new Date() && new Date() <= new Date(currentSchedule.end_datetime),
-                technician: technicianName,
-                scheduleId: currentSchedule.id
-              });
-            }
-          }
-        });
-
-        // Convertir en array avec les counts
-        const steps = Object.values(stepMap).map(step => ({
-          ...step,
-          count: step.vehicles.length
-        }));
-
-        // Les steps sont maintenant gérés par le hook useVehicleWorkflow
-        
-      } catch (error) {
-        console.error('Erreur lors du chargement des données de workflow:', error);
-      }
-    };
-
-    loadWorkflowData();
-  }, [companyInfo?.id]);
 
   return (
     <div className="min-h-screen bg-muted/20 p-4">
