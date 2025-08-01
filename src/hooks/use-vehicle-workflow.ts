@@ -108,10 +108,12 @@ export const useVehicleWorkflow = (companyId?: string) => {
         }
       };
 
-      // Associer chaque véhicule à sa bonne étape
-      vehiclesData?.forEach(vehicle => {
-        const workflowStep = workflowData?.find(w => w.vehicle_id === vehicle.id);
-        const currentStep = workflowStep?.current_step || 'accueil_preparation';
+      // Associer seulement les véhicules qui ont une entrée dans vehicle_workflow_steps
+      workflowData?.forEach(workflowStep => {
+        const vehicle = vehiclesData?.find(v => v.id === workflowStep.vehicle_id);
+        if (!vehicle) return;
+        
+        const currentStep = workflowStep.current_step;
         
         // Trouver le devis associé au véhicule
         const quote = quotesData?.find(q => q.vehicle_id === vehicle.id);
@@ -127,10 +129,10 @@ export const useVehicleWorkflow = (companyId?: string) => {
             client: `${vehicle.clients?.first_name || ''} ${vehicle.clients?.last_name || ''}`.trim() || 'Client inconnu',
             price: `${amountTTC.toFixed(2).replace('.', ',')}€`,
             duration: "0h", // À calculer selon la configuration
-            status: "",
-            inProgress: workflowStep?.progress_percentage > 0,
-            technician: workflowStep?.technician_id ? "Assigné" : null,
-            workflowId: workflowStep?.id
+            status: workflowStep.progress_percentage === 100 ? "Terminé" : "En cours",
+            inProgress: workflowStep.progress_percentage > 0 && workflowStep.progress_percentage < 100,
+            technician: workflowStep.technician_id ? "Assigné" : null,
+            workflowId: workflowStep.id
           });
         }
       });
