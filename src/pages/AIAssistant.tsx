@@ -58,7 +58,7 @@ const AIAssistant = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50 relative">
-      <div className="page-container space-y-3 sm:space-y-4 lg:space-y-6 p-3 sm:p-4 lg:p-6">
+      <div className="p-6 space-y-6">
         {/* Header contextuel avec statut IA */}
         <IAStatusHeader />
         
