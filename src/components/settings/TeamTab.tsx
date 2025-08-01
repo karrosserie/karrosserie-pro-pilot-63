@@ -181,10 +181,6 @@ const TeamTab = () => {
           variant: "destructive"
         });
       } else {
-        toast({
-          title: "Succès",
-          description: "Membre ajouté avec succès"
-        });
         setIsAddDialogOpen(false);
         addForm.reset();
         fetchTeamMembers();
