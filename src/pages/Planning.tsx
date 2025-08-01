@@ -445,29 +445,6 @@ const Planning = () => {
     loadAllEmployeeSchedules();
   }, [companyInfo?.id, employees]);
 
-  // Ajouter un système de rafraîchissement en temps réel
-  useEffect(() => {
-    if (!companyInfo?.id) return;
-
-    const channel = supabase
-      .channel('employee-schedule-changes')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'employee_schedule',
-        filter: `company_id=eq.${companyInfo.id}`
-      }, (payload) => {
-        console.log('🔄 Changement détecté dans employee_schedule:', payload);
-        // Recharger les données quand il y a un changement
-        loadAllEmployeeSchedules();
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [companyInfo?.id]);
-
   // Charger les données des étapes de workflow depuis la base de données
   useEffect(() => {
     const loadWorkflowData = async () => {
