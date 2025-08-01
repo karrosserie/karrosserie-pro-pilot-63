@@ -54,7 +54,8 @@ const RepairOrderDialog = ({
       
       // Si c'est une conversion depuis un devis et qu'un ordre a été créé,
       // rediriger vers la page des ordres de réparation avec l'ordre ouvert
-      if (isConversionFromQuote && createdOrder) {
+      if (isConversionFromQuote && createdOrder?.id) {
+        console.log('Redirection vers ordre créé:', createdOrder.id);
         setTimeout(() => {
           navigate(`/documents/ordres?openOrder=${createdOrder.id}`);
         }, 100);
