@@ -986,7 +986,7 @@ const Planning = () => {
                   className="bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90"
                   onClick={() => setShowPlanningModal(true)}
                 >
-                  <Plus className="w-4 h-4 mr-2" />
+                  <Car className="w-4 h-4 mr-2" />
                   Entrée véhicule
                 </Button>
               </div>
@@ -4358,7 +4358,7 @@ const Planning = () => {
                       .insert({
                         company_id: companyInfo?.id,
                         vehicle_id: selectedVehicle.id,
-                        current_step: 'Accueil & Préparation du dossier',
+                        step: 'accueil_preparation',
                         progress_percentage: 0,
                         notes: 'Véhicule ajouté via entrée manuelle'
                       });
@@ -4455,21 +4455,27 @@ const Planning = () => {
                       throw new Error('Erreur lors de la création de certaines planifications');
                     }
 
-                    toast({
-                      title: "Planification sauvegardée",
-                      description: "Les étapes du véhicule ont été planifiées avec succès"
-                    });
+                    // Utiliser setTimeout pour éviter l'erreur React de mise à jour avant le montage
+                    setTimeout(() => {
+                      toast({
+                        title: "Planification sauvegardée",
+                        description: "Les étapes du véhicule ont été planifiées avec succès"
+                      });
+                    }, 0);
                     
                     setShowPlanningModal(false);
                     // Refresh workflow data
                     refetchWorkflow();
                   } catch (error) {
                     console.error('Erreur lors de la planification:', error);
-                    toast({
-                      title: "Erreur",
-                      description: "Impossible de sauvegarder la planification",
-                      variant: "destructive"
-                    });
+                    // Utiliser setTimeout pour éviter l'erreur React de mise à jour avant le montage
+                    setTimeout(() => {
+                      toast({
+                        title: "Erreur",
+                        description: "Impossible de sauvegarder la planification",
+                        variant: "destructive"
+                      });
+                    }, 0);
                   }
                 }}
                 variant="validation"
