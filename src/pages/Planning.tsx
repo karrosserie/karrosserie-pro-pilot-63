@@ -4105,19 +4105,95 @@ const Planning = () => {
                       return;
                     }
 
-                    // Créer ou mettre à jour l'étape de workflow
-                    const { error } = await supabase
-                      .from('vehicle_workflow_steps')
-                      .upsert({
-                        vehicle_id: selectedVehicle.id,
-                        company_id: companyInfo.id,
-                        current_step: 'accueil_preparation',
-                        progress_percentage: 0,
-                        technician_id: planningData.accueil_preparation.employeeId || null,
-                        notes: JSON.stringify(planningData)
+                    // Supprimer les anciennes planifications pour ce véhicule
+                    await (supabase as any)
+                      .from('employee_schedule')
+                      .delete()
+                      .eq('vehicle_id', selectedVehicle.id)
+                      .eq('company_id', companyInfo.id);
+
+                    // Préparer les données des étapes avec horaires
+                    const steps = [
+                      { 
+                        key: 'accueil_preparation', 
+                        task_type: 'Accueil & Préparation du dossier',
+                        start_time: '09:00:00',
+                        duration: planningData.accueil_preparation.duration,
+                        employeeId: planningData.accueil_preparation.employeeId
+                      },
+                      { 
+                        key: 'remplacement_debosselage', 
+                        task_type: 'Remplacement ou débosselage',
+                        start_time: '10:00:00',
+                        duration: planningData.remplacement_debosselage.duration,
+                        employeeId: planningData.remplacement_debosselage.employeeId
+                      },
+                      { 
+                        key: 'preparation_peinture', 
+                        task_type: 'Préparation peinture',
+                        start_time: '14:00:00',
+                        duration: planningData.preparation_peinture.duration,
+                        employeeId: planningData.preparation_peinture.employeeId
+                      },
+                      { 
+                        key: 'mise_en_peinture', 
+                        task_type: 'Mise en peinture',
+                        start_time: '09:00:00',
+                        duration: planningData.mise_en_peinture.duration,
+                        employeeId: planningData.mise_en_peinture.employeeId
+                      },
+                      { 
+                        key: 'finitions_remontage', 
+                        task_type: 'Finitions & remontage',
+                        start_time: '14:00:00',
+                        duration: planningData.finitions_remontage.duration,
+                        employeeId: planningData.finitions_remontage.employeeId
+                      },
+                      { 
+                        key: 'cloture_livraison', 
+                        task_type: 'Clôture & livraison',
+                        start_time: '16:00:00',
+                        duration: planningData.cloture_livraison.duration,
+                        employeeId: planningData.cloture_livraison.employeeId
+                      }
+                    ];
+
+                    // Créer les planifications pour chaque étape qui a un employé assigné
+                    const schedulePromises = steps
+                      .filter(step => step.employeeId && step.duration)
+                      .map(step => {
+                        // Calculer les heures de début et fin
+                        const today = new Date();
+                        const startDateTime = new Date(today);
+                        const [startHour, startMinute] = step.start_time.split(':');
+                        startDateTime.setHours(parseInt(startHour), parseInt(startMinute), 0, 0);
+                        
+                        const endDateTime = new Date(startDateTime);
+                        const [durationHour, durationMinute] = step.duration.split(':');
+                        endDateTime.setHours(
+                          endDateTime.getHours() + parseInt(durationHour),
+                          endDateTime.getMinutes() + parseInt(durationMinute)
+                        );
+
+                        return (supabase as any)
+                          .from('employee_schedule')
+                          .insert({
+                            company_id: companyInfo.id,
+                            employee_id: step.employeeId,
+                            vehicle_id: selectedVehicle.id,
+                            task_type: step.task_type,
+                            start_datetime: startDateTime.toISOString(),
+                            end_datetime: endDateTime.toISOString()
+                          });
                       });
 
-                    if (error) throw error;
+                    const results = await Promise.all(schedulePromises);
+                    
+                    // Vérifier s'il y a des erreurs
+                    const errors = results.filter(result => result.error);
+                    if (errors.length > 0) {
+                      throw new Error('Erreur lors de la création de certaines planifications');
+                    }
 
                     toast({
                       title: "Planification sauvegardée",
