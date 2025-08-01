@@ -3772,7 +3772,7 @@ const Planning = () => {
             <div className="space-y-6">
               {/* Accueil & Préparation du dossier */}
               <div className="border rounded-lg p-4">
-                <h3 className="font-medium text-sm mb-3 text-karrosserie-orange">Accueil & Préparation du dossier</h3>
+                <h3 className="font-medium text-sm mb-3">Accueil & Préparation du dossier</h3>
                 <div className="flex items-end gap-4">
                   <div className="flex-shrink-0">
                     <Label htmlFor="accueil_duration">Durée</Label>
@@ -3801,9 +3801,7 @@ const Planning = () => {
                       </SelectTrigger>
                       <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                         {employees?.filter(emp => 
-                          emp.qualifications.includes('Accueil') || 
-                          emp.qualifications.includes('Réception') ||
-                          emp.qualifications.length === 0  // Inclure les employés sans qualifications spécifiques
+                          emp.qualifications.includes('Accueil & Préparation du dossier')
                         ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
                             {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
@@ -3820,7 +3818,7 @@ const Planning = () => {
 
               {/* Remplacement ou débosselage */}
               <div className="border rounded-lg p-4">
-                <h3 className="font-medium text-sm mb-3 text-green-500">Remplacement ou débosselage</h3>
+                <h3 className="font-medium text-sm mb-3">Remplacement ou débosselage</h3>
                 <div className="flex items-end gap-4">
                   <div className="flex-shrink-0">
                     <Label htmlFor="remplacement_duration">Durée</Label>
@@ -3849,10 +3847,7 @@ const Planning = () => {
                       </SelectTrigger>
                       <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                         {employees?.filter(emp => 
-                          emp.qualifications.includes('Débosselage') || 
-                          emp.qualifications.includes('Remplacement de pièces') ||
-                          emp.qualifications.includes('Carrosserie') ||
-                          emp.qualifications.length === 0
+                          emp.qualifications.includes('Remplacement ou débosselage')
                         ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
                             {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
@@ -3869,7 +3864,7 @@ const Planning = () => {
 
               {/* Préparation peinture */}
               <div className="border rounded-lg p-4">
-                <h3 className="font-medium text-sm mb-3 text-yellow-500">Préparation peinture</h3>
+                <h3 className="font-medium text-sm mb-3">Préparation peinture</h3>
                 <div className="flex items-end gap-4">
                   <div className="flex-shrink-0">
                     <Label htmlFor="preparation_duration">Durée</Label>
@@ -3898,9 +3893,7 @@ const Planning = () => {
                       </SelectTrigger>
                       <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                         {employees?.filter(emp => 
-                          emp.qualifications.includes('Préparation peinture') ||
-                          emp.qualifications.includes('Peinture') ||
-                          emp.qualifications.length === 0
+                          emp.qualifications.includes('Préparation peinture')
                         ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
                             {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
@@ -3917,7 +3910,7 @@ const Planning = () => {
 
               {/* Mise en peinture */}
               <div className="border rounded-lg p-4">
-                <h3 className="font-medium text-sm mb-3 text-blue-500">Mise en peinture</h3>
+                <h3 className="font-medium text-sm mb-3">Mise en peinture</h3>
                 <div className="flex items-end gap-4">
                   <div className="flex-shrink-0">
                     <Label htmlFor="peinture_duration">Durée</Label>
@@ -3946,9 +3939,7 @@ const Planning = () => {
                       </SelectTrigger>
                       <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                         {employees?.filter(emp => 
-                          emp.qualifications.includes('Peinture') ||
-                          emp.qualifications.includes('Mise en peinture') ||
-                          emp.qualifications.length === 0
+                          emp.qualifications.includes('Mise en peinture')
                         ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
                             {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
@@ -3965,7 +3956,7 @@ const Planning = () => {
 
               {/* Finitions & remontage */}
               <div className="border rounded-lg p-4">
-                <h3 className="font-medium text-sm mb-3 text-purple-500">Finitions & remontage</h3>
+                <h3 className="font-medium text-sm mb-3">Finitions & remontage</h3>
                 <div className="flex items-end gap-4">
                   <div className="flex-shrink-0">
                     <Label htmlFor="finitions_duration">Durée</Label>
@@ -3994,10 +3985,7 @@ const Planning = () => {
                       </SelectTrigger>
                       <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                         {employees?.filter(emp => 
-                          emp.qualifications.includes('Finitions') || 
-                          emp.qualifications.includes('Remontage') ||
-                          emp.qualifications.includes('Carrosserie') ||
-                          emp.qualifications.length === 0
+                          emp.qualifications.includes('Finitions & remontage')
                         ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
                             {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
@@ -4014,7 +4002,7 @@ const Planning = () => {
 
               {/* Clôture & livraison */}
               <div className="border rounded-lg p-4">
-                <h3 className="font-medium text-sm mb-3 text-red-500">Clôture & livraison</h3>
+                <h3 className="font-medium text-sm mb-3">Clôture & livraison</h3>
                 <div className="flex items-end gap-4">
                   <div className="flex-shrink-0">
                     <Label htmlFor="cloture_duration">Durée</Label>
@@ -4043,10 +4031,7 @@ const Planning = () => {
                       </SelectTrigger>
                       <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                         {employees?.filter(emp => 
-                          emp.qualifications.includes('Livraison') || 
-                          emp.qualifications.includes('Accueil') ||
-                          emp.qualifications.includes('Réception') ||
-                          emp.qualifications.length === 0
+                          emp.qualifications.includes('Clôture du dossier et livraison')
                         ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
                             {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
