@@ -9,6 +9,7 @@ import { Quote } from '@/services/supabase/quotes';
 import { useCompany } from '@/hooks/use-company';
 import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 import { useQuotes } from '@/hooks/use-quotes';
+import { useQueryClient } from '@tanstack/react-query';
 import { calculateGlobalTotals } from '@/components/quotes/form/utils/calculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
@@ -33,26 +34,65 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
   const { preferences } = useCompanyPreferences();
   const { deleteQuote } = useQuotes();
   const { confirm } = useConfirmation();
+  const queryClient = useQueryClient();
   const [clientData, setClientData] = useState<any>(null);
   const [vehicleData, setVehicleData] = useState<any>(null);
+  const [currentQuote, setCurrentQuote] = useState<Quote | null>(quote);
   
   // States for dialogs
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [repairOrderDialogOpen, setRepairOrderDialogOpen] = useState(false);
   const [prefilledRepairOrder, setPrefilledRepairOrder] = useState<Partial<RepairOrder> | null>(null);
+
+  // Mettre à jour le devis actuel quand la prop change
+  useEffect(() => {
+    setCurrentQuote(quote);
+  }, [quote]);
+
+  // Écouter les mises à jour du cache React Query pour ce devis spécifique
+  useEffect(() => {
+    if (!currentQuote?.id) return;
+
+    const refetchQuoteData = async () => {
+      try {
+        // Récupérer les données mises à jour depuis le cache React Query
+        const cachedQuotes = queryClient.getQueryData(['quotes']) as Quote[] | undefined;
+        if (cachedQuotes) {
+          const updatedQuote = cachedQuotes.find(q => q.id === currentQuote.id);
+          if (updatedQuote) {
+            console.log('Quote updated from cache:', updatedQuote);
+            setCurrentQuote(updatedQuote);
+          }
+        }
+      } catch (error) {
+        console.error('Error refreshing quote data:', error);
+      }
+    };
+
+    // Écouter les invalidations du cache des devis
+    const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
+      if (event?.query?.queryKey?.[0] === 'quotes' && event.type === 'updated') {
+        refetchQuoteData();
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [currentQuote?.id, queryClient]);
   
   useEffect(() => {
     const fetchRelatedData = async () => {
-      if (!quote) return;
+      if (!currentQuote) return;
 
       try {
         // Récupérer les données client
-        if (quote.client_id) {
+        if (currentQuote.client_id) {
           const { data: client } = await supabase
             .from('clients')
             .select('*')
-            .eq('id', quote.client_id)
+            .eq('id', currentQuote.client_id)
             .single();
           
           if (client) {
@@ -61,7 +101,7 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
         }
 
         // Récupérer les données véhicule avec les informations de marque et modèle
-        if (quote.vehicle_id) {
+        if (currentQuote.vehicle_id) {
           const { data: vehicle } = await supabase
             .from('vehicles')
             .select(`
@@ -69,7 +109,7 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
               car_brands(name),
               car_models(name)
             `)
-            .eq('id', quote.vehicle_id)
+            .eq('id', currentQuote.vehicle_id)
             .single();
           
           if (vehicle) {
@@ -81,12 +121,12 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
       }
     };
 
-    if (open && quote) {
+    if (open && currentQuote) {
       fetchRelatedData();
     }
-  }, [quote, open]);
+  }, [currentQuote, open]);
 
-  if (!quote) return null;
+  if (!currentQuote) return null;
 
   const template = preferences?.invoice_template || 'default';
 
@@ -105,19 +145,19 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
   let discounts = [];
   
   try {
-    repairs = quote.repairs_data ? JSON.parse(quote.repairs_data as string) : [];
+    repairs = currentQuote.repairs_data ? JSON.parse(currentQuote.repairs_data as string) : [];
   } catch (e) {
     console.error('Error parsing repairs data:', e);
   }
   
   try {
-    parts = quote.parts_data ? JSON.parse(quote.parts_data as string) : [];
+    parts = currentQuote.parts_data ? JSON.parse(currentQuote.parts_data as string) : [];
   } catch (e) {
     console.error('Error parsing parts data:', e);
   }
   
   try {
-    discounts = quote.discounts_data ? JSON.parse(quote.discounts_data as string) : [];
+    discounts = currentQuote.discounts_data ? JSON.parse(currentQuote.discounts_data as string) : [];
   } catch (e) {
     console.error('Error parsing discounts data:', e);
   }
@@ -125,21 +165,21 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
   const totals = calculateGlobalTotals(repairs, parts, discounts);
 
   const quoteData = {
-    number: quote.reference,
-    claimNumber: quote.claim_number || undefined,
-    billingDate: formatDateFr(quote.created_at),
-    validUntil: formatDateFr(quote.valid_until),
+    number: currentQuote.reference,
+    claimNumber: currentQuote.claim_number || undefined,
+    billingDate: formatDateFr(currentQuote.created_at),
+    validUntil: formatDateFr(currentQuote.valid_until),
     vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : undefined,
     licensePlate: vehicleData?.license_plate || undefined,
     mileage: vehicleData?.mileage ? `${vehicleData.mileage.toLocaleString('fr-FR')} km` : undefined,
     amountDue: `${totals.total.toFixed(2).replace('.', ',')} €`,
-    date: formatDateFr(quote.created_at),
-    reportNumber: quote.report_number || undefined,
-    policyNumber: quote.policy_number || undefined,
-    expertName: quote.expert_name || undefined,
-    incidentDate: formatDateFr(quote.incident_date),
-    reportDate: formatDateFr(quote.report_date),
-    notes: quote.notes || undefined
+    date: formatDateFr(currentQuote.created_at),
+    reportNumber: currentQuote.report_number || undefined,
+    policyNumber: currentQuote.policy_number || undefined,
+    expertName: currentQuote.expert_name || undefined,
+    incidentDate: formatDateFr(currentQuote.incident_date),
+    reportDate: formatDateFr(currentQuote.report_date),
+    notes: currentQuote.notes || undefined
   };
 
   const clientDataForTemplate = {
@@ -151,7 +191,7 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
     licensePlate: vehicleData?.license_plate || undefined,
     mileage: vehicleData?.mileage ? `${vehicleData.mileage.toLocaleString('fr-FR')} km` : undefined,
     vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : undefined,
-    notes: quote.notes || undefined
+    notes: currentQuote.notes || undefined
   };
 
   const items = [];
@@ -195,7 +235,7 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
   const handleDelete = async () => {
     const confirmed = await confirm({
       title: 'Supprimer le devis',
-      description: `Êtes-vous sûr de vouloir supprimer le devis ${quote.reference} ? Cette action est irréversible.`,
+      description: `Êtes-vous sûr de vouloir supprimer le devis ${currentQuote.reference} ? Cette action est irréversible.`,
       confirmText: 'Supprimer',
       cancelText: 'Annuler',
       variant: 'destructive'
@@ -203,11 +243,11 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
 
     if (confirmed) {
       try {
-        await deleteQuote.mutateAsync(quote.id);
+        await deleteQuote.mutateAsync(currentQuote.id);
         onOpenChange(false);
         toast({
           title: "Devis supprimé",
-          description: `Le devis ${quote.reference} a été supprimé avec succès.`,
+          description: `Le devis ${currentQuote.reference} a été supprimé avec succès.`,
         });
       } catch (error: any) {
         console.error('Error deleting quote:', error);
@@ -222,11 +262,11 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
 
   const handleDownload = async () => {
     const { generateQuotePDFWithTemplate } = await import('@/utils/quotePDFGeneration');
-    const result = await generateQuotePDFWithTemplate(quote, {});
+    const result = await generateQuotePDFWithTemplate(currentQuote, {});
     if (result.success) {
       toast({
         title: "Téléchargement réussi",
-        description: `Le devis ${quote.reference} a été téléchargé.`
+        description: `Le devis ${currentQuote.reference} a été téléchargé.`
       });
     } else {
       toast({
@@ -239,11 +279,11 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
 
   const handlePrint = async () => {
     const { printQuotePDFWithTemplate } = await import('@/utils/quotePDFGeneration');
-    const result = await printQuotePDFWithTemplate(quote, {});
+    const result = await printQuotePDFWithTemplate(currentQuote, {});
     if (result.success) {
       toast({
         title: "Impression",
-        description: `Le devis ${quote.reference} a été ouvert pour impression.`
+        description: `Le devis ${currentQuote.reference} a été ouvert pour impression.`
       });
     } else {
       toast({
@@ -263,14 +303,14 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
       const { tokensService } = await import('@/services/supabase/tokens');
       
       await tokensService.createToken({
-        company_id: quote.company_id!,
-        client_id: quote.client_id,
-        vehicule_id: quote.vehicle_id
+        company_id: currentQuote.company_id!,
+        client_id: currentQuote.client_id,
+        vehicule_id: currentQuote.vehicle_id
       });
 
       toast({
         title: "Demande de justificatifs",
-        description: `Demande de justificatifs envoyée pour le devis ${quote.reference}. Token créé avec succès.`
+        description: `Demande de justificatifs envoyée pour le devis ${currentQuote.reference}. Token créé avec succès.`
       });
     } catch (error) {
       console.error('Erreur lors de la création du token:', error);
@@ -284,17 +324,17 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
 
   const handleConvertToRepairOrder = () => {
     const prefilledOrder: Partial<RepairOrder> = {
-      client_id: quote.client_id,
-      vehicle_id: quote.vehicle_id,
-      quote_id: quote.id,
+      client_id: currentQuote.client_id,
+      vehicle_id: currentQuote.vehicle_id,
+      quote_id: currentQuote.id,
       status: 'En cours',
-      notes: quote.notes || '',
-      claim_number: quote.claim_number || '',
-      report_number: quote.report_number || '',
-      policy_number: quote.policy_number || '',
-      report_date: quote.report_date || '',
-      expert_name: quote.expert_name || '',
-      incident_date: quote.incident_date || '',
+      notes: currentQuote.notes || '',
+      claim_number: currentQuote.claim_number || '',
+      report_number: currentQuote.report_number || '',
+      policy_number: currentQuote.policy_number || '',
+      report_date: currentQuote.report_date || '',
+      expert_name: currentQuote.expert_name || '',
+      incident_date: currentQuote.incident_date || '',
       repairs_data: JSON.stringify(repairs),
       parts_data: JSON.stringify(parts),
       discounts_data: JSON.stringify(discounts),
@@ -310,7 +350,7 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
           {/* Barre d'actions en haut */}
           <div className="p-4 pr-16 border-b bg-background">
-            <h2 className="text-lg font-semibold mb-3">Aperçu du devis n°{quote.reference}</h2>
+            <h2 className="text-lg font-semibold mb-3">Aperçu du devis n°{currentQuote.reference}</h2>
             <div className="flex items-center gap-2 flex-wrap">
               <Button variant="outline" size="sm" onClick={handleEdit}>
                 <Pencil className="h-4 w-4 mr-1" />
@@ -337,7 +377,7 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
                 Justificatifs
               </Button>
 
-              {!quote.repair_orders || quote.repair_orders.length === 0 ? (
+              {!currentQuote.repair_orders || currentQuote.repair_orders.length === 0 ? (
                 <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={handleConvertToRepairOrder}>
                   <ArrowRight className="h-4 w-4 mr-1" />
                   Convertir
@@ -379,13 +419,13 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
 
       {/* Dialogues pour les actions */}
       <QuoteDialog
-        quote={quote}
+        quote={currentQuote}
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
       />
 
       <QuoteEmailDialog
-        quote={quote}
+        quote={currentQuote}
         open={emailDialogOpen}
         onOpenChange={setEmailDialogOpen}
       />
@@ -402,7 +442,7 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
           // Afficher un toast de succès
           toast({
             title: "Conversion réussie",
-            description: `L'ordre de réparation a été créé à partir du devis ${quote.reference}.`
+            description: `L'ordre de réparation a été créé à partir du devis ${currentQuote.reference}.`
           });
         }}
       />
