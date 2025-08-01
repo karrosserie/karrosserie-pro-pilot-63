@@ -39,6 +39,7 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
   const [signatureDialogOpen, setSignatureDialogOpen] = useState(false);
+  const [prefilledInvoice, setPrefilledInvoice] = useState<any>(null);
   
   // Récupérer les données client et véhicule depuis la base de données
   useEffect(() => {
@@ -300,6 +301,36 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
   };
 
   const handleConvertToInvoice = () => {
+    // Préparer les données de la facture à partir de l'ordre de réparation
+    const today = new Date().toISOString().split('T')[0];
+    
+    const prefilledData = {
+      client_id: repairOrder.client_id,
+      vehicle_id: repairOrder.vehicle_id,
+      repair_order_id: repairOrder.id,
+      status: 'En attente de paiement',
+      date: today,
+      due_date: today,
+      notes: repairOrder.notes || '',
+      // Informations du sinistre depuis l'ordre de réparation
+      claim_number: repairOrder.claim_number || '',
+      policy_number: repairOrder.policy_number || '',
+      report_date: repairOrder.report_date || '',
+      expert_name: repairOrder.expert_name || '',
+      report_number: repairOrder.report_number || '',
+      incident_date: repairOrder.incident_date || '',
+      // Inclure les données de réparations, pièces et remises de l'ordre de réparation
+      // Convertir Json en string si nécessaire
+      repairs_data: repairOrder.repairs_data ? (typeof repairOrder.repairs_data === 'string' ? repairOrder.repairs_data : JSON.stringify(repairOrder.repairs_data)) : undefined,
+      parts_data: repairOrder.parts_data ? (typeof repairOrder.parts_data === 'string' ? repairOrder.parts_data : JSON.stringify(repairOrder.parts_data)) : undefined,
+      discounts_data: repairOrder.discounts_data ? (typeof repairOrder.discounts_data === 'string' ? repairOrder.discounts_data : JSON.stringify(repairOrder.discounts_data)) : undefined,
+    };
+
+    console.log('Converting repair order to invoice with data:', prefilledData);
+    console.log('Original repair order data:', repairOrder);
+
+    // Passer les données de pré-remplissage pour la création d'une nouvelle facture
+    setPrefilledInvoice(prefilledData);
     setInvoiceDialogOpen(true);
   };
 
@@ -403,8 +434,15 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
       />
 
       <InvoiceDialog
+        invoice={null}
         open={invoiceDialogOpen}
-        onOpenChange={setInvoiceDialogOpen}
+        onOpenChange={(open) => {
+          setInvoiceDialogOpen(open);
+          if (!open) {
+            setPrefilledInvoice(null);
+          }
+        }}
+        prefillData={prefilledInvoice}
         onSuccess={() => {
           setInvoiceDialogOpen(false);
           toast({
