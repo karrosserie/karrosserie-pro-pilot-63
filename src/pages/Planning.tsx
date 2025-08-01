@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash, Play, Crown, UserCheck } from "lucide-react";
+import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash, Play, Crown, UserCheck, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -889,10 +889,7 @@ const Planning = () => {
                   <CardContent>
                     <div className="grid gap-4 md:grid-cols-2">
                       {step.vehicles.map((vehicle, vehicleIndex) => (
-                        <Card key={vehicleIndex} className="p-4 cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
-                          setSelectedVehicle(vehicle);
-                          setShowVehicleDetailModal(true);
-                        }}>
+                        <Card key={vehicleIndex} className="p-4 hover:shadow-md transition-shadow">
                           <div className="space-y-3">
                             <div className="flex items-start justify-between">
                               <div>
@@ -925,12 +922,26 @@ const Planning = () => {
                                 <Badge variant="secondary">À planifier</Badge>
                               )}
                               
-                              {!vehicle.inProgress && (
-                                <Button size="sm" variant="outline">
-                                  <Calendar className="w-3 h-3 mr-1" />
-                                  Planifier
+                              <div className="flex items-center gap-2">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => {
+                                    setSelectedVehicle(vehicle);
+                                    setShowVehicleDetailModal(true);
+                                  }}
+                                >
+                                  <Eye className="w-3 h-3 mr-1" />
+                                  Détails
                                 </Button>
-                              )}
+                                
+                                {!vehicle.inProgress && (
+                                  <Button size="sm" variant="outline">
+                                    <Calendar className="w-3 h-3 mr-1" />
+                                    Planifier
+                                  </Button>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </Card>
