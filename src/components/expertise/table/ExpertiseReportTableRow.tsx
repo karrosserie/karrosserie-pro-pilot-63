@@ -64,7 +64,7 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
   };
 
   return (
-    <React.Fragment>
+    <>
       <TableRow className="hover:bg-gray-50 border-b-0">
         <TableCell>
           {report.report_number || 'Non spécifié'}
@@ -163,6 +163,6 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
           </div>
         </TableCell>
       </TableRow>
-    </React.Fragment>
+    </>
   );
 };

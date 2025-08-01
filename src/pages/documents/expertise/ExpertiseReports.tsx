@@ -24,6 +24,7 @@ const ExpertiseReports = () => {
   const { reports, isLoading, error, deleteReport } = useExpertiseReports();
   const { convertToQuote, checkMultipleReports, isConverting, isConverted, convertedReports } = useReportToQuote();
   const { settings: environmentSettings } = useEnvironment();
+  const [initialCheckComplete, setInitialCheckComplete] = useState(false);
   const { pendingImports, isLoading: importsLoading } = useImports();
   const [searchTerm, setSearchTerm] = useState('');
   const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -83,12 +84,17 @@ const ExpertiseReports = () => {
     }
   };
 
-  // Effet pour vérifier le statut de conversion des rapports
+  // Effet pour vérifier le statut de conversion des rapports au chargement initial
   useEffect(() => {
-    if (reports && reports.length > 0) {
-      checkMultipleReports(reports);
-    }
-  }, [reports, checkMultipleReports]);
+    const initializeReports = async () => {
+      if (reports && reports.length > 0 && !initialCheckComplete) {
+        await checkMultipleReports(reports);
+        setInitialCheckComplete(true);
+      }
+    };
+    
+    initializeReports();
+  }, [reports, checkMultipleReports, initialCheckComplete]);
 
   const handleConvertToQuote = async (report: ExpertiseReport) => {
     if (!report.client_id || !report.vehicle_id) {
@@ -177,7 +183,7 @@ const ExpertiseReports = () => {
       <div className="card-container">
         <ExpertiseReportTable 
           reports={filteredReports}
-          isLoading={isLoading}
+          isLoading={isLoading || !initialCheckComplete}
           error={error as Error | null}
           onEditReport={handleEditReport}
           onDeleteReport={handleDeleteReport}

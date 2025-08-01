@@ -27,10 +27,12 @@ export const useReportToQuote = () => {
     }
   };
 
-  // Vérifier le statut de conversion pour plusieurs rapports
+  // Vérifier le statut de conversion pour plusieurs rapports (maintenant synchrone pour le chargement initial)
   const checkMultipleReports = async (reports: ExpertiseReport[]) => {
     const results: Record<string, any> = {};
-    for (const report of reports) {
+    
+    // Utiliser Promise.all pour charger tous les statuts en parallèle
+    const promises = reports.map(async (report) => {
       try {
         const existingQuote = await quotesService.getByReportId(report.id);
         if (existingQuote) {
@@ -39,8 +41,11 @@ export const useReportToQuote = () => {
       } catch (error) {
         console.error(`Error checking report ${report.id}:`, error);
       }
-    }
+    });
+    
+    await Promise.all(promises);
     setConvertedReports(results);
+    return results;
   };
 
   // Convertir un rapport d'expertise en devis
