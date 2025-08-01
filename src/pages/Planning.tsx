@@ -1114,18 +1114,23 @@ const Planning = () => {
                     const currentDate = new Date(monday);
                     currentDate.setDate(monday.getDate() + index);
                     
-                    // Get schedules for this day from all employees
-                    const daySchedules = employees?.flatMap(employee => {
-                      const employeeSchedules = allEmployeeSchedules[employee.id] || [];
-                      return employeeSchedules.filter(schedule => {
-                        const scheduleDate = new Date(schedule.start_datetime);
-                        return scheduleDate.toDateString() === currentDate.toDateString();
-                      }).map(schedule => ({
-                        ...schedule,
-                        employee,
-                        vehicle: schedule.vehicles
-                      }));
-                    }) || [];
+                     // Get schedules for this day from all employees
+                     const daySchedules = (employees?.flatMap(employee => {
+                       const employeeSchedules = allEmployeeSchedules[employee.id] || [];
+                       return employeeSchedules.filter(schedule => {
+                         const scheduleDate = new Date(schedule.start_datetime);
+                         return scheduleDate.toDateString() === currentDate.toDateString();
+                       }).map(schedule => ({
+                         ...schedule,
+                         employee,
+                         vehicle: schedule.vehicles
+                       }));
+                     }) || []).sort((a, b) => {
+                       // Trier par heure de début croissante
+                       const timeA = new Date(a.start_datetime).getTime();
+                       const timeB = new Date(b.start_datetime).getTime();
+                       return timeA - timeB;
+                     });
                     
                     // Filter workshop schedule for this day
                     const dayOfWeekMap = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
@@ -1139,13 +1144,16 @@ const Planning = () => {
                     
                     return (
                       <Card key={dayName}>
-                        <CardHeader className="pb-3">
-                          <CardTitle className="text-lg text-orange-600">{dayName}</CardTitle>
-                          <p className="text-sm text-muted-foreground">
-                            {currentDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
-                          </p>
-                          <p className="text-sm text-muted-foreground">{daySchedules.length} tâche(s)</p>
-                        </CardHeader>
+                         <CardHeader className="pb-3">
+                           <CardTitle className="text-lg flex items-center gap-2">
+                             <span className="text-orange-600">{dayName}</span>
+                             <span className="text-orange-600">-</span>
+                             <span className="text-orange-600">
+                               {currentDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
+                             </span>
+                           </CardTitle>
+                           <p className="text-sm text-muted-foreground">{daySchedules.length} tâche(s)</p>
+                         </CardHeader>
                         <CardContent className="space-y-3">
                           {daySchedules.length > 0 && (
                             daySchedules.map((schedule, idx) => {
