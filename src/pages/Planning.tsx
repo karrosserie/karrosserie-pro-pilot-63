@@ -29,12 +29,21 @@ const Planning = () => {
   const [showUrgentVehicleModal, setShowUrgentVehicleModal] = useState(false);
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [showScheduleConfigModal, setShowScheduleConfigModal] = useState(false);
+  const [showPlanningModal, setShowPlanningModal] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [employeeFormData, setEmployeeFormData] = useState({
     teamMemberId: "",
     qualifications: [] as string[]
+  });
+  const [planningData, setPlanningData] = useState({
+    accueil_preparation: { duration: "01:00", employeeId: "" },
+    remplacement_debosselage: { duration: "02:30", employeeId: "" },
+    preparation_peinture: { duration: "02:30", employeeId: "" },
+    mise_en_peinture: { duration: "05:00", employeeId: "" },
+    finitions_remontage: { duration: "02:00", employeeId: "" },
+    cloture_livraison: { duration: "00:30", employeeId: "" }
   });
   const [configData, setConfigData] = useState({
     accueil: "01:00",
@@ -936,7 +945,14 @@ const Planning = () => {
                                 </Button>
                                 
                                 {!vehicle.inProgress && (
-                                  <Button size="sm" variant="outline">
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => {
+                                      setSelectedVehicle(vehicle);
+                                      setShowPlanningModal(true);
+                                    }}
+                                  >
                                     <Calendar className="w-3 h-3 mr-1" />
                                     Planifier
                                   </Button>
@@ -3675,6 +3691,314 @@ const Planning = () => {
                     toast({
                       title: "Erreur",
                       description: "Impossible de sauvegarder la configuration",
+                      variant: "destructive"
+                    });
+                  }
+                }}
+              >
+                Sauvegarder
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal de planification */}
+        <Dialog open={showPlanningModal} onOpenChange={setShowPlanningModal}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Planifier les étapes du véhicule</DialogTitle>
+              <DialogDescription>
+                {selectedVehicle && `${selectedVehicle.brand} - ${selectedVehicle.plate} - ${selectedVehicle.client}`}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-6">
+              {/* Accueil & Préparation du dossier */}
+              <div className="border rounded-lg p-4">
+                <h3 className="font-medium text-sm mb-3 text-karrosserie-orange">Accueil & Préparation du dossier</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="accueil_duration">Durée (hh:mm)</Label>
+                    <Input
+                      id="accueil_duration"
+                      type="time"
+                      value={planningData.accueil_preparation.duration}
+                      onChange={(e) => setPlanningData(prev => ({
+                        ...prev,
+                        accueil_preparation: { ...prev.accueil_preparation, duration: e.target.value }
+                      }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="accueil_employee">Employé</Label>
+                    <Select 
+                      value={planningData.accueil_preparation.employeeId}
+                      onValueChange={(value) => setPlanningData(prev => ({
+                        ...prev,
+                        accueil_preparation: { ...prev.accueil_preparation, employeeId: value }
+                      }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un employé" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {employees?.filter(emp => emp.qualifications.includes('Accueil')).map(emp => (
+                          <SelectItem key={emp.id} value={emp.id}>
+                            {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Remplacement ou débosselage */}
+              <div className="border rounded-lg p-4">
+                <h3 className="font-medium text-sm mb-3 text-green-500">Remplacement ou débosselage</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="remplacement_duration">Durée (hh:mm)</Label>
+                    <Input
+                      id="remplacement_duration"
+                      type="time"
+                      value={planningData.remplacement_debosselage.duration}
+                      onChange={(e) => setPlanningData(prev => ({
+                        ...prev,
+                        remplacement_debosselage: { ...prev.remplacement_debosselage, duration: e.target.value }
+                      }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="remplacement_employee">Employé</Label>
+                    <Select 
+                      value={planningData.remplacement_debosselage.employeeId}
+                      onValueChange={(value) => setPlanningData(prev => ({
+                        ...prev,
+                        remplacement_debosselage: { ...prev.remplacement_debosselage, employeeId: value }
+                      }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un employé" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {employees?.filter(emp => emp.qualifications.includes('Débosselage') || emp.qualifications.includes('Remplacement de pièces')).map(emp => (
+                          <SelectItem key={emp.id} value={emp.id}>
+                            {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Préparation peinture */}
+              <div className="border rounded-lg p-4">
+                <h3 className="font-medium text-sm mb-3 text-yellow-500">Préparation peinture</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="preparation_duration">Durée (hh:mm)</Label>
+                    <Input
+                      id="preparation_duration"
+                      type="time"
+                      value={planningData.preparation_peinture.duration}
+                      onChange={(e) => setPlanningData(prev => ({
+                        ...prev,
+                        preparation_peinture: { ...prev.preparation_peinture, duration: e.target.value }
+                      }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="preparation_employee">Employé</Label>
+                    <Select 
+                      value={planningData.preparation_peinture.employeeId}
+                      onValueChange={(value) => setPlanningData(prev => ({
+                        ...prev,
+                        preparation_peinture: { ...prev.preparation_peinture, employeeId: value }
+                      }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un employé" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {employees?.filter(emp => emp.qualifications.includes('Préparation peinture')).map(emp => (
+                          <SelectItem key={emp.id} value={emp.id}>
+                            {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mise en peinture */}
+              <div className="border rounded-lg p-4">
+                <h3 className="font-medium text-sm mb-3 text-blue-500">Mise en peinture</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="peinture_duration">Durée (hh:mm)</Label>
+                    <Input
+                      id="peinture_duration"
+                      type="time"
+                      value={planningData.mise_en_peinture.duration}
+                      onChange={(e) => setPlanningData(prev => ({
+                        ...prev,
+                        mise_en_peinture: { ...prev.mise_en_peinture, duration: e.target.value }
+                      }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="peinture_employee">Employé</Label>
+                    <Select 
+                      value={planningData.mise_en_peinture.employeeId}
+                      onValueChange={(value) => setPlanningData(prev => ({
+                        ...prev,
+                        mise_en_peinture: { ...prev.mise_en_peinture, employeeId: value }
+                      }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un employé" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {employees?.filter(emp => emp.qualifications.includes('Peinture')).map(emp => (
+                          <SelectItem key={emp.id} value={emp.id}>
+                            {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Finitions & remontage */}
+              <div className="border rounded-lg p-4">
+                <h3 className="font-medium text-sm mb-3 text-purple-500">Finitions & remontage</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="finitions_duration">Durée (hh:mm)</Label>
+                    <Input
+                      id="finitions_duration"
+                      type="time"
+                      value={planningData.finitions_remontage.duration}
+                      onChange={(e) => setPlanningData(prev => ({
+                        ...prev,
+                        finitions_remontage: { ...prev.finitions_remontage, duration: e.target.value }
+                      }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="finitions_employee">Employé</Label>
+                    <Select 
+                      value={planningData.finitions_remontage.employeeId}
+                      onValueChange={(value) => setPlanningData(prev => ({
+                        ...prev,
+                        finitions_remontage: { ...prev.finitions_remontage, employeeId: value }
+                      }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un employé" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {employees?.filter(emp => emp.qualifications.includes('Finitions') || emp.qualifications.includes('Remontage')).map(emp => (
+                          <SelectItem key={emp.id} value={emp.id}>
+                            {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Clôture & livraison */}
+              <div className="border rounded-lg p-4">
+                <h3 className="font-medium text-sm mb-3 text-red-500">Clôture & livraison</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="cloture_duration">Durée (hh:mm)</Label>
+                    <Input
+                      id="cloture_duration"
+                      type="time"
+                      value={planningData.cloture_livraison.duration}
+                      onChange={(e) => setPlanningData(prev => ({
+                        ...prev,
+                        cloture_livraison: { ...prev.cloture_livraison, duration: e.target.value }
+                      }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="cloture_employee">Employé</Label>
+                    <Select 
+                      value={planningData.cloture_livraison.employeeId}
+                      onValueChange={(value) => setPlanningData(prev => ({
+                        ...prev,
+                        cloture_livraison: { ...prev.cloture_livraison, employeeId: value }
+                      }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un employé" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {employees?.filter(emp => emp.qualifications.includes('Livraison') || emp.qualifications.includes('Accueil')).map(emp => (
+                          <SelectItem key={emp.id} value={emp.id}>
+                            {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="outline" onClick={() => setShowPlanningModal(false)}>
+                Annuler
+              </Button>
+              <Button 
+                onClick={async () => {
+                  try {
+                    if (!selectedVehicle?.id || !companyInfo?.id) {
+                      toast({
+                        title: "Erreur",
+                        description: "Informations manquantes pour la planification",
+                        variant: "destructive"
+                      });
+                      return;
+                    }
+
+                    // Créer ou mettre à jour l'étape de workflow
+                    const { error } = await supabase
+                      .from('vehicle_workflow_steps')
+                      .upsert({
+                        vehicle_id: selectedVehicle.id,
+                        company_id: companyInfo.id,
+                        current_step: 'accueil_preparation',
+                        progress_percentage: 0,
+                        technician_id: planningData.accueil_preparation.employeeId || null,
+                        notes: JSON.stringify(planningData)
+                      });
+
+                    if (error) throw error;
+
+                    toast({
+                      title: "Planification sauvegardée",
+                      description: "Les étapes du véhicule ont été planifiées avec succès"
+                    });
+                    
+                    setShowPlanningModal(false);
+                    // Refresh workflow data
+                    if (workflowSteps) {
+                      // This would trigger a refetch
+                    }
+                  } catch (error) {
+                    console.error('Erreur lors de la planification:', error);
+                    toast({
+                      title: "Erreur",
+                      description: "Impossible de sauvegarder la planification",
                       variant: "destructive"
                     });
                   }
