@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash, Play, Crown, UserCheck, Eye, LogOut } from "lucide-react";
+import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash, Play, Crown, UserCheck, Eye, LogOut, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCompany } from '@/hooks/use-company';
 import { useEmployees, Employee } from '@/hooks/use-employees';
 import { EmployeesList } from '@/components/planning/EmployeesList';
+import { AddVehicleToWorkshopForm } from '@/components/planning/AddVehicleToWorkshopForm';
 import { toast } from '@/hooks/use-toast';
 import { useCompanyId } from '@/hooks/use-company-id';
 import { useVehicleWorkflow } from '@/hooks/use-vehicle-workflow';
@@ -55,6 +56,7 @@ const Planning = () => {
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [showScheduleConfigModal, setShowScheduleConfigModal] = useState(false);
   const [showPlanningModal, setShowPlanningModal] = useState(false);
+  const [showAddVehicleModal, setShowAddVehicleModal] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
@@ -768,6 +770,10 @@ const Planning = () => {
             <Button variant="destructive" size="sm" onClick={() => setShowUrgentVehicleModal(true)}>
               <AlertTriangle className="w-4 h-4 mr-2" />
               Véhicule en urgence
+            </Button>
+            <Button variant="outline" size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white" onClick={() => setShowAddVehicleModal(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Ajouter véhicule
             </Button>
             <Button variant="outline" size="sm" onClick={() => setShowConfigModal(true)}>
               <Settings className="w-4 h-4" />
@@ -4547,6 +4553,30 @@ const Planning = () => {
                 Sauvegarder
               </Button>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal pour ajouter un véhicule à l'atelier */}
+        <Dialog open={showAddVehicleModal} onOpenChange={setShowAddVehicleModal}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Ajouter un véhicule à l'atelier</DialogTitle>
+              <DialogDescription>
+                Sélectionnez un véhicule avec un ordre de réparation qui n'est pas encore dans l'atelier
+              </DialogDescription>
+            </DialogHeader>
+            <AddVehicleToWorkshopForm 
+              companyId={companyInfo?.id}
+              onSuccess={() => {
+                setShowAddVehicleModal(false);
+                refetchWorkflow();
+                toast({
+                  title: "Véhicule ajouté",
+                  description: "Le véhicule a été ajouté à l'atelier avec succès"
+                });
+              }}
+              employees={employees}
+            />
           </DialogContent>
         </Dialog>
       </div>
