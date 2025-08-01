@@ -4358,7 +4358,7 @@ const Planning = () => {
                       .insert({
                         company_id: companyInfo?.id,
                         vehicle_id: selectedVehicle.id,
-                        step: 'accueil_preparation',
+                        current_step: 'accueil_preparation',
                         progress_percentage: 0,
                         notes: 'Véhicule ajouté via entrée manuelle'
                       });
