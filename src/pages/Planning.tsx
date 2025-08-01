@@ -1036,7 +1036,7 @@ const Planning = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="planning" className="space-y-6">
+          <TabsContent value="planning" className="space-y-6 w-full">
             {/* Résumé de la semaine */}
             <div className="space-y-4">
               <div className="flex items-center gap-2">
@@ -1067,7 +1067,7 @@ const Planning = () => {
             </div>
 
             {/* Planning détaillé */}
-            <div className="space-y-4">
+            <div className="space-y-4 w-full">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-muted-foreground" />
@@ -1095,7 +1095,7 @@ const Planning = () => {
               </div>
 
               {/* Planning Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-7 gap-4 w-full">
+              <div className="grid grid-cols-1 lg:grid-cols-7 gap-4 w-full min-w-0">
                 {(() => {
                   const today = new Date();
                   const weekDays = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
