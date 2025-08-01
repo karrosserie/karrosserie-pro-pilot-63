@@ -966,13 +966,17 @@ const Planning = () => {
                                     variant="outline"
                                     onClick={() => {
                                       setSelectedVehicle(vehicle);
-                                      // Calculer la planification optimale
-                                      const optimalPlanning = calculateOptimalPlanning();
-                                      setPlanningData(prev => ({
-                                        ...prev,
-                                        ...optimalPlanning
-                                      }));
                                       setShowPlanningModal(true);
+                                      // Calculer la planification optimale après l'ouverture du modal
+                                      setTimeout(() => {
+                                        if (employees && employees.length > 0) {
+                                          const optimalPlanning = calculateOptimalPlanning();
+                                          setPlanningData(prev => ({
+                                            ...prev,
+                                            ...optimalPlanning
+                                          }));
+                                        }
+                                      }, 100);
                                     }}
                                   >
                                     <Calendar className="w-3 h-3 mr-1" />
