@@ -8,6 +8,7 @@ import { RepairOrder } from '@/services/supabase/repair-orders';
 import { useCompany } from '@/hooks/use-company';
 import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
+import { useQueryClient } from '@tanstack/react-query';
 import { calculateOrderAmount } from './utils/orderCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
@@ -31,8 +32,44 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
   const { preferences } = useCompanyPreferences();
   const { deleteOrder } = useRepairOrders();
   const { confirm } = useConfirmation();
+  const queryClient = useQueryClient();
   const [clientData, setClientData] = useState<any>(null);
   const [vehicleData, setVehicleData] = useState<any>(null);
+  
+  // État local pour l'ordre de réparation actuel affiché
+  const [currentRepairOrder, setCurrentRepairOrder] = useState<RepairOrder | null>(repairOrder);
+
+  // Mettre à jour l'ordre de réparation local quand le prop change
+  useEffect(() => {
+    setCurrentRepairOrder(repairOrder);
+  }, [repairOrder]);
+
+  // Écouter les changements dans le cache React Query pour mettre à jour l'affichage
+  useEffect(() => {
+    if (!repairOrder?.id) return;
+
+    const updateFromCache = () => {
+      const cachedOrders = queryClient.getQueryData(['repairOrders']) as RepairOrder[] | undefined;
+      if (cachedOrders) {
+        const updatedOrder = cachedOrders.find(order => order.id === repairOrder.id);
+        if (updatedOrder) {
+          setCurrentRepairOrder(updatedOrder);
+        }
+      }
+    };
+
+    // Mettre à jour immédiatement si les données sont déjà en cache
+    updateFromCache();
+
+    // Écouter les changements futurs du cache
+    const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
+      if (event?.query?.queryKey?.[0] === 'repairOrders') {
+        updateFromCache();
+      }
+    });
+
+    return unsubscribe;
+  }, [repairOrder?.id, queryClient]);
   
   // States for dialogs
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -44,15 +81,15 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
   // Récupérer les données client et véhicule depuis la base de données
   useEffect(() => {
     const fetchRelatedData = async () => {
-      if (!repairOrder) return;
+      if (!currentRepairOrder) return;
 
       try {
         // Récupérer les données client
-        if (repairOrder.client_id) {
+        if (currentRepairOrder.client_id) {
           const { data: client } = await supabase
             .from('clients')
             .select('*')
-            .eq('id', repairOrder.client_id)
+            .eq('id', currentRepairOrder.client_id)
             .single();
           
           if (client) {
@@ -61,7 +98,7 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
         }
 
         // Récupérer les données véhicule avec les informations de marque et modèle
-        if (repairOrder.vehicle_id) {
+        if (currentRepairOrder.vehicle_id) {
           const { data: vehicle } = await supabase
             .from('vehicles')
             .select(`
@@ -69,7 +106,7 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
               car_brands(name),
               car_models(name)
             `)
-            .eq('id', repairOrder.vehicle_id)
+            .eq('id', currentRepairOrder.vehicle_id)
             .single();
           
           if (vehicle) {
@@ -81,12 +118,12 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
       }
     };
 
-    if (open && repairOrder) {
+    if (open && currentRepairOrder) {
       fetchRelatedData();
     }
-  }, [repairOrder, open]);
+  }, [currentRepairOrder, open]);
 
-  if (!repairOrder) return null;
+  if (!currentRepairOrder) return null;
 
   const template = preferences?.invoice_template || 'default';
 
@@ -107,46 +144,46 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
   let discounts = [];
   
   try {
-    repairs = repairOrder.repairs_data ? 
-      (Array.isArray(repairOrder.repairs_data) ? repairOrder.repairs_data : JSON.parse(repairOrder.repairs_data as string)) : [];
+    repairs = currentRepairOrder.repairs_data ? 
+      (Array.isArray(currentRepairOrder.repairs_data) ? currentRepairOrder.repairs_data : JSON.parse(currentRepairOrder.repairs_data as string)) : [];
   } catch (e) {
     console.error('Error parsing repairs data:', e);
   }
   
   try {
-    parts = repairOrder.parts_data ? 
-      (Array.isArray(repairOrder.parts_data) ? repairOrder.parts_data : JSON.parse(repairOrder.parts_data as string)) : [];
+    parts = currentRepairOrder.parts_data ? 
+      (Array.isArray(currentRepairOrder.parts_data) ? currentRepairOrder.parts_data : JSON.parse(currentRepairOrder.parts_data as string)) : [];
   } catch (e) {
     console.error('Error parsing parts data:', e);
   }
   
   try {
-    discounts = repairOrder.discounts_data ? 
-      (Array.isArray(repairOrder.discounts_data) ? repairOrder.discounts_data : JSON.parse(repairOrder.discounts_data as string)) : [];
+    discounts = currentRepairOrder.discounts_data ? 
+      (Array.isArray(currentRepairOrder.discounts_data) ? currentRepairOrder.discounts_data : JSON.parse(currentRepairOrder.discounts_data as string)) : [];
   } catch (e) {
     console.error('Error parsing discounts data:', e);
   }
 
-  const totalAmount = calculateOrderAmount(repairOrder);
+  const totalAmount = calculateOrderAmount(currentRepairOrder);
 
   // Préparer les données pour les composants de template
   const orderData = {
-    number: repairOrder.reference,
-    claimNumber: repairOrder.claim_number || undefined,
-    orderDate: formatDateFr(repairOrder.order_date || repairOrder.created_at),
-    signatureDate: formatDateFr(repairOrder.signature_date),
+    number: currentRepairOrder.reference,
+    claimNumber: currentRepairOrder.claim_number || undefined,
+    orderDate: formatDateFr(currentRepairOrder.order_date || currentRepairOrder.created_at),
+    signatureDate: formatDateFr(currentRepairOrder.signature_date),
     vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : undefined,
     licensePlate: vehicleData?.license_plate || undefined,
     mileage: vehicleData?.mileage ? `${vehicleData.mileage.toLocaleString('fr-FR')} km` : undefined,
     amountDue: `${totalAmount.toFixed(2).replace('.', ',')} €`,
-    date: formatDateFr(repairOrder.created_at),
-    reportNumber: repairOrder.report_number || undefined,
-    policyNumber: repairOrder.policy_number || undefined,
-    expertName: repairOrder.expert_name || undefined,
-    incidentDate: formatDateFr(repairOrder.incident_date),
-    reportDate: formatDateFr(repairOrder.report_date),
-    status: repairOrder.status || 'En attente',
-    notes: repairOrder.notes || undefined
+    date: formatDateFr(currentRepairOrder.created_at),
+    reportNumber: currentRepairOrder.report_number || undefined,
+    policyNumber: currentRepairOrder.policy_number || undefined,
+    expertName: currentRepairOrder.expert_name || undefined,
+    incidentDate: formatDateFr(currentRepairOrder.incident_date),
+    reportDate: formatDateFr(currentRepairOrder.report_date),
+    status: currentRepairOrder.status || 'En attente',
+    notes: currentRepairOrder.notes || undefined
   };
 
   // Préparer les données client pour le template
@@ -213,7 +250,7 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
   const handleDelete = async () => {
     const confirmed = await confirm({
       title: "Supprimer l'ordre de réparation",
-      description: `Êtes-vous sûr de vouloir supprimer l'ordre de réparation ${repairOrder.reference} ? Cette action est irréversible.`,
+      description: `Êtes-vous sûr de vouloir supprimer l'ordre de réparation ${currentRepairOrder.reference} ? Cette action est irréversible.`,
       confirmText: 'Supprimer',
       cancelText: 'Annuler',
       variant: 'destructive'
@@ -221,11 +258,11 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
 
     if (confirmed) {
       try {
-        await deleteOrder.mutateAsync(repairOrder.id);
+        await deleteOrder.mutateAsync(currentRepairOrder.id);
         onOpenChange(false);
         toast({
           title: "Ordre de réparation supprimé",
-          description: `L'ordre de réparation ${repairOrder.reference} a été supprimé avec succès.`,
+          description: `L'ordre de réparation ${currentRepairOrder.reference} a été supprimé avec succès.`,
         });
       } catch (error: any) {
         console.error('Error deleting repair order:', error);
@@ -240,11 +277,11 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
 
   const handleDownload = async () => {
     const { generateRepairOrderPDFWithTemplate } = await import('@/utils/repairOrderPDFGeneration');
-    const result = await generateRepairOrderPDFWithTemplate(repairOrder, {});
+    const result = await generateRepairOrderPDFWithTemplate(currentRepairOrder, {});
     if (result.success) {
       toast({
         title: "Téléchargement réussi",
-        description: `L'ordre de réparation ${repairOrder.reference} a été téléchargé.`
+        description: `L'ordre de réparation ${currentRepairOrder.reference} a été téléchargé.`
       });
     } else {
       toast({
@@ -257,11 +294,11 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
 
   const handlePrint = async () => {
     const { printRepairOrderPDFWithTemplate } = await import('@/utils/repairOrderPDFGeneration');
-    const result = await printRepairOrderPDFWithTemplate(repairOrder, {});
+    const result = await printRepairOrderPDFWithTemplate(currentRepairOrder, {});
     if (result.success) {
       toast({
         title: "Impression",
-        description: `L'ordre de réparation ${repairOrder.reference} a été ouvert pour impression.`
+        description: `L'ordre de réparation ${currentRepairOrder.reference} a été ouvert pour impression.`
       });
     } else {
       toast({
@@ -281,14 +318,14 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
       const { tokensService } = await import('@/services/supabase/tokens');
       
       await tokensService.createToken({
-        company_id: repairOrder.company_id!,
-        client_id: repairOrder.client_id,
-        vehicule_id: repairOrder.vehicle_id
+        company_id: currentRepairOrder.company_id!,
+        client_id: currentRepairOrder.client_id,
+        vehicule_id: currentRepairOrder.vehicle_id
       });
 
       toast({
         title: "Demande de justificatifs",
-        description: `Demande de justificatifs envoyée pour l'ordre de réparation ${repairOrder.reference}. Token créé avec succès.`
+        description: `Demande de justificatifs envoyée pour l'ordre de réparation ${currentRepairOrder.reference}. Token créé avec succès.`
       });
     } catch (error) {
       console.error('Erreur lors de la création du token:', error);
@@ -305,29 +342,29 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
     const today = new Date().toISOString().split('T')[0];
     
     const prefilledData = {
-      client_id: repairOrder.client_id,
-      vehicle_id: repairOrder.vehicle_id,
-      repair_order_id: repairOrder.id,
+      client_id: currentRepairOrder.client_id,
+      vehicle_id: currentRepairOrder.vehicle_id,
+      repair_order_id: currentRepairOrder.id,
       status: 'En attente de paiement',
       date: today,
       due_date: today,
-      notes: repairOrder.notes || '',
+      notes: currentRepairOrder.notes || '',
       // Informations du sinistre depuis l'ordre de réparation
-      claim_number: repairOrder.claim_number || '',
-      policy_number: repairOrder.policy_number || '',
-      report_date: repairOrder.report_date || '',
-      expert_name: repairOrder.expert_name || '',
-      report_number: repairOrder.report_number || '',
-      incident_date: repairOrder.incident_date || '',
+      claim_number: currentRepairOrder.claim_number || '',
+      policy_number: currentRepairOrder.policy_number || '',
+      report_date: currentRepairOrder.report_date || '',
+      expert_name: currentRepairOrder.expert_name || '',
+      report_number: currentRepairOrder.report_number || '',
+      incident_date: currentRepairOrder.incident_date || '',
       // Inclure les données de réparations, pièces et remises de l'ordre de réparation
       // Convertir Json en string si nécessaire
-      repairs_data: repairOrder.repairs_data ? (typeof repairOrder.repairs_data === 'string' ? repairOrder.repairs_data : JSON.stringify(repairOrder.repairs_data)) : undefined,
-      parts_data: repairOrder.parts_data ? (typeof repairOrder.parts_data === 'string' ? repairOrder.parts_data : JSON.stringify(repairOrder.parts_data)) : undefined,
-      discounts_data: repairOrder.discounts_data ? (typeof repairOrder.discounts_data === 'string' ? repairOrder.discounts_data : JSON.stringify(repairOrder.discounts_data)) : undefined,
+      repairs_data: currentRepairOrder.repairs_data ? (typeof currentRepairOrder.repairs_data === 'string' ? currentRepairOrder.repairs_data : JSON.stringify(currentRepairOrder.repairs_data)) : undefined,
+      parts_data: currentRepairOrder.parts_data ? (typeof currentRepairOrder.parts_data === 'string' ? currentRepairOrder.parts_data : JSON.stringify(currentRepairOrder.parts_data)) : undefined,
+      discounts_data: currentRepairOrder.discounts_data ? (typeof currentRepairOrder.discounts_data === 'string' ? currentRepairOrder.discounts_data : JSON.stringify(currentRepairOrder.discounts_data)) : undefined,
     };
 
     console.log('Converting repair order to invoice with data:', prefilledData);
-    console.log('Original repair order data:', repairOrder);
+    console.log('Original repair order data:', currentRepairOrder);
 
     // Passer les données de pré-remplissage pour la création d'une nouvelle facture
     setPrefilledInvoice(prefilledData);
@@ -344,7 +381,7 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
           {/* Barre d'actions en haut */}
           <div className="p-4 pr-16 border-b bg-background">
-            <h2 className="text-lg font-semibold mb-3">Aperçu de l'ordre de réparation n°{repairOrder.reference}</h2>
+            <h2 className="text-lg font-semibold mb-3">Aperçu de l'ordre de réparation n°{currentRepairOrder.reference}</h2>
             <div className="flex items-center gap-2 flex-wrap">
               <Button variant="outline" size="sm" onClick={handleEdit}>
                 <Pencil className="h-4 w-4 mr-1" />
@@ -366,7 +403,7 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
                 Envoyer
               </Button>
 
-              {repairOrder.status !== 'Signé' && (
+              {currentRepairOrder.status !== 'Signé' && (
                 <Button variant="outline" size="sm" onClick={handleClientSignature}>
                   <Signature className="h-4 w-4 mr-1" />
                   Signature du client
@@ -378,7 +415,7 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
                 Demander docs
               </Button>
 
-              {!repairOrder.invoices || repairOrder.invoices.length === 0 ? (
+              {!currentRepairOrder.invoices || currentRepairOrder.invoices.length === 0 ? (
                 <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={handleConvertToInvoice}>
                   <ArrowRight className="h-4 w-4 mr-1" />
                   Convertir
@@ -422,13 +459,13 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
 
       {/* Dialogues pour les actions */}
       <RepairOrderDialog
-        order={repairOrder}
+        order={currentRepairOrder}
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
       />
 
       <RepairOrderEmailDialog
-        repairOrder={repairOrder}
+        repairOrder={currentRepairOrder}
         open={emailDialogOpen}
         onOpenChange={setEmailDialogOpen}
       />
@@ -447,13 +484,13 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
           setInvoiceDialogOpen(false);
           toast({
             title: "Facture créée",
-            description: `La facture a été créée à partir de l'ordre de réparation ${repairOrder.reference}.`
+            description: `La facture a été créée à partir de l'ordre de réparation ${currentRepairOrder.reference}.`
           });
         }}
       />
 
       <RepairOrderSignatureDialog
-        repairOrder={repairOrder}
+        repairOrder={currentRepairOrder}
         open={signatureDialogOpen}
         onOpenChange={setSignatureDialogOpen}
       />
