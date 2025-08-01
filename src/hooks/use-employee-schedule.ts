@@ -10,6 +10,9 @@ export interface EmployeeSchedule {
   task_type: string;
   start_datetime: string;
   end_datetime: string;
+  status: 'En attente' | 'En cours' | 'Terminé';
+  real_start_datetime: string | null;
+  real_end_datetime: string | null;
   created_at: string;
   updated_at: string;
   vehicles?: {

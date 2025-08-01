@@ -771,13 +771,13 @@ const Planning = () => {
                     const vehicle = schedule.vehicles;
                     
                     return (
-                      <Card key={schedule.id} className="border-l-4 border-l-blue-500">
+                      <Card key={schedule.id} className="border-l-4 border-l-orange-500">
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between">
                             <div className="space-y-2">
-                              <div className="flex items-center gap-2 text-sm font-medium">
-                                <Clock className="w-4 h-4 text-blue-600" />
-                                <span className="text-blue-600">
+                            <div className="flex items-center gap-2 text-sm font-medium">
+                              <Clock className="w-4 h-4 text-orange-600" />
+                              <span className="text-orange-600">
                                   {startTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} - 
                                   {endTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                                 </span>
