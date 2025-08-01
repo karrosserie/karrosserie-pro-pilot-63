@@ -451,7 +451,7 @@ const Planning = () => {
             repair_orders!inner (reference, status)
           `)
           .eq('company_id', companyInfo.id)
-          .in('repair_orders.status', ['pending', 'in_progress']);
+          .in('repair_orders.status', ['En attente', 'En cours']);
 
         if (vehiclesError) throw vehiclesError;
 
@@ -470,11 +470,10 @@ const Planning = () => {
           ?.filter(vehicle => !vehicleIdsInWorkshop.has(vehicle.id))
           .map(vehicle => ({
             id: vehicle.id,
-            license_plate: vehicle.license_plate,
-            brand_name: vehicle.car_brands?.name || 'Marque inconnue',
-            model_name: vehicle.car_models?.name || 'Modèle inconnu',
-            client_name: `${vehicle.clients?.first_name || ''} ${vehicle.clients?.last_name || ''}`.trim(),
-            repair_order_reference: vehicle.repair_orders?.[0]?.reference || 'N/A'
+            plate: vehicle.license_plate,
+            brand: `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'}`.trim(),
+            client: `${vehicle.clients?.first_name || ''} ${vehicle.clients?.last_name || ''}`.trim() || 'Client inconnu',
+            repair_orders: vehicle.repair_orders
           })) || [];
 
         setAvailableVehicles(available);
