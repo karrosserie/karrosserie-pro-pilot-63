@@ -15,6 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCompany } from '@/hooks/use-company';
 import { useEmployees, Employee } from '@/hooks/use-employees';
 import { EmployeesList } from '@/components/planning/EmployeesList';
+import TaskDetailsModal from '@/components/planning/TaskDetailsModal';
 
 import { toast } from '@/hooks/use-toast';
 import { useCompanyId } from '@/hooks/use-company-id';
@@ -62,6 +63,8 @@ const Planning = () => {
   const [availableVehicles, setAvailableVehicles] = useState<any[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
+  const [showTaskDetailsModal, setShowTaskDetailsModal] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<any>(null);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [employeeFormData, setEmployeeFormData] = useState({
     teamMemberId: "",
@@ -1149,7 +1152,14 @@ const Planning = () => {
                               const startTime = new Date(schedule.start_datetime);
                               const endTime = new Date(schedule.end_datetime);
                               return (
-                                <Card key={idx} className="border-l-4 border-l-orange-500 p-3 cursor-pointer hover:shadow-md transition-shadow">
+                                <Card 
+                                  key={idx} 
+                                  className="border-l-4 border-l-orange-500 p-3 cursor-pointer hover:shadow-md transition-shadow"
+                                  onClick={() => {
+                                    setSelectedTask(schedule);
+                                    setShowTaskDetailsModal(true);
+                                  }}
+                                >
                                   <div className="space-y-2">
                                     <div className="flex items-center gap-2 text-sm text-orange-600">
                                       <Clock className="w-3 h-3" />
@@ -3237,6 +3247,16 @@ const Planning = () => {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Modal des détails de tâche */}
+        <TaskDetailsModal
+          isOpen={showTaskDetailsModal}
+          onClose={() => {
+            setShowTaskDetailsModal(false);
+            setSelectedTask(null);
+          }}
+          task={selectedTask}
+        />
 
       </div>
     </div>
