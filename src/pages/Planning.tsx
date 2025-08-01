@@ -150,6 +150,59 @@ const Planning = () => {
     }, 100);
   };
 
+  // Helper function to handle duration change and reselect best technician
+  const handleDurationChange = (stepIndex: number, stepKey: keyof ExtendedPlanningData, newDuration: string) => {
+    if (!employees || employees.length === 0) return;
+    
+    // Find the best available technician for this step
+    const stepNames = [
+      'Accueil & Préparation du dossier',
+      'Remplacement ou débosselage', 
+      'Préparation peinture',
+      'Mise en peinture',
+      'Finitions & remontage',
+      'Clôture du dossier et livraison'
+    ];
+    
+    const qualifiedEmployees = employees.filter(emp => 
+      emp.qualifications?.includes(stepNames[stepIndex])
+    );
+    
+    const bestEmployee = qualifiedEmployees.length > 0 ? qualifiedEmployees[0] : null;
+    
+    setPlanningData(prev => ({
+      ...prev,
+      [stepKey]: { 
+        ...prev[stepKey], 
+        duration: newDuration,
+        employeeId: bestEmployee?.id || ''
+      }
+    }));
+    
+    recalculateFollowingSteps(stepIndex);
+  };
+
+  // Helper function to handle employee change and find best slot
+  const handleEmployeeChange = (stepIndex: number, stepKey: keyof ExtendedPlanningData, employeeId: string) => {
+    if (!employees || employees.length === 0) return;
+    
+    // Get the best available slot for this employee
+    const optimalPlanning = calculateOptimalPlanning();
+    const currentStepData = optimalPlanning[stepKey];
+    
+    setPlanningData(prev => ({
+      ...prev,
+      [stepKey]: { 
+        ...prev[stepKey], 
+        employeeId: employeeId,
+        startDateTime: currentStepData?.startDateTime,
+        endDateTime: currentStepData?.endDateTime
+      }
+    }));
+    
+    recalculateFollowingSteps(stepIndex);
+  };
+
   // Charger les temps de configuration depuis la base de données
   useEffect(() => {
     const loadConfigData = async () => {
@@ -3941,13 +3994,9 @@ const Planning = () => {
                       id="accueil_duration"
                       type="time"
                       value={planningData.accueil_preparation.duration}
-                       onChange={(e) => {
-                         setPlanningData(prev => ({
-                           ...prev,
-                           accueil_preparation: { ...prev.accueil_preparation, duration: e.target.value }
-                         }));
-                         recalculateFollowingSteps(0);
-                       }}
+                        onChange={(e) => {
+                          handleDurationChange(0, 'accueil_preparation', e.target.value);
+                        }}
                       className="w-[90px]"
                     />
                   </div>
@@ -3956,13 +4005,9 @@ const Planning = () => {
                     <div className="flex gap-2 items-end">
                       <Select 
                         value={planningData.accueil_preparation.employeeId}
-                        onValueChange={(value) => {
-                          setPlanningData(prev => ({
-                            ...prev,
-                            accueil_preparation: { ...prev.accueil_preparation, employeeId: value }
-                          }));
-                          recalculateFollowingSteps(0);
-                        }}
+                         onValueChange={(value) => {
+                           handleEmployeeChange(0, 'accueil_preparation', value);
+                         }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Sélectionner un employé" />
@@ -4016,13 +4061,9 @@ const Planning = () => {
                       id="remplacement_duration"
                       type="time"
                       value={planningData.remplacement_debosselage.duration}
-                       onChange={(e) => {
-                         setPlanningData(prev => ({
-                           ...prev,
-                           remplacement_debosselage: { ...prev.remplacement_debosselage, duration: e.target.value }
-                         }));
-                         recalculateFollowingSteps(1);
-                       }}
+                        onChange={(e) => {
+                          handleDurationChange(1, 'remplacement_debosselage', e.target.value);
+                        }}
                       className="w-[90px]"
                     />
                   </div>
@@ -4031,13 +4072,9 @@ const Planning = () => {
                     <div className="flex gap-2 items-end">
                       <Select 
                         value={planningData.remplacement_debosselage.employeeId}
-                        onValueChange={(value) => {
-                          setPlanningData(prev => ({
-                            ...prev,
-                            remplacement_debosselage: { ...prev.remplacement_debosselage, employeeId: value }
-                          }));
-                          recalculateFollowingSteps(1);
-                        }}
+                         onValueChange={(value) => {
+                           handleEmployeeChange(1, 'remplacement_debosselage', value);
+                         }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Sélectionner un employé" />
@@ -4091,13 +4128,9 @@ const Planning = () => {
                       id="preparation_duration"
                       type="time"
                       value={planningData.preparation_peinture.duration}
-                       onChange={(e) => {
-                         setPlanningData(prev => ({
-                           ...prev,
-                           preparation_peinture: { ...prev.preparation_peinture, duration: e.target.value }
-                         }));
-                         recalculateFollowingSteps(2);
-                       }}
+                        onChange={(e) => {
+                          handleDurationChange(2, 'preparation_peinture', e.target.value);
+                        }}
                       className="w-[90px]"
                     />
                   </div>
@@ -4106,13 +4139,9 @@ const Planning = () => {
                     <div className="flex gap-2 items-end">
                       <Select 
                         value={planningData.preparation_peinture.employeeId}
-                        onValueChange={(value) => {
-                          setPlanningData(prev => ({
-                            ...prev,
-                            preparation_peinture: { ...prev.preparation_peinture, employeeId: value }
-                          }));
-                          recalculateFollowingSteps(2);
-                        }}
+                         onValueChange={(value) => {
+                           handleEmployeeChange(2, 'preparation_peinture', value);
+                         }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Sélectionner un employé" />
@@ -4166,13 +4195,9 @@ const Planning = () => {
                       id="peinture_duration"
                       type="time"
                       value={planningData.mise_en_peinture.duration}
-                       onChange={(e) => {
-                         setPlanningData(prev => ({
-                           ...prev,
-                           mise_en_peinture: { ...prev.mise_en_peinture, duration: e.target.value }
-                         }));
-                         recalculateFollowingSteps(3);
-                       }}
+                        onChange={(e) => {
+                          handleDurationChange(3, 'mise_en_peinture', e.target.value);
+                        }}
                       className="w-[90px]"
                     />
                   </div>
@@ -4181,13 +4206,9 @@ const Planning = () => {
                     <div className="flex gap-2 items-end">
                       <Select 
                         value={planningData.mise_en_peinture.employeeId}
-                        onValueChange={(value) => {
-                          setPlanningData(prev => ({
-                            ...prev,
-                            mise_en_peinture: { ...prev.mise_en_peinture, employeeId: value }
-                          }));
-                          recalculateFollowingSteps(3);
-                        }}
+                         onValueChange={(value) => {
+                           handleEmployeeChange(3, 'mise_en_peinture', value);
+                         }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Sélectionner un employé" />
@@ -4241,13 +4262,9 @@ const Planning = () => {
                       id="finitions_duration"
                       type="time"
                       value={planningData.finitions_remontage.duration}
-                       onChange={(e) => {
-                         setPlanningData(prev => ({
-                           ...prev,
-                           finitions_remontage: { ...prev.finitions_remontage, duration: e.target.value }
-                         }));
-                         recalculateFollowingSteps(4);
-                       }}
+                        onChange={(e) => {
+                          handleDurationChange(4, 'finitions_remontage', e.target.value);
+                        }}
                       className="w-[90px]"
                     />
                   </div>
@@ -4256,13 +4273,9 @@ const Planning = () => {
                     <div className="flex gap-2 items-end">
                       <Select 
                         value={planningData.finitions_remontage.employeeId}
-                        onValueChange={(value) => {
-                          setPlanningData(prev => ({
-                            ...prev,
-                            finitions_remontage: { ...prev.finitions_remontage, employeeId: value }
-                          }));
-                          recalculateFollowingSteps(4);
-                        }}
+                         onValueChange={(value) => {
+                           handleEmployeeChange(4, 'finitions_remontage', value);
+                         }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Sélectionner un employé" />
