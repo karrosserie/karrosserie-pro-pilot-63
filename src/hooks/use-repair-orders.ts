@@ -50,8 +50,9 @@ export function useRepairOrders() {
     mutationFn: async ({ id, data }: { id: string, data: UpdateRepairOrder }) => {
       return await repairOrdersService.update(id, data);
     },
-    onSuccess: () => {
+    onSuccess: (updatedOrder, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['repair-orders'] });
+      queryClient.invalidateQueries({ queryKey: ['repair-order', id] });
       toast({
         title: "Ordre de réparation mis à jour",
         description: "L'ordre de réparation a été mis à jour avec succès."
