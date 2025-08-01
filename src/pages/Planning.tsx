@@ -3905,6 +3905,12 @@ const Planning = () => {
                   onValueChange={(vehicleId) => {
                     const vehicle = availableVehicles.find(v => v.id === vehicleId);
                     setSelectedVehicle(vehicle);
+                    
+                    // Exécuter le calcul optimal de planification pour le véhicule sélectionné
+                    if (vehicle && employees && employees.length > 0) {
+                      const optimalPlanning = calculateOptimalPlanning();
+                      setPlanningData(optimalPlanning);
+                    }
                   }}
                 >
                   <SelectTrigger className="mt-2">
@@ -3918,11 +3924,6 @@ const Planning = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                {selectedVehicle && (
-                  <div className="mt-2 text-sm text-muted-foreground">
-                    Ordre de réparation: {selectedVehicle.repair_orders?.[0]?.reference || 'N/A'}
-                  </div>
-                )}
               </div>
               {/* Accueil & Préparation du dossier */}
               <div className="border rounded-lg p-4">
