@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash, Play, Crown, UserCheck, Eye } from "lucide-react";
+import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash, Play, Crown, UserCheck, Eye, LogOut } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -971,6 +971,49 @@ const Planning = () => {
                                     Planifier
                                   </Button>
                                 )}
+                                
+                                <Button 
+                                  size="sm" 
+                                  variant="destructive"
+                                  onClick={async () => {
+                                    try {
+                                      if (!vehicle.workflowId || !companyInfo?.id) {
+                                        toast({
+                                          title: "Erreur",
+                                          description: "Impossible de sortir le véhicule de l'atelier",
+                                          variant: "destructive"
+                                        });
+                                        return;
+                                      }
+
+                                      // Supprimer l'entrée du workflow
+                                      const { error } = await supabase
+                                        .from('vehicle_workflow_steps')
+                                        .delete()
+                                        .eq('id', vehicle.workflowId);
+
+                                      if (error) throw error;
+
+                                      toast({
+                                        title: "Véhicule sorti",
+                                        description: "Le véhicule a été sorti de l'atelier avec succès"
+                                      });
+                                      
+                                      // Refresh workflow data
+                                      refetchWorkflow();
+                                    } catch (error) {
+                                      console.error('Erreur lors de la sortie:', error);
+                                      toast({
+                                        title: "Erreur",
+                                        description: "Impossible de sortir le véhicule de l'atelier",
+                                        variant: "destructive"
+                                      });
+                                    }
+                                  }}
+                                >
+                                  <LogOut className="w-3 h-3 mr-1" />
+                                  Sortir de l'atelier
+                                </Button>
                               </div>
                             </div>
                           </div>
@@ -3741,6 +3784,7 @@ const Planning = () => {
                         ...prev,
                         accueil_preparation: { ...prev.accueil_preparation, duration: e.target.value }
                       }))}
+                      className="w-32"
                     />
                   </div>
                   <div>
@@ -3756,7 +3800,11 @@ const Planning = () => {
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
                       <SelectContent>
-                        {employees?.filter(emp => emp.qualifications.includes('Accueil')).map(emp => (
+                        {employees?.filter(emp => 
+                          emp.qualifications.includes('Accueil') || 
+                          emp.qualifications.includes('Réception') ||
+                          emp.qualifications.length === 0  // Inclure les employés sans qualifications spécifiques
+                        ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
                             {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
                           </SelectItem>
@@ -3781,6 +3829,7 @@ const Planning = () => {
                         ...prev,
                         remplacement_debosselage: { ...prev.remplacement_debosselage, duration: e.target.value }
                       }))}
+                      className="w-32"
                     />
                   </div>
                   <div>
@@ -3796,7 +3845,12 @@ const Planning = () => {
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
                       <SelectContent>
-                        {employees?.filter(emp => emp.qualifications.includes('Débosselage') || emp.qualifications.includes('Remplacement de pièces')).map(emp => (
+                        {employees?.filter(emp => 
+                          emp.qualifications.includes('Débosselage') || 
+                          emp.qualifications.includes('Remplacement de pièces') ||
+                          emp.qualifications.includes('Carrosserie') ||
+                          emp.qualifications.length === 0
+                        ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
                             {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
                           </SelectItem>
@@ -3821,6 +3875,7 @@ const Planning = () => {
                         ...prev,
                         preparation_peinture: { ...prev.preparation_peinture, duration: e.target.value }
                       }))}
+                      className="w-32"
                     />
                   </div>
                   <div>
@@ -3836,7 +3891,11 @@ const Planning = () => {
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
                       <SelectContent>
-                        {employees?.filter(emp => emp.qualifications.includes('Préparation peinture')).map(emp => (
+                        {employees?.filter(emp => 
+                          emp.qualifications.includes('Préparation peinture') ||
+                          emp.qualifications.includes('Peinture') ||
+                          emp.qualifications.length === 0
+                        ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
                             {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
                           </SelectItem>
@@ -3861,6 +3920,7 @@ const Planning = () => {
                         ...prev,
                         mise_en_peinture: { ...prev.mise_en_peinture, duration: e.target.value }
                       }))}
+                      className="w-32"
                     />
                   </div>
                   <div>
@@ -3876,7 +3936,11 @@ const Planning = () => {
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
                       <SelectContent>
-                        {employees?.filter(emp => emp.qualifications.includes('Peinture')).map(emp => (
+                        {employees?.filter(emp => 
+                          emp.qualifications.includes('Peinture') ||
+                          emp.qualifications.includes('Mise en peinture') ||
+                          emp.qualifications.length === 0
+                        ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
                             {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
                           </SelectItem>
@@ -3901,6 +3965,7 @@ const Planning = () => {
                         ...prev,
                         finitions_remontage: { ...prev.finitions_remontage, duration: e.target.value }
                       }))}
+                      className="w-32"
                     />
                   </div>
                   <div>
@@ -3916,7 +3981,12 @@ const Planning = () => {
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
                       <SelectContent>
-                        {employees?.filter(emp => emp.qualifications.includes('Finitions') || emp.qualifications.includes('Remontage')).map(emp => (
+                        {employees?.filter(emp => 
+                          emp.qualifications.includes('Finitions') || 
+                          emp.qualifications.includes('Remontage') ||
+                          emp.qualifications.includes('Carrosserie') ||
+                          emp.qualifications.length === 0
+                        ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
                             {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
                           </SelectItem>
@@ -3941,6 +4011,7 @@ const Planning = () => {
                         ...prev,
                         cloture_livraison: { ...prev.cloture_livraison, duration: e.target.value }
                       }))}
+                      className="w-32"
                     />
                   </div>
                   <div>
@@ -3956,7 +4027,12 @@ const Planning = () => {
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
                       <SelectContent>
-                        {employees?.filter(emp => emp.qualifications.includes('Livraison') || emp.qualifications.includes('Accueil')).map(emp => (
+                        {employees?.filter(emp => 
+                          emp.qualifications.includes('Livraison') || 
+                          emp.qualifications.includes('Accueil') ||
+                          emp.qualifications.includes('Réception') ||
+                          emp.qualifications.length === 0
+                        ).map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
                             {emp.user_companies?.[0]?.profiles?.first_name} {emp.user_companies?.[0]?.profiles?.last_name}
                           </SelectItem>
