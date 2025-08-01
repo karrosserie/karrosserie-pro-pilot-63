@@ -3893,11 +3893,38 @@ const Planning = () => {
             <DialogHeader>
               <DialogTitle>Planifier les étapes du véhicule</DialogTitle>
               <DialogDescription>
-                {selectedVehicle && `${selectedVehicle.brand} - ${selectedVehicle.plate} - ${selectedVehicle.client}`}
+                Sélectionnez un véhicule et planifiez ses étapes de réparation
               </DialogDescription>
             </DialogHeader>
             
             <div className="space-y-6">
+              {/* Sélection du véhicule */}
+              <div className="border rounded-lg p-4 bg-muted/50">
+                <Label htmlFor="vehicle_select" className="font-medium">Véhicule à planifier</Label>
+                <Select 
+                  value={selectedVehicle?.id || ''}
+                  onValueChange={(vehicleId) => {
+                    const vehicle = availableVehicles.find(v => v.id === vehicleId);
+                    setSelectedVehicle(vehicle);
+                  }}
+                >
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Sélectionner un véhicule avec ordre de réparation" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
+                    {availableVehicles.map(vehicle => (
+                      <SelectItem key={vehicle.id} value={vehicle.id}>
+                        {vehicle.plate} - {vehicle.brand} - {vehicle.client}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedVehicle && (
+                  <div className="mt-2 text-sm text-muted-foreground">
+                    Ordre de réparation: {selectedVehicle.repair_orders?.[0]?.reference || 'N/A'}
+                  </div>
+                )}
+              </div>
               {/* Accueil & Préparation du dossier */}
               <div className="border rounded-lg p-4">
                 <h3 className="font-medium text-sm mb-3">Accueil & Préparation du dossier</h3>
