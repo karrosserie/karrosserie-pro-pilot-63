@@ -3182,18 +3182,30 @@ const Planning = () => {
                     const schedulePromises = steps
                       .filter(step => step.employeeId && step.duration)
                       .map(step => {
-                        // Calculer les heures de début et fin
-                        const today = new Date();
-                        const startDateTime = new Date(today);
-                        const [startHour, startMinute] = step.start_time.split(':');
-                        startDateTime.setHours(parseInt(startHour), parseInt(startMinute), 0, 0);
+                        // Utiliser les dates calculées depuis planningData au lieu de la date du jour
+                        const stepData = planningData[step.key as keyof ExtendedPlanningData];
                         
-                        const endDateTime = new Date(startDateTime);
-                        const [durationHour, durationMinute] = step.duration.split(':');
-                        endDateTime.setHours(
-                          endDateTime.getHours() + parseInt(durationHour),
-                          endDateTime.getMinutes() + parseInt(durationMinute)
-                        );
+                        let startDateTime: Date;
+                        let endDateTime: Date;
+                        
+                        // Vérifier si on a des dates calculées, sinon utiliser le fallback
+                        if (stepData.startDateTime && stepData.endDateTime) {
+                          startDateTime = stepData.startDateTime;
+                          endDateTime = stepData.endDateTime;
+                        } else {
+                          // Fallback : utiliser la date du jour avec les heures par défaut
+                          const today = new Date();
+                          startDateTime = new Date(today);
+                          const [startHour, startMinute] = step.start_time.split(':');
+                          startDateTime.setHours(parseInt(startHour), parseInt(startMinute), 0, 0);
+                          
+                          endDateTime = new Date(startDateTime);
+                          const [durationHour, durationMinute] = step.duration.split(':');
+                          endDateTime.setHours(
+                            endDateTime.getHours() + parseInt(durationHour),
+                            endDateTime.getMinutes() + parseInt(durationMinute)
+                          );
+                        }
 
                         return (supabase as any)
                           .from('employee_schedule')
