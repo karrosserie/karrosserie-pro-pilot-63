@@ -48,10 +48,7 @@ export function useOptimalPlanning(employees: any[] = [], companyId?: string) {
         const existingEnd = new Date(schedule.end_datetime);
         
         // Vérifier si les créneaux se chevauchent
-        if (
-          (startDateTime < existingEnd && endDateTime > existingStart) ||
-          (existingStart < endDateTime && existingEnd > startDateTime)
-        ) {
+        if (startDateTime < existingEnd && endDateTime > existingStart) {
           return false; // Conflit détecté
         }
       }
@@ -59,7 +56,7 @@ export function useOptimalPlanning(employees: any[] = [], companyId?: string) {
       return true; // Pas de conflit
     } catch (error) {
       console.error('Erreur lors de la vérification de disponibilité:', error);
-      return true; // En cas d'erreur, considérer comme disponible
+      return false; // En cas d'erreur, considérer comme non disponible pour éviter les conflits
     }
   };
 
@@ -157,7 +154,7 @@ export function useOptimalPlanning(employees: any[] = [], companyId?: string) {
         let bestEmployee = null;
         let bestStartDateTime = null;
         
-        // Trouver l'employé avec le créneau le plus tôt
+        // Trouver l'employé avec le créneau le plus tôt disponible à partir de currentDateTime
         for (const employee of qualifiedEmployees) {
           const availableSlot = await findNextAvailableSlot(employee.id, currentDateTime, durationMinutes);
           
@@ -177,7 +174,7 @@ export function useOptimalPlanning(employees: any[] = [], companyId?: string) {
             endDateTime: finalEndDateTime
           };
           
-          // Préparer pour la prochaine étape (commencer après la fin de cette étape)
+          // Préparer pour la prochaine étape : elle doit commencer au plus tôt après la fin de cette étape
           currentDateTime = new Date(finalEndDateTime);
         }
       }
