@@ -21,6 +21,7 @@ import { useCompanyId } from '@/hooks/use-company-id';
 import { useVehicleWorkflow } from '@/hooks/use-vehicle-workflow';
 import { useOptimalPlanning } from '@/hooks/use-optimal-planning';
 import { useEmployeeSchedule } from '@/hooks/use-employee-schedule';
+import { useWorkshopSchedule } from '@/hooks/use-workshop-schedule';
 
 // Helper function to calculate duration between two timestamps
 const calculateDuration = (startDateTime: string, endDateTime: string): string => {
@@ -131,6 +132,7 @@ const Planning = () => {
   const { workflowSteps, refetch: refetchWorkflow } = useVehicleWorkflow(companyInfo?.id);
   const { schedules: employeeSchedules } = useEmployeeSchedule(selectedEmployeeId);
   const { schedules: planningEmployeeSchedules } = useEmployeeSchedule(selectedPlanningEmployeeId);
+  const { schedules: workshopSchedules } = useWorkshopSchedule();
   const { calculateOptimalPlanning } = useOptimalPlanning(employees);
 
   // Helper function to recalculate following steps
@@ -779,9 +781,9 @@ const Planning = () => {
         )}
 
         {/* Vue Manager - Onglets complets */}
-        {activeView === "manager" && (
-        <Tabs defaultValue="workshop" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-6">
+         {activeView === "manager" && (
+          <Tabs defaultValue="workshop" className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="workshop" className="flex items-center gap-2">
               <Wrench className="w-4 h-4" />
               Étapes atelier
@@ -959,7 +961,89 @@ const Planning = () => {
               </div>
 
               {/* Planning Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
+                {(() => {
+                  const today = new Date();
+                  const weekDays = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+                  const dayNumbers = [1, 2, 3, 4, 5, 6, 0]; // Monday = 1, Sunday = 0
+                  
+                  // Get start of current week (Monday)
+                  const currentDay = today.getDay();
+                  const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+                  const monday = new Date(today);
+                  monday.setDate(today.getDate() + mondayOffset);
+                  
+                  return weekDays.map((dayName, index) => {
+                    const currentDate = new Date(monday);
+                    currentDate.setDate(monday.getDate() + index);
+                    
+                    // Get schedules for this day
+                    const daySchedules = employees?.flatMap(employee => {
+                      // We would need to get all employee schedules here
+                      // For now, let's use a placeholder approach
+                      return [];
+                    }) || [];
+                    
+                    // Filter workshop schedule for this day
+                    const dayOfWeekMap = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+                    const dayOfWeek = dayOfWeekMap[currentDate.getDay()];
+                    const workshopDay = workshopSchedules.find(ws => ws.day_of_week.toLowerCase() === dayOfWeek);
+                    
+                    if (!workshopDay?.enabled) {
+                      return (
+                        <Card key={dayName} className="opacity-50">
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-lg text-muted-foreground">{dayName}</CardTitle>
+                            <p className="text-sm text-muted-foreground">
+                              {currentDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
+                            </p>
+                            <p className="text-sm text-muted-foreground">Fermé</p>
+                          </CardHeader>
+                        </Card>
+                      );
+                    }
+                    
+                    return (
+                      <Card key={dayName}>
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-lg text-orange-600">{dayName}</CardTitle>
+                          <p className="text-sm text-muted-foreground">
+                            {currentDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {workshopDay?.morning_start && workshopDay?.morning_end && 
+                             `${workshopDay.morning_start}-${workshopDay.morning_end}`}
+                            {workshopDay?.afternoon_start && workshopDay?.afternoon_end && 
+                             ` / ${workshopDay.afternoon_start}-${workshopDay.afternoon_end}`}
+                          </p>
+                          <p className="text-sm text-muted-foreground">{daySchedules.length} tâche(s)</p>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          {daySchedules.length === 0 ? (
+                            <div className="text-center text-muted-foreground py-4">
+                              Aucune tâche planifiée
+                            </div>
+                          ) : (
+                            daySchedules.map((schedule, idx) => (
+                              <Card key={idx} className="border-l-4 border-l-orange-500 p-3 cursor-pointer hover:shadow-md transition-shadow">
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2 text-sm text-orange-600">
+                                    <Clock className="w-3 h-3" />
+                                    Placeholder
+                                  </div>
+                                  <div className="font-semibold text-sm">Placeholder</div>
+                                  <div className="text-xs text-muted-foreground">Placeholder</div>
+                                  <Badge className="bg-orange-100 text-orange-800 text-xs">Placeholder</Badge>
+                                </div>
+                              </Card>
+                            ))
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
+                  });
+                })()}
+              </div>
               {/* Lundi */}
               <Card>
                 <CardHeader className="pb-3">
@@ -1383,7 +1467,6 @@ const Planning = () => {
                 </CardContent>
               </Card>
             </div>
-            </div>
           </TabsContent>
 
           <TabsContent value="employees" className="space-y-6">
@@ -1416,55 +1499,108 @@ const Planning = () => {
             <Card data-lov-id="src/pages/Planning.tsx:844:10">
               <CardContent className="p-6">
                 {/* En-tête employé */}
-                <div className="bg-muted/30 rounded-lg p-4 mb-6">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h2 className="text-xl font-semibold text-primary mb-1">Sophie Martin</h2>
-                      <p className="text-sm text-muted-foreground mb-3">sophie.martin@carrosserie.fr</p>
-                      <div className="flex flex-wrap gap-2">
-                        <Badge variant="secondary" className="bg-orange-100 text-orange-800">Préparation peinture</Badge>
-                        <Badge variant="secondary" className="bg-orange-100 text-orange-800">Mise en peinture</Badge>
-                        <Badge variant="secondary" className="bg-orange-100 text-orange-800">Finitions & remontage</Badge>
+                {selectedPlanningEmployeeId && (() => {
+                  const selectedEmployee = employees?.find(emp => emp.id === selectedPlanningEmployeeId);
+                  const currentSchedules = planningEmployeeSchedules.filter(schedule => {
+                    const now = new Date();
+                    const startDate = new Date(schedule.start_datetime);
+                    const endDate = new Date(schedule.end_datetime);
+                    return startDate <= now && endDate >= now;
+                  });
+                  const completedSchedules = planningEmployeeSchedules.filter(schedule => {
+                    const now = new Date();
+                    const endDate = new Date(schedule.end_datetime);
+                    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const scheduleDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+                    return endDate < now && scheduleDate.getTime() === today.getTime();
+                  });
+                  
+                  return (
+                    <div className="bg-muted/30 rounded-lg p-4 mb-6">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h2 className="text-xl font-semibold text-primary mb-1">
+                            {selectedEmployee?.user_companies?.profiles?.first_name && selectedEmployee?.user_companies?.profiles?.last_name 
+                              ? `${selectedEmployee.user_companies.profiles.first_name} ${selectedEmployee.user_companies.profiles.last_name}`
+                              : `Employé #${selectedEmployee?.id.slice(0, 8)}`
+                            }
+                          </h2>
+                          <p className="text-sm text-muted-foreground mb-3">
+                            {selectedEmployee?.user_companies?.profiles?.email || 'Email non renseigné'}
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedEmployee?.qualifications?.map((qualification, index) => (
+                              <Badge key={index} variant="secondary" className="bg-orange-100 text-orange-800">
+                                {qualification}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="flex gap-6 text-center">
+                          <div>
+                            <div className="text-2xl font-bold text-primary">{currentSchedules.length}</div>
+                            <div className="text-sm text-muted-foreground">En cours</div>
+                          </div>
+                          <div>
+                            <div className="text-2xl font-bold text-green-600">{completedSchedules.length}</div>
+                            <div className="text-sm text-muted-foreground">Terminées</div>
+                          </div>
+                          <div>
+                            <div className="text-2xl font-bold text-orange-600">{planningEmployeeSchedules.length}</div>
+                            <div className="text-sm text-muted-foreground">Total</div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex gap-6 text-center">
-                      <div>
-                        <div className="text-2xl font-bold text-primary">5</div>
-                        <div className="text-sm text-muted-foreground">En cours</div>
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-green-600">2</div>
-                        <div className="text-sm text-muted-foreground">Terminées</div>
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-orange-600">7</div>
-                        <div className="text-sm text-muted-foreground">Total</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })()}
 
                 {/* Section titre avec icône */}
                 <div className="flex items-center gap-2 mb-4">
                   <User className="w-5 h-5 text-muted-foreground" />
-                  <h3 className="text-lg font-semibold">Planning de Sophie Martin</h3>
+                  <h3 className="text-lg font-semibold">
+                    Planning de {selectedPlanningEmployeeId && (() => {
+                      const selectedEmployee = employees?.find(emp => emp.id === selectedPlanningEmployeeId);
+                      return selectedEmployee?.user_companies?.profiles?.first_name && selectedEmployee?.user_companies?.profiles?.last_name 
+                        ? `${selectedEmployee.user_companies.profiles.first_name} ${selectedEmployee.user_companies.profiles.last_name}`
+                        : `Employé #${selectedEmployee?.id.slice(0, 8)}`;
+                    })()}
+                  </h3>
                 </div>
 
                 {/* Statistiques détaillées */}
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div className="bg-primary/10 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-primary">5</div>
-                    <div className="text-sm text-muted-foreground">Tâches en cours</div>
-                  </div>
-                  <div className="bg-green-50 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-green-600">2</div>
-                    <div className="text-sm text-muted-foreground">Terminées aujourd'hui</div>
-                  </div>
-                  <div className="bg-orange-50 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-orange-600">7</div>
-                    <div className="text-sm text-muted-foreground">Total du jour</div>
-                  </div>
-                </div>
+                {selectedPlanningEmployeeId && (() => {
+                  const currentSchedules = planningEmployeeSchedules.filter(schedule => {
+                    const now = new Date();
+                    const startDate = new Date(schedule.start_datetime);
+                    const endDate = new Date(schedule.end_datetime);
+                    return startDate <= now && endDate >= now;
+                  });
+                  const completedSchedules = planningEmployeeSchedules.filter(schedule => {
+                    const now = new Date();
+                    const endDate = new Date(schedule.end_datetime);
+                    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const scheduleDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+                    return endDate < now && scheduleDate.getTime() === today.getTime();
+                  });
+                  
+                  return (
+                    <div className="grid grid-cols-3 gap-4 mb-6">
+                      <div className="bg-primary/10 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-primary">{currentSchedules.length}</div>
+                        <div className="text-sm text-muted-foreground">Tâches en cours</div>
+                      </div>
+                      <div className="bg-green-50 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-green-600">{completedSchedules.length}</div>
+                        <div className="text-sm text-muted-foreground">Terminées aujourd'hui</div>
+                      </div>
+                      <div className="bg-orange-50 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-orange-600">{planningEmployeeSchedules.length}</div>
+                        <div className="text-sm text-muted-foreground">Total du jour</div>
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* Tâches en cours */}
                 <div className="mb-6">
@@ -1480,71 +1616,60 @@ const Planning = () => {
                   </div>
 
                   <div className="space-y-3">
-                    {/* Tâche 1 */}
-                    <Card className="border-l-4 border-l-orange-500 p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 text-sm text-orange-600 mb-2">
-                            <Clock className="w-3 h-3" />
-                            8h-11h
+                    {planningEmployeeSchedules.filter(schedule => {
+                      const now = new Date();
+                      const startDate = new Date(schedule.start_datetime);
+                      const endDate = new Date(schedule.end_datetime);
+                      return startDate <= now && endDate >= now;
+                    }).map((schedule) => (
+                      <Card key={schedule.id} className="border-l-4 border-l-orange-500 p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 text-sm text-orange-600 mb-2">
+                              <Clock className="w-3 h-3" />
+                              {new Date(schedule.start_datetime).toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}-{new Date(schedule.end_datetime).toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </div>
+                            <div className="font-semibold mb-1">{schedule.task_type}</div>
+                            <div className="text-sm text-muted-foreground mb-1">
+                              <span className="font-medium">Véhicule :</span> {schedule.vehicles?.license_plate || 'N/A'}
+                            </div>
+                            <div className="text-sm text-muted-foreground mb-1">
+                              <span className="font-medium">Modèle :</span> {schedule.vehicles?.car_brands?.name} {schedule.vehicles?.car_models?.name}
+                            </div>
+                            <div className="text-sm text-muted-foreground mb-2">
+                              <span className="font-medium">Client :</span> {schedule.vehicles?.clients?.first_name} {schedule.vehicles?.clients?.last_name}
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Clock className="w-3 h-3" />
+                              <span className="font-medium">Durée:</span> {calculateDuration(schedule.start_datetime, schedule.end_datetime)}
+                            </div>
                           </div>
-                          <div className="font-semibold mb-1">Remplacement pare-chocs</div>
-                          <div className="text-sm text-muted-foreground mb-1">
-                            <span className="font-medium">Véhicule :</span> HT-556-GH
-                          </div>
-                          <div className="text-sm text-muted-foreground mb-1">
-                            <span className="font-medium">Modèle :</span> BMW Série 1
-                          </div>
-                          <div className="text-sm text-muted-foreground mb-2">
-                            <span className="font-medium">Client :</span> M. Rousseau
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Clock className="w-3 h-3" />
-                            <span className="font-medium">Durée estimée:</span> 3h
+                          <div className="flex flex-col items-end gap-2">
+                            <Badge className="bg-orange-100 text-orange-800">En cours</Badge>
+                            <Button size="sm" className="bg-orange-600 hover:bg-orange-700 text-white">
+                              <CheckCircle className="w-3 h-3 mr-1" />
+                              Terminer
+                            </Button>
                           </div>
                         </div>
-                        <div className="flex flex-col items-end gap-2">
-                          <Badge className="bg-orange-100 text-karrosserie-orange">En cours</Badge>
-                          <Button size="sm" className="bg-orange-600 hover:bg-orange-700 text-white">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Terminer
-                          </Button>
-                        </div>
+                      </Card>
+                    ))}
+                    {planningEmployeeSchedules.filter(schedule => {
+                      const now = new Date();
+                      const startDate = new Date(schedule.start_datetime);
+                      const endDate = new Date(schedule.end_datetime);
+                      return startDate <= now && endDate >= now;
+                    }).length === 0 && (
+                      <div className="text-center text-muted-foreground py-4">
+                        Aucune tâche en cours
                       </div>
-                    </Card>
-
-                    {/* Tâche 2 */}
-                    <Card className="border-l-4 border-l-orange-500 p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 text-sm text-orange-600 mb-2">
-                            <Clock className="w-3 h-3" />
-                            14h-15h
-                          </div>
-                          <div className="font-semibold mb-1">Finitions peinture</div>
-                          <div className="text-sm text-muted-foreground mb-1">
-                            <span className="font-medium">Véhicule :</span> CD-123-ZW
-                          </div>
-                          <div className="text-sm text-muted-foreground mb-1">
-                            <span className="font-medium">Modèle :</span> Renault Clio
-                          </div>
-                          <div className="text-sm text-muted-foreground mb-2">
-                            <span className="font-medium">Client :</span> M. Petit
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Clock className="w-3 h-3" />
-                            <span className="font-medium">Durée estimée:</span> 1h
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end gap-2">
-                          <Badge className="bg-orange-100 text-orange-800">Planifié</Badge>
-                          <Button size="sm" className="bg-orange-600 hover:bg-orange-700 text-white">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Terminer
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
+                    )}
                   </div>
                 </div>
 
@@ -1562,65 +1687,59 @@ const Planning = () => {
                   </div>
 
                   <div className="space-y-3">
-                    {/* Tâche terminée 1 */}
-                    <Card className="border-l-4 border-l-green-500 p-4 bg-green-50/30">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 text-sm text-green-600 mb-2">
-                            <Clock className="w-3 h-3" />
-                            8h-10h
+                    {planningEmployeeSchedules.filter(schedule => {
+                      const now = new Date();
+                      const endDate = new Date(schedule.end_datetime);
+                      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                      const scheduleDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+                      return endDate < now && scheduleDate.getTime() === today.getTime();
+                    }).map((schedule) => (
+                      <Card key={schedule.id} className="border-l-4 border-l-green-500 p-4 bg-green-50/30">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 text-sm text-green-600 mb-2">
+                              <Clock className="w-3 h-3" />
+                              {new Date(schedule.start_datetime).toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}-{new Date(schedule.end_datetime).toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </div>
+                            <div className="font-semibold mb-1">{schedule.task_type}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {schedule.vehicles?.license_plate} - {schedule.vehicles?.car_brands?.name} {schedule.vehicles?.car_models?.name} - {schedule.vehicles?.clients?.first_name} {schedule.vehicles?.clients?.last_name}
+                            </div>
                           </div>
-                          <div className="font-semibold mb-1">Préparation peinture</div>
-                          <div className="text-sm text-muted-foreground">
-                            HT-556-GH - BMW Série 1 - M. Rousseau
+                          <div className="flex flex-col items-end gap-2">
+                            <Badge className="bg-green-100 text-green-800">Terminé</Badge>
+                            <Button size="sm" variant="outline" onClick={() => {
+                              setSelectedVehicle({
+                                brand: `${schedule.vehicles?.car_brands?.name} ${schedule.vehicles?.car_models?.name}`,
+                                plate: schedule.vehicles?.license_plate,
+                                client: `${schedule.vehicles?.clients?.first_name} ${schedule.vehicles?.clients?.last_name}`,
+                                technician: employees?.find(emp => emp.id === selectedPlanningEmployeeId)?.user_companies?.profiles?.first_name + ' ' + employees?.find(emp => emp.id === selectedPlanningEmployeeId)?.user_companies?.profiles?.last_name
+                              });
+                              setShowVehicleDetailModal(true);
+                            }}>
+                              Voir détails
+                            </Button>
                           </div>
                         </div>
-                        <div className="flex flex-col items-end gap-2">
-                          <Badge className="bg-green-100 text-green-800">Terminé</Badge>
-                          <Button size="sm" variant="outline" onClick={() => {
-                            setSelectedVehicle({
-                              brand: "BMW Série 1",
-                              plate: "HT-556-GH",
-                              client: "M. Rousseau",
-                              technician: "Sophie Martin"
-                            });
-                            setShowVehicleDetailModal(true);
-                          }}>
-                            Voir détails
-                          </Button>
-                        </div>
+                      </Card>
+                    ))}
+                    {planningEmployeeSchedules.filter(schedule => {
+                      const now = new Date();
+                      const endDate = new Date(schedule.end_datetime);
+                      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                      const scheduleDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+                      return endDate < now && scheduleDate.getTime() === today.getTime();
+                    }).length === 0 && (
+                      <div className="text-center text-muted-foreground py-4">
+                        Aucune tâche terminée aujourd'hui
                       </div>
-                    </Card>
-
-                    {/* Tâche terminée 2 */}
-                    <Card className="border-l-4 border-l-green-500 p-4 bg-green-50/30">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 text-sm text-green-600 mb-2">
-                            <Clock className="w-3 h-3" />
-                            10h-12h
-                          </div>
-                          <div className="font-semibold mb-1">Débosselage portière</div>
-                          <div className="text-sm text-muted-foreground">
-                            VS-901-AB - Audi A4 - M. Bernard
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end gap-2">
-                          <Badge className="bg-green-100 text-green-800">Terminé</Badge>
-                          <Button size="sm" variant="outline" onClick={() => {
-                            setSelectedVehicle({
-                              brand: "Audi A4",
-                              plate: "VS-901-AB",
-                              client: "M. Bernard",
-                              technician: "Sophie Martin"
-                            });
-                            setShowVehicleDetailModal(true);
-                          }}>
-                            Voir détails
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
+                     )}
                   </div>
                 </div>
               </CardContent>
