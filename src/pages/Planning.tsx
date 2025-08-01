@@ -20,6 +20,20 @@ import { useCompanyId } from '@/hooks/use-company-id';
 import { useVehicleWorkflow } from '@/hooks/use-vehicle-workflow';
 import { useOptimalPlanning } from '@/hooks/use-optimal-planning';
 
+// Helper function to calculate duration between two timestamps
+const calculateDuration = (startDateTime: string, endDateTime: string): string => {
+  const start = new Date(startDateTime);
+  const end = new Date(endDateTime);
+  const diffMs = end.getTime() - start.getTime();
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  
+  if (diffHours === 0) {
+    return `${diffMinutes}min`;
+  }
+  return diffMinutes > 0 ? `${diffHours}h${diffMinutes}min` : `${diffHours}h`;
+};
+
 const Planning = () => {
   const { companyInfo } = useCompany();
   const { user } = useAuth();
@@ -102,6 +116,25 @@ const Planning = () => {
   const { employees, createEmployee, updateEmployee } = useEmployees();
   const { workflowSteps, refetch: refetchWorkflow } = useVehicleWorkflow(companyInfo?.id);
   const { calculateOptimalPlanning } = useOptimalPlanning(employees);
+
+  // Helper function to recalculate following steps
+  const recalculateFollowingSteps = (fromStepIndex: number) => {
+    if (!employees || employees.length === 0) return;
+    
+    const optimalPlanning = calculateOptimalPlanning();
+    const stepKeys = ['accueil_preparation', 'remplacement_debosselage', 'preparation_peinture', 'mise_en_peinture', 'finitions_remontage', 'cloture_livraison'];
+    
+    setTimeout(() => {
+      setPlanningData(prev => {
+        const newData = { ...prev };
+        for (let i = fromStepIndex + 1; i < stepKeys.length; i++) {
+          const key = stepKeys[i] as keyof typeof optimalPlanning;
+          newData[key] = optimalPlanning[key];
+        }
+        return newData;
+      });
+    }, 100);
+  };
 
   // Charger les temps de configuration depuis la base de données
   useEffect(() => {
@@ -221,66 +254,103 @@ const Planning = () => {
 
         if (vehiclesError) throw vehiclesError;
 
-        // Récupérer les étapes de workflow pour ces véhicules
-        const { data: workflowData, error: workflowError } = await supabase
-          .from('vehicle_workflow_steps')
-          .select('*')
+        // Récupérer les planifications d'employés pour ces véhicules
+        const { data: scheduleData, error: scheduleError } = await (supabase as any)
+          .from('employee_schedule')
+          .select(`
+            *,
+            employees (
+              id,
+              user_companies (
+                profiles (
+                  first_name,
+                  last_name
+                )
+              )
+            )
+          `)
           .eq('company_id', companyInfo.id);
 
-        if (workflowError) throw workflowError;
+        if (scheduleError) throw scheduleError;
 
         // Organiser les données par étapes
         const stepMap = {
-          'accueil_preparation': {
+          'Accueil & Préparation du dossier': {
             title: "Accueil & Préparation du dossier",
             color: "border-l-karrosserie-orange",
             vehicles: []
           },
-          'remplacement_debosselage': {
+          'Remplacement ou débosselage': {
             title: "Remplacement ou débosselage",
             color: "border-l-green-500",
             vehicles: []
           },
-          'preparation_peinture': {
+          'Préparation peinture': {
             title: "Préparation peinture",
             color: "border-l-yellow-500",
             vehicles: []
           },
-          'mise_en_peinture': {
+          'Mise en peinture': {
             title: "Mise en peinture",
             color: "border-l-blue-500",
             vehicles: []
           },
-          'finitions_remontage': {
+          'Finitions & remontage': {
             title: "Finitions & remontage",
             color: "border-l-purple-500",
             vehicles: []
           },
-          'cloture_livraison': {
+          'Clôture & livraison': {
             title: "Clôture du dossier et livraison",
             color: "border-l-red-500",
             vehicles: []
           }
         };
 
-        // Associer chaque véhicule à sa bonne étape
+        // Associer chaque véhicule à sa bonne étape selon le planning
         vehiclesData?.forEach(vehicle => {
-          const workflowStep = workflowData?.find(w => w.vehicle_id === vehicle.id);
-          const currentStep = workflowStep?.current_step || 'accueil_preparation';
+          const vehicleSchedules = scheduleData?.filter(s => s.vehicle_id === vehicle.id) || [];
           
-          if (stepMap[currentStep]) {
-            stepMap[currentStep].vehicles.push({
+          // Si pas de planification, mettre en première étape
+          if (vehicleSchedules.length === 0) {
+            stepMap['Accueil & Préparation du dossier'].vehicles.push({
               id: vehicle.id,
               brand: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim() || 'Véhicule',
               plate: vehicle.license_plate,
               client: `${vehicle.clients?.first_name || ''} ${vehicle.clients?.last_name || ''}`.trim() || 'Client inconnu',
-              price: "0€", // À calculer depuis les devis/factures
-              duration: "0h", // À calculer selon la configuration
+              price: "0€",
+              duration: "0h",
               status: "En attente",
-              inProgress: workflowStep?.progress_percentage > 0,
-              technician: workflowStep?.technician_id ? "Assigné" : null,
-              workflowId: workflowStep?.id
+              inProgress: false,
+              technician: null,
+              scheduleId: null
             });
+          } else {
+            // Trouver l'étape en cours (la plus récente non terminée)
+            const currentSchedule = vehicleSchedules
+              .sort((a, b) => new Date(a.start_datetime).getTime() - new Date(b.start_datetime).getTime())
+              .find(s => new Date(s.end_datetime) > new Date()) || vehicleSchedules[vehicleSchedules.length - 1];
+            
+            const stepKey = currentSchedule.task_type;
+            
+            if (stepMap[stepKey]) {
+              const technicianName = currentSchedule.employees?.user_companies?.profiles 
+                ? `${currentSchedule.employees.user_companies.profiles.first_name} ${currentSchedule.employees.user_companies.profiles.last_name}`
+                : 'Employé assigné';
+                
+              stepMap[stepKey].vehicles.push({
+                id: vehicle.id,
+                brand: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim() || 'Véhicule',
+                plate: vehicle.license_plate,
+                client: `${vehicle.clients?.first_name || ''} ${vehicle.clients?.last_name || ''}`.trim() || 'Client inconnu',
+                price: "0€",
+                duration: calculateDuration(currentSchedule.start_datetime, currentSchedule.end_datetime),
+                status: new Date(currentSchedule.start_datetime) <= new Date() && new Date() <= new Date(currentSchedule.end_datetime) ? "En cours" : "En attente",
+                inProgress: new Date(currentSchedule.start_datetime) <= new Date() && new Date() <= new Date(currentSchedule.end_datetime),
+                technician: technicianName,
+                scheduleId: currentSchedule.id
+              });
+            }
           }
         });
 
@@ -459,66 +529,103 @@ const Planning = () => {
 
         if (vehiclesError) throw vehiclesError;
 
-        // Récupérer les étapes de workflow pour ces véhicules
-        const { data: workflowData, error: workflowError } = await supabase
-          .from('vehicle_workflow_steps')
-          .select('*')
+        // Récupérer les planifications d'employés pour ces véhicules  
+        const { data: scheduleData, error: scheduleError } = await (supabase as any)
+          .from('employee_schedule')
+          .select(`
+            *,
+            employees (
+              id,
+              user_companies (
+                profiles (
+                  first_name,
+                  last_name
+                )
+              )
+            )
+          `)
           .eq('company_id', companyInfo.id);
 
-        if (workflowError) throw workflowError;
+        if (scheduleError) throw scheduleError;
 
         // Organiser les données par étapes
         const stepMap = {
-          'accueil_preparation': {
+          'Accueil & Préparation du dossier': {
             title: "Accueil & Préparation du dossier",
             color: "border-l-karrosserie-orange",
             vehicles: []
           },
-          'remplacement_debosselage': {
+          'Remplacement ou débosselage': {
             title: "Remplacement ou débosselage",
             color: "border-l-green-500",
             vehicles: []
           },
-          'preparation_peinture': {
+          'Préparation peinture': {
             title: "Préparation peinture",
             color: "border-l-yellow-500",
             vehicles: []
           },
-          'mise_en_peinture': {
+          'Mise en peinture': {
             title: "Mise en peinture",
             color: "border-l-blue-500",
             vehicles: []
           },
-          'finitions_remontage': {
+          'Finitions & remontage': {
             title: "Finitions & remontage",
             color: "border-l-purple-500",
             vehicles: []
           },
-          'cloture_livraison': {
+          'Clôture & livraison': {
             title: "Clôture du dossier et livraison",
             color: "border-l-red-500",
             vehicles: []
           }
         };
 
-        // Associer chaque véhicule à sa bonne étape
+        // Associer chaque véhicule à sa bonne étape selon le planning
         vehiclesData?.forEach(vehicle => {
-          const workflowStep = workflowData?.find(w => w.vehicle_id === vehicle.id);
-          const currentStep = workflowStep?.current_step || 'accueil_preparation';
+          const vehicleSchedules = scheduleData?.filter(s => s.vehicle_id === vehicle.id) || [];
           
-          if (stepMap[currentStep]) {
-            stepMap[currentStep].vehicles.push({
+          // Si pas de planification, mettre en première étape
+          if (vehicleSchedules.length === 0) {
+            stepMap['Accueil & Préparation du dossier'].vehicles.push({
               id: vehicle.id,
               brand: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim(),
               plate: vehicle.license_plate,
               client: `${vehicle.clients?.first_name || ''} ${vehicle.clients?.last_name || ''}`.trim(),
-              price: "0€", // À calculer depuis les devis/factures
-              duration: "0h", // À calculer selon la configuration
+              price: "0€",
+              duration: "0h",
               status: "En attente",
-              inProgress: workflowStep?.progress_percentage > 0,
-              technician: workflowStep?.technician_id ? "Assigné" : null,
-              workflowId: workflowStep?.id
+              inProgress: false,
+              technician: null,
+              scheduleId: null
             });
+          } else {
+            // Trouver l'étape en cours (la plus récente non terminée)
+            const currentSchedule = vehicleSchedules
+              .sort((a, b) => new Date(a.start_datetime).getTime() - new Date(b.start_datetime).getTime())
+              .find(s => new Date(s.end_datetime) > new Date()) || vehicleSchedules[vehicleSchedules.length - 1];
+            
+            const stepKey = currentSchedule.task_type;
+            
+            if (stepMap[stepKey]) {
+              const technicianName = currentSchedule.employees?.user_companies?.profiles 
+                ? `${currentSchedule.employees.user_companies.profiles.first_name} ${currentSchedule.employees.user_companies.profiles.last_name}`
+                : 'Employé assigné';
+                
+              stepMap[stepKey].vehicles.push({
+                id: vehicle.id,
+                brand: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim(),
+                plate: vehicle.license_plate,
+                client: `${vehicle.clients?.first_name || ''} ${vehicle.clients?.last_name || ''}`.trim(),
+                price: "0€",
+                duration: calculateDuration(currentSchedule.start_datetime, currentSchedule.end_datetime),
+                status: new Date(currentSchedule.start_datetime) <= new Date() && new Date() <= new Date(currentSchedule.end_datetime) ? "En cours" : "En attente",
+                inProgress: new Date(currentSchedule.start_datetime) <= new Date() && new Date() <= new Date(currentSchedule.end_datetime),
+                technician: technicianName,
+                scheduleId: currentSchedule.id
+              });
+            }
           }
         });
 
@@ -3792,10 +3899,13 @@ const Planning = () => {
                       id="accueil_duration"
                       type="time"
                       value={planningData.accueil_preparation.duration}
-                      onChange={(e) => setPlanningData(prev => ({
-                        ...prev,
-                        accueil_preparation: { ...prev.accueil_preparation, duration: e.target.value }
-                      }))}
+                       onChange={(e) => {
+                         setPlanningData(prev => ({
+                           ...prev,
+                           accueil_preparation: { ...prev.accueil_preparation, duration: e.target.value }
+                         }));
+                         recalculateFollowingSteps(0);
+                       }}
                       className="w-[90px]"
                     />
                   </div>
@@ -3804,10 +3914,13 @@ const Planning = () => {
                     <div className="flex gap-2 items-end">
                       <Select 
                         value={planningData.accueil_preparation.employeeId}
-                        onValueChange={(value) => setPlanningData(prev => ({
-                          ...prev,
-                          accueil_preparation: { ...prev.accueil_preparation, employeeId: value }
-                        }))}
+                        onValueChange={(value) => {
+                          setPlanningData(prev => ({
+                            ...prev,
+                            accueil_preparation: { ...prev.accueil_preparation, employeeId: value }
+                          }));
+                          recalculateFollowingSteps(0);
+                        }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Sélectionner un employé" />
@@ -3843,10 +3956,13 @@ const Planning = () => {
                       id="remplacement_duration"
                       type="time"
                       value={planningData.remplacement_debosselage.duration}
-                      onChange={(e) => setPlanningData(prev => ({
-                        ...prev,
-                        remplacement_debosselage: { ...prev.remplacement_debosselage, duration: e.target.value }
-                      }))}
+                       onChange={(e) => {
+                         setPlanningData(prev => ({
+                           ...prev,
+                           remplacement_debosselage: { ...prev.remplacement_debosselage, duration: e.target.value }
+                         }));
+                         recalculateFollowingSteps(1);
+                       }}
                       className="w-[90px]"
                     />
                   </div>
@@ -3855,10 +3971,13 @@ const Planning = () => {
                     <div className="flex gap-2 items-end">
                       <Select 
                         value={planningData.remplacement_debosselage.employeeId}
-                        onValueChange={(value) => setPlanningData(prev => ({
-                          ...prev,
-                          remplacement_debosselage: { ...prev.remplacement_debosselage, employeeId: value }
-                        }))}
+                        onValueChange={(value) => {
+                          setPlanningData(prev => ({
+                            ...prev,
+                            remplacement_debosselage: { ...prev.remplacement_debosselage, employeeId: value }
+                          }));
+                          recalculateFollowingSteps(1);
+                        }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Sélectionner un employé" />
@@ -3894,10 +4013,13 @@ const Planning = () => {
                       id="preparation_duration"
                       type="time"
                       value={planningData.preparation_peinture.duration}
-                      onChange={(e) => setPlanningData(prev => ({
-                        ...prev,
-                        preparation_peinture: { ...prev.preparation_peinture, duration: e.target.value }
-                      }))}
+                       onChange={(e) => {
+                         setPlanningData(prev => ({
+                           ...prev,
+                           preparation_peinture: { ...prev.preparation_peinture, duration: e.target.value }
+                         }));
+                         recalculateFollowingSteps(2);
+                       }}
                       className="w-[90px]"
                     />
                   </div>
@@ -3906,10 +4028,13 @@ const Planning = () => {
                     <div className="flex gap-2 items-end">
                       <Select 
                         value={planningData.preparation_peinture.employeeId}
-                        onValueChange={(value) => setPlanningData(prev => ({
-                          ...prev,
-                          preparation_peinture: { ...prev.preparation_peinture, employeeId: value }
-                        }))}
+                        onValueChange={(value) => {
+                          setPlanningData(prev => ({
+                            ...prev,
+                            preparation_peinture: { ...prev.preparation_peinture, employeeId: value }
+                          }));
+                          recalculateFollowingSteps(2);
+                        }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Sélectionner un employé" />
@@ -3945,10 +4070,13 @@ const Planning = () => {
                       id="peinture_duration"
                       type="time"
                       value={planningData.mise_en_peinture.duration}
-                      onChange={(e) => setPlanningData(prev => ({
-                        ...prev,
-                        mise_en_peinture: { ...prev.mise_en_peinture, duration: e.target.value }
-                      }))}
+                       onChange={(e) => {
+                         setPlanningData(prev => ({
+                           ...prev,
+                           mise_en_peinture: { ...prev.mise_en_peinture, duration: e.target.value }
+                         }));
+                         recalculateFollowingSteps(3);
+                       }}
                       className="w-[90px]"
                     />
                   </div>
@@ -3957,10 +4085,13 @@ const Planning = () => {
                     <div className="flex gap-2 items-end">
                       <Select 
                         value={planningData.mise_en_peinture.employeeId}
-                        onValueChange={(value) => setPlanningData(prev => ({
-                          ...prev,
-                          mise_en_peinture: { ...prev.mise_en_peinture, employeeId: value }
-                        }))}
+                        onValueChange={(value) => {
+                          setPlanningData(prev => ({
+                            ...prev,
+                            mise_en_peinture: { ...prev.mise_en_peinture, employeeId: value }
+                          }));
+                          recalculateFollowingSteps(3);
+                        }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Sélectionner un employé" />
@@ -3996,10 +4127,13 @@ const Planning = () => {
                       id="finitions_duration"
                       type="time"
                       value={planningData.finitions_remontage.duration}
-                      onChange={(e) => setPlanningData(prev => ({
-                        ...prev,
-                        finitions_remontage: { ...prev.finitions_remontage, duration: e.target.value }
-                      }))}
+                       onChange={(e) => {
+                         setPlanningData(prev => ({
+                           ...prev,
+                           finitions_remontage: { ...prev.finitions_remontage, duration: e.target.value }
+                         }));
+                         recalculateFollowingSteps(4);
+                       }}
                       className="w-[90px]"
                     />
                   </div>
@@ -4008,10 +4142,13 @@ const Planning = () => {
                     <div className="flex gap-2 items-end">
                       <Select 
                         value={planningData.finitions_remontage.employeeId}
-                        onValueChange={(value) => setPlanningData(prev => ({
-                          ...prev,
-                          finitions_remontage: { ...prev.finitions_remontage, employeeId: value }
-                        }))}
+                        onValueChange={(value) => {
+                          setPlanningData(prev => ({
+                            ...prev,
+                            finitions_remontage: { ...prev.finitions_remontage, employeeId: value }
+                          }));
+                          recalculateFollowingSteps(4);
+                        }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Sélectionner un employé" />
@@ -4047,10 +4184,13 @@ const Planning = () => {
                       id="cloture_duration"
                       type="time"
                       value={planningData.cloture_livraison.duration}
-                      onChange={(e) => setPlanningData(prev => ({
-                        ...prev,
-                        cloture_livraison: { ...prev.cloture_livraison, duration: e.target.value }
-                      }))}
+                       onChange={(e) => {
+                         setPlanningData(prev => ({
+                           ...prev,
+                           cloture_livraison: { ...prev.cloture_livraison, duration: e.target.value }
+                         }));
+                         // Pas de recalcul car c'est la dernière étape
+                       }}
                       className="w-[90px]"
                     />
                   </div>
@@ -4059,10 +4199,13 @@ const Planning = () => {
                     <div className="flex gap-2 items-end">
                       <Select 
                         value={planningData.cloture_livraison.employeeId}
-                        onValueChange={(value) => setPlanningData(prev => ({
-                          ...prev,
-                          cloture_livraison: { ...prev.cloture_livraison, employeeId: value }
-                        }))}
+                        onValueChange={(value) => {
+                          setPlanningData(prev => ({
+                            ...prev,
+                            cloture_livraison: { ...prev.cloture_livraison, employeeId: value }
+                          }));
+                          // Pas de recalcul car c'est la dernière étape
+                        }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Sélectionner un employé" />
