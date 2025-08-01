@@ -20,47 +20,46 @@ export function useExpertiseReports() {
     refetchOnWindowFocus: true, // Refetch quand la fenêtre reprend le focus
   });
 
-  // Realtime updates pour les rapports d'expertise et quotes
-  useEffect(() => {
-    const reportsChannel = supabase
-      .channel('expertise-reports-realtime')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'expertise_reports'
-        },
-        (payload) => {
-          console.log('Expertise report updated:', payload);
-          queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
-        }
-      )
-      .subscribe();
+  // Temporarily disable realtime to prevent WebSocket browser compatibility issues
+  // TODO: Re-implement with proper browser WebSocket handling
+  // useEffect(() => {
+  //   const reportsChannel = supabase
+  //     .channel('expertise-reports-realtime')
+  //     .on(
+  //       'postgres_changes',
+  //       {
+  //         event: '*',
+  //         schema: 'public',
+  //         table: 'expertise_reports'
+  //       },
+  //       (payload) => {
+  //         console.log('Expertise report updated:', payload);
+  //         queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
+  //       }
+  //     )
+  //     .subscribe();
 
-    // Écouter aussi les changements de quotes pour mettre à jour les statuts de conversion
-    const quotesChannel = supabase
-      .channel('quotes-realtime')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'quotes'
-        },
-        (payload) => {
-          console.log('Quote created:', payload);
-          // Invalider aussi les rapports car le statut de conversion peut changer
-          queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
-        }
-      )
-      .subscribe();
+  //   const quotesChannel = supabase
+  //     .channel('quotes-realtime')
+  //     .on(
+  //       'postgres_changes',
+  //       {
+  //         event: 'INSERT',
+  //         schema: 'public',
+  //         table: 'quotes'
+  //       },
+  //       (payload) => {
+  //         console.log('Quote created:', payload);
+  //         queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
+  //       }
+  //     )
+  //     .subscribe();
 
-    return () => {
-      supabase.removeChannel(reportsChannel);
-      supabase.removeChannel(quotesChannel);
-    };
-  }, [queryClient]);
+  //   return () => {
+  //     supabase.removeChannel(reportsChannel);
+  //     supabase.removeChannel(quotesChannel);
+  //   };
+  // }, [queryClient]);
   
   const createReport = useMutation({
     mutationFn: (newReport: NewExpertiseReport) => expertiseReportsService.create(newReport),
