@@ -152,9 +152,22 @@ const Planning = () => {
 
   // Helper function to handle duration change and reselect best technician
   const handleDurationChange = (stepIndex: number, stepKey: keyof ExtendedPlanningData, newDuration: string) => {
-    if (!employees || employees.length === 0) return;
-    
     console.log(`Changing duration for step ${stepIndex} (${stepKey}) to ${newDuration}`);
+    
+    // Always update the duration in the state, even if it's empty (for user experience)
+    setPlanningData(prev => ({
+      ...prev,
+      [stepKey]: { 
+        ...prev[stepKey], 
+        duration: newDuration
+      }
+    }));
+    
+    // Only proceed with recalculation if we have a valid duration and employees
+    if (!newDuration || !employees || employees.length === 0) {
+      console.log('Skipping recalculation: empty duration or no employees');
+      return;
+    }
     
     // Find the best available technician for this step
     const stepNames = [
@@ -173,19 +186,15 @@ const Planning = () => {
     const bestEmployee = qualifiedEmployees.length > 0 ? qualifiedEmployees[0] : null;
     console.log(`Best employee found:`, bestEmployee);
     
-    // Update the current step with new duration and best employee
-    setPlanningData(prev => {
-      const updated = {
-        ...prev,
-        [stepKey]: { 
-          ...prev[stepKey], 
-          duration: newDuration,
-          employeeId: bestEmployee?.id || ''
-        }
-      };
-      console.log(`Updated planning data:`, updated);
-      return updated;
-    });
+    // Update with the best employee
+    setPlanningData(prev => ({
+      ...prev,
+      [stepKey]: { 
+        ...prev[stepKey], 
+        duration: newDuration,
+        employeeId: bestEmployee?.id || prev[stepKey].employeeId || ''
+      }
+    }));
     
     // Recalculate following steps after state update
     setTimeout(() => {
