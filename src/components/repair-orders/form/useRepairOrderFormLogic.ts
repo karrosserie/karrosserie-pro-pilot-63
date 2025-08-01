@@ -92,7 +92,7 @@ export const useRepairOrderFormLogic = ({ order, prefillData }: UseRepairOrderFo
         setFormData(prev => ({
           ...prev,
           reference: nextNumber,
-          // Appliquer les données de pré-remplissage si disponibles
+          // Appliquer les données de pré-remplissage si disponibles depuis order ou prefillData
           ...(order && {
             client_id: order.client_id || null,
             vehicle_id: order.vehicle_id || null,
@@ -106,13 +106,34 @@ export const useRepairOrderFormLogic = ({ order, prefillData }: UseRepairOrderFo
             incident_date: order.incident_date || '',
             quote_id: order.quote_id || null,
             order_date: (order as any).order_date || new Date().toISOString().split('T')[0]
+          }),
+          // Appliquer les prefillData si disponibles
+          ...(prefillData && {
+            client_id: prefillData.client_id || null,
+            vehicle_id: prefillData.vehicle_id || null,
+            status: prefillData.status || 'En attente',
+            notes: prefillData.notes || '',
+            personal_items: prefillData.personal_items || '',
+            report_number: prefillData.report_number || '',
+            policy_number: prefillData.policy_number || '',
+            report_date: prefillData.report_date || '',
+            expert_name: prefillData.expert_name || '',
+            incident_date: prefillData.incident_date || '',
+            quote_id: prefillData.quote_id || null,
+            order_date: (prefillData as any).order_date || new Date().toISOString().split('T')[0]
           })
         }));
+
+        console.log('Setting form data with prefill data:', {
+          client_id: prefillData?.client_id,
+          vehicle_id: prefillData?.vehicle_id
+        });
       });
       
       // Si on a des données de pré-remplissage (comme d'un devis converti)
-      if (order) {
-        const orderData = parseOrderData(order);
+      const dataSource = order || prefillData;
+      if (dataSource) {
+        const orderData = parseOrderData(dataSource);
         setClaimNumber(orderData.claimNumber || '');
         setRepairs(orderData.repairs || []);
         setParts(orderData.parts || []);
@@ -124,7 +145,7 @@ export const useRepairOrderFormLogic = ({ order, prefillData }: UseRepairOrderFo
         setDiscounts([]);
       }
     }
-  }, [order]);
+  }, [order, prefillData]);
 
   return {
     formData,
