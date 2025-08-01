@@ -21,19 +21,35 @@ export function useOptimalPlanning(employees: any[] = []) {
   const calculateOptimalPlanning = (): OptimalPlanningData => {
     const now = new Date();
     
-    // Calculer le prochain créneau disponible (demain matin 8h minimum)
+    // Calculer le prochain créneau disponible
     const nextAvailableDate = new Date(now);
-    if (now.getHours() >= 17) {
+    
+    // Si on est dans les heures ouvrables du jour même
+    if (now.getHours() >= 8 && now.getHours() < 17) {
+      // Commencer au moins 1 heure après maintenant, arrondi à l'heure suivante
+      nextAvailableDate.setHours(now.getHours() + 1, 0, 0, 0);
+      
+      // Si on dépasse 17h, aller au lendemain 8h
+      if (nextAvailableDate.getHours() >= 17) {
+        nextAvailableDate.setDate(nextAvailableDate.getDate() + 1);
+        nextAvailableDate.setHours(8, 0, 0, 0);
+      }
+    } else if (now.getHours() >= 17) {
       // Si après 17h, commencer le lendemain
       nextAvailableDate.setDate(nextAvailableDate.getDate() + 1);
+      nextAvailableDate.setHours(8, 0, 0, 0);
+    } else {
+      // Si avant 8h, commencer à 8h le même jour
+      nextAvailableDate.setHours(8, 0, 0, 0);
     }
-    nextAvailableDate.setHours(8, 0, 0, 0);
     
     // Si c'est le weekend, aller au lundi suivant
     if (nextAvailableDate.getDay() === 0) { // Dimanche
       nextAvailableDate.setDate(nextAvailableDate.getDate() + 1);
+      nextAvailableDate.setHours(8, 0, 0, 0);
     } else if (nextAvailableDate.getDay() === 6) { // Samedi
       nextAvailableDate.setDate(nextAvailableDate.getDate() + 2);
+      nextAvailableDate.setHours(8, 0, 0, 0);
     }
 
     let currentDateTime = new Date(nextAvailableDate);
