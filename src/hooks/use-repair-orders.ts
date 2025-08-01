@@ -26,12 +26,16 @@ export function useRepairOrders() {
       }
       return await repairOrdersService.create(orderData, companyId);
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['repair-orders'] });
-      toast({
-        title: "Ordre de réparation créé",
-        description: "L'ordre de réparation a été créé avec succès."
-      });
+      // Ne pas afficher de toast si c'est une conversion depuis un devis
+      // (le toast sera géré par le composant appelant)
+      if (!(variables as any)?.quote_id) {
+        toast({
+          title: "Ordre de réparation créé",
+          description: "L'ordre de réparation a été créé avec succès."
+        });
+      }
     },
     onError: (error) => {
       toast({

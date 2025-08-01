@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -27,6 +28,7 @@ interface QuoteViewerModalProps {
 }
 
 const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) => {
+  const navigate = useNavigate();
   const { companyData } = useCompany();
   const { preferences } = useCompanyPreferences();
   const { deleteQuote } = useQuotes();
@@ -392,10 +394,14 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
         order={prefilledRepairOrder as RepairOrder}
         open={repairOrderDialogOpen}
         onOpenChange={setRepairOrderDialogOpen}
+        prefillData={prefilledRepairOrder}
         onSuccess={() => {
-          setRepairOrderDialogOpen(false);
+          // Fermer l'aperçu du devis
+          onOpenChange(false);
+          
+          // Afficher un toast de succès
           toast({
-            title: "Ordre de réparation créé",
+            title: "Conversion réussie",
             description: `L'ordre de réparation a été créé à partir du devis ${quote.reference}.`
           });
         }}
