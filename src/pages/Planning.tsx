@@ -34,6 +34,16 @@ const calculateDuration = (startDateTime: string, endDateTime: string): string =
   return diffMinutes > 0 ? `${diffHours}h${diffMinutes}min` : `${diffHours}h`;
 };
 
+// Interface locale étendue pour la planification avec dates
+interface ExtendedPlanningData {
+  accueil_preparation: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
+  remplacement_debosselage: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
+  preparation_peinture: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
+  mise_en_peinture: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
+  finitions_remontage: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
+  cloture_livraison: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
+}
+
 const Planning = () => {
   const { companyInfo } = useCompany();
   const { user } = useAuth();
@@ -52,7 +62,7 @@ const Planning = () => {
     teamMemberId: "",
     qualifications: [] as string[]
   });
-  const [planningData, setPlanningData] = useState({
+  const [planningData, setPlanningData] = useState<ExtendedPlanningData>({
     accueil_preparation: { duration: "", employeeId: "" },
     remplacement_debosselage: { duration: "", employeeId: "" },
     preparation_peinture: { duration: "", employeeId: "" },
@@ -128,8 +138,12 @@ const Planning = () => {
       setPlanningData(prev => {
         const newData = { ...prev };
         for (let i = fromStepIndex + 1; i < stepKeys.length; i++) {
-          const key = stepKeys[i] as keyof typeof optimalPlanning;
-          newData[key] = optimalPlanning[key];
+          const key = stepKeys[i] as keyof ExtendedPlanningData;
+          newData[key] = {
+            ...optimalPlanning[key],
+            startDateTime: optimalPlanning[key]?.startDateTime,
+            endDateTime: optimalPlanning[key]?.endDateTime
+          };
         }
         return newData;
       });
@@ -1079,8 +1093,36 @@ const Planning = () => {
                                         if (employees && employees.length > 0) {
                                           const optimalPlanning = calculateOptimalPlanning();
                                           setPlanningData(prev => ({
-                                            ...prev,
-                                            ...optimalPlanning
+                                            accueil_preparation: {
+                                              ...optimalPlanning.accueil_preparation,
+                                              startDateTime: optimalPlanning.accueil_preparation?.startDateTime,
+                                              endDateTime: optimalPlanning.accueil_preparation?.endDateTime
+                                            },
+                                            remplacement_debosselage: {
+                                              ...optimalPlanning.remplacement_debosselage,
+                                              startDateTime: optimalPlanning.remplacement_debosselage?.startDateTime,
+                                              endDateTime: optimalPlanning.remplacement_debosselage?.endDateTime
+                                            },
+                                            preparation_peinture: {
+                                              ...optimalPlanning.preparation_peinture,
+                                              startDateTime: optimalPlanning.preparation_peinture?.startDateTime,
+                                              endDateTime: optimalPlanning.preparation_peinture?.endDateTime
+                                            },
+                                            mise_en_peinture: {
+                                              ...optimalPlanning.mise_en_peinture,
+                                              startDateTime: optimalPlanning.mise_en_peinture?.startDateTime,
+                                              endDateTime: optimalPlanning.mise_en_peinture?.endDateTime
+                                            },
+                                            finitions_remontage: {
+                                              ...optimalPlanning.finitions_remontage,
+                                              startDateTime: optimalPlanning.finitions_remontage?.startDateTime,
+                                              endDateTime: optimalPlanning.finitions_remontage?.endDateTime
+                                            },
+                                            cloture_livraison: {
+                                              ...optimalPlanning.cloture_livraison,
+                                              startDateTime: optimalPlanning.cloture_livraison?.startDateTime,
+                                              endDateTime: optimalPlanning.cloture_livraison?.endDateTime
+                                            }
                                           }));
                                         }
                                       }, 100);
@@ -3938,8 +3980,26 @@ const Planning = () => {
                           ))}
                         </SelectContent>
                       </Select>
-                      <div className="text-sm text-muted-foreground whitespace-nowrap">
-                        {planningData.accueil_preparation.employeeId && "9h00 - 10h00"}
+                      <div className="text-sm text-muted-foreground whitespace-nowrap min-w-[120px]">
+                        {planningData.accueil_preparation.employeeId && planningData.accueil_preparation.startDateTime && planningData.accueil_preparation.endDateTime && (
+                          <div className="text-right">
+                            <div className="font-medium">
+                              {planningData.accueil_preparation.startDateTime.toLocaleDateString('fr-FR', { 
+                                day: '2-digit', 
+                                month: '2-digit' 
+                              })}
+                            </div>
+                            <div>
+                              {planningData.accueil_preparation.startDateTime.toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })} - {planningData.accueil_preparation.endDateTime.toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -3995,8 +4055,26 @@ const Planning = () => {
                           ))}
                         </SelectContent>
                       </Select>
-                      <div className="text-sm text-muted-foreground whitespace-nowrap">
-                        {planningData.remplacement_debosselage.employeeId && "10h00 - 12h30"}
+                      <div className="text-sm text-muted-foreground whitespace-nowrap min-w-[120px]">
+                        {planningData.remplacement_debosselage.employeeId && planningData.remplacement_debosselage.startDateTime && planningData.remplacement_debosselage.endDateTime && (
+                          <div className="text-right">
+                            <div className="font-medium">
+                              {planningData.remplacement_debosselage.startDateTime.toLocaleDateString('fr-FR', { 
+                                day: '2-digit', 
+                                month: '2-digit' 
+                              })}
+                            </div>
+                            <div>
+                              {planningData.remplacement_debosselage.startDateTime.toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })} - {planningData.remplacement_debosselage.endDateTime.toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -4052,8 +4130,26 @@ const Planning = () => {
                           ))}
                         </SelectContent>
                       </Select>
-                      <div className="text-sm text-muted-foreground whitespace-nowrap">
-                        {planningData.preparation_peinture.employeeId && "14h00 - 16h30"}
+                      <div className="text-sm text-muted-foreground whitespace-nowrap min-w-[120px]">
+                        {planningData.preparation_peinture.employeeId && planningData.preparation_peinture.startDateTime && planningData.preparation_peinture.endDateTime && (
+                          <div className="text-right">
+                            <div className="font-medium">
+                              {planningData.preparation_peinture.startDateTime.toLocaleDateString('fr-FR', { 
+                                day: '2-digit', 
+                                month: '2-digit' 
+                              })}
+                            </div>
+                            <div>
+                              {planningData.preparation_peinture.startDateTime.toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })} - {planningData.preparation_peinture.endDateTime.toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -4109,8 +4205,26 @@ const Planning = () => {
                           ))}
                         </SelectContent>
                       </Select>
-                      <div className="text-sm text-muted-foreground whitespace-nowrap">
-                        {planningData.mise_en_peinture.employeeId && "9h00 - 14h00"}
+                      <div className="text-sm text-muted-foreground whitespace-nowrap min-w-[120px]">
+                        {planningData.mise_en_peinture.employeeId && planningData.mise_en_peinture.startDateTime && planningData.mise_en_peinture.endDateTime && (
+                          <div className="text-right">
+                            <div className="font-medium">
+                              {planningData.mise_en_peinture.startDateTime.toLocaleDateString('fr-FR', { 
+                                day: '2-digit', 
+                                month: '2-digit' 
+                              })}
+                            </div>
+                            <div>
+                              {planningData.mise_en_peinture.startDateTime.toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })} - {planningData.mise_en_peinture.endDateTime.toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -4166,8 +4280,26 @@ const Planning = () => {
                           ))}
                         </SelectContent>
                       </Select>
-                      <div className="text-sm text-muted-foreground whitespace-nowrap">
-                        {planningData.finitions_remontage.employeeId && "14h00 - 16h00"}
+                      <div className="text-sm text-muted-foreground whitespace-nowrap min-w-[120px]">
+                        {planningData.finitions_remontage.employeeId && planningData.finitions_remontage.startDateTime && planningData.finitions_remontage.endDateTime && (
+                          <div className="text-right">
+                            <div className="font-medium">
+                              {planningData.finitions_remontage.startDateTime.toLocaleDateString('fr-FR', { 
+                                day: '2-digit', 
+                                month: '2-digit' 
+                              })}
+                            </div>
+                            <div>
+                              {planningData.finitions_remontage.startDateTime.toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })} - {planningData.finitions_remontage.endDateTime.toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -4223,8 +4355,26 @@ const Planning = () => {
                           ))}
                         </SelectContent>
                       </Select>
-                      <div className="text-sm text-muted-foreground whitespace-nowrap">
-                        {planningData.cloture_livraison.employeeId && "16h00 - 16h30"}
+                      <div className="text-sm text-muted-foreground whitespace-nowrap min-w-[120px]">
+                        {planningData.cloture_livraison.employeeId && planningData.cloture_livraison.startDateTime && planningData.cloture_livraison.endDateTime && (
+                          <div className="text-right">
+                            <div className="font-medium">
+                              {planningData.cloture_livraison.startDateTime.toLocaleDateString('fr-FR', { 
+                                day: '2-digit', 
+                                month: '2-digit' 
+                              })}
+                            </div>
+                            <div>
+                              {planningData.cloture_livraison.startDateTime.toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })} - {planningData.cloture_livraison.endDateTime.toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
