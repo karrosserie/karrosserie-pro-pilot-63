@@ -8,6 +8,7 @@ import { Invoice } from '@/services/supabase/invoices';
 import { useCompany } from '@/hooks/use-company';
 import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 import { useInvoices } from '@/hooks/use-invoices';
+import { useQueryClient } from '@tanstack/react-query';
 import { calculateInvoiceTotals } from '@/utils/invoiceCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
@@ -31,28 +32,67 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
   const { preferences } = useCompanyPreferences();
   const { deleteInvoice } = useInvoices();
   const { confirm } = useConfirmation();
+  const queryClient = useQueryClient();
   const [clientData, setClientData] = useState<any>(null);
   const [vehicleData, setVehicleData] = useState<any>(null);
   const [receiptsData, setReceiptsData] = useState<any[]>([]);
+  const [currentInvoice, setCurrentInvoice] = useState<Invoice | null>(invoice);
   
   // States for dialogs
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
   const [creditDialogOpen, setCreditDialogOpen] = useState(false);
+
+  // Mettre à jour la facture actuelle quand la prop change
+  useEffect(() => {
+    setCurrentInvoice(invoice);
+  }, [invoice]);
+
+  // Écouter les mises à jour du cache React Query pour cette facture spécifique
+  useEffect(() => {
+    if (!currentInvoice?.id) return;
+
+    const refetchInvoiceData = async () => {
+      try {
+        // Récupérer les données mises à jour depuis le cache React Query
+        const cachedInvoices = queryClient.getQueryData(['invoices']) as Invoice[] | undefined;
+        if (cachedInvoices) {
+          const updatedInvoice = cachedInvoices.find(i => i.id === currentInvoice.id);
+          if (updatedInvoice) {
+            console.log('Invoice updated from cache:', updatedInvoice);
+            setCurrentInvoice(updatedInvoice);
+          }
+        }
+      } catch (error) {
+        console.error('Error refreshing invoice data:', error);
+      }
+    };
+
+    // Écouter les invalidations du cache des factures
+    const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
+      if (event?.query?.queryKey?.[0] === 'invoices' && event.type === 'updated') {
+        refetchInvoiceData();
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [currentInvoice?.id, queryClient]);
   
   // Récupérer les données client et véhicule depuis la base de données
   useEffect(() => {
     const fetchRelatedData = async () => {
-      if (!invoice) return;
+      if (!currentInvoice) return;
 
       try {
         // Récupérer les données client
-        if (invoice.client_id) {
+        if (currentInvoice.client_id) {
           const { data: client } = await supabase
             .from('clients')
             .select('*')
-            .eq('id', invoice.client_id)
+            .eq('id', currentInvoice.client_id)
             .single();
           
           if (client) {
@@ -61,7 +101,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
         }
 
         // Récupérer les données véhicule avec les informations de marque et modèle
-        if (invoice.vehicle_id) {
+        if (currentInvoice.vehicle_id) {
           const { data: vehicle } = await supabase
             .from('vehicles')
             .select(`
@@ -69,7 +109,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
               car_brands(name),
               car_models(name)
             `)
-            .eq('id', invoice.vehicle_id)
+            .eq('id', currentInvoice.vehicle_id)
             .single();
           
           if (vehicle) {
@@ -81,7 +121,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
         const { data: receipts } = await supabase
           .from('receipts')
           .select('*')
-          .eq('invoice_id', invoice.id)
+          .eq('invoice_id', currentInvoice.id)
           .order('date', { ascending: true });
         
         if (receipts) {
@@ -92,12 +132,12 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
       }
     };
 
-    if (open && invoice) {
+    if (open && currentInvoice) {
       fetchRelatedData();
     }
-  }, [invoice, open]);
+  }, [currentInvoice, open]);
 
-  if (!invoice) return null;
+  if (!currentInvoice) return null;
 
   const template = preferences?.invoice_template || 'default';
 
@@ -114,17 +154,17 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
 
   // Préparer les données pour les composants de template
   const invoiceData = {
-    number: invoice.reference,
-    claimNumber: invoice.claim_number || undefined,
-    billingDate: formatDateFr(invoice.date),
-    dueDate: formatDateFr(invoice.due_date),
+    number: currentInvoice.reference,
+    claimNumber: currentInvoice.claim_number || undefined,
+    billingDate: formatDateFr(currentInvoice.date),
+    dueDate: formatDateFr(currentInvoice.due_date),
     vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : undefined,
     licensePlate: vehicleData?.license_plate || undefined,
     mileage: vehicleData?.mileage ? `${vehicleData.mileage.toLocaleString('fr-FR')} km` : undefined,
-    amountDue: `${invoice.amount.toFixed(2).replace('.', ',')} €`,
-    date: formatDateFr(invoice.date),
-    notes: invoice.notes || undefined,
-    payment_details: invoice.payment_details || undefined
+    amountDue: `${currentInvoice.amount.toFixed(2).replace('.', ',')} €`,
+    date: formatDateFr(currentInvoice.date),
+    notes: currentInvoice.notes || undefined,
+    payment_details: currentInvoice.payment_details || undefined
   };
 
   // Préparer les données client pour le template
@@ -141,8 +181,8 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
 
   // Convertir les données des items
   const items = [];
-  if (invoice.repairs_data) {
-    const repairs = Array.isArray(invoice.repairs_data) ? invoice.repairs_data : [];
+  if (currentInvoice.repairs_data) {
+    const repairs = Array.isArray(currentInvoice.repairs_data) ? currentInvoice.repairs_data : [];
     items.push(...repairs.map((repair: any) => ({
       ref: repair.ref || '',
       description: repair.description || repair.label || '',
@@ -155,8 +195,8 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
     })));
   }
 
-  if (invoice.parts_data) {
-    const parts = Array.isArray(invoice.parts_data) ? invoice.parts_data : [];
+  if (currentInvoice.parts_data) {
+    const parts = Array.isArray(currentInvoice.parts_data) ? currentInvoice.parts_data : [];
     items.push(...parts.map((part: any) => ({
       ref: part.ref || '',
       description: part.description || part.label || '',
@@ -169,7 +209,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
     })));
   }
 
-  const totals = calculateInvoiceTotals(invoice.repairs_data, invoice.parts_data);
+  const totals = calculateInvoiceTotals(currentInvoice.repairs_data, currentInvoice.parts_data);
   const totalsData = {
     subtotal: `${totals.subtotalAfterDiscount.toFixed(2).replace('.', ',')} €`,
     vat: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
@@ -182,7 +222,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
 
   // Calculer les montants de paiement
   const totalPaidAmount = receiptsData.reduce((sum, receipt) => sum + receipt.amount, 0);
-  const remainingAmount = invoice.amount - totalPaidAmount;
+  const remainingAmount = currentInvoice.amount - totalPaidAmount;
 
   // Action handlers
   const handleEdit = () => {
@@ -192,7 +232,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
   const handleDelete = async () => {
     const confirmed = await confirm({
       title: 'Supprimer la facture',
-      description: `Êtes-vous sûr de vouloir supprimer la facture ${invoice.reference} ? Cette action est irréversible.`,
+      description: `Êtes-vous sûr de vouloir supprimer la facture ${currentInvoice.reference} ? Cette action est irréversible.`,
       confirmText: 'Supprimer',
       cancelText: 'Annuler',
       variant: 'destructive'
@@ -200,11 +240,11 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
 
     if (confirmed) {
       try {
-        await deleteInvoice.mutateAsync(invoice.id);
+        await deleteInvoice.mutateAsync(currentInvoice.id);
         onOpenChange(false);
         toast({
           title: "Facture supprimée",
-          description: `La facture ${invoice.reference} a été supprimée avec succès.`,
+          description: `La facture ${currentInvoice.reference} a été supprimée avec succès.`,
         });
       } catch (error: any) {
         console.error('Error deleting invoice:', error);
@@ -219,11 +259,11 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
 
   const handleDownload = async () => {
     const { generateInvoicePDFWithTemplate } = await import('@/utils/invoicePDFGeneration');
-    const result = await generateInvoicePDFWithTemplate(invoice, {});
+    const result = await generateInvoicePDFWithTemplate(currentInvoice, {});
     if (result.success) {
       toast({
         title: "Téléchargement réussi",
-        description: `La facture ${invoice.reference} a été téléchargée.`
+        description: `La facture ${currentInvoice.reference} a été téléchargée.`
       });
     } else {
       toast({
@@ -236,11 +276,11 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
 
   const handlePrint = async () => {
     const { printInvoicePDFWithTemplate } = await import('@/utils/invoicePDFGeneration');
-    const result = await printInvoicePDFWithTemplate(invoice, {});
+    const result = await printInvoicePDFWithTemplate(currentInvoice, {});
     if (result.success) {
       toast({
         title: "Impression",
-        description: `La facture ${invoice.reference} a été ouverte pour impression.`
+        description: `La facture ${currentInvoice.reference} a été ouverte pour impression.`
       });
     } else {
       toast({
@@ -269,7 +309,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
           {/* Barre d'actions en haut */}
           <div className="p-4 pr-16 border-b bg-background">
-            <h2 className="text-lg font-semibold mb-3">Aperçu de la facture n°{invoice.reference}</h2>
+            <h2 className="text-lg font-semibold mb-3">Aperçu de la facture n°{currentInvoice.reference}</h2>
             <div className="flex items-center gap-2 flex-wrap">
               <Button variant="outline" size="sm" onClick={handleEdit}>
                 <Pencil className="h-4 w-4 mr-1" />
@@ -342,13 +382,13 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
 
       {/* Dialogues pour les actions */}
       <InvoiceDialog
-        invoice={invoice}
+        invoice={currentInvoice}
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
       />
 
       <InvoiceEmailDialog
-        invoice={invoice}
+        invoice={currentInvoice}
         open={emailDialogOpen}
         onOpenChange={setEmailDialogOpen}
       />
@@ -357,8 +397,8 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
         open={receiptDialogOpen}
         onOpenChange={setReceiptDialogOpen}
         preselectedInvoice={{
-          id: invoice.id,
-          amount: remainingAmount > 0 ? remainingAmount : invoice.amount,
+          id: currentInvoice.id,
+          amount: remainingAmount > 0 ? remainingAmount : currentInvoice.amount,
         }}
       />
 
@@ -366,7 +406,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
         open={creditDialogOpen}
         onOpenChange={setCreditDialogOpen}
         credit={{
-          invoice_id: invoice.id,
+          invoice_id: currentInvoice.id,
           reference: '',
           status: 'En attente',
           amount: 0,
