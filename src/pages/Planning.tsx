@@ -50,7 +50,7 @@ const Planning = () => {
   const { companyInfo } = useCompany();
   const { user } = useAuth();
   const [activeView, setActiveView] = useState("manager");
-  const [activeProcessStep, setActiveProcessStep] = useState("accueil");
+  const [activeView, setActiveView] = useState("manager");
   const [showWaitingVehiclesModal, setShowWaitingVehiclesModal] = useState(false);
   const [showVehicleDetailModal, setShowVehicleDetailModal] = useState(false);
   const [showUrgentVehicleModal, setShowUrgentVehicleModal] = useState(false);
@@ -58,6 +58,7 @@ const Planning = () => {
   const [showScheduleConfigModal, setShowScheduleConfigModal] = useState(false);
   const [showPlanningModal, setShowPlanningModal] = useState(false);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>('');
+  const [selectedPlanningEmployeeId, setSelectedPlanningEmployeeId] = useState<string>('');
   const [availableVehicles, setAvailableVehicles] = useState<any[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
@@ -130,6 +131,7 @@ const Planning = () => {
   const { employees, createEmployee, updateEmployee } = useEmployees();
   const { workflowSteps, refetch: refetchWorkflow } = useVehicleWorkflow(companyInfo?.id);
   const { schedules: employeeSchedules } = useEmployeeSchedule(selectedEmployeeId);
+  const { schedules: planningEmployeeSchedules } = useEmployeeSchedule(selectedPlanningEmployeeId);
   const { calculateOptimalPlanning } = useOptimalPlanning(employees);
 
   // Helper function to recalculate following steps
@@ -263,6 +265,16 @@ const Planning = () => {
 
     loadConfigData();
   }, [companyInfo?.id]);
+
+  // Sélectionner automatiquement le premier employé
+  useEffect(() => {
+    if (employees && employees.length > 0 && !selectedEmployeeId) {
+      setSelectedEmployeeId(employees[0].id);
+    }
+    if (employees && employees.length > 0 && !selectedPlanningEmployeeId) {
+      setSelectedPlanningEmployeeId(employees[0].id);
+    }
+  }, [employees, selectedEmployeeId, selectedPlanningEmployeeId]);
 
   // Pré-remplir les données de planification avec les temps par défaut
   useEffect(() => {
@@ -786,10 +798,6 @@ const Planning = () => {
             <TabsTrigger value="staff" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               Employés
-            </TabsTrigger>
-            <TabsTrigger value="process" className="flex items-center gap-2">
-              <Cog className="w-4 h-4" />
-              Process
             </TabsTrigger>
           </TabsList>
 
@@ -1383,7 +1391,10 @@ const Planning = () => {
             {/* Sélecteur d'employé */}
             <div className="flex items-center gap-4">
               <Label htmlFor="employee_select">Employé :</Label>
-              <Select defaultValue="sophie">
+              <Select 
+                value={selectedPlanningEmployeeId}
+                onValueChange={setSelectedPlanningEmployeeId}
+              >
                 <SelectTrigger
                   id="employee_select"
                   className="w-[200px]"
@@ -1391,8 +1402,14 @@ const Planning = () => {
                   <SelectValue placeholder="Sélectionner un employé" />
                 </SelectTrigger>
                 <SelectContent className="bg-background border border-border shadow-md z-50">
-                  <SelectItem value="sophie">Sophie Martin</SelectItem>
-                  <SelectItem value="martin">Martin Dubois</SelectItem>
+                  {employees?.map(employee => (
+                    <SelectItem key={employee.id} value={employee.id}>
+                      {employee.user_companies?.profiles?.first_name && employee.user_companies?.profiles?.last_name 
+                        ? `${employee.user_companies.profiles.first_name} ${employee.user_companies.profiles.last_name}`
+                        : `Employé #${employee.id.slice(0, 8)}`
+                      }
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
