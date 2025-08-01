@@ -47,10 +47,6 @@ export function useCessions() {
       cessionsService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cessions'] });
-      toast({
-        title: "Cession mise à jour",
-        description: "La cession a été mise à jour avec succès."
-      });
     },
     onError: (error) => {
       toast({
