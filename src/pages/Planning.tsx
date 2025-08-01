@@ -130,7 +130,7 @@ const Planning = () => {
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const { employees, createEmployee, updateEmployee } = useEmployees();
   const { workflowSteps, refetch: refetchWorkflow } = useVehicleWorkflow(companyInfo?.id);
-  const { schedules: employeeSchedules } = useEmployeeSchedule(selectedEmployeeId);
+  const { schedules: employeeSchedules, refetch: refetchEmployeeSchedule } = useEmployeeSchedule(selectedEmployeeId);
   const { schedules: planningEmployeeSchedules } = useEmployeeSchedule(selectedPlanningEmployeeId);
   const { schedules: workshopSchedules } = useWorkshopSchedule();
   const { calculateOptimalPlanning } = useOptimalPlanning(employees);
@@ -270,6 +270,73 @@ const Planning = () => {
 
     loadConfigData();
   }, [companyInfo?.id]);
+
+  // Fonction pour démarrer une tâche
+  const handleStartTask = async (schedule: any) => {
+    if (!companyInfo?.id) return;
+    
+    try {
+      const now = new Date().toISOString();
+      
+      // 1. Mettre à jour le statut dans employee_schedule
+      const { error: scheduleError } = await (supabase as any)
+        .from('employee_schedule')
+        .update({
+          status: 'En cours',
+          real_start_datetime: now
+        })
+        .eq('id', schedule.id);
+
+      if (scheduleError) throw scheduleError;
+
+      // 2. Mettre à jour le current_step dans vehicle_workflow_steps si un véhicule est associé
+      if (schedule.vehicle_id) {
+        // Déterminer le next step basé sur le task_type
+        let nextStep = schedule.task_type;
+        
+        // Mapping des types de tâches vers les étapes du workflow
+        const taskTypeToStep: { [key: string]: string } = {
+          'Accueil et préparation': 'remplacement_debosselage',
+          'Remplacement/débosselage': 'preparation_peinture',
+          'Préparation peinture': 'mise_en_peinture',
+          'Mise en peinture': 'finitions_remontage',
+          'Finitions et remontage': 'cloture_livraison',
+          'Clôture et livraison': 'completed'
+        };
+        
+        nextStep = taskTypeToStep[schedule.task_type] || schedule.task_type;
+        
+        const { error: workflowError } = await supabase
+          .from('vehicle_workflow_steps')
+          .update({
+            current_step: nextStep,
+            progress_percentage: Math.min(100, (Object.keys(taskTypeToStep).indexOf(schedule.task_type) + 1) * 16.66)
+          })
+          .eq('vehicle_id', schedule.vehicle_id)
+          .eq('company_id', companyInfo.id);
+
+        if (workflowError) throw workflowError;
+      }
+
+      toast({
+        title: "Tâche démarrée",
+        description: "La tâche a été démarrée avec succès",
+      });
+
+      // Recharger les données
+      if (selectedEmployeeId) {
+        refetchEmployeeSchedule();
+      }
+      
+    } catch (error) {
+      console.error('Erreur lors du démarrage de la tâche:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de démarrer la tâche",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Sélectionner automatiquement le premier employé
   useEffect(() => {
@@ -807,10 +874,16 @@ const Planning = () => {
                                   setShowVehicleDetailModal(true);
                                 }
                               }}>Détails</Button>
-                              <div className="flex gap-2">
-                                <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
+                               <div className="flex gap-2">
+                                <Button 
+                                  size="sm" 
+                                  className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+                                  onClick={() => handleStartTask(schedule)}
+                                  disabled={schedule.status === 'En cours' || schedule.status === 'Terminé'}
+                                >
                                   <Play className="w-4 h-4 mr-2" />
-                                  Démarrer
+                                  {schedule.status === 'En attente' ? 'Démarrer' : 
+                                   schedule.status === 'En cours' ? 'En cours' : 'Terminé'}
                                 </Button>
                               </div>
                             </div>
