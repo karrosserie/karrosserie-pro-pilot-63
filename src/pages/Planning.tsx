@@ -38,12 +38,12 @@ const Planning = () => {
     qualifications: [] as string[]
   });
   const [planningData, setPlanningData] = useState({
-    accueil_preparation: { duration: "01:00", employeeId: "" },
-    remplacement_debosselage: { duration: "02:30", employeeId: "" },
-    preparation_peinture: { duration: "02:30", employeeId: "" },
-    mise_en_peinture: { duration: "05:00", employeeId: "" },
-    finitions_remontage: { duration: "02:00", employeeId: "" },
-    cloture_livraison: { duration: "00:30", employeeId: "" }
+    accueil_preparation: { duration: "", employeeId: "" },
+    remplacement_debosselage: { duration: "", employeeId: "" },
+    preparation_peinture: { duration: "", employeeId: "" },
+    mise_en_peinture: { duration: "", employeeId: "" },
+    finitions_remontage: { duration: "", employeeId: "" },
+    cloture_livraison: { duration: "", employeeId: "" }
   });
   const [configData, setConfigData] = useState({
     accueil: "01:00",
@@ -99,7 +99,7 @@ const Planning = () => {
   });
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const { employees, createEmployee, updateEmployee } = useEmployees();
-  const { workflowSteps } = useVehicleWorkflow(companyInfo?.id);
+  const { workflowSteps, refetch: refetchWorkflow } = useVehicleWorkflow(companyInfo?.id);
 
   // Charger les temps de configuration depuis la base de données
   useEffect(() => {
@@ -132,6 +132,20 @@ const Planning = () => {
 
     loadConfigData();
   }, [companyInfo?.id]);
+
+  // Pré-remplir les données de planification avec les temps par défaut
+  useEffect(() => {
+    if (showPlanningModal) {
+      setPlanningData({
+        accueil_preparation: { duration: configData.accueil, employeeId: "" },
+        remplacement_debosselage: { duration: configData.debosselage, employeeId: "" },
+        preparation_peinture: { duration: configData.preparation, employeeId: "" },
+        mise_en_peinture: { duration: configData.peinture, employeeId: "" },
+        finitions_remontage: { duration: configData.finitions, employeeId: "" },
+        cloture_livraison: { duration: configData.cloture, employeeId: "" }
+      });
+    }
+  }, [showPlanningModal, configData]);
 
   // Charger les horaires d'ouverture depuis la base de données
   useEffect(() => {
@@ -3718,7 +3732,7 @@ const Planning = () => {
                 <h3 className="font-medium text-sm mb-3 text-karrosserie-orange">Accueil & Préparation du dossier</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="accueil_duration">Durée (hh:mm)</Label>
+                    <Label htmlFor="accueil_duration">Durée</Label>
                     <Input
                       id="accueil_duration"
                       type="time"
@@ -3758,7 +3772,7 @@ const Planning = () => {
                 <h3 className="font-medium text-sm mb-3 text-green-500">Remplacement ou débosselage</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="remplacement_duration">Durée (hh:mm)</Label>
+                    <Label htmlFor="remplacement_duration">Durée</Label>
                     <Input
                       id="remplacement_duration"
                       type="time"
@@ -3798,7 +3812,7 @@ const Planning = () => {
                 <h3 className="font-medium text-sm mb-3 text-yellow-500">Préparation peinture</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="preparation_duration">Durée (hh:mm)</Label>
+                    <Label htmlFor="preparation_duration">Durée</Label>
                     <Input
                       id="preparation_duration"
                       type="time"
@@ -3838,7 +3852,7 @@ const Planning = () => {
                 <h3 className="font-medium text-sm mb-3 text-blue-500">Mise en peinture</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="peinture_duration">Durée (hh:mm)</Label>
+                    <Label htmlFor="peinture_duration">Durée</Label>
                     <Input
                       id="peinture_duration"
                       type="time"
@@ -3878,7 +3892,7 @@ const Planning = () => {
                 <h3 className="font-medium text-sm mb-3 text-purple-500">Finitions & remontage</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="finitions_duration">Durée (hh:mm)</Label>
+                    <Label htmlFor="finitions_duration">Durée</Label>
                     <Input
                       id="finitions_duration"
                       type="time"
@@ -3918,7 +3932,7 @@ const Planning = () => {
                 <h3 className="font-medium text-sm mb-3 text-red-500">Clôture & livraison</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="cloture_duration">Durée (hh:mm)</Label>
+                    <Label htmlFor="cloture_duration">Durée</Label>
                     <Input
                       id="cloture_duration"
                       type="time"
@@ -3991,9 +4005,7 @@ const Planning = () => {
                     
                     setShowPlanningModal(false);
                     // Refresh workflow data
-                    if (workflowSteps) {
-                      // This would trigger a refetch
-                    }
+                    refetchWorkflow();
                   } catch (error) {
                     console.error('Erreur lors de la planification:', error);
                     toast({
