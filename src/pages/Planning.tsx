@@ -781,8 +781,9 @@ const Planning = () => {
         )}
 
         {/* Vue Manager - Onglets complets */}
-         {activeView === "manager" && (
-          <Tabs defaultValue="workshop" className="w-full">
+        {activeView === "manager" && (
+          <>
+            <Tabs defaultValue="workshop" className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="workshop" className="flex items-center gap-2">
               <Wrench className="w-4 h-4" />
@@ -891,7 +892,7 @@ const Planning = () => {
                                   En cours
                                 </Badge>
                               ) : (
-                                <Badge variant="secondary">À planifier</Badge>
+                                <Badge variant="secondary">À préparer</Badge>
                               )}
                               
                               <div className="flex items-center gap-2">
@@ -1759,7 +1760,8 @@ const Planning = () => {
             />
           </TabsContent>
 
-        </Tabs>
+            </Tabs>
+          </>
         )}
 
         {/* Modal des véhicules en attente */}
@@ -2061,7 +2063,7 @@ const Planning = () => {
                             <span className="font-medium">220€</span>
                           </div>
                           <div className="flex justify-end">
-                            <Badge variant="secondary" className="text-xs">À planifier</Badge>
+                            <Badge variant="secondary" className="text-xs">À préparer</Badge>
                           </div>
                         </div>
                       </div>
