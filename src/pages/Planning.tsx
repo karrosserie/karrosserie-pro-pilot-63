@@ -154,6 +154,8 @@ const Planning = () => {
   const handleDurationChange = (stepIndex: number, stepKey: keyof ExtendedPlanningData, newDuration: string) => {
     if (!employees || employees.length === 0) return;
     
+    console.log(`Changing duration for step ${stepIndex} (${stepKey}) to ${newDuration}`);
+    
     // Find the best available technician for this step
     const stepNames = [
       'Accueil & Préparation du dossier',
@@ -169,38 +171,51 @@ const Planning = () => {
     );
     
     const bestEmployee = qualifiedEmployees.length > 0 ? qualifiedEmployees[0] : null;
+    console.log(`Best employee found:`, bestEmployee);
     
-    setPlanningData(prev => ({
-      ...prev,
-      [stepKey]: { 
-        ...prev[stepKey], 
-        duration: newDuration,
-        employeeId: bestEmployee?.id || ''
-      }
-    }));
+    // Update the current step with new duration and best employee
+    setPlanningData(prev => {
+      const updated = {
+        ...prev,
+        [stepKey]: { 
+          ...prev[stepKey], 
+          duration: newDuration,
+          employeeId: bestEmployee?.id || ''
+        }
+      };
+      console.log(`Updated planning data:`, updated);
+      return updated;
+    });
     
-    recalculateFollowingSteps(stepIndex);
+    // Recalculate following steps after state update
+    setTimeout(() => {
+      recalculateFollowingSteps(stepIndex);
+    }, 100);
   };
 
   // Helper function to handle employee change and find best slot
   const handleEmployeeChange = (stepIndex: number, stepKey: keyof ExtendedPlanningData, employeeId: string) => {
     if (!employees || employees.length === 0) return;
     
-    // Get the best available slot for this employee
-    const optimalPlanning = calculateOptimalPlanning();
-    const currentStepData = optimalPlanning[stepKey];
+    console.log(`Changing employee for step ${stepIndex} (${stepKey}) to ${employeeId}`);
     
-    setPlanningData(prev => ({
-      ...prev,
-      [stepKey]: { 
-        ...prev[stepKey], 
-        employeeId: employeeId,
-        startDateTime: currentStepData?.startDateTime,
-        endDateTime: currentStepData?.endDateTime
-      }
-    }));
+    // Update the current step with new employee
+    setPlanningData(prev => {
+      const updated = {
+        ...prev,
+        [stepKey]: { 
+          ...prev[stepKey], 
+          employeeId: employeeId
+        }
+      };
+      console.log(`Updated planning data:`, updated);
+      return updated;
+    });
     
-    recalculateFollowingSteps(stepIndex);
+    // Recalculate following steps after state update
+    setTimeout(() => {
+      recalculateFollowingSteps(stepIndex);
+    }, 100);
   };
 
   // Charger les temps de configuration depuis la base de données
