@@ -3784,7 +3784,7 @@ const Planning = () => {
                         ...prev,
                         accueil_preparation: { ...prev.accueil_preparation, duration: e.target.value }
                       }))}
-                      className="w-[80px]"
+                      className="w-[90px]"
                     />
                   </div>
                   <div className="flex-1">
@@ -3799,7 +3799,7 @@ const Planning = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
-                      <SelectContent className="bg-background border border-border shadow-md z-[100]">
+                      <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                         {employees?.filter(emp => 
                           emp.qualifications.includes('Accueil') || 
                           emp.qualifications.includes('Réception') ||
@@ -3829,7 +3829,7 @@ const Planning = () => {
                         ...prev,
                         remplacement_debosselage: { ...prev.remplacement_debosselage, duration: e.target.value }
                       }))}
-                      className="w-[80px]"
+                      className="w-[90px]"
                     />
                   </div>
                   <div className="flex-1">
@@ -3844,7 +3844,7 @@ const Planning = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
-                      <SelectContent className="bg-background border border-border shadow-md z-[100]">
+                      <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                         {employees?.filter(emp => 
                           emp.qualifications.includes('Débosselage') || 
                           emp.qualifications.includes('Remplacement de pièces') ||
@@ -3875,7 +3875,7 @@ const Planning = () => {
                         ...prev,
                         preparation_peinture: { ...prev.preparation_peinture, duration: e.target.value }
                       }))}
-                      className="w-[80px]"
+                      className="w-[90px]"
                     />
                   </div>
                   <div className="flex-1">
@@ -3890,7 +3890,7 @@ const Planning = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
-                      <SelectContent className="bg-background border border-border shadow-md z-[100]">
+                      <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                         {employees?.filter(emp => 
                           emp.qualifications.includes('Préparation peinture') ||
                           emp.qualifications.includes('Peinture') ||
@@ -3920,7 +3920,7 @@ const Planning = () => {
                         ...prev,
                         mise_en_peinture: { ...prev.mise_en_peinture, duration: e.target.value }
                       }))}
-                      className="w-[80px]"
+                      className="w-[90px]"
                     />
                   </div>
                   <div className="flex-1">
@@ -3935,7 +3935,7 @@ const Planning = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
-                      <SelectContent className="bg-background border border-border shadow-md z-[100]">
+                      <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                         {employees?.filter(emp => 
                           emp.qualifications.includes('Peinture') ||
                           emp.qualifications.includes('Mise en peinture') ||
@@ -3965,7 +3965,7 @@ const Planning = () => {
                         ...prev,
                         finitions_remontage: { ...prev.finitions_remontage, duration: e.target.value }
                       }))}
-                      className="w-[80px]"
+                      className="w-[90px]"
                     />
                   </div>
                   <div className="flex-1">
@@ -3980,7 +3980,7 @@ const Planning = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
-                      <SelectContent className="bg-background border border-border shadow-md z-[100]">
+                      <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                         {employees?.filter(emp => 
                           emp.qualifications.includes('Finitions') || 
                           emp.qualifications.includes('Remontage') ||
@@ -4011,7 +4011,7 @@ const Planning = () => {
                         ...prev,
                         cloture_livraison: { ...prev.cloture_livraison, duration: e.target.value }
                       }))}
-                      className="w-[80px]"
+                      className="w-[90px]"
                     />
                   </div>
                   <div className="flex-1">
@@ -4026,7 +4026,7 @@ const Planning = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un employé" />
                       </SelectTrigger>
-                      <SelectContent className="bg-background border border-border shadow-md z-[100]">
+                      <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                         {employees?.filter(emp => 
                           emp.qualifications.includes('Livraison') || 
                           emp.qualifications.includes('Accueil') ||
