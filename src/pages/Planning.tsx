@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash, Play, Crown, UserCheck, Eye, LogOut, Plus } from "lucide-react";
+import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash, Play, Crown, UserCheck, Eye, LogOut, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -137,6 +137,7 @@ const Planning = () => {
 
   // Store all employee schedules data
   const [allEmployeeSchedules, setAllEmployeeSchedules] = useState({});
+  const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
 
   // Helper function to recalculate following steps
   const recalculateFollowingSteps = (fromStepIndex: number) => {
@@ -999,9 +1000,25 @@ const Planning = () => {
                   <Calendar className="w-5 h-5 text-muted-foreground" />
                   <h3 className="text-lg font-semibold">Planning détaillé</h3>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => setShowScheduleConfigModal(true)}>
-                  <Settings className="w-4 h-4" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setCurrentWeekOffset(prev => prev - 1)}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setCurrentWeekOffset(prev => prev + 1)}
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setShowScheduleConfigModal(true)}>
+                    <Settings className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
 
               {/* Planning Grid */}
@@ -1011,11 +1028,11 @@ const Planning = () => {
                   const weekDays = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
                   const dayNumbers = [1, 2, 3, 4, 5, 6, 0]; // Monday = 1, Sunday = 0
                   
-                  // Get start of current week (Monday)
+                  // Get start of current week (Monday) with offset
                   const currentDay = today.getDay();
                   const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
                   const monday = new Date(today);
-                  monday.setDate(today.getDate() + mondayOffset);
+                  monday.setDate(today.getDate() + mondayOffset + (currentWeekOffset * 7));
                   
                   return weekDays.map((dayName, index) => {
                     const currentDate = new Date(monday);
@@ -1039,18 +1056,9 @@ const Planning = () => {
                     const dayOfWeek = dayOfWeekMap[currentDate.getDay()];
                     const workshopDay = workshopSchedules.find(ws => ws.day_of_week.toLowerCase() === dayOfWeek);
                     
+                    // Don't render if day is closed
                     if (!workshopDay?.enabled) {
-                      return (
-                        <Card key={dayName} className="opacity-50">
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-lg text-muted-foreground">{dayName}</CardTitle>
-                            <p className="text-sm text-muted-foreground">
-                              {currentDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
-                            </p>
-                            <p className="text-sm text-muted-foreground">Fermé</p>
-                          </CardHeader>
-                        </Card>
-                      );
+                      return null;
                     }
                     
                     return (
@@ -1060,20 +1068,10 @@ const Planning = () => {
                           <p className="text-sm text-muted-foreground">
                             {currentDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
                           </p>
-                          <p className="text-sm text-muted-foreground">
-                            {workshopDay?.morning_start && workshopDay?.morning_end && 
-                             `${workshopDay.morning_start}-${workshopDay.morning_end}`}
-                            {workshopDay?.afternoon_start && workshopDay?.afternoon_end && 
-                             ` / ${workshopDay.afternoon_start}-${workshopDay.afternoon_end}`}
-                          </p>
                           <p className="text-sm text-muted-foreground">{daySchedules.length} tâche(s)</p>
                         </CardHeader>
                         <CardContent className="space-y-3">
-                          {daySchedules.length === 0 ? (
-                            <div className="text-center text-muted-foreground py-4">
-                              Aucune tâche planifiée
-                            </div>
-                           ) : (
+                          {daySchedules.length > 0 && (
                             daySchedules.map((schedule, idx) => {
                               const startTime = new Date(schedule.start_datetime);
                               const endTime = new Date(schedule.end_datetime);
@@ -1106,12 +1104,12 @@ const Planning = () => {
                                   </div>
                                 </Card>
                               );
-                            })
+                             })
                            )}
                         </CardContent>
                       </Card>
                     );
-                  });
+                  }).filter(Boolean); // Remove null values (closed days)
                 })()}
               </div>
             </div>
