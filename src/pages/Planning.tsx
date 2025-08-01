@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Calendar, Clock, User, Car, Euro, AlertTriangle, Wrench, Users, Cog, X, ArrowLeft, Edit, CheckCircle, BarChart, Phone, Mail, MapPin, FileText, Settings, Package, History, Pencil, Trash, Play, Crown, UserCheck, Eye, LogOut, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -134,6 +134,9 @@ const Planning = () => {
   const { schedules: planningEmployeeSchedules } = useEmployeeSchedule(selectedPlanningEmployeeId);
   const { schedules: workshopSchedules } = useWorkshopSchedule();
   const { calculateOptimalPlanning } = useOptimalPlanning(employees);
+
+  // Store all employee schedules data
+  const [allEmployeeSchedules, setAllEmployeeSchedules] = useState({});
 
   // Helper function to recalculate following steps
   const recalculateFollowingSteps = (fromStepIndex: number) => {
@@ -332,6 +335,43 @@ const Planning = () => {
 
     loadScheduleData();
   }, [companyInfo?.id]);
+
+  // Load all employee schedules
+  useEffect(() => {
+    const loadAllEmployeeSchedules = async () => {
+      if (!companyInfo?.id || !employees || employees.length === 0) return;
+      
+      try {
+        const schedulesMap = {};
+        
+        for (const employee of employees) {
+          const { data, error } = await (supabase as any)
+            .from('employee_schedule')
+            .select(`
+              *,
+              vehicles (
+                license_plate,
+                car_brands (name),
+                car_models (name),
+                clients (first_name, last_name)
+              )
+            `)
+            .eq('company_id', companyInfo.id)
+            .eq('employee_id', employee.id)
+            .order('start_datetime', { ascending: true });
+          
+          if (error) throw error;
+          schedulesMap[employee.id] = data || [];
+        }
+        
+        setAllEmployeeSchedules(schedulesMap);
+      } catch (error) {
+        console.error('Error loading all employee schedules:', error);
+      }
+    };
+
+    loadAllEmployeeSchedules();
+  }, [companyInfo?.id, employees]);
 
   // Charger les données des étapes de workflow depuis la base de données
   useEffect(() => {
@@ -977,10 +1017,10 @@ const Planning = () => {
                     const currentDate = new Date(monday);
                     currentDate.setDate(monday.getDate() + index);
                     
-                    // Get schedules for this day
+                    // Get schedules for this day from all employees
                     const daySchedules = employees?.flatMap(employee => {
-                      const { schedules } = useEmployeeSchedule(employee.id);
-                      return schedules.filter(schedule => {
+                      const employeeSchedules = allEmployeeSchedules[employee.id] || [];
+                      return employeeSchedules.filter(schedule => {
                         const scheduleDate = new Date(schedule.start_datetime);
                         return scheduleDate.toDateString() === currentDate.toDateString();
                       }).map(schedule => ({
