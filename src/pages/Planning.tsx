@@ -20,6 +20,7 @@ import { toast } from '@/hooks/use-toast';
 import { useCompanyId } from '@/hooks/use-company-id';
 import { useVehicleWorkflow } from '@/hooks/use-vehicle-workflow';
 import { useOptimalPlanning } from '@/hooks/use-optimal-planning';
+import { useEmployeeSchedule } from '@/hooks/use-employee-schedule';
 
 // Helper function to calculate duration between two timestamps
 const calculateDuration = (startDateTime: string, endDateTime: string): string => {
@@ -56,6 +57,7 @@ const Planning = () => {
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [showScheduleConfigModal, setShowScheduleConfigModal] = useState(false);
   const [showPlanningModal, setShowPlanningModal] = useState(false);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>('');
   const [availableVehicles, setAvailableVehicles] = useState<any[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
@@ -127,6 +129,7 @@ const Planning = () => {
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const { employees, createEmployee, updateEmployee } = useEmployees();
   const { workflowSteps, refetch: refetchWorkflow } = useVehicleWorkflow(companyInfo?.id);
+  const { schedules: employeeSchedules } = useEmployeeSchedule(selectedEmployeeId);
   const { calculateOptimalPlanning } = useOptimalPlanning(employees);
 
   // Helper function to recalculate following steps
@@ -660,7 +663,10 @@ const Planning = () => {
             {/* Sélecteur d'employé */}
             <div className="flex items-center gap-4">
               <Label htmlFor="employee_select_simple">Employé :</Label>
-              <Select defaultValue="martin">
+              <Select 
+                value={selectedEmployeeId}
+                onValueChange={setSelectedEmployeeId}
+              >
                 <SelectTrigger
                   id="employee_select_simple"
                   className="w-[200px]"
@@ -668,251 +674,96 @@ const Planning = () => {
                   <SelectValue placeholder="Sélectionner un employé" />
                 </SelectTrigger>
                 <SelectContent className="bg-background border border-border shadow-md z-50">
-                  <SelectItem value="sophie">Sophie Martin</SelectItem>
-                  <SelectItem value="martin">Martin Dubois</SelectItem>
+                  {employees?.map(employee => (
+                    <SelectItem key={employee.id} value={employee.id}>
+                      {employee.user_companies?.profiles?.first_name && employee.user_companies?.profiles?.last_name 
+                        ? `${employee.user_companies.profiles.first_name} ${employee.user_companies.profiles.last_name}`
+                        : `Employé #${employee.id.slice(0, 8)}`
+                      }
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
             {/* Planning de l'employé */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Mon Planning - Martin Dubois</h3>
-              
-              {/* Tâche 1 */}
-              <Card className="border-l-4 border-l-red-500">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm font-medium">
-                        <Clock className="w-4 h-4 text-red-600" />
-                        <span className="text-red-600">08h-10h</span>
-                        <Badge variant="destructive" className="ml-2">Urgent</Badge>
+            {selectedEmployeeId && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">
+                  Mon Planning - {
+                    employees?.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.first_name && 
+                    employees?.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.last_name
+                      ? `${employees.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.first_name} ${employees.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.last_name}`
+                      : 'Employé'
+                  }
+                </h3>
+                
+                {employeeSchedules.length === 0 ? (
+                  <Card>
+                    <CardContent className="p-8 text-center">
+                      <div className="text-muted-foreground">
+                        Aucune tâche planifiée pour cet employé
                       </div>
-                      <div className="font-semibold">CX-145-DT</div>
-                      <div className="text-sm text-muted-foreground">Citroën C4</div>
-                      <div className="text-sm">Expertise assurance</div>
-                      <div className="text-sm text-muted-foreground">Accord Préparation dossier</div>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <Button variant="outline" size="sm" onClick={() => {
-                        setSelectedVehicle({
-                          brand: "Citroën C4",
-                          plate: "EZ-787-KL",
-                          client: "M. Durand",
-                          technician: "Martin Dubois"
-                        });
-                        setShowVehicleDetailModal(true);
-                      }}>Détails</Button>
-                      <div className="flex gap-2">
-                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
-                          <Play className="w-4 h-4 mr-2" />
-                          Démarrer
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Tâche 2 */}
-              <Card className="border-l-4 border-l-blue-500">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm font-medium">
-                        <Clock className="w-4 h-4 text-blue-600" />
-                        <span className="text-blue-600">12h-14h</span>
-                        <Badge variant="secondary" className="ml-2">Normal</Badge>
-                      </div>
-                      <div className="font-semibold">EZ-757-AL</div>
-                      <div className="text-sm text-muted-foreground">Audi A3</div>
-                      <div className="text-sm">Remplacement</div>
-                      <div className="text-sm text-muted-foreground">Accord Préparation dossier</div>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <Button variant="outline" size="sm" onClick={() => {
-                        setSelectedVehicle({
-                          brand: "Mercedes Classe C",
-                          plate: "QR-345-ST",
-                          client: "Mme Leclerc",
-                          technician: null
-                        });
-                        setShowVehicleDetailModal(true);
-                      }}>Détails</Button>
-                      <div className="flex gap-2">
-                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
-                          <Play className="w-4 h-4 mr-2" />
-                          Démarrer
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Tâche 3 */}
-              <Card className="border-l-4 border-l-blue-500">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm font-medium">
-                        <Clock className="w-4 h-4 text-blue-600" />
-                        <span className="text-blue-600">09h-12h</span>
-                        <Badge variant="secondary" className="ml-2">Normal</Badge>
-                      </div>
-                      <div className="font-semibold">AB-783-KY</div>
-                      <div className="text-sm text-muted-foreground">BMW X1</div>
-                      <div className="text-sm">Ponçage & retouches</div>
-                      <div className="text-sm text-muted-foreground">Accord Finitions</div>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <Button variant="outline" size="sm" onClick={() => {
-                        setSelectedVehicle({
-                          brand: "Audi A3",
-                          plate: "EZ-757-AL",
-                          client: "M. Durand",
-                          technician: "Martin Dubois"
-                        });
-                        setShowVehicleDetailModal(true);
-                      }}>Détails</Button>
-                      <div className="flex gap-2">
-                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
-                          <Play className="w-4 h-4 mr-2" />
-                          Démarrer
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Tâche 4 */}
-              <Card className="border-l-4 border-l-blue-500">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm font-medium">
-                        <Clock className="w-4 h-4 text-blue-600" />
-                        <span className="text-blue-600">13h-15h30</span>
-                        <Badge variant="secondary" className="ml-2">Normal</Badge>
-                      </div>
-                      <div className="font-semibold">SF-345-UV</div>
-                      <div className="text-sm text-muted-foreground">Volkswagen Golf</div>
-                      <div className="text-sm">Ponçage final</div>
-                      <div className="text-sm text-muted-foreground">Accord dossier livraison</div>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <Button variant="outline" size="sm" onClick={() => {
-                        setSelectedVehicle({
-                          brand: "BMW X1",
-                          plate: "AB-783-KY",
-                          client: "M. Durand",
-                          technician: "Martin Dubois"
-                        });
-                        setShowVehicleDetailModal(true);
-                      }}>Détails</Button>
-                      <div className="flex gap-2">
-                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white">
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          Terminer
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Tâche 5 */}
-              <Card className="border-l-4 border-l-red-500">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm font-medium">
-                        <Clock className="w-4 h-4 text-red-600" />
-                        <span className="text-red-600">08h-10h30</span>
-                        <Badge variant="destructive" className="ml-2">Urgent</Badge>
-                      </div>
-                      <div className="font-semibold">EF-345-UV</div>
-                      <div className="text-sm text-muted-foreground">Ford Focus</div>
-                      <div className="text-sm">Accueil client</div>
-                      <div className="text-sm text-muted-foreground">Accord Remontage</div>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <Button variant="outline" size="sm" onClick={() => {
-                        setSelectedVehicle({
-                          brand: "Volkswagen Golf",
-                          plate: "SF-345-UV",
-                          client: "M. Durand",
-                          technician: "Martin Dubois"
-                        });
-                        setShowVehicleDetailModal(true);
-                      }}>Détails</Button>
-                      <div className="flex gap-2">
-                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
-                          <Play className="w-4 h-4 mr-2" />
-                          Démarrer
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Tâche 6 */}
-              <Card className="border-l-4 border-l-blue-500">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm font-medium">
-                        <Clock className="w-4 h-4 text-blue-600" />
-                        <span className="text-blue-600">08h-14h</span>
-                        <Badge variant="secondary" className="ml-2">Normal</Badge>
-                      </div>
-                      <div className="font-semibold">EZ-757-AL</div>
-                      <div className="text-sm text-muted-foreground">Citroën C3</div>
-                      <div className="text-sm">Débosselage léger</div>
-                      <div className="text-sm text-muted-foreground">Accord dossier livraison</div>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <Button variant="outline" size="sm" onClick={() => {
-                        setSelectedVehicle({
-                          brand: "Ford Focus",
-                          plate: "EF-345-UV",
-                          client: "M. Durand",
-                          technician: "Martin Dubois"
-                        });
-                        setShowVehicleDetailModal(true);
-                      }}>Détails</Button>
-                      <div className="flex gap-2">
-                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white">
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          Terminer
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Section Notifications */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-karrosserie-orange" />
-                  Notifications (1)
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
-                  <div className="text-sm font-medium text-orange-800">Tâche reportée, voir le détail</div>
-                  <div className="text-sm text-orange-700 mt-1">Véhicule CX-145-DT nécessite validation expert</div>
-                  <Button variant="outline" size="sm" className="mt-2 text-karrosserie-orange border-karrosserie-orange hover:bg-karrosserie-orange hover:text-white">
-                    Marquer comme lu
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  employeeSchedules.map((schedule) => {
+                    const startTime = new Date(schedule.start_datetime);
+                    const endTime = new Date(schedule.end_datetime);
+                    const vehicle = schedule.vehicles;
+                    
+                    return (
+                      <Card key={schedule.id} className="border-l-4 border-l-blue-500">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 text-sm font-medium">
+                                <Clock className="w-4 h-4 text-blue-600" />
+                                <span className="text-blue-600">
+                                  {startTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} - 
+                                  {endTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                                <Badge variant="secondary" className="ml-2">Normal</Badge>
+                              </div>
+                              <div className="font-semibold">{vehicle?.license_plate || 'N/A'}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {vehicle?.car_brands?.name || ''} {vehicle?.car_models?.name || ''}
+                              </div>
+                              <div className="text-sm">{schedule.task_type}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {vehicle?.clients ? `${vehicle.clients.first_name || ''} ${vehicle.clients.last_name || ''}`.trim() : 'Client inconnu'}
+                              </div>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <Button variant="outline" size="sm" onClick={() => {
+                                if (vehicle) {
+                                  setSelectedVehicle({
+                                    brand: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim(),
+                                    plate: vehicle.license_plate,
+                                    client: vehicle.clients ? `${vehicle.clients.first_name || ''} ${vehicle.clients.last_name || ''}`.trim() : 'Client inconnu',
+                                    technician: employees?.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.first_name && 
+                                              employees?.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.last_name
+                                                ? `${employees.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.first_name} ${employees.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.last_name}`
+                                                : 'Employé'
+                                  });
+                                  setShowVehicleDetailModal(true);
+                                }
+                              }}>Détails</Button>
+                              <div className="flex gap-2">
+                                <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
+                                  <Play className="w-4 h-4 mr-2" />
+                                  Démarrer
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -1045,101 +896,6 @@ const Planning = () => {
                                 >
                                   <Eye className="w-3 h-3 mr-1" />
                                   Détails
-                                </Button>
-                                
-                                {!vehicle.inProgress && (
-                                  <Button 
-                                    size="sm" 
-                                    variant="outline"
-                                    onClick={() => {
-                                      setSelectedVehicle(vehicle);
-                                      setShowPlanningModal(true);
-                                      // Calculer la planification optimale après l'ouverture du modal
-                                      setTimeout(() => {
-                                        if (employees && employees.length > 0) {
-                                          const optimalPlanning = calculateOptimalPlanning();
-                                          setPlanningData(prev => ({
-                                            accueil_preparation: {
-                                              ...optimalPlanning.accueil_preparation,
-                                              startDateTime: optimalPlanning.accueil_preparation?.startDateTime,
-                                              endDateTime: optimalPlanning.accueil_preparation?.endDateTime
-                                            },
-                                            remplacement_debosselage: {
-                                              ...optimalPlanning.remplacement_debosselage,
-                                              startDateTime: optimalPlanning.remplacement_debosselage?.startDateTime,
-                                              endDateTime: optimalPlanning.remplacement_debosselage?.endDateTime
-                                            },
-                                            preparation_peinture: {
-                                              ...optimalPlanning.preparation_peinture,
-                                              startDateTime: optimalPlanning.preparation_peinture?.startDateTime,
-                                              endDateTime: optimalPlanning.preparation_peinture?.endDateTime
-                                            },
-                                            mise_en_peinture: {
-                                              ...optimalPlanning.mise_en_peinture,
-                                              startDateTime: optimalPlanning.mise_en_peinture?.startDateTime,
-                                              endDateTime: optimalPlanning.mise_en_peinture?.endDateTime
-                                            },
-                                            finitions_remontage: {
-                                              ...optimalPlanning.finitions_remontage,
-                                              startDateTime: optimalPlanning.finitions_remontage?.startDateTime,
-                                              endDateTime: optimalPlanning.finitions_remontage?.endDateTime
-                                            },
-                                            cloture_livraison: {
-                                              ...optimalPlanning.cloture_livraison,
-                                              startDateTime: optimalPlanning.cloture_livraison?.startDateTime,
-                                              endDateTime: optimalPlanning.cloture_livraison?.endDateTime
-                                            }
-                                          }));
-                                        }
-                                      }, 100);
-                                    }}
-                                  >
-                                    <Calendar className="w-3 h-3 mr-1" />
-                                    Planifier
-                                  </Button>
-                                )}
-                                
-                                <Button 
-                                  size="sm" 
-                                  variant="destructive"
-                                  onClick={async () => {
-                                    try {
-                                      if (!vehicle.workflowId || !companyInfo?.id) {
-                                        toast({
-                                          title: "Erreur",
-                                          description: "Impossible de sortir le véhicule de l'atelier",
-                                          variant: "destructive"
-                                        });
-                                        return;
-                                      }
-
-                                      // Supprimer l'entrée du workflow
-                                      const { error } = await supabase
-                                        .from('vehicle_workflow_steps')
-                                        .delete()
-                                        .eq('id', vehicle.workflowId);
-
-                                      if (error) throw error;
-
-                                      toast({
-                                        title: "Véhicule sorti",
-                                        description: "Le véhicule a été sorti de l'atelier avec succès"
-                                      });
-                                      
-                                      // Refresh workflow data
-                                      refetchWorkflow();
-                                    } catch (error) {
-                                      console.error('Erreur lors de la sortie:', error);
-                                      toast({
-                                        title: "Erreur",
-                                        description: "Impossible de sortir le véhicule de l'atelier",
-                                        variant: "destructive"
-                                      });
-                                    }
-                                  }}
-                                >
-                                  <LogOut className="w-3 h-3 mr-1" />
-                                  Sortir de l'atelier
                                 </Button>
                               </div>
                             </div>
