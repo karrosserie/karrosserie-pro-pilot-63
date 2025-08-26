@@ -144,7 +144,15 @@ const RelanceDetailsModal: React.FC<RelanceDetailsModalProps> = ({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="text-sm font-medium">Client #{relance.client_id.slice(-8)}</div>
+                        <div className="text-sm font-medium">
+                          {relance.clients 
+                            ? `${relance.clients.first_name} ${relance.clients.last_name}`
+                            : `Client #${relance.client_id.slice(-8)}`
+                          }
+                        </div>
+                        {(relance.channel === 'sms' || relance.channel === 'vms') && relance.clients?.phone && (
+                          <div className="text-xs text-blue-600 font-mono">{relance.clients.phone}</div>
+                        )}
                         {relance.invoice_id && (
                           <div className="text-xs text-gray-500">Facture #{relance.invoice_id.slice(-8)}</div>
                         )}

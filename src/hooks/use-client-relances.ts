@@ -34,6 +34,13 @@ export interface ClientRelance {
   channel_data?: any;
   created_at: string;
   updated_at: string;
+  // Relations
+  clients?: {
+    first_name: string;
+    last_name: string;
+    phone?: string;
+    email?: string;
+  } | null;
 }
 
 export const useClientRelances = () => {
@@ -104,7 +111,15 @@ export const useClientRelances = () => {
     try {
       const { data, error } = await supabase
         .from('client_relances')
-        .select('*')
+        .select(`
+          *,
+          clients (
+            first_name,
+            last_name,
+            phone,
+            email
+          )
+        `)
         .eq('company_id', companyData.id)
         .order('created_at', { ascending: false })
         .limit(100);
@@ -114,7 +129,7 @@ export const useClientRelances = () => {
         return;
       }
 
-      setRelances(data || []);
+      setRelances((data as any) || []);
     } catch (error) {
       console.error('Error in fetchRelances:', error);
     }
