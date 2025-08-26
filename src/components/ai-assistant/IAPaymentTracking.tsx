@@ -16,7 +16,7 @@ import { useUnpaidInvoices } from '@/hooks/use-unpaid-invoices';
 // Composant de suivi des impayés avec filtrage
 
 const IAPaymentTracking = () => {
-  const { formattedInvoices: unpaidInvoices, loading } = useUnpaidInvoices();
+  const { formattedInvoices: unpaidInvoices, loading, toggleAutoRelances } = useUnpaidInvoices();
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const [selectedActionType, setSelectedActionType] = useState<string>('');
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -255,6 +255,7 @@ Karrosserie Pro`,
                 getActionStyle={getActionStyle}
                 onActionClick={handleActionClick}
                 onHistoryClick={handleHistoryClick}
+                toggleAutoRelances={toggleAutoRelances}
               />
             ))}
           </div>
@@ -396,85 +397,102 @@ Karrosserie Pro`,
   );
 };
 
-const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, onActionClick, onHistoryClick }: any) => (
-  <div className="border rounded-lg p-4 bg-white hover:shadow-md transition-all duration-200 animate-fade-in">
-    <div className="flex flex-col lg:flex-row gap-4">
-      {/* En-tête avec numéro de facture et statut */}
-      <div className="flex-1">
-        <div className="flex items-start justify-between mb-2">
-          <div className="flex items-center gap-3 flex-1">
-            <h3 className="text-lg font-semibold text-gray-900">{invoice.id}</h3>
-            <Badge className={`${invoice.relanceTypeColor} text-xs font-medium`}>
-              {invoice.relanceType}
-            </Badge>
-          </div>
-          <div className="text-right">
-            <p className="text-xl font-bold text-orange-600 mb-1">{invoice.amount}</p>
-            <Button
-              className="bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90 h-8 text-xs px-3 mb-1"
-              size="sm"
-              onClick={() => onHistoryClick(invoice)}
-            >
-              <History className="h-3 w-3 mr-1" />
-              Historique
-            </Button>
-            <p className="text-xs text-gray-500">
-              Dernière relance: {invoice.lastRelanceDate}
-            </p>
-          </div>
-        </div>
+const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, onActionClick, onHistoryClick, toggleAutoRelances }: any) => {
+  const handleToggleAutoRelances = async () => {
+    if (invoice.clientId && toggleAutoRelances) {
+      await toggleAutoRelances(invoice.clientId, invoice.autoRelancesDisabled);
+    }
+  };
 
-        {/* Informations client et véhicule */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-2">
-          <div>
-            <p className="text-sm text-gray-600">Client</p>
-            <p className="font-medium text-gray-900">{invoice.client}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-600">Véhicule</p>
-            <div>
-              <p className="font-medium text-gray-900">{invoice.vehicle}</p>
-              <p className="text-xs text-gray-500">{invoice.vehicleRef}</p>
+  return (
+    <div className="border rounded-lg p-4 bg-white hover:shadow-md transition-all duration-200 animate-fade-in">
+      <div className="flex flex-col lg:flex-row gap-4">
+        {/* En-tête avec numéro de facture et statut */}
+        <div className="flex-1">
+          <div className="flex items-start justify-between mb-2">
+            <div className="flex items-center gap-3 flex-1">
+              <h3 className="text-lg font-semibold text-gray-900">{invoice.id}</h3>
+              <Badge className={`${invoice.relanceTypeColor} text-xs font-medium`}>
+                {invoice.relanceType}
+              </Badge>
+            </div>
+            <div className="text-right">
+              <p className="text-xl font-bold text-orange-600 mb-1">{invoice.amount}</p>
+              <div className="flex flex-col gap-1">
+                <Button
+                  className="bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90 h-8 text-xs px-3"
+                  size="sm"
+                  onClick={() => onHistoryClick(invoice)}
+                >
+                  <History className="h-3 w-3 mr-1" />
+                  Historique
+                </Button>
+                <Button
+                  variant={invoice.autoRelancesDisabled ? "destructive" : "outline"}
+                  size="sm"
+                  onClick={handleToggleAutoRelances}
+                  className="h-8 text-xs px-3"
+                >
+                  {invoice.autoRelancesDisabled ? 'Relances désactivées' : 'Désactiver relances'}
+                </Button>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Dernière relance: {invoice.lastRelanceDate}
+              </p>
             </div>
           </div>
-        </div>
 
-        {/* Informations dates */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-          <div>
-            <p className="text-sm text-gray-600">Échéance</p>
-            <p className="font-medium text-gray-900">{invoice.dueDate}</p>
+          {/* Informations client et véhicule */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-2">
+            <div>
+              <p className="text-sm text-gray-600">Client</p>
+              <p className="font-medium text-gray-900">{invoice.client}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Véhicule</p>
+              <div>
+                <p className="font-medium text-gray-900">{invoice.vehicle}</p>
+                <p className="text-xs text-gray-500">{invoice.vehicleRef}</p>
+              </div>
+            </div>
           </div>
-          <div>
-            <p className="text-sm text-gray-600">Prochaine action</p>
-            <p className="font-medium text-gray-900">{invoice.lastRelanceDate}</p>
+
+          {/* Informations dates */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+            <div>
+              <p className="text-sm text-gray-600">Échéance</p>
+              <p className="font-medium text-gray-900">{invoice.dueDate}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Prochaine action</p>
+              <p className="font-medium text-gray-900">{invoice.lastRelanceDate}</p>
+            </div>
           </div>
-        </div>
 
-        {/* Actions de relance */}
-        <div className="space-y-2">
-          <p className="text-sm text-gray-600">Moyens de relance utilisés :</p>
-          <div className="flex flex-wrap gap-2">
-            {invoice.availableActions.map((action: string, actionIndex: number) => (
-              <Button
-                key={actionIndex}
-                variant="outline"
-                size="sm"
-                onClick={() => onActionClick(invoice, action)}
-                className={`text-xs px-3 py-1 ${getActionStyle(action)} hover:opacity-80 transition-opacity cursor-pointer`}
-              >
-                {getActionIcon(action)}
-                <span className="ml-1">{getActionLabel(action)}</span>
-              </Button>
-            ))}
+          {/* Actions de relance */}
+          <div className="space-y-2">
+            <p className="text-sm text-gray-600">Moyens de relance utilisés :</p>
+            <div className="flex flex-wrap gap-2">
+              {invoice.availableActions.map((action: string, actionIndex: number) => (
+                <Button
+                  key={actionIndex}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onActionClick(invoice, action)}
+                  className={`text-xs px-3 py-1 ${getActionStyle(action)} hover:opacity-80 transition-opacity cursor-pointer`}
+                >
+                  {getActionIcon(action)}
+                  <span className="ml-1">{getActionLabel(action)}</span>
+                </Button>
+              ))}
+            </div>
           </div>
+
         </div>
-
-
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Message Panel Component
 const MessagePanel = ({ 

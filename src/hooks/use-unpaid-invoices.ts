@@ -24,6 +24,7 @@ export interface UnpaidInvoice {
     address?: string;
     city?: string;
     postal_code?: string;
+    auto_relances_disabled?: boolean;
   } | null;
   vehicles?: {
     id: string;
@@ -58,6 +59,8 @@ interface FormattedUnpaidInvoice {
   clientEmail?: string;
   clientAddress?: string;
   daysOverdue: number;
+  autoRelancesDisabled?: boolean;
+  clientId?: string;
 }
 
 export const useUnpaidInvoices = () => {
@@ -83,7 +86,8 @@ export const useUnpaidInvoices = () => {
             email,
             address,
             city,
-            postal_code
+            postal_code,
+            auto_relances_disabled
           ),
           vehicles (
             id,
@@ -179,7 +183,9 @@ export const useUnpaidInvoices = () => {
         clientPhone: invoice.clients?.phone,
         clientEmail: invoice.clients?.email,
         clientAddress,
-        daysOverdue
+        daysOverdue,
+        autoRelancesDisabled: invoice.clients?.auto_relances_disabled || false,
+        clientId: invoice.client_id
       };
     });
 
@@ -196,10 +202,40 @@ export const useUnpaidInvoices = () => {
     loadData();
   }, [companyData?.id]);
 
+  const toggleAutoRelances = async (clientId: string, currentValue: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('clients')
+        .update({ auto_relances_disabled: !currentValue })
+        .eq('id', clientId);
+
+      if (error) {
+        console.error('Error toggling auto relances:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de modifier les relances automatiques",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Succès",
+        description: !currentValue ? "Relances automatiques désactivées" : "Relances automatiques activées",
+      });
+
+      // Refetch data to update the UI
+      await fetchUnpaidInvoices();
+    } catch (error) {
+      console.error('Error in toggleAutoRelances:', error);
+    }
+  };
+
   return {
     invoices,
     formattedInvoices,
     loading,
-    refetch: fetchUnpaidInvoices
+    refetch: fetchUnpaidInvoices,
+    toggleAutoRelances
   };
 };
