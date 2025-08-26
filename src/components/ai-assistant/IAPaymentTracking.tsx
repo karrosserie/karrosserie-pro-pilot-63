@@ -10,11 +10,13 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { MessageCircle, Mail, FileText, Filter, Download, X, Sparkles, Send, Edit, ChevronDown, History, MessageSquare, Mic } from 'lucide-react';
+import { MessageCircle, Mail, FileText, Filter, Download, X, Sparkles, Send, Edit, ChevronDown, History, MessageSquare, Mic, Loader2 } from 'lucide-react';
+import { useUnpaidInvoices } from '@/hooks/use-unpaid-invoices';
 
 // Composant de suivi des impayés avec filtrage
 
 const IAPaymentTracking = () => {
+  const { formattedInvoices: unpaidInvoices, loading } = useUnpaidInvoices();
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const [selectedActionType, setSelectedActionType] = useState<string>('');
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -26,241 +28,6 @@ const IAPaymentTracking = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [selectedHistoryInvoice, setSelectedHistoryInvoice] = useState<any>(null);
-
-  const unpaidInvoices = [
-    {
-      id: 'F-2023-124',
-      client: 'Durand Auto',
-      vehicle: 'RENAULT MEGANE',
-      vehicleRef: 'OR 007 142',
-      garage: 'DEMO',
-      garageRef: 'FR 455 845 897',
-      amount: '2450,75 €',
-      dueDate: '10/04/2025',
-      lastRelanceDate: '19/05/2025',
-      relanceType: 'Relance 1',
-      relanceTypeColor: 'bg-blue-100 text-blue-800',
-      status: 'relance1',
-      availableActions: ['whatsapp', 'sms', 'vms', 'mail', 'recommande'],
-      history: [
-        {
-          date: '10/04/2025',
-          type: 'mail',
-          status: 'envoyé',
-          message: 'Premier rappel amical par email',
-          recipient: 'contact@durandauto.fr'
-        },
-        {
-          date: '15/04/2025',
-          type: 'sms',
-          status: 'livré',
-          message: 'SMS de rappel envoyé au +33 6 12 34 56 78',
-          recipient: '+33 6 12 34 56 78'
-        },
-        {
-          date: '18/04/2025',
-          type: 'whatsapp',
-          status: 'lu',
-          message: 'Message WhatsApp de rappel',
-          recipient: '+33 6 12 34 56 78'
-        }
-      ]
-    },
-    {
-      id: 'F-2023-122',
-      client: 'Martin SARL',
-      vehicle: 'PEUGEOT 308',
-      vehicleRef: 'OR 007 139',
-      garage: 'DEMO',
-      garageRef: 'FR 455 845 897',
-      amount: '3825,50 €',
-      dueDate: '05/04/2025',
-      lastRelanceDate: '17/05/2025',
-      relanceType: 'Relance 2',
-      relanceTypeColor: 'bg-orange-100 text-orange-800',
-      status: 'relance2',
-      availableActions: ['whatsapp', 'sms', 'vms', 'mail', 'recommande'],
-      history: [
-        {
-          date: '05/04/2025',
-          type: 'mail',
-          status: 'envoyé',
-          message: 'Email de relance initial',
-          recipient: 'martin@martin-sarl.com'
-        },
-        {
-          date: '10/04/2025',
-          type: 'sms',
-          status: 'livré',
-          message: 'SMS de rappel urgent',
-          recipient: '+33 6 23 45 67 89'
-        },
-        {
-          date: '15/04/2025',
-          type: 'vms',
-          status: 'envoyé',
-          message: 'Message vocal automatique',
-          recipient: '+33 6 23 45 67 89'
-        },
-        {
-          date: '17/05/2025',
-          type: 'recommande',
-          status: 'envoyé',
-          message: 'Lettre recommandée avec accusé de réception',
-          recipient: '123 Rue Martin, 69000 Lyon'
-        }
-      ]
-    },
-    {
-      id: 'F-2023-120',
-      client: 'Dubois et Fils',
-      vehicle: 'CITROEN C3',
-      vehicleRef: 'OR 007 135',
-      garage: 'DEMO',
-      garageRef: 'FR 455 845 897',
-      amount: '6120,25 €',
-      dueDate: '28/03/2025',
-      lastRelanceDate: '12/05/2025',
-      relanceType: 'Relance 3',
-      relanceTypeColor: 'bg-orange-100 text-orange-800',
-      status: 'relance3',
-      availableActions: ['whatsapp', 'sms', 'vms', 'mail', 'recommande'],
-      history: [
-        {
-          date: '28/03/2025',
-          type: 'mail',
-          status: 'envoyé',
-          message: 'Première relance automatique',
-          recipient: 'contact@duboisetfils.fr'
-        },
-        {
-          date: '05/04/2025',
-          type: 'sms',
-          status: 'livré',
-          message: 'Rappel par SMS',
-          recipient: '+33 6 34 56 78 90'
-        },
-        {
-          date: '08/04/2025',
-          type: 'whatsapp',
-          status: 'lu',
-          message: 'Message WhatsApp de relance',
-          recipient: '+33 6 34 56 78 90'
-        },
-        {
-          date: '12/05/2025',
-          type: 'recommande',
-          status: 'envoyé',
-          message: 'Lettre recommandée avec accusé de réception',
-          recipient: '456 Avenue Dubois, 33000 Bordeaux'
-        }
-      ]
-    },
-    {
-      id: 'F-2023-118',
-      client: 'Garage Central',
-      vehicle: 'BMW X3',
-      vehicleRef: 'OR 007 129',
-      garage: 'DEMO',
-      garageRef: 'FR 455 845 897',
-      amount: '4250,00 €',
-      dueDate: '15/03/2025',
-      lastRelanceDate: '08/05/2025',
-      relanceType: 'Relance 4',
-      relanceTypeColor: 'bg-red-100 text-red-800',
-      status: 'relance4',
-      availableActions: ['whatsapp', 'sms', 'vms', 'mail', 'recommande'],
-      history: [
-        {
-          date: '15/03/2025',
-          type: 'mail',
-          status: 'envoyé',
-          message: 'Email de relance automatique',
-          recipient: 'admin@garagecentral.com'
-        },
-        {
-          date: '22/03/2025',
-          type: 'sms',
-          status: 'livré',
-          message: 'SMS de rappel',
-          recipient: '+33 6 45 67 89 01'
-        },
-        {
-          date: '25/03/2025',
-          type: 'vms',
-          status: 'envoyé',
-          message: 'Message vocal de relance',
-          recipient: '+33 6 45 67 89 01'
-        },
-        {
-          date: '01/04/2025',
-          type: 'whatsapp',
-          status: 'lu',
-          message: 'Message WhatsApp de mise en demeure',
-          recipient: '+33 6 45 67 89 01'
-        },
-        {
-          date: '08/05/2025',
-          type: 'recommande',
-          status: 'envoyé',
-          message: 'Dernière mise en demeure avant contentieux',
-          recipient: '789 Boulevard Central, 13000 Marseille'
-        }
-      ]
-    },
-    {
-      id: 'F-2023-116',
-      client: 'Auto Express',
-      vehicle: 'AUDI A4',
-      vehicleRef: 'OR 007 122',
-      garage: 'DEMO',
-      garageRef: 'FR 455 845 897',
-      amount: '5780,50 €',
-      dueDate: '01/03/2025',
-      lastRelanceDate: '25/04/2025',
-      relanceType: 'Contentieux',
-      relanceTypeColor: 'bg-red-100 text-red-800',
-      status: 'contentieux',
-      availableActions: ['whatsapp', 'sms', 'vms', 'mail', 'recommande'],
-      history: [
-        {
-          date: '01/03/2025',
-          type: 'mail',
-          status: 'envoyé',
-          message: 'Premier rappel de paiement',
-          recipient: 'contact@autoexpress.fr'
-        },
-        {
-          date: '08/03/2025',
-          type: 'sms',
-          status: 'livré',
-          message: 'SMS de rappel urgent',
-          recipient: '+33 6 56 78 90 12'
-        },
-        {
-          date: '12/03/2025',
-          type: 'vms',
-          status: 'envoyé',
-          message: 'Message vocal de mise en demeure',
-          recipient: '+33 6 56 78 90 12'
-        },
-        {
-          date: '15/03/2025',
-          type: 'whatsapp',
-          status: 'lu',
-          message: 'WhatsApp de mise en demeure finale',
-          recipient: '+33 6 56 78 90 12'
-        },
-        {
-          date: '25/04/2025',
-          type: 'recommande',
-          status: 'envoyé',
-          message: 'Mise en demeure finale - Transmission au contentieux',
-          recipient: '321 Rue Express, 75012 Paris'
-        }
-      ]
-    }
-  ];
 
   const handleHistoryClick = (invoice: any) => {
     setSelectedHistoryInvoice(invoice);
@@ -294,27 +61,27 @@ const IAPaymentTracking = () => {
         return {
           ...baseData,
           subject: `Relance de paiement - Facture ${invoice.id}`,
-          recipient: 'client@example.com'
+          recipient: (invoice as any).clientEmail || 'client@example.com'
         };
       case 'sms':
         return {
           ...baseData,
-          phoneNumber: '+33 6 12 34 56 78'
+          phoneNumber: (invoice as any).clientPhone || '+33 6 12 34 56 78'
         };
       case 'whatsapp':
         return {
           ...baseData,
-          phoneNumber: '+33 6 12 34 56 78'
+          phoneNumber: (invoice as any).clientPhone || '+33 6 12 34 56 78'
         };
       case 'vms':
         return {
           ...baseData,
-          phoneNumber: '+33 6 12 34 56 78'
+          phoneNumber: (invoice as any).clientPhone || '+33 6 12 34 56 78'
         };
       case 'recommande':
         return {
           ...baseData,
-          address: '123 Rue du Client\n75001 Paris\nFrance'
+          address: (invoice as any).clientAddress || '123 Rue du Client\n75001 Paris\nFrance'
         };
       default:
         return baseData;
@@ -468,19 +235,30 @@ Karrosserie Pro`,
       </CardHeader>
 
       <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
-        <div className="space-y-3 sm:space-y-4">
-          {filteredInvoices.map((invoice, index) => (
-            <InvoiceCard 
-              key={index} 
-              invoice={invoice} 
-              getActionIcon={getActionIcon} 
-              getActionLabel={getActionLabel} 
-              getActionStyle={getActionStyle}
-              onActionClick={handleActionClick}
-              onHistoryClick={handleHistoryClick}
-            />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin mr-2" />
+            <span className="text-sm text-gray-600">Chargement des factures impayées...</span>
+          </div>
+        ) : unpaidInvoices.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">Aucune facture impayée trouvée</p>
+          </div>
+        ) : (
+          <div className="space-y-3 sm:space-y-4">
+            {filteredInvoices.map((invoice, index) => (
+              <InvoiceCard 
+                key={index} 
+                invoice={invoice} 
+                getActionIcon={getActionIcon} 
+                getActionLabel={getActionLabel} 
+                getActionStyle={getActionStyle}
+                onActionClick={handleActionClick}
+                onHistoryClick={handleHistoryClick}
+              />
+            ))}
+          </div>
+        )}
       </CardContent>
 
       {/* Sliding Panel */}
