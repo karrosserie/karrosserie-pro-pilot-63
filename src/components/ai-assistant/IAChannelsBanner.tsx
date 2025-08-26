@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Phone, Mail, MessageCircle, FileText, Settings, MessageSquare, Calendar, Zap, AlertTriangle } from 'lucide-react';
+import { Phone, Mail, MessageCircle, FileText, Settings, MessageSquare, Calendar, Zap, AlertTriangle, Mic } from 'lucide-react';
 
 const IAChannelsBanner = () => {
   const [isConfigOpen, setIsConfigOpen] = useState(false);
@@ -115,6 +115,12 @@ const IAChannelsBanner = () => {
       color: 'bg-green-100 text-green-800'
     },
     {
+      icon: <Mic className="h-4 w-4 sm:h-5 sm:w-5" />,
+      name: 'VMS',
+      count: 2,
+      color: 'bg-indigo-100 text-indigo-800'
+    },
+    {
       icon: <FileText className="h-4 w-4 sm:h-5 sm:w-5" />,
       name: 'Courrier',
       count: 0,
@@ -128,6 +134,7 @@ const IAChannelsBanner = () => {
       case 'email': return <Mail className="h-3 w-3" />;
       case 'sms': return <MessageCircle className="h-3 w-3" />;
       case 'whatsapp': return <MessageSquare className="h-3 w-3" />;
+      case 'vms': return <Mic className="h-3 w-3" />;
       case 'courrier': return <FileText className="h-3 w-3" />;
       case 'courrier_recommande': return <FileText className="h-3 w-3" />;
       default: return null;
@@ -140,6 +147,7 @@ const IAChannelsBanner = () => {
       'email': 'Email',
       'sms': 'SMS',
       'whatsapp': 'WhatsApp',
+      'vms': 'VMS',
       'courrier': 'Courrier',
       'courrier_recommande': 'Recommandé'
     };
@@ -315,7 +323,7 @@ const IAChannelsBanner = () => {
           </Dialog>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
           {channels.map((channel, index) => (
             <div
               key={index}
