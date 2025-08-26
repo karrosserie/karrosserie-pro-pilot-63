@@ -21,7 +21,11 @@ export const InvoiceHistoryModal: React.FC<InvoiceHistoryModalProps> = ({
   getActionIcon,
   getActionLabel,
 }) => {
-  const { relances, loading, markResponseAsRead } = useInvoiceRelances(invoice?.id);
+  // Debug log pour identifier le problème
+  console.log('InvoiceHistoryModal - invoice object:', invoice);
+  console.log('InvoiceHistoryModal - invoice.id:', invoice?.id, 'type:', typeof invoice?.id);
+  
+  const { relances, loading, markResponseAsRead } = useInvoiceRelances(invoice?.uuid);
 
   useEffect(() => {
     if (isOpen && openFromUnreadResponse && relances.length > 0) {

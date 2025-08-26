@@ -33,6 +33,19 @@ export const useInvoiceRelances = (invoiceId?: string) => {
   const fetchInvoiceRelances = async () => {
     if (!companyData?.id || !invoiceId) return;
 
+    // Vérifier si invoiceId est un UUID valide
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(invoiceId)) {
+      console.error('Invalid UUID format for invoiceId:', invoiceId);
+      toast({
+        title: "Erreur",
+        description: "ID de facture invalide",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log('Fetching relances for invoiceId:', invoiceId);
     setLoading(true);
     try {
       const { data, error } = await supabase

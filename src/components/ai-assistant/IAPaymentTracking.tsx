@@ -332,7 +332,7 @@ Karrosserie Pro`,
 };
 
 const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, onActionClick, onHistoryClick, onUnreadResponseClick, toggleAutoRelances }: any) => {
-  const { hasUnreadResponses, getUnreadResponsesCount } = useInvoiceRelances(invoice.id);
+  const { hasUnreadResponses, getUnreadResponsesCount } = useInvoiceRelances(invoice.uuid);
   const handleToggleAutoRelances = async () => {
     if (invoice.clientId && toggleAutoRelances) {
       await toggleAutoRelances(invoice.clientId, invoice.autoRelancesDisabled);

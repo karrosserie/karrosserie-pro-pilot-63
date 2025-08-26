@@ -41,7 +41,8 @@ export interface UnpaidInvoice {
 }
 
 interface FormattedUnpaidInvoice {
-  id: string;
+  id: string; // Référence de la facture pour l'affichage
+  uuid: string; // UUID de la facture pour les requêtes
   client: string;
   vehicle: string;
   vehicleRef: string;
@@ -166,7 +167,8 @@ export const useUnpaidInvoices = () => {
         : '';
 
       return {
-        id: invoice.reference,
+        id: invoice.reference, // Référence pour l'affichage
+        uuid: invoice.id, // UUID pour les requêtes base de données
         client: clientName,
         vehicle: vehicleName,
         vehicleRef: invoice.vehicles?.license_plate || 'N/A',
