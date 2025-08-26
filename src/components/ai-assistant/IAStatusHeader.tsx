@@ -9,7 +9,7 @@ import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 const IAStatusHeader = () => {
   const { preferences, isLoading, updateAiRelanceStatus } = useCompanyPreferences();
   
-  const isRelanceActive = preferences?.ai_relance_enabled ?? true;
+  const isRelanceActive = preferences?.ai_relance_enabled ?? false;
 
   return (
     <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">

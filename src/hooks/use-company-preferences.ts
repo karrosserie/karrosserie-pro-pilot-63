@@ -78,7 +78,7 @@ export function useCompanyPreferences() {
             next_repair_order_ref: '1',
             next_invoice_ref: '1',
             next_credit_ref: '1',
-            ai_relance_enabled: true,
+            ai_relance_enabled: false,
             payment_details: '',
             invoice_non_engagement_clause: '',
             repair_order_non_engagement_clause: '',
