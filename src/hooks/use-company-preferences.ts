@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompany } from '@/hooks/use-company';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/components/ui/use-toast';
 
 interface CompanyPreferences {
   id?: string;
@@ -22,6 +23,7 @@ interface CompanyPreferences {
   next_repair_order_ref: string;
   next_invoice_ref: string;
   next_credit_ref: string;
+  ai_relance_enabled: boolean;
   payment_details?: string;
   invoice_non_engagement_clause?: string;
   repair_order_non_engagement_clause?: string;
@@ -35,6 +37,7 @@ export function useCompanyPreferences() {
   const { companyData } = useCompany();
   const [preferences, setPreferences] = useState<CompanyPreferences | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const loadPreferences = async () => {
@@ -75,6 +78,7 @@ export function useCompanyPreferences() {
             next_repair_order_ref: '1',
             next_invoice_ref: '1',
             next_credit_ref: '1',
+            ai_relance_enabled: true,
             payment_details: '',
             invoice_non_engagement_clause: '',
             repair_order_non_engagement_clause: '',
@@ -105,8 +109,44 @@ export function useCompanyPreferences() {
     loadPreferences();
   }, [user?.id, companyData?.id]);
 
+  const updateAiRelanceStatus = async (enabled: boolean) => {
+    if (!companyData?.id || !preferences) return;
+
+    try {
+      const { error } = await supabase
+        .from('company_preferences')
+        .update({ ai_relance_enabled: enabled })
+        .eq('company_id', companyData.id);
+
+      if (error) {
+        console.error('Error updating AI relance status:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de mettre à jour le statut de la relance IA",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setPreferences(prev => prev ? { ...prev, ai_relance_enabled: enabled } : null);
+      
+      toast({
+        title: "Succès",
+        description: `Relance IA ${enabled ? 'activée' : 'désactivée'}`,
+      });
+    } catch (error) {
+      console.error('Error in updateAiRelanceStatus:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur inattendue s'est produite",
+        variant: "destructive",
+      });
+    }
+  };
+
   return {
     preferences,
     isLoading,
+    updateAiRelanceStatus,
   };
 }

@@ -1,12 +1,15 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Bot } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 
 const IAStatusHeader = () => {
-  const [isRelanceActive, setIsRelanceActive] = useState(true);
+  const { preferences, isLoading, updateAiRelanceStatus } = useCompanyPreferences();
+  
+  const isRelanceActive = preferences?.ai_relance_enabled ?? true;
 
   return (
     <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
@@ -28,14 +31,15 @@ const IAStatusHeader = () => {
           
           <div className="flex flex-col items-start sm:items-end space-y-2 w-full sm:w-auto">
             <Button 
-              onClick={() => setIsRelanceActive(!isRelanceActive)}
+              onClick={() => updateAiRelanceStatus && updateAiRelanceStatus(!isRelanceActive)}
+              disabled={isLoading || !updateAiRelanceStatus}
               className={`${
                 isRelanceActive 
                   ? 'bg-green-500 hover:bg-green-600 text-white' 
                   : 'bg-red-500 hover:bg-red-600 text-white'
-              } px-3 py-2 text-xs sm:text-sm w-full sm:w-auto`}
+              } px-3 py-2 text-xs sm:text-sm w-full sm:w-auto disabled:opacity-50`}
             >
-              {isRelanceActive ? '✅ Relance IA activée' : '❌ Relance IA désactivée'}
+              {isLoading ? '⏳ Chargement...' : (isRelanceActive ? '✅ Relance IA activée' : '❌ Relance IA désactivée')}
             </Button>
             <Badge className="bg-green-100 text-green-800 px-2 sm:px-3 py-1 text-xs sm:text-sm w-full sm:w-auto justify-center sm:justify-start">
               <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse flex-shrink-0"></div>

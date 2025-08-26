@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -330,6 +330,7 @@ export type Database = {
       company_preferences: {
         Row: {
           accueil_preparation_time: string | null
+          ai_relance_enabled: boolean
           cloture_livraison_time: string | null
           company_details: string | null
           company_id: string
@@ -364,6 +365,7 @@ export type Database = {
         }
         Insert: {
           accueil_preparation_time?: string | null
+          ai_relance_enabled?: boolean
           cloture_livraison_time?: string | null
           company_details?: string | null
           company_id: string
@@ -398,6 +400,7 @@ export type Database = {
         }
         Update: {
           accueil_preparation_time?: string | null
+          ai_relance_enabled?: boolean
           cloture_livraison_time?: string | null
           company_details?: string | null
           company_id?: string
@@ -475,6 +478,73 @@ export type Database = {
             columns: ["invoice_id"]
             isOneToOne: false
             referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_schedule: {
+        Row: {
+          company_id: string
+          created_at: string
+          employee_id: string
+          end_datetime: string
+          id: string
+          real_end_datetime: string | null
+          real_start_datetime: string | null
+          start_datetime: string
+          status: Database["public"]["Enums"]["task_status"]
+          task_type: Database["public"]["Enums"]["schedule_task_type"]
+          updated_at: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          employee_id: string
+          end_datetime: string
+          id?: string
+          real_end_datetime?: string | null
+          real_start_datetime?: string | null
+          start_datetime: string
+          status?: Database["public"]["Enums"]["task_status"]
+          task_type: Database["public"]["Enums"]["schedule_task_type"]
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          employee_id?: string
+          end_datetime?: string
+          id?: string
+          real_end_datetime?: string | null
+          real_start_datetime?: string | null
+          start_datetime?: string
+          status?: Database["public"]["Enums"]["task_status"]
+          task_type?: Database["public"]["Enums"]["schedule_task_type"]
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_schedule_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_schedule_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_schedule_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -1800,12 +1870,12 @@ export type Database = {
       }
       http_delete: {
         Args:
+          | { content: string; content_type: string; uri: string }
           | { uri: string }
-          | { uri: string; content: string; content_type: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
       }
       http_get: {
-        Args: { uri: string } | { uri: string; data: Json }
+        Args: { data: Json; uri: string } | { uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
       }
       http_head: {
@@ -1824,17 +1894,17 @@ export type Database = {
         }[]
       }
       http_patch: {
-        Args: { uri: string; content: string; content_type: string }
+        Args: { content: string; content_type: string; uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
       }
       http_post: {
         Args:
-          | { uri: string; content: string; content_type: string }
-          | { uri: string; data: Json }
+          | { content: string; content_type: string; uri: string }
+          | { data: Json; uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
       }
       http_put: {
-        Args: { uri: string; content: string; content_type: string }
+        Args: { content: string; content_type: string; uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
       }
       http_reset_curlopt: {
@@ -1854,16 +1924,24 @@ export type Database = {
         Returns: string
       }
       user_belongs_to_company: {
-        Args: { p_user_id: string; p_company_id: string }
+        Args: { p_company_id: string; p_user_id: string }
         Returns: boolean
       }
       user_is_company_owner: {
-        Args: { p_user_id: string; p_company_id: string }
+        Args: { p_company_id: string; p_user_id: string }
         Returns: boolean
       }
     }
     Enums: {
-      [_ in never]: never
+      schedule_task_type:
+        | "Accueil & Préparation du dossier"
+        | "Remplacement ou débosselage"
+        | "Préparation peinture"
+        | "Mise en peinture"
+        | "Finitions & remontage"
+        | "Clôture & livraison"
+        | "Absence"
+      task_status: "En attente" | "En cours" | "Terminé"
     }
     CompositeTypes: {
       http_header: {
@@ -2006,6 +2084,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      schedule_task_type: [
+        "Accueil & Préparation du dossier",
+        "Remplacement ou débosselage",
+        "Préparation peinture",
+        "Mise en peinture",
+        "Finitions & remontage",
+        "Clôture & livraison",
+        "Absence",
+      ],
+      task_status: ["En attente", "En cours", "Terminé"],
+    },
   },
 } as const
