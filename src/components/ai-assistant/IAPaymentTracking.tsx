@@ -10,7 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { MessageCircle, Mail, FileText, Filter, Download, X, Sparkles, Send, Edit, ChevronDown, History } from 'lucide-react';
+import { MessageCircle, Mail, FileText, Filter, Download, X, Sparkles, Send, Edit, ChevronDown, History, MessageSquare, Mic } from 'lucide-react';
 
 // Composant de suivi des impayés avec filtrage
 
@@ -41,11 +41,11 @@ const IAPaymentTracking = () => {
       relanceType: 'Relance 1',
       relanceTypeColor: 'bg-blue-100 text-blue-800',
       status: 'relance1',
-      availableActions: ['sms', 'email', 'courrier', 'recommande'],
+      availableActions: ['whatsapp', 'sms', 'vms', 'mail', 'recommande'],
       history: [
         {
           date: '10/04/2025',
-          type: 'email',
+          type: 'mail',
           status: 'envoyé',
           message: 'Premier rappel amical par email',
           recipient: 'contact@durandauto.fr'
@@ -55,6 +55,13 @@ const IAPaymentTracking = () => {
           type: 'sms',
           status: 'livré',
           message: 'SMS de rappel envoyé au +33 6 12 34 56 78',
+          recipient: '+33 6 12 34 56 78'
+        },
+        {
+          date: '18/04/2025',
+          type: 'whatsapp',
+          status: 'lu',
+          message: 'Message WhatsApp de rappel',
           recipient: '+33 6 12 34 56 78'
         }
       ]
@@ -72,11 +79,11 @@ const IAPaymentTracking = () => {
       relanceType: 'Relance 2',
       relanceTypeColor: 'bg-orange-100 text-orange-800',
       status: 'relance2',
-      availableActions: ['sms', 'email', 'courrier', 'recommande'],
+      availableActions: ['whatsapp', 'sms', 'vms', 'mail', 'recommande'],
       history: [
         {
           date: '05/04/2025',
-          type: 'email',
+          type: 'mail',
           status: 'envoyé',
           message: 'Email de relance initial',
           recipient: 'martin@martin-sarl.com'
@@ -89,10 +96,17 @@ const IAPaymentTracking = () => {
           recipient: '+33 6 23 45 67 89'
         },
         {
-          date: '17/05/2025',
-          type: 'courrier',
+          date: '15/04/2025',
+          type: 'vms',
           status: 'envoyé',
-          message: 'Courrier officiel de mise en demeure',
+          message: 'Message vocal automatique',
+          recipient: '+33 6 23 45 67 89'
+        },
+        {
+          date: '17/05/2025',
+          type: 'recommande',
+          status: 'envoyé',
+          message: 'Lettre recommandée avec accusé de réception',
           recipient: '123 Rue Martin, 69000 Lyon'
         }
       ]
@@ -110,11 +124,11 @@ const IAPaymentTracking = () => {
       relanceType: 'Relance 3',
       relanceTypeColor: 'bg-orange-100 text-orange-800',
       status: 'relance3',
-      availableActions: ['sms', 'email', 'courrier', 'recommande'],
+      availableActions: ['whatsapp', 'sms', 'vms', 'mail', 'recommande'],
       history: [
         {
           date: '28/03/2025',
-          type: 'email',
+          type: 'mail',
           status: 'envoyé',
           message: 'Première relance automatique',
           recipient: 'contact@duboisetfils.fr'
@@ -124,6 +138,13 @@ const IAPaymentTracking = () => {
           type: 'sms',
           status: 'livré',
           message: 'Rappel par SMS',
+          recipient: '+33 6 34 56 78 90'
+        },
+        {
+          date: '08/04/2025',
+          type: 'whatsapp',
+          status: 'lu',
+          message: 'Message WhatsApp de relance',
           recipient: '+33 6 34 56 78 90'
         },
         {
@@ -148,11 +169,11 @@ const IAPaymentTracking = () => {
       relanceType: 'Relance 4',
       relanceTypeColor: 'bg-red-100 text-red-800',
       status: 'relance4',
-      availableActions: ['sms', 'email', 'courrier', 'recommande'],
+      availableActions: ['whatsapp', 'sms', 'vms', 'mail', 'recommande'],
       history: [
         {
           date: '15/03/2025',
-          type: 'email',
+          type: 'mail',
           status: 'envoyé',
           message: 'Email de relance automatique',
           recipient: 'admin@garagecentral.com'
@@ -165,11 +186,18 @@ const IAPaymentTracking = () => {
           recipient: '+33 6 45 67 89 01'
         },
         {
-          date: '01/04/2025',
-          type: 'courrier',
+          date: '25/03/2025',
+          type: 'vms',
           status: 'envoyé',
-          message: 'Courrier de mise en demeure',
-          recipient: '789 Boulevard Central, 13000 Marseille'
+          message: 'Message vocal de relance',
+          recipient: '+33 6 45 67 89 01'
+        },
+        {
+          date: '01/04/2025',
+          type: 'whatsapp',
+          status: 'lu',
+          message: 'Message WhatsApp de mise en demeure',
+          recipient: '+33 6 45 67 89 01'
         },
         {
           date: '08/05/2025',
@@ -193,11 +221,11 @@ const IAPaymentTracking = () => {
       relanceType: 'Contentieux',
       relanceTypeColor: 'bg-red-100 text-red-800',
       status: 'contentieux',
-      availableActions: ['email', 'courrier', 'recommande'],
+      availableActions: ['whatsapp', 'sms', 'vms', 'mail', 'recommande'],
       history: [
         {
           date: '01/03/2025',
-          type: 'email',
+          type: 'mail',
           status: 'envoyé',
           message: 'Premier rappel de paiement',
           recipient: 'contact@autoexpress.fr'
@@ -210,11 +238,18 @@ const IAPaymentTracking = () => {
           recipient: '+33 6 56 78 90 12'
         },
         {
-          date: '15/03/2025',
-          type: 'courrier',
+          date: '12/03/2025',
+          type: 'vms',
           status: 'envoyé',
-          message: 'Courrier de mise en demeure',
-          recipient: '321 Rue Express, 75012 Paris'
+          message: 'Message vocal de mise en demeure',
+          recipient: '+33 6 56 78 90 12'
+        },
+        {
+          date: '15/03/2025',
+          type: 'whatsapp',
+          status: 'lu',
+          message: 'WhatsApp de mise en demeure finale',
+          recipient: '+33 6 56 78 90 12'
         },
         {
           date: '25/04/2025',
@@ -255,7 +290,7 @@ const IAPaymentTracking = () => {
     };
 
     switch (actionType) {
-      case 'email':
+      case 'mail':
         return {
           ...baseData,
           subject: `Relance de paiement - Facture ${invoice.id}`,
@@ -266,7 +301,16 @@ const IAPaymentTracking = () => {
           ...baseData,
           phoneNumber: '+33 6 12 34 56 78'
         };
-      case 'courrier':
+      case 'whatsapp':
+        return {
+          ...baseData,
+          phoneNumber: '+33 6 12 34 56 78'
+        };
+      case 'vms':
+        return {
+          ...baseData,
+          phoneNumber: '+33 6 12 34 56 78'
+        };
       case 'recommande':
         return {
           ...baseData,
@@ -285,8 +329,16 @@ const IAPaymentTracking = () => {
     
     const messages = {
       sms: `Bonjour ${invoice.client}, votre facture ${invoice.id} de ${invoice.amount} est en retard depuis le ${invoice.dueDate}. Merci de régulariser votre situation rapidement. Cordialement, Karrosserie Pro`,
-      email: `Objet: Relance de paiement - Facture ${invoice.id}\n\nMonsieur/Madame,\n\nNous vous informons que votre facture ${invoice.id} d'un montant de ${invoice.amount}, échue le ${invoice.dueDate}, n'a pas encore été réglée.\n\nNous vous prions de bien vouloir procéder au règlement dans les plus brefs délais.\n\nCordialement,\nL'équipe Karrosserie Pro`,
-      courrier: `Monsieur/Madame,\n\nNous vous adressons la présente lettre afin de vous rappeler que votre facture ${invoice.id} d'un montant de ${invoice.amount}, échue le ${invoice.dueDate}, demeure impayée à ce jour.\n\nNous vous prions de bien vouloir régulariser cette situation dans un délai de 15 jours.\n\nCordialement,\nKarrosserie Pro`,
+      whatsapp: `Bonjour ${invoice.client}, 
+      
+Nous vous informons que votre facture ${invoice.id} d'un montant de ${invoice.amount} est échue depuis le ${invoice.dueDate}.
+
+Merci de procéder au règlement dans les plus brefs délais.
+
+Cordialement,
+Karrosserie Pro`,
+      vms: `Bonjour, c'est Karrosserie Pro. Votre facture ${invoice.id} de ${invoice.amount} échue le ${invoice.dueDate} n'a pas encore été réglée. Merci de nous contacter rapidement pour régulariser cette situation.`,
+      mail: `Objet: Relance de paiement - Facture ${invoice.id}\n\nMonsieur/Madame,\n\nNous vous informons que votre facture ${invoice.id} d'un montant de ${invoice.amount}, échue le ${invoice.dueDate}, n'a pas encore été réglée.\n\nNous vous prions de bien vouloir procéder au règlement dans les plus brefs délais.\n\nCordialement,\nL'équipe Karrosserie Pro`,
       recommande: `MISE EN DEMEURE\n\nMonsieur/Madame,\n\nMalgré nos précédentes relances, votre facture ${invoice.id} d'un montant de ${invoice.amount}, échue le ${invoice.dueDate}, demeure impayée.\n\nNous vous mettons en demeure de procéder au règlement sous 8 jours, faute de quoi nous serons contraints d'engager des poursuites.\n\nCordialement,\nKarrosserie Pro`
     };
     
@@ -323,8 +375,9 @@ const IAPaymentTracking = () => {
   const getActionIcon = (action: string) => {
     switch (action) {
       case 'sms': return <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />;
-      case 'email': return <Mail className="h-3 w-3 sm:h-4 sm:w-4" />;
-      case 'courrier': return <FileText className="h-3 w-3 sm:h-4 sm:w-4" />;
+      case 'whatsapp': return <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />;
+      case 'vms': return <Mic className="h-3 w-3 sm:h-4 sm:w-4" />;
+      case 'mail': return <Mail className="h-3 w-3 sm:h-4 sm:w-4" />;
       case 'recommande': return <FileText className="h-3 w-3 sm:h-4 sm:w-4" />;
       default: return null;
     }
@@ -333,8 +386,9 @@ const IAPaymentTracking = () => {
   const getActionLabel = (action: string) => {
     switch (action) {
       case 'sms': return 'SMS';
-      case 'email': return 'Email';
-      case 'courrier': return 'Courrier';
+      case 'whatsapp': return 'WhatsApp';
+      case 'vms': return 'VMS';
+      case 'mail': return 'Mail';
       case 'recommande': return 'Recommandé';
       default: return action;
     }
@@ -342,10 +396,11 @@ const IAPaymentTracking = () => {
 
   const getActionStyle = (action: string) => {
     switch (action) {
-      case 'sms': return 'bg-green-100 text-green-800 border-green-200';
-      case 'email': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'courrier': return 'bg-gray-100 text-gray-800 border-gray-200';
-      case 'recommande': return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'sms': return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'whatsapp': return 'bg-green-100 text-green-800 border-green-200';
+      case 'vms': return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+      case 'mail': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'recommande': return 'bg-orange-100 text-orange-800 border-orange-200';
       default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
