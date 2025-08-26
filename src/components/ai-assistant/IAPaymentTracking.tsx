@@ -12,16 +12,19 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { MessageCircle, Mail, FileText, Filter, Download, X, Sparkles, Send, Edit, ChevronDown, History, MessageSquare, Mic, Loader2 } from 'lucide-react';
 import { useUnpaidInvoices } from '@/hooks/use-unpaid-invoices';
+import { useSendRelance } from '@/hooks/use-send-relance';
 
 // Composant de suivi des impayés avec filtrage
 
 const IAPaymentTracking = () => {
   const { formattedInvoices: unpaidInvoices, loading, toggleAutoRelances } = useUnpaidInvoices();
+  const { sendRelance } = useSendRelance();
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const [selectedActionType, setSelectedActionType] = useState<string>('');
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [generatedMessage, setGeneratedMessage] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const [isEditMode, setIsEditMode] = useState(true);
   const [messageData, setMessageData] = useState<any>({});
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -114,20 +117,44 @@ Karrosserie Pro`,
   };
 
   const handleSendMessage = async (autoMode = false) => {
-    if (autoMode) {
-      // In auto mode, send directly without user review
-      console.log('Sending message in auto mode:', generatedMessage);
-    } else {
-      // In semi-auto mode, use the edited message
-      console.log('Sending edited message:', generatedMessage);
+    if (!selectedInvoice || !selectedActionType) return;
+
+    setIsSending(true);
+    try {
+      const success = await sendRelance({
+        invoice: selectedInvoice,
+        channel: selectedActionType,
+        tone: getToneFromActionType(selectedActionType),
+        message: generatedMessage,
+        subject: messageData.subject,
+      });
+
+      if (success) {
+        setIsPanelOpen(false);
+        setSelectedInvoice(null);
+        setSelectedActionType('');
+        setGeneratedMessage('');
+        setMessageData({});
+      }
+    } finally {
+      setIsSending(false);
     }
-    
-    // Simulate sending
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Close panel and show success
-    setIsPanelOpen(false);
-    // You could add a toast notification here
+  };
+
+  const getToneFromActionType = (actionType: string): string => {
+    switch (actionType) {
+      case 'sms':
+      case 'whatsapp':
+        return 'amical';
+      case 'mail':
+        return 'serieux';
+      case 'vms':
+        return 'ferme';
+      case 'recommande':
+        return 'menacant';
+      default:
+        return 'serieux';
+    }
   };
 
   const closePanelAndReset = () => {
@@ -273,6 +300,7 @@ Karrosserie Pro`,
         generatedMessage={generatedMessage}
         setGeneratedMessage={setGeneratedMessage}
         isGenerating={isGenerating}
+        isSending={isSending}
         isEditMode={isEditMode}
         setIsEditMode={setIsEditMode}
         onSendMessage={handleSendMessage}
@@ -505,6 +533,7 @@ const MessagePanel = ({
   generatedMessage, 
   setGeneratedMessage, 
   isGenerating, 
+  isSending,
   isEditMode, 
   setIsEditMode, 
   onSendMessage, 
@@ -680,11 +709,20 @@ const MessagePanel = ({
             <div className="flex items-center gap-3">
               <Button
                 onClick={() => onSendMessage(false)}
-                disabled={!generatedMessage || isGenerating}
+                disabled={!generatedMessage || isGenerating || isSending}
                 className="bg-blue-600 hover:bg-blue-700"
               >
-                <Send className="h-4 w-4 mr-1" />
-                Envoyer
+                {isSending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                    Envoi en cours...
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4 mr-1" />
+                    Envoyer
+                  </>
+                )}
               </Button>
             </div>
           </div>
