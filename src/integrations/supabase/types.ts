@@ -227,6 +227,7 @@ export type Database = {
           channel: Database["public"]["Enums"]["relance_channel"]
           channel_data: Json | null
           client_id: string
+          client_response: string | null
           company_id: string
           created_at: string
           cycle_day: number | null
@@ -238,6 +239,7 @@ export type Database = {
           quote_id: string | null
           received_at: string | null
           responded_at: string | null
+          response_read: boolean
           scheduled_at: string | null
           sent_at: string | null
           status: Database["public"]["Enums"]["relance_status"]
@@ -250,6 +252,7 @@ export type Database = {
           channel: Database["public"]["Enums"]["relance_channel"]
           channel_data?: Json | null
           client_id: string
+          client_response?: string | null
           company_id: string
           created_at?: string
           cycle_day?: number | null
@@ -261,6 +264,7 @@ export type Database = {
           quote_id?: string | null
           received_at?: string | null
           responded_at?: string | null
+          response_read?: boolean
           scheduled_at?: string | null
           sent_at?: string | null
           status?: Database["public"]["Enums"]["relance_status"]
@@ -273,6 +277,7 @@ export type Database = {
           channel?: Database["public"]["Enums"]["relance_channel"]
           channel_data?: Json | null
           client_id?: string
+          client_response?: string | null
           company_id?: string
           created_at?: string
           cycle_day?: number | null
@@ -284,6 +289,7 @@ export type Database = {
           quote_id?: string | null
           received_at?: string | null
           responded_at?: string | null
+          response_read?: boolean
           scheduled_at?: string | null
           sent_at?: string | null
           status?: Database["public"]["Enums"]["relance_status"]

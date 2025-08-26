@@ -32,6 +32,8 @@ export interface ClientRelance {
   received_at?: string;
   responded_at?: string;
   channel_data?: any;
+  client_response?: string;
+  response_read: boolean;
   created_at: string;
   updated_at: string;
   // Relations
@@ -222,6 +224,30 @@ export const useClientRelances = () => {
     }
   };
 
+  const markResponseAsRead = async (relanceId: string) => {
+    try {
+      const { error } = await supabase
+        .from('client_relances')
+        .update({ response_read: true })
+        .eq('id', relanceId);
+
+      if (error) {
+        console.error('Error marking response as read:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de marquer la réponse comme lue",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Rafraîchir les données
+      fetchRelances();
+    } catch (error) {
+      console.error('Error in markResponseAsRead:', error);
+    }
+  };
+
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
@@ -238,6 +264,7 @@ export const useClientRelances = () => {
     loading,
     createRelance,
     updateRelanceStatus,
+    markResponseAsRead,
     refetch: () => {
       fetchRelanceStats();
       fetchRelances();

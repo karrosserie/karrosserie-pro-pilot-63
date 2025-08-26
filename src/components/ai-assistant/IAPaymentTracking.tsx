@@ -13,6 +13,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { MessageCircle, Mail, FileText, Filter, Download, X, Sparkles, Send, Edit, ChevronDown, History, MessageSquare, Mic, Loader2 } from 'lucide-react';
 import { useUnpaidInvoices } from '@/hooks/use-unpaid-invoices';
 import { useSendRelance } from '@/hooks/use-send-relance';
+import { useInvoiceRelances } from '@/hooks/use-invoice-relances';
+import { InvoiceHistoryModal } from './InvoiceHistoryModal';
 
 // Composant de suivi des impayés avec filtrage
 
@@ -31,9 +33,17 @@ const IAPaymentTracking = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [selectedHistoryInvoice, setSelectedHistoryInvoice] = useState<any>(null);
+  const [openFromUnreadResponse, setOpenFromUnreadResponse] = useState(false);
 
   const handleHistoryClick = (invoice: any) => {
     setSelectedHistoryInvoice(invoice);
+    setOpenFromUnreadResponse(false);
+    setIsHistoryOpen(true);
+  };
+
+  const handleUnreadResponseClick = (invoice: any) => {
+    setSelectedHistoryInvoice(invoice);
+    setOpenFromUnreadResponse(true);
     setIsHistoryOpen(true);
   };
 
@@ -282,6 +292,7 @@ Karrosserie Pro`,
                 getActionStyle={getActionStyle}
                 onActionClick={handleActionClick}
                 onHistoryClick={handleHistoryClick}
+                onUnreadResponseClick={handleUnreadResponseClick}
                 toggleAutoRelances={toggleAutoRelances}
               />
             ))}
@@ -308,124 +319,20 @@ Karrosserie Pro`,
       />
 
       {/* Modal Historique des relances */}
-      <Dialog open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <History className="h-5 w-5 text-blue-600" />
-              Historique des relances - {selectedHistoryInvoice?.id}
-            </DialogTitle>
-          </DialogHeader>
-          
-          {selectedHistoryInvoice && (
-            <div className="space-y-6">
-              {/* Informations de la facture */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-medium text-gray-900 mb-3">Informations de la facture</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-600">Client:</span>
-                    <p className="font-medium">{selectedHistoryInvoice.client}</p>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">Montant:</span>
-                    <p className="font-medium text-orange-600">{selectedHistoryInvoice.amount}</p>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">Échéance:</span>
-                    <p className="font-medium">{selectedHistoryInvoice.dueDate}</p>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">Statut:</span>
-                    <Badge className={selectedHistoryInvoice.relanceTypeColor}>
-                      {selectedHistoryInvoice.relanceType}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-
-              {/* Timeline des relances */}
-              <div className="space-y-4">
-                <h3 className="font-medium text-gray-900">Historique chronologique des relances</h3>
-                <div className="relative">
-                  {/* Ligne de timeline */}
-                  <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
-                  
-                  {selectedHistoryInvoice.history?.map((historyItem: any, index: number) => (
-                    <div key={index} className="relative flex items-start space-x-4 pb-6">
-                      {/* Icône de timeline */}
-                      <div className="relative z-10 flex items-center justify-center w-12 h-12 bg-white border-2 border-gray-200 rounded-full">
-                        {getActionIcon(historyItem.type)}
-                      </div>
-                      
-                      {/* Contenu */}
-                      <div className="flex-1 bg-white border rounded-lg p-4 shadow-sm">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-medium text-gray-900">
-                              {getActionLabel(historyItem.type)}
-                            </h4>
-                            <Badge 
-                              className={`text-xs ${
-                                historyItem.status === 'envoyé' ? 'bg-blue-100 text-blue-800' :
-                                historyItem.status === 'livré' ? 'bg-green-100 text-green-800' :
-                                'bg-gray-100 text-gray-800'
-                              }`}
-                            >
-                              {historyItem.status}
-                            </Badge>
-                          </div>
-                          <span className="text-sm text-gray-500">{historyItem.date}</span>
-                        </div>
-                        
-                        <p className="text-sm text-gray-700 mb-2">{historyItem.message}</p>
-                        
-                        <div className="text-xs text-gray-500">
-                          <strong>Destinataire:</strong> {historyItem.recipient}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Statistiques */}
-              <div className="bg-blue-50 rounded-lg p-4">
-                <h3 className="font-medium text-blue-900 mb-3">Statistiques des relances</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <span className="text-blue-700">Total relances:</span>
-                    <p className="font-bold text-blue-900">{selectedHistoryInvoice.history?.length || 0}</p>
-                  </div>
-                  <div>
-                    <span className="text-blue-700">Emails envoyés:</span>
-                    <p className="font-bold text-blue-900">
-                      {selectedHistoryInvoice.history?.filter((h: any) => h.type === 'email').length || 0}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-blue-700">SMS envoyés:</span>
-                    <p className="font-bold text-blue-900">
-                      {selectedHistoryInvoice.history?.filter((h: any) => h.type === 'sms').length || 0}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-blue-700">Courriers envoyés:</span>
-                    <p className="font-bold text-blue-900">
-                      {selectedHistoryInvoice.history?.filter((h: any) => ['courrier', 'recommande'].includes(h.type)).length || 0}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <InvoiceHistoryModal 
+        isOpen={isHistoryOpen}
+        onOpenChange={setIsHistoryOpen}
+        invoice={selectedHistoryInvoice}
+        openFromUnreadResponse={openFromUnreadResponse}
+        getActionIcon={getActionIcon}
+        getActionLabel={getActionLabel}
+      />
     </Card>
   );
 };
 
-const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, onActionClick, onHistoryClick, toggleAutoRelances }: any) => {
+const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, onActionClick, onHistoryClick, onUnreadResponseClick, toggleAutoRelances }: any) => {
+  const { hasUnreadResponses, getUnreadResponsesCount } = useInvoiceRelances(invoice.id);
   const handleToggleAutoRelances = async () => {
     if (invoice.clientId && toggleAutoRelances) {
       await toggleAutoRelances(invoice.clientId, invoice.autoRelancesDisabled);
@@ -447,6 +354,20 @@ const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, o
             <div className="text-right">
               <p className="text-xl font-bold text-orange-600 mb-1">{invoice.amount}</p>
               <div className="flex flex-col gap-1">
+                {hasUnreadResponses() && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-1.5 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3 border-green-500 text-green-700 hover:bg-green-50 relative"
+                    onClick={() => onUnreadResponseClick(invoice)}
+                  >
+                    <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Réponse client</span>
+                    <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-red-500 text-white text-xs">
+                      {getUnreadResponsesCount()}
+                    </Badge>
+                  </Button>
+                )}
                 <Button
                   className="bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90 h-8 text-xs px-3"
                   size="sm"
