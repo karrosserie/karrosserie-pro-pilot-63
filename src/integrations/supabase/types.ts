@@ -222,6 +222,78 @@ export type Database = {
           },
         ]
       }
+      client_relances: {
+        Row: {
+          channel: Database["public"]["Enums"]["relance_channel"]
+          channel_data: Json | null
+          client_id: string
+          company_id: string
+          created_at: string
+          cycle_day: number | null
+          id: string
+          invoice_id: string | null
+          is_automated: boolean
+          message: string | null
+          objective: string | null
+          quote_id: string | null
+          received_at: string | null
+          responded_at: string | null
+          scheduled_at: string | null
+          sent_at: string | null
+          status: Database["public"]["Enums"]["relance_status"]
+          step_number: number | null
+          subject: string | null
+          tone: Database["public"]["Enums"]["relance_tone"]
+          updated_at: string
+        }
+        Insert: {
+          channel: Database["public"]["Enums"]["relance_channel"]
+          channel_data?: Json | null
+          client_id: string
+          company_id: string
+          created_at?: string
+          cycle_day?: number | null
+          id?: string
+          invoice_id?: string | null
+          is_automated?: boolean
+          message?: string | null
+          objective?: string | null
+          quote_id?: string | null
+          received_at?: string | null
+          responded_at?: string | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["relance_status"]
+          step_number?: number | null
+          subject?: string | null
+          tone: Database["public"]["Enums"]["relance_tone"]
+          updated_at?: string
+        }
+        Update: {
+          channel?: Database["public"]["Enums"]["relance_channel"]
+          channel_data?: Json | null
+          client_id?: string
+          company_id?: string
+          created_at?: string
+          cycle_day?: number | null
+          id?: string
+          invoice_id?: string | null
+          is_automated?: boolean
+          message?: string | null
+          objective?: string | null
+          quote_id?: string | null
+          received_at?: string | null
+          responded_at?: string | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["relance_status"]
+          step_number?: number | null
+          subject?: string | null
+          tone?: Database["public"]["Enums"]["relance_tone"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           address: string | null
@@ -1933,6 +2005,23 @@ export type Database = {
       }
     }
     Enums: {
+      relance_channel:
+        | "phone"
+        | "email"
+        | "sms"
+        | "whatsapp"
+        | "vms"
+        | "courrier"
+        | "courrier_recommande"
+      relance_status:
+        | "en_attente"
+        | "en_cours"
+        | "envoye"
+        | "recu"
+        | "repondu"
+        | "echec"
+        | "annule"
+      relance_tone: "amical" | "ferme" | "serieux" | "menacant"
       schedule_task_type:
         | "Accueil & Préparation du dossier"
         | "Remplacement ou débosselage"
@@ -2085,6 +2174,25 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      relance_channel: [
+        "phone",
+        "email",
+        "sms",
+        "whatsapp",
+        "vms",
+        "courrier",
+        "courrier_recommande",
+      ],
+      relance_status: [
+        "en_attente",
+        "en_cours",
+        "envoye",
+        "recu",
+        "repondu",
+        "echec",
+        "annule",
+      ],
+      relance_tone: ["amical", "ferme", "serieux", "menacant"],
       schedule_task_type: [
         "Accueil & Préparation du dossier",
         "Remplacement ou débosselage",

@@ -11,9 +11,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Phone, Mail, MessageCircle, FileText, Settings, MessageSquare, Calendar, Zap, AlertTriangle, Mic } from 'lucide-react';
+import { useClientRelances } from '@/hooks/use-client-relances';
+import RelanceDetailsModal from './RelanceDetailsModal';
 
 const IAChannelsBanner = () => {
   const [isConfigOpen, setIsConfigOpen] = useState(false);
+  const [selectedChannel, setSelectedChannel] = useState<{name: string, key: string} | null>(null);
+  const { stats, loading } = useClientRelances();
   const [config, setConfig] = useState({
     phone: { enabled: true, number: '+33 1 23 45 67 89', autoResponse: true },
     email: { enabled: true, address: 'contact@karrosserie.pro', autoResponse: true },
@@ -89,41 +93,53 @@ const IAChannelsBanner = () => {
     ]
   });
 
+  // Mapper les données réelles des statistiques ou utiliser des valeurs par défaut
+  const getChannelStats = (channelKey: string) => {
+    const stat = stats.find(s => s.channel === channelKey);
+    return stat ? stat.count : 0;
+  };
+
   const channels = [
     {
       icon: <Phone className="h-4 w-4 sm:h-5 sm:w-5" />,
       name: 'Téléphone',
-      count: 3,
+      key: 'phone',
+      count: getChannelStats('phone'),
       color: 'bg-blue-100 text-blue-800'
     },
     {
       icon: <Mail className="h-4 w-4 sm:h-5 sm:w-5" />,
       name: 'Email',
-      count: 12,
+      key: 'email',
+      count: getChannelStats('email'),
       color: 'bg-green-100 text-green-800'
     },
     {
       icon: <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" />,
       name: 'SMS',
-      count: 5,
+      key: 'sms',
+      count: getChannelStats('sms'),
       color: 'bg-purple-100 text-purple-800'
     },
     {
       icon: <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5" />,
       name: 'WhatsApp',
-      count: 8,
+      key: 'whatsapp',
+      count: getChannelStats('whatsapp'),
       color: 'bg-green-100 text-green-800'
     },
     {
       icon: <Mic className="h-4 w-4 sm:h-5 sm:w-5" />,
       name: 'VMS',
-      count: 2,
+      key: 'vms',
+      count: getChannelStats('vms'),
       color: 'bg-indigo-100 text-indigo-800'
     },
     {
       icon: <FileText className="h-4 w-4 sm:h-5 sm:w-5" />,
       name: 'Courrier',
-      count: 0,
+      key: 'courrier',
+      count: getChannelStats('courrier'),
       color: 'bg-orange-100 text-orange-800'
     }
   ];
@@ -324,26 +340,56 @@ const IAChannelsBanner = () => {
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
-          {channels.map((channel, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between p-3 sm:p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-            >
-              <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-                <div className="flex-shrink-0">
-                  {channel.icon}
+          {loading ? (
+            // Skeleton loading pour les cartes
+            Array.from({ length: 6 }).map((_, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between p-3 sm:p-4 border rounded-lg bg-gray-50 animate-pulse"
+              >
+                <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 bg-gray-300 rounded"></div>
+                  <div className="h-4 bg-gray-300 rounded w-16"></div>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{channel.name}</p>
+                <div className="text-right flex-shrink-0 ml-2">
+                  <div className="h-6 bg-gray-300 rounded w-8"></div>
+                  <div className="h-3 bg-gray-300 rounded w-12 mt-1"></div>
                 </div>
               </div>
-              <div className="text-right flex-shrink-0 ml-2">
-                <p className="text-lg sm:text-xl font-bold text-gray-900">{channel.count}</p>
-                <p className="text-xs text-gray-500">en cours</p>
+            ))
+          ) : (
+            channels.map((channel, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between p-3 sm:p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer"
+                onClick={() => setSelectedChannel({name: channel.name, key: channel.key})}
+              >
+                <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                  <div className="flex-shrink-0">
+                    {channel.icon}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{channel.name}</p>
+                  </div>
+                </div>
+                <div className="text-right flex-shrink-0 ml-2">
+                  <p className="text-lg sm:text-xl font-bold text-gray-900">{channel.count}</p>
+                  <p className="text-xs text-gray-500">en cours</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
+
+        {/* Modal de détails des relances */}
+        {selectedChannel && (
+          <RelanceDetailsModal
+            isOpen={!!selectedChannel}
+            onClose={() => setSelectedChannel(null)}
+            channelName={selectedChannel.name}
+            channelKey={selectedChannel.key}
+          />
+        )}
       </CardContent>
     </Card>
   );
