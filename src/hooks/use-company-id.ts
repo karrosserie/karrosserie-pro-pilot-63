@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
 export function useCompanyId() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const [companyId, setCompanyId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -26,17 +26,6 @@ export function useCompanyId() {
           console.error('Erreur lors du parsing des données d\'impersonation:', error);
           // Continue with normal flow
         }
-      }
-
-      // Si l'utilisateur est admin et sur une page admin, ne pas récupérer de company_id
-      // Cela forcera l'utilisation des politiques RLS globales
-      const isAdmin = profile?.role === 'admin';
-      const isOnAdminPage = window.location.pathname.startsWith('/admin/');
-      
-      if (isAdmin && isOnAdminPage && !adminImpersonation) {
-        setCompanyId(null);
-        setIsLoading(false);
-        return;
       }
 
       setIsLoading(true);
@@ -63,7 +52,7 @@ export function useCompanyId() {
     };
 
     getCompanyId();
-  }, [user?.id, profile?.role]);
+  }, [user?.id]);
 
   return { companyId, isLoading };
 }

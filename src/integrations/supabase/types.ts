@@ -2277,10 +2277,6 @@ export type Database = {
         Args: { curlopt: string; value: string }
         Returns: boolean
       }
-      is_admin_impersonating: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
       text_to_bytea: {
         Args: { data: string }
         Returns: string
