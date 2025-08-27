@@ -15,7 +15,14 @@ export function useCompanyId() {
       }
 
       // Check for admin impersonation first
-      const adminImpersonation = localStorage.getItem('admin_impersonation');
+      let adminImpersonation = null;
+      try {
+        adminImpersonation = localStorage.getItem('admin_impersonation');
+      } catch (error) {
+        console.warn('Unable to access localStorage:', error);
+        // Continue with normal flow if localStorage is not available
+      }
+      
       if (adminImpersonation) {
         try {
           const impersonationData = JSON.parse(adminImpersonation);
