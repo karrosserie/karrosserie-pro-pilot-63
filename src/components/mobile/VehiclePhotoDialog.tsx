@@ -102,7 +102,7 @@ const VehiclePhotoDialog: React.FC<VehiclePhotoDialogProps> = ({
       
       await updateVehicle.mutateAsync({
         id: selectedVehicleId,
-        data: { vehicle_images: allImages }
+        data: { vehicle_images: allImages as any }
       });
       
       onOpenChange(false);

@@ -28,7 +28,11 @@ export type UpdateVehicle = Database['public']['Tables']['vehicles']['Update'];
 
 export const vehiclesService = {
   getAll: async () => {
-    const { data, error } = await supabase
+    console.log('Fetching all vehicles...');
+    
+    // Gérer l'impersonation côté client
+    const impersonationData = localStorage.getItem('admin_impersonation');
+    let query = supabase
       .from('vehicles')
       .select(`
         *,
@@ -36,14 +40,27 @@ export const vehiclesService = {
         car_models(id, name),
         clients(id, first_name, last_name),
         insurance_companies(id, name)
-      `)
-      .order('created_at', { ascending: false });
+      `);
+    
+    if (impersonationData) {
+      try {
+        const data = JSON.parse(impersonationData);
+        console.log('Using impersonation company_id for vehicles:', data.company_id);
+        // Filtrer par la company_id d'impersonation
+        query = query.eq('company_id', data.company_id);
+      } catch (error) {
+        console.error('Error parsing impersonation data for vehicles:', error);
+      }
+    }
+    
+    const { data, error } = await query.order('created_at', { ascending: false });
 
     if (error) {
       console.error('Error fetching vehicles:', error);
       throw new Error(error.message);
     }
     
+    console.log('Vehicles fetched successfully:', data);
     return data;
   },
   
