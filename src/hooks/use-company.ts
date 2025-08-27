@@ -3,10 +3,13 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { companyService, CompanyInfo } from '@/services/supabase/company';
+import { useImpersonation } from '@/hooks/use-impersonation';
+import { supabase } from '@/integrations/supabase/client';
 
 export function useCompany() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { isImpersonating, impersonationData } = useImpersonation();
   const [companyData, setCompanyData] = useState<Partial<CompanyInfo>>({
     name: '',
     email: '',
@@ -36,7 +39,22 @@ export function useCompany() {
       setIsLoading(true);
       
       try {
-        const data = await companyService.getCompanyInfo(user.id);
+        let data;
+        
+        if (isImpersonating && impersonationData) {
+          // En mode impersonation, récupérer directement les données de l'entreprise ciblée
+          const { data: companyInfo, error } = await supabase
+            .from('company_info')
+            .select('*')
+            .eq('id', impersonationData.company_id)
+            .single();
+            
+          if (error) throw error;
+          data = companyInfo;
+        } else {
+          // Mode normal
+          data = await companyService.getCompanyInfo(user.id);
+        }
         
         if (data) {
           setCompanyData(data);
@@ -54,7 +72,7 @@ export function useCompany() {
     };
 
     loadCompanyData();
-  }, [user?.id]);
+  }, [user?.id, isImpersonating, impersonationData?.company_id]);
 
   const saveCompanyData = async () => {
     if (!user) {
@@ -63,7 +81,24 @@ export function useCompany() {
 
     setIsSaving(true);
     try {
-      const updatedData = await companyService.updateCompanyInfo(user.id, companyData);
+      let updatedData;
+      
+      if (isImpersonating && impersonationData) {
+        // En mode impersonation, mise à jour directe
+        const { data, error } = await supabase
+          .from('company_info')
+          .update(companyData)
+          .eq('id', impersonationData.company_id)
+          .select()
+          .single();
+          
+        if (error) throw error;
+        updatedData = data;
+      } else {
+        // Mode normal
+        updatedData = await companyService.updateCompanyInfo(user.id, companyData);
+      }
+      
       setCompanyData(updatedData);
       toast({
         title: "Données sauvegardées",

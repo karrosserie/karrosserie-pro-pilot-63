@@ -1,12 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { subscriptionService } from '@/services/supabase/subscriptions';
 import { useCompany } from './use-company';
+import { useImpersonation } from './use-impersonation';
 import { toast } from '@/hooks/use-toast';
 import { TOKEN_COSTS, TokenOperation, getTokenCost } from '@/config/token-costs';
 
 export const useSubscription = () => {
   const { companyData } = useCompany();
+  const { isImpersonating, impersonationData } = useImpersonation();
   const queryClient = useQueryClient();
+
+  // Utiliser l'ID de l'entreprise approprié (impersonation ou normal)
+  const effectiveCompanyId = isImpersonating ? impersonationData?.company_id : companyData?.id;
 
   // Get subscription plans
   const { data: subscriptionPlans, isLoading: plansLoading } = useQuery({
@@ -22,23 +27,23 @@ export const useSubscription = () => {
 
   // Get company subscription
   const { data: companySubscription, isLoading: subscriptionLoading } = useQuery({
-    queryKey: ['company-subscription', companyData?.id],
-    queryFn: () => companyData?.id ? subscriptionService.getCompanySubscription(companyData.id) : null,
-    enabled: !!companyData?.id,
+    queryKey: ['company-subscription', effectiveCompanyId],
+    queryFn: () => effectiveCompanyId ? subscriptionService.getCompanySubscription(effectiveCompanyId) : null,
+    enabled: !!effectiveCompanyId,
   });
 
   // Get token usage history
   const { data: tokenUsage, isLoading: usageLoading } = useQuery({
-    queryKey: ['token-usage', companyData?.id],
-    queryFn: () => companyData?.id ? subscriptionService.getTokenUsage(companyData.id) : [],
-    enabled: !!companyData?.id,
+    queryKey: ['token-usage', effectiveCompanyId],
+    queryFn: () => effectiveCompanyId ? subscriptionService.getTokenUsage(effectiveCompanyId) : [],
+    enabled: !!effectiveCompanyId,
   });
 
   // Create subscription mutation
   const createSubscriptionMutation = useMutation({
     mutationFn: ({ planId, tokensIncluded }: { planId: string; tokensIncluded: number }) => {
-      if (!companyData?.id) throw new Error('No company selected');
-      return subscriptionService.createSubscription(companyData.id, planId, tokensIncluded);
+      if (!effectiveCompanyId) throw new Error('No company selected');
+      return subscriptionService.createSubscription(effectiveCompanyId, planId, tokensIncluded);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['company-subscription'] });
@@ -87,14 +92,14 @@ export const useSubscription = () => {
       operation: TokenOperation; 
       description?: string; 
     }) => {
-      if (!companyData?.id || !companySubscription?.id) {
+      if (!effectiveCompanyId || !companySubscription?.id) {
         throw new Error('No company or active subscription');
       }
       
       const tokenCost = getTokenCost(operation);
       
       return subscriptionService.consumeTokens(
-        companyData.id,
+        effectiveCompanyId,
         companySubscription.id,
         tokenCost,
         operation,
