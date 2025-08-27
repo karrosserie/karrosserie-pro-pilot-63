@@ -56,7 +56,7 @@ const Settings = () => {
             <Bell className="h-4 w-4 mr-2" />
             Notifications
           </TabsTrigger>
-          <TabsTrigger value="subscription" className="hidden">
+          <TabsTrigger value="subscription">
             <CreditCard className="h-4 w-4 mr-2" />
             Abonnement
           </TabsTrigger>

@@ -545,6 +545,56 @@ export type Database = {
         }
         Relationships: []
       }
+      company_subscriptions: {
+        Row: {
+          company_id: string
+          created_at: string
+          end_date: string | null
+          id: string
+          next_billing_date: string | null
+          start_date: string
+          status: string
+          subscription_plan_id: string
+          tokens_remaining: number
+          tokens_used: number
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          next_billing_date?: string | null
+          start_date?: string
+          status?: string
+          subscription_plan_id: string
+          tokens_remaining?: number
+          tokens_used?: number
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          next_billing_date?: string | null
+          start_date?: string
+          status?: string
+          subscription_plan_id?: string
+          tokens_remaining?: number
+          tokens_used?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_subscriptions_subscription_plan_id_fkey"
+            columns: ["subscription_plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       credits: {
         Row: {
           amount: number
@@ -588,6 +638,44 @@ export type Database = {
             columns: ["invoice_id"]
             isOneToOne: false
             referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_breaks: {
+        Row: {
+          break_end_time: string | null
+          break_start_time: string
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          timesheet_id: string
+          updated_at: string
+        }
+        Insert: {
+          break_end_time?: string | null
+          break_start_time?: string
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          timesheet_id: string
+          updated_at?: string
+        }
+        Update: {
+          break_end_time?: string | null
+          break_start_time?: string
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          timesheet_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_breaks_timesheet_id_fkey"
+            columns: ["timesheet_id"]
+            isOneToOne: false
+            referencedRelation: "employee_timesheets"
             referencedColumns: ["id"]
           },
         ]
@@ -655,6 +743,50 @@ export type Database = {
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_timesheets: {
+        Row: {
+          clock_in_time: string
+          clock_out_time: string | null
+          company_id: string
+          created_at: string
+          date: string
+          employee_id: string
+          id: string
+          total_work_minutes: number | null
+          updated_at: string
+        }
+        Insert: {
+          clock_in_time?: string
+          clock_out_time?: string | null
+          company_id: string
+          created_at?: string
+          date?: string
+          employee_id: string
+          id?: string
+          total_work_minutes?: number | null
+          updated_at?: string
+        }
+        Update: {
+          clock_in_time?: string
+          clock_out_time?: string | null
+          company_id?: string
+          created_at?: string
+          date?: string
+          employee_id?: string
+          id?: string
+          total_work_minutes?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_timesheets_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
             referencedColumns: ["id"]
           },
         ]
@@ -1676,6 +1808,152 @@ export type Database = {
           },
         ]
       }
+      subscription_plans: {
+        Row: {
+          billing_period: string
+          created_at: string
+          description: string | null
+          features: Json
+          id: string
+          is_active: boolean
+          name: string
+          price: number
+          tokens_included: number
+          updated_at: string
+        }
+        Insert: {
+          billing_period: string
+          created_at?: string
+          description?: string | null
+          features?: Json
+          id?: string
+          is_active?: boolean
+          name: string
+          price: number
+          tokens_included?: number
+          updated_at?: string
+        }
+        Update: {
+          billing_period?: string
+          created_at?: string
+          description?: string | null
+          features?: Json
+          id?: string
+          is_active?: boolean
+          name?: string
+          price?: number
+          tokens_included?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      task_photos: {
+        Row: {
+          company_id: string
+          created_at: string
+          employee_id: string
+          file_name: string
+          file_url: string
+          id: string
+          photo_type: string
+          task_id: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          employee_id: string
+          file_name: string
+          file_url: string
+          id?: string
+          photo_type: string
+          task_id: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          employee_id?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          photo_type?: string
+          task_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      token_packages: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          price: number
+          token_count: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          price: number
+          token_count: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          price?: number
+          token_count?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      token_usage: {
+        Row: {
+          company_id: string
+          created_at: string
+          description: string | null
+          id: string
+          operation_type: string
+          subscription_id: string
+          tokens_consumed: number
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          operation_type: string
+          subscription_id: string
+          tokens_consumed?: number
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          operation_type?: string
+          subscription_id?: string
+          tokens_consumed?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "token_usage_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "company_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tokens: {
         Row: {
           client_id: string | null
@@ -1740,36 +2018,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      users: {
-        Row: {
-          building_id: string | null
-          created_at: string | null
-          id: string
-          lot: string | null
-          phone: string
-          role: string
-          updated_at: string | null
-        }
-        Insert: {
-          building_id?: string | null
-          created_at?: string | null
-          id?: string
-          lot?: string | null
-          phone: string
-          role: string
-          updated_at?: string | null
-        }
-        Update: {
-          building_id?: string | null
-          created_at?: string | null
-          id?: string
-          lot?: string | null
-          phone?: string
-          role?: string
-          updated_at?: string | null
-        }
-        Relationships: []
       }
       vehicle_workflow_steps: {
         Row: {
