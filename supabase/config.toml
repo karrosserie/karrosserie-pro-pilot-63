@@ -5,3 +5,6 @@ verify_jwt = true
 
 [functions.get-active-repair-orders]
 verify_jwt = true
+
+[functions.send-token-alert]
+verify_jwt = true

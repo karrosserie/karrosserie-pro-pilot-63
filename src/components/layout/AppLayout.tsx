@@ -6,6 +6,7 @@ import Sidebar from "./Sidebar";
 import QuickActions from "@/components/shared/QuickActions";
 import AccessRestriction from "./AccessRestriction";
 import SubscriptionExpiryAlert from "@/components/subscription/SubscriptionExpiryAlert";
+import TokenLowAlert from "@/components/subscription/TokenLowAlert";
 import { useSubscription } from '@/hooks/use-subscription';
 import { useLocation } from 'react-router-dom';
 
@@ -16,7 +17,7 @@ interface AppLayoutProps {
 const AppLayout = ({ children }: AppLayoutProps) => {
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { hasFullAccess } = useSubscription();
+  const { hasFullAccess, tokensRemaining, companySubscription } = useSubscription();
   const location = useLocation();
 
   const toggleSidebar = () => {
@@ -54,6 +55,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       
       {/* Alertes d'expiration d'abonnement */}
       <SubscriptionExpiryAlert />
+      
+      {/* Alertes de jetons faibles */}
+      {companySubscription?.company_id && (
+        <TokenLowAlert 
+          tokensRemaining={tokensRemaining} 
+          companyId={companySubscription.company_id} 
+        />
+      )}
     </div>
   );
 };
