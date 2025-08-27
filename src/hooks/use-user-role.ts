@@ -29,7 +29,7 @@ export function useUserRole() {
             .eq('user_id', user.id)
             .eq('company_id', impersonationData.company_id)
             .eq('active', true)
-            .single();
+            .maybeSingle();
 
           if (error || !data) {
             console.error('Erreur lors de la récupération du rôle (impersonation):', error);
@@ -52,7 +52,7 @@ export function useUserRole() {
           .select('role')
           .eq('user_id', user.id)
           .eq('active', true)
-          .single();
+          .maybeSingle();
 
         if (error || !data) {
           console.error('Erreur lors de la récupération du rôle:', error);
