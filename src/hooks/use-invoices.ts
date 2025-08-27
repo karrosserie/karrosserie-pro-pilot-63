@@ -2,17 +2,25 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { invoicesService } from '@/services/supabase/invoices';
+import { useImpersonation } from '@/hooks/use-impersonation';
+import { useEffect } from 'react';
 
 export function useInvoices() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { isImpersonating, impersonationData } = useImpersonation();
+
+  // Invalider les requêtes lors du changement d'impersonation
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ['invoices'] });
+  }, [isImpersonating, impersonationData?.company_id, queryClient]);
 
   const {
     data: invoices,
     isLoading,
     error
   } = useQuery({
-    queryKey: ['invoices'],
+    queryKey: ['invoices', impersonationData?.company_id || 'normal'],
     queryFn: async () => {
       return await invoicesService.getAll();
     }

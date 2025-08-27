@@ -3,18 +3,26 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { receiptsService, ReceiptWithClient } from '@/services/supabase/receipts';
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
+import { useImpersonation } from '@/hooks/use-impersonation';
+import { useEffect } from 'react';
 
 export function useReceiptsData() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
+  const { isImpersonating, impersonationData } = useImpersonation();
+
+  // Invalider les requêtes lors du changement d'impersonation
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ['receipts'] });
+  }, [isImpersonating, impersonationData?.company_id, queryClient]);
   
   const {
     data: receiptsData,
     isLoading,
     error
   } = useQuery({
-    queryKey: ['receipts'],
+    queryKey: ['receipts', impersonationData?.company_id || 'normal'],
     queryFn: receiptsService.getAll
   });
 

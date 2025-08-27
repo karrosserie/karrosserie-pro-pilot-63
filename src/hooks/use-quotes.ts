@@ -2,17 +2,25 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { getCurrentUserCompanyId } from '@/services/supabase/auth-company';
+import { useImpersonation } from '@/hooks/use-impersonation';
+import { useEffect } from 'react';
 
 export function useQuotes() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { isImpersonating, impersonationData } = useImpersonation();
+
+  // Invalider les requêtes lors du changement d'impersonation
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ['quotes'] });
+  }, [isImpersonating, impersonationData?.company_id, queryClient]);
 
   const {
     data: quotes,
     isLoading,
     error
   } = useQuery({
-    queryKey: ['quotes'],
+    queryKey: ['quotes', impersonationData?.company_id || 'normal'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('quotes')

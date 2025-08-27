@@ -2,6 +2,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { clientsService, NewClient, UpdateClient } from '@/services/supabase/clients';
 import { useToast } from '@/hooks/use-toast';
+import { useImpersonation } from '@/hooks/use-impersonation';
+import { useEffect } from 'react';
 
 // Helper function to transform client data from database format to frontend format
 const transformClientFromDB = (client: any) => {
@@ -20,13 +22,19 @@ const transformClientFromDB = (client: any) => {
 export function useClients() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { isImpersonating, impersonationData } = useImpersonation();
+
+  // Invalider les requêtes lors du changement d'impersonation
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ['clients'] });
+  }, [isImpersonating, impersonationData?.company_id, queryClient]);
   
   const {
     data: clients,
     isLoading,
     error
   } = useQuery({
-    queryKey: ['clients'],
+    queryKey: ['clients', impersonationData?.company_id || 'normal'],
     queryFn: async () => {
       const data = await clientsService.getAll();
       return data?.map(transformClientFromDB) || [];

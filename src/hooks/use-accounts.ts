@@ -3,11 +3,19 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import { accountsService, Account } from '@/services/supabase/accounts';
+import { useImpersonation } from '@/hooks/use-impersonation';
+import { useEffect } from 'react';
 
 export const useAccounts = () => {
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   const queryClient = useQueryClient();
+  const { isImpersonating, impersonationData } = useImpersonation();
+
+  // Invalider les requêtes lors du changement d'impersonation
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ['accounts'] });
+  }, [isImpersonating, impersonationData?.company_id, queryClient]);
 
   // Fetch accounts
   const {
@@ -15,7 +23,7 @@ export const useAccounts = () => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['accounts'],
+    queryKey: ['accounts', impersonationData?.company_id || 'normal'],
     queryFn: accountsService.getAll,
     retry: (failureCount, error: any) => {
       // Don't retry authentication errors

@@ -1,9 +1,23 @@
 import { supabase } from '@/integrations/supabase/client';
 
 /**
- * Service pour récupérer le company_id de l'utilisateur connecté
+ * Récupère l'ID de l'entreprise effective (en tenant compte de l'impersonation)
  */
 export async function getCurrentUserCompanyId(): Promise<string> {
+  // Vérifier d'abord s'il y a une impersonation active
+  const impersonationData = localStorage.getItem('admin_impersonation');
+  if (impersonationData) {
+    try {
+      const data = JSON.parse(impersonationData);
+      return data.company_id;
+    } catch (error) {
+      console.error('Error parsing impersonation data:', error);
+      // Nettoyer les données corrompues
+      localStorage.removeItem('admin_impersonation');
+    }
+  }
+
+  // Mode normal : récupérer la company_id de l'utilisateur
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   
   if (userError || !user) {
