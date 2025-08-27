@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 import { Building2, Users, CreditCard, UserCheck, Coins } from 'lucide-react';
 
 interface Company {
@@ -44,6 +45,7 @@ const AdminAccounts = () => {
   const [newTokens, setNewTokens] = useState('');
   const [selectedPlan, setSelectedPlan] = useState('');
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchCompanies();
@@ -232,8 +234,11 @@ const AdminAccounts = () => {
 
       toast({
         title: "Connexion établie",
-        description: `Vous êtes maintenant connecté en tant que ${companyName}. Actualisez la page pour voir les données de cette carrosserie.`
+        description: `Vous êtes maintenant connecté en tant que ${companyName}.`
       });
+
+      // Redirect to dashboard
+      navigate('/');
     } catch (error) {
       console.error('Error impersonating:', error);
       toast({
