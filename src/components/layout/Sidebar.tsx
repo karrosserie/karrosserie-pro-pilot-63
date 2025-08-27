@@ -19,8 +19,10 @@ import {
   Bot,
   X,
   HelpCircle,
-  Calendar
+  Calendar,
+  Shield
 } from 'lucide-react';
+import { useAdmin } from '@/hooks/use-admin';
 
 interface SidebarProps {
   isMobile: boolean;
@@ -105,6 +107,7 @@ const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems
 
 const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
   const location = useLocation();
+  const { isAdmin } = useAdmin();
   
   const isActivePath = (path: string): boolean => {
     if (path === '/') {
@@ -116,6 +119,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
   const navItems = [
     { icon: <Home className="app-icon" />, label: 'Tableau de bord', path: '/' },
     { icon: <Bot className="app-icon" />, label: 'Assistant IA', path: '/ai-assistant' },
+    ...(isAdmin ? [{ icon: <Shield className="app-icon" />, label: 'Accès aux comptes', path: '/admin/accounts' }] : []),
     { icon: <Users className="app-icon" />, label: 'Clients', path: '/clients' },
     { icon: <Car className="app-icon" />, label: 'Véhicules', path: '/vehicles' },
     { icon: <Calendar className="app-icon" />, label: 'Planning', path: '/planning' },
