@@ -258,7 +258,7 @@ const SubscriptionTab: React.FC = () => {
                   <Button 
                     className="w-full"
                     onClick={() => createSubscription({ planId: plan.id, tokensIncluded: plan.tokens_included })}
-                    disabled={isCreatingSubscription}
+                    disabled={true}
                   >
                     <CreditCardIcon className="w-4 h-4 mr-2" />
                     {hasActiveSubscription && (companySubscription as any).subscription_plans?.price === 0
