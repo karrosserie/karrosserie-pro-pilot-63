@@ -12,7 +12,7 @@ import Settings from "@/pages/Settings";
 import Accounting from "@/pages/Accounting";
 import Cessions from "@/pages/Cessions";
 import Help from "@/pages/Help";
-import KarrosseriePlanningPage from "@/pages/KarrosseriePlanningPage";
+import Planning from "@/pages/Planning";
 
 export const coreRoutes = [
   {
@@ -130,7 +130,7 @@ export const coreRoutes = [
     element: (
       <ProtectedRoute>
         <AppLayout>
-          <KarrosseriePlanningPage />
+          <Planning />
         </AppLayout>
       </ProtectedRoute>
     )
