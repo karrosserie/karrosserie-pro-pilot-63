@@ -20,9 +20,11 @@ import {
   X,
   HelpCircle,
   Calendar,
-  Shield
+  Shield,
+  ArrowLeft
 } from 'lucide-react';
 import { useAdmin } from '@/hooks/use-admin';
+import { Button } from '@/components/ui/button';
 
 interface SidebarProps {
   isMobile: boolean;
@@ -107,7 +109,7 @@ const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems
 
 const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
   const location = useLocation();
-  const { isAdmin } = useAdmin();
+  const { isAdmin, isImpersonating, impersonationData, exitImpersonation } = useAdmin();
   
   const isActivePath = (path: string): boolean => {
     if (path === '/') {
@@ -194,6 +196,29 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
         </div>
         
         <div className="p-4 overflow-y-auto h-[calc(100vh-4rem)] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+          {/* Admin impersonation banner */}
+          {isImpersonating && impersonationData && (
+            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-medium text-amber-800">
+                  Mode Administrateur
+                </p>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={exitImpersonation}
+                  className="h-6 px-2 py-1 text-xs border-amber-200 text-amber-700 hover:bg-amber-100"
+                >
+                  <ArrowLeft className="h-3 w-3 mr-1" />
+                  Retour Admin
+                </Button>
+              </div>
+              <p className="text-xs text-amber-700">
+                Connecté en tant que: <span className="font-medium">{impersonationData.company_name}</span>
+              </p>
+            </div>
+          )}
+          
           <nav className="space-y-1">
             {navItems.map((item, index) => (
               <NavItem

@@ -237,8 +237,8 @@ const AdminAccounts = () => {
         description: `Vous êtes maintenant connecté en tant que ${companyName}.`
       });
 
-      // Redirect to dashboard
-      navigate('/');
+      // Force page reload to refresh all hooks and data
+      window.location.href = '/';
     } catch (error) {
       console.error('Error impersonating:', error);
       toast({
