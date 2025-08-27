@@ -35,7 +35,7 @@ import InvoiceViewerModal from '@/components/invoices/InvoiceViewerModal';
 import InvoiceEmailDialog from '@/components/invoices/InvoiceEmailDialog';
 import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 import { CreditDialog } from '@/components/credits/CreditDialog';
-import { Invoice } from '@/services/supabase/invoices';
+import { InvoiceWithJoins } from '@/hooks/use-invoices';
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import { useCompany } from '@/hooks/use-company';
@@ -56,7 +56,7 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
   const [creditDialogOpen, setCreditDialogOpen] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<InvoiceWithJoins | null>(null);
 
   if (isLoading) {
     return (
@@ -69,17 +69,17 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
   const clientInvoices = invoices?.filter(invoice => invoice.client_id === clientId) || [];
   const { sortedData, sortConfig, handleSort } = useTableSorting(clientInvoices, 'reference');
 
-  const handleView = (invoice: Invoice) => {
+  const handleView = (invoice: InvoiceWithJoins) => {
     setSelectedInvoice(invoice);
     setViewerModalOpen(true);
   };
 
-  const handleEdit = (invoice: Invoice) => {
+  const handleEdit = (invoice: InvoiceWithJoins) => {
     setSelectedInvoice(invoice);
     setDialogOpen(true);
   };
 
-  const handleDelete = async (invoice: Invoice) => {
+  const handleDelete = async (invoice: InvoiceWithJoins) => {
     const confirmed = await confirm({
       title: 'Supprimer la facture',
       description: `Êtes-vous sûr de vouloir supprimer la facture ${invoice.reference} ? Cette action est irréversible.`,
@@ -105,7 +105,7 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
     }
   };
 
-  const handleDownload = async (invoice: Invoice) => {
+  const handleDownload = async (invoice: InvoiceWithJoins) => {
     try {
       toast({
         title: "Génération du PDF",
@@ -132,7 +132,7 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
     }
   };
 
-  const handlePrint = async (invoice: Invoice) => {
+  const handlePrint = async (invoice: InvoiceWithJoins) => {
     try {
       toast({
         title: "Ouverture pour impression",
@@ -154,17 +154,17 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
     }
   };
 
-  const handleSendEmail = (invoice: Invoice) => {
+  const handleSendEmail = (invoice: InvoiceWithJoins) => {
     setSelectedInvoice(invoice);
     setEmailDialogOpen(true);
   };
 
-  const handleAddPayment = (invoice: Invoice) => {
+  const handleAddPayment = (invoice: InvoiceWithJoins) => {
     setSelectedInvoice(invoice);
     setReceiptDialogOpen(true);
   };
 
-  const handleAddCredit = (invoice: Invoice) => {
+  const handleAddCredit = (invoice: InvoiceWithJoins) => {
     setSelectedInvoice(invoice);
     setCreditDialogOpen(true);
   };

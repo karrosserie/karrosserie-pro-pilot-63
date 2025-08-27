@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { clientsService, NewClient, UpdateClient } from '@/services/supabase/clients';
 import { useToast } from '@/hooks/use-toast';
+import { useCompanyId } from '@/hooks/use-company-id';
 
 // Helper function to transform client data from database format to frontend format
 const transformClientFromDB = (client: any) => {
@@ -20,17 +21,20 @@ const transformClientFromDB = (client: any) => {
 export function useClients() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { companyId } = useCompanyId();
   
   const {
     data: clients,
     isLoading,
     error
   } = useQuery({
-    queryKey: ['clients'],
+    queryKey: ['clients', companyId],
     queryFn: async () => {
+      if (!companyId) return [];
       const data = await clientsService.getAll();
       return data?.map(transformClientFromDB) || [];
-    }
+    },
+    enabled: !!companyId
   });
   
   const createClient = useMutation({
