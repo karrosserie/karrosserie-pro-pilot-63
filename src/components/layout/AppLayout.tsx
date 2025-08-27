@@ -5,6 +5,7 @@ import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import QuickActions from "@/components/shared/QuickActions";
 import AccessRestriction from "./AccessRestriction";
+import SubscriptionExpiryAlert from "@/components/subscription/SubscriptionExpiryAlert";
 import { useSubscription } from '@/hooks/use-subscription';
 import { useLocation } from 'react-router-dom';
 
@@ -50,6 +51,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
       {/* Quick Actions présentes sur toutes les pages */}
       <QuickActions />
+      
+      {/* Alertes d'expiration d'abonnement */}
+      <SubscriptionExpiryAlert />
     </div>
   );
 };
