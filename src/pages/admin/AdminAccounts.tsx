@@ -10,7 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { Building2, Users, CreditCard, UserCheck, Coins } from 'lucide-react';
+import { Building2, Users, CreditCard, UserCheck, Coins, Search, ArrowUpDown } from 'lucide-react';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface Company {
   id: string;
@@ -39,12 +41,15 @@ interface SubscriptionPlan {
 
 const AdminAccounts = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
+  const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
   const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newTokens, setNewTokens] = useState('');
   const [selectedPlan, setSelectedPlan] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortConfig, setSortConfig] = useState<{key: string, direction: 'asc' | 'desc'} | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -110,6 +115,7 @@ const AdminAccounts = () => {
       );
 
       setCompanies(companiesWithData);
+      setFilteredCompanies(companiesWithData);
     } catch (error) {
       console.error('Error fetching companies:', error);
       toast({
@@ -252,6 +258,60 @@ const AdminAccounts = () => {
     }
   };
 
+  // Fonction de recherche
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+    const filtered = companies.filter(company => 
+      company.name.toLowerCase().includes(term.toLowerCase()) ||
+      company.email.toLowerCase().includes(term.toLowerCase()) ||
+      company.city.toLowerCase().includes(term.toLowerCase())
+    );
+    setFilteredCompanies(filtered);
+  };
+
+  // Fonction de tri
+  const handleSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+
+    const sorted = [...filteredCompanies].sort((a, b) => {
+      let aValue: any;
+      let bValue: any;
+
+      if (key === 'subscription_end') {
+        aValue = a.subscription?.end_date ? new Date(a.subscription.end_date) : new Date(0);
+        bValue = b.subscription?.end_date ? new Date(b.subscription.end_date) : new Date(0);
+      } else if (key === 'subscription_plan') {
+        aValue = a.subscription?.plan_name || '';
+        bValue = b.subscription?.plan_name || '';
+      } else if (key === 'tokens') {
+        aValue = a.subscription?.tokens_remaining || 0;
+        bValue = b.subscription?.tokens_remaining || 0;
+      } else {
+        aValue = (a as any)[key] || '';
+        bValue = (b as any)[key] || '';
+      }
+
+      if (aValue < bValue) {
+        return direction === 'asc' ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return direction === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+
+    setFilteredCompanies(sorted);
+  };
+
+  // Effet pour mettre à jour les résultats filtrés quand les données changent
+  useEffect(() => {
+    handleSearch(searchTerm);
+  }, [companies]);
+
   if (loading) {
     return (
       <div className="p-6">
@@ -276,6 +336,19 @@ const AdminAccounts = () => {
         </div>
       </div>
 
+      {/* Barre de recherche */}
+      <Card className="p-4">
+        <div className="flex items-center space-x-2">
+          <Search className="h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher par nom, email ou ville..."
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="max-w-sm"
+          />
+        </div>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>Toutes les carrosseries</CardTitle>
@@ -284,17 +357,53 @@ const AdminAccounts = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nom</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Ville</TableHead>
-                <TableHead>Utilisateurs</TableHead>
-                <TableHead>Abonnement</TableHead>
-                <TableHead>Jetons</TableHead>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('name')}>
+                  <div className="flex items-center space-x-1">
+                    <span>Nom</span>
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('email')}>
+                  <div className="flex items-center space-x-1">
+                    <span>Email</span>
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('city')}>
+                  <div className="flex items-center space-x-1">
+                    <span>Ville</span>
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('user_count')}>
+                  <div className="flex items-center space-x-1">
+                    <span>Utilisateurs</span>
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('subscription_plan')}>
+                  <div className="flex items-center space-x-1">
+                    <span>Abonnement</span>
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('tokens')}>
+                  <div className="flex items-center space-x-1">
+                    <span>Jetons</span>
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('subscription_end')}>
+                  <div className="flex items-center space-x-1">
+                    <span>Échéance</span>
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {companies.map((company) => (
+              {filteredCompanies.map((company) => (
                 <TableRow key={company.id}>
                   <TableCell className="font-medium">{company.name}</TableCell>
                   <TableCell>{company.email}</TableCell>
@@ -320,6 +429,15 @@ const AdminAccounts = () => {
                         <Coins className="h-4 w-4" />
                         <span>{company.subscription.tokens_remaining}</span>
                       </div>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {company.subscription?.end_date ? (
+                      <Badge variant={new Date(company.subscription.end_date) < new Date() ? "destructive" : "secondary"}>
+                        {format(new Date(company.subscription.end_date), 'dd/MM/yyyy', { locale: fr })}
+                      </Badge>
                     ) : (
                       <span className="text-muted-foreground">-</span>
                     )}
