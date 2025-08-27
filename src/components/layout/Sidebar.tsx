@@ -24,6 +24,8 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { useAdmin } from '@/hooks/use-admin';
+import { useUserRole } from '@/hooks/use-user-role';
+import { getFilteredNavItems } from '@/utils/role-permissions';
 import { Button } from '@/components/ui/button';
 
 interface SidebarProps {
@@ -110,6 +112,7 @@ const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems
 const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
   const location = useLocation();
   const { isAdmin, isImpersonating, impersonationData, exitImpersonation } = useAdmin();
+  const { role } = useUserRole();
   
   const isActivePath = (path: string): boolean => {
     if (path === '/') {
@@ -118,7 +121,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     return location.pathname.startsWith(path);
   };
 
-  const navItems = [
+  const allNavItems = [
     { icon: <Home className="app-icon" />, label: 'Tableau de bord', path: '/' },
     { icon: <Bot className="app-icon" />, label: 'Assistant IA', path: '/ai-assistant' },
     { icon: <Users className="app-icon" />, label: 'Clients', path: '/clients' },
@@ -155,6 +158,9 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     ...(isAdmin ? [{ icon: <Shield className="app-icon" />, label: 'Accès aux comptes', path: '/admin/accounts' }] : []),
     { icon: <Settings className="app-icon" />, label: 'Paramètres', path: '/settings' },
   ];
+
+  // Filter navigation items based on user role
+  const navItems = getFilteredNavItems(role, allNavItems);
 
   const handleOverlayClick = () => {
     if (isMobile) {

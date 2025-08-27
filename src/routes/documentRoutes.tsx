@@ -1,5 +1,6 @@
 
 import { ProtectedRoute } from "@/components/router/ProtectedRoute";
+import { RoleProtectedRoute } from "@/components/router/RoleProtectedRoute";
 import AppLayout from "@/components/layout/AppLayout";
 import Documents from "@/pages/Documents";
 import ExpertiseReports from "@/pages/documents/expertise/ExpertiseReports";
@@ -13,61 +14,61 @@ export const documentRoutes = [
   {
     path: "/documents",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Documents />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/documents/expertise",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <ExpertiseReports />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/documents/devis",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Quotes />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/documents/ordres",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <RepairOrders />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/documents/factures",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Invoices />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/documents/avoirs",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Credits />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {

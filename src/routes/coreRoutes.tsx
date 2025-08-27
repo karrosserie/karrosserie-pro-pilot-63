@@ -1,5 +1,6 @@
 
 import { ProtectedRoute } from "@/components/router/ProtectedRoute";
+import { RoleProtectedRoute } from "@/components/router/RoleProtectedRoute";
 import AppLayout from "@/components/layout/AppLayout";
 import Index from "@/pages/Index";
 import Activity from "@/pages/Activity";
@@ -18,121 +19,121 @@ export const coreRoutes = [
   {
     path: "/",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Index />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/activity",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Activity />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/ai-assistant",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <AIAssistant />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/profile",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Profile />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/clients",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Clients />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/vehicles",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Vehicles />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/fleet",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Fleet />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/accounting",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Accounting />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/cessions",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Cessions />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/settings",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Settings />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/help",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Help />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/planning",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Planning />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   }
 ];

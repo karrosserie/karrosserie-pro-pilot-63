@@ -1,5 +1,6 @@
 
 import { ProtectedRoute } from "@/components/router/ProtectedRoute";
+import { RoleProtectedRoute } from "@/components/router/RoleProtectedRoute";
 import AppLayout from "@/components/layout/AppLayout";
 import Receipts from "@/pages/payments/receipts/Receipts";
 import Expenses from "@/pages/payments/expenses/Expenses";
@@ -9,31 +10,31 @@ export const paymentRoutes = [
   {
     path: "/payments/receipts",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Receipts />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/payments/expenses",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Expenses />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   },
   {
     path: "/payments/accounts",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <Accounts />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   }
 ];

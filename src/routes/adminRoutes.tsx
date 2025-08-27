@@ -1,4 +1,4 @@
-import { ProtectedRoute } from "@/components/router/ProtectedRoute";
+import { RoleProtectedRoute } from "@/components/router/RoleProtectedRoute";
 import AppLayout from "@/components/layout/AppLayout";
 import AdminAccounts from "@/pages/admin/AdminAccounts";
 
@@ -6,11 +6,11 @@ export const adminRoutes = [
   {
     path: "/admin/accounts",
     element: (
-      <ProtectedRoute>
+      <RoleProtectedRoute>
         <AppLayout>
           <AdminAccounts />
         </AppLayout>
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     )
   }
 ];
