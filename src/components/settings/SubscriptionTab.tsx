@@ -65,28 +65,55 @@ const SubscriptionTab: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           {hasActiveSubscription && companySubscription ? (
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="font-semibold">{(companySubscription as any).subscription_plans?.name}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {(companySubscription as any).subscription_plans?.price}€ / 
-                    {(companySubscription as any).subscription_plans?.billing_period === 'monthly' ? ' mois' : ' an'}
+            <>
+              {/* Trial Warning */}
+              {(companySubscription as any).subscription_plans?.price === 0 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+                    <h4 className="font-medium text-amber-800">Période d'essai gratuit</h4>
+                  </div>
+                  <p className="text-sm text-amber-700 mt-1">
+                    Votre essai gratuit se termine le {companySubscription.end_date && formatDate(new Date(companySubscription.end_date), 'dd MMMM yyyy', { locale: fr })}
                   </p>
-                </div>
-                <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
-                  <CheckIcon className="w-3 h-3 mr-1" />
-                  Actif
-                </Badge>
-              </div>
-              {companySubscription.next_billing_date && (
-                <div className="mt-2">
-                  <p className="text-sm text-muted-foreground">
-                    Prochain prélèvement: {formatDate(new Date(companySubscription.next_billing_date), 'dd/MM/yyyy', { locale: fr })}
+                  <p className="text-sm text-amber-600 mt-2">
+                    Choisissez un plan payant pour continuer à accéder à toutes les fonctionnalités après cette date.
                   </p>
                 </div>
               )}
-            </div>
+
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="font-semibold">{(companySubscription as any).subscription_plans?.name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {(companySubscription as any).subscription_plans?.price === 0 
+                        ? 'Gratuit pendant l\'essai'
+                        : `${(companySubscription as any).subscription_plans?.price}€ / ${(companySubscription as any).subscription_plans?.billing_period === 'monthly' ? ' mois' : ' an'}`
+                      }
+                    </p>
+                  </div>
+                  <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
+                    <CheckIcon className="w-3 h-3 mr-1" />
+                    Actif
+                  </Badge>
+                </div>
+                {companySubscription.next_billing_date && (
+                  <div className="mt-2">
+                    <p className="text-sm text-muted-foreground">
+                      Prochain prélèvement: {formatDate(new Date(companySubscription.next_billing_date), 'dd/MM/yyyy', { locale: fr })}
+                    </p>
+                  </div>
+                )}
+                {companySubscription.end_date && (companySubscription as any).subscription_plans?.price === 0 && (
+                  <div className="mt-2">
+                    <p className="text-sm text-muted-foreground">
+                      Fin de l'essai: {formatDate(new Date(companySubscription.end_date), 'dd/MM/yyyy', { locale: fr })}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </>
           ) : (
             <div className="bg-muted/50 p-4 rounded-lg">
               <div className="text-center">

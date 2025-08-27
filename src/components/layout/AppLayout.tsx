@@ -4,6 +4,9 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import QuickActions from "@/components/shared/QuickActions";
+import AccessRestriction from "./AccessRestriction";
+import { useSubscription } from '@/hooks/use-subscription';
+import { useLocation } from 'react-router-dom';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -12,6 +15,8 @@ interface AppLayoutProps {
 const AppLayout = ({ children }: AppLayoutProps) => {
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { hasFullAccess } = useSubscription();
+  const location = useLocation();
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -21,6 +26,13 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     setSidebarOpen(false);
   };
 
+  // Pages qui ne nécessitent pas d'accès complet (toujours accessibles)
+  const publicPages = ['/settings'];
+  const isPublicPage = publicPages.some(page => location.pathname.startsWith(page));
+  
+  // Pages qui nécessitent un accès complet
+  const requiresFullAccess = !isPublicPage;
+
   return (
     <div className="flex h-screen bg-gray-50 w-full">
       <Sidebar isMobile={!!isMobile} isOpen={sidebarOpen} onClose={closeSidebar} />
@@ -29,7 +41,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         <Navbar onToggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />
         <main className="flex-1 overflow-y-auto">
           <div className="min-h-full">
-            {children}
+            <AccessRestriction requiresFullAccess={requiresFullAccess}>
+              {children}
+            </AccessRestriction>
           </div>
         </main>
       </div>

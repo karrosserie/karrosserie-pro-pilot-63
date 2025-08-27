@@ -140,5 +140,21 @@ export const useSubscription = () => {
     hasActiveSubscription: !!companySubscription && companySubscription.status === 'active',
     tokensRemaining: companySubscription?.tokens_remaining || 0,
     tokensUsed: companySubscription?.tokens_used || 0,
+    
+    // Trial and access control
+    isTrialExpired: companySubscription?.end_date ? new Date(companySubscription.end_date) < new Date() : false,
+    isTrialSubscription: companySubscription && (companySubscription as any).subscription_plans?.price === 0,
+    trialEndDate: companySubscription?.end_date ? new Date(companySubscription.end_date) : null,
+    hasFullAccess: (() => {
+      if (!companySubscription || companySubscription.status !== 'active') return false;
+      
+      // Si c'est un plan d'essai et qu'il est expiré
+      if ((companySubscription as any).subscription_plans?.price === 0) {
+        return companySubscription.end_date ? new Date(companySubscription.end_date) >= new Date() : false;
+      }
+      
+      // Si c'est un plan payant actif
+      return true;
+    })(),
   };
 };
