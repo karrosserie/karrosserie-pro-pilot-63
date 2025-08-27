@@ -16,7 +16,6 @@ import { useCompany } from '@/hooks/use-company';
 import { useEmployees, Employee } from '@/hooks/use-employees';
 import { EmployeesList } from '@/components/planning/EmployeesList';
 import TaskDetailsModal from '@/components/planning/TaskDetailsModal';
-import KarrosseriePlanning from '@/components/planning/KarrosseriePlanning';
 import { WorkshopPlanningInterface } from '@/components/planning/WorkshopPlanningInterface';
 
 import { toast } from '@/hooks/use-toast';
@@ -1133,7 +1132,7 @@ const Planning = () => {
           </TabsContent>
 
           <TabsContent value="planning" className="space-y-6 w-full">
-            {/* Interface de Planning Karrosserie */}
+            {/* Interface complète de Planning Karrosserie */}
             <WorkshopPlanningInterface
               employees={employees || []}
               vehicles={availableVehicles}
