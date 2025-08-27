@@ -182,17 +182,25 @@ const SubscriptionTab: React.FC = () => {
       </Card>
 
       {/* Available Plans */}
-      {!hasActiveSubscription && (
+      {(!hasActiveSubscription || (hasActiveSubscription && (companySubscription as any).subscription_plans?.price === 0)) && (
         <Card>
           <CardHeader>
-            <CardTitle>Plans d'abonnement</CardTitle>
+            <CardTitle>
+              {hasActiveSubscription && (companySubscription as any).subscription_plans?.price === 0 
+                ? 'Passez à un plan payant' 
+                : 'Plans d\'abonnement'
+              }
+            </CardTitle>
             <CardDescription>
-              Choisissez le plan qui correspond à vos besoins.
+              {hasActiveSubscription && (companySubscription as any).subscription_plans?.price === 0
+                ? 'Continuez à utiliser toutes les fonctionnalités après votre essai gratuit.'
+                : 'Choisissez le plan qui correspond à vos besoins.'
+              }
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 gap-4">
-              {subscriptionPlans?.map((plan) => (
+              {subscriptionPlans?.filter(plan => plan.price > 0).map((plan) => (
                 <div key={plan.id} className="border rounded-lg p-6 space-y-4">
                   <div>
                     <h3 className="font-semibold text-lg">{plan.name}</h3>
@@ -222,7 +230,10 @@ const SubscriptionTab: React.FC = () => {
                     disabled={isCreatingSubscription}
                   >
                     <CreditCardIcon className="w-4 h-4 mr-2" />
-                    Choisir ce plan
+                    {hasActiveSubscription && (companySubscription as any).subscription_plans?.price === 0
+                      ? 'Passer à ce plan'
+                      : 'Choisir ce plan'
+                    }
                   </Button>
                 </div>
               ))}
