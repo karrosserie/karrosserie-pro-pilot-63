@@ -5,6 +5,13 @@ import { Badge } from "@/components/ui/badge";
 import { Crown, User, AlertTriangle, Wrench, Clock, Users, Cog, BarChart } from "lucide-react";
 import { WorkshopStats } from "./WorkshopStats";
 import { WorkflowStep } from "./WorkflowStep";
+import { EmployeeView } from "./EmployeeView";
+import { VehiclesWaitingTab } from "./VehiclesWaitingTab";
+import { PlanningCalendar } from "./PlanningCalendar";
+import { EmployeePlanningTab } from "./EmployeePlanningTab";
+import { EmployeesManagement } from "./EmployeesManagement";
+import { ProcessConfig } from "./ProcessConfig";
+
 
 interface WorkshopPlanningInterfaceProps {
   employees?: any[];
@@ -211,8 +218,9 @@ export const WorkshopPlanningInterface = ({
         </Button>
       </div>
 
-      {/* Navigation Tabs */}
-      <Tabs defaultValue="workshop" className="w-full">
+      {/* Navigation Tabs - Only show for manager view */}
+      {activeView === 'manager' && (
+        <Tabs defaultValue="workshop" className="w-full">
         <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="workshop" className="flex items-center gap-1">
             <Wrench className="w-4 h-4" />
@@ -285,42 +293,34 @@ export const WorkshopPlanningInterface = ({
           </div>
         </TabsContent>
 
-        {/* Other tabs placeholders */}
-        <TabsContent value="waiting" className="space-y-6">
-          <div className="text-center py-12">
-            <h3 className="text-lg font-semibold mb-2">Véhicules en Attente</h3>
-            <p className="text-muted-foreground">Fonctionnalité en cours de développement</p>
-          </div>
-        </TabsContent>
+            <TabsContent value="waiting" className="space-y-6">
+              <VehiclesWaitingTab />
+            </TabsContent>
 
-        <TabsContent value="planning" className="space-y-6">
-          <div className="text-center py-12">
-            <h3 className="text-lg font-semibold mb-2">Planning</h3>
-            <p className="text-muted-foreground">Fonctionnalité en cours de développement</p>
-          </div>
-        </TabsContent>
+            <TabsContent value="planning" className="space-y-6">
+              <PlanningCalendar />
+            </TabsContent>
 
-        <TabsContent value="employee-planning" className="space-y-6">
-          <div className="text-center py-12">
-            <h3 className="text-lg font-semibold mb-2">Planning Employés</h3>
-            <p className="text-muted-foreground">Fonctionnalité en cours de développement</p>
-          </div>
-        </TabsContent>
+            <TabsContent value="employee-planning" className="space-y-6">
+              <EmployeePlanningTab />
+            </TabsContent>
 
-        <TabsContent value="employees" className="space-y-6">
-          <div className="text-center py-12">
-            <h3 className="text-lg font-semibold mb-2">Employés</h3>
-            <p className="text-muted-foreground">Fonctionnalité en cours de développement</p>
-          </div>
-        </TabsContent>
+            <TabsContent value="employees" className="space-y-6">
+              <EmployeesManagement />
+            </TabsContent>
 
-        <TabsContent value="process" className="space-y-6">
-          <div className="text-center py-12">
-            <h3 className="text-lg font-semibold mb-2">Process</h3>
-            <p className="text-muted-foreground">Fonctionnalité en cours de développement</p>
-          </div>
-        </TabsContent>
-      </Tabs>
+            <TabsContent value="process" className="space-y-6">
+              <ProcessConfig />
+            </TabsContent>
+        </Tabs>
+      )}
+
+      {/* Employee View */}
+      {activeView === 'employee' && (
+        <div className="mt-6">
+          <EmployeeView />
+        </div>
+      )}
     </div>
   );
 };
