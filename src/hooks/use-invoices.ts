@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { useCompanyId } from '@/hooks/use-company-id';
 import { supabase } from '@/integrations/supabase/client';
+import { demoService, DEMO_MODE } from '@/services/demoService';
 
 export interface InvoiceWithJoins {
   id: string;
@@ -71,6 +72,11 @@ export function useInvoices() {
   } = useQuery({
     queryKey: ['invoices', companyId],
     queryFn: async () => {
+      if (DEMO_MODE) {
+        const { data } = await demoService.invoices.getAll();
+        return data || [];
+      }
+      
       if (!companyId) return [];
       
       const { data, error } = await supabase
@@ -160,7 +166,7 @@ export function useInvoices() {
 
       return transformedInvoices as InvoiceWithJoins[];
     },
-    enabled: !!companyId
+    enabled: DEMO_MODE || !!companyId
   });
 
   const createInvoice = useMutation({

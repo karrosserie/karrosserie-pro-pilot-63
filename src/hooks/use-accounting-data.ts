@@ -4,6 +4,7 @@ import { useInvoices } from '@/hooks/use-invoices';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { useExpenses } from '@/hooks/use-expenses';
 import { useClients } from '@/hooks/use-clients';
+import { demoService, DEMO_MODE } from '@/services/demoService';
 import { formatCurrency } from '@/lib/utils';
 
 export interface Transaction {
@@ -27,6 +28,42 @@ export const useAccountingData = () => {
   const { data: transactions = [], isLoading } = useQuery({
     queryKey: ['accounting-transactions', invoices, receipts, expenses, clients],
     queryFn: () => {
+      if (DEMO_MODE) {
+        // Retourner des transactions de démonstration
+        return [
+          {
+            id: '1',
+            date: '27/08/2024',
+            description: 'Encaissement carrosserie - Facture FAC-2024-001',
+            amount: '890,00 €',
+            type: 'Encaissement' as const,
+            method: 'Carte bancaire',
+            client: 'Pierre Durand',
+            status: 'Validé'
+          },
+          {
+            id: '2',
+            date: '26/08/2024', 
+            description: 'Fournisseurs - Autodistribution',
+            amount: '485,50 €',
+            type: 'Dépense' as const,
+            method: 'Virement',
+            client: 'AB-123-CD Renault Clio',
+            status: 'Payé'
+          },
+          {
+            id: '3',
+            date: '25/08/2024',
+            description: 'Encaissement mécanique - Révision BMW',
+            amount: '320,00 €', 
+            type: 'Encaissement' as const,
+            method: 'Chèque',
+            client: 'Camille Moreau',
+            status: 'Validé'
+          }
+        ];
+      }
+      
       const allTransactions: Transaction[] = [];
 
       // Ajouter les encaissements (reçus)

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { DEMO_MODE } from '@/services/demoService';
 
 export function useCompanyId() {
   const { user } = useAuth();
@@ -9,6 +10,12 @@ export function useCompanyId() {
 
   useEffect(() => {
     const getCompanyId = async () => {
+      if (DEMO_MODE) {
+        setCompanyId('00000000-0000-4000-8000-000000000002');
+        setIsLoading(false);
+        return;
+      }
+      
       if (!user?.id) {
         setCompanyId(null);
         return;

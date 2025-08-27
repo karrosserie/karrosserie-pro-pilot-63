@@ -1,6 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { clientsService, NewClient, UpdateClient } from '@/services/supabase/clients';
+import { demoService, DEMO_MODE } from '@/services/demoService';
 import { useToast } from '@/hooks/use-toast';
 import { useCompanyId } from '@/hooks/use-company-id';
 
@@ -30,16 +31,23 @@ export function useClients() {
   } = useQuery({
     queryKey: ['clients', companyId],
     queryFn: async () => {
+      if (DEMO_MODE) {
+        const { data } = await demoService.clients.getAll();
+        return data?.map(transformClientFromDB) || [];
+      }
       if (!companyId) return [];
       const data = await clientsService.getAll(companyId);
       return data?.map(transformClientFromDB) || [];
     },
-    enabled: !!companyId
+    enabled: DEMO_MODE || !!companyId
   });
   
   const createClient = useMutation({
     mutationFn: (newClient: any) => {
       console.log('Creating client with data:', newClient);
+      if (DEMO_MODE) {
+        return demoService.clients.create(newClient);
+      }
       return clientsService.create(newClient);
     },
     onSuccess: () => {
@@ -62,6 +70,9 @@ export function useClients() {
   const updateClient = useMutation({
     mutationFn: ({ id, data }: { id: string, data: any }) => {
       console.log('Updating client with id and data:', id, data);
+      if (DEMO_MODE) {
+        return demoService.clients.update(id, data);
+      }
       return clientsService.update(id, data);
     },
     onSuccess: () => {
@@ -82,7 +93,12 @@ export function useClients() {
   });
   
   const deleteClient = useMutation({
-    mutationFn: (id: string) => clientsService.delete(id),
+    mutationFn: (id: string) => {
+      if (DEMO_MODE) {
+        return demoService.clients.delete(id);
+      }
+      return clientsService.delete(id);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       toast({
@@ -118,6 +134,10 @@ export function useClient(id?: string) {
     queryKey: ['clients', id],
     queryFn: async () => {
       if (!id) return null;
+      if (DEMO_MODE) {
+        const { data } = await demoService.clients.getById(id);
+        return transformClientFromDB(data);
+      }
       const data = await clientsService.getById(id);
       return transformClientFromDB(data);
     },

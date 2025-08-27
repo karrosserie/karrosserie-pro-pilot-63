@@ -1,6 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { receiptsService, ReceiptWithClient } from '@/services/supabase/receipts';
+import { demoService, DEMO_MODE } from '@/services/demoService';
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
 
@@ -15,7 +16,42 @@ export function useReceiptsData() {
     error
   } = useQuery({
     queryKey: ['receipts'],
-    queryFn: receiptsService.getAll
+    queryFn: async () => {
+      if (DEMO_MODE) {
+        // Simuler des reçus avec le format attendu
+        return [
+          {
+            id: '1',
+            date: new Date().toISOString(),
+            amount: 1500,
+            status: 'Encaissé',
+            reference: 'ENC-001',
+            invoice_id: 'invoice-2',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            company_id: '00000000-0000-4000-8000-000000000002',
+            invoices: {
+              reference: 'FAC-2024-002'
+            }
+          },
+          {
+            id: '2', 
+            date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+            amount: 890,
+            status: 'Encaissé',
+            reference: 'ENC-002',
+            invoice_id: 'invoice-1',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            company_id: '00000000-0000-4000-8000-000000000002',
+            invoices: {
+              reference: 'FAC-2024-001'
+            }
+          }
+        ];
+      }
+      return receiptsService.getAll();
+    }
   });
 
   // Transform receipts data to include client names and invoice references

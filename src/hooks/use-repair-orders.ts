@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { repairOrdersService } from '@/services/supabase/repair-orders';
 import { NewRepairOrder, UpdateRepairOrder } from '@/services/supabase/repair-orders/types';
+import { demoService, DEMO_MODE } from '@/services/demoService';
 import { useCompanyId } from '@/hooks/use-company-id';
 
 export function useRepairOrders() {
@@ -16,7 +17,13 @@ export function useRepairOrders() {
     error
   } = useQuery({
     queryKey: ['repair-orders'],
-    queryFn: repairOrdersService.getAll
+    queryFn: async () => {
+      if (DEMO_MODE) {
+        const { data } = await demoService.repairOrders.getAll();
+        return data || [];
+      }
+      return repairOrdersService.getAll();
+    }
   });
 
   const createOrder = useMutation({

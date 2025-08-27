@@ -6,6 +6,7 @@ import { useInvoices } from '@/hooks/use-invoices';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useAccountingData } from '@/hooks/use-accounting-data';
 import { useReceipts } from '@/hooks/use-receipts';
+import { demoService, DEMO_MODE } from '@/services/demoService';
 import { parseISO, startOfMonth, endOfMonth, subMonths, isWithinInterval } from 'date-fns';
 
 export const useDashboardStats = () => {
@@ -18,7 +19,11 @@ export const useDashboardStats = () => {
 
   const { data: dashboardStats, isLoading } = useQuery({
     queryKey: ['dashboard-stats', vehicles, clients, invoices, quotes, receipts, transactions],
-    queryFn: () => {
+    queryFn: async () => {
+      if (DEMO_MODE) {
+        const { data } = await demoService.dashboard.getStats();
+        return data;
+      }
       const now = new Date();
       const currentMonthStart = startOfMonth(now);
       const currentMonthEnd = endOfMonth(now);
@@ -164,7 +169,7 @@ export const useDashboardStats = () => {
         mechanicIsPositive: mechanicChange >= 0
       };
     },
-    enabled: !vehiclesLoading && !clientsLoading && !invoicesLoading && !quotesLoading
+    enabled: DEMO_MODE || (!vehiclesLoading && !clientsLoading && !invoicesLoading && !quotesLoading)
   });
 
   return {

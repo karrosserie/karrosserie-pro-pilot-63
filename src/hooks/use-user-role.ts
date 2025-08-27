@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { DEMO_MODE } from '@/services/demoService';
 
 export type UserRole = 'Propriétaire' | 'Carrossier' | 'Carrossier-vehicule de courtoisie' | 'Responsable' | 'Responsable administratif' | null;
 
@@ -11,6 +12,12 @@ export function useUserRole() {
 
   useEffect(() => {
     const getUserRole = async () => {
+      if (DEMO_MODE) {
+        setRole('Propriétaire');
+        setIsLoading(false);
+        return;
+      }
+      
       if (!user?.id) {
         setRole(null);
         return;

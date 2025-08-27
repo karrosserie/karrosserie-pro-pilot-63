@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
+import { demoService, DEMO_MODE } from '@/services/demoService';
 import { 
   getExpenses, 
   createExpense, 
@@ -24,7 +25,21 @@ export const useExpenses = () => {
     error 
   } = useQuery({
     queryKey: ['expenses'],
-    queryFn: getExpenses,
+    queryFn: async () => {
+      if (DEMO_MODE) {
+        const { data } = await demoService.expenses.getAll();
+        // Ajouter le champ total_amount qui correspond au champ amount
+        return data?.map(expense => ({
+          ...expense,
+          total_amount: expense.amount,
+          vehicle: null, // Pas de relation véhicule dans les données fictives pour l'instant
+          supplier: expense.supplier || '',
+          category: expense.category || '',
+          type: expense.category || 'général'
+        })) || [];
+      }
+      return getExpenses();
+    }
   });
 
   const createMutation = useMutation({

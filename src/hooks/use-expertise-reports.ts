@@ -1,6 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { expertiseReportsService, NewExpertiseReport, UpdateExpertiseReport, ExpertiseReport } from '@/services/supabase/expertise-reports';
+import { demoService, DEMO_MODE } from '@/services/demoService';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,7 +16,13 @@ export function useExpertiseReports() {
     error
   } = useQuery({
     queryKey: ['expertiseReports'],
-    queryFn: expertiseReportsService.getAll,
+    queryFn: async () => {
+      if (DEMO_MODE) {
+        // Retourner un tableau vide pour le mode démo
+        return [];
+      }
+      return expertiseReportsService.getAll();
+    },
     staleTime: 0, // Considérer les données comme obsolètes immédiatement
     refetchOnWindowFocus: true, // Refetch quand la fenêtre reprend le focus
   });

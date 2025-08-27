@@ -8,6 +8,7 @@ import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { useCredits } from '@/hooks/use-credits';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { useExpenses } from '@/hooks/use-expenses';
+import { demoService, DEMO_MODE } from '@/services/demoService';
 import { formatCurrency } from '@/lib/utils';
 
 export const useRecentActivity = () => {
@@ -22,7 +23,12 @@ export const useRecentActivity = () => {
 
   const { data: recentActivity } = useQuery({
     queryKey: ['recent-activity', quotes, clients, vehicles, receipts, invoices, repairOrders, credits, expenses],
-    queryFn: () => {
+    queryFn: async () => {
+      if (DEMO_MODE) {
+        const { data } = await demoService.dashboard.getRecentActivity();
+        return data || [];
+      }
+      
       const activities = [];
 
       // Helper function to check if an item was updated (not just created)

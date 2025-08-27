@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { demoService, DEMO_MODE } from '@/services/demoService';
 import { useToast } from '@/hooks/use-toast';
 import { useCompanyId } from '@/hooks/use-company-id';
 import type { Database } from '@/integrations/supabase/types';
@@ -36,6 +37,11 @@ export function useClientVehicles(clientId?: string) {
     queryKey: ['vehicles', 'client', clientId],
     queryFn: async () => {
       if (!clientId) return [];
+      
+      if (DEMO_MODE) {
+        const { data } = await demoService.vehicles.getByClientId(clientId);
+        return data || [];
+      }
       
       const { data, error } = await supabase
         .from('vehicles')
@@ -76,6 +82,11 @@ export function useVehicles() {
   } = useQuery({
     queryKey: ['vehicles', companyId],
     queryFn: async () => {
+      if (DEMO_MODE) {
+        const { data } = await demoService.vehicles.getAll();
+        return data || [];
+      }
+      
       if (!companyId) return [];
       
       const { data, error } = await supabase
@@ -101,7 +112,7 @@ export function useVehicles() {
 
       return data as Vehicle[];
     },
-    enabled: !!companyId
+    enabled: DEMO_MODE || !!companyId
   });
 
   const createVehicle = useMutation({

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { demoService, DEMO_MODE } from '@/services/demoService';
 import { useToast } from '@/hooks/use-toast';
 import { useCompanyId } from '@/hooks/use-company-id';
 
@@ -15,6 +16,11 @@ export function useQuotes() {
   } = useQuery({
     queryKey: ['quotes', companyId],
     queryFn: async () => {
+      if (DEMO_MODE) {
+        const { data } = await demoService.quotes.getAll();
+        return data || [];
+      }
+      
       if (!companyId) return [];
       
       const { data, error } = await supabase
@@ -40,11 +46,16 @@ export function useQuotes() {
 
       return data;
     },
-    enabled: !!companyId
+    enabled: DEMO_MODE || !!companyId
   });
 
   const createQuote = useMutation({
     mutationFn: async (quoteData: any) => {
+      if (DEMO_MODE) {
+        const { data } = await demoService.quotes.create(quoteData);
+        return data;
+      }
+
       if (!companyId) {
         throw new Error('Company ID is required');
       }

@@ -1,6 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { creditsService } from '@/services/supabase/credits';
+import { demoService, DEMO_MODE } from '@/services/demoService';
 import { useToast } from '@/hooks/use-toast';
 
 export function useCredits() {
@@ -13,7 +14,13 @@ export function useCredits() {
     error
   } = useQuery({
     queryKey: ['credits'],
-    queryFn: creditsService.getCredits
+    queryFn: async () => {
+      if (DEMO_MODE) {
+        const { data } = await demoService.credits.getAll();
+        return data || [];
+      }
+      return creditsService.getCredits();
+    }
   });
 
   const createCredit = useMutation({

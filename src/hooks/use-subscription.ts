@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { subscriptionService } from '@/services/supabase/subscriptions';
+import { demoService, DEMO_MODE } from '@/services/demoService';
 import { useCompany } from './use-company';
 import { toast } from '@/hooks/use-toast';
 import { TOKEN_COSTS, TokenOperation, getTokenCost } from '@/config/token-costs';
@@ -11,27 +12,63 @@ export const useSubscription = () => {
   // Get subscription plans
   const { data: subscriptionPlans, isLoading: plansLoading } = useQuery({
     queryKey: ['subscription-plans'],
-    queryFn: () => subscriptionService.getSubscriptionPlans(),
+    queryFn: async () => {
+      if (DEMO_MODE) {
+        return [
+          {
+            id: 'plan-annual',
+            name: 'Karrosserie Pro - Annuel',
+            price: 299.99,
+            currency: 'EUR',
+            interval: 'year',
+            tokens_included: 120000,
+            features: ['Gestion illimitée', 'Assistant IA', 'Support prioritaire']
+          }
+        ];
+      }
+      return subscriptionService.getSubscriptionPlans();
+    },
   });
 
   // Get token packages
   const { data: tokenPackages, isLoading: packagesLoading } = useQuery({
     queryKey: ['token-packages'],
-    queryFn: () => subscriptionService.getTokenPackages(),
+    queryFn: async () => {
+      if (DEMO_MODE) {
+        return [
+          { id: 'tokens-10k', name: '10 000 jetons', tokens: 10000, price: 19.99 },
+          { id: 'tokens-25k', name: '25 000 jetons', tokens: 25000, price: 44.99 },
+          { id: 'tokens-50k', name: '50 000 jetons', tokens: 50000, price: 79.99 }
+        ];
+      }
+      return subscriptionService.getTokenPackages();
+    },
   });
 
   // Get company subscription
   const { data: companySubscription, isLoading: subscriptionLoading } = useQuery({
     queryKey: ['company-subscription', companyData?.id],
-    queryFn: () => companyData?.id ? subscriptionService.getCompanySubscription(companyData.id) : null,
-    enabled: !!companyData?.id,
+    queryFn: async () => {
+      if (DEMO_MODE) {
+        const { data } = await demoService.subscription.getSubscription();
+        return data;
+      }
+      return companyData?.id ? subscriptionService.getCompanySubscription(companyData.id) : null;
+    },
+    enabled: DEMO_MODE || !!companyData?.id,
   });
 
   // Get token usage history
   const { data: tokenUsage, isLoading: usageLoading } = useQuery({
     queryKey: ['token-usage', companyData?.id],
-    queryFn: () => companyData?.id ? subscriptionService.getTokenUsage(companyData.id) : [],
-    enabled: !!companyData?.id,
+    queryFn: async () => {
+      if (DEMO_MODE) {
+        const { data } = await demoService.subscription.getUsageStats();
+        return data?.tokens_per_day_last_30 || [];
+      }
+      return companyData?.id ? subscriptionService.getTokenUsage(companyData.id) : [];
+    },
+    enabled: DEMO_MODE || !!companyData?.id,
   });
 
   // Create subscription mutation
