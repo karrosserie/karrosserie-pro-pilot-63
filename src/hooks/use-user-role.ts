@@ -21,24 +21,32 @@ export function useUserRole() {
       if (adminImpersonation) {
         try {
           const impersonationData = JSON.parse(adminImpersonation);
-          // For impersonation, we might need to get the role of the impersonated company
-          // For now, we'll fetch it normally but using the impersonated company
-          const { data, error } = await supabase
-            .from('user_companies')
-            .select('role')
-            .eq('user_id', user.id)
-            .eq('company_id', impersonationData.company_id)
-            .eq('active', true)
-            .maybeSingle();
+          
+          // Pour l'impersonation, on utilise l'ID de l'utilisateur impersoné
+          if (impersonationData.user_id && impersonationData.company_id) {
+            const { data, error } = await supabase
+              .from('user_companies')
+              .select('role')
+              .eq('user_id', impersonationData.user_id)
+              .eq('company_id', impersonationData.company_id)
+              .eq('active', true)
+              .maybeSingle();
 
-          if (error || !data) {
-            console.error('Erreur lors de la récupération du rôle (impersonation):', error);
-            setRole(null);
+            if (error) {
+              console.error('Erreur lors de la récupération du rôle (impersonation):', error);
+              setRole(null);
+            } else if (data) {
+              setRole(data.role as UserRole);
+            } else {
+              // Aucune donnée trouvée, définir un rôle par défaut pour l'impersonation
+              setRole('Propriétaire');
+            }
+            setIsLoading(false);
+            return;
           } else {
-            setRole(data.role as UserRole);
+            console.error('Données d\'impersonation incomplètes:', impersonationData);
+            // Continue with normal flow
           }
-          setIsLoading(false);
-          return;
         } catch (error) {
           console.error('Erreur lors du parsing des données d\'impersonation:', error);
           // Continue with normal flow
