@@ -6,6 +6,22 @@ export const receiptQueries = {
   getAll: async (): Promise<Receipt[]> => {
     console.log('Fetching receipts...');
     
+    // Définir explicitement la company_id en mode impersonation
+    const impersonationData = localStorage.getItem('admin_impersonation');
+    if (impersonationData) {
+      try {
+        const data = JSON.parse(impersonationData);
+        console.log('Using impersonation company_id for receipts:', data.company_id);
+        await supabase.rpc('set_config' as any, {
+          setting_name: 'app.impersonation_company_id',
+          setting_value: data.company_id,
+          is_local: true
+        });
+      } catch (error) {
+        console.error('Error setting impersonation config for receipts:', error);
+      }
+    }
+    
     const { data: receiptsWithJoins, error: joinError } = await supabase
       .from('receipts')
       .select(`

@@ -18,6 +18,23 @@ export type UpdateClient = Database['public']['Tables']['clients']['Update'] & {
 export const clientsService = {
   getAll: async () => {
     console.log('Fetching all clients...');
+    
+    // Définir explicitement la company_id en mode impersonation
+    const impersonationData = localStorage.getItem('admin_impersonation');
+    if (impersonationData) {
+      try {
+        const data = JSON.parse(impersonationData);
+        console.log('Using impersonation company_id:', data.company_id);
+        await supabase.rpc('set_config' as any, {
+          setting_name: 'app.impersonation_company_id',
+          setting_value: data.company_id,
+          is_local: true
+        });
+      } catch (error) {
+        console.error('Error setting impersonation config:', error);
+      }
+    }
+    
     const { data, error } = await supabase
       .from('clients')
       .select('*')

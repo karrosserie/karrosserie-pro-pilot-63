@@ -2,6 +2,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const setImpersonationSession = async (companyId: string | null) => {
   try {
+    console.log('Setting impersonation session for company:', companyId);
+    
     if (companyId) {
       // Définir le paramètre de session pour l'impersonation
       const { error } = await supabase.rpc('set_config' as any, {
@@ -12,6 +14,8 @@ export const setImpersonationSession = async (companyId: string | null) => {
       
       if (error) {
         console.error('Error setting impersonation session:', error);
+      } else {
+        console.log('Impersonation session set successfully');
       }
     } else {
       // Supprimer le paramètre de session
@@ -23,6 +27,8 @@ export const setImpersonationSession = async (companyId: string | null) => {
       
       if (error) {
         console.error('Error clearing impersonation session:', error);
+      } else {
+        console.log('Impersonation session cleared successfully');
       }
     }
   } catch (error) {

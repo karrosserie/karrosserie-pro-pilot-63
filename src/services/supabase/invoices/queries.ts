@@ -7,6 +7,22 @@ export const invoiceQueries = {
     console.log('=== DEBUT RÉCUPÉRATION FACTURES ===');
     console.log('Fetching invoices...');
     
+    // Définir explicitement la company_id en mode impersonation
+    const impersonationData = localStorage.getItem('admin_impersonation');
+    if (impersonationData) {
+      try {
+        const data = JSON.parse(impersonationData);
+        console.log('Using impersonation company_id for invoices:', data.company_id);
+        await supabase.rpc('set_config' as any, {
+          setting_name: 'app.impersonation_company_id',
+          setting_value: data.company_id,
+          is_local: true
+        });
+      } catch (error) {
+        console.error('Error setting impersonation config for invoices:', error);
+      }
+    }
+    
     // First, try to get invoices with joins
     const { data: invoicesWithJoins, error: joinError } = await supabase
       .from('invoices')
