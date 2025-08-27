@@ -28,6 +28,12 @@ export function useRepairOrders() {
 
   const createOrder = useMutation({
     mutationFn: async (orderData: NewRepairOrder) => {
+      if (DEMO_MODE) {
+        const { data, error } = await demoService.repairOrders.create(orderData);
+        if (error) throw new Error(error);
+        return data;
+      }
+      
       if (!companyId) {
         throw new Error('Company ID not found. User must be authenticated and belong to a company.');
       }
@@ -55,6 +61,12 @@ export function useRepairOrders() {
 
   const updateOrder = useMutation({
     mutationFn: async ({ id, data }: { id: string, data: UpdateRepairOrder }) => {
+      if (DEMO_MODE) {
+        const { data: result, error } = await demoService.repairOrders.update(id, data);
+        if (error) throw new Error(error);
+        return result;
+      }
+      
       return await repairOrdersService.update(id, data);
     },
     onSuccess: (updatedOrder, { id }) => {
@@ -76,6 +88,12 @@ export function useRepairOrders() {
 
   const deleteOrder = useMutation({
     mutationFn: async (id: string) => {
+      if (DEMO_MODE) {
+        const { error } = await demoService.repairOrders.delete(id);
+        if (error) throw new Error(error);
+        return true;
+      }
+      
       return await repairOrdersService.delete(id);
     },
     onSuccess: () => {

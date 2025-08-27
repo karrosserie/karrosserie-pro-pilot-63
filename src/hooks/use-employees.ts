@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/hooks/use-company';
 import { toast } from '@/hooks/use-toast';
+import { DEMO_MODE } from '@/services/demoService';
 
 export interface Employee {
   id: string;
@@ -44,6 +45,46 @@ export const useEmployees = () => {
   } = useQuery({
     queryKey: ['employees', companyInfo?.id],
     queryFn: async () => {
+      if (DEMO_MODE) {
+        // Return mock employees data for demo
+        return [
+          {
+            id: 'emp-1',
+            company_id: '00000000-0000-4000-8000-000000000002',
+            team_member_id: 'team-1',
+            qualifications: ['Carrosserie', 'Peinture'],
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            user_companies: {
+              id: 'team-1',
+              role: 'employee',
+              profiles: {
+                first_name: 'Michel',
+                last_name: 'Leblanc',
+                email: 'michel.leblanc@garage.fr'
+              }
+            }
+          },
+          {
+            id: 'emp-2',
+            company_id: '00000000-0000-4000-8000-000000000002',
+            team_member_id: 'team-2',
+            qualifications: ['Mécanique', 'Diagnostic'],
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            user_companies: {
+              id: 'team-2',
+              role: 'employee',
+              profiles: {
+                first_name: 'Jean-Paul',
+                last_name: 'Rousseau',
+                email: 'jp.rousseau@garage.fr'
+              }
+            }
+          }
+        ] as Employee[];
+      }
+
       if (!companyInfo?.id) return [];
 
       try {
@@ -96,12 +137,25 @@ export const useEmployees = () => {
         return [];
       }
     },
-    enabled: !!companyInfo?.id
+    enabled: DEMO_MODE || !!companyInfo?.id
   });
 
   // Créer un employé
   const createEmployee = useMutation({
     mutationFn: async (data: CreateEmployeeData) => {
+      if (DEMO_MODE) {
+        // Mock create in demo mode
+        const newEmployee = {
+          id: `emp-${Date.now()}`,
+          company_id: '00000000-0000-4000-8000-000000000002',
+          team_member_id: data.team_member_id,
+          qualifications: data.qualifications,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        return newEmployee;
+      }
+
       if (!companyInfo?.id) throw new Error('Company ID not found');
 
       const { data: employee, error } = await supabase
@@ -137,6 +191,19 @@ export const useEmployees = () => {
   // Mettre à jour un employé
   const updateEmployee = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateEmployeeData }) => {
+      if (DEMO_MODE) {
+        // Mock update in demo mode
+        const updatedEmployee = {
+          id,
+          company_id: '00000000-0000-4000-8000-000000000002',
+          team_member_id: data.team_member_id || 'team-1',
+          qualifications: data.qualifications || [],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        return updatedEmployee;
+      }
+
       const { data: employee, error } = await supabase
         .from('employees')
         .update(data)
@@ -167,6 +234,11 @@ export const useEmployees = () => {
   // Supprimer un employé
   const deleteEmployee = useMutation({
     mutationFn: async (id: string) => {
+      if (DEMO_MODE) {
+        // Mock delete in demo mode
+        return true;
+      }
+
       const { error } = await supabase
         .from('employees')
         .delete()

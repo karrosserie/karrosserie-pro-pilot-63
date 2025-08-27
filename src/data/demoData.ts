@@ -134,6 +134,26 @@ export interface DemoFleetReservation {
   company_id: string;
 }
 
+export interface DemoExpertiseReport {
+  id: string;
+  report_number: string;
+  client_id: string;
+  vehicle_id: string;
+  report_date: string;
+  claim_number: string;
+  incident_date: string;
+  incident_description: string;
+  policy_number: string;
+  insurance_company: string;
+  expert_name: string;
+  total_estimated: number;
+  status: string;
+  repairs_data: any[];
+  parts_data: any[];
+  created_at: string;
+  company_id: string;
+}
+
 export interface DemoCession {
   id: string;
   client_id: string;
@@ -308,8 +328,8 @@ export const demoQuotes: DemoQuote[] = [
   {
     id: 'quote-1',
     quote_number: 'DEV-2024-001',
-    client_id: 'client-1',
-    vehicle_id: 'vehicle-1',
+    client_id: '00000000-0000-4000-8000-000000000010',
+    vehicle_id: '00000000-0000-4000-8000-000000000020',
     status: 'valide',
     total_ht: 1250.00,
     total_ttc: 1500.00,
@@ -329,8 +349,8 @@ export const demoQuotes: DemoQuote[] = [
   {
     id: 'quote-2',
     quote_number: 'DEV-2024-002',
-    client_id: 'client-2',
-    vehicle_id: 'vehicle-2',
+    client_id: '00000000-0000-4000-8000-000000000011',
+    vehicle_id: '00000000-0000-4000-8000-000000000021',
     status: 'facture',
     total_ht: 890.00,
     total_ttc: 1068.00,
@@ -349,8 +369,8 @@ export const demoQuotes: DemoQuote[] = [
   {
     id: 'quote-3',
     quote_number: 'DEV-2024-003',
-    client_id: 'client-3',
-    vehicle_id: 'vehicle-3',
+    client_id: '00000000-0000-4000-8000-000000000012',
+    vehicle_id: '00000000-0000-4000-8000-000000000022',
     status: 'en_attente',
     total_ht: 2150.00,
     total_ttc: 2580.00,
@@ -366,6 +386,69 @@ export const demoQuotes: DemoQuote[] = [
     ],
     company_id: COMPANY_ID,
   },
+  {
+    id: 'quote-4',
+    quote_number: 'DEV-2024-004',
+    client_id: '00000000-0000-4000-8000-000000000013',
+    vehicle_id: '00000000-0000-4000-8000-000000000023',
+    status: 'refuse',
+    total_ht: 3200.00,
+    total_ttc: 3840.00,
+    vat_amount: 640.00,
+    created_at: subDays(new Date(), 45).toISOString(),
+    valid_until: subDays(new Date(), 15).toISOString(),
+    repairs_data: [
+      { description: 'Réparation structurelle châssis', quantity: 12, unit_price: 120, total: 1440 },
+      { description: 'Peinture intégrale véhicule', quantity: 1, unit_price: 880, total: 880 },
+      { description: 'Démontage/Remontage éléments', quantity: 6, unit_price: 65, total: 390 }
+    ],
+    parts_data: [
+      { reference: 'P005', description: 'Longerons avant', quantity: 2, unit_price: 245, total: 490 }
+    ],
+    company_id: COMPANY_ID,
+  },
+  {
+    id: 'quote-5',
+    quote_number: 'DEV-2024-005',
+    client_id: '00000000-0000-4000-8000-000000000014',
+    vehicle_id: '00000000-0000-4000-8000-000000000024',
+    status: 'valide',
+    total_ht: 750.00,
+    total_ttc: 900.00,
+    vat_amount: 150.00,
+    created_at: subDays(new Date(), 3).toISOString(),
+    valid_until: addDays(new Date(), 27).toISOString(),
+    repairs_data: [
+      { description: 'Réparation rayure profonde', quantity: 2, unit_price: 85, total: 170 },
+      { description: 'Retouche peinture localisée', quantity: 3, unit_price: 55, total: 165 }
+    ],
+    parts_data: [
+      { reference: 'P006', description: 'Kit retouche peinture BMW', quantity: 1, unit_price: 415, total: 415 }
+    ],
+    company_id: COMPANY_ID,
+  },
+  {
+    id: 'quote-6',
+    quote_number: 'DEV-2024-006',
+    client_id: '00000000-0000-4000-8000-000000000010',
+    vehicle_id: '00000000-0000-4000-8000-000000000020',
+    status: 'expire',
+    total_ht: 1800.00,
+    total_ttc: 2160.00,
+    vat_amount: 360.00,
+    created_at: subDays(new Date(), 60).toISOString(),
+    valid_until: subDays(new Date(), 30).toISOString(),
+    repairs_data: [
+      { description: 'Réparation choc latéral', quantity: 5, unit_price: 95, total: 475 },
+      { description: 'Peinture 3 panneaux', quantity: 1, unit_price: 420, total: 420 }
+    ],
+    parts_data: [
+      { reference: 'P007', description: 'Rétroviseur électrique gauche', quantity: 1, unit_price: 320, total: 320 },
+      { reference: 'P008', description: 'Baguettes de protection', quantity: 2, unit_price: 85, total: 170 },
+      { reference: 'P009', description: 'Enjoliveur roue', quantity: 1, unit_price: 415, total: 415 }
+    ],
+    company_id: COMPANY_ID,
+  }
 ];
 
 // Ordres de réparation fictifs
@@ -373,8 +456,8 @@ export const demoRepairOrders: DemoRepairOrder[] = [
   {
     id: 'order-1',
     order_number: 'ORD-2024-001',
-    client_id: 'client-1',
-    vehicle_id: 'vehicle-1',
+    client_id: '00000000-0000-4000-8000-000000000010',
+    vehicle_id: '00000000-0000-4000-8000-000000000020',
     quote_id: 'quote-1',
     status: 'en_cours',
     total_ht: 1250.00,
@@ -388,8 +471,8 @@ export const demoRepairOrders: DemoRepairOrder[] = [
   {
     id: 'order-2',
     order_number: 'ORD-2024-002',
-    client_id: 'client-2',
-    vehicle_id: 'vehicle-2',
+    client_id: '00000000-0000-4000-8000-000000000011',
+    vehicle_id: '00000000-0000-4000-8000-000000000021',
     quote_id: 'quote-2',
     status: 'termine',
     total_ht: 890.00,
@@ -403,16 +486,58 @@ export const demoRepairOrders: DemoRepairOrder[] = [
   {
     id: 'order-3',
     order_number: 'ORD-2024-003',
-    client_id: 'client-4',
-    vehicle_id: 'vehicle-4',
+    client_id: '00000000-0000-4000-8000-000000000012',
+    vehicle_id: '00000000-0000-4000-8000-000000000022',
+    quote_id: 'quote-3',
     status: 'en_attente',
-    total_ht: 1680.00,
-    total_ttc: 2016.00,
+    total_ht: 2150.00,
+    total_ttc: 2580.00,
     start_date: addDays(new Date(), 3).toISOString(),
     assigned_employee: 'Patrick Dumont',
     created_at: subDays(new Date(), 2).toISOString(),
     company_id: COMPANY_ID,
   },
+  {
+    id: 'order-4',
+    order_number: 'ORD-2024-004',
+    client_id: '00000000-0000-4000-8000-000000000013',
+    vehicle_id: '00000000-0000-4000-8000-000000000023',
+    status: 'pret',
+    total_ht: 1890.00,
+    total_ttc: 2268.00,
+    start_date: subDays(new Date(), 12).toISOString(),
+    end_date: subDays(new Date(), 1).toISOString(),
+    assigned_employee: 'Sylvain Martinez',
+    created_at: subDays(new Date(), 15).toISOString(),
+    company_id: COMPANY_ID,
+  },
+  {
+    id: 'order-5',
+    order_number: 'ORD-2024-005',
+    client_id: '00000000-0000-4000-8000-000000000014',
+    vehicle_id: '00000000-0000-4000-8000-000000000024',
+    quote_id: 'quote-5',
+    status: 'planifie',
+    total_ht: 750.00,
+    total_ttc: 900.00,
+    start_date: addDays(new Date(), 7).toISOString(),
+    assigned_employee: 'Antoine Moreau',
+    created_at: subDays(new Date(), 1).toISOString(),
+    company_id: COMPANY_ID,
+  },
+  {
+    id: 'order-6',
+    order_number: 'ORD-2024-006',
+    client_id: '00000000-0000-4000-8000-000000000010',
+    vehicle_id: '00000000-0000-4000-8000-000000000020',
+    status: 'annule',
+    total_ht: 3200.00,
+    total_ttc: 3840.00,
+    start_date: subDays(new Date(), 30).toISOString(),
+    assigned_employee: 'Michel Leblanc',
+    created_at: subDays(new Date(), 35).toISOString(),
+    company_id: COMPANY_ID,
+  }
 ];
 
 // Factures fictives
@@ -420,8 +545,8 @@ export const demoInvoices: DemoInvoice[] = [
   {
     id: 'invoice-1',
     invoice_number: 'FAC-2024-001',
-    client_id: 'client-2',
-    vehicle_id: 'vehicle-2',
+    client_id: '00000000-0000-4000-8000-000000000011',
+    vehicle_id: '00000000-0000-4000-8000-000000000021',
     repair_order_id: 'order-2',
     status: 'payee',
     total_ht: 890.00,
@@ -434,8 +559,8 @@ export const demoInvoices: DemoInvoice[] = [
   {
     id: 'invoice-2',
     invoice_number: 'FAC-2024-002',
-    client_id: 'client-1',
-    vehicle_id: 'vehicle-1',
+    client_id: '00000000-0000-4000-8000-000000000010',
+    vehicle_id: '00000000-0000-4000-8000-000000000020',
     repair_order_id: 'order-1',
     status: 'en_attente',
     total_ht: 1250.00,
@@ -445,6 +570,85 @@ export const demoInvoices: DemoInvoice[] = [
     created_at: subDays(new Date(), 3).toISOString(),
     company_id: COMPANY_ID,
   },
+  {
+    id: 'invoice-3',
+    invoice_number: 'FAC-2024-003',
+    client_id: '00000000-0000-4000-8000-000000000013',
+    vehicle_id: '00000000-0000-4000-8000-000000000023',
+    repair_order_id: 'order-4',
+    status: 'payee',
+    total_ht: 1890.00,
+    total_ttc: 2268.00,
+    vat_amount: 378.00,
+    payment_due_date: subDays(new Date(), 5).toISOString(),
+    created_at: subDays(new Date(), 8).toISOString(),
+    company_id: COMPANY_ID,
+  },
+  {
+    id: 'invoice-4',
+    invoice_number: 'FAC-2024-004',
+    client_id: '00000000-0000-4000-8000-000000000012',
+    vehicle_id: '00000000-0000-4000-8000-000000000022',
+    status: 'en_retard',
+    total_ht: 2150.00,
+    total_ttc: 2580.00,
+    vat_amount: 430.00,
+    payment_due_date: subDays(new Date(), 30).toISOString(),
+    created_at: subDays(new Date(), 40).toISOString(),
+    company_id: COMPANY_ID,
+  },
+  {
+    id: 'invoice-5',
+    invoice_number: 'FAC-2024-005',
+    client_id: '00000000-0000-4000-8000-000000000014',
+    vehicle_id: '00000000-0000-4000-8000-000000000024',
+    status: 'partiellement_payee',
+    total_ht: 750.00,
+    total_ttc: 900.00,
+    vat_amount: 150.00,
+    payment_due_date: subDays(new Date(), 10).toISOString(),
+    created_at: subDays(new Date(), 12).toISOString(),
+    company_id: COMPANY_ID,
+  },
+  {
+    id: 'invoice-6',
+    invoice_number: 'FAC-2024-006',
+    client_id: '00000000-0000-4000-8000-000000000010',
+    vehicle_id: '00000000-0000-4000-8000-000000000020',
+    status: 'en_attente',
+    total_ht: 680.90,
+    total_ttc: 817.08,
+    vat_amount: 136.18,
+    payment_due_date: addDays(new Date(), 20).toISOString(),
+    created_at: subDays(new Date(), 1).toISOString(),
+    company_id: COMPANY_ID,
+  },
+  {
+    id: 'invoice-7',
+    invoice_number: 'FAC-2024-007',
+    client_id: '00000000-0000-4000-8000-000000000011',
+    vehicle_id: '00000000-0000-4000-8000-000000000021',
+    status: 'annulee',
+    total_ht: 3200.00,
+    total_ttc: 3840.00,
+    vat_amount: 640.00,
+    payment_due_date: subDays(new Date(), 60).toISOString(),
+    created_at: subDays(new Date(), 65).toISOString(),
+    company_id: COMPANY_ID,
+  },
+  {
+    id: 'invoice-8',
+    invoice_number: 'FAC-2024-008',
+    client_id: '00000000-0000-4000-8000-000000000012',
+    vehicle_id: '00000000-0000-4000-8000-000000000022',
+    status: 'payee',
+    total_ht: 1520.50,
+    total_ttc: 1824.60,
+    vat_amount: 304.10,
+    payment_due_date: subDays(new Date(), 25).toISOString(),
+    created_at: subDays(new Date(), 28).toISOString(),
+    company_id: COMPANY_ID,
+  }
 ];
 
 // Avoirs fictifs
@@ -571,6 +775,144 @@ export const demoFleetReservations: DemoFleetReservation[] = [
   },
 ];
 
+// Rapports d'expertise fictifs
+export const demoExpertiseReports: DemoExpertiseReport[] = [
+  {
+    id: 'expertise-1',
+    report_number: 'EXP-2024-001',
+    client_id: '00000000-0000-4000-8000-000000000010',
+    vehicle_id: '00000000-0000-4000-8000-000000000020',
+    report_date: subDays(new Date(), 20).toISOString(),
+    claim_number: 'SIN-2024-001234',
+    incident_date: subDays(new Date(), 25).toISOString(),
+    incident_description: 'Collision par l\'arrière en stationnement. Dégâts mineurs sur le pare-chocs et le coffre.',
+    policy_number: 'POL-789456123',
+    insurance_company: 'AXA Assurances',
+    expert_name: 'Jean-Claude Expertise SARL',
+    total_estimated: 1520.50,
+    status: 'valide',
+    repairs_data: [
+      { description: 'Réparation pare-chocs arrière', quantity: 1, unit_price: 280, total: 280 },
+      { description: 'Redressage coffre', quantity: 2, unit_price: 120, total: 240 },
+      { description: 'Peinture éléments réparés', quantity: 1, unit_price: 350, total: 350 }
+    ],
+    parts_data: [
+      { reference: 'REN-001', description: 'Feu arrière gauche', quantity: 1, unit_price: 145, total: 145 },
+      { reference: 'REN-002', description: 'Enjoliveur pare-chocs', quantity: 1, unit_price: 85, total: 85 },
+      { reference: 'REN-003', description: 'Joint coffre', quantity: 1, unit_price: 420.50, total: 420.50 }
+    ],
+    created_at: subDays(new Date(), 22).toISOString(),
+    company_id: COMPANY_ID,
+  },
+  {
+    id: 'expertise-2',
+    report_number: 'EXP-2024-002',
+    client_id: '00000000-0000-4000-8000-000000000011',
+    vehicle_id: '00000000-0000-4000-8000-000000000021',
+    report_date: subDays(new Date(), 35).toISOString(),
+    claim_number: 'SIN-2024-005678',
+    incident_date: subDays(new Date(), 42).toISOString(),
+    incident_description: 'Choc frontal avec véhicule tiers. Dégâts importants sur l\'avant du véhicule.',
+    policy_number: 'POL-456789012',
+    insurance_company: 'Groupama',
+    expert_name: 'SAS Expert Auto',
+    total_estimated: 3850.75,
+    status: 'accepte',
+    repairs_data: [
+      { description: 'Réparation structure avant', quantity: 8, unit_price: 150, total: 1200 },
+      { description: 'Peinture complète avant', quantity: 1, unit_price: 680, total: 680 },
+      { description: 'Géométrie et parallélisme', quantity: 1, unit_price: 120, total: 120 }
+    ],
+    parts_data: [
+      { reference: 'PEU-001', description: 'Optique avant droit', quantity: 1, unit_price: 420, total: 420 },
+      { reference: 'PEU-002', description: 'Calandre avant', quantity: 1, unit_price: 280, total: 280 },
+      { reference: 'PEU-003', description: 'Pare-chocs avant', quantity: 1, unit_price: 650, total: 650 },
+      { reference: 'PEU-004', description: 'Radiateur', quantity: 1, unit_price: 500.75, total: 500.75 }
+    ],
+    created_at: subDays(new Date(), 38).toISOString(),
+    company_id: COMPANY_ID,
+  },
+  {
+    id: 'expertise-3',
+    report_number: 'EXP-2024-003',
+    client_id: '00000000-0000-4000-8000-000000000012',
+    vehicle_id: '00000000-0000-4000-8000-000000000022',
+    report_date: subDays(new Date(), 12).toISOString(),
+    claim_number: 'SIN-2024-009876',
+    incident_date: subDays(new Date(), 18).toISOString(),
+    incident_description: 'Dégâts causés par grêle. Impacts multiples sur carrosserie et vitres.',
+    policy_number: 'POL-987654321',
+    insurance_company: 'MAIF',
+    expert_name: 'Cabinet d\'Expertise Automobile',
+    total_estimated: 2750.25,
+    status: 'refuse',
+    repairs_data: [
+      { description: 'Débosselage sans peinture (PDR)', quantity: 25, unit_price: 35, total: 875 },
+      { description: 'Retouches peinture localisées', quantity: 8, unit_price: 45, total: 360 },
+      { description: 'Polissage carrosserie', quantity: 1, unit_price: 180, total: 180 }
+    ],
+    parts_data: [
+      { reference: 'VW-001', description: 'Pare-brise avant', quantity: 1, unit_price: 385, total: 385 },
+      { reference: 'VW-002', description: 'Lunette arrière', quantity: 1, unit_price: 290, total: 290 },
+      { reference: 'VW-003', description: 'Vitre latérale droite', quantity: 2, unit_price: 330.125, total: 660.25 }
+    ],
+    created_at: subDays(new Date(), 15).toISOString(),
+    company_id: COMPANY_ID,
+  },
+  {
+    id: 'expertise-4',
+    report_number: 'EXP-2024-004',
+    client_id: '00000000-0000-4000-8000-000000000013',
+    vehicle_id: '00000000-0000-4000-8000-000000000023',
+    report_date: subDays(new Date(), 5).toISOString(),
+    claim_number: 'SIN-2024-012345',
+    incident_date: subDays(new Date(), 8).toISOString(),
+    incident_description: 'Rayures profondes sur le côté droit du véhicule causées par acte de vandalisme.',
+    policy_number: 'POL-123456789',
+    insurance_company: 'Allianz',
+    expert_name: 'Expert Conseil Automobile',
+    total_estimated: 1890.00,
+    status: 'en_cours',
+    repairs_data: [
+      { description: 'Ponçage et apprêt portières', quantity: 2, unit_price: 95, total: 190 },
+      { description: 'Peinture 2 portières droites', quantity: 1, unit_price: 480, total: 480 },
+      { description: 'Vernis et finition', quantity: 1, unit_price: 120, total: 120 }
+    ],
+    parts_data: [
+      { reference: 'CIT-001', description: 'Baguettes de protection', quantity: 2, unit_price: 85, total: 170 },
+      { reference: 'CIT-002', description: 'Emblèmes latéraux', quantity: 2, unit_price: 45, total: 90 },
+      { reference: 'CIT-003', description: 'Kit peinture Citroën Rouge Aden', quantity: 1, unit_price: 840, total: 840 }
+    ],
+    created_at: subDays(new Date(), 7).toISOString(),
+    company_id: COMPANY_ID,
+  },
+  {
+    id: 'expertise-5',
+    report_number: 'EXP-2024-005',
+    client_id: '00000000-0000-4000-8000-000000000014',
+    vehicle_id: '00000000-0000-4000-8000-000000000024',
+    report_date: subDays(new Date(), 2).toISOString(),
+    claim_number: 'SIN-2024-087654',
+    incident_date: subDays(new Date(), 4).toISOString(),
+    incident_description: 'Dégâts mineurs suite à un accrochage en parking. Impact sur rétroviseur et portière.',
+    policy_number: 'POL-567890123',
+    insurance_company: 'Generali',
+    expert_name: 'Expertise Automobile Conseil',
+    total_estimated: 680.90,
+    status: 'valide',
+    repairs_data: [
+      { description: 'Réparation portière avant gauche', quantity: 1, unit_price: 180, total: 180 },
+      { description: 'Retouche peinture localisée', quantity: 1, unit_price: 85, total: 85 }
+    ],
+    parts_data: [
+      { reference: 'BMW-001', description: 'Rétroviseur électrique gauche', quantity: 1, unit_price: 315.90, total: 315.90 },
+      { reference: 'BMW-002', description: 'Clignotant rétroviseur', quantity: 1, unit_price: 100, total: 100 }
+    ],
+    created_at: subDays(new Date(), 3).toISOString(),
+    company_id: COMPANY_ID,
+  }
+];
+
 // Cessions fictives
 export const demoCessions: DemoCession[] = [
   {
@@ -613,4 +955,5 @@ export const demoData = {
   fleetVehicles: demoFleetVehicles,
   fleetReservations: demoFleetReservations,
   cessions: demoCessions,
+  expertiseReports: demoExpertiseReports,
 };

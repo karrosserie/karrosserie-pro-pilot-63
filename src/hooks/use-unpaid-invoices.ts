@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/hooks/use-company';
 import { useToast } from '@/components/ui/use-toast';
 import { format } from 'date-fns';
@@ -75,51 +74,99 @@ export const useUnpaidInvoices = () => {
     if (!companyData?.id) return;
 
     try {
-      const { data, error } = await supabase
-        .from('invoices')
-        .select(`
-          *,
-          clients (
-            id,
-            first_name,
-            last_name,
-            phone,
-            email,
-            address,
-            city,
-            postal_code,
-            auto_relances_disabled
-          ),
-          vehicles (
-            id,
-            license_plate,
-            brand_id,
-            model_id,
-            car_brands (
-              name
-            ),
-            car_models (
-              name
-            )
-          )
-        `)
-        .eq('company_id', companyData.id)
-        .lt('due_date', new Date().toISOString().split('T')[0])
-        .in('status', ['En attente de paiement', 'Partiellement payé'])
-        .order('due_date', { ascending: true });
+      // Données fictives pour les factures impayées
+      const mockInvoices: UnpaidInvoice[] = [
+        {
+          id: 'inv-1',
+          reference: '2024-001',
+          client_id: 'client-1',
+          vehicle_id: 'vehicle-1',
+          amount: 1250.50,
+          due_date: '2024-01-15',
+          status: 'En attente de paiement',
+          created_at: '2024-01-01T10:00:00Z',
+          clients: {
+            id: 'client-1',
+            first_name: 'Jean',
+            last_name: 'Dupont',
+            phone: '06.12.34.56.78',
+            email: 'jean.dupont@email.com',
+            address: '123 Rue de la République',
+            city: 'Lyon',
+            postal_code: '69002',
+            auto_relances_disabled: false
+          },
+          vehicles: {
+            id: 'vehicle-1',
+            license_plate: 'AB-123-CD',
+            brand_id: 'brand-1',
+            model_id: 'model-1',
+            car_brands: { name: 'Peugeot' },
+            car_models: { name: '308' }
+          }
+        },
+        {
+          id: 'inv-2',
+          reference: '2024-002',
+          client_id: 'client-2',
+          vehicle_id: 'vehicle-2',
+          amount: 890.75,
+          due_date: '2024-01-08',
+          status: 'Partiellement payé',
+          created_at: '2023-12-28T14:30:00Z',
+          clients: {
+            id: 'client-2',
+            first_name: 'Marie',
+            last_name: 'Martin',
+            phone: '06.98.76.54.32',
+            email: 'marie.martin@email.com',
+            address: '45 Avenue des Fleurs',
+            city: 'Marseille',
+            postal_code: '13001',
+            auto_relances_disabled: false
+          },
+          vehicles: {
+            id: 'vehicle-2',
+            license_plate: 'EF-456-GH',
+            brand_id: 'brand-2',
+            model_id: 'model-2',
+            car_brands: { name: 'Renault' },
+            car_models: { name: 'Clio' }
+          }
+        },
+        {
+          id: 'inv-3',
+          reference: '2024-003',
+          client_id: 'client-3',
+          vehicle_id: 'vehicle-3',
+          amount: 2150.00,
+          due_date: '2023-12-20',
+          status: 'En attente de paiement',
+          created_at: '2023-12-05T09:15:00Z',
+          clients: {
+            id: 'client-3',
+            first_name: 'Pierre',
+            last_name: 'Durand',
+            phone: '06.11.22.33.44',
+            email: 'pierre.durand@email.com',
+            address: '78 Boulevard de la Liberté',
+            city: 'Toulouse',
+            postal_code: '31000',
+            auto_relances_disabled: true
+          },
+          vehicles: {
+            id: 'vehicle-3',
+            license_plate: 'IJ-789-KL',
+            brand_id: 'brand-3',
+            model_id: 'model-3',
+            car_brands: { name: 'Volkswagen' },
+            car_models: { name: 'Golf' }
+          }
+        }
+      ];
 
-      if (error) {
-        console.error('Error fetching unpaid invoices:', error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de charger les factures impayées",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setInvoices(data || []);
-      formatInvoicesForDisplay(data || []);
+      setInvoices(mockInvoices);
+      formatInvoicesForDisplay(mockInvoices);
     } catch (error) {
       console.error('Error in fetchUnpaidInvoices:', error);
     }
@@ -206,27 +253,26 @@ export const useUnpaidInvoices = () => {
 
   const toggleAutoRelances = async (clientId: string, currentValue: boolean) => {
     try {
-      const { error } = await supabase
-        .from('clients')
-        .update({ auto_relances_disabled: !currentValue })
-        .eq('id', clientId);
-
-      if (error) {
-        console.error('Error toggling auto relances:', error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de modifier les relances automatiques",
-          variant: "destructive",
-        });
-        return;
-      }
+      // Simuler la modification des relances automatiques
+      setInvoices(prev => prev.map(invoice => {
+        if (invoice.client_id === clientId && invoice.clients) {
+          return {
+            ...invoice,
+            clients: {
+              ...invoice.clients,
+              auto_relances_disabled: !currentValue
+            }
+          };
+        }
+        return invoice;
+      }));
 
       toast({
         title: "Succès",
         description: !currentValue ? "Relances automatiques désactivées" : "Relances automatiques activées",
       });
 
-      // Refetch data to update the UI
+      // Refetch data to update the formatted invoices
       await fetchUnpaidInvoices();
     } catch (error) {
       console.error('Error in toggleAutoRelances:', error);

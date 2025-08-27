@@ -283,9 +283,9 @@ Karrosserie Pro`,
           </div>
         ) : (
           <div className="space-y-3 sm:space-y-4">
-            {filteredInvoices.map((invoice, index) => (
+            {filteredInvoices.map((invoice) => (
               <InvoiceCard 
-                key={index} 
+                key={invoice.uuid} 
                 invoice={invoice} 
                 getActionIcon={getActionIcon} 
                 getActionLabel={getActionLabel} 
@@ -422,9 +422,9 @@ const InvoiceCard = ({ invoice, getActionIcon, getActionLabel, getActionStyle, o
           <div className="space-y-2">
             <p className="text-sm text-gray-600">Moyens de relance utilisés :</p>
             <div className="flex flex-wrap gap-2">
-              {invoice.availableActions.map((action: string, actionIndex: number) => (
+              {invoice.availableActions.map((action: string) => (
                 <Button
-                  key={actionIndex}
+                  key={action}
                   variant="outline"
                   size="sm"
                   onClick={() => onActionClick(invoice, action)}

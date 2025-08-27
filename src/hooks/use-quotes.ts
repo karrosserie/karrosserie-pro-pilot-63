@@ -106,6 +106,14 @@ export function useQuotes() {
 
   const updateQuote = useMutation({
     mutationFn: async ({ id, data }: { id: string, data: any }) => {
+      if (DEMO_MODE) {
+        const { data: result, error } = await demoService.quotes.update(id, data);
+        if (error) {
+          throw new Error(error);
+        }
+        return result;
+      }
+      
       const { data: result, error } = await supabase
         .from('quotes')
         .update(data)
@@ -147,6 +155,14 @@ export function useQuotes() {
 
   const deleteQuote = useMutation({
     mutationFn: async (id: string) => {
+      if (DEMO_MODE) {
+        const { error } = await demoService.quotes.delete(id);
+        if (error) {
+          throw new Error(error);
+        }
+        return true;
+      }
+      
       const { error } = await supabase
         .from('quotes')
         .delete()

@@ -6,18 +6,28 @@ import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useCredits } from '@/hooks/use-credits';
 import { useVehicles } from '@/hooks/use-vehicles';
+import { DEMO_MODE } from '@/services/demoService';
 
 export const useRecentDocuments = () => {
-  const { invoices } = useInvoices();
-  const { quotes } = useQuotes();
-  const { orders: repairOrders } = useRepairOrders();
-  const { reports: expertiseReports } = useExpertiseReports();
-  const { credits } = useCredits();
-  const { vehicles } = useVehicles();
+  const { invoices } = DEMO_MODE ? { invoices: [] } : useInvoices();
+  const { quotes } = DEMO_MODE ? { quotes: [] } : useQuotes();
+  const { orders: repairOrders } = DEMO_MODE ? { orders: [] } : useRepairOrders();
+  const { reports: expertiseReports } = DEMO_MODE ? { reports: [] } : useExpertiseReports();
+  const { credits } = DEMO_MODE ? { credits: [] } : useCredits();
+  const { vehicles } = DEMO_MODE ? { vehicles: [] } : useVehicles();
 
   const { data: recentDocuments } = useQuery({
     queryKey: ['recent-documents', invoices, quotes, repairOrders, expertiseReports, credits, vehicles],
     queryFn: () => {
+      if (DEMO_MODE) {
+        return [
+          { id: '1', type: 'Facture', title: 'FAC-2024-001', clientName: 'Marie Martin', amount: 1500, date: '2024-01-20' },
+          { id: '2', type: 'Devis', title: 'DEV-2024-002', clientName: 'Pierre Durand', amount: 1068, date: '2024-01-18' },
+          { id: '3', type: 'Ordre', title: 'ORD-2024-001', clientName: 'Sophie Bernard', amount: 2580, date: '2024-01-15' },
+          { id: '4', type: 'Expertise', title: 'EXP-2024-001', clientName: 'Antoine Petit', amount: 1890, date: '2024-01-12' }
+        ];
+      }
+      
       const documents = [];
       
       // Factures

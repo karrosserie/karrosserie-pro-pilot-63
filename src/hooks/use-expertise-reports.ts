@@ -18,8 +18,8 @@ export function useExpertiseReports() {
     queryKey: ['expertiseReports'],
     queryFn: async () => {
       if (DEMO_MODE) {
-        // Retourner un tableau vide pour le mode démo
-        return [];
+        const { data } = await demoService.expertiseReports.getAll();
+        return data || [];
       }
       return expertiseReportsService.getAll();
     },
@@ -140,7 +140,16 @@ export function useExpertiseReport(id?: string) {
     error
   } = useQuery({
     queryKey: ['expertiseReports', id],
-    queryFn: () => id ? expertiseReportsService.getById(id) : null,
+    queryFn: async () => {
+      if (!id) return null;
+      
+      if (DEMO_MODE) {
+        const { data } = await demoService.expertiseReports.getById(id);
+        return data;
+      }
+      
+      return expertiseReportsService.getById(id);
+    },
     enabled: !!id
   });
   

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/hooks/use-company';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -56,52 +55,17 @@ export const useClientRelances = () => {
     if (!companyData?.id) return;
 
     try {
-      // Récupérer les statistiques par canal
-      const { data: statsData, error: statsError } = await supabase
-        .from('client_relances')
-        .select('channel, status')
-        .eq('company_id', companyData.id)
-        .in('status', ['en_attente', 'en_cours', 'envoye', 'recu']);
+      // Données fictives pour les statistiques de relances
+      const mockStats: RelanceStats[] = [
+        { channel: 'phone', count: 15, en_cours: 3, envoye: 8, recu: 4, echec: 0 },
+        { channel: 'email', count: 42, en_cours: 5, envoye: 28, recu: 7, echec: 2 },
+        { channel: 'sms', count: 23, en_cours: 2, envoye: 18, recu: 3, echec: 0 },
+        { channel: 'whatsapp', count: 31, en_cours: 4, envoye: 22, recu: 5, echec: 0 },
+        { channel: 'vms', count: 8, en_cours: 1, envoye: 5, recu: 2, echec: 0 },
+        { channel: 'courrier', count: 6, en_cours: 0, envoye: 4, recu: 2, echec: 0 }
+      ];
 
-      if (statsError) {
-        console.error('Error fetching relance stats:', statsError);
-        toast({
-          title: "Erreur",
-          description: "Impossible de charger les statistiques des relances",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Traiter les données pour créer les statistiques par canal
-      const statsMap = new Map<string, RelanceStats>();
-      
-      // Initialiser avec tous les canaux
-      const channels = ['phone', 'email', 'sms', 'whatsapp', 'vms', 'courrier'];
-      channels.forEach(channel => {
-        statsMap.set(channel, {
-          channel,
-          count: 0,
-          en_cours: 0,
-          envoye: 0,
-          recu: 0,
-          echec: 0
-        });
-      });
-
-      // Compter les relances par canal et statut
-      statsData?.forEach(relance => {
-        const stat = statsMap.get(relance.channel);
-        if (stat) {
-          stat.count++;
-          if (relance.status === 'en_cours') stat.en_cours++;
-          else if (relance.status === 'envoye') stat.envoye++;
-          else if (relance.status === 'recu') stat.recu++;
-          else if (relance.status === 'echec') stat.echec++;
-        }
-      });
-
-      setStats(Array.from(statsMap.values()));
+      setStats(mockStats);
     } catch (error) {
       console.error('Error in fetchRelanceStats:', error);
     }
@@ -111,27 +75,76 @@ export const useClientRelances = () => {
     if (!companyData?.id) return;
 
     try {
-      const { data, error } = await supabase
-        .from('client_relances')
-        .select(`
-          *,
-          clients (
-            first_name,
-            last_name,
-            phone,
-            email
-          )
-        `)
-        .eq('company_id', companyData.id)
-        .order('created_at', { ascending: false })
-        .limit(100);
+      // Données fictives pour les relances clients
+      const mockRelances: ClientRelance[] = [
+        {
+          id: 'rel-1',
+          company_id: companyData.id,
+          client_id: 'client-1',
+          invoice_id: 'inv-1',
+          channel: 'email',
+          tone: 'amical',
+          status: 'envoye',
+          subject: 'Rappel facture #2024-001',
+          message: 'Bonjour, nous vous rappelons que votre facture arrive à échéance.',
+          is_automated: true,
+          sent_at: '2024-01-15T10:30:00Z',
+          response_read: false,
+          created_at: '2024-01-15T10:30:00Z',
+          updated_at: '2024-01-15T10:30:00Z',
+          clients: {
+            first_name: 'Jean',
+            last_name: 'Dupont',
+            phone: '06.12.34.56.78',
+            email: 'jean.dupont@email.com'
+          }
+        },
+        {
+          id: 'rel-2',
+          company_id: companyData.id,
+          client_id: 'client-2',
+          invoice_id: 'inv-2',
+          channel: 'sms',
+          tone: 'serieux',
+          status: 'recu',
+          subject: 'Facture en retard',
+          message: 'Votre facture #2024-002 est en retard de paiement.',
+          is_automated: false,
+          sent_at: '2024-01-10T14:15:00Z',
+          received_at: '2024-01-10T14:16:00Z',
+          response_read: true,
+          created_at: '2024-01-10T14:15:00Z',
+          updated_at: '2024-01-10T14:16:00Z',
+          clients: {
+            first_name: 'Marie',
+            last_name: 'Martin',
+            phone: '06.98.76.54.32',
+            email: 'marie.martin@email.com'
+          }
+        },
+        {
+          id: 'rel-3',
+          company_id: companyData.id,
+          client_id: 'client-3',
+          channel: 'whatsapp',
+          tone: 'amical',
+          status: 'en_cours',
+          subject: 'Devis en attente',
+          message: 'Votre devis est prêt, souhaitez-vous le consulter ?',
+          is_automated: true,
+          response_read: false,
+          created_at: '2024-01-20T09:00:00Z',
+          updated_at: '2024-01-20T09:00:00Z',
+          clients: {
+            first_name: 'Pierre',
+            last_name: 'Durand',
+            phone: '06.11.22.33.44',
+            email: 'pierre.durand@email.com'
+          }
+        }
+      ];
 
-      if (error) {
-        console.error('Error fetching relances:', error);
-        return;
-      }
-
-      setRelances((data as any) || []);
+      setRelances(mockRelances);
     } catch (error) {
       console.error('Error in fetchRelances:', error);
     }
@@ -141,40 +154,15 @@ export const useClientRelances = () => {
     if (!companyData?.id) return null;
 
     try {
-      const { data, error } = await supabase
-        .from('client_relances')
-        .insert({
-          company_id: companyData.id,
-          client_id: relanceData.client_id,
-          channel: relanceData.channel,
-          tone: relanceData.tone,
-          status: relanceData.status || 'en_attente',
-          subject: relanceData.subject,
-          message: relanceData.message,
-          objective: relanceData.objective,
-          cycle_day: relanceData.cycle_day,
-          step_number: relanceData.step_number,
-          is_automated: relanceData.is_automated,
-          scheduled_at: relanceData.scheduled_at,
-          sent_at: relanceData.sent_at,
-          received_at: relanceData.received_at,
-          responded_at: relanceData.responded_at,
-          channel_data: relanceData.channel_data,
-          invoice_id: relanceData.invoice_id,
-          quote_id: relanceData.quote_id,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error creating relance:', error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de créer la relance",
-          variant: "destructive",
-        });
-        return null;
-      }
+      // Simuler la création d'une relance
+      const mockRelance = {
+        id: `rel-${Date.now()}`,
+        company_id: companyData.id,
+        ...relanceData,
+        status: relanceData.status || 'en_attente',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
 
       toast({
         title: "Succès",
@@ -185,7 +173,7 @@ export const useClientRelances = () => {
       fetchRelanceStats();
       fetchRelances();
 
-      return data;
+      return mockRelance;
     } catch (error) {
       console.error('Error in createRelance:', error);
       return null;
@@ -194,31 +182,23 @@ export const useClientRelances = () => {
 
   const updateRelanceStatus = async (relanceId: string, status: ClientRelance['status']) => {
     try {
-      const updateData: any = { status };
-      
-      // Ajouter les timestamps selon le statut
-      if (status === 'en_cours') updateData.sent_at = new Date().toISOString();
-      else if (status === 'recu') updateData.received_at = new Date().toISOString();
-      else if (status === 'repondu') updateData.responded_at = new Date().toISOString();
+      // Simuler la mise à jour du statut
+      setRelances(prev => prev.map(relance => {
+        if (relance.id === relanceId) {
+          const updateData: any = { ...relance, status };
+          
+          // Ajouter les timestamps selon le statut
+          if (status === 'en_cours') updateData.sent_at = new Date().toISOString();
+          else if (status === 'recu') updateData.received_at = new Date().toISOString();
+          else if (status === 'repondu') updateData.responded_at = new Date().toISOString();
+          
+          return updateData;
+        }
+        return relance;
+      }));
 
-      const { error } = await supabase
-        .from('client_relances')
-        .update(updateData)
-        .eq('id', relanceId);
-
-      if (error) {
-        console.error('Error updating relance status:', error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de mettre à jour le statut de la relance",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Rafraîchir les données
+      // Rafraîchir les statistiques
       fetchRelanceStats();
-      fetchRelances();
     } catch (error) {
       console.error('Error in updateRelanceStatus:', error);
     }
@@ -226,23 +206,12 @@ export const useClientRelances = () => {
 
   const markResponseAsRead = async (relanceId: string) => {
     try {
-      const { error } = await supabase
-        .from('client_relances')
-        .update({ response_read: true })
-        .eq('id', relanceId);
-
-      if (error) {
-        console.error('Error marking response as read:', error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de marquer la réponse comme lue",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Rafraîchir les données
-      fetchRelances();
+      // Simuler le marquage comme lu
+      setRelances(prev => prev.map(relance => 
+        relance.id === relanceId 
+          ? { ...relance, response_read: true }
+          : relance
+      ));
     } catch (error) {
       console.error('Error in markResponseAsRead:', error);
     }

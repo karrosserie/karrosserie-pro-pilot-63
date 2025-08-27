@@ -24,6 +24,7 @@ export const useDashboardStats = () => {
         const { data } = await demoService.dashboard.getStats();
         return data;
       }
+
       const now = new Date();
       const currentMonthStart = startOfMonth(now);
       const currentMonthEnd = endOfMonth(now);
@@ -174,6 +175,6 @@ export const useDashboardStats = () => {
 
   return {
     dashboardStats,
-    isLoading: isLoading || vehiclesLoading || clientsLoading
+    isLoading: DEMO_MODE ? isLoading : (isLoading || vehiclesLoading || clientsLoading)
   };
 };

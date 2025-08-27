@@ -94,6 +94,16 @@ export const demoVehicleService = {
       return { data: demoData.vehicles[index], error: null };
     }
     return { data: null, error: 'Véhicule non trouvé' };
+  },
+  
+  async delete(id: string) {
+    await simulateNetworkDelay();
+    const index = demoData.vehicles.findIndex(v => v.id === id);
+    if (index !== -1) {
+      demoData.vehicles.splice(index, 1);
+      return { error: null };
+    }
+    return { error: 'Véhicule non trouvé' };
   }
 };
 
@@ -101,13 +111,59 @@ export const demoVehicleService = {
 export const demoQuoteService = {
   async getAll() {
     await simulateNetworkDelay();
-    return { data: demoData.quotes, error: null };
+    
+    // Joindre les données clients et véhicules aux devis
+    const quotesWithRelations = demoData.quotes.map(quote => {
+      const client = demoData.clients.find(c => c.id === quote.client_id);
+      const vehicle = demoData.vehicles.find(v => v.id === quote.vehicle_id);
+      
+      return {
+        ...quote,
+        reference: quote.quote_number,
+        clients: client ? {
+          id: client.id,
+          first_name: client.first_name,
+          last_name: client.last_name
+        } : null,
+        vehicles: vehicle ? {
+          id: vehicle.id,
+          license_plate: vehicle.registration_number,
+          car_brands: { name: vehicle.brand },
+          car_models: { name: vehicle.model }
+        } : null
+      };
+    });
+    
+    return { data: quotesWithRelations, error: null };
   },
   
   async getById(id: string) {
     await simulateNetworkDelay();
     const quote = demoData.quotes.find(q => q.id === id);
-    return { data: quote || null, error: quote ? null : 'Devis non trouvé' };
+    
+    if (!quote) return { data: null, error: 'Devis non trouvé' };
+    
+    // Joindre les relations
+    const client = demoData.clients.find(c => c.id === quote.client_id);
+    const vehicle = demoData.vehicles.find(v => v.id === quote.vehicle_id);
+    
+    const quoteWithRelations = {
+      ...quote,
+      reference: quote.quote_number,
+      clients: client ? {
+        id: client.id,
+        first_name: client.first_name,
+        last_name: client.last_name
+      } : null,
+      vehicles: vehicle ? {
+        id: vehicle.id,
+        license_plate: vehicle.registration_number,
+        car_brands: { name: vehicle.brand },
+        car_models: { name: vehicle.model }
+      } : null
+    };
+    
+    return { data: quoteWithRelations, error: null };
   },
   
   async create(quoteData: any) {
@@ -120,7 +176,28 @@ export const demoQuoteService = {
       company_id: 'demo-company-id',
     };
     demoData.quotes.push(newQuote);
-    return { data: newQuote, error: null };
+    
+    // Retourner avec les relations jointes
+    const client = demoData.clients.find(c => c.id === newQuote.client_id);
+    const vehicle = demoData.vehicles.find(v => v.id === newQuote.vehicle_id);
+    
+    const quoteWithRelations = {
+      ...newQuote,
+      reference: newQuote.quote_number,
+      clients: client ? {
+        id: client.id,
+        first_name: client.first_name,
+        last_name: client.last_name
+      } : null,
+      vehicles: vehicle ? {
+        id: vehicle.id,
+        license_plate: vehicle.registration_number,
+        car_brands: { name: vehicle.brand },
+        car_models: { name: vehicle.model }
+      } : null
+    };
+    
+    return { data: quoteWithRelations, error: null };
   },
   
   async update(id: string, quoteData: any) {
@@ -128,9 +205,41 @@ export const demoQuoteService = {
     const index = demoData.quotes.findIndex(q => q.id === id);
     if (index !== -1) {
       demoData.quotes[index] = { ...demoData.quotes[index], ...quoteData };
-      return { data: demoData.quotes[index], error: null };
+      const updatedQuote = demoData.quotes[index];
+      
+      // Retourner avec les relations jointes
+      const client = demoData.clients.find(c => c.id === updatedQuote.client_id);
+      const vehicle = demoData.vehicles.find(v => v.id === updatedQuote.vehicle_id);
+      
+      const quoteWithRelations = {
+        ...updatedQuote,
+        reference: updatedQuote.quote_number,
+        clients: client ? {
+          id: client.id,
+          first_name: client.first_name,
+          last_name: client.last_name
+        } : null,
+        vehicles: vehicle ? {
+          id: vehicle.id,
+          license_plate: vehicle.registration_number,
+          car_brands: { name: vehicle.brand },
+          car_models: { name: vehicle.model }
+        } : null
+      };
+      
+      return { data: quoteWithRelations, error: null };
     }
     return { data: null, error: 'Devis non trouvé' };
+  },
+  
+  async delete(id: string) {
+    await simulateNetworkDelay();
+    const index = demoData.quotes.findIndex(q => q.id === id);
+    if (index !== -1) {
+      demoData.quotes.splice(index, 1);
+      return { error: null };
+    }
+    return { error: 'Devis non trouvé' };
   }
 };
 
@@ -138,7 +247,35 @@ export const demoQuoteService = {
 export const demoRepairOrderService = {
   async getAll() {
     await simulateNetworkDelay();
-    return { data: demoData.repairOrders, error: null };
+    
+    // Joindre les données clients et véhicules aux ordres de réparation
+    const ordersWithRelations = demoData.repairOrders.map(order => {
+      const client = demoData.clients.find(c => c.id === order.client_id);
+      const vehicle = demoData.vehicles.find(v => v.id === order.vehicle_id);
+      
+      return {
+        ...order,
+        reference: order.order_number,
+        amount: order.total_ttc,
+        clients: client ? {
+          id: client.id,
+          first_name: client.first_name,
+          last_name: client.last_name
+        } : null,
+        vehicles: vehicle ? {
+          id: vehicle.id,
+          license_plate: vehicle.registration_number,
+          car_brands: { name: vehicle.brand },
+          car_models: { name: vehicle.model }
+        } : null,
+        quotes: order.quote_id ? {
+          id: order.quote_id,
+          reference: `DEV-${order.quote_id}`
+        } : null
+      };
+    });
+    
+    return { data: ordersWithRelations, error: null };
   },
   
   async getById(id: string) {
@@ -168,6 +305,16 @@ export const demoRepairOrderService = {
       return { data: demoData.repairOrders[index], error: null };
     }
     return { data: null, error: 'Ordre non trouvé' };
+  },
+  
+  async delete(id: string) {
+    await simulateNetworkDelay();
+    const index = demoData.repairOrders.findIndex(o => o.id === id);
+    if (index !== -1) {
+      demoData.repairOrders.splice(index, 1);
+      return { error: null };
+    }
+    return { error: 'Ordre non trouvé' };
   }
 };
 
@@ -175,7 +322,46 @@ export const demoRepairOrderService = {
 export const demoInvoiceService = {
   async getAll() {
     await simulateNetworkDelay();
-    return { data: demoData.invoices, error: null };
+    
+    // Joindre les données clients et véhicules aux factures
+    const invoicesWithRelations = demoData.invoices.map(invoice => {
+      const client = demoData.clients.find(c => c.id === invoice.client_id);
+      const vehicle = demoData.vehicles.find(v => v.id === invoice.vehicle_id);
+      
+      return {
+        ...invoice,
+        reference: invoice.invoice_number,
+        amount: invoice.total_ttc,
+        date: invoice.created_at,
+        due_date: invoice.payment_due_date,
+        repairs_data: [],
+        parts_data: [],
+        discounts_data: [],
+        clients: client ? {
+          id: client.id,
+          first_name: client.first_name,
+          last_name: client.last_name,
+          email: client.email,
+          phone: client.phone,
+          address: client.address,
+          city: client.city,
+          postal_code: client.postal_code
+        } : null,
+        vehicles: vehicle ? {
+          id: vehicle.id,
+          license_plate: vehicle.registration_number,
+          mileage: vehicle.mileage,
+          car_brands: { id: 'brand-1', name: vehicle.brand },
+          car_models: { id: 'model-1', name: vehicle.model }
+        } : null,
+        repair_orders: invoice.repair_order_id ? {
+          id: invoice.repair_order_id,
+          reference: `ORD-${invoice.repair_order_id}`
+        } : null
+      };
+    });
+    
+    return { data: invoicesWithRelations, error: null };
   },
   
   async getById(id: string) {
@@ -195,6 +381,26 @@ export const demoInvoiceService = {
     };
     demoData.invoices.push(newInvoice);
     return { data: newInvoice, error: null };
+  },
+  
+  async update(id: string, invoiceData: any) {
+    await simulateNetworkDelay();
+    const index = demoData.invoices.findIndex(i => i.id === id);
+    if (index !== -1) {
+      demoData.invoices[index] = { ...demoData.invoices[index], ...invoiceData };
+      return { data: demoData.invoices[index], error: null };
+    }
+    return { data: null, error: 'Facture non trouvée' };
+  },
+  
+  async delete(id: string) {
+    await simulateNetworkDelay();
+    const index = demoData.invoices.findIndex(i => i.id === id);
+    if (index !== -1) {
+      demoData.invoices.splice(index, 1);
+      return { error: null };
+    }
+    return { error: 'Facture non trouvée' };
   }
 };
 
@@ -295,6 +501,95 @@ export const demoFleetReservationService = {
   }
 };
 
+// Service rapports d'expertise
+export const demoExpertiseReportService = {
+  async getAll() {
+    await simulateNetworkDelay();
+    
+    // Joindre les données clients et véhicules aux rapports
+    const reportsWithRelations = demoData.expertiseReports.map(report => {
+      const client = demoData.clients.find(c => c.id === report.client_id);
+      const vehicle = demoData.vehicles.find(v => v.id === report.vehicle_id);
+      
+      return {
+        ...report,
+        clients: client ? {
+          first_name: client.first_name,
+          last_name: client.last_name
+        } : null,
+        vehicles: vehicle ? {
+          id: vehicle.id,
+          license_plate: vehicle.registration_number,
+          car_brands: { name: vehicle.brand },
+          car_models: { name: vehicle.model }
+        } : null
+      };
+    });
+    
+    return { data: reportsWithRelations, error: null };
+  },
+  
+  async getById(id: string) {
+    await simulateNetworkDelay();
+    const report = demoData.expertiseReports.find(r => r.id === id);
+    
+    if (!report) return { data: null, error: 'Rapport non trouvé' };
+    
+    // Joindre les relations
+    const client = demoData.clients.find(c => c.id === report.client_id);
+    const vehicle = demoData.vehicles.find(v => v.id === report.vehicle_id);
+    
+    const reportWithRelations = {
+      ...report,
+      clients: client ? {
+        first_name: client.first_name,
+        last_name: client.last_name
+      } : null,
+      vehicles: vehicle ? {
+        id: vehicle.id,
+        license_plate: vehicle.registration_number,
+        car_brands: { name: vehicle.brand },
+        car_models: { name: vehicle.model }
+      } : null
+    };
+    
+    return { data: reportWithRelations, error: null };
+  },
+  
+  async create(reportData: any) {
+    await simulateNetworkDelay();
+    const newReport = {
+      ...reportData,
+      id: `expertise-${Date.now()}`,
+      report_number: `EXP-2024-${String(demoData.expertiseReports.length + 1).padStart(3, '0')}`,
+      created_at: new Date().toISOString(),
+      company_id: 'demo-company-id',
+    };
+    demoData.expertiseReports.push(newReport);
+    return { data: newReport, error: null };
+  },
+  
+  async update(id: string, reportData: any) {
+    await simulateNetworkDelay();
+    const index = demoData.expertiseReports.findIndex(r => r.id === id);
+    if (index !== -1) {
+      demoData.expertiseReports[index] = { ...demoData.expertiseReports[index], ...reportData };
+      return { data: demoData.expertiseReports[index], error: null };
+    }
+    return { data: null, error: 'Rapport non trouvé' };
+  },
+  
+  async delete(id: string) {
+    await simulateNetworkDelay();
+    const index = demoData.expertiseReports.findIndex(r => r.id === id);
+    if (index !== -1) {
+      demoData.expertiseReports.splice(index, 1);
+      return { error: null };
+    }
+    return { error: 'Rapport non trouvé' };
+  }
+};
+
 // Service cessions
 export const demoCessionService = {
   async getAll() {
@@ -385,12 +680,20 @@ export const demoDashboardService = {
     await simulateNetworkDelay();
     
     const stats = {
-      total_vehicles: demoData.vehicles.length,
-      vehicles_in_repair: demoData.vehicles.filter(v => v.status === 'en_cours').length,
-      active_clients: demoData.clients.length,
-      pending_quotes: demoData.quotes.filter(q => q.status === 'en_attente').length,
-      monthly_revenue: demoData.invoices.reduce((sum, inv) => sum + inv.total_ttc, 0),
-      unpaid_invoices: demoData.invoices.filter(i => i.status === 'en_attente').length,
+      vehiclesInRepair: demoData.vehicles.filter(v => v.status === 'en_cours').length,
+      activeClients: demoData.clients.length,
+      pendingQuotes: demoData.quotes.filter(q => q.status === 'en_attente').length,
+      revenue: 15420.50,
+      revenueChange: '+12%',
+      revenueIsPositive: true,
+      clientsChange: '+8%',
+      clientsIsPositive: true,
+      carBodyRevenue: 9850.25,
+      carBodyChange: '+15%',
+      carBodyIsPositive: true,
+      mechanicRevenue: 5570.25,
+      mechanicChange: '+7%',
+      mechanicIsPositive: true
     };
     
     return { data: stats, error: null };
@@ -399,10 +702,53 @@ export const demoDashboardService = {
   async getRecentActivity() {
     await simulateNetworkDelay();
     
+    const now = new Date();
     const activities = [
-      { type: 'vehicle_added', description: 'Nouveau véhicule ajouté', date: new Date().toISOString() },
-      { type: 'quote_created', description: 'Devis créé pour Marie Martin', date: new Date().toISOString() },
-      { type: 'invoice_paid', description: 'Facture FAC-2024-001 payée', date: new Date().toISOString() },
+      {
+        id: 'activity-1',
+        icon: 'Car',
+        iconBackground: 'bg-purple-500',
+        title: 'Véhicule créé',
+        description: 'Renault Clio - AB-123-CD',
+        time: `${now.toLocaleDateString('fr-FR')} à ${now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+        timestamp: now.getTime()
+      },
+      {
+        id: 'activity-2',
+        icon: 'FileText',
+        iconBackground: 'bg-blue-500',
+        title: 'Devis créé',
+        description: 'Devis n°DEV-2024-001 - Marie Martin',
+        time: `${new Date(now.getTime() - 3600000).toLocaleDateString('fr-FR')} à ${new Date(now.getTime() - 3600000).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+        timestamp: now.getTime() - 3600000
+      },
+      {
+        id: 'activity-3',
+        icon: 'CreditCard',
+        iconBackground: 'bg-amber-500',
+        title: 'Paiement reçu',
+        description: 'Facture n°FAC-2024-001 - Pierre Durand (890,00 €)',
+        time: `${new Date(now.getTime() - 7200000).toLocaleDateString('fr-FR')} à ${new Date(now.getTime() - 7200000).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+        timestamp: now.getTime() - 7200000
+      },
+      {
+        id: 'activity-4',
+        icon: 'Wrench',
+        iconBackground: 'bg-orange-500',
+        title: 'Ordre de réparation créé',
+        description: 'Ordre n°ORD-2024-003 - Sophie Bernard',
+        time: `${new Date(now.getTime() - 10800000).toLocaleDateString('fr-FR')} à ${new Date(now.getTime() - 10800000).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+        timestamp: now.getTime() - 10800000
+      },
+      {
+        id: 'activity-5',
+        icon: 'User',
+        iconBackground: 'bg-green-500',
+        title: 'Nouveau client créé',
+        description: 'Antoine Petit',
+        time: `${new Date(now.getTime() - 14400000).toLocaleDateString('fr-FR')} à ${new Date(now.getTime() - 14400000).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+        timestamp: now.getTime() - 14400000
+      }
     ];
     
     return { data: activities, error: null };
@@ -421,6 +767,7 @@ export const demoService = {
   fleetVehicles: demoFleetVehicleService,
   fleetReservations: demoFleetReservationService,
   cessions: demoCessionService,
+  expertiseReports: demoExpertiseReportService,
   dashboard: demoDashboardService,
   subscription: demoSubscriptionService,
 };

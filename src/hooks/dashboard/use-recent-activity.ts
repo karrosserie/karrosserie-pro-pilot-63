@@ -12,14 +12,14 @@ import { demoService, DEMO_MODE } from '@/services/demoService';
 import { formatCurrency } from '@/lib/utils';
 
 export const useRecentActivity = () => {
-  const { vehicles } = useVehicles();
-  const { clients } = useClients();
-  const { invoices } = useInvoices();
-  const { quotes } = useQuotes();
-  const { orders: repairOrders } = useRepairOrders();
-  const { credits } = useCredits();
-  const { receipts } = useReceiptsData();
-  const { expenses } = useExpenses();
+  const { vehicles } = DEMO_MODE ? { vehicles: [] } : useVehicles();
+  const { clients } = DEMO_MODE ? { clients: [] } : useClients();
+  const { invoices } = DEMO_MODE ? { invoices: [] } : useInvoices();
+  const { quotes } = DEMO_MODE ? { quotes: [] } : useQuotes();
+  const { orders: repairOrders } = DEMO_MODE ? { orders: [] } : useRepairOrders();
+  const { credits } = DEMO_MODE ? { credits: [] } : useCredits();
+  const { receipts } = DEMO_MODE ? { receipts: [] } : useReceiptsData();
+  const { expenses } = DEMO_MODE ? { expenses: [] } : useExpenses();
 
   const { data: recentActivity } = useQuery({
     queryKey: ['recent-activity', quotes, clients, vehicles, receipts, invoices, repairOrders, credits, expenses],
@@ -340,8 +340,7 @@ export const useRecentActivity = () => {
         .sort((a, b) => b.timestamp - a.timestamp)
         .slice(0, 5);
     },
-    // Enlever la dépendance stricte aux expertiseReports qui causent l'erreur
-    enabled: !!quotes && !!clients && !!vehicles && !!receipts && !!invoices && !!repairOrders && !!credits && !!expenses
+    enabled: DEMO_MODE || (!!quotes && !!clients && !!vehicles && !!receipts && !!invoices && !!repairOrders && !!credits && !!expenses)
   });
 
   return { recentActivity };

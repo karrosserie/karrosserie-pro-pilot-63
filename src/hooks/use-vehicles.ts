@@ -117,6 +117,14 @@ export function useVehicles() {
 
   const createVehicle = useMutation({
     mutationFn: async (vehicleData: any) => {
+      if (DEMO_MODE) {
+        const { data, error } = await demoService.vehicles.create(vehicleData);
+        if (error) {
+          throw new Error(error);
+        }
+        return data;
+      }
+      
       const { data, error } = await supabase
         .from('vehicles')
         .insert([vehicleData])
@@ -153,6 +161,14 @@ export function useVehicles() {
 
   const updateVehicle = useMutation({
     mutationFn: async ({ id, data }: { id: string, data: any }) => {
+      if (DEMO_MODE) {
+        const { data: result, error } = await demoService.vehicles.update(id, data);
+        if (error) {
+          throw new Error(error);
+        }
+        return result;
+      }
+      
       const { data: result, error } = await supabase
         .from('vehicles')
         .update(data)
@@ -190,6 +206,14 @@ export function useVehicles() {
 
   const deleteVehicle = useMutation({
     mutationFn: async (id: string) => {
+      if (DEMO_MODE) {
+        const { error } = await demoService.vehicles.delete(id);
+        if (error) {
+          throw new Error(error);
+        }
+        return true;
+      }
+      
       const { error } = await supabase
         .from('vehicles')
         .delete()

@@ -2,14 +2,23 @@
 import { useQuery } from '@tanstack/react-query';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useClients } from '@/hooks/use-clients';
+import { DEMO_MODE, demoService } from '@/services/demoService';
 
 export const useRecentVehicles = () => {
-  const { vehicles } = useVehicles();
-  const { clients } = useClients();
+  const { vehicles } = DEMO_MODE ? { vehicles: [] } : useVehicles();
+  const { clients } = DEMO_MODE ? { clients: [] } : useClients();
 
   const { data: recentVehicles } = useQuery({
     queryKey: ['recent-vehicles', vehicles, clients],
     queryFn: () => {
+      if (DEMO_MODE) {
+        return [
+          { id: '1', brand: 'Renault', model: 'Clio', licensePlate: 'AB-123-CD', clientName: 'Marie Martin' },
+          { id: '2', brand: 'Peugeot', model: '308', licensePlate: 'EF-456-GH', clientName: 'Pierre Durand' },
+          { id: '3', brand: 'Volkswagen', model: 'Golf', licensePlate: 'IJ-789-KL', clientName: 'Sophie Bernard' }
+        ];
+      }
+      
       if (!vehicles) return [];
       
       return vehicles

@@ -5,7 +5,6 @@ import StatsCard from '@/components/dashboard/StatsCard';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { useDashboardData } from '@/hooks/use-dashboard-data';
 import VehicleDialog from '@/components/vehicle/VehicleDialog';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import ClientDialog from '@/components/client/ClientDialog';
@@ -15,7 +14,151 @@ import { useMobileDetection } from '@/hooks/use-mobile-detection';
 
 const Index = () => {
   const isMobile = useMobileDetection();
-  const { dashboardStats, recentVehicles, recentDocuments, recentActivity, isLoading } = useDashboardData();
+  
+  // Données statiques pour le dashboard
+  const dashboardStats = {
+    vehiclesInRepair: 8,
+    activeClients: 42,
+    pendingQuotes: 6,
+    revenue: 15420.50,
+    revenueChange: '+12%',
+    revenueIsPositive: true,
+    clientsChange: '+8%',
+    clientsIsPositive: true,
+    carBodyRevenue: 9850.25,
+    carBodyChange: '+15%',
+    carBodyIsPositive: true,
+    mechanicRevenue: 5570.25,
+    mechanicChange: '+7%',
+    mechanicIsPositive: true
+  };
+
+  const recentVehicles = [
+    {
+      id: '1',
+      model: 'Renault Clio',
+      licensePlate: 'AB-123-CD',
+      client: 'Marie Martin',
+      status: 'En cours',
+      lastUpdate: '2024-01-20',
+      vehicleData: {
+        id: '1',
+        brand: 'Renault',
+        model: 'Clio',
+        license_plate: 'AB-123-CD',
+        year: 2019,
+        client_id: 'client-1'
+      }
+    },
+    {
+      id: '2',
+      model: 'Peugeot 308',
+      licensePlate: 'EF-456-GH',
+      client: 'Pierre Durand',
+      status: 'Terminé',
+      lastUpdate: '2024-01-18',
+      vehicleData: {
+        id: '2',
+        brand: 'Peugeot',
+        model: '308',
+        license_plate: 'EF-456-GH',
+        year: 2020,
+        client_id: 'client-2'
+      }
+    },
+    {
+      id: '3',
+      model: 'Volkswagen Golf',
+      licensePlate: 'IJ-789-KL',
+      client: 'Sophie Bernard',
+      status: 'En attente',
+      lastUpdate: '2024-01-15',
+      vehicleData: {
+        id: '3',
+        brand: 'Volkswagen',
+        model: 'Golf',
+        license_plate: 'IJ-789-KL',
+        year: 2021,
+        client_id: 'client-3'
+      }
+    }
+  ];
+
+  const recentDocuments = [
+    {
+      id: '1',
+      type: 'invoice',
+      title: 'Facture FAC-2024-001',
+      description: 'Réparation carrosserie - Marie Martin',
+      date: '20/01/2024'
+    },
+    {
+      id: '2',
+      type: 'quote',
+      title: 'Devis DEV-2024-002',
+      description: 'Peinture complète - Pierre Durand',
+      date: '18/01/2024'
+    },
+    {
+      id: '3',
+      type: 'order',
+      title: 'Ordre ORD-2024-001',
+      description: 'Réparation structurelle - Sophie Bernard',
+      date: '15/01/2024'
+    },
+    {
+      id: '4',
+      type: 'expertise',
+      title: 'Expertise EXP-2024-001',
+      description: 'Évaluation dégâts - Antoine Petit',
+      date: '12/01/2024'
+    }
+  ];
+
+  const recentActivity = [
+    {
+      id: 'activity-1',
+      icon: 'Car',
+      iconBackground: 'bg-purple-500',
+      title: 'Véhicule créé',
+      description: 'Renault Clio - AB-123-CD',
+      time: '20/01/2024 à 10:30'
+    },
+    {
+      id: 'activity-2',
+      icon: 'FileText',
+      iconBackground: 'bg-blue-500',
+      title: 'Devis créé',
+      description: 'Devis n°DEV-2024-001 - Marie Martin',
+      time: '20/01/2024 à 09:15'
+    },
+    {
+      id: 'activity-3',
+      icon: 'CreditCard',
+      iconBackground: 'bg-amber-500',
+      title: 'Paiement reçu',
+      description: 'Facture n°FAC-2024-001 - Pierre Durand (890,00 €)',
+      time: '19/01/2024 à 14:20'
+    },
+    {
+      id: 'activity-4',
+      icon: 'Wrench',
+      iconBackground: 'bg-orange-500',
+      title: 'Ordre de réparation créé',
+      description: 'Ordre n°ORD-2024-003 - Sophie Bernard',
+      time: '18/01/2024 à 11:45'
+    },
+    {
+      id: 'activity-5',
+      icon: 'User',
+      iconBackground: 'bg-green-500',
+      title: 'Nouveau client créé',
+      description: 'Antoine Petit',
+      time: '17/01/2024 à 16:30'
+    }
+  ];
+
+  const isLoading = false;
   
   // États pour les dialogues
   const [isVehicleDialogOpen, setIsVehicleDialogOpen] = useState(false);

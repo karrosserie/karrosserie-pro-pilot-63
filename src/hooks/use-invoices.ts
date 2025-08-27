@@ -171,6 +171,12 @@ export function useInvoices() {
 
   const createInvoice = useMutation({
     mutationFn: async (invoiceData: any) => {
+      if (DEMO_MODE) {
+        const { data, error } = await demoService.invoices.create(invoiceData);
+        if (error) throw new Error(error);
+        return data;
+      }
+      
       if (!companyId) throw new Error('Company ID is required');
       
       const { data, error } = await supabase
@@ -200,6 +206,12 @@ export function useInvoices() {
 
   const updateInvoice = useMutation({
     mutationFn: async ({ id, data }: { id: string, data: any }) => {
+      if (DEMO_MODE) {
+        const { data: updatedData, error } = await demoService.invoices.update(id, data);
+        if (error) throw new Error(error);
+        return updatedData;
+      }
+      
       const { data: updatedData, error } = await supabase
         .from('invoices')
         .update(data)
@@ -229,6 +241,12 @@ export function useInvoices() {
 
   const deleteInvoice = useMutation({
     mutationFn: async (id: string) => {
+      if (DEMO_MODE) {
+        const { error } = await demoService.invoices.delete(id);
+        if (error) throw new Error(error);
+        return true;
+      }
+      
       const { error } = await supabase
         .from('invoices')
         .delete()

@@ -215,7 +215,7 @@ const IAChannelsBanner = () => {
 
                 <div className="space-y-4">
                   {relanceConfig.steps.map((step, index) => (
-                    <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                    <div key={`step-${step.day}-${index}`} className="border rounded-lg p-4 bg-gray-50">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
@@ -238,7 +238,7 @@ const IAChannelsBanner = () => {
                       
                       <div className="flex flex-wrap gap-2 mt-3">
                         {step.channels.map((channel, channelIndex) => (
-                          <div key={channelIndex} className="flex items-center gap-1 bg-white px-2 py-1 rounded border text-xs">
+                          <div key={`${step.day}-${channel}-${channelIndex}`} className="flex items-center gap-1 bg-white px-2 py-1 rounded border text-xs">
                             {getChannelIcon(channel)}
                             <span>{getChannelLabel(channel)}</span>
                           </div>
@@ -344,7 +344,7 @@ const IAChannelsBanner = () => {
             // Skeleton loading pour les cartes
             Array.from({ length: 6 }).map((_, index) => (
               <div
-                key={index}
+                key={`skeleton-${index}`}
                 className="flex items-center justify-between p-3 sm:p-4 border rounded-lg bg-gray-50 animate-pulse"
               >
                 <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
@@ -358,9 +358,9 @@ const IAChannelsBanner = () => {
               </div>
             ))
           ) : (
-            channels.map((channel, index) => (
+            channels.map((channel) => (
               <div
-                key={index}
+                key={channel.key}
                 className="flex items-center justify-between p-3 sm:p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer"
                 onClick={() => setSelectedChannel({name: channel.name, key: channel.key})}
               >

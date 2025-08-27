@@ -36,31 +36,20 @@ const QuoteDialog = ({
   // Déterminer si c'est une modification (devis existant avec ID)
   const isEditing = quote && quote.id;
 
-  console.log('🔧 QuoteDialog - Component render:', { 
-    isConversionFromReport, 
-    isEditing, 
-    prefillData: !!prefillData,
-    quote: !!quote 
-  });
-
   const handleSubmit = async (formData: Partial<Quote>) => {
     if (isSubmitting) return; // Prevent multiple submissions
     
     setIsSubmitting(true);
-    console.log('🔄 QuoteDialog - handleSubmit called', { isConversionFromReport, formData });
     
     try {
       let createdQuote;
       
       // Si c'est une modification d'un devis existant (quote avec un ID)
       if (quote && quote.id) {
-        console.log('📝 QuoteDialog - Updating existing quote:', quote.id);
         await updateQuote.mutateAsync({ id: quote.id, data: formData });
       } else {
         // Sinon c'est une création (nouveau devis ou conversion depuis rapport)
-        console.log('✨ QuoteDialog - Creating new quote');
         createdQuote = await createQuote.mutateAsync(formData as any);
-        console.log('✅ QuoteDialog - Quote created:', createdQuote);
       }
       
       onOpenChange(false);
@@ -68,18 +57,15 @@ const QuoteDialog = ({
       // Si c'est une conversion depuis un rapport d'expertise et qu'un devis a été créé,
       // rediriger vers la page des devis avec le devis ouvert
       if (isConversionFromReport && createdQuote) {
-        console.log('🚀 QuoteDialog - Redirecting to quote view:', createdQuote.id);
         setTimeout(() => {
           navigate(`/documents/devis?openQuote=${createdQuote.id}`);
         }, 100);
-      } else {
-        console.log('⚠️ QuoteDialog - No redirection:', { isConversionFromReport, createdQuote: !!createdQuote });
       }
       
       // Don't show toast here as it's already handled in the hooks
     } catch (error: any) {
       // Only show error toast here, success toasts are handled in hooks
-      console.error('❌ QuoteDialog - Dialog submission error:', error);
+      console.error('QuoteDialog - Dialog submission error:', error);
     } finally {
       setIsSubmitting(false);
     }
