@@ -14,6 +14,20 @@ export function useCompanyId() {
         return;
       }
 
+      // Check for admin impersonation first
+      const adminImpersonation = localStorage.getItem('admin_impersonation');
+      if (adminImpersonation) {
+        try {
+          const impersonationData = JSON.parse(adminImpersonation);
+          setCompanyId(impersonationData.company_id);
+          setIsLoading(false);
+          return;
+        } catch (error) {
+          console.error('Erreur lors du parsing des données d\'impersonation:', error);
+          // Continue with normal flow
+        }
+      }
+
       setIsLoading(true);
       try {
         const { data, error } = await supabase

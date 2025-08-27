@@ -41,17 +41,23 @@ export const companyService = {
       return null;
     }
 
+    return this.getCompanyInfoById(userCompany.company_id);
+  },
+
+  async getCompanyInfoById(companyId: string): Promise<CompanyInfo | null> {
+    console.log('Chargement des données entreprise pour companyId:', companyId);
+
     const { data, error } = await supabase
       .from('company_info')
       .select('*')
-      .eq('id', userCompany.company_id)
+      .eq('id', companyId)
       .single();
 
     if (error) {
       console.log('Erreur lors du chargement:', error);
       if (error.code === 'PGRST116') {
         // No rows found
-        console.log('Aucune donnée trouvée pour cet utilisateur');
+        console.log('Aucune donnée trouvée pour cette entreprise');
         return null;
       }
       throw new Error(error.message);
