@@ -92,12 +92,29 @@ const AdminAccounts = () => {
               status,
               tokens_remaining,
               tokens_used,
-              end_date,
-              subscription_plans(name)
+              start_date,
+              subscription_plans(name, billing_period)
             `)
             .eq('company_id', company.id)
             .eq('status', 'active')
+            .order('start_date', { ascending: false })
+            .limit(1)
             .single();
+
+          // Calculate end date based on start date and billing period
+          let calculatedEndDate = null;
+          if (subscriptionData?.start_date && subscriptionData?.subscription_plans?.billing_period) {
+            const startDate = new Date(subscriptionData.start_date);
+            const billingPeriod = subscriptionData.subscription_plans.billing_period;
+            
+            if (billingPeriod === 'monthly') {
+              calculatedEndDate = new Date(startDate.setMonth(startDate.getMonth() + 1));
+            } else if (billingPeriod === 'yearly') {
+              calculatedEndDate = new Date(startDate.setFullYear(startDate.getFullYear() + 1));
+            } else if (billingPeriod === 'trial') {
+              calculatedEndDate = new Date(startDate.setDate(startDate.getDate() + 30));
+            }
+          }
 
           return {
             ...company,
@@ -108,7 +125,7 @@ const AdminAccounts = () => {
               status: subscriptionData.status,
               tokens_remaining: subscriptionData.tokens_remaining,
               tokens_used: subscriptionData.tokens_used,
-              end_date: subscriptionData.end_date,
+              end_date: calculatedEndDate?.toISOString() || null,
             } : undefined
           };
         })
