@@ -100,16 +100,6 @@ const Auth = () => {
   return (
     <AuthContainer>
       {renderAuthForm()}
-      
-      {/* Lien temporaire pour l'administration */}
-      <div className="text-center mt-6">
-        <a 
-          href="/admin-create-users" 
-          className="inline-block px-4 py-2 text-sm font-medium text-white bg-karrosserie-orange hover:bg-karrosserie-orange/90 rounded-lg transition-colors shadow-md hover:shadow-lg"
-        >
-          🔧 Administration - Créer utilisateurs de test
-        </a>
-      </div>
     </AuthContainer>
   );
 };
