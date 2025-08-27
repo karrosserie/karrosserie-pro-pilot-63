@@ -38,10 +38,10 @@ export type NewFleetReservation = Database['public']['Tables']['fleet_reservatio
 export type UpdateFleetReservation = Database['public']['Tables']['fleet_reservations']['Update'];
 
 export const fleetReservationsService = {
-  getAll: async () => {
-    console.log('Fetching fleet reservations with relations');
+  getAll: async (companyId?: string) => {
+    console.log('Fetching fleet reservations with relations for company:', companyId);
     
-    const { data, error } = await supabase
+    let query = supabase
       .from('fleet_reservations')
       .select(`
         *,
@@ -61,6 +61,12 @@ export const fleetReservationsService = {
         )
       `)
       .order('created_at', { ascending: false });
+      
+    if (companyId) {
+      query = query.eq('company_id', companyId);
+    }
+    
+    const { data, error } = await query;
     
     if (error) {
       console.error('Error fetching fleet reservations:', error);

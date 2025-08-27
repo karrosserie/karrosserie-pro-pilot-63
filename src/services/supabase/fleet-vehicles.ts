@@ -41,10 +41,10 @@ export type UpdateFleetVehicle = Database['public']['Tables']['fleet_vehicles'][
 };
 
 export const fleetVehiclesService = {
-  getAll: async () => {
-    console.log('Fetching fleet vehicles with relations');
+  getAll: async (companyId?: string) => {
+    console.log('Fetching fleet vehicles with relations for company:', companyId);
     
-    const { data, error } = await supabase
+    let query = supabase
       .from('fleet_vehicles')
       .select(`
         id,
@@ -67,6 +67,12 @@ export const fleetVehiclesService = {
         car_models(id, name)
       `)
       .order('created_at', { ascending: false });
+      
+    if (companyId) {
+      query = query.eq('company_id', companyId);
+    }
+    
+    const { data, error } = await query;
     
     if (error) {
       console.error('Error fetching fleet vehicles:', error);

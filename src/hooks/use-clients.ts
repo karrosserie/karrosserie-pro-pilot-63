@@ -31,7 +31,7 @@ export function useClients() {
     queryKey: ['clients', companyId],
     queryFn: async () => {
       if (!companyId) return [];
-      const data = await clientsService.getAll();
+      const data = await clientsService.getAll(companyId);
       return data?.map(transformClientFromDB) || [];
     },
     enabled: !!companyId
