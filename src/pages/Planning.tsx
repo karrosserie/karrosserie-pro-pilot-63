@@ -16,6 +16,7 @@ import { useCompany } from '@/hooks/use-company';
 import { useEmployees, Employee } from '@/hooks/use-employees';
 import { EmployeesList } from '@/components/planning/EmployeesList';
 import TaskDetailsModal from '@/components/planning/TaskDetailsModal';
+import KarrosseriePlanning from '@/components/planning/KarrosseriePlanning';
 
 import { toast } from '@/hooks/use-toast';
 import { useCompanyId } from '@/hooks/use-company-id';
@@ -1158,6 +1159,20 @@ const Planning = () => {
                   iconBg="bg-orange-100"
                 />
               </div>
+            </div>
+
+            {/* Karrosserie Planning - Vue Interactive */}
+            <div className="space-y-4 w-full">
+              <KarrosseriePlanning
+                employees={employees || []}
+                vehicles={availableVehicles}
+                schedules={Object.values(allEmployeeSchedules).flat()}
+                onScheduleUpdate={(scheduleData) => {
+                  console.log('Schedule updated:', scheduleData);
+                  // Recharger les données après une mise à jour
+                  refreshAllData();
+                }}
+              />
             </div>
 
             {/* Planning détaillé */}
