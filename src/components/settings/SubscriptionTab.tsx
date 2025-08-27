@@ -138,6 +138,37 @@ const SubscriptionTab: React.FC = () => {
                 <p>Jetons restants</p>
                 <span className="font-bold text-primary">{tokensRemaining}</span>
               </div>
+
+              {/* Token Usage Breakdown */}
+              <div className="mb-4">
+                <h4 className="text-sm font-medium text-muted-foreground mb-2">Coût des opérations :</h4>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex justify-between">
+                    <span>📞 Téléphone</span>
+                    <span className="font-medium">3 jetons</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>📱 VMS</span>
+                    <span className="font-medium">3 jetons</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>💬 SMS</span>
+                    <span className="font-medium">1 jeton</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>📮 Courrier</span>
+                    <span className="font-medium">5 jetons</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>📧 Email</span>
+                    <span className="font-medium text-green-600">Gratuit</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>💼 Cession</span>
+                    <span className="font-medium">10 jetons</span>
+                  </div>
+                </div>
+              </div>
               
               <Dialog>
                 <DialogTrigger asChild>

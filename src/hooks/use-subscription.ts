@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { subscriptionService } from '@/services/supabase/subscriptions';
 import { useCompany } from './use-company';
 import { toast } from '@/hooks/use-toast';
+import { TOKEN_COSTS, TokenOperation, getTokenCost } from '@/config/token-costs';
 
 export const useSubscription = () => {
   const { companyData } = useCompany();
@@ -80,22 +81,23 @@ export const useSubscription = () => {
   // Consume tokens mutation
   const consumeTokensMutation = useMutation({
     mutationFn: ({ 
-      tokenCount, 
-      operationType, 
+      operation, 
       description 
     }: { 
-      tokenCount: number; 
-      operationType: string; 
+      operation: TokenOperation; 
       description?: string; 
     }) => {
       if (!companyData?.id || !companySubscription?.id) {
         throw new Error('No company or active subscription');
       }
+      
+      const tokenCost = getTokenCost(operation);
+      
       return subscriptionService.consumeTokens(
         companyData.id,
         companySubscription.id,
-        tokenCount,
-        operationType,
+        tokenCost,
+        operation,
         description
       );
     },
@@ -111,6 +113,22 @@ export const useSubscription = () => {
       });
     },
   });
+
+  // Helper function to check if user can perform operation
+  const canPerformOperation = (operation: TokenOperation): boolean => {
+    if (!companySubscription || companySubscription.status !== 'active') return false;
+    
+    const tokenCost = getTokenCost(operation);
+    if (tokenCost === 0) return true; // Free operations are always allowed
+    
+    return (companySubscription.tokens_remaining || 0) >= tokenCost;
+  };
+
+  // Helper function to get remaining tokens after operation
+  const getRemainingTokensAfterOperation = (operation: TokenOperation): number => {
+    const tokenCost = getTokenCost(operation);
+    return Math.max(0, (companySubscription?.tokens_remaining || 0) - tokenCost);
+  };
 
   return {
     // Data
@@ -156,5 +174,10 @@ export const useSubscription = () => {
       // Si c'est un plan payant actif
       return true;
     })(),
+    
+    // Token operation helpers
+    canPerformOperation,
+    getRemainingTokensAfterOperation,
+    TOKEN_COSTS,
   };
 };
