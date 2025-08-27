@@ -17,6 +17,7 @@ import { useEmployees, Employee } from '@/hooks/use-employees';
 import { EmployeesList } from '@/components/planning/EmployeesList';
 import TaskDetailsModal from '@/components/planning/TaskDetailsModal';
 import KarrosseriePlanning from '@/components/planning/KarrosseriePlanning';
+import { WorkshopPlanningInterface } from '@/components/planning/WorkshopPlanningInterface';
 
 import { toast } from '@/hooks/use-toast';
 import { useCompanyId } from '@/hooks/use-company-id';
@@ -1132,184 +1133,17 @@ const Planning = () => {
           </TabsContent>
 
           <TabsContent value="planning" className="space-y-6 w-full">
-            {/* Résumé de la semaine */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <BarChart className="w-5 h-5 text-muted-foreground" />
-                <h3 className="text-lg font-semibold">Résumé de la semaine</h3>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <StatsCard 
-                  title="Tâches totales" 
-                  value={14}
-                  icon={<CheckCircle className="h-8 w-8 text-blue-600" />}
-                  iconBg="bg-blue-100"
-                />
-                <StatsCard 
-                  title="Véhicules traités" 
-                  value={8}
-                  icon={<Car className="h-8 w-8 text-green-600" />}
-                  iconBg="bg-green-100"
-                />
-                <StatsCard 
-                  title="Techniciens mobilisés" 
-                  value={2}
-                  icon={<User className="h-8 w-8 text-orange-600" />}
-                  iconBg="bg-orange-100"
-                />
-              </div>
-            </div>
-
-            {/* Karrosserie Planning - Vue Interactive */}
-            <div className="space-y-4 w-full">
-              <KarrosseriePlanning
-                employees={employees || []}
-                vehicles={availableVehicles}
-                schedules={Object.values(allEmployeeSchedules).flat()}
-                onScheduleUpdate={(scheduleData) => {
-                  console.log('Schedule updated:', scheduleData);
-                  // Recharger les données après une mise à jour
-                  refreshAllData();
-                }}
-              />
-            </div>
-
-            {/* Planning détaillé */}
-            <div className="space-y-4 w-full flex-1">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-muted-foreground" />
-                  <h3 className="text-lg font-semibold">Planning détaillé</h3>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setCurrentWeekOffset(prev => prev - 1)}
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setCurrentWeekOffset(prev => prev + 1)}
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => setShowScheduleConfigModal(true)}>
-                    <Settings className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* Planning Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 w-full">
-                {(() => {
-                  const today = new Date();
-                  const weekDays = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-                  const dayNumbers = [1, 2, 3, 4, 5, 6, 0]; // Monday = 1, Sunday = 0
-                  
-                  // Get start of current week (Monday) with offset
-                  const currentDay = today.getDay();
-                  const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
-                  const monday = new Date(today);
-                  monday.setDate(today.getDate() + mondayOffset + (currentWeekOffset * 7));
-                  
-                  return weekDays.map((dayName, index) => {
-                    const currentDate = new Date(monday);
-                    currentDate.setDate(monday.getDate() + index);
-                    
-                     // Get schedules for this day from all employees
-                     const daySchedules = (employees?.flatMap(employee => {
-                       const employeeSchedules = allEmployeeSchedules[employee.id] || [];
-                       return employeeSchedules.filter(schedule => {
-                         const scheduleDate = new Date(schedule.start_datetime);
-                         return scheduleDate.toDateString() === currentDate.toDateString();
-                       }).map(schedule => ({
-                         ...schedule,
-                         employee,
-                         vehicle: schedule.vehicles
-                       }));
-                     }) || []).sort((a, b) => {
-                       // Trier par heure de début croissante
-                       const timeA = new Date(a.start_datetime).getTime();
-                       const timeB = new Date(b.start_datetime).getTime();
-                       return timeA - timeB;
-                     });
-                    
-                    // Filter workshop schedule for this day
-                    const dayOfWeekMap = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-                    const dayOfWeek = dayOfWeekMap[currentDate.getDay()];
-                    const workshopDay = workshopSchedules.find(ws => ws.day_of_week.toLowerCase() === dayOfWeek);
-                    
-                    // Don't render if day is closed
-                    if (!workshopDay?.enabled) {
-                      return null;
-                    }
-                    
-                    return (
-                      <Card key={dayName}>
-                         <CardHeader className="pb-3">
-                           <CardTitle className="text-lg flex items-center gap-2">
-                             <span className="text-orange-600">{dayName}</span>
-                             <span className="text-orange-600">-</span>
-                             <span className="text-orange-600">
-                               {currentDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
-                             </span>
-                           </CardTitle>
-                           <p className="text-sm text-muted-foreground">{daySchedules.length} tâche(s)</p>
-                         </CardHeader>
-                        <CardContent className="space-y-3">
-                          {daySchedules.length > 0 && (
-                            daySchedules.map((schedule, idx) => {
-                              const startTime = new Date(schedule.start_datetime);
-                              const endTime = new Date(schedule.end_datetime);
-                              return (
-                                <Card 
-                                  key={idx} 
-                                  className="border-l-4 border-l-orange-500 p-3 cursor-pointer hover:shadow-md transition-shadow"
-                                  onClick={() => {
-                                    setSelectedTask(schedule);
-                                    setShowTaskDetailsModal(true);
-                                  }}
-                                >
-                                  <div className="space-y-2">
-                                    <div className="flex items-center gap-2 text-sm text-orange-600">
-                                      <Clock className="w-3 h-3" />
-                                      {startTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}-
-                                      {endTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                                    </div>
-                                    <div className="font-semibold text-sm">{schedule.vehicle?.license_plate || 'N/A'}</div>
-                                    <div className="text-xs text-muted-foreground">
-                                      {schedule.vehicle?.car_brands?.name || ''} {schedule.vehicle?.car_models?.name || ''}
-                                    </div>
-                                    <div className="text-xs text-muted-foreground">{schedule.task_type}</div>
-                                    <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                      <User className="w-3 h-3" />
-                                      {schedule.employee?.user_companies?.profiles?.first_name && 
-                                       schedule.employee?.user_companies?.profiles?.last_name
-                                         ? `${schedule.employee.user_companies.profiles.first_name} ${schedule.employee.user_companies.profiles.last_name}`
-                                         : 'Employé'}
-                                    </div>
-                                    <div className="text-xs text-muted-foreground">
-                                      Client: {schedule.vehicle?.clients 
-                                        ? `${schedule.vehicle.clients.first_name || ''} ${schedule.vehicle.clients.last_name || ''}`.trim() 
-                                        : 'Client inconnu'}
-                                    </div>
-                                    <Badge className="bg-orange-100 text-orange-800 text-xs">{schedule.task_type}</Badge>
-                                  </div>
-                                </Card>
-                              );
-                             })
-                           )}
-                        </CardContent>
-                      </Card>
-                    );
-                  }).filter(Boolean); // Remove null values (closed days)
-                })()}
-              </div>
-            </div>
+            {/* Interface de Planning Karrosserie */}
+            <WorkshopPlanningInterface
+              employees={employees || []}
+              vehicles={availableVehicles}
+              schedules={Object.values(allEmployeeSchedules).flat()}
+              onScheduleUpdate={(scheduleData) => {
+                console.log('Schedule updated:', scheduleData);
+                // Recharger les données après une mise à jour
+                refreshAllData();
+              }}
+            />
           </TabsContent>
 
           <TabsContent value="employees" className="space-y-6">
