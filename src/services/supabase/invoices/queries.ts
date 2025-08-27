@@ -7,26 +7,12 @@ export const invoiceQueries = {
     console.log('=== DEBUT RÉCUPÉRATION FACTURES ===');
     console.log('Fetching invoices...');
     
-    // Définir explicitement la company_id en mode impersonation
+    // Gérer l'impersonation côté client
     const impersonationData = localStorage.getItem('admin_impersonation');
-    if (impersonationData) {
-      try {
-        const data = JSON.parse(impersonationData);
-        console.log('Using impersonation company_id for invoices:', data.company_id);
-        await supabase.rpc('set_config' as any, {
-          setting_name: 'app.impersonation_company_id',
-          setting_value: data.company_id,
-          is_local: true
-        });
-      } catch (error) {
-        console.error('Error setting impersonation config for invoices:', error);
-      }
-    }
+    let baseQuery = supabase.from('invoices');
     
     // First, try to get invoices with joins
-    const { data: invoicesWithJoins, error: joinError } = await supabase
-      .from('invoices')
-      .select(`
+    let query = baseQuery.select(`
         *,
         clients (
           id,
@@ -49,17 +35,37 @@ export const invoiceQueries = {
           id,
           reference
         )
-      `)
-      .order('created_at', { ascending: false });
+      `);
+    
+    if (impersonationData) {
+      try {
+        const data = JSON.parse(impersonationData);
+        console.log('Using impersonation company_id for invoices:', data.company_id);
+        // Filtrer par la company_id d'impersonation
+        query = query.eq('company_id', data.company_id);
+      } catch (error) {
+        console.error('Error parsing impersonation data for invoices:', error);
+      }
+    }
+    
+    const { data: invoicesWithJoins, error: joinError } = await query.order('created_at', { ascending: false });
 
     // If joins fail, fall back to basic query
     if (joinError) {
       console.log('Joins failed, falling back to basic query:', joinError);
       
-      const { data: basicInvoices, error: basicError } = await supabase
-        .from('invoices')
-        .select('*')
-        .order('created_at', { ascending: false });
+      let basicQuery = baseQuery.select('*');
+      
+      if (impersonationData) {
+        try {
+          const data = JSON.parse(impersonationData);
+          basicQuery = basicQuery.eq('company_id', data.company_id);
+        } catch (error) {
+          console.error('Error parsing impersonation data for basic invoices:', error);
+        }
+      }
+      
+      const { data: basicInvoices, error: basicError } = await basicQuery.order('created_at', { ascending: false });
 
       if (basicError) {
         console.error('Error fetching invoices (basic):', basicError);

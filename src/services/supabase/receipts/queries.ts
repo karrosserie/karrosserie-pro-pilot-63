@@ -6,25 +6,11 @@ export const receiptQueries = {
   getAll: async (): Promise<Receipt[]> => {
     console.log('Fetching receipts...');
     
-    // Définir explicitement la company_id en mode impersonation
+    // Gérer l'impersonation côté client
     const impersonationData = localStorage.getItem('admin_impersonation');
-    if (impersonationData) {
-      try {
-        const data = JSON.parse(impersonationData);
-        console.log('Using impersonation company_id for receipts:', data.company_id);
-        await supabase.rpc('set_config' as any, {
-          setting_name: 'app.impersonation_company_id',
-          setting_value: data.company_id,
-          is_local: true
-        });
-      } catch (error) {
-        console.error('Error setting impersonation config for receipts:', error);
-      }
-    }
+    let baseQuery = supabase.from('receipts');
     
-    const { data: receiptsWithJoins, error: joinError } = await supabase
-      .from('receipts')
-      .select(`
+    let query = baseQuery.select(`
         *,
         invoices (
           id,
@@ -32,16 +18,36 @@ export const receiptQueries = {
           amount,
           client_id
         )
-      `)
-      .order('created_at', { ascending: false });
+      `);
+    
+    if (impersonationData) {
+      try {
+        const data = JSON.parse(impersonationData);
+        console.log('Using impersonation company_id for receipts:', data.company_id);
+        // Filtrer par la company_id d'impersonation
+        query = query.eq('company_id', data.company_id);
+      } catch (error) {
+        console.error('Error parsing impersonation data for receipts:', error);
+      }
+    }
+    
+    const { data: receiptsWithJoins, error: joinError } = await query.order('created_at', { ascending: false });
 
     if (joinError) {
       console.log('Joins failed for receipts, falling back to basic query:', joinError);
       
-      const { data: basicReceipts, error: basicError } = await supabase
-        .from('receipts')
-        .select('*')
-        .order('created_at', { ascending: false });
+      let basicQuery = baseQuery.select('*');
+      
+      if (impersonationData) {
+        try {
+          const data = JSON.parse(impersonationData);
+          basicQuery = basicQuery.eq('company_id', data.company_id);
+        } catch (error) {
+          console.error('Error parsing impersonation data for basic receipts:', error);
+        }
+      }
+      
+      const { data: basicReceipts, error: basicError } = await basicQuery.order('created_at', { ascending: false });
 
       if (basicError) {
         console.error('Error fetching receipts (basic):', basicError);
