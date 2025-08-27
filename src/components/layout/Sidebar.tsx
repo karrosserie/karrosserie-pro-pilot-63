@@ -119,7 +119,6 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
   const navItems = [
     { icon: <Home className="app-icon" />, label: 'Tableau de bord', path: '/' },
     { icon: <Bot className="app-icon" />, label: 'Assistant IA', path: '/ai-assistant' },
-    ...(isAdmin ? [{ icon: <Shield className="app-icon" />, label: 'Accès aux comptes', path: '/admin/accounts' }] : []),
     { icon: <Users className="app-icon" />, label: 'Clients', path: '/clients' },
     { icon: <Car className="app-icon" />, label: 'Véhicules', path: '/vehicles' },
     { icon: <Calendar className="app-icon" />, label: 'Planning', path: '/planning' },
@@ -151,6 +150,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     { icon: <Clock className="app-icon" />, label: 'Véhicules de courtoisie', path: '/fleet' },
     { icon: <Receipt className="app-icon" />, label: 'Comptabilité', path: '/accounting' },
     { icon: <HelpCircle className="app-icon" />, label: 'Aide', path: '/help' },
+    ...(isAdmin ? [{ icon: <Shield className="app-icon" />, label: 'Accès aux comptes', path: '/admin/accounts' }] : []),
     { icon: <Settings className="app-icon" />, label: 'Paramètres', path: '/settings' },
   ];
 
