@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useImpersonation } from '@/hooks/use-impersonation';
 import MobileMenuButton from './navbar/MobileMenuButton';
 import SearchBar from './navbar/SearchBar';
 import NotificationsPanel from './navbar/NotificationsPanel';
@@ -18,6 +19,7 @@ const Navbar = ({ onToggleSidebar, isSidebarOpen = false }: NavbarProps) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const { user } = useAuth();
+  const { isImpersonating, impersonationData, exitImpersonation } = useImpersonation();
 
   // Données mockées pour les alertes
   const notifications = [
@@ -38,6 +40,19 @@ const Navbar = ({ onToggleSidebar, isSidebarOpen = false }: NavbarProps) => {
         </div>
 
         <div className="flex items-center space-x-1 sm:space-x-2">
+          {isImpersonating && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={exitImpersonation}
+              className="hidden sm:flex items-center gap-2 bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100"
+            >
+              <Shield className="h-4 w-4" />
+              <span className="hidden md:inline">Retour Admin</span>
+              <span className="md:hidden">Admin</span>
+            </Button>
+          )}
+          
           <Button 
             variant="ghost" 
             size="icon"

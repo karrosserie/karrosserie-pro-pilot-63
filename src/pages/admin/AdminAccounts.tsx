@@ -232,8 +232,13 @@ const AdminAccounts = () => {
 
       toast({
         title: "Connexion établie",
-        description: `Vous êtes maintenant connecté en tant que ${companyName}. Actualisez la page pour voir les données de cette carrosserie.`
+        description: `Redirection vers le dashboard de ${companyName}...`
       });
+
+      // Rediriger vers le dashboard
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1000);
     } catch (error) {
       console.error('Error impersonating:', error);
       toast({
