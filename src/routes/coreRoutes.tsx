@@ -1,6 +1,5 @@
 
 import { ProtectedRoute } from "@/components/router/ProtectedRoute";
-import { RoleProtectedRoute } from "@/components/router/RoleProtectedRoute";
 import AppLayout from "@/components/layout/AppLayout";
 import Index from "@/pages/Index";
 import Activity from "@/pages/Activity";
@@ -13,127 +12,127 @@ import Settings from "@/pages/Settings";
 import Accounting from "@/pages/Accounting";
 import Cessions from "@/pages/Cessions";
 import Help from "@/pages/Help";
-import Planning from "@/pages/Planning";
+import KarrosseriePlanningPage from "@/pages/KarrosseriePlanningPage";
 
 export const coreRoutes = [
   {
     path: "/",
     element: (
-      <RoleProtectedRoute>
+      <ProtectedRoute>
         <AppLayout>
           <Index />
         </AppLayout>
-      </RoleProtectedRoute>
+      </ProtectedRoute>
     )
   },
   {
     path: "/activity",
     element: (
-      <RoleProtectedRoute>
+      <ProtectedRoute>
         <AppLayout>
           <Activity />
         </AppLayout>
-      </RoleProtectedRoute>
+      </ProtectedRoute>
     )
   },
   {
     path: "/ai-assistant",
     element: (
-      <RoleProtectedRoute>
+      <ProtectedRoute>
         <AppLayout>
           <AIAssistant />
         </AppLayout>
-      </RoleProtectedRoute>
+      </ProtectedRoute>
     )
   },
   {
     path: "/profile",
     element: (
-      <RoleProtectedRoute>
+      <ProtectedRoute>
         <AppLayout>
           <Profile />
         </AppLayout>
-      </RoleProtectedRoute>
+      </ProtectedRoute>
     )
   },
   {
     path: "/clients",
     element: (
-      <RoleProtectedRoute>
+      <ProtectedRoute>
         <AppLayout>
           <Clients />
         </AppLayout>
-      </RoleProtectedRoute>
+      </ProtectedRoute>
     )
   },
   {
     path: "/vehicles",
     element: (
-      <RoleProtectedRoute>
+      <ProtectedRoute>
         <AppLayout>
           <Vehicles />
         </AppLayout>
-      </RoleProtectedRoute>
+      </ProtectedRoute>
     )
   },
   {
     path: "/fleet",
     element: (
-      <RoleProtectedRoute>
+      <ProtectedRoute>
         <AppLayout>
           <Fleet />
         </AppLayout>
-      </RoleProtectedRoute>
+      </ProtectedRoute>
     )
   },
   {
     path: "/accounting",
     element: (
-      <RoleProtectedRoute>
+      <ProtectedRoute>
         <AppLayout>
           <Accounting />
         </AppLayout>
-      </RoleProtectedRoute>
+      </ProtectedRoute>
     )
   },
   {
     path: "/cessions",
     element: (
-      <RoleProtectedRoute>
+      <ProtectedRoute>
         <AppLayout>
           <Cessions />
         </AppLayout>
-      </RoleProtectedRoute>
+      </ProtectedRoute>
     )
   },
   {
     path: "/settings",
     element: (
-      <RoleProtectedRoute>
+      <ProtectedRoute>
         <AppLayout>
           <Settings />
         </AppLayout>
-      </RoleProtectedRoute>
+      </ProtectedRoute>
     )
   },
   {
     path: "/help",
     element: (
-      <RoleProtectedRoute>
+      <ProtectedRoute>
         <AppLayout>
           <Help />
         </AppLayout>
-      </RoleProtectedRoute>
+      </ProtectedRoute>
     )
   },
   {
     path: "/planning",
     element: (
-      <RoleProtectedRoute>
+      <ProtectedRoute>
         <AppLayout>
-          <Planning />
+          <KarrosseriePlanningPage />
         </AppLayout>
-      </RoleProtectedRoute>
+      </ProtectedRoute>
     )
   }
 ];

@@ -2,24 +2,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fleetVehiclesService, NewFleetVehicle, UpdateFleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useToast } from '@/hooks/use-toast';
-import { useCompanyId } from '@/hooks/use-company-id';
 
 export function useFleetVehicles() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { companyId } = useCompanyId();
   
   const {
     data: vehicles,
     isLoading,
     error
   } = useQuery({
-    queryKey: ['fleetVehicles', companyId],
-    queryFn: async () => {
-      if (!companyId) return [];
-      return fleetVehiclesService.getAll(companyId);
-    },
-    enabled: !!companyId
+    queryKey: ['fleetVehicles'],
+    queryFn: fleetVehiclesService.getAll
   });
   
   const createVehicle = useMutation({

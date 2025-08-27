@@ -14,27 +14,6 @@ export function useCompanyId() {
         return;
       }
 
-      // Check for admin impersonation first
-      let adminImpersonation = null;
-      try {
-        adminImpersonation = localStorage.getItem('admin_impersonation');
-      } catch (error) {
-        console.warn('Unable to access localStorage:', error);
-        // Continue with normal flow if localStorage is not available
-      }
-      
-      if (adminImpersonation) {
-        try {
-          const impersonationData = JSON.parse(adminImpersonation);
-          setCompanyId(impersonationData.company_id);
-          setIsLoading(false);
-          return;
-        } catch (error) {
-          console.error('Erreur lors du parsing des données d\'impersonation:', error);
-          // Continue with normal flow
-        }
-      }
-
       setIsLoading(true);
       try {
         const { data, error } = await supabase

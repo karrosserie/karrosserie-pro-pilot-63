@@ -3,11 +3,9 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { companyService, CompanyInfo } from '@/services/supabase/company';
-import { useCompanyId } from '@/hooks/use-company-id';
 
 export function useCompany() {
   const { user } = useAuth();
-  const { companyId } = useCompanyId();
   const { toast } = useToast();
   const [companyData, setCompanyData] = useState<Partial<CompanyInfo>>({
     name: '',
@@ -31,14 +29,14 @@ export function useCompany() {
 
   useEffect(() => {
     const loadCompanyData = async () => {
-      if (!user || !companyId) {
+      if (!user) {
         return;
       }
       
       setIsLoading(true);
       
       try {
-        const data = await companyService.getCompanyInfoById(companyId);
+        const data = await companyService.getCompanyInfo(user.id);
         
         if (data) {
           setCompanyData(data);
@@ -56,7 +54,7 @@ export function useCompany() {
     };
 
     loadCompanyData();
-  }, [user?.id, companyId]);
+  }, [user?.id]);
 
   const saveCompanyData = async () => {
     if (!user) {

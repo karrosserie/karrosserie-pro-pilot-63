@@ -20,13 +20,9 @@ import {
   X,
   HelpCircle,
   Calendar,
-  Shield,
-  ArrowLeft
+  Shield
 } from 'lucide-react';
 import { useAdmin } from '@/hooks/use-admin';
-import { useUserRole } from '@/hooks/use-user-role';
-import { getFilteredNavItems } from '@/utils/role-permissions';
-import { Button } from '@/components/ui/button';
 
 interface SidebarProps {
   isMobile: boolean;
@@ -111,8 +107,7 @@ const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems
 
 const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
   const location = useLocation();
-  const { isAdmin, isImpersonating, impersonationData, exitImpersonation } = useAdmin();
-  const { role } = useUserRole();
+  const { isAdmin } = useAdmin();
   
   const isActivePath = (path: string): boolean => {
     if (path === '/') {
@@ -121,9 +116,10 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     return location.pathname.startsWith(path);
   };
 
-  const allNavItems = [
+  const navItems = [
     { icon: <Home className="app-icon" />, label: 'Tableau de bord', path: '/' },
     { icon: <Bot className="app-icon" />, label: 'Assistant IA', path: '/ai-assistant' },
+    ...(isAdmin ? [{ icon: <Shield className="app-icon" />, label: 'Accès aux comptes', path: '/admin/accounts' }] : []),
     { icon: <Users className="app-icon" />, label: 'Clients', path: '/clients' },
     { icon: <Car className="app-icon" />, label: 'Véhicules', path: '/vehicles' },
     { icon: <Calendar className="app-icon" />, label: 'Planning', path: '/planning' },
@@ -155,12 +151,8 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     { icon: <Clock className="app-icon" />, label: 'Véhicules de courtoisie', path: '/fleet' },
     { icon: <Receipt className="app-icon" />, label: 'Comptabilité', path: '/accounting' },
     { icon: <HelpCircle className="app-icon" />, label: 'Aide', path: '/help' },
-    ...(isAdmin ? [{ icon: <Shield className="app-icon" />, label: 'Accès aux comptes', path: '/admin/accounts' }] : []),
     { icon: <Settings className="app-icon" />, label: 'Paramètres', path: '/settings' },
   ];
-
-  // Filter navigation items based on user role
-  const navItems = getFilteredNavItems(role, allNavItems);
 
   const handleOverlayClick = () => {
     if (isMobile) {
@@ -202,29 +194,6 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
         </div>
         
         <div className="p-4 overflow-y-auto h-[calc(100vh-4rem)] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-          {/* Admin impersonation banner */}
-          {isImpersonating && impersonationData && (
-            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-medium text-amber-800">
-                  Mode Administrateur
-                </p>
-                <Button 
-                  size="sm" 
-                  variant="outline"
-                  onClick={exitImpersonation}
-                  className="h-6 px-2 py-1 text-xs border-amber-200 text-amber-700 hover:bg-amber-100"
-                >
-                  <ArrowLeft className="h-3 w-3 mr-1" />
-                  Retour Admin
-                </Button>
-              </div>
-              <p className="text-xs text-amber-700">
-                Connecté en tant que: <span className="font-medium">{impersonationData.company_name}</span>
-              </p>
-            </div>
-          )}
-          
           <nav className="space-y-1">
             {navItems.map((item, index) => (
               <NavItem

@@ -1,22 +1,19 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useCompanyId } from '@/hooks/use-company-id';
+import { getCurrentUserCompanyId } from '@/services/supabase/auth-company';
 
 export function useQuotes() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { companyId } = useCompanyId();
 
   const {
     data: quotes,
     isLoading,
     error
   } = useQuery({
-    queryKey: ['quotes', companyId],
+    queryKey: ['quotes'],
     queryFn: async () => {
-      if (!companyId) return [];
-      
       const { data, error } = await supabase
         .from('quotes')
         .select(`
@@ -30,7 +27,6 @@ export function useQuotes() {
           ),
           repair_orders!quote_id(id, reference)
         `)
-        .eq('company_id', companyId)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -39,15 +35,20 @@ export function useQuotes() {
       }
 
       return data;
-    },
-    enabled: !!companyId
+    }
   });
 
   const createQuote = useMutation({
     mutationFn: async (quoteData: any) => {
-      if (!companyId) {
-        throw new Error('Company ID is required');
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        console.error('Error getting current user:', userError);
+        throw new Error('User not authenticated');
       }
+
+      const companyId = await getCurrentUserCompanyId();
 
       // Add company_id automatically
       const quoteWithCompanyId = {
