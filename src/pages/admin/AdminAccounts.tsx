@@ -42,6 +42,7 @@ const AdminAccounts = () => {
   const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [newTokens, setNewTokens] = useState('');
   const [selectedPlan, setSelectedPlan] = useState('');
   const { toast } = useToast();
@@ -157,6 +158,7 @@ const AdminAccounts = () => {
 
       setEditingCompany(null);
       setNewTokens('');
+      setDialogOpen(false);
       fetchCompanies();
     } catch (error) {
       console.error('Error adding tokens:', error);
@@ -211,6 +213,7 @@ const AdminAccounts = () => {
 
       setEditingCompany(null);
       setSelectedPlan('');
+      setDialogOpen(false);
       fetchCompanies();
     } catch (error) {
       console.error('Error changing subscription:', error);
@@ -323,20 +326,19 @@ const AdminAccounts = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => {
-                              setEditingCompany(company);
-                              setSelectedPlan(company.subscription?.id || '');
-                            }}
-                          >
-                            <CreditCard className="h-4 w-4 mr-1" />
-                            Gérer
-                          </Button>
-                        </DialogTrigger>
+                      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setEditingCompany(company);
+                            setSelectedPlan(company.subscription?.id || '');
+                            setDialogOpen(true);
+                          }}
+                        >
+                          <CreditCard className="h-4 w-4 mr-1" />
+                          Gérer
+                        </Button>
                         <DialogContent>
                           <DialogHeader>
                             <DialogTitle>Gérer {company.name}</DialogTitle>
