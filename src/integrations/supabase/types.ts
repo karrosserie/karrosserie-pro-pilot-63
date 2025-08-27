@@ -390,7 +390,10 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          latitude: number | null
+          location_radius: number | null
           logo_url: string | null
+          longitude: number | null
           name: string
           notifications: Json
           oodrive_recipient_id: string | null
@@ -407,7 +410,10 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          latitude?: number | null
+          location_radius?: number | null
           logo_url?: string | null
+          longitude?: number | null
           name?: string
           notifications?: Json
           oodrive_recipient_id?: string | null
@@ -424,7 +430,10 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          latitude?: number | null
+          location_radius?: number | null
           logo_url?: string | null
+          longitude?: number | null
           name?: string
           notifications?: Json
           oodrive_recipient_id?: string | null
@@ -749,6 +758,8 @@ export type Database = {
       }
       employee_timesheets: {
         Row: {
+          clock_in_latitude: number | null
+          clock_in_longitude: number | null
           clock_in_time: string
           clock_out_time: string | null
           company_id: string
@@ -756,10 +767,13 @@ export type Database = {
           date: string
           employee_id: string
           id: string
+          location_verified: boolean | null
           total_work_minutes: number | null
           updated_at: string
         }
         Insert: {
+          clock_in_latitude?: number | null
+          clock_in_longitude?: number | null
           clock_in_time?: string
           clock_out_time?: string | null
           company_id: string
@@ -767,10 +781,13 @@ export type Database = {
           date?: string
           employee_id: string
           id?: string
+          location_verified?: boolean | null
           total_work_minutes?: number | null
           updated_at?: string
         }
         Update: {
+          clock_in_latitude?: number | null
+          clock_in_longitude?: number | null
           clock_in_time?: string
           clock_out_time?: string | null
           company_id?: string
@@ -778,6 +795,7 @@ export type Database = {
           date?: string
           employee_id?: string
           id?: string
+          location_verified?: boolean | null
           total_work_minutes?: number | null
           updated_at?: string
         }
@@ -2275,6 +2293,10 @@ export type Database = {
       }
       http_set_curlopt: {
         Args: { curlopt: string; value: string }
+        Returns: boolean
+      }
+      is_admin_impersonating: {
+        Args: Record<PropertyKey, never>
         Returns: boolean
       }
       text_to_bytea: {
