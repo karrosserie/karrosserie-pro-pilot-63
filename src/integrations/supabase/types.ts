@@ -2240,6 +2240,10 @@ export type Database = {
         Args: { data: string }
         Returns: string
       }
+      current_setting: {
+        Args: { setting_name: string }
+        Returns: string
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -2302,6 +2306,14 @@ export type Database = {
       is_admin_impersonating: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      set_config: {
+        Args: {
+          is_local?: boolean
+          setting_name: string
+          setting_value: string
+        }
+        Returns: undefined
       }
       text_to_bytea: {
         Args: { data: string }
