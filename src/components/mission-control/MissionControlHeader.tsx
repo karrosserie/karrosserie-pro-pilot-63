@@ -1,7 +1,15 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 
-const MissionControlHeader = () => {
+interface MissionControlHeaderProps {
+  selectedPeriod: 'today' | 'week' | 'month';
+  onPeriodChange: (period: 'today' | 'week' | 'month') => void;
+}
+
+const MissionControlHeader: React.FC<MissionControlHeaderProps> = ({ 
+  selectedPeriod, 
+  onPeriodChange 
+}) => {
   return (
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center gap-4">
@@ -12,21 +20,34 @@ const MissionControlHeader = () => {
         <div className="flex gap-2">
           <Button 
             size="sm" 
-            className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 h-7"
+            className={`text-xs px-3 py-1 h-7 ${
+              selectedPeriod === 'today' 
+                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+            }`}
+            onClick={() => onPeriodChange('today')}
           >
             Aujourd'hui
           </Button>
           <Button 
             size="sm" 
-            variant="outline" 
-            className="text-xs px-3 py-1 h-7"
+            className={`text-xs px-3 py-1 h-7 ${
+              selectedPeriod === 'week' 
+                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+            }`}
+            onClick={() => onPeriodChange('week')}
           >
             Semaine
           </Button>
           <Button 
             size="sm" 
-            variant="outline" 
-            className="text-xs px-3 py-1 h-7"
+            className={`text-xs px-3 py-1 h-7 ${
+              selectedPeriod === 'month' 
+                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+            }`}
+            onClick={() => onPeriodChange('month')}
           >
             Mois
           </Button>
