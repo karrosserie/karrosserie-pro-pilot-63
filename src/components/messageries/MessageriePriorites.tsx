@@ -319,7 +319,7 @@ export default function MessageriePriorites() {
                         </Button>
                         {it.priority !== 1 && (
                           <>
-                            <Button size="sm" variant="outline" onClick={() => handleAutoManage(it.id)}>
+                            <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => handleAutoManage(it.id)}>
                               Réponse auto
                             </Button>
                             <Button size="sm" variant="outline" onClick={() => handleSemiAuto(it.id)}>
@@ -486,7 +486,7 @@ export default function MessageriePriorites() {
                   </Button>
                   {selectedItem.priority !== 1 && (
                     <>
-                      <Button size="sm" variant="outline" onClick={() => { handleAutoManage(selectedItem.id); setSelectedItem(null); }}>
+                      <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => { handleAutoManage(selectedItem.id); setSelectedItem(null); }}>
                         Réponse auto
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => { handleSemiAuto(selectedItem.id); setSelectedItem(null); }}>
