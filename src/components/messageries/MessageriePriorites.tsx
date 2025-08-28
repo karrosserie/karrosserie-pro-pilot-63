@@ -314,7 +314,7 @@ export default function MessageriePriorites() {
                     </Button>
                     {!showResolved && (
                       <>
-                        <Button size="sm" variant="secondary" onClick={() => handleReply(it.id)}>
+                        <Button size="sm" className="bg-teal-500 hover:bg-teal-600 text-white" onClick={() => handleReply(it.id)}>
                           Répondre
                         </Button>
                         {it.priority !== 1 && (
