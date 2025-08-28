@@ -434,7 +434,10 @@ const AdminAccounts = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
-                      <Dialog>
+                      <Dialog 
+                        open={editingCompany?.id === company.id} 
+                        onOpenChange={(open) => !open && setEditingCompany(null)}
+                      >
                         <DialogTrigger asChild>
                           <Button 
                             variant="outline" 
