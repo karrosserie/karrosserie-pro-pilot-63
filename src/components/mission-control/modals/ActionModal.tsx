@@ -1214,6 +1214,1016 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
           </div>
         );
 
+      case 'ajuster_creneaux_maintenance':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary" />
+                Ajustement créneaux maintenance
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-card p-3 rounded border-l-4 border-l-karrosserie-orange">
+                  <div className="text-sm font-medium mb-1">Planning maintenance optimisé</div>
+                  <p className="text-xs text-muted-foreground">Éviter interruptions pendant heures de pointe</p>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="p-2 bg-accent rounded">
+                    <div className="flex justify-between">
+                      <span>Cabine peinture n°1 - Entretien ventilation:</span>
+                      <span className="font-medium text-green-600">Mardi 7h-9h</span>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-accent rounded">
+                    <div className="flex justify-between">
+                      <span>Marbre redressage - Calibrage:</span>
+                      <span className="font-medium text-green-600">Mercredi 18h-20h</span>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-accent rounded">
+                    <div className="flex justify-between">
+                      <span>Compresseur - Vidange + filtres:</span>
+                      <span className="font-medium text-green-600">Vendredi 12h-13h</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Valider nouveau planning
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Proposer alternatives
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'relancer_assureurs':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <Phone className="h-4 w-4 text-primary" />
+                Relances assureurs - Sinistres en cours
+              </h4>
+              <div className="space-y-3">
+                <div className="space-y-2 text-sm">
+                  <div className="p-2 bg-card rounded border-l-4 border-l-destructive">
+                    <div className="flex justify-between items-center">
+                      <span>MAIF - BMW X3 (Expertise en attente)</span>
+                      <span className="text-destructive font-medium">J+8</span>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded border-l-4 border-l-karrosserie-orange">
+                    <div className="flex justify-between items-center">
+                      <span>AXA - Peugeot 308 (Devis non validé)</span>
+                      <span className="text-karrosserie-orange font-medium">J+5</span>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded border-l-4 border-l-green-500">
+                    <div className="flex justify-between items-center">
+                      <span>GROUPAMA - Renault Clio (Accord obtenu)</span>
+                      <span className="text-green-600 font-medium">Validé</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Actions de relance</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  <span>Email automatique avec photos complémentaires</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  <span>Appel direct gestionnaire sinistre</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Transmission devis détaillé</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Lancer relances
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Programmer rappels
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'preparer_expertises':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <FileText className="h-4 w-4 text-primary" />
+                Préparation expertises - 3 véhicules
+              </h4>
+              <div className="space-y-3">
+                <div className="space-y-2 text-sm">
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-medium">Audi A4 - Expert MAIF</span>
+                      <span className="text-green-600 font-medium">Jeudi 14h</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      ✓ Photos prises ✓ Devis préparé ⏳ Nettoyage véhicule
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-medium">Mercedes Classe C - Expert AXA</span>
+                      <span className="text-karrosserie-orange font-medium">Vendredi 10h</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      ✓ Photos prises ⏳ Devis en cours ⏳ Démontage pièces
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-medium">Volkswagen Golf - Expert GROUPAMA</span>
+                      <span className="text-primary font-medium">Vendredi 16h</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      ✓ Photos prises ✓ Devis prêt ✓ Véhicule préparé
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Check-list expertise</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Photos détaillées prises:</span>
+                  <span className="text-green-600 font-medium">3/3 véhicules</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Devis détaillés:</span>
+                  <span className="text-karrosserie-orange font-medium">2/3 finalisés</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Véhicules nettoyés:</span>
+                  <span className="text-primary font-medium">En cours</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Finaliser préparations
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Vérifier planning
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'programmer_livraisons':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary" />
+                Planning livraisons - 8 véhicules prêts
+              </h4>
+              <div className="space-y-3">
+                <div className="space-y-2 text-sm">
+                  <div className="p-2 bg-green-50 rounded border border-green-200">
+                    <div className="flex justify-between items-center">
+                      <span>Mme MARTIN - Peugeot 308</span>
+                      <span className="text-green-600 font-medium">Lundi 9h ✓</span>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center">
+                      <span>M. DUPOND - BMW Série 3</span>
+                      <span className="text-primary font-medium">Lundi 14h</span>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center">
+                      <span>Mme BERNARD - Renault Clio</span>
+                      <span className="text-primary font-medium">Mardi 10h</span>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-karrosserie-orange/10 rounded border border-karrosserie-orange/20">
+                    <div className="flex justify-between items-center">
+                      <span>M. MICHEL - Audi A4 (+ 5 autres)</span>
+                      <span className="text-karrosserie-orange font-medium">À programmer</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Optimisation livraisons</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Créneaux disponibles:</span>
+                  <span className="font-medium text-green-600">12 slots cette semaine</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Préparation véhicules:</span>
+                  <span className="font-medium">2h par véhicule</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Taux confirmation RDV:</span>
+                  <span className="font-medium text-green-600">94%</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Optimiser planning
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Proposer créneaux
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'commander_stock_urgent':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <Package className="h-4 w-4 text-destructive" />
+                Commandes urgentes - 15 références critiques
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-destructive/10 p-3 rounded border border-destructive/20">
+                  <div className="text-sm font-medium text-destructive mb-1">Stock critique atteint</div>
+                  <p className="text-xs text-muted-foreground">Risque rupture sous 48h - Intervention immédiate</p>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center">
+                      <span>Peinture base RAL 9003 (blanc pur)</span>
+                      <span className="text-destructive font-medium">Stock: 0.5L</span>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center">
+                      <span>Optique avant Peugeot 308</span>
+                      <span className="text-destructive font-medium">Stock: 1 unité</span>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center">
+                      <span>Pare-choc avant BMW Série 3</span>
+                      <span className="text-destructive font-medium">Stock: 0</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Commande express</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Montant total commande:</span>
+                  <span className="font-medium text-destructive">6 847€ HT</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Délai livraison express:</span>
+                  <span className="font-medium text-green-600">24-48h</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Véhicules débloqués:</span>
+                  <span className="font-medium text-green-600">7 réparations</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                Commander maintenant
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Négocier délais
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'analyser_rentabilite':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <CreditCard className="h-4 w-4 text-primary" />
+                Analyse rentabilité mensuelle
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-card p-3 rounded">
+                  <div className="text-sm font-medium mb-2">Répartition CA par type de prestation</div>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-muted-foreground">Carrosserie:</span>
+                      <p className="font-medium text-green-600">78 450€ (55%)</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Peinture:</span>
+                      <p className="font-medium text-green-600">42 300€ (30%)</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Mécanique:</span>
+                      <p className="font-medium">15 680€ (11%)</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Expertise:</span>
+                      <p className="font-medium">5 570€ (4%)</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Marge moyenne carrosserie:</span>
+                    <span className="font-medium text-green-600">42%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Marge moyenne peinture:</span>
+                    <span className="font-medium text-green-600">38%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Coût main d'œuvre/h:</span>
+                    <span className="font-medium text-karrosserie-orange">67€ HT</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Recommandations IA</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <span>Augmenter tarif peinture de 5€/h (objectif 40%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Optimiser approvisionnement pièces (-3%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span>Former équipe prestations haute valeur</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Appliquer recommandations
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Rapport détaillé
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'negocier_contrats_assurance':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <CreditCard className="h-4 w-4 text-primary" />
+                Négociation contrats assureurs
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-card p-3 rounded">
+                  <div className="text-sm font-medium mb-2">Enjeux par assureur (CA annuel)</div>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex justify-between p-2 bg-accent rounded">
+                      <span>MAIF - 34% du CA total</span>
+                      <span className="font-medium text-green-600">48 200€</span>
+                    </div>
+                    <div className="flex justify-between p-2 bg-accent rounded">
+                      <span>AXA - 22% du CA total</span>
+                      <span className="font-medium text-green-600">31 100€</span>
+                    </div>
+                    <div className="flex justify-between p-2 bg-accent rounded">
+                      <span>GROUPAMA - 12% du CA total</span>
+                      <span className="font-medium">16 950€</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Points de négociation</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <span>Délais paiement : 30 jours au lieu de 45</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Tarifs préférentiels main d'œuvre (+8%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  <span>Ligne directe expertise (gain 48h)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span>Formation certifiante véhicules récents</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Programmer négociations
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Préparer dossier
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'programmer_formation_ve':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary" />
+                Formation véhicules électriques
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-accent p-3 rounded">
+                  <div className="text-sm font-medium mb-1">Certifications visées</div>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-green-600">✓ Tesla Service Center</span>
+                      <p className="text-muted-foreground">5 jours - 1 890€/pers</p>
+                    </div>
+                    <div>
+                      <span className="text-green-600">✓ BMW i Certified</span>
+                      <p className="text-muted-foreground">3 jours - 1 350€/pers</p>
+                    </div>
+                    <div>
+                      <span className="text-primary">◦ Renault Electric</span>
+                      <p className="text-muted-foreground">2 jours - 890€/pers</p>
+                    </div>
+                    <div>
+                      <span className="text-primary">◦ Peugeot e-Service</span>
+                      <p className="text-muted-foreground">2 jours - 790€/pers</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Carrossiers sélectionnés:</span>
+                    <span className="font-medium">Pierre, Marc, Julie, Thomas</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Coût total formation:</span>
+                    <span className="font-medium text-destructive">12 840€ TTC</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>ROI estimé:</span>
+                    <span className="font-medium text-green-600">14 mois</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Planning formation</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Tesla - Pierre & Marc:</span>
+                  <span className="font-medium text-green-600">Janvier 2025</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>BMW i - Julie & Thomas:</span>
+                  <span className="font-medium text-green-600">Février 2025</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Impact planning atelier:</span>
+                  <span className="font-medium text-karrosserie-orange">-15% pendant formation</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Valider formations
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Rechercher subventions
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'valider_investissement':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <CreditCard className="h-4 w-4 text-primary" />
+                Validation investissement équipements
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-card p-3 rounded">
+                  <div className="text-sm font-medium mb-2">Équipements prioritaires</div>
+                  <div className="space-y-2 text-xs">
+                    <div className="p-2 bg-accent rounded">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">Marbre redressage CELETTE</span>
+                        <span className="text-destructive font-medium">42 000€ HT</span>
+                      </div>
+                      <div className="text-muted-foreground">Remplacement urgent - Fin de vie atteinte</div>
+                    </div>
+                    <div className="p-2 bg-accent rounded">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">Station mixage peinture SATA</span>
+                        <span className="text-destructive font-medium">25 000€ HT</span>
+                      </div>
+                      <div className="text-muted-foreground">Amélioration précision couleur (+30%)</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Investissement total:</span>
+                    <span className="font-medium text-destructive">67 000€ HT</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Gain productivité estimé:</span>
+                    <span className="font-medium text-green-600">+15% (2 340€/mois)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Retour sur investissement:</span>
+                    <span className="font-medium text-green-600">24 mois</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Impact business</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <span>Réduction délais réparation : -20%</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Amélioration qualité finition</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span>Capacité véhicules haut de gamme</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Valider investissement
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Étaler paiement
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'contacter_clients_livraison':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <Phone className="h-4 w-4 text-primary" />
+                Contact clients pour livraisons
+              </h4>
+              <div className="space-y-3">
+                <div className="space-y-2 text-sm">
+                  <div className="p-2 bg-green-50 rounded border border-green-200">
+                    <div className="flex justify-between items-center">
+                      <span>M. DUPOND - BMW Série 3</span>
+                      <span className="text-green-600 font-medium">Confirmé lundi 14h</span>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center">
+                      <span>Mme BERNARD - Renault Clio</span>
+                      <span className="text-primary font-medium">À contacter</span>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center">
+                      <span>M. MICHEL - Audi A4</span>
+                      <span className="text-primary font-medium">À contacter</span>
+                    </div>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    + 3 autres clients à contacter
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Message type de contact</h4>
+              <div className="p-3 bg-card rounded border text-sm">
+                <p className="italic text-muted-foreground">
+                  "Bonjour [Client], votre véhicule est prêt ! Nous pouvons organiser la livraison dès [jour]. 
+                  Préférez-vous [matin/après-midi] ? Merci de nous confirmer votre disponibilité."
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Envoyer SMS groupés
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Appels individuels
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'negocier_delais_stock':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary" />
+                Négociation délais fournisseurs
+              </h4>
+              <div className="space-y-3">
+                <div className="space-y-2 text-sm">
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-medium">AUTODIS FRANCE</span>
+                      <span className="text-green-600 font-medium">24h confirmé</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Peinture + optiques - Relation privilégiée
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-medium">BMW PARTS CENTER</span>
+                      <span className="text-karrosserie-orange font-medium">72h (négociable)</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Pièces BMW - Commande groupée possible
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-medium">PEUGEOT PIECES</span>
+                      <span className="text-destructive font-medium">5j standard</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Express possible +15% - À négocier
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Leviers de négociation</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <span>Volume annuel : 45 000€ HT (argument fidélité)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Paiement comptant (remise 2%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  <span>Commandes groupées mensuelles</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Négocier maintenant
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Proposer partenariat
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'reviser_tarifs':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <CreditCard className="h-4 w-4 text-primary" />
+                Révision grille tarifaire 2025
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-card p-3 rounded">
+                  <div className="text-sm font-medium mb-2">Comparatif concurrence locale</div>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-muted-foreground">Carrosserie MARTIN:</span>
+                      <p className="font-medium">72€/h (+7%)</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">AUTO PRESTIGE:</span>
+                      <p className="font-medium">78€/h (+16%)</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Nos tarifs actuels:</span>
+                      <p className="font-medium text-green-600">67€/h (base)</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Marge objective:</span>
+                      <p className="font-medium text-karrosserie-orange">40% (vs 37%)</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Augmentation recommandée:</span>
+                    <span className="font-medium text-green-600">+5€/h (67€ → 72€)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Impact CA annuel:</span>
+                    <span className="font-medium text-green-600">+12 500€</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Risque perte clientèle:</span>
+                    <span className="font-medium text-green-600">Faible (2-3%)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Communication clients</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  <span>Email d'information 1 mois avant</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Justification : inflation, qualité service</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span>Tarif préférentiel clients fidèles</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Appliquer nouveaux tarifs
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Tester sur échantillon
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'etudier_concurrence':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <FileText className="h-4 w-4 text-primary" />
+                Étude concurrentielle locale
+              </h4>
+              <div className="space-y-3">
+                <div className="space-y-2 text-sm">
+                  <div className="p-2 bg-card rounded border-l-4 border-l-green-500">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-medium">CARROSSERIE MARTIN</span>
+                      <span className="text-green-600 font-medium">Concurrent principal</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      ✓ Tarifs similaires ✓ Qualité équivalente ⚠️ Délais +30%
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded border-l-4 border-l-karrosserie-orange">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-medium">AUTO PRESTIGE</span>
+                      <span className="text-karrosserie-orange font-medium">Haut de gamme</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      ⚠️ Tarifs +25% ✓ Équipements récents ✓ Clientèle premium
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded border-l-4 border-l-destructive">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-medium">RAPID CARROSS</span>
+                      <span className="text-destructive font-medium">Low cost</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      ⚠️ Tarifs -20% ⚠️ Qualité variable ✓ Délais courts
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Notre positionnement</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Avantage concurrentiel:</span>
+                  <span className="font-medium text-green-600">Rapport qualité/prix</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Point faible vs concurrence:</span>
+                  <span className="font-medium text-destructive">Communication digitale</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Opportunité identifiée:</span>
+                  <span className="font-medium text-green-600">Marché véhicules électriques</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Plan d'action concurrentiel
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Veille mensuelle
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'budgeter_equipements':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <Package className="h-4 w-4 text-primary" />
+                Budget équipements véhicules électriques
+              </h4>
+              <div className="space-y-3">
+                <div className="space-y-2 text-sm">
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-medium">Outillage isolation électrique</span>
+                      <span className="text-destructive font-medium">8 500€ HT</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Gants, tapis, outils isolés - Sécurité obligatoire
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-medium">Station diagnostic VE/Hybride</span>
+                      <span className="text-destructive font-medium">15 200€ HT</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Valises multi-marques Tesla, BMW, Audi, Mercedes
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-medium">Pont élévateur isolé</span>
+                      <span className="text-destructive font-medium">12 800€ HT</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Spécial VE - Isolation batteries hautes tensions
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">ROI et financement</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Investissement total:</span>
+                  <span className="font-medium text-destructive">36 500€ HT</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>CA additionnel VE estimé:</span>
+                  <span className="font-medium text-green-600">+28k€/an</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Retour sur investissement:</span>
+                  <span className="font-medium text-green-600">18 mois</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Valider budget
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Rechercher subventions
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'etudier_financement':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <CreditCard className="h-4 w-4 text-primary" />
+                Options de financement équipements
+              </h4>
+              <div className="space-y-3">
+                <div className="space-y-2 text-sm">
+                  <div className="p-2 bg-card rounded border border-green-200">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-medium">Crédit-bail professionnel</span>
+                      <span className="text-green-600 font-medium">Recommandé</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      48 mois - 1 580€/mois - Option rachat 8% VN
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-medium">Prêt équipement BNP</span>
+                      <span className="text-primary font-medium">Alternative</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      60 mois - 1 290€/mois - Taux 4.2% - Propriété immédiate
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-medium">Autofinancement</span>
+                      <span className="text-karrosserie-orange font-medium">Possible</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      67k€ - Trésorerie actuelle : 89k€ - Reste 22k€
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Avantages fiscaux</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <span>Amortissement dégressif possible</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Crédit d'impôt modernisation (15%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span>Economies IS : -10 050€ la 1ère année</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Choisir crédit-bail
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Comparer offres
+              </Button>
+            </div>
+          </div>
+        );
+
       default:
         return (
           <div className="text-center py-8">
