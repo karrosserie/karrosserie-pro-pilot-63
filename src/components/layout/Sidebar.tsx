@@ -123,10 +123,10 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
   const allNavItems = [
     { icon: <Home className="app-icon" />, label: 'Tableau de bord', path: '/' },
     { icon: <Bot className="app-icon" />, label: 'Assistant IA', path: '/ai-assistant' },
+    { icon: <MessageSquare className="app-icon" />, label: 'Messageries', path: '/messageries' },
     { icon: <Users className="app-icon" />, label: 'Clients', path: '/clients' },
     { icon: <Car className="app-icon" />, label: 'Véhicules', path: '/vehicles' },
     { icon: <Calendar className="app-icon" />, label: 'Planning', path: '/planning' },
-    { icon: <MessageSquare className="app-icon" />, label: 'Messageries', path: '/messageries' },
     { 
       icon: <FileText className="app-icon" />, 
       label: 'Documents', 
