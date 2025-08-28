@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import ActionModal from './modals/ActionModal';
 import { 
   Cloud, 
   CreditCard, 
@@ -11,12 +12,18 @@ import {
   Users,
   Eye,
   Package,
-  Wrench
+  Wrench,
+  Building2,
+  Calculator,
+  Shield,
+  Truck,
+  Banknote,
+  FileText
 } from 'lucide-react';
 
 interface AlertCardProps {
   type: 'critical' | 'important';
-  icon: 'weather' | 'payment' | 'power' | 'cooling';
+  icon: 'weather' | 'payment' | 'power' | 'cooling' | 'finance' | 'accounting' | 'insurance' | 'supplier' | 'bank' | 'administration';
   title: string;
   subtitle?: string;
   description: string;
@@ -31,6 +38,8 @@ interface AlertCardProps {
     label: string;
     variant: 'primary' | 'secondary' | 'outline';
     icon?: React.ReactNode;
+    modalType?: string;
+    modalData?: any;
   }>;
   className?: string;
 }
@@ -41,6 +50,12 @@ const getIcon = (iconType: string) => {
     case 'payment': return <CreditCard className="h-5 w-5" />;
     case 'power': return <Zap className="h-5 w-5" />;
     case 'cooling': return <Snowflake className="h-5 w-5" />;
+    case 'finance': return <Building2 className="h-5 w-5" />;
+    case 'accounting': return <Calculator className="h-5 w-5" />;
+    case 'insurance': return <Shield className="h-5 w-5" />;
+    case 'supplier': return <Truck className="h-5 w-5" />;
+    case 'bank': return <Banknote className="h-5 w-5" />;
+    case 'administration': return <FileText className="h-5 w-5" />;
     default: return <Cloud className="h-5 w-5" />;
   }
 };
@@ -57,6 +72,29 @@ const AlertCard: React.FC<AlertCardProps> = ({
   actions,
   className = ""
 }) => {
+  const [activeModal, setActiveModal] = useState<{
+    isOpen: boolean;
+    modalType: string;
+    modalData: any;
+  }>({
+    isOpen: false,
+    modalType: '',
+    modalData: null
+  });
+
+  const handleActionClick = (action: any) => {
+    if (action.modalType) {
+      setActiveModal({
+        isOpen: true,
+        modalType: action.modalType,
+        modalData: action.modalData || { title: action.label }
+      });
+    }
+  };
+
+  const closeModal = () => {
+    setActiveModal({ isOpen: false, modalType: '', modalData: null });
+  };
   const isImportant = type === 'important';
   const isCritical = type === 'critical';
   
@@ -121,11 +159,12 @@ const AlertCard: React.FC<AlertCardProps> = ({
               key={index}
               size="sm"
               variant={action.variant === 'primary' ? 'default' : action.variant === 'secondary' ? 'secondary' : 'outline'}
+              onClick={() => handleActionClick(action)}
               className={`text-xs h-8 ${
                 action.variant === 'primary' 
-                  ? 'bg-gray-900 hover:bg-gray-800 text-white' 
+                  ? 'bg-primary hover:bg-primary/90 text-primary-foreground' 
                   : action.variant === 'secondary'
-                  ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                  ? 'bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white'
                   : ''
               }`}
             >
@@ -135,6 +174,13 @@ const AlertCard: React.FC<AlertCardProps> = ({
           ))}
         </div>
       </CardContent>
+
+      <ActionModal
+        isOpen={activeModal.isOpen}
+        onClose={closeModal}
+        actionType={activeModal.modalType}
+        modalData={activeModal.modalData}
+      />
     </Card>
   );
 };
