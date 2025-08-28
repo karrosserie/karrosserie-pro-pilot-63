@@ -42,7 +42,7 @@ const addMemberSchema = z.object({
     return isValidPhoneNumber(phone);
   }, "Veuillez entrer un numéro de téléphone valide"),
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
-  role: z.enum(['Propriétaire', 'Responsable', 'Gestionnaire de réservation', 'Gestionnaire d\'inventaire']),
+  role: z.enum(['carrossier', 'carrossier-vehicule de courtoisie', 'responsable', 'responsable administratif']),
   active: z.boolean().default(true)
 });
 
@@ -57,7 +57,7 @@ const editMemberSchema = z.object({
     if (!phone) return false;
     return isValidPhoneNumber(phone);
   }, "Veuillez entrer un numéro de téléphone valide"),
-  role: z.enum(['Propriétaire', 'Responsable', 'Gestionnaire de réservation', 'Gestionnaire d\'inventaire']),
+  role: z.enum(['carrossier', 'carrossier-vehicule de courtoisie', 'responsable', 'responsable administratif']),
   active: z.boolean()
 });
 
@@ -82,7 +82,7 @@ const TeamTab = () => {
       email: "",
       phoneNumber: "",
       password: "",
-      role: "Responsable",
+      role: "carrossier",
       active: true
     }
   });
@@ -94,7 +94,7 @@ const TeamTab = () => {
       lastName: "",
       email: "",
       phoneNumber: "",
-      role: "Responsable",
+      role: "carrossier",
       active: true
     }
   });
@@ -316,7 +316,7 @@ const TeamTab = () => {
       lastName: member.profiles?.last_name || '',
       email: member.profiles?.email || '',
       phoneNumber: member.profiles?.phone_number || '',
-      role: member.role as 'Propriétaire' | 'Responsable' | 'Gestionnaire de réservation' | 'Gestionnaire d\'inventaire',
+      role: member.role as 'carrossier' | 'carrossier-vehicule de courtoisie' | 'responsable' | 'responsable administratif',
       active: member.active
     });
     setIsEditDialogOpen(true);
@@ -325,9 +325,10 @@ const TeamTab = () => {
   const getRoleIcon = (role: string) => {
     switch (role) {
       case 'Propriétaire': return <Crown className="h-4 w-4" />;
-      case 'Responsable': return <Users className="h-4 w-4" />;
-      case 'Gestionnaire de réservation': return <User className="h-4 w-4" />;
-      case 'Gestionnaire d\'inventaire': return <User className="h-4 w-4" />;
+      case 'carrossier': return <User className="h-4 w-4" />;
+      case 'carrossier-vehicule de courtoisie': return <User className="h-4 w-4" />;
+      case 'responsable': return <Users className="h-4 w-4" />;
+      case 'responsable administratif': return <Users className="h-4 w-4" />;
       default: return <User className="h-4 w-4" />;
     }
   };
@@ -461,9 +462,10 @@ const TeamTab = () => {
                           {...field}
                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
                         >
-                          <option value="Responsable">Responsable</option>
-                          <option value="Gestionnaire de réservation">Gestionnaire de réservation</option>
-                          <option value="Gestionnaire d'inventaire">Gestionnaire d'inventaire</option>
+                          <option value="carrossier">Carrossier</option>
+                          <option value="carrossier-vehicule de courtoisie">Carrossier-véhicule de courtoisie</option>
+                          <option value="responsable">Responsable</option>
+                          <option value="responsable administratif">Responsable administratif</option>
                         </select>
                       </FormControl>
                       <FormMessage />
@@ -657,9 +659,10 @@ const TeamTab = () => {
                            {...field}
                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
                          >
-                           <option value="Responsable">Responsable</option>
-                           <option value="Gestionnaire de réservation">Gestionnaire de réservation</option>
-                           <option value="Gestionnaire d'inventaire">Gestionnaire d'inventaire</option>
+                           <option value="carrossier">Carrossier</option>
+                           <option value="carrossier-vehicule de courtoisie">Carrossier-véhicule de courtoisie</option>
+                           <option value="responsable">Responsable</option>
+                           <option value="responsable administratif">Responsable administratif</option>
                          </select>
                       </FormControl>
                       <FormMessage />
