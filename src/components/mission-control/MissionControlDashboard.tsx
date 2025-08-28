@@ -15,302 +15,155 @@ const MissionControlDashboard = () => {
   const getMissionsForPeriod = (period: 'today' | 'week' | 'month', mode: string) => {
     const allMissions = {
       today: [
-        // Clientèle Financière
-        {
-          type: 'critical' as const,
-          icon: 'finance' as const,
-          title: 'Audit fiscal urgent - FINANCIERE OCCITANE',
-          subtitle: 'Contrôle fiscal URSSAF - Documentation manquante',
-          description: 'Contrôle fiscal en cours - Documents comptables demandés sous 48h',
-          impact: 'Risque de redressement fiscal - Pénalités possibles 15 000€',
-          suggestion: 'Extraction automatique des pièces comptables + accompagnement expert-comptable',
-          metrics: [
-            { value: '48h', label: 'Délai réponse', unit: '' },
-            { value: '15k€', label: 'Risque pénalités', unit: '' },
-            { value: '847', label: 'Pièces à fournir', unit: '' }
-          ],
-          actions: [
-            { 
-              label: 'Générer dossier fiscal', 
-              variant: 'primary' as const, 
-              modalType: 'audit_fiscal',
-              modalData: { title: 'Générer dossier fiscal', client: 'FINANCIERE OCCITANE' }
-            },
-            { 
-              label: 'Contacter expert-comptable', 
-              variant: 'secondary' as const, 
-              modalType: 'contact_expert',
-              modalData: { title: 'Contacter expert-comptable' }
-            }
-          ],
-          modes: ['super_admin', 'finance']
-        },
-        // Clientèle Comptable
-        {
-          type: 'critical' as const,
-          icon: 'accounting' as const,
-          title: 'Clôture mensuelle bloquée - COMPTA+',
-          subtitle: 'Écritures en suspens - Balance déséquilibrée',
-          description: 'Clôture comptable impossible - Écart de 2 847€ non identifié',
-          impact: 'Retard déclaration TVA - Risque pénalités client final',
-          suggestion: 'Analyse automatique des écarts + correction proposée par IA comptable',
-          metrics: [
-            { value: '2.8k€', label: 'Écart détecté', unit: '' },
-            { value: '156', label: 'Écritures suspens', unit: '' },
-            { value: '3j', label: 'Retard clôture', unit: '' }
-          ],
-          actions: [
-            { 
-              label: 'Analyser les écarts', 
-              variant: 'primary' as const,
-              modalType: 'analyser_ecarts',
-              modalData: { title: 'Analyse des écarts comptables', montant: '2 847€' }
-            },
-            { 
-              label: 'Lettrage automatique', 
-              variant: 'outline' as const,
-              modalType: 'lettrage_auto',
-              modalData: { title: 'Lettrage automatique' }
-            }
-          ],
-          modes: ['super_admin', 'finance']
-        },
-        // Clientèle Assurance  
-        {
-          type: 'important' as const,
-          icon: 'insurance' as const,
-          title: 'Déclaration sinistre - ASSUR+ CONSEIL',
-          subtitle: 'Sinistre dégât des eaux - Expertise demandée',
-          description: 'Dégât des eaux bureaux client - Dossier à constituer pour assureur',
-          impact: 'Interruption activité client - Perte exploitation estimée 8 500€/jour',
-          suggestion: 'Constitution automatique dossier sinistre + mise en relation expert',
-          metrics: [
-            { value: '8.5k€', label: 'Perte/jour', unit: '' },
-            { value: '72h', label: 'Délai déclaration', unit: '' },
-            { value: '95%', label: 'Chance prise charge', unit: '' }
-          ],
-          actions: [
-            { 
-              label: 'Constituer dossier', 
-              variant: 'primary' as const,
-              modalType: 'dossier_sinistre',
-              modalData: { title: 'Constitution dossier sinistre', type: 'Dégât des eaux' }
-            },
-            { 
-              label: 'Contacter expert', 
-              variant: 'secondary' as const,
-              modalType: 'contact_expert_assurance',
-              modalData: { title: 'Contacter expert assurance' }
-            }
-          ],
-          modes: ['super_admin', 'finance']
-        },
-        // Fournisseur
-        {
-          type: 'critical' as const,
-          icon: 'supplier' as const,
-          title: 'Rupture stock critique - FOURNI-TECH',
-          subtitle: 'Pièce essentielle en rupture - Production bloquée',
-          description: 'Composant électronique critique en rupture - Arrêt production client',
-          impact: 'Arrêt ligne production - Pénalité retard 12 000€/jour',
-          suggestion: 'Sourcing alternatif identifié + livraison express 24h disponible',
-          metrics: [
-            { value: '24h', label: 'Délai fournisseur alternatif', unit: '' },
-            { value: '12k€', label: 'Pénalité/jour', unit: '' },
-            { value: '3', label: 'Fournisseurs alternatifs', unit: '' }
-          ],
-          actions: [
-            { 
-              label: 'Commander express', 
-              variant: 'primary' as const,
-              modalType: 'commande_express',
-              modalData: { title: 'Commande express', fournisseur: 'FOURNI-TECH' }
-            },
-            { 
-              label: 'Négocier délais', 
-              variant: 'outline' as const,
-              modalType: 'negocier_delais',
-              modalData: { title: 'Négociation délais' }
-            }
-          ],
-          modes: ['super_admin', 'ouvrier']
-        },
-        // Banque
-        {
-          type: 'critical' as const,
-          icon: 'bank' as const,
-          title: 'Découvert autorisé dépassé - CREDIT MUTUEL',
-          subtitle: 'Solde: -25 847€ - Autorisation: 20 000€',
-          description: 'Dépassement découvert autorisé - Agios majorés depuis 3 jours',
-          impact: 'Frais bancaires majorés 89€/jour + risque rejet prélèvements',
-          suggestion: 'Virement d\'urgence recommandé + négociation extension découvert',
-          metrics: [
-            { value: '5.8k€', label: 'Dépassement', unit: '' },
-            { value: '89€', label: 'Agios/jour', unit: '' },
-            { value: '3j', label: 'Durée dépassement', unit: '' }
-          ],
-          actions: [
-            { 
-              label: 'Virement d\'urgence', 
-              variant: 'primary' as const,
-              modalType: 'virement_urgence',
-              modalData: { title: 'Virement d\'urgence', montant: '5 847€' }
-            },
-            { 
-              label: 'Négocier découvert', 
-              variant: 'secondary' as const,
-              modalType: 'negocier_decouvert',
-              modalData: { title: 'Négocier découvert' }
-            }
-          ],
-          modes: ['super_admin', 'finance']
-        },
-        // Administration
-        {
-          type: 'important' as const,
-          icon: 'administration' as const,
-          title: 'Déclaration URSSAF échéance demain',
-          subtitle: 'DSN mensuelle + cotisations sociales',
-          description: 'Déclaration sociale nominative à transmettre avant 15h demain',
-          impact: 'Pénalités 0.40% par mois de retard + majoration 10%',
-          suggestion: 'Transmission automatique activée + vérification données paie',
-          metrics: [
-            { value: '15h', label: 'Échéance demain', unit: '' },
-            { value: '847€', label: 'Montant cotisations', unit: '' },
-            { value: '0.40%', label: 'Pénalité retard/mois', unit: '' }
-          ],
-          actions: [
-            { 
-              label: 'Transmettre DSN', 
-              variant: 'primary' as const,
-              modalType: 'transmettre_dsn',
-              modalData: { title: 'Transmission DSN', echeance: 'Demain 15h' }
-            },
-            { 
-              label: 'Vérifier données', 
-              variant: 'outline' as const,
-              modalType: 'verifier_donnees',
-              modalData: { title: 'Vérification données paie' }
-            }
-          ],
-          modes: ['super_admin', 'finance']
-        },
+        // Alerte météo pour peinture extérieure
         {
           type: 'critical' as const,
           icon: 'weather' as const,
-          title: 'Alerte météo critique',
-          description: 'Pluie intense jeudi : 3 chantiers extérieurs impactés',
-          impact: 'Risque de retard 2-3 jours sur projets prioritaires',
-          suggestion: 'Replanification automatique recommandée - Optimisation par IA',
+          title: 'Alerte météo critique - Peinture extérieure',
+          subtitle: 'Pluie prévue demain - 4 véhicules en cours de peinture',
+          description: 'Risque de défauts de peinture si exposition à l\'humidité',
+          impact: 'Reprise complète peinture = 2 jours supplémentaires par véhicule',
+          suggestion: 'Mise à l\'abri immédiate + accélération séchage avec étuves',
           metrics: [
-            { value: '85', label: 'Probabilité pluie', unit: '%' },
-            { value: '3', label: 'Chantiers impactés', unit: '' },
-            { value: '48h', label: 'Fenêtre optimale', unit: '' }
+            { value: '85%', label: 'Probabilité pluie', unit: '' },
+            { value: '4', label: 'Véhicules exposés', unit: '' },
+            { value: '2h', label: 'Temps pour mise à l\'abri', unit: '' }
           ],
           actions: [
             { 
-              label: 'Replanifier maintenant', 
+              label: 'Mettre à l\'abri maintenant', 
               variant: 'primary' as const,
-              modalType: 'replanifier_meteo',
-              modalData: { title: 'Replanification météo', chantiers: 3 }
+              modalType: 'mise_abri_vehicules',
+              modalData: { title: 'Mise à l\'abri véhicules', vehicules: 4 }
             },
             { 
-              label: 'Voir alternatives', 
+              label: 'Programmer étuvage', 
               variant: 'outline' as const, 
-              icon: <Eye className="h-3 w-3" />,
-              modalType: 'alternatives_meteo',
-              modalData: { title: 'Alternatives météo' }
+              modalType: 'programmer_etuvage',
+              modalData: { title: 'Programmation étuvage' }
             }
           ],
-          modes: ['super_admin', 'chef_equipe']
+          modes: ['super_admin', 'chef_equipe', 'carrossier']
         },
+        // Retard paiement client carrosserie
         {
           type: 'critical' as const,
           icon: 'payment' as const,
-          title: 'Retard paiement critique',
-          subtitle: 'DUPONT SARL - 4 520€ - 43j sans réponse',
-          description: 'Impact trésorerie immédiat - Procédure recommandée',
-          impact: 'Impact trésorerie immédiat - Procédure recommandée',
-          suggestion: 'Séquence de relance intelligente + escalade automatique',
+          title: 'Impayé critique - Réparation sinistre',
+          subtitle: 'Mme MARTIN - Peugeot 308 - 2 847€ - 45j de retard',
+          description: 'Réparation terminée il y a 45 jours - Client injoignable',
+          impact: 'Trésorerie bloquée - Procédure contentieuse recommandée',
+          suggestion: 'Séquence de relance automatique + saisie véhicule si nécessaire',
           metrics: [
-            { value: '43j', label: 'Retard encaissement', unit: '' },
-            { value: '4.5k€', label: 'Montant dû', unit: '' },
-            { value: '3', label: 'Relances ignorées', unit: '' }
+            { value: '45j', label: 'Retard paiement', unit: '' },
+            { value: '2.8k€', label: 'Montant dû', unit: '' },
+            { value: '7', label: 'Relances envoyées', unit: '' }
           ],
           actions: [
             { 
-              label: 'Lancer séquence', 
+              label: 'Lancer contentieux', 
               variant: 'primary' as const,
-              modalType: 'relance_paiement',
-              modalData: { title: 'Séquence de relance', client: 'DUPONT SARL', montant: '4 520€' }
+              modalType: 'contentieux_client',
+              modalData: { title: 'Procédure contentieuse', client: 'Mme MARTIN', montant: '2 847€' }
             },
             { 
-              label: 'Négocier échéances', 
+              label: 'Négocier arrangement', 
               variant: 'secondary' as const,
-              modalType: 'negocier_echeances',
-              modalData: { title: 'Négociation échéances' }
+              modalType: 'negocier_arrangement',
+              modalData: { title: 'Négociation arrangement' }
             }
           ],
           modes: ['super_admin', 'finance']
         },
+        // Sinistre automobile urgent
         {
-          type: 'critical' as const,
-          icon: 'power' as const,
-          title: 'Panne électrique urgente',
-          subtitle: 'Cabinet médical BERNARD - Système d\'urgence KO',
-          description: 'Activité client paralysée - Intervention sous 2h obligatoire',
-          impact: 'Activité client paralysée - Intervention sous 2h obligatoire',
-          suggestion: 'Équipe urgence disponible - Pièces en stock - Facturation majoration 100%',
+          type: 'important' as const,
+          icon: 'insurance' as const,
+          title: 'Nouveau sinistre automobile urgent',
+          subtitle: 'BMW X3 2019 - Choc frontal - Assurance MAIF',
+          description: 'Véhicule accidenté remorqué - Expertise à programmer sous 48h',
+          impact: 'Véhicule de remplacement en attente - Satisfaction client prioritaire',
+          suggestion: 'Prise de RDV expertise + préparation dossier automatique',
           metrics: [
-            { value: '2h', label: 'Délai max', unit: '' },
-            { value: '100', label: 'Majoration', unit: '%' },
-            { value: '1', label: 'Équipe dispo', unit: '' }
+            { value: '48h', label: 'Délai expertise', unit: '' },
+            { value: '15k€', label: 'Valeur véhicule', unit: '' },
+            { value: '24h', label: 'Véhicule courtoisie max', unit: '' }
           ],
           actions: [
             { 
-              label: 'Déclencher intervention', 
+              label: 'Programmer expertise', 
               variant: 'primary' as const,
-              modalType: 'intervention_urgence',
-              modalData: { title: 'Intervention d\'urgence', client: 'Cabinet médical BERNARD' }
+              modalType: 'programmer_expertise',
+              modalData: { title: 'Programmation expertise', vehicule: 'BMW X3 2019' }
             },
             { 
-              label: 'Vérifier stock', 
-              variant: 'outline' as const, 
-              icon: <Package className="h-3 w-3" />,
-              modalType: 'verifier_stock',
-              modalData: { title: 'Vérification stock' }
+              label: 'Préparer dossier', 
+              variant: 'outline' as const,
+              modalType: 'preparer_dossier_sinistre',
+              modalData: { title: 'Préparation dossier sinistre' }
             }
           ],
-          modes: ['super_admin', 'ouvrier', 'chef_equipe']
+          modes: ['super_admin', 'responsable']
         },
+        // Rupture stock pièces critiques
+        {
+          type: 'critical' as const,
+          icon: 'supplier' as const,
+          title: 'Rupture stock critique - Pièces BMW',
+          subtitle: 'Pare-choc avant BMW Série 3 - 3 réparations bloquées',
+          description: 'Stock épuisé - Fournisseur principal en rupture - Délai 10 jours',
+          impact: 'Immobilisation 3 véhicules - Pénalités retard 150€/jour/véhicule',
+          suggestion: 'Sourcing alternatif identifié - Pièce occasion/adaptable disponible',
+          metrics: [
+            { value: '3', label: 'Véhicules bloqués', unit: '' },
+            { value: '10j', label: 'Délai fournisseur', unit: '' },
+            { value: '450€', label: 'Pénalité/jour', unit: '' }
+          ],
+          actions: [
+            { 
+              label: 'Commander alternatif', 
+              variant: 'primary' as const,
+              modalType: 'commander_alternatif',
+              modalData: { title: 'Commande alternative', piece: 'Pare-choc BMW Série 3' }
+            },
+            { 
+              label: 'Chercher occasion', 
+              variant: 'secondary' as const,
+              modalType: 'chercher_occasion',
+              modalData: { title: 'Recherche pièce occasion' }
+            }
+          ],
+          modes: ['super_admin', 'responsable']
+        },
+        // Équipement carrosserie en panne
         {
           type: 'important' as const,
           icon: 'cooling' as const,
-          title: 'Clim défaillante restaurant',
-          subtitle: 'LA BRASSERIE - système principal en panne - 35°C prévu',
-          description: 'Risque fermeture client - Perte CA weekend - Réparation urgente',
-          impact: 'Risque fermeture client - Perte CA weekend - Réparation urgente',
-          suggestion: 'Compresseur de secours disponible - Intervention ce soir recommandée',
+          title: 'Panne cabine de peinture n°2',
+          subtitle: 'Système de ventilation défaillant - Température excessive',
+          description: 'Cabine surchauffe - Risque défauts peinture + arrêt production',
+          impact: 'Capacité réduite 50% - Retard livraisons client estimé 3 jours',
+          suggestion: 'Intervention maintenance urgente + utilisation cabine n°1 en priorité',
           metrics: [
-            { value: '35', label: 'Temp prévue', unit: '°C' },
-            { value: '18h', label: 'Fermeture si non réparé' },
-            { value: '2800', label: 'CA weekend', unit: '€' }
+            { value: '42°C', label: 'Température cabine', unit: '' },
+            { value: '50%', label: 'Capacité réduite', unit: '' },
+            { value: '8', label: 'Véhicules en attente', unit: '' }
           ],
           actions: [
             { 
-              label: 'Programmer réparation', 
+              label: 'Intervention urgente', 
               variant: 'primary' as const,
-              modalType: 'programmer_reparation',
-              modalData: { title: 'Programmer réparation', client: 'LA BRASSERIE' }
+              modalType: 'intervention_cabine',
+              modalData: { title: 'Intervention cabine peinture' }
             },
             { 
-              label: 'Solution temporaire', 
+              label: 'Réorganiser planning', 
               variant: 'secondary' as const,
-              modalType: 'solution_temporaire',
-              modalData: { title: 'Solution temporaire' }
+              modalType: 'reorganiser_planning',
+              modalData: { title: 'Réorganisation planning peinture' }
             }
           ],
-          modes: ['super_admin', 'ouvrier']
+          modes: ['super_admin', 'responsable', 'carrossier']
         }
       ],
       week: [
