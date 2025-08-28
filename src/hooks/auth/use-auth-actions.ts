@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { authService } from '@/services/supabase/auth';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useRoleBasedRedirect } from '@/hooks/use-role-based-redirect';
 
 export const useAuthActions = (setLoading: (loading: boolean) => void) => {
   const navigate = useNavigate();
+  const { redirectBasedOnRole } = useRoleBasedRedirect();
 
   // Sign in with email and password
   const signIn = useCallback(async (email: string, password: string) => {
@@ -48,7 +50,12 @@ export const useAuthActions = (setLoading: (loading: boolean) => void) => {
         title: "Connexion réussie",
         description: "Vous êtes maintenant connecté.",
       });
-      navigate('/');
+      
+      // Redirection basée sur le rôle utilisateur avec un délai pour laisser le temps au profil de se charger
+      setTimeout(() => {
+        redirectBasedOnRole();
+      }, 1000); // Délai plus long pour s'assurer que les données de rôle sont chargées
+      
       return { session: newSession, user: newUser };
     } catch (error: any) {
       let errorMessage = error.message;
@@ -68,7 +75,7 @@ export const useAuthActions = (setLoading: (loading: boolean) => void) => {
     } finally {
       setLoading(false);
     }
-  }, [navigate, setLoading]);
+  }, [redirectBasedOnRole, setLoading]);
 
   // Sign up with email and password
   const signUp = useCallback(async (email: string, password: string, firstName: string, lastName: string, phoneNumber: string, isTeamMember: boolean = false) => {
