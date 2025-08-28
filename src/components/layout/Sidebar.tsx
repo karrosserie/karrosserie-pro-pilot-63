@@ -121,8 +121,8 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
 
   // Définir tous les éléments de navigation
   const allNavItems = [
-    { icon: <Home className="app-icon" />, label: 'Tableau de bord', path: '/' },
     { icon: <Bot className="app-icon" />, label: 'Assistant IA', path: '/ai-assistant' },
+    { icon: <Home className="app-icon" />, label: 'Tableau de bord', path: '/' },
     { icon: <MessageSquare className="app-icon" />, label: 'Messageries', path: '/messageries' },
     { icon: <Users className="app-icon" />, label: 'Clients', path: '/clients' },
     { icon: <Car className="app-icon" />, label: 'Véhicules', path: '/vehicles' },
