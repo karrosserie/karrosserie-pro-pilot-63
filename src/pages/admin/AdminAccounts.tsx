@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Building2, Users, CreditCard, UserCheck, Coins } from 'lucide-react';
+import { Building2, Users, CreditCard, UserCheck, Coins, Search, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface Company {
   id: string;
@@ -44,6 +44,9 @@ const AdminAccounts = () => {
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [newTokens, setNewTokens] = useState('');
   const [selectedPlan, setSelectedPlan] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState<keyof Company | 'subscription.plan_name' | 'subscription.end_date' | 'subscription.tokens_remaining'>('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -265,6 +268,72 @@ const AdminAccounts = () => {
     }
   };
 
+  // Filter and sort companies
+  const filteredAndSortedCompanies = companies
+    .filter(company => {
+      if (!searchTerm) return true;
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        company.name.toLowerCase().includes(searchLower) ||
+        company.email.toLowerCase().includes(searchLower) ||
+        company.city.toLowerCase().includes(searchLower) ||
+        company.subscription?.plan_name.toLowerCase().includes(searchLower)
+      );
+    })
+    .sort((a, b) => {
+      let aValue: any;
+      let bValue: any;
+
+      if (sortField.includes('.')) {
+        const [field, subField] = sortField.split('.');
+        aValue = (a as any)[field]?.[subField] || '';
+        bValue = (b as any)[field]?.[subField] || '';
+      } else {
+        aValue = (a as any)[sortField] || '';
+        bValue = (b as any)[sortField] || '';
+      }
+
+      // Handle dates
+      if (sortField === 'subscription.end_date') {
+        aValue = aValue ? new Date(aValue).getTime() : 0;
+        bValue = bValue ? new Date(bValue).getTime() : 0;
+      }
+
+      // Handle numbers
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+      }
+
+      // Handle strings
+      const comparison = String(aValue).localeCompare(String(bValue));
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+
+  const handleSort = (field: typeof sortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const SortableHeader = ({ field, children }: { field: typeof sortField; children: React.ReactNode }) => (
+    <TableHead 
+      className="cursor-pointer hover:bg-muted/50 select-none"
+      onClick={() => handleSort(field)}
+    >
+      <div className="flex items-center space-x-1">
+        <span>{children}</span>
+        {sortField === field && (
+          sortDirection === 'asc' ? 
+            <ChevronUp className="h-4 w-4" /> : 
+            <ChevronDown className="h-4 w-4" />
+        )}
+      </div>
+    </TableHead>
+  );
+
   if (loading) {
     return (
       <div className="p-6">
@@ -283,11 +352,23 @@ const AdminAccounts = () => {
           <Card className="p-4">
             <div className="flex items-center space-x-2">
               <Building2 className="h-5 w-5 text-primary" />
-              <span className="text-sm font-medium">{companies.length} Carrosseries</span>
+              <span className="text-sm font-medium">{filteredAndSortedCompanies.length} / {companies.length} Carrosseries</span>
             </div>
           </Card>
         </div>
       </div>
+
+      <Card className="p-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher par nom, email, ville ou abonnement..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -297,18 +378,18 @@ const AdminAccounts = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nom</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Ville</TableHead>
-                <TableHead>Utilisateurs</TableHead>
-                <TableHead>Abonnement</TableHead>
-                <TableHead>Fin d'abonnement</TableHead>
-                <TableHead>Jetons</TableHead>
+                <SortableHeader field="name">Nom</SortableHeader>
+                <SortableHeader field="email">Email</SortableHeader>
+                <SortableHeader field="city">Ville</SortableHeader>
+                <SortableHeader field="user_count">Utilisateurs</SortableHeader>
+                <SortableHeader field="subscription.plan_name">Abonnement</SortableHeader>
+                <SortableHeader field="subscription.end_date">Fin d'abonnement</SortableHeader>
+                <SortableHeader field="subscription.tokens_remaining">Jetons</SortableHeader>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {companies.map((company) => (
+              {filteredAndSortedCompanies.map((company) => (
                 <TableRow key={company.id}>
                   <TableCell className="font-medium">{company.name}</TableCell>
                   <TableCell>{company.email}</TableCell>
