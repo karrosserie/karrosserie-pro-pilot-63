@@ -34,6 +34,7 @@ interface SubscriptionPlan {
   name: string;
   price: number;
   tokens_included: number;
+  billing_period: string;
 }
 
 const AdminAccounts = () => {
@@ -123,7 +124,7 @@ const AdminAccounts = () => {
     try {
       const { data, error } = await supabase
         .from('subscription_plans')
-        .select('id, name, price, tokens_included')
+        .select('id, name, price, tokens_included, billing_period')
         .eq('is_active', true)
         .order('price');
 
@@ -175,18 +176,33 @@ const AdminAccounts = () => {
 
       if (editingCompany.subscription) {
         // Update existing subscription
+        const endDate = new Date();
+        if (plan.billing_period === 'yearly' || plan.billing_period === 'annual') {
+          endDate.setFullYear(endDate.getFullYear() + 1);
+        } else {
+          endDate.setMonth(endDate.getMonth() + 1);
+        }
+
         const { error } = await supabase
           .from('company_subscriptions')
           .update({
             subscription_plan_id: selectedPlan,
             tokens_remaining: plan.tokens_included,
-            tokens_used: 0
+            tokens_used: 0,
+            end_date: endDate.toISOString()
           })
           .eq('id', editingCompany.subscription.id);
 
         if (error) throw error;
       } else {
         // Create new subscription
+        const endDate = new Date();
+        if (plan.billing_period === 'yearly' || plan.billing_period === 'annual') {
+          endDate.setFullYear(endDate.getFullYear() + 1);
+        } else {
+          endDate.setMonth(endDate.getMonth() + 1);
+        }
+
         const { error } = await supabase
           .from('company_subscriptions')
           .insert({
@@ -196,7 +212,7 @@ const AdminAccounts = () => {
             tokens_remaining: plan.tokens_included,
             tokens_used: 0,
             start_date: new Date().toISOString(),
-            end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days from now
+            end_date: endDate.toISOString()
           });
 
         if (error) throw error;
