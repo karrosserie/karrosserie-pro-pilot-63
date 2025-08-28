@@ -45,16 +45,18 @@ const MissionControlHeader: React.FC<MissionControlHeaderProps> = ({
   }, []);
 
   return (
-    <div className="flex items-center justify-between mb-6">
-      <div className="flex items-center gap-4">
-        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-          <span className="text-white font-bold text-lg">T</span>
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-lg">T</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Tour de contrôle</h1>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900">Tour de contrôle</h1>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button 
             size="sm" 
-            className={`text-xs px-3 py-1 h-7 ${
+            className={`text-xs px-2 sm:px-3 py-1 h-7 ${
               selectedPeriod === 'today' 
                 ? 'bg-blue-600 hover:bg-blue-700 text-white' 
                 : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -65,7 +67,7 @@ const MissionControlHeader: React.FC<MissionControlHeaderProps> = ({
           </Button>
           <Button 
             size="sm" 
-            className={`text-xs px-3 py-1 h-7 ${
+            className={`text-xs px-2 sm:px-3 py-1 h-7 ${
               selectedPeriod === 'week' 
                 ? 'bg-blue-600 hover:bg-blue-700 text-white' 
                 : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -76,7 +78,7 @@ const MissionControlHeader: React.FC<MissionControlHeaderProps> = ({
           </Button>
           <Button 
             size="sm" 
-            className={`text-xs px-3 py-1 h-7 ${
+            className={`text-xs px-2 sm:px-3 py-1 h-7 ${
               selectedPeriod === 'month' 
                 ? 'bg-blue-600 hover:bg-blue-700 text-white' 
                 : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -87,7 +89,7 @@ const MissionControlHeader: React.FC<MissionControlHeaderProps> = ({
           </Button>
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <button
           onClick={onAIToggle}
           className={`px-3 py-1 rounded-full text-sm font-medium transition-colors cursor-pointer hover:opacity-90 ${
@@ -104,12 +106,13 @@ const MissionControlHeader: React.FC<MissionControlHeaderProps> = ({
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 cursor-pointer"
           >
-            <span>{currentModeLabel}</span>
+            <span className="hidden sm:inline">{currentModeLabel}</span>
+            <span className="sm:hidden">{modes.find(mode => mode.key === selectedMode)?.label.split(' ')[0] || 'Admin'}</span>
             <ChevronDown className="h-3 w-3" />
           </button>
           
           {isDropdownOpen && (
-            <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+            <div className="absolute right-0 top-full mt-1 w-40 sm:w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
               {modes.map((mode) => (
                 <button
                   key={mode.key}
@@ -117,11 +120,12 @@ const MissionControlHeader: React.FC<MissionControlHeaderProps> = ({
                     onModeChange(mode.key as any);
                     setIsDropdownOpen(false);
                   }}
-                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
+                  className={`w-full text-left px-3 sm:px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
                     selectedMode === mode.key ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700'
                   }`}
                 >
-                  {mode.label}
+                  <span className="hidden sm:inline">{mode.label}</span>
+                  <span className="sm:hidden">{mode.label.split(' ')[0]}</span>
                 </button>
               ))}
             </div>

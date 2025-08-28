@@ -428,7 +428,7 @@ const MissionControlDashboard = () => {
   const currentMissions = getMissionsForPeriod(selectedPeriod, selectedMode);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-3 sm:p-6">
       <MissionControlHeader 
         selectedPeriod={selectedPeriod}
         onPeriodChange={setSelectedPeriod}
@@ -438,21 +438,25 @@ const MissionControlDashboard = () => {
         onModeChange={setSelectedMode}
       />
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {currentMissions.map((alert, index) => (
-          <AlertCard
-            key={`${selectedPeriod}-${selectedMode}-${index}`}
-            {...alert}
-            className={currentMissions.length === 4 && index === 3 ? 'lg:col-span-1 xl:col-span-1' : ''}
-          />
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+        {currentMissions.length === 0 ? (
+          <div className="col-span-full text-center py-12">
+            <div className="text-gray-500">
+              <Eye className="h-12 w-12 mx-auto mb-4" />
+              <h3 className="text-lg font-medium">Aucune mission pour cette période</h3>
+              <p className="mt-2">Tout semble sous contrôle pour le moment.</p>
+            </div>
+          </div>
+        ) : (
+          currentMissions.map((alert, index) => (
+            <AlertCard
+              key={`${selectedPeriod}-${selectedMode}-${index}`}
+              {...alert}
+              className={currentMissions.length === 4 && index === 3 ? 'md:col-span-2 xl:col-span-1' : ''}
+            />
+          ))
+        )}
       </div>
-      
-      {currentMissions.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">Aucune mission pour ce mode dans la période sélectionnée</p>
-        </div>
-      )}
     </div>
   );
 };

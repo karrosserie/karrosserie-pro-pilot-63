@@ -108,17 +108,18 @@ const AlertCard: React.FC<AlertCardProps> = ({
       <CardContent className="p-4">
         {/* Header avec icône et badge */}
         <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 ${iconBg} ${iconColor} rounded-lg flex items-center justify-center`}>
+          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+            <div className={`w-8 h-8 sm:w-10 sm:h-10 ${iconBg} ${iconColor} rounded-lg flex items-center justify-center flex-shrink-0`}>
               {getIcon(icon)}
             </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 text-sm">{title}</h3>
-              {subtitle && <p className="text-xs text-gray-600">{subtitle}</p>}
+            <div className="min-w-0 flex-1">
+              <h3 className="font-semibold text-gray-900 text-sm leading-tight">{title}</h3>
+              {subtitle && <p className="text-xs text-gray-600 mt-1 break-words">{subtitle}</p>}
             </div>
           </div>
-          <span className={`px-2 py-1 rounded text-xs font-medium ${badgeBg}`}>
-            {type.toUpperCase()}
+          <span className={`px-2 py-1 rounded text-xs font-medium ${badgeBg} flex-shrink-0 ml-2`}>
+            <span className="hidden sm:inline">{type.toUpperCase()}</span>
+            <span className="sm:hidden">{type === 'critical' ? 'CRIT' : 'IMP'}</span>
           </span>
         </div>
 
@@ -140,10 +141,10 @@ const AlertCard: React.FC<AlertCardProps> = ({
         </div>
 
         {/* Métriques */}
-        <div className="grid grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 mb-4">
           {metrics.map((metric, index) => (
-            <div key={index} className="text-center">
-              <div className="text-lg font-bold text-gray-900">
+            <div key={index} className="text-center sm:text-center">
+              <div className="text-base sm:text-lg font-bold text-gray-900">
                 {metric.value}
                 {metric.unit && <span className="text-sm font-normal text-gray-600">{metric.unit}</span>}
               </div>
@@ -160,7 +161,7 @@ const AlertCard: React.FC<AlertCardProps> = ({
               size="sm"
               variant={action.variant === 'primary' ? 'default' : action.variant === 'secondary' ? 'secondary' : 'outline'}
               onClick={() => handleActionClick(action)}
-              className={`text-xs h-8 ${
+              className={`text-xs h-8 flex-1 sm:flex-none min-w-0 ${
                 action.variant === 'primary' 
                   ? 'bg-primary hover:bg-primary/90 text-primary-foreground' 
                   : action.variant === 'secondary'
@@ -168,8 +169,8 @@ const AlertCard: React.FC<AlertCardProps> = ({
                   : ''
               }`}
             >
-              {action.icon && <span className="mr-1">{action.icon}</span>}
-              {action.label}
+              {action.icon && <span className="mr-1 hidden sm:inline">{action.icon}</span>}
+              <span className="truncate">{action.label}</span>
             </Button>
           ))}
         </div>
