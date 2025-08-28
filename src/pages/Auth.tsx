@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRoleBasedRedirect } from '@/hooks/use-role-based-redirect';
+import { usePostLoginRedirect } from '@/hooks/use-post-login-redirect';
 import AuthContainer from '@/components/auth/AuthContainer';
 import LoginForm from '@/components/auth/LoginForm';
 import SignupForm from '@/components/auth/SignupForm';
@@ -16,8 +16,10 @@ const Auth = () => {
   const [authMode, setAuthMode] = useState<AuthMode>('login');
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const { redirectBasedOnRole } = useRoleBasedRedirect();
   const [searchParams] = useSearchParams();
+  
+  // Utiliser le hook de redirection post-connexion
+  usePostLoginRedirect();
   
   // Déterminer le mode basé sur l'URL
   useEffect(() => {
@@ -54,12 +56,9 @@ const Auth = () => {
   useEffect(() => {
     // Si l'utilisateur est connecté, redirigez-le selon son rôle
     if (user && !loading) {
-      // Petit délai pour laisser le temps aux hooks de charger le rôle
-      setTimeout(() => {
-        redirectBasedOnRole();
-      }, 500);
+      navigate('/');
     }
-  }, [user, loading, redirectBasedOnRole]);
+  }, [user, loading, navigate]);
 
   // Afficher un indicateur de chargement pendant la vérification de l'authentification
   if (loading) {
