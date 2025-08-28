@@ -2,7 +2,7 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import ActionModalExtended from './ActionModalExtended';
-import { X, User, Calendar, Phone, Mail, CreditCard, FileText, AlertTriangle } from 'lucide-react';
+import { X, User, Calendar, Phone, Mail, CreditCard, FileText, AlertTriangle, Package } from 'lucide-react';
 
 interface ActionModalProps {
   isOpen: boolean;
@@ -260,6 +260,326 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
               </Button>
               <Button variant="outline">
                 Ajuster les créneaux
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'alternatives_meteo':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary" />
+                Solutions alternatives météo
+              </h4>
+              <div className="space-y-3">
+                <div className="p-3 bg-card rounded border-l-4 border-l-karrosserie-orange">
+                  <div className="text-sm font-medium mb-1">Travaux couverts disponibles</div>
+                  <p className="text-xs text-muted-foreground">Finitions intérieures - Électricité - Plomberie</p>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Tâches intérieures MARTIN SARL:</span>
+                    <span className="text-green-600 font-medium">2 jours</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Électricité BATIMECA:</span>
+                    <span className="text-green-600 font-medium">1.5 jours</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Report DUPOND & CIE:</span>
+                    <span className="text-karrosserie-orange font-medium">Lundi matin</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Optimisation proposée</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <span>Avancer les travaux intérieurs de 2 jours</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  <span>Prévenir les clients des ajustements</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Mise à jour planning automatique</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Appliquer les alternatives
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Personnaliser planning
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'verifier_stock':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <Package className="h-4 w-4 text-primary" />
+                Vérification stock d'urgence
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-green-50 p-3 rounded border border-green-200">
+                  <div className="text-sm font-medium text-green-800 mb-1">Pièces disponibles en stock</div>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-green-600">Disjoncteur 32A:</span>
+                      <p className="font-medium">3 unités</p>
+                    </div>
+                    <div>
+                      <span className="text-green-600">Câble 4mm²:</span>
+                      <p className="font-medium">50m</p>
+                    </div>
+                    <div>
+                      <span className="text-green-600">Boîtier étanche:</span>
+                      <p className="font-medium">5 unités</p>
+                    </div>
+                    <div>
+                      <span className="text-green-600">Relais secours:</span>
+                      <p className="font-medium">2 unités</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Préparation intervention</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Temps préparation:</span>
+                  <span className="font-medium text-green-600">8 minutes</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Outillage spécialisé:</span>
+                  <span className="font-medium text-green-600">Disponible</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Véhicule équipé:</span>
+                  <span className="font-medium text-green-600">VU-247 prêt</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                <Package className="h-4 w-4 mr-2" />
+                Préparer matériel
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Commander pièces manquantes
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'negocier_echeances':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <CreditCard className="h-4 w-4 text-primary" />
+                Négociation échéances - DUPONT SARL
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-card p-3 rounded border-l-4 border-l-karrosserie-orange">
+                  <div className="text-sm font-medium mb-1">Proposition d'échelonnement</div>
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                      <span className="text-muted-foreground">Montant total:</span>
+                      <p className="font-medium">4 520€</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Durée proposée:</span>
+                      <p className="font-medium">3 mensualités</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between p-2 bg-accent rounded">
+                    <span>1ère mensualité (immédiat):</span>
+                    <span className="font-medium">1 520€</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-accent rounded">
+                    <span>2ème mensualité (J+30):</span>
+                    <span className="font-medium">1 500€</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-accent rounded">
+                    <span>3ème mensualité (J+60):</span>
+                    <span className="font-medium">1 500€</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Conditions négociées</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <span>Aucun frais d'échelonnement</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Avenant au contrat automatique</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  <span>Relances préventives activées</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Valider échelonnement
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Modifier conditions
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'programmer_reparation':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary" />
+                Programmation réparation - LA BRASSERIE
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-card p-3 rounded border-l-4 border-l-destructive">
+                  <div className="text-sm font-medium text-destructive mb-1">Climatisation défaillante</div>
+                  <p className="text-xs text-muted-foreground">Température extérieure prévue: 35°C</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span className="text-muted-foreground">Technicien assigné:</span>
+                    <p className="font-medium">Michel BERNARD</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Créneau optimal:</span>
+                    <p className="font-medium text-green-600">Aujourd'hui 19h</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Durée estimée:</span>
+                    <p className="font-medium">2h 30min</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Pièce nécessaire:</span>
+                    <p className="font-medium">Compresseur (stock OK)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Planning d'intervention</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Arrivée sur site:</span>
+                  <span className="font-medium">19h00</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Diagnostic complet:</span>
+                  <span className="font-medium">19h15</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Remplacement compresseur:</span>
+                  <span className="font-medium">20h30</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Tests et mise en service:</span>
+                  <span className="font-medium">21h30</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Confirmer intervention
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Ajuster horaire
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'solution_temporaire':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-primary" />
+                Solution temporaire d'urgence
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-karrosserie-orange/10 p-3 rounded border border-karrosserie-orange/20">
+                  <div className="text-sm font-medium text-karrosserie-orange mb-1">Climatiseur mobile disponible</div>
+                  <p className="text-xs text-muted-foreground">Unité 12000 BTU - Installation immédiate</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span className="text-muted-foreground">Puissance:</span>
+                    <p className="font-medium">12 000 BTU</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Surface couverte:</span>
+                    <p className="font-medium">45m²</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Installation:</span>
+                    <p className="font-medium text-green-600">30 minutes</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Location/jour:</span>
+                    <p className="font-medium">89€ TTC</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Plan d'action immédiat</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <span>Déploiement sous 1h maximum</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  <span>Information client en cours</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Bon de commande automatique</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Déployer maintenant
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Négocier conditions
               </Button>
             </div>
           </div>
