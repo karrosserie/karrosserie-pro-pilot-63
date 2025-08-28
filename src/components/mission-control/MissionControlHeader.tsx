@@ -18,7 +18,7 @@ const MissionControlHeader: React.FC<MissionControlHeaderProps> = ({
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center gap-4">
         <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-          <span className="text-white font-bold text-lg">M</span>
+          <span className="text-white font-bold text-lg">T</span>
         </div>
         <h1 className="text-2xl font-bold text-gray-900">Tour de contrôle</h1>
         <div className="flex gap-2">
