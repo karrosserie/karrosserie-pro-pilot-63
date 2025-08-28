@@ -322,7 +322,7 @@ export default function MessageriePriorites() {
                             Réponse auto
                           </Button>
                         )}
-                        <Button size="sm" variant="outline" onClick={() => handleSemiAuto(it.id)}>
+                        <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => handleSemiAuto(it.id)}>
                           Semi auto
                         </Button>
                         <Button size="sm" variant="destructive" onClick={() => handleEscalate(it.id)}>
