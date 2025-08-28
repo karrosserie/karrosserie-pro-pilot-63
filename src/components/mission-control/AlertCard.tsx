@@ -154,14 +154,14 @@ const AlertCard: React.FC<AlertCardProps> = ({
         </div>
 
         {/* Actions */}
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-1 sm:gap-2 flex-wrap">
           {actions.map((action, index) => (
             <Button
               key={index}
               size="sm"
               variant={action.variant === 'primary' ? 'default' : action.variant === 'secondary' ? 'secondary' : 'outline'}
               onClick={() => handleActionClick(action)}
-              className={`text-xs h-8 flex-1 sm:flex-none min-w-0 ${
+              className={`text-xs h-6 sm:h-8 px-2 sm:px-3 py-1 flex-1 sm:flex-none min-w-0 ${
                 action.variant === 'primary' 
                   ? 'bg-primary hover:bg-primary/90 text-primary-foreground' 
                   : action.variant === 'secondary'
@@ -170,7 +170,7 @@ const AlertCard: React.FC<AlertCardProps> = ({
               }`}
             >
               {action.icon && <span className="mr-1 hidden sm:inline">{action.icon}</span>}
-              <span className="truncate">{action.label}</span>
+              <span className="truncate text-xs">{action.label}</span>
             </Button>
           ))}
         </div>
