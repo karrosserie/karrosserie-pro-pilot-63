@@ -86,8 +86,8 @@ export function IframePlanning({ className = "" }: IframePlanningProps) {
       };
       
       try {
-        iframeRef.current.contentWindow?.postMessage(completeUserData, baseUrl);
-        console.log('Données utilisateur envoyées à l\'iframe:', completeUserData);
+        iframeRef.current.contentWindow?.postMessage(completeUserData, 'https://lovable.dev');
+        console.log('Données utilisateur envoyées à l\'iframe avec origine https://lovable.dev:', completeUserData);
       } catch (error) {
         console.warn('Impossible d\'envoyer les données à l\'iframe:', error);
       }
