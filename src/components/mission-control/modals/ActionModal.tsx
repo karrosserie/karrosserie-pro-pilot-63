@@ -284,9 +284,9 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
             </DialogTitle>
             <button
               onClick={onClose}
-              className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 p-1 hover:bg-accent"
+              className="w-6 h-6 bg-muted rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors"
             >
-              <X className="h-4 w-4" />
+              <X className="h-4 w-4 text-muted-foreground" />
             </button>
           </div>
         </DialogHeader>
