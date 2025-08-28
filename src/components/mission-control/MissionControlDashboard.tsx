@@ -167,106 +167,19 @@ const MissionControlDashboard = () => {
         }
       ],
       week: [
-        // Clientèle Financière - Semaine
-        {
-          type: 'important' as const,
-          icon: 'finance' as const,
-          title: 'Révision budgets prévisionnels - Semaine 47',
-          subtitle: '12 clients - Budgets 2025 à valider',
-          description: 'Validation budgets prévisionnels 2025 - Ajustements nécessaires',
-          impact: 'Retard validation = décalage stratégies financières clients',
-          suggestion: 'Analyse comparative automatique + recommandations IA sectorielles',
-          metrics: [
-            { value: '12', label: 'Budgets à valider', unit: '' },
-            { value: '2.4M€', label: 'Montant total', unit: '' },
-            { value: '85%', label: 'Conformité prévisions', unit: '' }
-          ],
-          actions: [
-            { 
-              label: 'Valider budgets', 
-              variant: 'primary' as const,
-              modalType: 'valider_budgets',
-              modalData: { title: 'Validation budgets 2025' }
-            },
-            { 
-              label: 'Ajustements sectoriels', 
-              variant: 'outline' as const,
-              modalType: 'ajustements_budgets',
-              modalData: { title: 'Ajustements sectoriels' }
-            }
-          ],
-          modes: ['super_admin', 'finance']
-        },
-        // Clientèle Comptable - Semaine
-        {
-          type: 'critical' as const,
-          icon: 'accounting' as const,
-          title: 'Arrêtés de comptes trimestriels',
-          subtitle: '8 dossiers en attente - Échéance 30/11',
-          description: 'Clôtures trimestrielles Q3 - Liasses fiscales à produire',
-          impact: 'Retard = pénalités clients + surcharge période de pointe',
-          suggestion: 'Priorisation automatique par complexité + affectation ressources',
-          metrics: [
-            { value: '8', label: 'Dossiers restants', unit: '' },
-            { value: '5j', label: 'Délai moyen', unit: '' },
-            { value: '30/11', label: 'Échéance', unit: '' }
-          ],
-          actions: [
-            { 
-              label: 'Prioriser dossiers', 
-              variant: 'primary' as const,
-              modalType: 'prioriser_dossiers',
-              modalData: { title: 'Priorisation arrêtés comptes' }
-            },
-            { 
-              label: 'Affecter ressources', 
-              variant: 'secondary' as const,
-              modalType: 'affecter_ressources',
-              modalData: { title: 'Affectation ressources' }
-            }
-          ],
-          modes: ['super_admin', 'finance']
-        },
-        {
-          type: 'important' as const,
-          icon: 'payment' as const,
-          title: 'Échéances paiements semaine',
-          subtitle: 'Factures en attente : 18 500€ - 7 clients',
-          description: 'Relances programmées - Suivi automatique activé',
-          impact: 'Trésorerie stable - Risque modéré si non encaissé',
-          suggestion: 'Campagne de relance ciblée + conditions préférentielles pour paiement rapide',
-          metrics: [
-            { value: '18.5', label: 'Montant total', unit: 'k€' },
-            { value: '7', label: 'Clients concernés', unit: '' },
-            { value: '3', label: 'Relances envoyées', unit: '' }
-          ],
-          actions: [
-            { 
-              label: 'Lancer campagne', 
-              variant: 'primary' as const,
-              modalType: 'campagne_relance',
-              modalData: { title: 'Campagne de relance' }
-            },
-            { 
-              label: 'Conditions préférentielles', 
-              variant: 'outline' as const,
-              modalType: 'conditions_preferentielles',
-              modalData: { title: 'Conditions préférentielles' }
-            }
-          ],
-          modes: ['super_admin', 'finance']
-        },
+        // Maintenance préventive équipements carrosserie
         {
           type: 'important' as const,
           icon: 'cooling' as const,
-          title: 'Maintenance préventive',
-          description: '8 équipements nécessitent maintenance cette semaine',
-          impact: 'Prévention pannes - Optimisation performances clients',
-          suggestion: 'Planning optimisé par IA - Groupage géographique efficace',
+          title: 'Maintenance préventive hebdomadaire',
+          subtitle: '5 équipements carrosserie - Planning semaine 47',
+          description: 'Entretien préventif équipements essentiels - Éviter pannes coûteuses',
+          impact: 'Prévention arrêts production + optimisation performances',
+          suggestion: 'Planning optimisé par IA - Maintenance groupée par zone',
           metrics: [
-            { value: '8', label: 'Équipements', unit: '' },
-            { value: '3', label: 'Secteurs', unit: '' },
-            { value: '2', label: 'Équipes nécessaires', unit: '' }
+            { value: '5', label: 'Équipements concernés', unit: '' },
+            { value: '8h', label: 'Temps total prévu', unit: '' },
+            { value: '2', label: 'Techniciens assignés', unit: '' }
           ],
           actions: [
             { 
@@ -276,269 +189,225 @@ const MissionControlDashboard = () => {
               modalData: { title: 'Planning maintenance préventive' }
             },
             { 
-              label: 'Optimiser trajets', 
+              label: 'Ajuster créneaux', 
               variant: 'outline' as const, 
-              icon: <Calendar className="h-3 w-3" />,
-              modalType: 'optimiser_trajets',
-              modalData: { title: 'Optimisation trajets' }
+              modalType: 'ajuster_creneaux_maintenance',
+              modalData: { title: 'Ajustement créneaux' }
             }
           ],
-          modes: ['super_admin', 'ouvrier', 'chef_equipe']
-        }
-      ],
-      month: [
-        // Clientèle Financière - Mois
-        {
-          type: 'critical' as const,
-          icon: 'finance' as const,
-          title: 'Clôture fiscale annuelle - HOLDING MEDITERRANEE',
-          subtitle: 'Consolidation 15 filiales - Échéance 31/12',
-          description: 'Consolidation complexe 15 filiales - Optimisation fiscale recommandée',
-          impact: 'Risque pénalités fiscales 45 000€ + surcharge équipes',
-          suggestion: 'Consolidation automatisée + optimisation niches fiscales IA',
-          metrics: [
-            { value: '15', label: 'Filiales à consolider', unit: '' },
-            { value: '45k€', label: 'Risque pénalités', unit: '' },
-            { value: '31/12', label: 'Échéance légale', unit: '' }
-          ],
-          actions: [
-            { 
-              label: 'Consolidation auto', 
-              variant: 'primary' as const,
-              modalType: 'consolidation_auto',
-              modalData: { title: 'Consolidation automatique', filiales: 15 }
-            },
-            { 
-              label: 'Optimisation fiscale', 
-              variant: 'secondary' as const,
-              modalType: 'optimisation_fiscale',
-              modalData: { title: 'Optimisation fiscale' }
-            }
-          ],
-          modes: ['super_admin', 'finance']
+          modes: ['super_admin', 'responsable', 'carrossier']
         },
-        // Clientèle Comptable - Mois
-        {
-          type: 'important' as const,
-          icon: 'accounting' as const,
-          title: 'Révision tarifs comptables 2025',
-          subtitle: 'Mise à jour grille tarifaire - 45 clients impactés',
-          description: 'Révision annuelle tarifs - Négociation avenant clients',
-          impact: 'Augmentation CA prévisionnelle +12% vs inflation +8%',
-          suggestion: 'Négociation progressive + accompagnement valeur ajoutée',
-          metrics: [
-            { value: '45', label: 'Clients concernés', unit: '' },
-            { value: '+12%', label: 'Hausse moyenne', unit: '' },
-            { value: '89%', label: 'Taux acceptation prévu', unit: '' }
-          ],
-          actions: [
-            { 
-              label: 'Négocier avenants', 
-              variant: 'primary' as const,
-              modalType: 'negocier_avenants',
-              modalData: { title: 'Négociation avenants tarifaires' }
-            },
-            { 
-              label: 'Plan accompagnement', 
-              variant: 'outline' as const,
-              modalType: 'plan_accompagnement',
-              modalData: { title: 'Plan d\'accompagnement clients' }
-            }
-          ],
-          modes: ['super_admin', 'finance']
-        },
-        // Clientèle Assurance - Mois
+        // Suivi sinistres en cours - semaine
         {
           type: 'critical' as const,
           icon: 'insurance' as const,
-          title: 'Renouvellement polices collectives',
-          subtitle: 'RC Pro + Cyber-risques - 23 clients',
-          description: 'Renouvellement annuel polices - Négociation groupe recommandée',
-          impact: 'Économies potentielles 28 000€ en négociation groupée',
-          suggestion: 'Négociation collective + renforcement couverture cyber',
+          title: 'Suivi sinistres hebdomadaire',
+          subtitle: '12 dossiers en cours - 3 expertises cette semaine',
+          description: 'Point d\'étape sinistres - Relances nécessaires assureurs',
+          impact: 'Déblocage paiements + satisfaction client maintenue',
+          suggestion: 'Automatisation relances + préparation documents manquants',
           metrics: [
-            { value: '23', label: 'Polices à renouveler', unit: '' },
-            { value: '28k€', label: 'Économies potentielles', unit: '' },
-            { value: '95%', label: 'Taux renouvellement', unit: '' }
+            { value: '12', label: 'Sinistres en cours', unit: '' },
+            { value: '3', label: 'Expertises prévues', unit: '' },
+            { value: '47k€', label: 'Montant total', unit: '' }
           ],
           actions: [
             { 
-              label: 'Négociation groupe', 
+              label: 'Relancer assureurs', 
               variant: 'primary' as const,
-              modalType: 'negociation_groupe',
-              modalData: { title: 'Négociation groupe assurances' }
+              modalType: 'relancer_assureurs',
+              modalData: { title: 'Relances assureurs' }
             },
             { 
-              label: 'Audit couvertures', 
+              label: 'Préparer expertises', 
               variant: 'secondary' as const,
-              modalType: 'audit_couvertures',
-              modalData: { title: 'Audit couvertures' }
+              modalType: 'preparer_expertises',
+              modalData: { title: 'Préparation expertises' }
             }
           ],
-          modes: ['super_admin', 'finance']
+          modes: ['super_admin', 'responsable']
         },
-        // Fournisseurs - Mois
-        {
-          type: 'important' as const,
-          icon: 'supplier' as const,
-          title: 'Renégociation contrats fournisseurs',
-          subtitle: 'Révision annuelle - 12 contrats majeurs',
-          description: 'Renégociation contrats annuels - Optimisation coûts recommandée',
-          impact: 'Potentiel économies 15% sur achats = 67 000€/an',
-          suggestion: 'Appel d\'offres concurrentiel + négociation volume',
-          metrics: [
-            { value: '12', label: 'Contrats à renégocier', unit: '' },
-            { value: '67k€', label: 'Économies potentielles/an', unit: '' },
-            { value: '15%', label: 'Réduction coûts cible', unit: '' }
-          ],
-          actions: [
-            { 
-              label: 'Lancer appels offres', 
-              variant: 'primary' as const,
-              modalType: 'appels_offres',
-              modalData: { title: 'Appels d\'offres fournisseurs' }
-            },
-            { 
-              label: 'Benchmark prix', 
-              variant: 'outline' as const,
-              modalType: 'benchmark_prix',
-              modalData: { title: 'Benchmark prix marché' }
-            }
-          ],
-          modes: ['super_admin', 'ouvrier']
-        },
-        // Banques - Mois
-        {
-          type: 'important' as const,
-          icon: 'bank' as const,
-          title: 'Renégociation conditions bancaires',
-          subtitle: 'Taux crédit + commissions - 3 banques',
-          description: 'Révision annuelle conditions bancaires - Mise en concurrence',
-          impact: 'Économies financières potentielles 8 400€/an sur frais',
-          suggestion: 'Mise en concurrence + négociation taux préférentiels',
-          metrics: [
-            { value: '3', label: 'Banques partenaires', unit: '' },
-            { value: '8.4k€', label: 'Économies potentielles/an', unit: '' },
-            { value: '0.25%', label: 'Réduction taux cible', unit: '' }
-          ],
-          actions: [
-            { 
-              label: 'Négocier conditions', 
-              variant: 'primary' as const,
-              modalType: 'negocier_conditions',
-              modalData: { title: 'Négociation conditions bancaires' }
-            },
-            { 
-              label: 'Comparatif marché', 
-              variant: 'secondary' as const,
-              modalType: 'comparatif_marche',
-              modalData: { title: 'Comparatif marché bancaire' }
-            }
-          ],
-          modes: ['super_admin', 'finance']
-        },
-        // Administration - Mois
-        {
-          type: 'critical' as const,
-          icon: 'administration' as const,
-          title: 'Mise à jour registres légaux',
-          subtitle: 'Registre unique du personnel + DUERP',
-          description: 'Mise à jour obligatoire registres - Contrôle inspection probable',
-          impact: 'Risque amende 3 750€ par manquement + mise en demeure',
-          suggestion: 'Audit automatisé conformité + mise à jour prioritaire',
-          metrics: [
-            { value: '47', label: 'Registres à jour', unit: '' },
-            { value: '3.75k€', label: 'Amende par manquement', unit: '' },
-            { value: '15j', label: 'Délai mise à jour', unit: '' }
-          ],
-          actions: [
-            { 
-              label: 'Audit conformité', 
-              variant: 'primary' as const,
-              modalType: 'audit_conformite',
-              modalData: { title: 'Audit conformité registres' }
-            },
-            { 
-              label: 'Planifier mises à jour', 
-              variant: 'outline' as const,
-              modalType: 'planifier_maj',
-              modalData: { title: 'Planification mises à jour' }
-            }
-          ],
-          modes: ['super_admin', 'finance']
-        },
-        {
-          type: 'critical' as const,
-          icon: 'weather' as const,
-          title: 'Objectifs mensuels en péril',
-          description: 'CA prévisionnel : 78% de l\'objectif - Écart significatif',
-          impact: 'Manque à gagner estimé : 25 000€ sur le mois',
-          suggestion: 'Stratégie de rattrapage : prospection intensive + offres flash',
-          metrics: [
-            { value: '78', label: 'Objectif atteint', unit: '%' },
-            { value: '25', label: 'Manque à gagner', unit: 'k€' },
-            { value: '12', label: 'Jours restants', unit: '' }
-          ],
-          actions: [
-            { label: 'Plan de rattrapage', variant: 'primary' as const },
-            { label: 'Offres flash', variant: 'secondary' as const }
-          ],
-          modes: ['super_admin', 'finance', 'chef_equipe']
-        },
+        // Planning livraisons véhicules - semaine
         {
           type: 'important' as const,
           icon: 'payment' as const,
-          title: 'Bilan financier mensuel',
-          subtitle: 'Encaissements : 142 000€ - Charges : 89 000€',
-          description: 'Résultat positif mais en baisse vs mois précédent',
-          impact: 'Marge brute : 37% (objectif 40%) - Optimisation nécessaire',
-          suggestion: 'Révision des coûts variables + négociation fournisseurs prioritaire',
+          title: 'Livraisons véhicules prévues',
+          subtitle: '8 véhicules à livrer - 6 clients à contacter',
+          description: 'Organisation livraisons hebdomadaires - Coordination clients',
+          impact: 'Fluidité rotation atelier + satisfaction client optimale',
+          suggestion: 'Système de notification automatique + planification optimisée',
           metrics: [
-            { value: '142', label: 'Encaissements', unit: 'k€' },
-            { value: '89', label: 'Charges', unit: 'k€' },
-            { value: '37', label: 'Marge brute', unit: '%' }
+            { value: '8', label: 'Véhicules prêts', unit: '' },
+            { value: '6', label: 'Clients à contacter', unit: '' },
+            { value: '23.5k€', label: 'CA à encaisser', unit: '' }
           ],
           actions: [
-            { label: 'Analyser coûts', variant: 'primary' as const },
-            { label: 'Renégocier fournisseurs', variant: 'outline' as const }
+            { 
+              label: 'Programmer livraisons', 
+              variant: 'primary' as const,
+              modalType: 'programmer_livraisons',
+              modalData: { title: 'Planning livraisons' }
+            },
+            { 
+              label: 'Contacter clients', 
+              variant: 'outline' as const,
+              modalType: 'contacter_clients_livraison',
+              modalData: { title: 'Contact clients' }
+            }
           ],
-          modes: ['super_admin', 'finance']
+          modes: ['super_admin', 'responsable']
         },
+        // Gestion stocks pièces - semaine
+        {
+          type: 'critical' as const,
+          icon: 'supplier' as const,
+          title: 'Réapprovisionnement stocks',
+          subtitle: '15 références en seuil critique - Commandes urgentes',
+          description: 'Stock pièces détachées critique - Risque rupture imminente',
+          impact: 'Éviter blocage réparations + maintenir délais clients',
+          suggestion: 'Commandes automatiques + négociation délais fournisseurs',
+          metrics: [
+            { value: '15', label: 'Références critiques', unit: '' },
+            { value: '6.8k€', label: 'Montant commandes', unit: '' },
+            { value: '48h', label: 'Délai moyen livraison', unit: '' }
+          ],
+          actions: [
+            { 
+              label: 'Commander maintenant', 
+              variant: 'primary' as const,
+              modalType: 'commander_stock_urgent',
+              modalData: { title: 'Commandes urgentes' }
+            },
+            { 
+              label: 'Négocier délais', 
+              variant: 'secondary' as const,
+              modalType: 'negocier_delais_stock',
+              modalData: { title: 'Négociation délais' }
+            }
+          ],
+          modes: ['super_admin', 'responsable']
+        }
+      ],
+      month: [
+        // Bilan mensuel activité carrosserie
+        {
+          type: 'important' as const,
+          icon: 'payment' as const,
+          title: 'Bilan mensuel carrosserie',
+          subtitle: 'CA: 142 000€ - 89 véhicules réparés - Marge: 37%',
+          description: 'Performance mensuelle en légère baisse vs objectifs',
+          impact: 'Marge brute inférieure objectif 40% - Optimisation requise',
+          suggestion: 'Analyse coûts pièces + révision tarifs main d\'œuvre',
+          metrics: [
+            { value: '142k€', label: 'Chiffre d\'affaires', unit: '' },
+            { value: '89', label: 'Véhicules traités', unit: '' },
+            { value: '37%', label: 'Marge brute', unit: '' }
+          ],
+          actions: [
+            { 
+              label: 'Analyser rentabilité', 
+              variant: 'primary' as const,
+              modalType: 'analyser_rentabilite',
+              modalData: { title: 'Analyse rentabilité mensuelle' }
+            },
+            { 
+              label: 'Réviser tarifs', 
+              variant: 'outline' as const,
+              modalType: 'reviser_tarifs',
+              modalData: { title: 'Révision grille tarifaire' }
+            }
+          ],
+          modes: ['super_admin', 'responsable']
+        },
+        // Révision contrats assurances partenaires
+        {
+          type: 'critical' as const,
+          icon: 'insurance' as const,
+          title: 'Renouvellement accords assureurs',
+          subtitle: 'MAIF, AXA, GROUPAMA - Négociation annuelle',
+          description: 'Révision conditions partenariats assureurs - Enjeu volume',
+          impact: '68% du CA via assurances - Négociation stratégique critique',
+          suggestion: 'Mise en concurrence + valorisation expertise technique',
+          metrics: [
+            { value: '68%', label: 'CA via assurances', unit: '' },
+            { value: '3', label: 'Contrats à renégocier', unit: '' },
+            { value: '96k€', label: 'CA annuel concerné', unit: '' }
+          ],
+          actions: [
+            { 
+              label: 'Négocier contrats', 
+              variant: 'primary' as const,
+              modalType: 'negocier_contrats_assurance',
+              modalData: { title: 'Négociation contrats assureurs' }
+            },
+            { 
+              label: 'Étudier concurrence', 
+              variant: 'secondary' as const,
+              modalType: 'etudier_concurrence',
+              modalData: { title: 'Étude concurrentielle' }
+            }
+          ],
+          modes: ['super_admin', 'responsable']
+        },
+        // Formation équipe nouvelles technologies
         {
           type: 'important' as const,
           icon: 'cooling' as const,
-          title: 'Performance équipes mensuelle',
-          description: 'Productivité moyenne : 92% - 3 équipes sous-performantes',
-          impact: 'Potentiel d\'amélioration identifié - Formation recommandée',
-          suggestion: 'Programme de formation ciblé + système de prime performance',
+          title: 'Formation véhicules électriques',
+          subtitle: 'Certification Tesla + BMW i - 4 carrossiers',
+          description: 'Adaptation compétences véhicules électriques/hybrides',
+          impact: 'Accès marché VE en croissance + différenciation concurrentielle',
+          suggestion: 'Formation certifiante + investissement outils spécialisés',
           metrics: [
-            { value: '92', label: 'Productivité moy.', unit: '%' },
-            { value: '3', label: 'Équipes à former', unit: '' },
-            { value: '47', label: 'Interventions/équipe', unit: '' }
+            { value: '4', label: 'Carrossiers concernés', unit: '' },
+            { value: '28%', label: 'Croissance marché VE', unit: '' },
+            { value: '3.2k€', label: 'Coût formation/personne', unit: '' }
           ],
           actions: [
-            { label: 'Programmer formations', variant: 'primary' as const },
-            { label: 'Système primes', variant: 'secondary' as const }
+            { 
+              label: 'Programmer formation', 
+              variant: 'primary' as const,
+              modalType: 'programmer_formation_ve',
+              modalData: { title: 'Formation véhicules électriques' }
+            },
+            { 
+              label: 'Budgéter équipements', 
+              variant: 'outline' as const,
+              modalType: 'budgeter_equipements',
+              modalData: { title: 'Budget équipements VE' }
+            }
           ],
-          modes: ['super_admin', 'chef_equipe']
+          modes: ['super_admin', 'responsable']
         },
+        // Investissement équipements carrosserie
         {
           type: 'important' as const,
           icon: 'power' as const,
-          title: 'Investissements prévus',
-          description: 'Budget équipement : 45 000€ - 2 machines critiques',
-          impact: 'Modernisation nécessaire pour maintenir compétitivité',
-          suggestion: 'Financement optimisé identifié - ROI prévu 18 mois',
+          title: 'Modernisation équipements',
+          subtitle: 'Marbre de redressage + système mixage peinture',
+          description: 'Renouvellement équipements critiques - Fin de vie atteinte',
+          impact: 'Qualité réparations + réduction temps intervention',
+          suggestion: 'Financement étalé + ROI calculé sur gains productivité',
           metrics: [
-            { value: '45', label: 'Budget prévu', unit: 'k€' },
-            { value: '2', label: 'Machines critiques', unit: '' },
-            { value: '18', label: 'ROI prévu', unit: 'mois' }
+            { value: '67k€', label: 'Budget équipements', unit: '' },
+            { value: '24', label: 'ROI prévu', unit: 'mois' },
+            { value: '15%', label: 'Gain productivité', unit: '' }
           ],
           actions: [
-            { label: 'Valider financement', variant: 'primary' as const },
-            { label: 'Planifier installation', variant: 'outline' as const, icon: <Wrench className="h-3 w-3" /> }
+            { 
+              label: 'Valider investissement', 
+              variant: 'primary' as const,
+              modalType: 'valider_investissement',
+              modalData: { title: 'Validation investissement' }
+            },
+            { 
+              label: 'Étudier financement', 
+              variant: 'outline' as const,
+              modalType: 'etudier_financement',
+              modalData: { title: 'Options financement' }
+            }
           ],
-          modes: ['super_admin', 'finance']
+          modes: ['super_admin', 'responsable']
         }
       ]
     };
