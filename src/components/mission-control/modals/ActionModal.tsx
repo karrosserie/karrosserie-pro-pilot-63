@@ -585,6 +585,635 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
           </div>
         );
 
+      case 'mise_abri_vehicules':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-destructive" />
+                Mise à l'abri urgente - 4 véhicules
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-destructive/10 p-3 rounded border border-destructive/20">
+                  <div className="text-sm font-medium text-destructive mb-1">Peinture fraîche exposée aux intempéries</div>
+                  <p className="text-xs text-muted-foreground">Risque de défauts irréversibles si exposition prolongée</p>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between p-2 bg-card rounded border-l-4 border-l-karrosserie-orange">
+                    <span>Peugeot 308 - Zone B2</span>
+                    <span className="text-destructive font-medium">Peinture 6h de séchage</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-card rounded border-l-4 border-l-karrosserie-orange">
+                    <span>Renault Clio - Zone B3</span>
+                    <span className="text-destructive font-medium">Vernis en cours</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-card rounded border-l-4 border-l-karrosserie-orange">
+                    <span>BMW X1 - Zone B1</span>
+                    <span className="text-destructive font-medium">Apprêt frais</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Plan d'action immédiat</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <span>Transfert vers hangar couvert sous 15 min</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span>Équipe de 3 carrossiers mobilisée</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Notification clients automatique des délais</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                Mise à l'abri immédiate
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Programmer déplacement
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'programmer_etuvage':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary" />
+                Programmation étuvage accéléré
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-accent p-3 rounded">
+                  <div className="text-sm font-medium mb-1">Étuves disponibles</div>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-green-600">Étuve n°1:</span>
+                      <p className="font-medium">Libre - 60°C prête</p>
+                    </div>
+                    <div>
+                      <span className="text-karrosserie-orange">Étuve n°2:</span>
+                      <p className="font-medium">Occupée jusqu'à 16h</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Temps d'étuvage optimisé:</span>
+                    <span className="font-medium text-green-600">2h au lieu de 8h</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Consommation énergétique:</span>
+                    <span className="font-medium">+35€ par véhicule</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Livraison possible:</span>
+                    <span className="font-medium text-green-600">Demain 10h</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Programmer étuvage
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Séchage naturel prolongé
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'contentieux_client':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <FileText className="h-4 w-4 text-destructive" />
+                Procédure contentieuse - Mme MARTIN
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-card p-3 rounded border-l-4 border-l-destructive">
+                  <div className="text-sm font-medium mb-1">Peugeot 308 - Réparation sinistre</div>
+                  <p className="text-xs text-muted-foreground">Véhicule livré le 10/10/2024 - Facture impayée</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span className="text-muted-foreground">Montant dû:</span>
+                    <p className="font-medium text-destructive">2 847€ TTC</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Retard:</span>
+                    <p className="font-medium text-destructive">45 jours</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Relances envoyées:</span>
+                    <p className="font-medium">7 courriers + emails</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Statut client:</span>
+                    <p className="font-medium text-destructive">Injoignable</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Étapes contentieuses</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  <span>Mise en demeure LRAR automatique</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Saisine huissier après 15 jours</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  <span>Inscription FICP si nécessaire</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                Lancer contentieux
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Dernière relance amiable
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'programmer_expertise':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary" />
+                Programmation expertise - BMW X3 2019
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-card p-3 rounded border-l-4 border-l-karrosserie-orange">
+                  <div className="text-sm font-medium mb-1">Sinistre automobile - Choc frontal</div>
+                  <p className="text-xs text-muted-foreground">Assurance MAIF - Contrat n° 12847539</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span className="text-muted-foreground">Expert assigné:</span>
+                    <p className="font-medium">M. BERNARD (MAIF)</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Disponibilité:</span>
+                    <p className="font-medium text-green-600">Demain 14h</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Durée prévue:</span>
+                    <p className="font-medium">1h 30min</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Photos préparatoires:</span>
+                    <p className="font-medium text-green-600">Prises et envoyées</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Préparation expertise</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Dossier technique:</span>
+                  <span className="text-green-600 font-medium">Complet</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Devis préliminaire:</span>
+                  <span className="text-green-600 font-medium">8 450€ TTC</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Pièces détachées:</span>
+                  <span className="text-green-600 font-medium">Disponibilité vérifiée</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Confirmer RDV expertise
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Reporter à plus tard
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'commander_alternatif':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <Package className="h-4 w-4 text-primary" />
+                Commande alternative - Pare-choc BMW Série 3
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-destructive/10 p-3 rounded border border-destructive/20">
+                  <div className="text-sm font-medium text-destructive mb-1">Stock principal épuisé</div>
+                  <p className="text-xs text-muted-foreground">Délai fournisseur BMW : 10 jours ouvrés</p>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="p-2 bg-card rounded border border-green-200">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">AUTODISTRIB FRANCE</span>
+                      <span className="text-green-600 font-medium">Stock: 2 unités</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>Livraison: 24h</span>
+                      <span>Prix: 385€ HT (+15€)</span>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded border border-karrosserie-orange/50">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">PIECES AUTO EXPRESS</span>
+                      <span className="text-karrosserie-orange font-medium">Livraison: 48h</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>Stock: 1 unité</span>
+                      <span>Prix: 370€ HT (prix normal)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Impact sur planning</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Véhicules débloqués:</span>
+                  <span className="font-medium text-green-600">3 BMW Série 3</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Économie pénalités:</span>
+                  <span className="font-medium text-green-600">4 500€ (10j × 450€)</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Surcoût fournisseur:</span>
+                  <span className="font-medium text-destructive">+45€ (3 × 15€)</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Commander AUTODISTRIB
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Comparer d'autres prix
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'intervention_cabine':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-destructive" />
+                Intervention urgente - Cabine de peinture n°2
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-destructive/10 p-3 rounded border border-destructive/20">
+                  <div className="text-sm font-medium text-destructive mb-1">Surchauffe système ventilation</div>
+                  <p className="text-xs text-muted-foreground">Température actuelle: 42°C (Normal: 22°C)</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span className="text-muted-foreground">Technicien disponible:</span>
+                    <p className="font-medium text-green-600">Pierre MAINTENANCE</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Pièce suspectée:</span>
+                    <p className="font-medium">Ventilateur extracteur</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Stock pièce:</span>
+                    <p className="font-medium text-green-600">1 unité disponible</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Durée intervention:</span>
+                    <p className="font-medium">2h maximum</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Plan d'intervention</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <span>Arrêt cabine immédiat pour sécurité</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span>Diagnostic complet système ventilation</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Remplacement ventilateur si confirmé</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  <span>Tests et remise en service</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                Intervention immédiate
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Programmer maintenance
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'negocier_arrangement':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <User className="h-4 w-4 text-primary" />
+                Négociation arrangement - Mme MARTIN
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-card p-3 rounded border-l-4 border-l-karrosserie-orange">
+                  <div className="text-sm font-medium mb-1">Proposition d'arrangement amiable</div>
+                  <p className="text-xs text-muted-foreground">Éviter les frais de procédure - Solution gagnant/gagnant</p>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="p-2 bg-accent rounded">
+                    <div className="flex justify-between">
+                      <span>Remise commerciale (10%):</span>
+                      <span className="font-medium text-green-600">-285€</span>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-accent rounded">
+                    <div className="flex justify-between">
+                      <span>Montant réduit:</span>
+                      <span className="font-medium">2 562€</span>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-accent rounded">
+                    <div className="flex justify-between">
+                      <span>Paiement échelonné:</span>
+                      <span className="font-medium text-green-600">3 × 854€</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Avantages arrangement</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <span>Évite frais d'huissier (150-300€)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Préserve relation client</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  <span>Encaissement rapide garanti</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Proposer arrangement
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Maintenir montant initial
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'preparer_dossier_sinistre':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <FileText className="h-4 w-4 text-primary" />
+                Préparation dossier sinistre - BMW X3 2019
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-card p-3 rounded border-l-4 border-l-karrosserie-orange">
+                  <div className="text-sm font-medium mb-1">Documents requis par l'assureur MAIF</div>
+                  <p className="text-xs text-muted-foreground">Dossier complet pour accélération traitement</p>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between p-2 bg-green-50 rounded border border-green-200">
+                    <span>✓ Constat amiable</span>
+                    <span className="text-green-600 font-medium">Scanné</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-green-50 rounded border border-green-200">
+                    <span>✓ Photos dégâts multiples</span>
+                    <span className="text-green-600 font-medium">27 photos HD</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-card rounded">
+                    <span>📋 Devis réparation détaillé</span>
+                    <span className="text-primary font-medium">En préparation</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-card rounded">
+                    <span>📋 Facture véhicule courtoisie</span>
+                    <span className="text-primary font-medium">À générer</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Éléments techniques</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Temps de main d'œuvre:</span>
+                  <span className="font-medium">18h estimées</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Pièces détachées:</span>
+                  <span className="font-medium text-green-600">Liste établie</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Sous-traitance peinture:</span>
+                  <span className="font-medium">4 600€ HT</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Finaliser dossier
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Compléter photos
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'chercher_occasion':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <Package className="h-4 w-4 text-primary" />
+                Recherche pièce occasion - Pare-choc BMW Série 3
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-accent p-3 rounded">
+                  <div className="text-sm font-medium mb-1">Casses automobiles partenaires</div>
+                  <p className="text-xs text-muted-foreground">Réseau de 847 casses référencées</p>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="p-2 bg-card rounded border border-green-200">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">AUTO RECYCLAGE 34</span>
+                      <span className="text-green-600 font-medium">État: Excellent</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>BMW 320d 2018 - 15 000km</span>
+                      <span>Prix: 195€ HT (-50%)</span>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded border border-karrosserie-orange/50">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">PIECES OCCASION SUD</span>
+                      <span className="text-karrosserie-orange font-medium">État: Bon</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>BMW 318i 2019 - 32 000km</span>
+                      <span>Prix: 165€ HT (-55%)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Avantages pièce occasion</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Économie vs neuf:</span>
+                  <span className="font-medium text-green-600">-190€ par pare-choc</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Disponibilité:</span>
+                  <span className="font-medium text-green-600">Immédiate</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Garantie casse:</span>
+                  <span className="font-medium">3 mois retour</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Commander occasion
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Négocier prix
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'reorganiser_planning':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary" />
+                Réorganisation planning peinture
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-destructive/10 p-3 rounded border border-destructive/20">
+                  <div className="text-sm font-medium text-destructive mb-1">Cabine n°2 hors service</div>
+                  <p className="text-xs text-muted-foreground">Capacité réduite 50% - 8 véhicules en attente</p>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="p-2 bg-card rounded border-l-4 border-l-green-500">
+                    <div className="flex justify-between">
+                      <span>Cabine n°1 - Priorité absolue</span>
+                      <span className="text-green-600 font-medium">BMW X3 + Peugeot 208</span>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded border-l-4 border-l-karrosserie-orange">
+                    <div className="flex justify-between">
+                      <span>Sous-traitance externe</span>
+                      <span className="text-karrosserie-orange font-medium">3 véhicules</span>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-card rounded border-l-4 border-l-destructive">
+                    <div className="flex justify-between">
+                      <span>Report nécessaire</span>
+                      <span className="text-destructive font-medium">3 véhicules (+2j)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Optimisation proposée</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Cabine n°1 - Sessions étendues:</span>
+                  <span className="font-medium text-green-600">+4h/jour</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Sous-traitance CARROSSE PRO:</span>
+                  <span className="font-medium text-karrosserie-orange">+85€/véhicule</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Retard client maximum:</span>
+                  <span className="font-medium text-green-600">2 jours</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button className="flex-1 bg-primary hover:bg-primary/90">
+                Valider réorganisation
+              </Button>
+              <Button variant="outline" className="flex-1">
+                Négocier sous-traitance
+              </Button>
+            </div>
+          </div>
+        );
+
       default:
         return (
           <div className="text-center py-8">
