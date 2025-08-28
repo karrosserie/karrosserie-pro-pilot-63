@@ -327,7 +327,7 @@ export default function MessageriePriorites() {
                             </Button>
                           </>
                         )}
-                        <Button size="sm" variant="outline" onClick={() => handleEscalate(it.id)}>
+                        <Button size="sm" variant="destructive" onClick={() => handleEscalate(it.id)}>
                           Escalader
                         </Button>
                       </>
