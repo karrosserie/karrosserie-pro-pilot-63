@@ -1,10 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Car, FileText, Users, CreditCard, Eye, Pencil, Wrench, PaintBucket } from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/use-dashboard-data';
 import VehicleDialog from '@/components/vehicle/VehicleDialog';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
@@ -12,9 +12,12 @@ import ClientDialog from '@/components/client/ClientDialog';
 import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 import MobileHomePage from '@/components/mobile/MobileHomePage';
 import { useMobileDetection } from '@/hooks/use-mobile-detection';
+import { useUserRole } from '@/hooks/use-user-role';
 
 const Index = () => {
   const isMobile = useMobileDetection();
+  const navigate = useNavigate();
+  const { isCarrossier, isCarrossierCourtesy, isLoading: roleLoading } = useUserRole();
   const { dashboardStats, recentVehicles, recentDocuments, recentActivity, isLoading } = useDashboardData();
   
   // États pour les dialogues
@@ -26,6 +29,13 @@ const Index = () => {
   // États pour les dialogues de véhicules
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [vehicleDialogMode, setVehicleDialogMode] = useState<'create' | 'edit' | 'view'>('create');
+
+  // Redirection basée sur le rôle pour les carrossiers
+  useEffect(() => {
+    if (!roleLoading && (isCarrossier || isCarrossierCourtesy)) {
+      navigate('/planning', { replace: true });
+    }
+  }, [isCarrossier, isCarrossierCourtesy, roleLoading, navigate]);
 
   // Early return for mobile to prevent any potential conflicts
   if (isMobile) {

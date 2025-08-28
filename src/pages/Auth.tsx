@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { usePostLoginRedirect } from '@/hooks/use-post-login-redirect';
 import AuthContainer from '@/components/auth/AuthContainer';
 import LoginForm from '@/components/auth/LoginForm';
 import SignupForm from '@/components/auth/SignupForm';
@@ -17,9 +16,6 @@ const Auth = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
-  // Utiliser le hook de redirection post-connexion
-  usePostLoginRedirect();
   
   // Déterminer le mode basé sur l'URL
   useEffect(() => {
