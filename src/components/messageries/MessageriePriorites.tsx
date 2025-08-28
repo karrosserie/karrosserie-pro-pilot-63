@@ -332,7 +332,7 @@ export default function MessageriePriorites() {
                         </Button>
                       </>
                     )}
-                    <Button size="sm" variant="outline" onClick={() => toggleResolved(it.id)}>
+                    <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => toggleResolved(it.id)}>
                       {it.resolved ? "Marquer non résolu" : "Marquer résolu"}
                     </Button>
                     <Button size="sm" variant="outline" onClick={() => handleArchive(it.id)}>
