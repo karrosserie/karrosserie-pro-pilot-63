@@ -587,57 +587,57 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
 
       case 'mise_abri_vehicules':
         return (
-          <div className="space-y-4">
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-destructive" />
+          <div className="space-y-3 max-h-[80vh] overflow-y-auto">
+            <div className="bg-muted/50 p-3 rounded-lg">
+              <h4 className="font-medium text-xs sm:text-sm mb-2 flex items-center gap-2">
+                <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-destructive flex-shrink-0" />
                 Mise à l'abri urgente - 4 véhicules
               </h4>
-              <div className="space-y-3">
-                <div className="bg-destructive/10 p-3 rounded border border-destructive/20">
-                  <div className="text-sm font-medium text-destructive mb-1">Peinture fraîche exposée aux intempéries</div>
+              <div className="space-y-2">
+                <div className="bg-destructive/10 p-2 rounded border border-destructive/20">
+                  <div className="text-xs sm:text-sm font-medium text-destructive mb-1">Peinture fraîche exposée aux intempéries</div>
                   <p className="text-xs text-muted-foreground">Risque de défauts irréversibles si exposition prolongée</p>
                 </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between p-2 bg-card rounded border-l-4 border-l-karrosserie-orange">
-                    <span>Peugeot 308 - Zone B2</span>
-                    <span className="text-destructive font-medium">Peinture 6h de séchage</span>
+                <div className="space-y-1 text-xs sm:text-sm">
+                  <div className="flex justify-between items-center p-2 bg-card rounded border-l-2 border-l-karrosserie-orange">
+                    <span className="font-medium">Peugeot 308 - Zone B2</span>
+                    <span className="text-destructive font-medium text-xs">Peinture 6h de séchage</span>
                   </div>
-                  <div className="flex justify-between p-2 bg-card rounded border-l-4 border-l-karrosserie-orange">
-                    <span>Renault Clio - Zone B3</span>
-                    <span className="text-destructive font-medium">Vernis en cours</span>
+                  <div className="flex justify-between items-center p-2 bg-card rounded border-l-2 border-l-karrosserie-orange">
+                    <span className="font-medium">Renault Clio - Zone B3</span>
+                    <span className="text-destructive font-medium text-xs">Vernis en cours</span>
                   </div>
-                  <div className="flex justify-between p-2 bg-card rounded border-l-4 border-l-karrosserie-orange">
-                    <span>BMW X1 - Zone B1</span>
-                    <span className="text-destructive font-medium">Apprêt frais</span>
+                  <div className="flex justify-between items-center p-2 bg-card rounded border-l-2 border-l-karrosserie-orange">
+                    <span className="font-medium">BMW X1 - Zone B1</span>
+                    <span className="text-destructive font-medium text-xs">Apprêt frais</span>
                   </div>
                 </div>
               </div>
             </div>
             
-            <div className="bg-accent/50 p-4 rounded-lg">
-              <h4 className="font-medium text-sm mb-2">Plan d'action immédiat</h4>
-              <div className="space-y-2 text-sm">
+            <div className="bg-accent/50 p-3 rounded-lg">
+              <h4 className="font-medium text-xs sm:text-sm mb-2">Plan d'action immédiat</h4>
+              <div className="space-y-1.5 text-xs sm:text-sm">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
+                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                   <span>Transfert vers hangar couvert sous 15 min</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
+                  <User className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                   <span>Équipe de 3 carrossiers mobilisée</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
+                  <FileText className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                   <span>Notification clients automatique des délais</span>
                 </div>
               </div>
             </div>
 
             <div className="flex gap-2">
-              <Button className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+              <Button className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground text-xs sm:text-sm h-8 sm:h-10">
                 Mise à l'abri immédiate
               </Button>
-              <Button variant="outline" className="flex-1">
+              <Button variant="outline" className="flex-1 text-xs sm:text-sm h-8 sm:h-10">
                 Programmer déplacement
               </Button>
             </div>
@@ -2235,13 +2235,21 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-card border-border">
-        <DialogHeader className="pb-2">
-          <DialogTitle className="text-lg font-semibold text-card-foreground">
+      <DialogContent className="max-w-md sm:max-w-lg bg-card border-border max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="pb-2 flex-shrink-0">
+          <DialogTitle className="text-base sm:text-lg font-semibold text-card-foreground flex items-center justify-between">
             {modalData?.title || 'Action'}
+            <button
+              onClick={onClose}
+              className="p-1 hover:bg-gray-100 rounded-full transition-colors ml-2"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </DialogTitle>
         </DialogHeader>
-        {renderModalContent()}
+        <div className="overflow-y-auto flex-1 pr-1">
+          {renderModalContent()}
+        </div>
       </DialogContent>
     </Dialog>
   );
