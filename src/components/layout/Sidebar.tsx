@@ -109,7 +109,7 @@ const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems
 const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
   const location = useLocation();
   const { isAdmin } = useAdmin();
-  const { userRole, isCarrossierCourtesy } = useUserRole();
+  const { userRole, isCarrossierCourtesy, isCarrossier, isResponsable, isResponsableAdmin } = useUserRole();
   
   const isActivePath = (path: string): boolean => {
     if (path === '/') {
@@ -158,12 +158,43 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
   ];
 
   // Filtrer les éléments selon le rôle de l'utilisateur
-  const navItems = isCarrossierCourtesy 
-    ? allNavItems.filter(item => 
-        item.path === '/planning' || 
-        item.path === '/fleet'
-      )
-    : allNavItems;
+  let navItems = allNavItems;
+
+  if (isCarrossier) {
+    // Carrossier : seulement planning
+    navItems = allNavItems.filter(item => 
+      item.path === '/planning'
+    );
+  } else if (isCarrossierCourtesy) {
+    // Carrossier-véhicule de courtoisie : planning et véhicules de courtoisie
+    navItems = allNavItems.filter(item => 
+      item.path === '/planning' || 
+      item.path === '/fleet'
+    );
+  } else if (isResponsable) {
+    // Responsable : tableau de bord, clients, véhicules, planning, véhicules de courtoisie
+    navItems = allNavItems.filter(item => 
+      item.path === '/' ||
+      item.path === '/clients' ||
+      item.path === '/vehicles' ||
+      item.path === '/planning' ||
+      item.path === '/fleet' ||
+      item.path === '/settings' ||
+      item.path === '/help'
+    );
+  } else if (isResponsableAdmin) {
+    // Responsable administratif : documents, paiements, tableau de bord, assistant IA, cession de créance, comptabilité
+    navItems = allNavItems.filter(item => 
+      item.path === '/' ||
+      item.path === '/ai-assistant' ||
+      item.path === '/documents' ||
+      item.path === '/payments' ||
+      item.path === '/cessions' ||
+      item.path === '/accounting' ||
+      item.path === '/settings' ||
+      item.path === '/help'
+    );
+  }
 
   const handleOverlayClick = () => {
     if (isMobile) {
