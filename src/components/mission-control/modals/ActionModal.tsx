@@ -278,17 +278,9 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md bg-card border-border">
         <DialogHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-lg font-semibold text-card-foreground">
-              {modalData?.title || 'Action'}
-            </DialogTitle>
-            <button
-              onClick={onClose}
-              className="w-6 h-6 bg-muted rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors"
-            >
-              <X className="h-4 w-4 text-muted-foreground" />
-            </button>
-          </div>
+          <DialogTitle className="text-lg font-semibold text-card-foreground">
+            {modalData?.title || 'Action'}
+          </DialogTitle>
         </DialogHeader>
         {renderModalContent()}
       </DialogContent>
