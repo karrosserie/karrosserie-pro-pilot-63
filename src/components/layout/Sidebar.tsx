@@ -20,7 +20,8 @@ import {
   X,
   HelpCircle,
   Calendar,
-  Shield
+  Shield,
+  MessageSquare
 } from 'lucide-react';
 import { useAdmin } from '@/hooks/use-admin';
 import { useUserRole } from '@/hooks/use-user-role';
@@ -125,6 +126,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     { icon: <Users className="app-icon" />, label: 'Clients', path: '/clients' },
     { icon: <Car className="app-icon" />, label: 'Véhicules', path: '/vehicles' },
     { icon: <Calendar className="app-icon" />, label: 'Planning', path: '/planning' },
+    { icon: <MessageSquare className="app-icon" />, label: 'Messageries', path: '/messageries' },
     { 
       icon: <FileText className="app-icon" />, 
       label: 'Documents', 
@@ -172,21 +174,23 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
       item.path === '/fleet'
     );
   } else if (isResponsable) {
-    // Responsable : tableau de bord, clients, véhicules, planning, véhicules de courtoisie
+    // Responsable : tableau de bord, clients, véhicules, planning, véhicules de courtoisie, messageries
     navItems = allNavItems.filter(item => 
       item.path === '/' ||
       item.path === '/clients' ||
       item.path === '/vehicles' ||
       item.path === '/planning' ||
+      item.path === '/messageries' ||
       item.path === '/fleet' ||
       item.path === '/settings' ||
       item.path === '/help'
     );
   } else if (isResponsableAdmin) {
-    // Responsable administratif : documents, paiements, tableau de bord, assistant IA, cession de créance, comptabilité
+    // Responsable administratif : documents, paiements, tableau de bord, assistant IA, cession de créance, comptabilité, messageries
     navItems = allNavItems.filter(item => 
       item.path === '/' ||
       item.path === '/ai-assistant' ||
+      item.path === '/messageries' ||
       item.path === '/documents' ||
       item.path === '/payments' ||
       item.path === '/cessions' ||

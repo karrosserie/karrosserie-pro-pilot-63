@@ -13,6 +13,7 @@ import Accounting from "@/pages/Accounting";
 import Cessions from "@/pages/Cessions";
 import Help from "@/pages/Help";
 import KarrosseriePlanningPage from "@/pages/KarrosseriePlanningPage";
+import Messageries from "@/pages/Messageries";
 
 export const coreRoutes = [
   {
@@ -131,6 +132,16 @@ export const coreRoutes = [
       <ProtectedRoute>
         <AppLayout>
           <KarrosseriePlanningPage />
+        </AppLayout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/messageries",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <Messageries />
         </AppLayout>
       </ProtectedRoute>
     )
