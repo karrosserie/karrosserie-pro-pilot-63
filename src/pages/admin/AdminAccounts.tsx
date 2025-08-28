@@ -92,18 +92,18 @@ const AdminAccounts = () => {
             .eq('status', 'active')
             .single();
 
-          return {
-            ...company,
-            user_count: userCount || 0,
-            subscription: subscriptionData ? {
-              id: subscriptionData.id,
-              plan_name: subscriptionData.subscription_plans?.name || 'Unknown',
-              status: subscriptionData.status,
-              tokens_remaining: subscriptionData.tokens_remaining,
-              tokens_used: subscriptionData.tokens_used,
-              end_date: subscriptionData.end_date,
-            } : undefined
-          };
+           return {
+             ...company,
+             user_count: userCount || 0,
+             subscription: subscriptionData ? {
+               id: subscriptionData.id,
+               plan_name: subscriptionData.subscription_plans?.name || 'Unknown',
+               status: subscriptionData.status,
+               tokens_remaining: subscriptionData.tokens_remaining,
+               tokens_used: subscriptionData.tokens_used,
+               end_date: subscriptionData.end_date,
+             } : undefined
+           };
         })
       );
 
@@ -331,7 +331,11 @@ const AdminAccounts = () => {
                   <TableCell>
                     {company.subscription?.end_date ? (
                       <span className="text-sm">
-                        {new Date(company.subscription.end_date).toLocaleDateString('fr-FR')}
+                        {new Date(company.subscription.end_date).toLocaleDateString('fr-FR', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit'
+                        })}
                       </span>
                     ) : (
                       <span className="text-muted-foreground">-</span>
