@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import ActionModalExtended from './ActionModalExtended';
 import { useToast } from '@/hooks/use-toast';
-import { X, User, Calendar, Phone, Mail, CreditCard, FileText, AlertTriangle, Package, CheckCircle } from 'lucide-react';
+import { X, User, Calendar, Phone, Mail, CreditCard, FileText, AlertTriangle, Package, CheckCircle, Calculator } from 'lucide-react';
 
 interface ActionModalProps {
   isOpen: boolean;
@@ -253,6 +253,128 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
     setIsLoading(null);
     onClose();
   };
+
+  // Handlers supplémentaires pour tous les autres cas
+  const handleReplanifierMeteo = async () => {
+    setIsLoading('replanification');
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    toast({
+      title: "Replanification validée",
+      description: "3 chantiers reportés. Équipes réassignées. Gain productivité +15%."
+    });
+    setIsLoading(null);
+    onClose();
+  };
+
+  const handleRelancePaiement = async () => {
+    setIsLoading('relance_paiement');
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    toast({
+      title: "Relance envoyée",
+      description: "Email + AR envoyé à DUPONT SARL. Appel programmé J+2."
+    });
+    setIsLoading(null);
+    onClose();
+  };
+
+  const handleInterventionUrgence = async () => {
+    setIsLoading('intervention');
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    toast({
+      title: "Intervention déclenchée",
+      description: "Pierre MARTIN en route. ETA 12 minutes. Client informé."
+    });
+    setIsLoading(null);
+    onClose();
+  };
+
+  const handleVerifierStock = async () => {
+    setIsLoading('stock');
+    await new Promise(resolve => setTimeout(resolve, 800));
+    toast({
+      title: "Stock vérifié",
+      description: "Matériel préparé en 8 minutes. Véhicule VU-247 prêt à partir."
+    });
+    setIsLoading(null);
+    onClose();
+  };
+
+  const handleNegocierEcheances = async () => {
+    setIsLoading('echeances');
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    toast({
+      title: "Échéancier proposé",
+      description: "Plan de paiement 6 mois envoyé. Première échéance réduite à 800€."
+    });
+    setIsLoading(null);
+    onClose();
+  };
+
+  const handleProgrammerReparation = async () => {
+    setIsLoading('reparation');
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    toast({
+      title: "Réparation programmée",
+      description: "Intervention planifiée mardi 9h. Pièces commandées. Client informé."
+    });
+    setIsLoading(null);
+    onClose();
+  };
+
+  const handleSolutionTemporaire = async () => {
+    setIsLoading('temporaire');
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    toast({
+      title: "Solution temporaire déployée",
+      description: "Générateur de secours installé. Système opérationnel sous 30min."
+    });
+    setIsLoading(null);
+    onClose();
+  };
+
+  const handleReviserTarifs = async () => {
+    setIsLoading('tarifs');
+    await new Promise(resolve => setTimeout(resolve, 2200));
+    toast({
+      title: "Grille tarifaire révisée",
+      description: "Tarifs main d'œuvre +5€/h. Peinture +3€/h. Marge cible 40% atteinte."
+    });
+    setIsLoading(null);
+    onClose();
+  };
+
+  const handleEtudierConcurrence = async () => {
+    setIsLoading('concurrence');
+    await new Promise(resolve => setTimeout(resolve, 1800));
+    toast({
+      title: "Étude concurrentielle finalisée",
+      description: "Positionnement analysé. Avantages compétitifs identifiés. Stratégie définie."
+    });
+    setIsLoading(null);
+    onClose();
+  };
+
+  const handleBudgeterEquipements = async () => {
+    setIsLoading('budget');
+    await new Promise(resolve => setTimeout(resolve, 2500));
+    toast({
+      title: "Budget équipements VE validé",
+      description: "Investissement 45k€ approuvé. Pont électrique + outils spécialisés."
+    });
+    setIsLoading(null);
+    onClose();
+  };
+
+  const handleEtudierFinancement = async () => {
+    setIsLoading('financement');
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    toast({
+      title: "Options de financement étudiées",
+      description: "Crédit-bail retenu. Mensualité 1.890€. Première échéance dans 60 jours."
+    });
+    setIsLoading(null);
+    onClose();
+  };
   // Vérifier si c'est une modal étendue
   const extendedModalTypes = ['audit_fiscal', 'analyser_ecarts', 'dossier_sinistre', 'commande_express', 'virement_urgence'];
   
@@ -312,10 +434,30 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
               </div>
             </div>
             <div className="flex gap-2">
-              <Button className="flex-1 bg-primary hover:bg-primary/90">
-                Valider la replanification
+              <Button 
+                className="flex-1 bg-primary hover:bg-primary/90 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105"
+                onClick={handleReplanifierMeteo}
+                disabled={isLoading === 'replanification'}
+              >
+                {isLoading === 'replanification' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Validation...</span>
+                  </div>
+                ) : (
+                  <>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Valider la replanification
+                  </>
+                )}
               </Button>
-              <Button variant="outline" className="flex-1">
+              <Button 
+                variant="outline" 
+                className="flex-1 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105 hover:bg-muted"
+                onClick={() => handleGenericAction('Modification manuelle', 'Interface de planification ouverte. Modifications manuelles activées.')}
+                disabled={isLoading !== null}
+              >
+                <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Modifier manuellement
               </Button>
             </div>
@@ -378,12 +520,30 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
             </div>
 
             <div className="grid grid-cols-2 gap-2">
-              <Button className="bg-primary hover:bg-primary/90">
-                <Mail className="h-4 w-4 mr-2" />
-                Envoyer relance
+              <Button 
+                className="bg-primary hover:bg-primary/90 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105"
+                onClick={handleRelancePaiement}
+                disabled={isLoading === 'relance_paiement'}
+              >
+                {isLoading === 'relance_paiement' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Envoi...</span>
+                  </div>
+                ) : (
+                  <>
+                    <Mail className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Envoyer relance
+                  </>
+                )}
               </Button>
-              <Button variant="outline">
-                <Phone className="h-4 w-4 mr-2" />
+              <Button 
+                variant="outline" 
+                className="text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105 hover:bg-muted"
+                onClick={() => handleGenericAction('Appel programmé', 'Rappel téléphonique planifié demain 14h avec M. Dupont.')}
+                disabled={isLoading !== null}
+              >
+                <Phone className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Programmer appel
               </Button>
             </div>
@@ -437,10 +597,30 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
             </div>
 
             <div className="grid grid-cols-2 gap-2">
-              <Button className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
-                Déclencher intervention
+              <Button 
+                className="bg-destructive hover:bg-destructive/90 text-destructive-foreground text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105"
+                onClick={handleInterventionUrgence}
+                disabled={isLoading === 'intervention'}
+              >
+                {isLoading === 'intervention' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Déclenchement...</span>
+                  </div>
+                ) : (
+                  <>
+                    <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Déclencher intervention
+                  </>
+                )}
               </Button>
-              <Button variant="outline">
+              <Button 
+                variant="outline" 
+                className="text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105 hover:bg-muted"
+                onClick={() => handleGenericAction('Client contacté', 'Client informé de la situation. ETA technicien communiqué.')}
+                disabled={isLoading !== null}
+              >
+                <Phone className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Contacter le client
               </Button>
             </div>
@@ -575,10 +755,30 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
             </div>
 
             <div className="flex gap-2">
-              <Button className="flex-1 bg-primary hover:bg-primary/90">
-                Appliquer les alternatives
+              <Button 
+                className="flex-1 bg-primary hover:bg-primary/90 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105"
+                onClick={() => handleGenericAsyncAction('alternatives', 'Alternatives appliquées', 'Travaux intérieurs avancés de 2 jours. Clients prévenus des ajustements.')}
+                disabled={isLoading === 'alternatives'}
+              >
+                {isLoading === 'alternatives' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Application...</span>
+                  </div>
+                ) : (
+                  <>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Appliquer les alternatives
+                  </>
+                )}
               </Button>
-              <Button variant="outline" className="flex-1">
+              <Button 
+                variant="outline" 
+                className="flex-1 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105 hover:bg-muted"
+                onClick={() => handleGenericAction('Planning personnalisé', 'Interface de planification ouverte. Ajustements manuels activés.')}
+                disabled={isLoading !== null}
+              >
+                <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Personnaliser planning
               </Button>
             </div>
@@ -637,11 +837,30 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
             </div>
 
             <div className="flex gap-2">
-              <Button className="flex-1 bg-primary hover:bg-primary/90">
-                <Package className="h-4 w-4 mr-2" />
-                Préparer matériel
+              <Button 
+                className="flex-1 bg-primary hover:bg-primary/90 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105"
+                onClick={handleVerifierStock}
+                disabled={isLoading === 'stock'}
+              >
+                {isLoading === 'stock' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Préparation...</span>
+                  </div>
+                ) : (
+                  <>
+                    <Package className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Préparer matériel
+                  </>
+                )}
               </Button>
-              <Button variant="outline" className="flex-1">
+              <Button 
+                variant="outline" 
+                className="flex-1 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105 hover:bg-muted"
+                onClick={() => handleGenericAction('Pièces commandées', 'Commande urgente lancée. Livraison express sous 4h.')}
+                disabled={isLoading !== null}
+              >
+                <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Commander pièces manquantes
               </Button>
             </div>
@@ -706,10 +925,30 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
             </div>
 
             <div className="flex gap-2">
-              <Button className="flex-1 bg-primary hover:bg-primary/90">
-                Valider échelonnement
+              <Button 
+                className="flex-1 bg-primary hover:bg-primary/90 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105"
+                onClick={handleNegocierEcheances}
+                disabled={isLoading === 'echeances'}
+              >
+                {isLoading === 'echeances' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Validation...</span>
+                  </div>
+                ) : (
+                  <>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Valider échelonnement
+                  </>
+                )}
               </Button>
-              <Button variant="outline" className="flex-1">
+              <Button 
+                variant="outline" 
+                className="flex-1 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105 hover:bg-muted"
+                onClick={() => handleGenericAction('Conditions modifiées', 'Nouvel échelonnement sur 6 mois proposé. Première mensualité réduite.')}
+                disabled={isLoading !== null}
+              >
+                <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Modifier conditions
               </Button>
             </div>
@@ -836,10 +1075,30 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
             </div>
 
             <div className="flex gap-2">
-              <Button className="flex-1 bg-primary hover:bg-primary/90">
-                Déployer maintenant
+              <Button 
+                className="flex-1 bg-primary hover:bg-primary/90 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105"
+                onClick={handleSolutionTemporaire}
+                disabled={isLoading === 'temporaire'}
+              >
+                {isLoading === 'temporaire' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Déploiement...</span>
+                  </div>
+                ) : (
+                  <>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Déployer maintenant
+                  </>
+                )}
               </Button>
-              <Button variant="outline" className="flex-1">
+              <Button 
+                variant="outline" 
+                className="flex-1 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105 hover:bg-muted"
+                onClick={() => handleGenericAction('Conditions négociées', 'Tarifs préférentiels obtenus. Contrat d\'urgence signé.')}
+                disabled={isLoading !== null}
+              >
+                <Phone className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Négocier conditions
               </Button>
             </div>
@@ -2485,10 +2744,30 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
             </div>
 
             <div className="flex gap-2">
-              <Button className="flex-1 bg-primary hover:bg-primary/90">
-                Appliquer nouveaux tarifs
+              <Button 
+                className="flex-1 bg-primary hover:bg-primary/90 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105"
+                onClick={handleReviserTarifs}
+                disabled={isLoading === 'tarifs'}
+              >
+                {isLoading === 'tarifs' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Application...</span>
+                  </div>
+                ) : (
+                  <>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Appliquer nouveaux tarifs
+                  </>
+                )}
               </Button>
-              <Button variant="outline" className="flex-1">
+              <Button 
+                variant="outline" 
+                className="flex-1 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105 hover:bg-muted"
+                onClick={() => handleGenericAction('Test en cours', 'Nouveaux tarifs testés sur 10 clients. Retours positifs à 85%.')}
+                disabled={isLoading !== null}
+              >
+                <Package className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Tester sur échantillon
               </Button>
             </div>
@@ -2555,10 +2834,30 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
             </div>
 
             <div className="flex gap-2">
-              <Button className="flex-1 bg-primary hover:bg-primary/90">
-                Plan d'action concurrentiel
+              <Button 
+                className="flex-1 bg-primary hover:bg-primary/90 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105"
+                onClick={handleEtudierConcurrence}
+                disabled={isLoading === 'concurrence'}
+              >
+                {isLoading === 'concurrence' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Création...</span>
+                  </div>
+                ) : (
+                  <>
+                    <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Plan d'action concurrentiel
+                  </>
+                )}
               </Button>
-              <Button variant="outline" className="flex-1">
+              <Button 
+                variant="outline" 
+                className="flex-1 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105 hover:bg-muted"
+                onClick={() => handleGenericAction('Veille programmée', 'Surveillance concurrentielle mensuelle activée. Alertes automatiques.')}
+                disabled={isLoading !== null}
+              >
+                <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Veille mensuelle
               </Button>
             </div>
@@ -2625,10 +2924,30 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
             </div>
 
             <div className="flex gap-2">
-              <Button className="flex-1 bg-primary hover:bg-primary/90">
-                Valider budget
+              <Button 
+                className="flex-1 bg-primary hover:bg-primary/90 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105"
+                onClick={handleBudgeterEquipements}
+                disabled={isLoading === 'budget'}
+              >
+                {isLoading === 'budget' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Validation...</span>
+                  </div>
+                ) : (
+                  <>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Valider budget
+                  </>
+                )}
               </Button>
-              <Button variant="outline" className="flex-1">
+              <Button 
+                variant="outline" 
+                className="flex-1 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105 hover:bg-muted"
+                onClick={() => handleGenericAction('Subventions trouvées', 'Aides ADEME et région identifiées. Dossier de demande préparé.')}
+                disabled={isLoading !== null}
+              >
+                <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Rechercher subventions
               </Button>
             </div>
@@ -2695,10 +3014,30 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
             </div>
 
             <div className="flex gap-2">
-              <Button className="flex-1 bg-primary hover:bg-primary/90">
-                Choisir crédit-bail
+              <Button 
+                className="flex-1 bg-primary hover:bg-primary/90 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105"
+                onClick={handleEtudierFinancement}
+                disabled={isLoading === 'financement'}
+              >
+                {isLoading === 'financement' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Sélection...</span>
+                  </div>
+                ) : (
+                  <>
+                    <CreditCard className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Choisir crédit-bail
+                  </>
+                )}
               </Button>
-              <Button variant="outline" className="flex-1">
+              <Button 
+                variant="outline" 
+                className="flex-1 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105 hover:bg-muted"
+                onClick={() => handleGenericAction('Offres comparées', 'Analyse comparative des 3 solutions de financement détaillée.')}
+                disabled={isLoading !== null}
+              >
+                <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Comparer offres
               </Button>
             </div>
@@ -2707,8 +3046,33 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
 
       default:
         return (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">Contenu de la modal à définir</p>
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2 flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-primary" />
+                Action mission
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                Action exécutable depuis le tour de contrôle.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                className="flex-1 bg-primary hover:bg-primary/90 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105"
+                onClick={() => handleGenericAction('Action exécutée', 'Mission accomplie avec succès. Système mis à jour.')}
+              >
+                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                Exécuter
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex-1 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105 hover:bg-muted"
+                onClick={onClose}
+              >
+                <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                Annuler
+              </Button>
+            </div>
           </div>
         );
     }
