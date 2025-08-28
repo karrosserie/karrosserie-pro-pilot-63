@@ -2237,14 +2237,8 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md sm:max-w-lg bg-card border-border max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader className="pb-2 flex-shrink-0">
-          <DialogTitle className="text-base sm:text-lg font-semibold text-card-foreground flex items-center justify-between">
+          <DialogTitle className="text-base sm:text-lg font-semibold text-card-foreground">
             {modalData?.title || 'Action'}
-            <button
-              onClick={onClose}
-              className="p-1 hover:bg-gray-100 rounded-full transition-colors ml-2"
-            >
-              <X className="h-4 w-4" />
-            </button>
           </DialogTitle>
         </DialogHeader>
         <div className="overflow-y-auto flex-1 pr-1">
