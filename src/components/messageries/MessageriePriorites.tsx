@@ -309,7 +309,7 @@ export default function MessageriePriorites() {
                   <p className="mt-4 text-sm">{it.message}</p>
 
                   <div className="mt-4 flex flex-wrap gap-2">
-                    <Button size="sm" onClick={() => handleViewDetails(it.id)}>
+                    <Button size="sm" className="bg-cyan-500 hover:bg-cyan-600 text-white" onClick={() => handleViewDetails(it.id)}>
                       Détails complets
                     </Button>
                     {!showResolved && (
