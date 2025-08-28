@@ -23,6 +23,7 @@ import {
   Shield
 } from 'lucide-react';
 import { useAdmin } from '@/hooks/use-admin';
+import { useUserRole } from '@/hooks/use-user-role';
 
 interface SidebarProps {
   isMobile: boolean;
@@ -108,6 +109,7 @@ const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems
 const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
   const location = useLocation();
   const { isAdmin } = useAdmin();
+  const { userRole, isCarrossierCourtesy } = useUserRole();
   
   const isActivePath = (path: string): boolean => {
     if (path === '/') {
@@ -116,7 +118,8 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     return location.pathname.startsWith(path);
   };
 
-  const navItems = [
+  // Définir tous les éléments de navigation
+  const allNavItems = [
     { icon: <Home className="app-icon" />, label: 'Tableau de bord', path: '/' },
     { icon: <Bot className="app-icon" />, label: 'Assistant IA', path: '/ai-assistant' },
     { icon: <Users className="app-icon" />, label: 'Clients', path: '/clients' },
@@ -153,6 +156,14 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     ...(isAdmin ? [{ icon: <Shield className="app-icon" />, label: 'Accès aux comptes', path: '/admin/accounts' }] : []),
     { icon: <Settings className="app-icon" />, label: 'Paramètres', path: '/settings' },
   ];
+
+  // Filtrer les éléments selon le rôle de l'utilisateur
+  const navItems = isCarrossierCourtesy 
+    ? allNavItems.filter(item => 
+        item.path === '/planning' || 
+        item.path === '/fleet'
+      )
+    : allNavItems;
 
   const handleOverlayClick = () => {
     if (isMobile) {
