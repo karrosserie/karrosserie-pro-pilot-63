@@ -5,6 +5,11 @@ import { Eye, Package, Wrench, Calendar, Users, Clock, FileText } from 'lucide-r
 
 const MissionControlDashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month'>('today');
+  const [isAIOn, setIsAIOn] = useState(true);
+
+  const handleAIToggle = () => {
+    setIsAIOn(!isAIOn);
+  };
 
   const getMissionsForPeriod = (period: 'today' | 'week' | 'month') => {
     switch (period) {
@@ -221,6 +226,8 @@ const MissionControlDashboard = () => {
       <MissionControlHeader 
         selectedPeriod={selectedPeriod}
         onPeriodChange={setSelectedPeriod}
+        isAIOn={isAIOn}
+        onAIToggle={handleAIToggle}
       />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">

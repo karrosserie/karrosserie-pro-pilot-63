@@ -4,11 +4,15 @@ import { Button } from '@/components/ui/button';
 interface MissionControlHeaderProps {
   selectedPeriod: 'today' | 'week' | 'month';
   onPeriodChange: (period: 'today' | 'week' | 'month') => void;
+  isAIOn: boolean;
+  onAIToggle: () => void;
 }
 
 const MissionControlHeader: React.FC<MissionControlHeaderProps> = ({ 
   selectedPeriod, 
-  onPeriodChange 
+  onPeriodChange,
+  isAIOn,
+  onAIToggle
 }) => {
   return (
     <div className="flex items-center justify-between mb-6">
@@ -54,9 +58,16 @@ const MissionControlHeader: React.FC<MissionControlHeaderProps> = ({
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <div className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-          IA ON
-        </div>
+        <button
+          onClick={onAIToggle}
+          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors cursor-pointer hover:opacity-90 ${
+            isAIOn 
+              ? 'bg-green-500 text-white' 
+              : 'bg-gray-400 text-white'
+          }`}
+        >
+          {isAIOn ? 'IA ON' : 'IA OFF'}
+        </button>
         <span className="text-sm font-medium text-gray-700">Super Admin</span>
       </div>
     </div>
