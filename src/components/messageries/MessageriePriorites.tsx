@@ -318,15 +318,13 @@ export default function MessageriePriorites() {
                           Répondre
                         </Button>
                         {it.priority !== 1 && (
-                          <>
-                            <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => handleAutoManage(it.id)}>
-                              Réponse auto
-                            </Button>
-                            <Button size="sm" variant="outline" onClick={() => handleSemiAuto(it.id)}>
-                              Semi auto
-                            </Button>
-                          </>
+                          <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => handleAutoManage(it.id)}>
+                            Réponse auto
+                          </Button>
                         )}
+                        <Button size="sm" variant="outline" onClick={() => handleSemiAuto(it.id)}>
+                          Semi auto
+                        </Button>
                         <Button size="sm" variant="destructive" onClick={() => handleEscalate(it.id)}>
                           Escalader
                         </Button>
