@@ -103,7 +103,7 @@ export function IframePlanning({ className = "" }: IframePlanningProps) {
         style={{ minHeight: '800px' }}
         onError={handleIframeError}
         title="Interface de Planning Carrosserie"
-        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-geolocation"
         allow="clipboard-write; geolocation"
       />
     </div>
