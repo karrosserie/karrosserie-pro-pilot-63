@@ -8,3 +8,6 @@ verify_jwt = true
 
 [functions.send-token-alert]
 verify_jwt = true
+
+[functions.get-user-context]
+verify_jwt = true
