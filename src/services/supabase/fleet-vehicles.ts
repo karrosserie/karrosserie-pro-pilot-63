@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
+import { getCurrentUserCompanyId } from './auth-company';
 
 export type FleetVehicle = Database['public']['Tables']['fleet_vehicles']['Row'] & {
   vin?: string;
@@ -44,6 +45,10 @@ export const fleetVehiclesService = {
   getAll: async () => {
     console.log('Fetching fleet vehicles with relations');
     
+    // Get current user's company ID (handles impersonation)
+    const companyId = await getCurrentUserCompanyId();
+    console.log('Fetching fleet vehicles for company:', companyId);
+    
     const { data, error } = await supabase
       .from('fleet_vehicles')
       .select(`
@@ -66,6 +71,7 @@ export const fleetVehiclesService = {
         car_brands(id, name),
         car_models(id, name)
       `)
+      .eq('company_id', companyId)
       .order('created_at', { ascending: false });
     
     if (error) {
