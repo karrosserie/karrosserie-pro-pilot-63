@@ -10,7 +10,7 @@ interface AuthContextType {
   profile: Profile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ session: Session; user: User; }>;
-  signUp: (email: string, password: string, firstName: string, lastName: string, phoneNumber: string) => Promise<{ user: User; session: Session; }>;
+  signUp: (email: string, password: string, firstName: string, lastName: string, phoneNumber: string, isTeamMember?: boolean) => Promise<{ user: User; session: Session; }>;
   signOut: () => Promise<void>;
   resendEmailVerification: (email: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;

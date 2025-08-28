@@ -163,8 +163,8 @@ const TeamTab = () => {
 
     try {
       console.log('Calling signUp...');
-      // Créer l'utilisateur avec Supabase Auth
-      const { user } = await signUp(data.email, data.password, data.firstName, data.lastName, data.phoneNumber);
+      // Créer l'utilisateur avec Supabase Auth en tant que membre d'équipe
+      const { user } = await signUp(data.email, data.password, data.firstName, data.lastName, data.phoneNumber, true);
       console.log('SignUp completed, user:', user);
       
       console.log('Adding user to team...');

@@ -8,6 +8,7 @@ export interface AuthSignUpData {
   phoneNumber: string;
   email: string;
   password: string;
+  isTeamMember?: boolean;
 }
 
 export interface AuthError {
@@ -42,7 +43,7 @@ export const authService = {
   /**
    * Sign up with email and password
    */
-  signUp: async ({ email, password, firstName, lastName, phoneNumber }: AuthSignUpData) => {
+  signUp: async ({ email, password, firstName, lastName, phoneNumber, isTeamMember = false }: AuthSignUpData) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -51,6 +52,7 @@ export const authService = {
           first_name: firstName,
           last_name: lastName,
           phone_number: phoneNumber,
+          is_team_member: isTeamMember.toString(),
         },
         emailRedirectTo: `${window.location.origin}/auth`,
       },
