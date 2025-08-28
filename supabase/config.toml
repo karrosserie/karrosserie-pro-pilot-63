@@ -10,4 +10,7 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.get-user-context]
+verify_jwt = false
+
+[functions.generate-iframe-token]
 verify_jwt = true

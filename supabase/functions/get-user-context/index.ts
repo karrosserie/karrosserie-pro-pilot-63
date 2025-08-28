@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { verify } from 'https://deno.land/x/djwt@v2.8/mod.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,7 +14,100 @@ serve(async (req) => {
   }
 
   try {
-    // Initialize Supabase client
+    const jwtSecret = Deno.env.get('SUPABASE_JWT_SECRET') || 'your-secret-key'
+    
+    // Check if this is a token validation request
+    const url = new URL(req.url)
+    const iframeToken = url.searchParams.get('token')
+    
+    if (iframeToken) {
+      // Validate iframe token
+      console.log('Validating iframe token')
+      
+      const key = await crypto.subtle.importKey(
+        'raw',
+        new TextEncoder().encode(jwtSecret),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['verify']
+      )
+
+      try {
+        const payload = await verify(iframeToken, key)
+        
+        if (payload.purpose !== 'iframe-context') {
+          throw new Error('Invalid token purpose')
+        }
+
+        console.log('Successfully validated iframe token for user:', payload.user?.id)
+
+        // Build role permissions from the stored role
+        const userRole = payload.role
+        const rolePermissions = {
+          isOwner: userRole === 'Propriétaire',
+          isCarrossier: userRole === 'carrossier',
+          isCarrossierCourtesy: userRole === 'carrossier-vehicule de courtoisie',
+          isResponsable: userRole === 'responsable',
+          isResponsableAdmin: userRole === 'responsable administratif',
+          canManage: ['Propriétaire', 'responsable', 'responsable administratif'].includes(userRole),
+          viewOnly: ['carrossier', 'carrossier-vehicule de courtoisie'].includes(userRole),
+          restrictedView: userRole === 'carrossier' ? 'employee' : 
+                         userRole === 'responsable' ? 'manager' : null
+        }
+
+        return new Response(
+          JSON.stringify({
+            user: {
+              id: payload.user.id,
+              email: payload.user.email,
+              profile: {
+                firstName: payload.user.first_name || '',
+                lastName: payload.user.last_name || '',
+                phoneNumber: payload.user.phone_number || '',
+                role: payload.user.role || 'user'
+              }
+            },
+            company: {
+              id: payload.company?.id || '',
+              name: payload.company?.name || '',
+              email: payload.company?.email || '',
+              address: payload.company?.address || '',
+              city: payload.company?.city || '',
+              zipcode: payload.company?.zipcode || '',
+              phone: payload.company?.phone || '',
+              siret: payload.company?.siret || '',
+              siren: payload.company?.siren || '',
+              tva: payload.company?.tva || '',
+              logoUrl: payload.company?.logo_url || '',
+              notifications: payload.company?.notifications || { email: true, push: true, sms: false }
+            },
+            role: {
+              current: userRole,
+              permissions: rolePermissions
+            },
+            impersonation: {
+              isActive: false,
+              originalUser: null,
+              companyName: null
+            }
+          }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          },
+        )
+      } catch (tokenError) {
+        console.error('Invalid iframe token:', tokenError)
+        return new Response(
+          JSON.stringify({ error: 'Invalid or expired iframe token' }),
+          { 
+            status: 401, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        )
+      }
+    }
+
+    // Original authentication flow for regular requests
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
