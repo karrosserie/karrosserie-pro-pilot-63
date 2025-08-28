@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import { PlanningCalendar } from "./PlanningCalendar";
 import { EmployeePlanningTab } from "./EmployeePlanningTab";
 import { EmployeesManagement } from "./EmployeesManagement";
 import { ProcessConfig } from "./ProcessConfig";
+import { useUserRole } from "@/hooks/use-user-role";
 
 
 interface WorkshopPlanningInterfaceProps {
@@ -26,8 +27,28 @@ export const WorkshopPlanningInterface = ({
   schedules = [], 
   onScheduleUpdate 
 }: WorkshopPlanningInterfaceProps) => {
-  const [activeView, setActiveView] = useState<'manager' | 'employee'>('manager');
+  const { userRole, isCarrossier, isCarrossierCourtesy, isResponsable, isOwner, isLoading } = useUserRole();
+  
+  // Déterminer la vue par défaut selon le rôle
+  const getDefaultView = () => {
+    if (isCarrossier || isCarrossierCourtesy) return 'employee';
+    if (isResponsable) return 'manager';
+    return 'manager'; // Par défaut pour owner et autres
+  };
+  
+  const [activeView, setActiveView] = useState<'manager' | 'employee'>(getDefaultView());
   const [urgentVehicles, setUrgentVehicles] = useState(false);
+
+  // Mettre à jour la vue si le rôle change
+  useEffect(() => {
+    if (!isLoading) {
+      const defaultView = getDefaultView();
+      setActiveView(defaultView);
+    }
+  }, [isCarrossier, isCarrossierCourtesy, isResponsable, isLoading]);
+
+  // Déterminer si l'utilisateur peut changer de vue
+  const canSwitchView = isOwner;
 
   // Mock data based on the karrosserie-planning interface
   const mockWorkflowSteps = [
@@ -187,24 +208,47 @@ export const WorkshopPlanningInterface = ({
       {/* Header with view switcher */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Button
-            variant={activeView === 'manager' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveView('manager')}
-            className="flex items-center gap-2"
-          >
-            <Crown className="w-4 h-4" />
-            Vue Manager
-          </Button>
-          <Button
-            variant={activeView === 'employee' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveView('employee')}
-            className="flex items-center gap-2"
-          >
-            <User className="w-4 h-4" />
-            Vue Employé
-          </Button>
+          {/* Afficher les boutons de changement de vue uniquement pour les propriétaires */}
+          {canSwitchView ? (
+            <>
+              <Button
+                variant={activeView === 'manager' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setActiveView('manager')}
+                className="flex items-center gap-2"
+              >
+                <Crown className="w-4 h-4" />
+                Vue Manager
+              </Button>
+              <Button
+                variant={activeView === 'employee' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setActiveView('employee')}
+                className="flex items-center gap-2"
+              >
+                <User className="w-4 h-4" />
+                Vue Employé
+              </Button>
+            </>
+          ) : (
+            /* Afficher la vue actuelle sans possibilité de changement */
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-md">
+              {activeView === 'manager' ? (
+                <>
+                  <Crown className="w-4 h-4" />
+                  <span className="text-sm font-medium">Vue Manager</span>
+                </>
+              ) : (
+                <>
+                  <User className="w-4 h-4" />
+                  <span className="text-sm font-medium">Vue Employé</span>
+                </>
+              )}
+              <Badge variant="secondary" className="ml-2 text-xs">
+                {userRole}
+              </Badge>
+            </div>
+          )}
         </div>
         
         <Button
