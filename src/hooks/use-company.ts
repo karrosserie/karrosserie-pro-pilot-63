@@ -4,7 +4,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { companyService, CompanyInfo } from '@/services/supabase/company';
 import { useImpersonation } from '@/hooks/use-impersonation';
-import { supabase } from '@/integrations/supabase/client';
 
 export function useCompany() {
   const { user } = useAuth();
@@ -39,22 +38,8 @@ export function useCompany() {
       setIsLoading(true);
       
       try {
-        let data;
-        
-        if (isImpersonating && impersonationData) {
-          // En mode impersonation, récupérer directement les données de l'entreprise ciblée
-          const { data: companyInfo, error } = await supabase
-            .from('company_info')
-            .select('*')
-            .eq('id', impersonationData.company_id)
-            .single();
-            
-          if (error) throw error;
-          data = companyInfo;
-        } else {
-          // Mode normal
-          data = await companyService.getCompanyInfo(user.id);
-        }
+        // Le service companyService gère automatiquement l'impersonation
+        const data = await companyService.getCompanyInfo();
         
         if (data) {
           setCompanyData(data);
@@ -81,23 +66,8 @@ export function useCompany() {
 
     setIsSaving(true);
     try {
-      let updatedData;
-      
-      if (isImpersonating && impersonationData) {
-        // En mode impersonation, mise à jour directe
-        const { data, error } = await supabase
-          .from('company_info')
-          .update(companyData)
-          .eq('id', impersonationData.company_id)
-          .select()
-          .single();
-          
-        if (error) throw error;
-        updatedData = data;
-      } else {
-        // Mode normal
-        updatedData = await companyService.updateCompanyInfo(user.id, companyData);
-      }
+      // Le service companyService gère automatiquement l'impersonation
+      const updatedData = await companyService.updateCompanyInfo(undefined, companyData);
       
       setCompanyData(updatedData);
       toast({

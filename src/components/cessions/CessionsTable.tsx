@@ -287,7 +287,7 @@ export const CessionsTable = ({
             if (companyData?.id && repairOrderData.company_id) {
               console.log('Updating company with recipient ID:', signatureResponse.recipients[0].id);
               try {
-                await companyService.updateCompanyInfo(repairOrderData.company_id, {
+                await companyService.updateCompanyInfo(undefined, {
                   ...companyData,
                   oodrive_recipient_id: signatureResponse.recipients[0].id.toString()
                 });

@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { getCurrentUserCompanyId } from './auth-company';
 
 export interface CompanyInfo {
   id: string;
@@ -23,28 +24,17 @@ export interface CompanyInfo {
 }
 
 export const companyService = {
-  async getCompanyInfo(userId: string): Promise<CompanyInfo | null> {
-    console.log('Chargement des données entreprise pour userId:', userId);
+  async getCompanyInfo(userId?: string): Promise<CompanyInfo | null> {
+    console.log('Chargement des données entreprise...');
     
-    // Get company through user_companies relationship
-    const { data: userCompany, error: userCompanyError } = await supabase
-      .from('user_companies')
-      .select('company_id')
-      .eq('user_id', userId)
-      .eq('active', true)
-      .single();
-
-    console.log('Requête user_companies:', { userId, userCompany, userCompanyError });
-
-    if (userCompanyError || !userCompany) {
-      console.log('Aucune entreprise trouvée pour cet utilisateur');
-      return null;
-    }
+    // Use getCurrentUserCompanyId to handle impersonation
+    const companyId = await getCurrentUserCompanyId();
+    console.log('Company ID effective (avec impersonation):', companyId);
 
     const { data, error } = await supabase
       .from('company_info')
       .select('*')
-      .eq('id', userCompany.company_id)
+      .eq('id', companyId)
       .single();
 
     if (error) {
@@ -75,20 +65,12 @@ export const companyService = {
     return transformedData;
   },
 
-  async updateCompanyInfo(userId: string, companyData: Partial<CompanyInfo>): Promise<CompanyInfo> {
-    console.log('Sauvegarde des données entreprise:', { userId, companyData });
+  async updateCompanyInfo(userId?: string, companyData: Partial<CompanyInfo> = {}): Promise<CompanyInfo> {
+    console.log('Sauvegarde des données entreprise:', companyData);
     
-    // Get company through user_companies relationship
-    const { data: userCompany, error: userCompanyError } = await supabase
-      .from('user_companies')
-      .select('company_id')
-      .eq('user_id', userId)
-      .eq('active', true)
-      .single();
-
-    if (userCompanyError || !userCompany) {
-      throw new Error('Aucune entreprise trouvée pour cet utilisateur');
-    }
+    // Use getCurrentUserCompanyId to handle impersonation
+    const companyId = await getCurrentUserCompanyId();
+    console.log('Company ID effective (avec impersonation):', companyId);
 
     const dataToUpdate = {
       name: companyData.name || '',
@@ -111,7 +93,7 @@ export const companyService = {
     const { data, error } = await supabase
       .from('company_info')
       .update(dataToUpdate)
-      .eq('id', userCompany.company_id)
+      .eq('id', companyId)
       .select()
       .single();
 
@@ -135,23 +117,15 @@ export const companyService = {
     } as CompanyInfo;
   },
 
-  async deleteCompanyInfo(userId: string): Promise<void> {
-    // Get company through user_companies relationship
-    const { data: userCompany, error: userCompanyError } = await supabase
-      .from('user_companies')
-      .select('company_id')
-      .eq('user_id', userId)
-      .eq('active', true)
-      .single();
-
-    if (userCompanyError || !userCompany) {
-      throw new Error('Aucune entreprise trouvée pour cet utilisateur');
-    }
+  async deleteCompanyInfo(userId?: string): Promise<void> {
+    // Use getCurrentUserCompanyId to handle impersonation
+    const companyId = await getCurrentUserCompanyId();
+    console.log('Company ID effective (avec impersonation):', companyId);
 
     const { error } = await supabase
       .from('company_info')
       .delete()
-      .eq('id', userCompany.company_id);
+      .eq('id', companyId);
 
     if (error) {
       throw new Error(error.message);
