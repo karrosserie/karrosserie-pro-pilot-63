@@ -1,23 +1,18 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Cession } from './types';
-import { getCurrentUserCompanyId } from '../auth-company';
 
 export const getAllCessions = async (): Promise<Cession[]> => {
   console.log('Fetching cessions...');
   
-  // Get current user's company ID (handles impersonation)
-  const companyId = await getCurrentUserCompanyId();
-  console.log('Fetching cessions for company:', companyId);
-  
   // Get cessions with insurance companies only (removing bank_accounts join)
+  // RLS policies handle company filtering automatically with impersonation
   const { data: cessions, error } = await supabase
     .from('cessions')
     .select(`
       *,
       insurance_companies(name)
     `)
-    .eq('company_id', companyId)
     .order('created_at', { ascending: false });
 
   if (error) {
