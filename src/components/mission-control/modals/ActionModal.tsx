@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import ActionModalExtended from './ActionModalExtended';
-import { X, User, Calendar, Phone, Mail, CreditCard, FileText, AlertTriangle, Package } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { X, User, Calendar, Phone, Mail, CreditCard, FileText, AlertTriangle, Package, CheckCircle } from 'lucide-react';
 
 interface ActionModalProps {
   isOpen: boolean;
@@ -12,6 +13,157 @@ interface ActionModalProps {
 }
 
 const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, modalData }) => {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState<string | null>(null);
+
+  // Fonctions pour gérer les actions des boutons
+  const handleMiseAbri = async () => {
+    setIsLoading('mise_abri');
+    
+    // Simulation d'une action réelle
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    toast({
+      title: "Mise à l'abri effectuée",
+      description: "Les 4 véhicules ont été transférés vers le hangar couvert. Notifications clients envoyées.",
+    });
+    
+    setIsLoading(null);
+    onClose();
+  };
+
+  const handleProgrammerDeplacer = () => {
+    toast({
+      title: "Déplacement programmé", 
+      description: "Le déplacement est planifié pour demain 8h. Équipe assignée.",
+    });
+    onClose();
+  };
+
+  const handleProgrammerEtuvage = async () => {
+    setIsLoading('etuvage');
+    
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    toast({
+      title: "Étuvage programmé",
+      description: "Étuve n°1 réservée pour 2h d'étuvage accéléré. Livraison demain 10h.",
+    });
+    
+    setIsLoading(null);
+    onClose();
+  };
+
+  const handleAjusterCreneaux = () => {
+    toast({
+      title: "Créneaux ajustés",
+      description: "Planning optimisé selon vos préférences. 3 créneaux modifiés.",
+    });
+    onClose();
+  };
+
+  const handleContentieux = async () => {
+    setIsLoading('contentieux');
+    
+    await new Promise(resolve => setTimeout(resolve, 2500));
+    
+    toast({
+      title: "Procédure contentieuse initiée",
+      description: "Dossier transmis au service juridique. Première relance LRAR programmée.",
+    });
+    
+    setIsLoading(null);
+    onClose();
+  };
+
+  const handleNegocierArrangement = () => {
+    toast({
+      title: "Négociation d'arrangement",
+      description: "Proposition d'échelonnement envoyée au client. Suivi programmé dans 48h.",
+    });
+    onClose();
+  };
+
+  const handleProgrammerExpertise = async () => {
+    setIsLoading('expertise');
+    
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    toast({
+      title: "Expertise programmée",
+      description: "RDV confirmé demain 14h avec M. BERNARD. Notifications envoyées.",
+    });
+    
+    setIsLoading(null);
+    onClose();
+  };
+
+  const handlePreparerDossier = () => {
+    toast({
+      title: "Dossier sinistre préparé",
+      description: "Documents compilés et transmis à l'assureur. Suivi automatique activé.",
+    });
+    onClose();
+  };
+
+  const handleCommanderAlternatif = async () => {
+    setIsLoading('commande');
+    
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    toast({
+      title: "Commande alternative validée",
+      description: "Pièce compatible commandée chez fournisseur alternatif. Livraison 48h.",
+    });
+    
+    setIsLoading(null);
+    onClose();
+  };
+
+  const handleChercherOccasion = () => {
+    toast({
+      title: "Recherche pièce occasion",
+      description: "3 pièces d'occasion trouvées. Vérification qualité en cours.",
+    });
+    onClose();
+  };
+
+  const handleInterventionCabine = async () => {
+    setIsLoading('intervention');
+    
+    await new Promise(resolve => setTimeout(resolve, 1800));
+    
+    toast({
+      title: "Intervention programmée",
+      description: "Technicien maintenance dépêché. Intervention prévue dans 30min.",
+    });
+    
+    setIsLoading(null);
+    onClose();
+  };
+
+  const handleReorganiserPlanning = () => {
+    toast({
+      title: "Planning réorganisé", 
+      description: "8 véhicules redistribués sur cabine n°1. Planning optimisé.",
+    });
+    onClose();
+  };
+
+  // Handler générique pour les actions simples
+  const handleGenericAction = (title: string, description: string) => {
+    toast({ title, description });
+    onClose();
+  };
+
+  // Handler générique pour les actions avec loading
+  const handleGenericAsyncAction = async (loadingKey: string, title: string, description: string, delay = 1500) => {
+    setIsLoading(loadingKey);
+    await new Promise(resolve => setTimeout(resolve, delay));
+    toast({ title, description });
+    setIsLoading(null);
+    onClose();
+  };
   // Vérifier si c'est une modal étendue
   const extendedModalTypes = ['audit_fiscal', 'analyser_ecarts', 'dossier_sinistre', 'commande_express', 'virement_urgence'];
   
@@ -634,10 +786,30 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
             </div>
 
             <div className="flex gap-2">
-              <Button className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground text-xs sm:text-sm h-8 sm:h-10">
-                Mise à l'abri immédiate
+              <Button 
+                className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105"
+                onClick={handleMiseAbri}
+                disabled={isLoading === 'mise_abri'}
+              >
+                {isLoading === 'mise_abri' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>En cours...</span>
+                  </div>
+                ) : (
+                  <>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Mise à l'abri immédiate
+                  </>
+                )}
               </Button>
-              <Button variant="outline" className="flex-1 text-xs sm:text-sm h-8 sm:h-10">
+              <Button 
+                variant="outline" 
+                className="flex-1 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105 hover:bg-muted"
+                onClick={handleProgrammerDeplacer}
+                disabled={isLoading !== null}
+              >
+                <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Programmer déplacement
               </Button>
             </div>
@@ -684,10 +856,30 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
             </div>
 
             <div className="flex gap-2">
-              <Button className="flex-1 bg-primary hover:bg-primary/90">
-                Programmer étuvage
+              <Button 
+                className="flex-1 bg-primary hover:bg-primary/90 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105"
+                onClick={handleProgrammerEtuvage}
+                disabled={isLoading === 'etuvage'}
+              >
+                {isLoading === 'etuvage' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Programmation...</span>
+                  </div>
+                ) : (
+                  <>
+                    <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Programmer étuvage
+                  </>
+                )}
               </Button>
-              <Button variant="outline" className="flex-1">
+              <Button 
+                variant="outline" 
+                className="flex-1 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105 hover:bg-muted"
+                onClick={handleAjusterCreneaux}
+                disabled={isLoading !== null}
+              >
+                <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Séchage naturel prolongé
               </Button>
             </div>
@@ -747,10 +939,30 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
             </div>
 
             <div className="flex gap-2">
-              <Button className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground">
-                Lancer contentieux
+              <Button 
+                className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105"
+                onClick={handleContentieux}
+                disabled={isLoading === 'contentieux'}
+              >
+                {isLoading === 'contentieux' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Initialisation...</span>
+                  </div>
+                ) : (
+                  <>
+                    <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Lancer contentieux
+                  </>
+                )}
               </Button>
-              <Button variant="outline" className="flex-1">
+              <Button 
+                variant="outline" 
+                className="flex-1 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105 hover:bg-muted"
+                onClick={handleNegocierArrangement}
+                disabled={isLoading !== null}
+              >
+                <Mail className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Dernière relance amiable
               </Button>
             </div>
@@ -810,10 +1022,30 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
             </div>
 
             <div className="flex gap-2">
-              <Button className="flex-1 bg-primary hover:bg-primary/90">
-                Confirmer RDV expertise
+              <Button 
+                className="flex-1 bg-primary hover:bg-primary/90 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105"
+                onClick={() => handleGenericAsyncAction('expertise', 'Expertise confirmée', 'RDV confirmé demain 14h avec l\'expert MAIF. Notifications envoyées.')}
+                disabled={isLoading === 'expertise'}
+              >
+                {isLoading === 'expertise' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Confirmation...</span>
+                  </div>
+                ) : (
+                  <>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Confirmer RDV expertise
+                  </>
+                )}
               </Button>
-              <Button variant="outline" className="flex-1">
+              <Button 
+                variant="outline" 
+                className="flex-1 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105 hover:bg-muted"
+                onClick={() => handleGenericAction('Report programmé', 'Expertise reportée à la semaine prochaine. Client et assureur informés.')}
+                disabled={isLoading !== null}
+              >
+                <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Reporter à plus tard
               </Button>
             </div>
@@ -1514,10 +1746,30 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
             </div>
 
             <div className="flex gap-2">
-              <Button className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground">
-                Commander maintenant
+              <Button 
+                className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105"
+                onClick={() => handleGenericAsyncAction('commande', 'Commande urgente validée', 'Pièces commandées chez fournisseur alternatif. Livraison sous 48h garantie.')}
+                disabled={isLoading === 'commande'}
+              >
+                {isLoading === 'commande' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Commande...</span>
+                  </div>
+                ) : (
+                  <>
+                    <Package className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Commander maintenant
+                  </>
+                )}
               </Button>
-              <Button variant="outline" className="flex-1">
+              <Button 
+                variant="outline" 
+                className="flex-1 text-xs sm:text-sm h-8 sm:h-10 transition-all duration-200 hover:scale-105 hover:bg-muted"
+                onClick={() => handleGenericAction('Négociation délais', 'Négociation engagée avec le fournisseur. Réduction délai de 10 jours à 5 jours.')}
+                disabled={isLoading !== null}
+              >
+                <Phone className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 Négocier délais
               </Button>
             </div>
