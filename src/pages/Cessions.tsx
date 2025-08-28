@@ -92,36 +92,36 @@ const Cessions = () => {
     checkSignatureStatus();
   }, [cessions, updateCession]);
 
-  // Sync insurance companies on component mount
-  useEffect(() => {
-    const syncInsuranceCompanies = async () => {
-      try {
-        console.log('Syncing insurance companies...');
-        const { data, error } = await supabase.functions.invoke('sync-insurance-companies');
+  // Sync insurance companies on component mount - DISABLED for demo mode
+  // useEffect(() => {
+  //   const syncInsuranceCompanies = async () => {
+  //     try {
+  //       console.log('Syncing insurance companies...');
+  //       const { data, error } = await supabase.functions.invoke('sync-insurance-companies');
         
-        if (error) {
-          console.error('Error syncing insurance companies:', error);
-          toast({
-            title: "Erreur de synchronisation",
-            description: "Impossible de synchroniser les compagnies d'assurance",
-            variant: "destructive",
-          });
-        } else {
-          console.log('Insurance companies sync result:', data);
-          if (data?.stats?.inserted > 0 || data?.stats?.updated > 0) {
-            toast({
-              title: "Synchronisation réussie",
-              description: `${data.stats.inserted} ajoutées, ${data.stats.updated} mises à jour`,
-            });
-          }
-        }
-      } catch (error) {
-        console.error('Error calling sync function:', error);
-      }
-    };
+  //       if (error) {
+  //         console.error('Error syncing insurance companies:', error);
+  //         toast({
+  //           title: "Erreur de synchronisation",
+  //           description: "Impossible de synchroniser les compagnies d'assurance",
+  //           variant: "destructive",
+  //         });
+  //       } else {
+  //         console.log('Insurance companies sync result:', data);
+  //         if (data?.stats?.inserted > 0 || data?.stats?.updated > 0) {
+  //           toast({
+  //             title: "Synchronisation réussie",
+  //             description: `${data.stats.inserted} ajoutées, ${data.stats.updated} mises à jour`,
+  //           });
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.error('Error calling sync function:', error);
+  //     }
+  //   };
 
-    syncInsuranceCompanies();
-  }, []); // Run only on mount
+  //   syncInsuranceCompanies();
+  // }, []); // Run only on mount
 
   const filteredCessions = (cessions || []).filter(cession => {
     const matchesSearch = 

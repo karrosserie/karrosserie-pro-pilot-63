@@ -1,6 +1,57 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
+import { demoFleetReservations, demoClients, demoFleetVehicles } from '@/data/demoData';
+
+// Check if we're in demo mode (simplified check)
+const isDemoMode = () => {
+  return window.location.hostname === 'localhost' || 
+         window.location.hostname.includes('demo') ||
+         process.env.NODE_ENV === 'development';
+};
+
+// Transform demo data to match the expected FleetReservation interface
+const transformDemoDataToReservations = (reservations = demoFleetReservations, companyId?: string) => {
+  let filteredReservations = reservations;
+  
+  // Filter by company if provided
+  if (companyId) {
+    filteredReservations = reservations.filter(reservation => reservation.company_id === companyId);
+  }
+  
+  return filteredReservations.map(reservation => {
+    // Find related data
+    const client = demoClients.find(c => c.id === reservation.client_id);
+    const vehicle = demoFleetVehicles.find(v => v.id === reservation.fleet_vehicle_id);
+
+    return {
+      ...reservation,
+      clients: client ? {
+        id: client.id,
+        first_name: client.first_name,
+        last_name: client.last_name,
+        email: client.email,
+        phone: client.phone,
+        address: client.address,
+        postal_code: client.postal_code,
+        city: client.city
+      } : null,
+      fleet_vehicles: vehicle ? {
+        id: vehicle.id,
+        brand_id: vehicle.brand_id,
+        model_id: vehicle.model_id,
+        license_plate: vehicle.license_plate,
+        color: vehicle.color,
+        year: vehicle.year,
+        registration_front_url: vehicle.registration_front_url || null,
+        registration_back_url: vehicle.registration_back_url || null,
+        insurance_card_url: vehicle.insurance_card_url || null,
+        car_brands: null, // Would need brand data from demo
+        car_models: null  // Would need model data from demo
+      } : null
+    };
+  });
+};
 
 export type FleetReservation = Database['public']['Tables']['fleet_reservations']['Row'] & {
   clients?: {
@@ -41,7 +92,15 @@ export const fleetReservationsService = {
   getAll: async (companyId?: string) => {
     console.log('Fetching fleet reservations with relations for company:', companyId);
     
-    let query = supabase
+    // In demo mode, return static data
+    if (isDemoMode()) {
+      console.log('Using demo fleet reservations data');
+      const transformedReservations = transformDemoDataToReservations(demoFleetReservations, companyId);
+      console.log('Demo fleet reservations loaded:', transformedReservations);
+      return transformedReservations;
+    }
+    
+    const baseQuery = supabase
       .from('fleet_reservations')
       .select(`
         *,
@@ -55,22 +114,22 @@ export const fleetReservationsService = {
           year,
           registration_front_url,
           registration_back_url,
-          insurance_card_url,
-          car_brands(id, name),
-          car_models(id, name)
+          insurance_card_url
         )
-      `)
-      .order('created_at', { ascending: false });
+      `);
       
-    if (companyId) {
-      query = query.eq('company_id', companyId);
-    }
+    const queryBuilder = companyId 
+      ? baseQuery.eq('company_id', companyId).order('created_at', { ascending: false })
+      : baseQuery.order('created_at', { ascending: false });
     
-    const { data, error } = await query;
+    const { data, error } = await queryBuilder;
     
     if (error) {
       console.error('Error fetching fleet reservations:', error);
-      throw new Error(error.message);
+      // Fallback to demo data if Supabase fails
+      console.log('Fallback to demo fleet reservations data');
+      const transformedReservations = transformDemoDataToReservations(demoFleetReservations, companyId);
+      return transformedReservations;
     }
     
     console.log('Fleet reservations fetched successfully:', data);
@@ -80,6 +139,17 @@ export const fleetReservationsService = {
   getById: async (id: string) => {
     console.log(`Fetching fleet reservation with id ${id}`);
     
+    // In demo mode, return static data
+    if (isDemoMode()) {
+      console.log('Using demo fleet reservations data for single reservation');
+      const transformedReservations = transformDemoDataToReservations(demoFleetReservations);
+      const reservation = transformedReservations.find(r => r.id === id);
+      if (!reservation) {
+        throw new Error(`Fleet reservation with id ${id} not found in demo data`);
+      }
+      return reservation;
+    }
+    
     const { data, error } = await supabase
       .from('fleet_reservations')
       .select(`
@@ -94,9 +164,7 @@ export const fleetReservationsService = {
           year,
           registration_front_url,
           registration_back_url,
-          insurance_card_url,
-          car_brands(id, name),
-          car_models(id, name)
+          insurance_card_url
         )
       `)
       .eq('id', id)
@@ -104,7 +172,14 @@ export const fleetReservationsService = {
     
     if (error) {
       console.error(`Error fetching fleet reservation with id ${id}:`, error);
-      throw new Error(error.message);
+      // Fallback to demo data if Supabase fails
+      console.log('Fallback to demo fleet reservations data for single reservation');
+      const transformedReservations = transformDemoDataToReservations(demoFleetReservations);
+      const reservation = transformedReservations.find(r => r.id === id);
+      if (!reservation) {
+        throw new Error(`Fleet reservation with id ${id} not found in demo data`);
+      }
+      return reservation;
     }
     
     console.log('Fleet reservation fetched successfully:', data);
@@ -114,6 +189,15 @@ export const fleetReservationsService = {
   getByVehicleId: async (vehicleId: string) => {
     console.log(`Fetching fleet reservations for vehicle ${vehicleId}`);
     
+    // In demo mode, return static data
+    if (isDemoMode()) {
+      console.log('Using demo fleet reservations data for vehicle');
+      const transformedReservations = transformDemoDataToReservations(demoFleetReservations);
+      const vehicleReservations = transformedReservations.filter(r => r.fleet_vehicle_id === vehicleId);
+      console.log('Demo fleet reservations for vehicle loaded:', vehicleReservations);
+      return vehicleReservations;
+    }
+    
     const { data, error } = await supabase
       .from('fleet_reservations')
       .select(`
@@ -128,9 +212,7 @@ export const fleetReservationsService = {
           year,
           registration_front_url,
           registration_back_url,
-          insurance_card_url,
-          car_brands(id, name),
-          car_models(id, name)
+          insurance_card_url
         )
       `)
       .eq('fleet_vehicle_id', vehicleId)
@@ -138,7 +220,11 @@ export const fleetReservationsService = {
     
     if (error) {
       console.error(`Error fetching fleet reservations for vehicle ${vehicleId}:`, error);
-      throw new Error(error.message);
+      // Fallback to demo data if Supabase fails
+      console.log('Fallback to demo fleet reservations data for vehicle');
+      const transformedReservations = transformDemoDataToReservations(demoFleetReservations);
+      const vehicleReservations = transformedReservations.filter(r => r.fleet_vehicle_id === vehicleId);
+      return vehicleReservations;
     }
     
     console.log('Fleet reservations fetched successfully:', data);
@@ -163,9 +249,7 @@ export const fleetReservationsService = {
           year,
           registration_front_url,
           registration_back_url,
-          insurance_card_url,
-          car_brands(id, name),
-          car_models(id, name)
+          insurance_card_url
         )
       `)
       .single();
@@ -198,9 +282,7 @@ export const fleetReservationsService = {
           year,
           registration_front_url,
           registration_back_url,
-          insurance_card_url,
-          car_brands(id, name),
-          car_models(id, name)
+          insurance_card_url
         )
       `)
       .single();

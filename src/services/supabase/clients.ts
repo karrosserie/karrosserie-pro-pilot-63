@@ -18,16 +18,15 @@ export type UpdateClient = Database['public']['Tables']['clients']['Update'] & {
 export const clientsService = {
   getAll: async (companyId?: string) => {
     console.log('Fetching all clients for company:', companyId);
-    let query = supabase
+    const baseQuery = supabase
       .from('clients')
-      .select('*')
-      .order('last_name');
+      .select('*');
     
-    if (companyId) {
-      query = query.eq('company_id', companyId);
-    }
+    const queryBuilder = companyId 
+      ? baseQuery.eq('company_id', companyId).order('last_name')
+      : baseQuery.order('last_name');
     
-    const { data, error } = await query;
+    const { data, error } = await queryBuilder;
 
     if (error) {
       console.error('Error fetching clients:', error);

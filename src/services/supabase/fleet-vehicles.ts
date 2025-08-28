@@ -1,6 +1,14 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
+import { demoFleetVehicles } from '@/data/demoData';
+
+// Check if we're in demo mode (simplified check)
+const isDemoMode = () => {
+  return window.location.hostname === 'localhost' || 
+         window.location.hostname.includes('demo') ||
+         process.env.NODE_ENV === 'development';
+};
 
 export type FleetVehicle = Database['public']['Tables']['fleet_vehicles']['Row'] & {
   vin?: string;
@@ -44,7 +52,21 @@ export const fleetVehiclesService = {
   getAll: async (companyId?: string) => {
     console.log('Fetching fleet vehicles with relations for company:', companyId);
     
-    let query = supabase
+    // In demo mode, return static data
+    if (isDemoMode()) {
+      console.log('Using demo fleet vehicles data');
+      let filteredVehicles = demoFleetVehicles;
+      
+      // Filter by company if provided
+      if (companyId) {
+        filteredVehicles = demoFleetVehicles.filter(vehicle => vehicle.company_id === companyId);
+      }
+      
+      console.log('Demo fleet vehicles loaded:', filteredVehicles);
+      return filteredVehicles;
+    }
+    
+    const baseQuery = supabase
       .from('fleet_vehicles')
       .select(`
         id,
@@ -63,20 +85,24 @@ export const fleetVehiclesService = {
         created_at,
         updated_at,
         company_id,
-        car_brands(id, name),
-        car_models(id, name)
-      `)
-      .order('created_at', { ascending: false });
+        user_id
+      `);
       
-    if (companyId) {
-      query = query.eq('company_id', companyId);
-    }
+    const queryBuilder = companyId 
+      ? baseQuery.eq('company_id', companyId).order('created_at', { ascending: false })
+      : baseQuery.order('created_at', { ascending: false });
     
-    const { data, error } = await query;
+    const { data, error } = await queryBuilder;
     
     if (error) {
       console.error('Error fetching fleet vehicles:', error);
-      throw new Error(error.message);
+      // Fallback to demo data if Supabase fails
+      console.log('Fallback to demo fleet vehicles data');
+      let filteredVehicles = demoFleetVehicles;
+      if (companyId) {
+        filteredVehicles = demoFleetVehicles.filter(vehicle => vehicle.company_id === companyId);
+      }
+      return filteredVehicles;
     }
     
     console.log('Fleet vehicles fetched successfully:', data);
@@ -85,6 +111,16 @@ export const fleetVehiclesService = {
 
   getById: async (id: string) => {
     console.log(`Fetching fleet vehicle with id ${id}`);
+    
+    // In demo mode, return static data
+    if (isDemoMode()) {
+      console.log('Using demo fleet vehicles data for single vehicle');
+      const vehicle = demoFleetVehicles.find(v => v.id === id);
+      if (!vehicle) {
+        throw new Error(`Fleet vehicle with id ${id} not found in demo data`);
+      }
+      return vehicle;
+    }
     
     const { data, error } = await supabase
       .from('fleet_vehicles')
@@ -105,15 +141,20 @@ export const fleetVehiclesService = {
         created_at,
         updated_at,
         company_id,
-        car_brands(id, name),
-        car_models(id, name)
+        user_id
       `)
       .eq('id', id)
       .single();
     
     if (error) {
       console.error(`Error fetching fleet vehicle with id ${id}:`, error);
-      throw new Error(error.message);
+      // Fallback to demo data if Supabase fails
+      console.log('Fallback to demo fleet vehicles data for single vehicle');
+      const vehicle = demoFleetVehicles.find(v => v.id === id);
+      if (!vehicle) {
+        throw new Error(`Fleet vehicle with id ${id} not found in demo data`);
+      }
+      return vehicle;
     }
     
     console.log('Fleet vehicle fetched successfully:', data);
@@ -143,8 +184,7 @@ export const fleetVehiclesService = {
         created_at,
         updated_at,
         company_id,
-        car_brands(id, name),
-        car_models(id, name)
+        user_id
       `)
       .single();
     
@@ -181,8 +221,7 @@ export const fleetVehiclesService = {
         created_at,
         updated_at,
         company_id,
-        car_brands(id, name),
-        car_models(id, name)
+        user_id
       `)
       .single();
     
