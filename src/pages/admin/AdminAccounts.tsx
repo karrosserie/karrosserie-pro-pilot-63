@@ -286,6 +286,7 @@ const AdminAccounts = () => {
                 <TableHead>Ville</TableHead>
                 <TableHead>Utilisateurs</TableHead>
                 <TableHead>Abonnement</TableHead>
+                <TableHead>Fin d'abonnement</TableHead>
                 <TableHead>Jetons</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -309,6 +310,15 @@ const AdminAccounts = () => {
                       </Badge>
                     ) : (
                       <Badge variant="outline">Aucun</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {company.subscription?.end_date ? (
+                      <span className="text-sm">
+                        {new Date(company.subscription.end_date).toLocaleDateString('fr-FR')}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
                     )}
                   </TableCell>
                   <TableCell>
