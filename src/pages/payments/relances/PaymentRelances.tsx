@@ -37,11 +37,10 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
 
   // Calculate stats
   const stats = {
-    relance1: formattedInvoices.filter(i => i.status === 'relance1').length,
-    relance2: formattedInvoices.filter(i => i.status === 'relance2').length,
-    relance3: formattedInvoices.filter(i => i.status === 'relance3').length,
-    contentieux: formattedInvoices.filter(i => i.status === 'contentieux').length,
-    totalAmount: formattedInvoices.reduce((sum, invoice) => {
+    enRelance: formattedInvoices.filter(i => ['relance1', 'relance2', 'relance3'].includes(i.status)).length,
+    procedureJudiciaire: formattedInvoices.filter(i => ['relance4', 'contentieux'].includes(i.status)).length,
+    recupererCeMois: '28 450€', // TODO: Calculate actual recovered amount
+    totalImpayes: formattedInvoices.reduce((sum, invoice) => {
       const amount = parseFloat(invoice.amount.replace(' €', '').replace(',', '.'));
       return sum + amount;
     }, 0).toLocaleString('fr-FR') + ' €'
@@ -115,48 +114,39 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
-            <div className="text-2xl sm:text-3xl font-bold text-foreground">{stats.relance1}</div>
+            <div className="text-2xl sm:text-3xl font-bold text-foreground">{stats.enRelance}</div>
             <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
-              Relance 1
+              EN RELANCE
             </div>
           </CardContent>
         </Card>
         
-        <Card className="border-l-4 border-l-yellow-500 hover:shadow-lg transition-shadow">
-          <CardContent className="p-4">
-            <div className="text-2xl sm:text-3xl font-bold text-foreground">{stats.relance2}</div>
-            <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
-              Relance 2
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow">
-          <CardContent className="p-4">
-            <div className="text-2xl sm:text-3xl font-bold text-foreground">{stats.relance3}</div>
-            <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
-              Relance 3
-            </div>
-          </CardContent>
-        </Card>
-
         <Card className="border-l-4 border-l-red-500 hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
-            <div className="text-2xl sm:text-3xl font-bold text-foreground">{stats.contentieux}</div>
+            <div className="text-2xl sm:text-3xl font-bold text-foreground">{stats.procedureJudiciaire}</div>
             <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
-              Contentieux
+              PROCÉDURE JUDICIAIRE
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-green-500 hover:shadow-lg transition-shadow">
+          <CardContent className="p-4">
+            <div className="text-xl sm:text-2xl font-bold text-foreground">{stats.recupererCeMois}</div>
+            <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
+              RÉCUPÉRÉ CE MOIS
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-l-4 border-l-primary hover:shadow-lg transition-shadow">
           <CardContent className="p-4">
-            <div className="text-xl sm:text-2xl font-bold text-foreground">{stats.totalAmount}</div>
+            <div className="text-xl sm:text-2xl font-bold text-foreground">{stats.totalImpayes}</div>
             <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
-              Total impayés
+              TOTAL IMPAYÉS
             </div>
           </CardContent>
         </Card>
