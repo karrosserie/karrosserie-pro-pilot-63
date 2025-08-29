@@ -321,6 +321,9 @@ export default function PresencePointages() {
       }
 
       setReportDialogOpen(false);
+      
+      // Navigation vers la page de comptabilité après génération du rapport
+      navigate('/payments/accounting');
     } catch (error) {
       console.error('Erreur lors de la génération du rapport:', error);
       toast({
