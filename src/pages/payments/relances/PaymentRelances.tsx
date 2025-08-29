@@ -1516,15 +1516,171 @@ Garage Martin`
                 </Button>
               </div>
 
-              {/* Status Badge */}
-              <div className="mb-6">
-                <Badge 
-                  variant="outline" 
-                  className={`${getStatusColor(drawerData.status)} text-sm px-3 py-1`}
-                >
-                  {getStatusText(drawerData.status)}
-                </Badge>
-              </div>
+               {/* Status Badge */}
+               <div className="mb-6">
+                 <Badge 
+                   variant="outline" 
+                   className={`${getStatusColor(drawerData.status)} text-sm px-3 py-1`}
+                 >
+                   {getStatusText(drawerData.status)}
+                 </Badge>
+               </div>
+
+               {/* Progression des étapes */}
+               <div className="mb-6">
+                 <h4 className="text-lg font-semibold mb-4 flex items-center">
+                   <Scale className="h-5 w-5 mr-2" />
+                   Progression du recouvrement
+                 </h4>
+                 
+                 {(() => {
+                   // Déterminer l'étape actuelle basée sur l'historique et le statut
+                   const getProgressionStep = (invoice: any) => {
+                     const hasRegisteredMail = invoice.history.some((h: any) => 
+                       h.type === 'registered' || h.action.toLowerCase().includes('mise en demeure')
+                     );
+                     const hasLegalAction = invoice.history.some((h: any) => 
+                       h.type === 'legal' || h.action.toLowerCase().includes('tribunal')
+                     );
+                     const hasJudgment = invoice.history.some((h: any) => 
+                       h.action.toLowerCase().includes('jugement')
+                     );
+                     const hasRelances = invoice.history.some((h: any) => 
+                       h.type === 'email' || h.type === 'sms' || h.type === 'phone'
+                     );
+
+                     if (hasJudgment) return 5;
+                     if (hasLegalAction) return 4;
+                     if (hasRegisteredMail) return 3;
+                     if (hasRelances) return 2;
+                     return 1;
+                   };
+
+                   const currentStep = getProgressionStep(drawerData);
+                   
+                   const steps = [
+                     { 
+                       id: 1, 
+                       label: 'Facture émise', 
+                       color: currentStep >= 1 ? 'bg-green-500' : 'bg-gray-300',
+                       textColor: currentStep >= 1 ? 'text-green-700' : 'text-gray-500',
+                       bgColor: currentStep >= 1 ? 'bg-green-50' : 'bg-gray-50'
+                     },
+                     { 
+                       id: 2, 
+                       label: 'Relances auto', 
+                       color: currentStep >= 2 ? 'bg-green-500' : 'bg-gray-300',
+                       textColor: currentStep >= 2 ? 'text-green-700' : 'text-gray-500',
+                       bgColor: currentStep >= 2 ? 'bg-green-50' : 'bg-gray-50'
+                     },
+                     { 
+                       id: 3, 
+                       label: 'Mise en demeure', 
+                       color: currentStep >= 3 ? 'bg-orange-500' : 'bg-gray-300',
+                       textColor: currentStep >= 3 ? 'text-orange-700' : 'text-gray-500',
+                       bgColor: currentStep >= 3 ? 'bg-orange-50' : 'bg-gray-50'
+                     },
+                     { 
+                       id: 4, 
+                       label: 'Dossier tribunal', 
+                       color: currentStep >= 4 ? 'bg-red-500' : 'bg-gray-300',
+                       textColor: currentStep >= 4 ? 'text-red-700' : 'text-gray-500',
+                       bgColor: currentStep >= 4 ? 'bg-red-50' : 'bg-gray-50'
+                     },
+                     { 
+                       id: 5, 
+                       label: 'Jugement', 
+                       color: currentStep >= 5 ? 'bg-red-600' : 'bg-gray-300',
+                       textColor: currentStep >= 5 ? 'text-red-800' : 'text-gray-500',
+                       bgColor: currentStep >= 5 ? 'bg-red-50' : 'bg-gray-50'
+                     }
+                   ];
+
+                   return (
+                     <div className="relative">
+                       {/* Ligne de progression */}
+                       <div className="absolute top-6 left-6 right-6 h-0.5 bg-gray-200 z-0"></div>
+                       <div 
+                         className="absolute top-6 left-6 h-0.5 bg-green-500 z-10 transition-all duration-500"
+                         style={{ width: `${((currentStep - 1) / 4) * 100}%` }}
+                       ></div>
+
+                       {/* Étapes */}
+                       <div className="relative z-20 grid grid-cols-5 gap-2">
+                         {steps.map((step, index) => (
+                           <div key={step.id} className="flex flex-col items-center">
+                             {/* Cercle numéroté */}
+                             <div 
+                               className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm transition-all duration-300 ${step.color} ${
+                                 currentStep === step.id ? 'ring-4 ring-opacity-30 ' + (
+                                   step.id <= 2 ? 'ring-green-300' : 
+                                   step.id === 3 ? 'ring-orange-300' : 
+                                   'ring-red-300'
+                                 ) : ''
+                               }`}
+                             >
+                               {step.id}
+                             </div>
+                             
+                             {/* Label */}
+                             <div className={`mt-2 text-xs font-medium text-center ${step.textColor} transition-colors duration-300`}>
+                               {step.label}
+                             </div>
+                             
+                             {/* Indicator bar sous l'étape actuelle */}
+                             {currentStep === step.id && (
+                               <div className={`mt-1 w-16 h-1 rounded-full transition-all duration-300 ${
+                                 step.id <= 2 ? 'bg-green-400' : 
+                                 step.id === 3 ? 'bg-orange-400' : 
+                                 'bg-red-400'
+                               }`}></div>
+                             )}
+                           </div>
+                         ))}
+                       </div>
+
+                       {/* Informations sur l'étape actuelle */}
+                       <div className={`mt-6 p-4 rounded-lg border transition-all duration-300 ${
+                         currentStep <= 2 ? 'bg-green-50 border-green-200' :
+                         currentStep === 3 ? 'bg-orange-50 border-orange-200' :
+                         'bg-red-50 border-red-200'
+                       }`}>
+                         <div className="flex items-center justify-between">
+                           <div>
+                             <div className={`font-semibold text-sm ${
+                               currentStep <= 2 ? 'text-green-800' :
+                               currentStep === 3 ? 'text-orange-800' :
+                               'text-red-800'
+                             }`}>
+                               Étape actuelle : {steps[currentStep - 1].label}
+                             </div>
+                             <div className={`text-xs mt-1 ${
+                               currentStep <= 2 ? 'text-green-600' :
+                               currentStep === 3 ? 'text-orange-600' :
+                               'text-red-600'
+                             }`}>
+                               {currentStep === 1 && 'Facture émise, en attente de paiement'}
+                               {currentStep === 2 && 'Relances automatiques en cours'}
+                               {currentStep === 3 && 'Mise en demeure envoyée'}
+                               {currentStep === 4 && 'Procédure judiciaire engagée'}
+                               {currentStep === 5 && 'Jugement rendu'}
+                             </div>
+                           </div>
+                           <div className={`text-xl ${
+                             currentStep <= 2 ? 'text-green-500' :
+                             currentStep === 3 ? 'text-orange-500' :
+                             'text-red-500'
+                           }`}>
+                             {currentStep <= 2 ? '📧' :
+                              currentStep === 3 ? '📨' :
+                              currentStep === 4 ? '⚖️' : '🏛️'}
+                           </div>
+                         </div>
+                       </div>
+                     </div>
+                   );
+                 })()}
+               </div>
 
               {/* Relance History */}
               <div className="mb-6">
