@@ -11,7 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 export interface GeneratedReport {
   id: string;
   name: string;
-  type: 'monthly' | 'quarterly' | 'yearly' | 'fec' | 'csv' | 'excel' | 'social';
+  type: 'monthly' | 'quarterly' | 'yearly' | 'fec' | 'csv' | 'excel' | 'social' | 'pointages';
   fromDate: Date;
   toDate: Date;
   generatedAt: Date;
@@ -441,7 +441,9 @@ export const useGeneratedReports = () => {
       'Bilan sociale': 'social',
       'Export FEC': 'fec',
       'Export CSV': 'csv',
-      'Export Excel': 'excel'
+      'Export Excel': 'excel',
+      'Pointages FEC': 'pointages',
+      'Pointages CSV': 'pointages'
     };
 
     const { data: { user } } = await supabase.auth.getUser();

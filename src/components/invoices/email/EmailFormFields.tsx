@@ -14,7 +14,7 @@ interface EmailFormFieldsProps {
   isLoading: boolean;
   invoiceReference?: string;
   documentType?: 'invoice' | 'quote' | 'credit' | 'repair_order' | 'report';
-  reportType?: 'monthly' | 'quarterly' | 'yearly' | 'fec' | 'csv' | 'excel' | 'social';
+  reportType?: 'monthly' | 'quarterly' | 'yearly' | 'fec' | 'csv' | 'excel' | 'social' | 'pointages';
   reportFromDate?: Date;
   reportToDate?: Date;
 }
@@ -89,6 +89,10 @@ export const EmailFormFields = ({ data, onChange, isLoading, invoiceReference, d
                   const fromDateStr = format(reportFromDate, 'dd-MM-yyyy', { locale: fr });
                   const toDateStr = format(reportToDate, 'dd-MM-yyyy', { locale: fr });
                   return `export-fec-${fromDateStr}-${toDateStr}.txt`;
+                } else if (reportType === 'pointages') {
+                  const fromDateStr = format(reportFromDate, 'dd-MM-yyyy', { locale: fr });
+                  const toDateStr = format(reportToDate, 'dd-MM-yyyy', { locale: fr });
+                  return `pointages-${fromDateStr}-${toDateStr}.xlsx`;
                 }
                 return `${invoiceReference || 'XXX'}.pdf`;
               }

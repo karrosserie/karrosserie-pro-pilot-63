@@ -13,6 +13,7 @@ import { Download, Calendar, MapPin, FileText, Filter, Clock, User, Building2, C
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, CartesianGrid } from "recharts";
 import * as XLSX from 'xlsx';
 import { useToast } from "@/hooks/use-toast";
+import { useGeneratedReports } from "@/hooks/use-generated-reports";
 
 // ------------------ Types & Helpers ------------------
 type Pointage = {
@@ -175,6 +176,7 @@ export default function PresencePointages() {
   const [dateFin, setDateFin] = useState<string>(new Date().toISOString().split('T')[0]);
   const [formatExport, setFormatExport] = useState<"fec" | "csv">("fec");
   const { toast } = useToast();
+  const { addReport } = useGeneratedReports();
 
   const filtered = useMemo(() => {
     return SAMPLE.filter((p) =>
@@ -219,97 +221,112 @@ export default function PresencePointages() {
   const employes = Array.from(new Set(SAMPLE.map(s => s.employe)));
   const chantiers = Array.from(new Set(SAMPLE.map(s => s.chantier)));
 
-  const handleGenerateReport = () => {
-    // Filtrer les données selon la période sélectionnée
-    const filteredByDate = filtered.filter(p => {
-      return p.date >= dateDebut && p.date <= dateFin;
-    });
+  const handleGenerateReport = async () => {
+    try {
+      // Créer le nom du rapport selon le format
+      const reportName = formatExport === "csv" ? "Pointages CSV" : "Pointages FEC";
+      
+      // Ajouter le rapport à la base de données via le hook
+      const reportId = await addReport(reportName, new Date(dateDebut), new Date(dateFin));
+      
+      // Filtrer les données selon la période sélectionnée
+      const filteredByDate = filtered.filter(p => {
+        return p.date >= dateDebut && p.date <= dateFin;
+      });
 
-    if (formatExport === "csv") {
-      // Export CSV
-      const csvData = filteredByDate.map((p) => {
-        const d = durationHours(p, HEURES_JOUR);
-        const pauseTxt = p.typePause === "Repas" && p.pauseDebut && p.pauseFin
-          ? `${new Date(p.pauseDebut).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} – ${new Date(p.pauseFin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`
-          : (p.typePause?.startsWith("Demi-journée") ? p.typePause : "");
-        const statutOk = p.statutDebut === "VALIDE" && p.statutFin === "VALIDE";
+      if (formatExport === "csv") {
+        // Export CSV
+        const csvData = filteredByDate.map((p) => {
+          const d = durationHours(p, HEURES_JOUR);
+          const pauseTxt = p.typePause === "Repas" && p.pauseDebut && p.pauseFin
+            ? `${new Date(p.pauseDebut).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} – ${new Date(p.pauseFin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`
+            : (p.typePause?.startsWith("Demi-journée") ? p.typePause : "");
+          const statutOk = p.statutDebut === "VALIDE" && p.statutFin === "VALIDE";
+          
+          return {
+            'Date': p.date,
+            'Employé': p.employe,
+            'Matricule': p.matricule,
+            'Métier': p.metier,
+            'Chantier': p.chantier,
+            'Code Chantier': p.codeChantier,
+            'Début': p.debut ? new Date(p.debut).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '',
+            'Fin': p.fin ? new Date(p.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '',
+            'Pause': pauseTxt,
+            'Durée (HH:MM)': toHhMm(d.duree),
+            'Heures décimales': d.duree.toFixed(2),
+            'Heures normales': d.normales.toFixed(2),
+            'Heures supplémentaires': d.sup.toFixed(2),
+            'Statut GPS': statutOk ? 'VALIDE' : 'REFUSÉ',
+            'Distance début (m)': p.distDebut ?? 0,
+            'Distance fin (m)': p.distFin ?? 0,
+            'Absence': p.absence || '',
+            'Validation chef': p.validationChef ? 'Oui' : 'Non',
+            'GPS Début': p.gpsDebut || '',
+            'GPS Fin': p.gpsFin || '',
+            'Commentaire': p.commentaire || ''
+          };
+        });
+
+        const ws = XLSX.utils.json_to_sheet(csvData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Pointages_CSV");
         
-        return {
-          'Date': p.date,
-          'Employé': p.employe,
-          'Matricule': p.matricule,
-          'Métier': p.metier,
-          'Chantier': p.chantier,
-          'Code Chantier': p.codeChantier,
-          'Début': p.debut ? new Date(p.debut).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '',
-          'Fin': p.fin ? new Date(p.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '',
-          'Pause': pauseTxt,
-          'Durée (HH:MM)': toHhMm(d.duree),
-          'Heures décimales': d.duree.toFixed(2),
-          'Heures normales': d.normales.toFixed(2),
-          'Heures supplémentaires': d.sup.toFixed(2),
-          'Statut GPS': statutOk ? 'VALIDE' : 'REFUSÉ',
-          'Distance début (m)': p.distDebut ?? 0,
-          'Distance fin (m)': p.distFin ?? 0,
-          'Absence': p.absence || '',
-          'Validation chef': p.validationChef ? 'Oui' : 'Non',
-          'GPS Début': p.gpsDebut || '',
-          'GPS Fin': p.gpsFin || '',
-          'Commentaire': p.commentaire || ''
-        };
-      });
+        const fileName = `pointages_csv_${dateDebut}_${dateFin}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+        
+        toast({
+          title: "Rapport généré avec succès",
+          description: `Le rapport ${reportName} a été généré et ajouté à la liste. Fichier ${fileName} téléchargé.`,
+        });
+      } else {
+        // Export FEC
+        const fecData = filteredByDate.map((p) => {
+          const d = durationHours(p, HEURES_JOUR);
+          return {
+            'JournalCode': 'PAY',
+            'JournalLib': 'Paie',
+            'EcritureNum': p.id,
+            'EcritureDate': p.date,
+            'CompteNum': '641000',
+            'CompteLib': 'Rémunérations du personnel',
+            'CompAuxNum': p.matricule,
+            'CompAuxLib': p.employe,
+            'PieceRef': `POINT-${p.date}-${p.matricule}`,
+            'PieceDate': p.date,
+            'EcritureLib': `Pointage ${p.employe} - ${p.chantier}`,
+            'Debit': d.duree * 15, // Exemple: 15€/heure
+            'Credit': 0,
+            'EcritureLet': '',
+            'DateLet': '',
+            'ValidDate': p.validationChef ? p.date : '',
+            'Montantdevise': '',
+            'Idevise': ''
+          };
+        });
 
-      const ws = XLSX.utils.json_to_sheet(csvData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Pointages_CSV");
-      
-      const fileName = `pointages_csv_${dateDebut}_${dateFin}.xlsx`;
-      XLSX.writeFile(wb, fileName);
-      
-      toast({
-        title: "Export CSV généré",
-        description: `Fichier ${fileName} téléchargé avec succès.`,
-      });
-    } else {
-      // Export FEC
-      const fecData = filteredByDate.map((p) => {
-        const d = durationHours(p, HEURES_JOUR);
-        return {
-          'JournalCode': 'PAY',
-          'JournalLib': 'Paie',
-          'EcritureNum': p.id,
-          'EcritureDate': p.date,
-          'CompteNum': '641000',
-          'CompteLib': 'Rémunérations du personnel',
-          'CompAuxNum': p.matricule,
-          'CompAuxLib': p.employe,
-          'PieceRef': `POINT-${p.date}-${p.matricule}`,
-          'PieceDate': p.date,
-          'EcritureLib': `Pointage ${p.employe} - ${p.chantier}`,
-          'Debit': d.duree * 15, // Exemple: 15€/heure
-          'Credit': 0,
-          'EcritureLet': '',
-          'DateLet': '',
-          'ValidDate': p.validationChef ? p.date : '',
-          'Montantdevise': '',
-          'Idevise': ''
-        };
-      });
+        const ws = XLSX.utils.json_to_sheet(fecData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Export_FEC");
+        
+        const fileName = `pointages_fec_${dateDebut}_${dateFin}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+        
+        toast({
+          title: "Rapport généré avec succès",
+          description: `Le rapport ${reportName} a été généré et ajouté à la liste. Fichier ${fileName} téléchargé.`,
+        });
+      }
 
-      const ws = XLSX.utils.json_to_sheet(fecData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Export_FEC");
-      
-      const fileName = `pointages_fec_${dateDebut}_${dateFin}.xlsx`;
-      XLSX.writeFile(wb, fileName);
-      
+      setReportDialogOpen(false);
+    } catch (error) {
+      console.error('Erreur lors de la génération du rapport:', error);
       toast({
-        title: "Export FEC généré",
-        description: `Fichier ${fileName} téléchargé avec succès.`,
+        title: "Erreur",
+        description: "Impossible de générer le rapport. Veuillez réessayer.",
+        variant: "destructive"
       });
     }
-
-    setReportDialogOpen(false);
   };
 
   return (
