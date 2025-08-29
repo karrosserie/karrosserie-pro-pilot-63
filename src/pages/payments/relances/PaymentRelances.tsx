@@ -29,6 +29,9 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
   // Filter invoices based on selected status
   const filteredInvoices = formattedInvoices.filter(invoice => {
     if (filter === 'all') return true;
+    if (filter === 'relance') return ['relance1', 'relance2', 'relance3'].includes(invoice.status);
+    if (filter === 'demeure') return invoice.status === 'relance4';
+    if (filter === 'contentieux') return invoice.status === 'contentieux';
     return invoice.status === filter;
   });
 
@@ -174,28 +177,20 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
                 Toutes
               </Button>
               <Button 
-                variant={filter === 'relance1' ? 'default' : 'outline'} 
+                variant={filter === 'relance1' || filter === 'relance2' || filter === 'relance3' ? 'default' : 'outline'} 
                 size="sm"
-                onClick={() => setFilter('relance1')}
+                onClick={() => setFilter('relance')}
                 className="text-xs sm:text-sm"
               >
-                Relance 1
+                Relance
               </Button>
               <Button 
-                variant={filter === 'relance2' ? 'default' : 'outline'} 
+                variant={filter === 'demeure' ? 'default' : 'outline'} 
                 size="sm"
-                onClick={() => setFilter('relance2')}
+                onClick={() => setFilter('demeure')}
                 className="text-xs sm:text-sm"
               >
-                Relance 2
-              </Button>
-              <Button 
-                variant={filter === 'relance3' ? 'default' : 'outline'} 
-                size="sm"
-                onClick={() => setFilter('relance3')}
-                className="text-xs sm:text-sm"
-              >
-                Relance 3
+                Mise en demeure
               </Button>
               <Button 
                 variant={filter === 'contentieux' ? 'default' : 'outline'} 
@@ -203,7 +198,7 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
                 onClick={() => setFilter('contentieux')}
                 className="text-xs sm:text-sm"
               >
-                Contentieux
+                Judiciaire
               </Button>
             </div>
           </div>
