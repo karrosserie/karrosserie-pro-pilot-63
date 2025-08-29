@@ -584,6 +584,111 @@ Garage Martin`
 
       {currentView === 'relances' ? (
         <>
+          {/* Campaign Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Campagne Janvier 2025 */}
+            <Card className="border-l-4 border-l-green-500">
+              <CardHeader className="bg-green-50">
+                <CardTitle className="text-lg font-bold text-green-800">
+                  Campagne janvier 2025
+                </CardTitle>
+                <p className="text-sm text-green-700">Dernière relance automatique envoyée le 15 janvier 2025</p>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-foreground">8</div>
+                    <div className="text-xs text-muted-foreground">Total</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-foreground">4</div>
+                    <div className="text-xs text-muted-foreground">Envoyés</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-foreground">2</div>
+                    <div className="text-xs text-muted-foreground">Ouverts</div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    size="sm" 
+                    className={campaignStatus.janvier2025 === 'active' ? "bg-green-600 hover:bg-green-700" : "bg-orange-600 hover:bg-orange-700"}
+                    onClick={() => handleCampaignAction('janvier2025', campaignStatus.janvier2025 === 'active' ? 'stop' : 'restart')}
+                  >
+                    {campaignStatus.janvier2025 === 'active' ? 'En cours' : campaignStatus.janvier2025 === 'stopped' ? 'Arrêtée' : 'Reprogrammée'}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleCampaignAction('janvier2025', campaignStatus.janvier2025 === 'active' ? 'stop' : 'restart')}
+                  >
+                    {campaignStatus.janvier2025 === 'active' ? 'Arrêter' : 'Relancer'}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => viewCampaignDetails('janvier2025')}
+                    className="flex items-center gap-1"
+                  >
+                    <Eye className="h-3 w-3" />
+                    Détails
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Campagne Décembre 2024 */}
+            <Card className="border-l-4 border-l-blue-500">
+              <CardHeader className="bg-blue-50">
+                <CardTitle className="text-lg font-bold text-blue-800">
+                  Campagne décembre 2024
+                </CardTitle>
+                <p className="text-sm text-blue-700">Campagne terminée le 30 décembre 2024</p>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-foreground">34</div>
+                    <div className="text-xs text-muted-foreground">Total</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-foreground">5</div>
+                    <div className="text-xs text-muted-foreground">Payés</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-foreground">3</div>
+                    <div className="text-xs text-muted-foreground">En litige</div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className={`text-blue-600 border-blue-300 ${campaignStatus.decembre2024 === 'programmed' ? 'bg-blue-50' : ''}`}
+                  >
+                    {campaignStatus.decembre2024 === 'programmed' ? 'Reprogrammée' : 'Terminée'}
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    onClick={() => handleCampaignAction('decembre2024', 'program')}
+                  >
+                    {campaignStatus.decembre2024 === 'programmed' ? 'Programmer à nouveau' : 'Programmer campagne'}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => viewCampaignDetails('decembre2024')}
+                    className="flex items-center gap-1"
+                  >
+                    <Eye className="h-3 w-3" />
+                    Détails
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <Card 
@@ -777,113 +882,8 @@ Garage Martin`
           </Card>
         </>
       ) : (
-        /* Campagnes View */
+        /* Phase de Relance View */
         <>
-          {/* Campaign Cards */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {/* Campagne Janvier 2025 */}
-            <Card className="border-l-4 border-l-green-500">
-              <CardHeader className="bg-green-50">
-                <CardTitle className="text-lg font-bold text-green-800">
-                  Campagne janvier 2025
-                </CardTitle>
-                <p className="text-sm text-green-700">Dernière relance automatique envoyée le 15 janvier 2025</p>
-              </CardHeader>
-              <CardContent className="p-4">
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-foreground">8</div>
-                    <div className="text-xs text-muted-foreground">Total</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-foreground">4</div>
-                    <div className="text-xs text-muted-foreground">Envoyés</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-foreground">2</div>
-                    <div className="text-xs text-muted-foreground">Ouverts</div>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button 
-                    size="sm" 
-                    className={campaignStatus.janvier2025 === 'active' ? "bg-green-600 hover:bg-green-700" : "bg-orange-600 hover:bg-orange-700"}
-                    onClick={() => handleCampaignAction('janvier2025', campaignStatus.janvier2025 === 'active' ? 'stop' : 'restart')}
-                  >
-                    {campaignStatus.janvier2025 === 'active' ? 'En cours' : campaignStatus.janvier2025 === 'stopped' ? 'Arrêtée' : 'Reprogrammée'}
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleCampaignAction('janvier2025', campaignStatus.janvier2025 === 'active' ? 'stop' : 'restart')}
-                  >
-                    {campaignStatus.janvier2025 === 'active' ? 'Arrêter' : 'Relancer'}
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => viewCampaignDetails('janvier2025')}
-                    className="flex items-center gap-1"
-                  >
-                    <Eye className="h-3 w-3" />
-                    Détails
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Campagne Décembre 2024 */}
-            <Card className="border-l-4 border-l-blue-500">
-              <CardHeader className="bg-blue-50">
-                <CardTitle className="text-lg font-bold text-blue-800">
-                  Campagne décembre 2024
-                </CardTitle>
-                <p className="text-sm text-blue-700">Campagne terminée le 30 décembre 2024</p>
-              </CardHeader>
-              <CardContent className="p-4">
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-foreground">34</div>
-                    <div className="text-xs text-muted-foreground">Total</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-foreground">5</div>
-                    <div className="text-xs text-muted-foreground">Payés</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-foreground">3</div>
-                    <div className="text-xs text-muted-foreground">En litige</div>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className={`text-blue-600 border-blue-300 ${campaignStatus.decembre2024 === 'programmed' ? 'bg-blue-50' : ''}`}
-                  >
-                    {campaignStatus.decembre2024 === 'programmed' ? 'Reprogrammée' : 'Terminée'}
-                  </Button>
-                  <Button 
-                    variant="destructive" 
-                    size="sm"
-                    onClick={() => handleCampaignAction('decembre2024', 'program')}
-                  >
-                    {campaignStatus.decembre2024 === 'programmed' ? 'Programmer à nouveau' : 'Programmer campagne'}
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => viewCampaignDetails('decembre2024')}
-                    className="flex items-center gap-1"
-                  >
-                    <Eye className="h-3 w-3" />
-                    Détails
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
           {/* Journal d'Activité */}
           <Card>
             <CardHeader>
