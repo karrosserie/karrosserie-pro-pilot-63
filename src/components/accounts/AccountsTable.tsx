@@ -199,12 +199,6 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
             <div className="space-y-4 text-sm text-gray-700">
               <div className="flex items-start gap-3">
                 <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
-                  1
-                </div>
-                <p>Pour pointer vos paiements dans Karrosserie.pro.</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                   2
                 </div>
                 <p>Bridge (ACPR – Autorité de contrôle Banque de France) assure la connexion sécurisée.</p>
