@@ -2,45 +2,13 @@
 import React, { useState } from 'react';
 import { AccountingHeader } from '@/components/accounting/AccountingHeader';
 import { AccountingKpis } from '@/components/accounting/AccountingKpis';
-import { AccountingTabs } from '@/components/accounting/AccountingTabs';
+import ReportContent from '@/components/accounting/ReportContent';
 import { useAccountingData } from '@/hooks/use-accounting-data';
 import { useToast } from '@/hooks/use-toast';
-import type { DateRange } from 'react-day-picker';
-import { isWithinInterval, parseISO } from 'date-fns';
 
 const Accounting = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState<'all' | 'receipts' | 'expenses' | 'unpaid'>('all');
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [paymentMethod, setPaymentMethod] = useState<string>('all');
-  const { transactions, isLoading, totalReceipts, totalExpenses, balance } = useAccountingData();
+  const { totalReceipts, totalExpenses, balance, transactions, isLoading } = useAccountingData();
   const { toast } = useToast();
-  
-  const filteredTransactions = transactions.filter(transaction => {
-    const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         transaction.client.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesFilter = selectedFilter === 'all' || 
-                         (selectedFilter === 'receipts' && transaction.type === 'Encaissement') ||
-                         (selectedFilter === 'expenses' && transaction.type === 'Dépense') ||
-                         (selectedFilter === 'unpaid' && transaction.status === 'En attente');
-    
-    // Filtrage par date
-    const matchesDateRange = !dateRange?.from || !transaction.date || (() => {
-      // Convertir la date de transaction du format "dd/MM/yyyy" vers un objet Date
-      const [day, month, year] = transaction.date.split('/').map(Number);
-      const transactionDate = new Date(year, month - 1, day);
-      return isWithinInterval(transactionDate, {
-        start: dateRange.from,
-        end: dateRange.to || dateRange.from
-      });
-    })();
-    
-    // Filtrage par méthode de paiement
-    const matchesPaymentMethod = paymentMethod === 'all' || transaction.method === paymentMethod;
-    
-    return matchesSearch && matchesFilter && matchesDateRange && matchesPaymentMethod;
-  });
 
   const handleExport = (type: 'fec' | 'excel' | 'pdf') => {
     toast({
@@ -75,18 +43,7 @@ const Accounting = () => {
         transactionCount={transactions.length}
       />
       
-      <AccountingTabs
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        selectedFilter={selectedFilter}
-        setSelectedFilter={setSelectedFilter}
-        filteredTransactions={filteredTransactions}
-        allTransactions={transactions}
-        dateRange={dateRange}
-        setDateRange={setDateRange}
-        paymentMethod={paymentMethod}
-        setPaymentMethod={setPaymentMethod}
-      />
+      <ReportContent />
     </div>
   );
 };
