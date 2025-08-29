@@ -424,7 +424,16 @@ Garage Martin`
     
     if (!lastSmsAction) return null;
 
-    const smsDate = new Date(lastSmsAction.date + ' ' + (lastSmsAction.time || '00:00'));
+    // Parse date properly (DD/MM/YYYY format)
+    const [day, month, year] = lastSmsAction.date.split('/');
+    const smsDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    
+    // Add time if available
+    if (lastSmsAction.time) {
+      const [hours, minutes] = lastSmsAction.time.split(':');
+      smsDate.setHours(parseInt(hours), parseInt(minutes));
+    }
+    
     const miseEnDemeureDate = new Date(smsDate.getTime() + (8 * 24 * 60 * 60 * 1000)); // 8 jours après
     const tribunalDate = new Date(miseEnDemeureDate.getTime() + (10 * 24 * 60 * 60 * 1000)); // 10 jours après mise en demeure
     
@@ -432,42 +441,62 @@ Garage Martin`
     const miseEnDemeureTime = miseEnDemeureDate.getTime();
     const tribunalTime = tribunalDate.getTime();
 
-    if (now < miseEnDemeureTime) {
-      // Compte à rebours pour mise en demeure
-      const timeLeft = miseEnDemeureTime - now;
-      const days = Math.floor(timeLeft / (24 * 60 * 60 * 1000));
-      const hours = Math.floor((timeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-      const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
-      const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
-      
-      return {
-        type: 'miseEnDemeure',
-        action: 'Envoyer mise en demeure',
-        timeLeft: { days, hours, minutes, seconds },
-        isActive: true
-      };
-    } else if (now < tribunalTime) {
+    // Check if mise en demeure already sent
+    const miseEnDemeureExists = invoice.history.some((action: any) => 
+      action.type === 'registered' || action.action.toLowerCase().includes('mise en demeure')
+    );
+
+    if (miseEnDemeureExists) {
       // Compte à rebours pour tribunal
-      const timeLeft = tribunalTime - now;
-      const days = Math.floor(timeLeft / (24 * 60 * 60 * 1000));
-      const hours = Math.floor((timeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-      const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
-      const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
-      
-      return {
-        type: 'tribunal',
-        action: 'Générer dossier tribunal',
-        timeLeft: { days, hours, minutes, seconds },
-        isActive: true
-      };
+      if (now < tribunalTime) {
+        const timeLeft = tribunalTime - now;
+        const days = Math.floor(timeLeft / (24 * 60 * 60 * 1000));
+        const hours = Math.floor((timeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+        const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
+        const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
+        
+        return {
+          type: 'tribunal',
+          action: 'Générer dossier tribunal',
+          timeLeft: { days, hours, minutes, seconds },
+          isActive: true,
+          deadline: tribunalDate.toLocaleDateString('fr-FR')
+        };
+      } else {
+        return {
+          type: 'tribunal_expired',
+          action: 'Générer dossier tribunal',
+          timeLeft: null,
+          isActive: false,
+          deadline: tribunalDate.toLocaleDateString('fr-FR')
+        };
+      }
+    } else {
+      // Compte à rebours pour mise en demeure
+      if (now < miseEnDemeureTime) {
+        const timeLeft = miseEnDemeureTime - now;
+        const days = Math.floor(timeLeft / (24 * 60 * 60 * 1000));
+        const hours = Math.floor((timeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+        const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
+        const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
+        
+        return {
+          type: 'miseEnDemeure',
+          action: 'Envoyer mise en demeure',
+          timeLeft: { days, hours, minutes, seconds },
+          isActive: true,
+          deadline: miseEnDemeureDate.toLocaleDateString('fr-FR')
+        };
+      } else {
+        return {
+          type: 'miseEnDemeure_expired',
+          action: 'Envoyer mise en demeure',
+          timeLeft: null,
+          isActive: false,
+          deadline: miseEnDemeureDate.toLocaleDateString('fr-FR')
+        };
+      }
     }
-    
-    return {
-      type: 'expired',
-      action: 'Procédure automatique expirée',
-      timeLeft: null,
-      isActive: false
-    };
   };
 
   const getStatusColor = (status: string) => {
@@ -1022,24 +1051,36 @@ Garage Martin`
                               </div>
                               <div className="text-xs text-orange-600">
                                 {countdown.type === 'miseEnDemeure' 
-                                  ? 'Délai automatique de 8 jours après le dernier SMS'
-                                  : 'Délai automatique de 10 jours après la mise en demeure'
+                                  ? `Délai automatique de 8 jours après le dernier SMS (échéance: ${countdown.deadline})`
+                                  : `Délai automatique de 10 jours après la mise en demeure (échéance: ${countdown.deadline})`
                                 }
                               </div>
                             </div>
                           ) : (
-                            <div className="text-sm text-red-600 font-medium">
-                              Délai dépassé - Action manuelle requise
+                            <div className="space-y-1">
+                              <div className="text-sm text-red-600 font-medium">
+                                Délai dépassé depuis le {countdown.deadline}
+                              </div>
+                              <div className="text-xs text-red-500">
+                                Action manuelle requise
+                              </div>
                             </div>
                           )}
                         </div>
                       );
                     })()
                   ) : drawerData.status === 'contentieux' ? (
-                    <Button variant="destructive" className="w-full">
-                      <Scale className="h-4 w-4 mr-2" />
-                      Dossier tribunal actif
-                    </Button>
+                    <div className="text-center p-4 bg-gradient-to-r from-red-50 to-red-100 border border-red-300 rounded-lg">
+                      <div className="flex items-center justify-center mb-2">
+                        <Scale className="h-5 w-5 text-red-600 mr-2" />
+                        <span className="font-semibold text-red-800">
+                          Procédure judiciaire en cours
+                        </span>
+                      </div>
+                      <div className="text-sm text-red-600">
+                        Dossier déposé au tribunal
+                      </div>
+                    </div>
                   ) : null}
                 </div>
             </div>
