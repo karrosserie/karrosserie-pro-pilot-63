@@ -1419,7 +1419,7 @@ Garage Martin`
         </>
       )}
 
-      {/* Modal pour les détails du journal */}
+      {/* Drawer pour les détails du journal */}
       {viewingLog && (
         <>
           {/* Overlay */}
@@ -1428,13 +1428,13 @@ Garage Martin`
             onClick={closeLogViewer}
           />
           
-          {/* Modal */}
-          <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-background border border-border rounded-lg shadow-xl z-50 w-[500px] max-w-[90vw]">
-            <div className="p-6">
+          {/* Drawer */}
+          <div className="fixed right-0 top-0 h-screen w-[500px] max-w-[90vw] bg-background border-l border-border z-50 transform transition-transform duration-300 ease-in-out">
+            <div className="p-6 h-full overflow-y-auto">
               {/* Header */}
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-bold flex items-center">
-                  <Calendar className="h-5 w-5 mr-2" />
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold flex items-center">
+                  <Eye className="h-6 w-6 mr-2" />
                   Détails de l'activité
                 </h3>
                 <Button
@@ -1447,42 +1447,71 @@ Garage Martin`
                 </Button>
               </div>
 
-              {/* Content */}
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium text-muted-foreground">Heure:</span>
-                    <div className="font-mono">{viewingLog.time}</div>
+              {/* Status Badge */}
+              <div className="mb-6">
+                <Badge 
+                  variant={
+                    viewingLog.type === 'success' ? 'default' : 
+                    viewingLog.type === 'error' ? 'destructive' : 
+                    viewingLog.type === 'warning' ? 'secondary' : 'outline'
+                  }
+                  className="text-sm px-3 py-1"
+                >
+                  {viewingLog.status}
+                </Badge>
+              </div>
+
+              {/* Informations principales */}
+              <div className="mb-6">
+                <h4 className="text-lg font-semibold mb-4 flex items-center">
+                  <FileText className="h-5 w-5 mr-2" />
+                  Informations du client
+                </h4>
+                
+                <div className="space-y-4">
+                  <div className="p-4 bg-muted/30 rounded-lg">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="text-sm font-medium text-muted-foreground">Client</span>
+                      <span className="text-sm font-mono text-muted-foreground">{viewingLog.time}</span>
+                    </div>
+                    <div className="text-lg font-semibold text-foreground">{viewingLog.client}</div>
                   </div>
-                  <div>
-                    <span className="font-medium text-muted-foreground">Client:</span>
-                    <div className="font-semibold">{viewingLog.client}</div>
-                  </div>
-                  <div>
-                    <span className="font-medium text-muted-foreground">Action:</span>
-                    <div>{viewingLog.action}</div>
-                  </div>
-                  <div>
-                    <span className="font-medium text-muted-foreground">Statut:</span>
-                    <Badge 
-                      variant={
-                        viewingLog.type === 'success' ? 'default' : 
-                        viewingLog.type === 'error' ? 'destructive' : 
-                        viewingLog.type === 'warning' ? 'secondary' : 'outline'
-                      }
-                      className="text-xs"
-                    >
-                      {viewingLog.status}
-                    </Badge>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-3 bg-muted/20 rounded-lg">
+                      <div className="text-sm text-muted-foreground">Action</div>
+                      <div className="font-semibold">{viewingLog.action}</div>
+                    </div>
+                    <div className="p-3 bg-muted/20 rounded-lg">
+                      <div className="text-sm text-muted-foreground">Montant</div>
+                      <div className="font-semibold text-primary">{viewingLog.invoiceAmount}</div>
+                    </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Détails de l'action */}
+              <div className="mb-6">
+                <h4 className="text-lg font-semibold mb-4 flex items-center">
+                  <Mail className="h-5 w-5 mr-2" />
+                  Détails de l'action
+                </h4>
                 
-                <div>
-                  <span className="font-medium text-muted-foreground">Détails:</span>
-                  <div className="mt-1 p-3 bg-muted rounded border text-sm">
+                <div className="p-4 bg-muted/20 rounded-lg border-l-4 border-primary">
+                  <div className="text-sm text-foreground leading-relaxed">
                     {viewingLog.details}
                   </div>
                 </div>
+              </div>
+              
+              {/* Bouton Fermer */}
+              <div className="flex justify-center">
+                <Button 
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
+                  onClick={closeLogViewer}
+                >
+                  Fermer
+                </Button>
               </div>
             </div>
           </div>
