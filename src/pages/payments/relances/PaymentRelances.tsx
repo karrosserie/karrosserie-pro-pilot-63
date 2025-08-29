@@ -1464,28 +1464,104 @@ Garage Martin`
               {/* Informations principales */}
               <div className="mb-6">
                 <h4 className="text-lg font-semibold mb-4 flex items-center">
-                  <FileText className="h-5 w-5 mr-2" />
+                  <FileText className="h-5 w-5 mr-2 text-blue-600" />
                   Informations du client
                 </h4>
                 
                 <div className="space-y-4">
-                  <div className="p-4 bg-muted/30 rounded-lg">
+                  <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
                     <div className="flex justify-between items-start mb-2">
-                      <span className="text-sm font-medium text-muted-foreground">Client</span>
-                      <span className="text-sm font-mono text-muted-foreground">{viewingLog.time}</span>
+                      <span className="text-sm font-medium text-blue-700">Client</span>
+                      <span className="text-sm font-mono text-blue-600 bg-blue-100 px-2 py-1 rounded">{viewingLog.time}</span>
                     </div>
-                    <div className="text-lg font-semibold text-foreground">{viewingLog.client}</div>
+                    <div className="text-lg font-semibold text-blue-900">{viewingLog.client}</div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-3 bg-muted/20 rounded-lg">
-                      <div className="text-sm text-muted-foreground">Action</div>
-                      <div className="font-semibold">{viewingLog.action}</div>
+                    <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                      <div className="text-sm text-green-700 font-medium">Action</div>
+                      <div className="font-semibold text-green-900">{viewingLog.action}</div>
                     </div>
-                    <div className="p-3 bg-muted/20 rounded-lg">
-                      <div className="text-sm text-muted-foreground">Montant</div>
-                      <div className="font-semibold text-primary">{viewingLog.invoiceAmount}</div>
+                    <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                      <div className="text-sm text-purple-700 font-medium">Montant</div>
+                      <div className="font-semibold text-purple-900">{viewingLog.invoiceAmount}</div>
                     </div>
+                  </div>
+                  
+                  <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                    <div className="text-sm text-orange-700 font-medium">Date d'échéance</div>
+                    <div className="font-semibold text-orange-900">{viewingLog.dueDate}</div>
+                    <div className="text-xs text-orange-600 mt-1">
+                      {(() => {
+                        const today = new Date('2025-01-09');
+                        const [day, month, year] = viewingLog.dueDate.split('/');
+                        const dueDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                        const daysOverdue = Math.max(0, Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24)));
+                        
+                        if (daysOverdue === 0) return '✅ À jour';
+                        if (daysOverdue === 1) return '⚠️ 1 jour de retard';
+                        return `🔴 ${daysOverdue} jours de retard`;
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contenu du message */}
+              <div className="mb-6">
+                <h4 className="text-lg font-semibold mb-4 flex items-center">
+                  <Mail className="h-5 w-5 mr-2 text-indigo-600" />
+                  Contenu du message
+                </h4>
+                
+                <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+                  <div className="text-sm text-indigo-900 leading-relaxed font-mono">
+                    {viewingLog.action === 'Mise en demeure' && `
+MISE EN DEMEURE - DERNIÈRE RELANCE
+
+Madame, Monsieur,
+
+Malgré nos précédents rappels, votre facture d'un montant de ${viewingLog.invoiceAmount} demeure impayée à ce jour.
+
+Échéance dépassée : ${viewingLog.dueDate}
+Référence client : ${viewingLog.client}
+
+Nous vous mettons en demeure de procéder au règlement sous 8 jours à compter de la réception de ce courrier, faute de quoi nous engagerons une procédure judiciaire à vos frais.
+
+Cordialement,
+L'équipe de recouvrement`}
+                    
+                    {viewingLog.action === 'Email amiable' && `
+Objet: Rappel de paiement - Facture en retard
+
+Bonjour,
+
+Nous vous rappelons qu'une facture d'un montant de ${viewingLog.invoiceAmount} est arrivée à échéance le ${viewingLog.dueDate}.
+
+Client : ${viewingLog.client}
+
+Nous vous serions reconnaissants de bien vouloir procéder au règlement dans les meilleurs délais.
+
+Pour toute question, n'hésitez pas à nous contacter.
+
+Cordialement`}
+                    
+                    {viewingLog.action === 'SMS message' && `
+RAPPEL FACTURE: ${viewingLog.client}, votre facture de ${viewingLog.invoiceAmount} échue le ${viewingLog.dueDate} reste impayée. Merci de régulariser. Contact: 01.23.45.67.89 - STOP au 36173`}
+                    
+                    {viewingLog.action === 'LTR message' && `
+COURRIER RECOMMANDÉ AVEC AR
+
+Madame, Monsieur,
+
+Par la présente, nous vous informons qu'une facture d'un montant de ${viewingLog.invoiceAmount} est demeurée impayée depuis le ${viewingLog.dueDate}.
+
+Client concerné : ${viewingLog.client}
+
+Nous vous demandons de bien vouloir procéder au règlement sous huitaine.
+
+Cordialement,
+Service Comptabilité`}
                   </div>
                 </div>
               </div>
@@ -1493,12 +1569,12 @@ Garage Martin`
               {/* Détails de l'action */}
               <div className="mb-6">
                 <h4 className="text-lg font-semibold mb-4 flex items-center">
-                  <Mail className="h-5 w-5 mr-2" />
-                  Détails de l'action
+                  <AlertTriangle className="h-5 w-5 mr-2 text-amber-600" />
+                  Détails techniques
                 </h4>
                 
-                <div className="p-4 bg-muted/20 rounded-lg border-l-4 border-primary">
-                  <div className="text-sm text-foreground leading-relaxed">
+                <div className="p-4 bg-amber-50 rounded-lg border-l-4 border-amber-400">
+                  <div className="text-sm text-amber-900 leading-relaxed">
                     {viewingLog.details}
                   </div>
                 </div>
