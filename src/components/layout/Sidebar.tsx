@@ -149,6 +149,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
         { label: 'Encaissements', path: '/payments/receipts' },
         { label: 'Dépenses', path: '/payments/expenses' },
         { label: 'Gestion des comptes', path: '/payments/accounts' },
+        { label: 'Relance de paiement', path: '/payments/relances' },
       ]
     },
     { icon: <CreditCard className="app-icon" />, label: 'Cession de créance', path: '/cessions' },

@@ -4,6 +4,7 @@ import AppLayout from "@/components/layout/AppLayout";
 import Receipts from "@/pages/payments/receipts/Receipts";
 import Expenses from "@/pages/payments/expenses/Expenses";
 import Accounts from "@/pages/payments/accounts/Accounts";
+import PaymentRelances from "@/pages/payments/relances/PaymentRelances";
 
 export const paymentRoutes = [
   {
@@ -32,6 +33,16 @@ export const paymentRoutes = [
       <ProtectedRoute>
         <AppLayout>
           <Accounts />
+        </AppLayout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/payments/relances",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <PaymentRelances />
         </AppLayout>
       </ProtectedRoute>
     )
