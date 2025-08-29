@@ -89,89 +89,54 @@ const ReportContent = () => {
   return (
     <div className="space-y-6">
       {/* Section Rapports sociaux */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-background via-background to-karrosserie-orange/5 border border-karrosserie-orange/20 shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-karrosserie-orange/5 to-transparent opacity-50"></div>
-        <div className="relative p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-8 bg-gradient-to-b from-karrosserie-orange to-primary rounded-full shadow-sm"></div>
-            <h3 className="text-xl font-bold bg-gradient-to-r from-karrosserie-orange via-primary to-karrosserie-orange bg-clip-text text-transparent">
-              Rapports sociaux
-            </h3>
-          </div>
-          
-          <div className="flex justify-center">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/presence-pointages')} 
-              className="group relative overflow-hidden rounded-xl p-8 h-auto items-center justify-center min-h-[140px] w-full max-w-sm border-2 border-karrosserie-orange/30 hover:border-karrosserie-orange bg-gradient-to-br from-background to-karrosserie-orange/5 hover:from-karrosserie-orange/5 hover:to-karrosserie-orange/10 transition-all duration-500 hover:shadow-2xl hover:shadow-karrosserie-orange/25 hover:scale-105"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-              <div className="relative flex flex-col items-center">
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-karrosserie-orange/20 to-primary/20 mb-4 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110">
-                  <Clock className="h-10 w-10 text-karrosserie-orange group-hover:text-primary transition-colors duration-300" />
-                </div>
-                <span className="font-bold text-lg text-karrosserie-orange group-hover:text-primary transition-colors duration-300">
-                  Présence & Pointages
-                </span>
-                <span className="text-sm text-muted-foreground mt-2 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
-                  Géolocalisé • Temps réel
-                </span>
-              </div>
-            </Button>
-          </div>
+      <div className="bg-card rounded-lg border p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-1 h-6 bg-karrosserie-orange rounded"></div>
+          <h3 className="text-lg font-semibold text-foreground">Rapports sociaux</h3>
+        </div>
+        
+        <div className="flex justify-center">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/presence-pointages')} 
+            className="flex flex-col items-center gap-3 p-6 h-auto min-h-[120px] w-full max-w-sm hover:bg-muted/50 transition-colors"
+          >
+            <div className="p-3 rounded-full bg-karrosserie-orange/10">
+              <Clock className="h-8 w-8 text-karrosserie-orange" />
+            </div>
+            <div className="text-center">
+              <div className="font-medium text-foreground">Présence & Pointages</div>
+              <div className="text-sm text-muted-foreground">Géolocalisé</div>
+            </div>
+          </Button>
         </div>
       </div>
 
       {/* Section Export comptable */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-background via-background to-primary/5 border border-primary/20 shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent opacity-50"></div>
-        <div className="relative p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-8 bg-gradient-to-b from-primary to-karrosserie-orange rounded-full shadow-sm"></div>
-            <h4 className="text-xl font-bold bg-gradient-to-r from-primary via-karrosserie-orange to-primary bg-clip-text text-transparent">
-              Export pour cabinet comptable
-            </h4>
-          </div>
+      <div className="bg-card rounded-lg border p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-1 h-6 bg-primary rounded"></div>
+          <h4 className="text-lg font-semibold text-foreground">Export pour cabinet comptable</h4>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Button 
+            variant="outline" 
+            onClick={() => setOpenDialog('fec')} 
+            className="flex items-center justify-center gap-3 p-4 h-16 hover:bg-muted/50 transition-colors"
+          >
+            <Download className="h-5 w-5 text-primary" />
+            <span className="font-medium">Format FEC</span>
+          </Button>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <Button 
-              variant="outline" 
-              onClick={() => setOpenDialog('fec')} 
-              className="group relative overflow-hidden rounded-xl p-6 h-auto flex-col items-center justify-center min-h-[120px] border-2 border-primary/30 hover:border-primary bg-gradient-to-br from-background to-primary/5 hover:from-primary/5 hover:to-primary/10 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/25 hover:scale-105"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-              <div className="relative flex flex-col items-center">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-karrosserie-orange/20 mb-3 shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-110">
-                  <Download className="h-8 w-8 text-primary group-hover:text-karrosserie-orange transition-colors duration-300" />
-                </div>
-                <span className="font-bold text-base text-primary group-hover:text-karrosserie-orange transition-colors duration-300">
-                  Format FEC
-                </span>
-                <span className="text-xs text-muted-foreground mt-1 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
-                  Fichier Comptable Standard
-                </span>
-              </div>
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              onClick={() => setOpenDialog('csv')} 
-              className="group relative overflow-hidden rounded-xl p-6 h-auto flex-col items-center justify-center min-h-[120px] border-2 border-karrosserie-orange/30 hover:border-karrosserie-orange bg-gradient-to-br from-background to-karrosserie-orange/5 hover:from-karrosserie-orange/5 hover:to-karrosserie-orange/10 transition-all duration-500 hover:shadow-2xl hover:shadow-karrosserie-orange/25 hover:scale-105"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-              <div className="relative flex flex-col items-center">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-karrosserie-orange/20 to-primary/20 mb-3 shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-110">
-                  <Download className="h-8 w-8 text-karrosserie-orange group-hover:text-primary transition-colors duration-300" />
-                </div>
-                <span className="font-bold text-base text-karrosserie-orange group-hover:text-primary transition-colors duration-300">
-                  Format CSV
-                </span>
-                <span className="text-xs text-muted-foreground mt-1 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
-                  Export Données Tableur
-                </span>
-              </div>
-            </Button>
-          </div>
+          <Button 
+            variant="outline" 
+            onClick={() => setOpenDialog('csv')} 
+            className="flex items-center justify-center gap-3 p-4 h-16 hover:bg-muted/50 transition-colors"
+          >
+            <Download className="h-5 w-5 text-karrosserie-orange" />
+            <span className="font-medium">Format CSV</span>
+          </Button>
         </div>
       </div>
 
