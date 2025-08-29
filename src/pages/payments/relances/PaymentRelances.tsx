@@ -894,8 +894,8 @@ Garage Martin`
             <div className="hidden sm:flex items-center gap-1 lg:gap-2 xl:gap-3 w-full overflow-x-auto pb-2">
               {/* Factures impayées */}
               <div className="flex-1 relative min-w-0">
-                <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
-                  <div className="text-xs opacity-80 truncate">Factures impayées</div>
+                <div className="bg-white text-black border-3 border-blue-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                  <div className="text-xs opacity-70 truncate">Factures impayées</div>
                   <div className="text-xl lg:text-2xl font-bold">45</div>
                 </div>
                 <div className="absolute -right-0.5 top-1/2 transform -translate-y-1/2 text-blue-400">
@@ -907,8 +907,8 @@ Garage Martin`
 
               {/* Relances automatiques */}
               <div className="flex-1 relative min-w-0 ml-0.5">
-                <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
-                  <div className="text-xs opacity-80 truncate">Relances auto</div>
+                <div className="bg-white text-black border-3 border-orange-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                  <div className="text-xs opacity-70 truncate">Relances auto</div>
                   <div className="text-xl lg:text-2xl font-bold">38</div>
                 </div>
                 <div className="absolute -right-0.5 top-1/2 transform -translate-y-1/2 text-orange-400">
@@ -920,8 +920,8 @@ Garage Martin`
 
               {/* Mises en demeure */}
               <div className="flex-1 relative min-w-0 ml-0.5">
-                <div className="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
-                  <div className="text-xs opacity-80 truncate">Mises demeure</div>
+                <div className="bg-white text-black border-3 border-red-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                  <div className="text-xs opacity-70 truncate">Mises demeure</div>
                   <div className="text-xl lg:text-2xl font-bold">15</div>
                 </div>
                 <div className="absolute -right-0.5 top-1/2 transform -translate-y-1/2 text-red-400">
@@ -933,8 +933,8 @@ Garage Martin`
 
               {/* Procédures judiciaires */}
               <div className="flex-1 relative min-w-0 ml-0.5">
-                <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
-                  <div className="text-xs opacity-80 truncate">Judiciaires</div>
+                <div className="bg-white text-black border-3 border-purple-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                  <div className="text-xs opacity-70 truncate">Judiciaires</div>
                   <div className="text-xl lg:text-2xl font-bold">8</div>
                 </div>
                 <div className="absolute -right-0.5 top-1/2 transform -translate-y-1/2 text-purple-400">
@@ -946,8 +946,8 @@ Garage Martin`
 
               {/* Montants récupérés */}
               <div className="flex-1 min-w-0 ml-0.5">
-                <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border-2 border-green-300">
-                  <div className="text-xs opacity-80 truncate">Récupérés</div>
+                <div className="bg-white text-black border-3 border-green-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                  <div className="text-xs opacity-70 truncate">Récupérés</div>
                   <div className="text-xl lg:text-2xl font-bold">78%</div>
                 </div>
               </div>
@@ -955,37 +955,37 @@ Garage Martin`
 
             {/* Mobile - Vertical stack */}
             <div className="sm:hidden space-y-3">
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl p-4 shadow-lg">
+              <div className="bg-white text-black border-3 border-blue-500 rounded-xl p-4 shadow-lg">
                 <div className="flex justify-between items-center">
-                  <div className="text-sm opacity-90">Factures impayées</div>
+                  <div className="text-sm opacity-70">Factures impayées</div>
                   <div className="text-2xl font-bold">45</div>
                 </div>
               </div>
               
-              <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl p-4 shadow-lg mx-4">
+              <div className="bg-white text-black border-3 border-orange-500 rounded-xl p-4 shadow-lg mx-4">
                 <div className="flex justify-between items-center">
-                  <div className="text-sm opacity-90">Relances automatiques</div>
+                  <div className="text-sm opacity-70">Relances automatiques</div>
                   <div className="text-2xl font-bold">38</div>
                 </div>
               </div>
               
-              <div className="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl p-4 shadow-lg mx-8">
+              <div className="bg-white text-black border-3 border-red-500 rounded-xl p-4 shadow-lg mx-8">
                 <div className="flex justify-between items-center">
-                  <div className="text-sm opacity-90">Mises en demeure</div>
+                  <div className="text-sm opacity-70">Mises en demeure</div>
                   <div className="text-2xl font-bold">15</div>
                 </div>
               </div>
               
-              <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl p-4 shadow-lg mx-12">
+              <div className="bg-white text-black border-3 border-purple-500 rounded-xl p-4 shadow-lg mx-12">
                 <div className="flex justify-between items-center">
-                  <div className="text-sm opacity-90">Procédures judiciaires</div>
+                  <div className="text-sm opacity-70">Procédures judiciaires</div>
                   <div className="text-2xl font-bold">8</div>
                 </div>
               </div>
               
-              <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl p-4 shadow-lg mx-16 border-2 border-green-300">
+              <div className="bg-white text-black border-3 border-green-500 rounded-xl p-4 shadow-lg mx-16">
                 <div className="flex justify-between items-center">
-                  <div className="text-sm opacity-90">Montants récupérés</div>
+                  <div className="text-sm opacity-70">Montants récupérés</div>
                   <div className="text-2xl font-bold">78%</div>
                 </div>
               </div>
@@ -1014,17 +1014,21 @@ Garage Martin`
             <CardContent>
               <div className="space-y-3">
                 {[
-                  { time: "09/01/2025 17:02", client: "SAS Moreau", action: "Mise en demeure", status: "Envoyé", type: "success", details: "Mise en demeure envoyée par courrier recommandé. Accusé de réception en attente.", invoiceAmount: "5680€", dueDate: "01/10/2024" },
-                  { time: "09/01/2025 16:58", client: "EURL Rousseau", action: "Email amiable", status: "Erreur", type: "error", details: "Adresse email invalide. Tentative d'envoi échouée. Vérifier les coordonnées client.", invoiceAmount: "890€", dueDate: "15/12/2024" },
-                  { time: "09/01/2025 16:45", client: "M. Pierre Dubois", action: "SMS message", status: "Lu", type: "info", details: "SMS de relance lu à 16h52. Taux de lecture: 100%. Aucune réponse reçue.", invoiceAmount: "650€", dueDate: "20/12/2024" },
-                  { time: "09/01/2025 16:12", client: "SAS Moreau", action: "Email amiable", status: "Lu", type: "info", details: "Email ouvert à 16h18. Lien de paiement cliqué mais transaction non finalisée.", invoiceAmount: "5680€", dueDate: "01/10/2024" },
-                  { time: "09/01/2025 15:38", client: "SARL Petit Électricité", action: "SMS message", status: "Réception interrompue", type: "warning", details: "SMS partiellement délivré. Opérateur mobile a signalé une interruption de service.", invoiceAmount: "1890€", dueDate: "10/12/2024" },
-                  { time: "09/01/2025 15:12", client: "SAS Moreau", action: "SMS message", status: "Envoyé", type: "success", details: "SMS de première relance envoyé avec succès. Coût: 0,08€", invoiceAmount: "5680€", dueDate: "01/10/2024" },
-                  { time: "09/01/2025 14:45", client: "SARL Dupont", action: "SMS message", status: "Envoyé", type: "success", details: "SMS automatique de rappel d'échéance. Facture FAC-2024-001 - 3450€", invoiceAmount: "3450€", dueDate: "15/11/2024" },
-                  { time: "09/01/2025 14:23", client: "Entreprise Leroy", action: "LTR message", status: "Envoyé", type: "success", details: "Lettre recommandée avec AR expédiée. Suivi: RR123456789FR", invoiceAmount: "1250€", dueDate: "10/12/2024" },
-                  { time: "09/01/2025 13:56", client: "SARL Petit Électricité", action: "SMS message", status: "Envoyé", type: "success", details: "SMS de relance 2. Message personnalisé avec historique des impayés.", invoiceAmount: "1890€", dueDate: "10/12/2024" },
-                  { time: "09/01/2025 13:12", client: "SARL Dupont", action: "LTR message", status: "Envoyé", type: "success", details: "Courrier simple de première relance. Coût d'affranchissement: 1,16€", invoiceAmount: "3450€", dueDate: "15/11/2024" }
-                ].map((log, index) => {
+                  { time: "09/01/2025 17:02", client: "SAS Moreau", action: "Mise en demeure", status: "Envoyé", type: "success", details: "Mise en demeure envoyée par courrier recommandé. Accusé de réception en attente.", invoiceAmount: "5680€", dueDate: "01/10/2024", importance: "critical" },
+                  { time: "09/01/2025 16:58", client: "EURL Rousseau", action: "Email amiable", status: "Erreur", type: "error", details: "Adresse email invalide. Tentative d'envoi échouée. Vérifier les coordonnées client.", invoiceAmount: "890€", dueDate: "15/12/2024", importance: "critical" },
+                  { time: "09/01/2025 16:45", client: "M. Pierre Dubois", action: "SMS message", status: "Lu", type: "info", details: "SMS de relance lu à 16h52. Taux de lecture: 100%. Aucune réponse reçue.", invoiceAmount: "650€", dueDate: "20/12/2024", importance: "medium" },
+                  { time: "09/01/2025 16:12", client: "SAS Moreau", action: "Email amiable", status: "Lu", type: "info", details: "Email ouvert à 16h18. Lien de paiement cliqué mais transaction non finalisée.", invoiceAmount: "5680€", dueDate: "01/10/2024", importance: "critical" },
+                  { time: "09/01/2025 15:38", client: "SARL Petit Électricité", action: "SMS message", status: "Réception interrompue", type: "warning", details: "SMS partiellement délivré. Opérateur mobile a signalé une interruption de service.", invoiceAmount: "1890€", dueDate: "10/12/2024", importance: "medium" },
+                  { time: "09/01/2025 15:12", client: "SAS Moreau", action: "SMS message", status: "Envoyé", type: "success", details: "SMS de première relance envoyé avec succès. Coût: 0,08€", invoiceAmount: "5680€", dueDate: "01/10/2024", importance: "critical" },
+                  { time: "09/01/2025 14:45", client: "SARL Dupont", action: "SMS message", status: "Envoyé", type: "success", details: "SMS automatique de rappel d'échéance. Facture FAC-2024-001 - 3450€", invoiceAmount: "3450€", dueDate: "15/11/2024", importance: "medium" },
+                  { time: "09/01/2025 14:23", client: "Entreprise Leroy", action: "LTR message", status: "Envoyé", type: "success", details: "Lettre recommandée avec AR expédiée. Suivi: RR123456789FR", invoiceAmount: "1250€", dueDate: "10/12/2024", importance: "medium" },
+                  { time: "09/01/2025 13:56", client: "SARL Petit Électricité", action: "SMS message", status: "Envoyé", type: "success", details: "SMS de relance 2. Message personnalisé avec historique des impayés.", invoiceAmount: "1890€", dueDate: "10/12/2024", importance: "medium" },
+                  { time: "09/01/2025 13:12", client: "SARL Dupont", action: "LTR message", status: "Envoyé", type: "success", details: "Courrier simple de première relance. Coût d'affranchissement: 1,16€", invoiceAmount: "3450€", dueDate: "15/11/2024", importance: "low" }
+                ].sort((a, b) => {
+                  // Tri par importance : critical > medium > low
+                  const importanceOrder = { 'critical': 3, 'medium': 2, 'low': 1 };
+                  return importanceOrder[b.importance] - importanceOrder[a.importance];
+                }).map((log, index) => {
                   // Calculer le retard en jours depuis la date d'échéance
                   const today = new Date('2025-01-09');
                   const [day, month, year] = log.dueDate.split('/');
@@ -1042,27 +1046,25 @@ Garage Martin`
                   
                   const urgency = getUrgencyLevel(daysOverdue);
                   
-                  // Couleurs pastels selon l'urgence
-                  const getUrgencyStyles = (urgencyLevel) => {
-                    switch (urgencyLevel) {
-                      case 'critical': return 'bg-red-50 border-l-4 border-red-300 hover:bg-red-100';
-                      case 'high': return 'bg-orange-50 border-l-4 border-orange-300 hover:bg-orange-100';
-                      case 'medium': return 'bg-yellow-50 border-l-4 border-yellow-300 hover:bg-yellow-100';
-                      case 'low': return 'bg-blue-50 border-l-4 border-blue-300 hover:bg-blue-100';
-                      default: return 'bg-green-50 border-l-4 border-green-300 hover:bg-green-100';
+                  // Couleurs selon l'importance (rouge, jaune, bleu)
+                  const getImportanceStyles = (importance) => {
+                    switch (importance) {
+                      case 'critical': return 'bg-red-50 border-l-4 border-red-400 hover:bg-red-100';
+                      case 'medium': return 'bg-yellow-50 border-l-4 border-yellow-400 hover:bg-yellow-100';
+                      case 'low': return 'bg-blue-50 border-l-4 border-blue-400 hover:bg-blue-100';
+                      default: return 'bg-gray-50 border-l-4 border-gray-300 hover:bg-gray-100';
                     }
                   };
                   
-                  const getUrgencyBadgeColor = (urgencyLevel, type) => {
+                  const getImportanceBadgeColor = (importance, type) => {
                     if (type === 'error') return 'bg-red-100 text-red-700 border-red-200';
                     if (type === 'warning') return 'bg-amber-100 text-amber-700 border-amber-200';
                     
-                    switch (urgencyLevel) {
+                    switch (importance) {
                       case 'critical': return 'bg-red-100 text-red-700 border-red-200';
-                      case 'high': return 'bg-orange-100 text-orange-700 border-orange-200';
                       case 'medium': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
                       case 'low': return 'bg-blue-100 text-blue-700 border-blue-200';
-                      default: return 'bg-green-100 text-green-700 border-green-200';
+                      default: return 'bg-gray-100 text-gray-700 border-gray-200';
                     }
                   };
                   
@@ -1073,7 +1075,7 @@ Garage Martin`
                   };
                   
                   return (
-                    <div key={index} className={`p-4 rounded-lg transition-all duration-200 ${getUrgencyStyles(urgency)}`}>
+                    <div key={index} className={`p-4 rounded-lg transition-all duration-200 ${getImportanceStyles(log.importance)}`}>
                       {/* Header avec temps et urgence */}
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
                         <div className="flex items-center gap-3">
@@ -1094,7 +1096,7 @@ Garage Martin`
                         </div>
                         
                         <Badge 
-                          className={`text-xs border ${getUrgencyBadgeColor(urgency, log.type)}`}
+                          className={`text-xs border ${getImportanceBadgeColor(log.importance, log.type)}`}
                         >
                           {log.status}
                         </Badge>
