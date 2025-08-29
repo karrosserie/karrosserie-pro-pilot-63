@@ -894,7 +894,7 @@ Garage Martin`
             <div className="hidden sm:flex items-center gap-1 lg:gap-2 xl:gap-3 w-full overflow-x-auto pb-2">
               {/* Factures impayées */}
               <div className="flex-1 relative min-w-0">
-                <div className="bg-white text-black border-3 border-blue-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                <div className="bg-white text-black border-4 border-blue-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
                   <div className="text-xs opacity-70 truncate">Factures impayées</div>
                   <div className="text-xl lg:text-2xl font-bold">45</div>
                 </div>
@@ -907,7 +907,7 @@ Garage Martin`
 
               {/* Relances automatiques */}
               <div className="flex-1 relative min-w-0 ml-0.5">
-                <div className="bg-white text-black border-3 border-orange-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                <div className="bg-white text-black border-4 border-orange-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
                   <div className="text-xs opacity-70 truncate">Relances auto</div>
                   <div className="text-xl lg:text-2xl font-bold">38</div>
                 </div>
@@ -920,7 +920,7 @@ Garage Martin`
 
               {/* Mises en demeure */}
               <div className="flex-1 relative min-w-0 ml-0.5">
-                <div className="bg-white text-black border-3 border-red-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                <div className="bg-white text-black border-4 border-red-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
                   <div className="text-xs opacity-70 truncate">Mises demeure</div>
                   <div className="text-xl lg:text-2xl font-bold">15</div>
                 </div>
@@ -933,7 +933,7 @@ Garage Martin`
 
               {/* Procédures judiciaires */}
               <div className="flex-1 relative min-w-0 ml-0.5">
-                <div className="bg-white text-black border-3 border-purple-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                <div className="bg-white text-black border-4 border-purple-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
                   <div className="text-xs opacity-70 truncate">Judiciaires</div>
                   <div className="text-xl lg:text-2xl font-bold">8</div>
                 </div>
@@ -946,7 +946,7 @@ Garage Martin`
 
               {/* Montants récupérés */}
               <div className="flex-1 min-w-0 ml-0.5">
-                <div className="bg-white text-black border-3 border-green-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                <div className="bg-white text-black border-4 border-green-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
                   <div className="text-xs opacity-70 truncate">Récupérés</div>
                   <div className="text-xl lg:text-2xl font-bold">78%</div>
                 </div>
@@ -955,35 +955,35 @@ Garage Martin`
 
             {/* Mobile - Vertical stack */}
             <div className="sm:hidden space-y-3">
-              <div className="bg-white text-black border-3 border-blue-500 rounded-xl p-4 shadow-lg">
+              <div className="bg-white text-black border-4 border-blue-500 rounded-xl p-4 shadow-lg">
                 <div className="flex justify-between items-center">
                   <div className="text-sm opacity-70">Factures impayées</div>
                   <div className="text-2xl font-bold">45</div>
                 </div>
               </div>
               
-              <div className="bg-white text-black border-3 border-orange-500 rounded-xl p-4 shadow-lg mx-4">
+              <div className="bg-white text-black border-4 border-orange-500 rounded-xl p-4 shadow-lg mx-4">
                 <div className="flex justify-between items-center">
                   <div className="text-sm opacity-70">Relances automatiques</div>
                   <div className="text-2xl font-bold">38</div>
                 </div>
               </div>
               
-              <div className="bg-white text-black border-3 border-red-500 rounded-xl p-4 shadow-lg mx-8">
+              <div className="bg-white text-black border-4 border-red-500 rounded-xl p-4 shadow-lg mx-8">
                 <div className="flex justify-between items-center">
                   <div className="text-sm opacity-70">Mises en demeure</div>
                   <div className="text-2xl font-bold">15</div>
                 </div>
               </div>
               
-              <div className="bg-white text-black border-3 border-purple-500 rounded-xl p-4 shadow-lg mx-12">
+              <div className="bg-white text-black border-4 border-purple-500 rounded-xl p-4 shadow-lg mx-12">
                 <div className="flex justify-between items-center">
                   <div className="text-sm opacity-70">Procédures judiciaires</div>
                   <div className="text-2xl font-bold">8</div>
                 </div>
               </div>
               
-              <div className="bg-white text-black border-3 border-green-500 rounded-xl p-4 shadow-lg mx-16">
+              <div className="bg-white text-black border-4 border-green-500 rounded-xl p-4 shadow-lg mx-16">
                 <div className="flex justify-between items-center">
                   <div className="text-sm opacity-70">Montants récupérés</div>
                   <div className="text-2xl font-bold">78%</div>
