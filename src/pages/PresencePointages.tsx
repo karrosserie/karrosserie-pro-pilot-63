@@ -599,66 +599,73 @@ export default function PresencePointages() {
                   const statutOk = p.statutDebut === "VALIDE" && p.statutFin === "VALIDE";
                   const distMax = Math.max(p.distDebut || 0, p.distFin || 0);
                   return (
-                    <tr key={p.id} className="border-t">
-                      <td className="p-2 whitespace-nowrap">{p.date}</td>
-                      <td className="p-2 whitespace-nowrap flex items-center gap-2"><User className="w-4 h-4"/>{p.employe}</td>
-                      <td className="p-2 whitespace-nowrap flex items-center gap-2"><Building2 className="w-4 h-4"/>{p.chantier}</td>
-                      <td className="p-2 whitespace-nowrap">{p.debut ? new Date(p.debut).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : "—"} {p.gpsDebut && <span className="text-muted-foreground">({p.gpsDebut})</span>}</td>
-                      <td className="p-2 whitespace-nowrap">{p.fin ? new Date(p.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : "—"} {p.gpsFin && <span className="text-muted-foreground">({p.gpsFin})</span>}</td>
-                      <td className="p-2 whitespace-nowrap">{pauseTxt || "—"}</td>
-                      <td className="p-2 whitespace-nowrap font-medium">{toHhMm(d.duree)}</td>
-                      <td className="p-2 whitespace-nowrap">{d.duree.toFixed(2)}</td>
-                      <td className="p-2 whitespace-nowrap">{d.normales.toFixed(2)}</td>
-                      <td className="p-2 whitespace-nowrap">{d.sup.toFixed(2)}</td>
-                      <td className="p-2 whitespace-nowrap">{statutOk ? <Badge className="bg-emerald-600 hover:bg-emerald-600">VALIDE</Badge> : <Badge variant="destructive">REFUSÉ</Badge>}</td>
-                      <td className="p-2 whitespace-nowrap">{(p.distDebut ?? 0)} / {(p.distFin ?? 0)} m</td>
-                      <td className="p-2 whitespace-nowrap">{p.absence || "—"}</td>
-                      <td className="p-2 whitespace-nowrap">{p.validationChef ? <CheckCircle2 className="w-4 h-4"/> : <XCircle className="w-4 h-4"/>}</td>
-                      <td className="p-2 whitespace-nowrap">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button size="sm" variant="outline" className="h-8">Détail</Button>
-                          </DialogTrigger>
-                          <DialogContent className="sm:max-w-2xl">
-                            <DialogHeader>
-                              <DialogTitle>Fiche pointage — {p.employe} · {p.date}</DialogTitle>
-                            </DialogHeader>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                              <Card className="border-dashed">
-                                <CardHeader className="pb-1"><CardTitle className="text-sm">Chronologie</CardTitle></CardHeader>
-                                <CardContent className="space-y-2">
-                                  <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4"/> Début: {p.debut ? new Date(p.debut).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : "—"} <span className="text-muted-foreground">{p.gpsDebut && `(${p.gpsDebut})`}</span></div>
-                                  {p.pauseDebut && p.pauseFin && (
-                                    <div className="flex items-center gap-2"><Clock className="w-4 h-4"/> Pause: {new Date(p.pauseDebut).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} – {new Date(p.pauseFin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
-                                  )}
-                                  <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4"/> Fin: {p.fin ? new Date(p.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : "—"} <span className="text-muted-foreground">{p.gpsFin && `(${p.gpsFin})`}</span></div>
-                                  <div className="pt-2 text-muted-foreground">Distance: début {(p.distDebut ?? 0)} m · fin {(p.distFin ?? 0)} m</div>
-                                </CardContent>
-                              </Card>
-                              <Card className="border-dashed">
-                                <CardHeader className="pb-1"><CardTitle className="text-sm">Calculs</CardTitle></CardHeader>
-                                <CardContent className="grid grid-cols-2 gap-2">
-                                  <div className="text-muted-foreground">Durée</div><div className="font-medium">{toHhMm(d.duree)} ({d.duree.toFixed(2)})</div>
-                                  <div className="text-muted-foreground">Normales</div><div>{d.normales.toFixed(2)}</div>
-                                  <div className="text-muted-foreground">Sup.</div><div>{d.sup.toFixed(2)}</div>
-                                  <div className="text-muted-foreground">Absence</div><div>{p.absence || "—"}</div>
-                                  <div className="text-muted-foreground">Chef</div><div>{p.validationChef ? "Validé" : "À valider"}</div>
-                                </CardContent>
-                              </Card>
-                              <Card className="md:col-span-2 border-dashed">
-                                <CardHeader className="pb-1"><CardTitle className="text-sm">Justificatifs & actions</CardTitle></CardHeader>
-                                <CardContent className="flex flex-wrap items-center gap-2">
-                                  <Button variant="outline" className="gap-2"><Navigation className="w-4 h-4"/> Voir sur carte</Button>
-                                  <Button variant="outline" className="gap-2"><Phone className="w-4 h-4"/> Contacter l'employé</Button>
-                                  <Button variant="outline" className="gap-2"><Mail className="w-4 h-4"/> Demander justificatif</Button>
-                                  <Button className="gap-2"><CheckCircle2 className="w-4 h-4"/> Valider manuellement</Button>
-                                </CardContent>
-                              </Card>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                      </td>
-                    </tr>
+                    <Dialog key={p.id}>
+                      <DialogTrigger asChild>
+                        <tr className="border-t cursor-pointer hover:bg-gradient-to-r hover:from-karrosserie-orange/10 hover:to-primary/10 hover:shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 border-l-2 border-l-transparent hover:border-l-karrosserie-orange">
+                          <td className="p-2 whitespace-nowrap transition-colors duration-200 hover:text-karrosserie-orange">{p.date}</td>
+                          <td className="p-2 whitespace-nowrap flex items-center gap-2 transition-colors duration-200 hover:text-karrosserie-orange"><User className="w-4 h-4"/>{p.employe}</td>
+                          <td className="p-2 whitespace-nowrap flex items-center gap-2 transition-colors duration-200 hover:text-primary"><Building2 className="w-4 h-4"/>{p.chantier}</td>
+                          <td className="p-2 whitespace-nowrap transition-colors duration-200 hover:text-primary">{p.debut ? new Date(p.debut).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : "—"} {p.gpsDebut && <span className="text-muted-foreground">({p.gpsDebut})</span>}</td>
+                          <td className="p-2 whitespace-nowrap transition-colors duration-200 hover:text-primary">{p.fin ? new Date(p.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : "—"} {p.gpsFin && <span className="text-muted-foreground">({p.gpsFin})</span>}</td>
+                          <td className="p-2 whitespace-nowrap transition-colors duration-200 hover:text-primary">{pauseTxt || "—"}</td>
+                          <td className="p-2 whitespace-nowrap font-medium transition-colors duration-200 hover:text-karrosserie-orange">{toHhMm(d.duree)}</td>
+                          <td className="p-2 whitespace-nowrap transition-colors duration-200 hover:text-karrosserie-orange">{d.duree.toFixed(2)}</td>
+                          <td className="p-2 whitespace-nowrap transition-colors duration-200 hover:text-karrosserie-orange">{d.normales.toFixed(2)}</td>
+                          <td className="p-2 whitespace-nowrap transition-colors duration-200 hover:text-karrosserie-orange">{d.sup.toFixed(2)}</td>
+                          <td className="p-2 whitespace-nowrap">{statutOk ? <Badge className="bg-emerald-600 hover:bg-emerald-600">VALIDE</Badge> : <Badge variant="destructive">REFUSÉ</Badge>}</td>
+                          <td className="p-2 whitespace-nowrap transition-colors duration-200 hover:text-primary">{(p.distDebut ?? 0)} / {(p.distFin ?? 0)} m</td>
+                          <td className="p-2 whitespace-nowrap transition-colors duration-200 hover:text-primary">{p.absence || "—"}</td>
+                          <td className="p-2 whitespace-nowrap">{p.validationChef ? <CheckCircle2 className="w-4 h-4"/> : <XCircle className="w-4 h-4"/>}</td>
+                          <td className="p-2 whitespace-nowrap">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="h-8 hover:bg-karrosserie-orange/10 hover:text-karrosserie-orange hover:scale-110 transition-all duration-200"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              Détail
+                            </Button>
+                          </td>
+                        </tr>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-2xl">
+                        <DialogHeader>
+                          <DialogTitle>Fiche pointage — {p.employe} · {p.date}</DialogTitle>
+                        </DialogHeader>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                          <Card className="border-dashed">
+                            <CardHeader className="pb-1"><CardTitle className="text-sm">Chronologie</CardTitle></CardHeader>
+                            <CardContent className="space-y-2">
+                              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4"/> Début: {p.debut ? new Date(p.debut).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : "—"} <span className="text-muted-foreground">{p.gpsDebut && `(${p.gpsDebut})`}</span></div>
+                              {p.pauseDebut && p.pauseFin && (
+                                <div className="flex items-center gap-2"><Clock className="w-4 h-4"/> Pause: {new Date(p.pauseDebut).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} – {new Date(p.pauseFin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+                              )}
+                              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4"/> Fin: {p.fin ? new Date(p.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : "—"} <span className="text-muted-foreground">{p.gpsFin && `(${p.gpsFin})`}</span></div>
+                              <div className="pt-2 text-muted-foreground">Distance: début {(p.distDebut ?? 0)} m · fin {(p.distFin ?? 0)} m</div>
+                            </CardContent>
+                          </Card>
+                          <Card className="border-dashed">
+                            <CardHeader className="pb-1"><CardTitle className="text-sm">Calculs</CardTitle></CardHeader>
+                            <CardContent className="grid grid-cols-2 gap-2">
+                              <div className="text-muted-foreground">Durée</div><div className="font-medium">{toHhMm(d.duree)} ({d.duree.toFixed(2)})</div>
+                              <div className="text-muted-foreground">Normales</div><div>{d.normales.toFixed(2)}</div>
+                              <div className="text-muted-foreground">Sup.</div><div>{d.sup.toFixed(2)}</div>
+                              <div className="text-muted-foreground">Absence</div><div>{p.absence || "—"}</div>
+                              <div className="text-muted-foreground">Chef</div><div>{p.validationChef ? "Validé" : "À valider"}</div>
+                            </CardContent>
+                          </Card>
+                          <Card className="md:col-span-2 border-dashed">
+                            <CardHeader className="pb-1"><CardTitle className="text-sm">Justificatifs & actions</CardTitle></CardHeader>
+                            <CardContent className="flex flex-wrap items-center gap-2">
+                              <Button variant="outline" className="gap-2"><Navigation className="w-4 h-4"/> Voir sur carte</Button>
+                              <Button variant="outline" className="gap-2"><Phone className="w-4 h-4"/> Contacter l'employé</Button>
+                              <Button variant="outline" className="gap-2"><Mail className="w-4 h-4"/> Demander justificatif</Button>
+                              <Button className="gap-2"><CheckCircle2 className="w-4 h-4"/> Valider manuellement</Button>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   );
                 })}
               </tbody>
