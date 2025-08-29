@@ -304,7 +304,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                 <div className="min-w-[28px] w-7 h-7 sm:min-w-[32px] sm:w-8 sm:h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0">
                   3
                 </div>
-                <p className="text-xs sm:text-sm">L'accès est strictement en lecture-seule : il sert uniquement à lire le paiement de vos clients pour le rapprochement bancaire.</p>
+                <p className="text-xs sm:text-sm">L'accès sert uniquement à lire le paiement de vos clients pour le rapprochement bancaire.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="min-w-[28px] w-7 h-7 sm:min-w-[32px] sm:w-8 sm:h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0">
