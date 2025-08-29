@@ -635,7 +635,7 @@ Garage Martin`
             <Card className="border-l-4 border-l-green-500">
               <CardHeader className="bg-green-50">
                 <CardTitle className="text-lg font-bold text-green-800">
-                  Campagne janvier 2025
+                  Relance janvier 2025
                 </CardTitle>
                 <p className="text-sm text-green-700">Dernière relance automatique envoyée le 15 janvier 2025</p>
               </CardHeader>
