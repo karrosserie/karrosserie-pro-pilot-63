@@ -1,5 +1,8 @@
 project_id = "jukdsypvuehnniskgpfd"
 
+[functions.analyze-driving-license]
+verify_jwt = true
+
 [functions.analyze-violation]
 verify_jwt = true
 

@@ -26,6 +26,9 @@ export const useFleetLoanFormHandlers = (
 
   const handleClientSelect = (clientId: string) => {
     setFormData(prev => ({ ...prev, clientId }));
+    
+    // Also update the client data in the parent component
+    state.setFormData(prev => ({ ...prev, clientId }));
   };
 
   const handleMileageChange = (mileage: number) => {
@@ -87,6 +90,25 @@ export const useFleetLoanFormHandlers = (
     setFormData(prev => ({ ...prev, driverLicenseBackUrl: url }));
   };
 
+  const handleLicenseAnalyzed = (analyzedData: any) => {
+    // Update form data with analyzed information
+    if (analyzedData.numero_permis) {
+      setFormData(prev => ({ ...prev, licenseNumber: analyzedData.numero_permis }));
+    }
+    if (analyzedData.date_delivrance) {
+      setFormData(prev => ({ ...prev, licenseIssueDate: analyzedData.date_delivrance }));
+    }
+    if (analyzedData.prefecture) {
+      setFormData(prev => ({ ...prev, prefecture: analyzedData.prefecture }));
+    }
+    if (analyzedData.date_naissance) {
+      setFormData(prev => ({ ...prev, dateOfBirth: analyzedData.date_naissance }));
+    }
+    if (analyzedData.lieu_naissance) {
+      setFormData(prev => ({ ...prev, placeOfBirth: analyzedData.lieu_naissance }));
+    }
+  };
+
   const handleInsuranceSwitchChange = (checked: boolean) => {
     setFormData(prev => ({ ...prev, clientInsurance: checked }));
   };
@@ -107,7 +129,7 @@ export const useFleetLoanFormHandlers = (
 
     try {
       // Prepare data for database with proper JSON conversion
-      const reservationData = prepareReservationData(formData, formData.vehicleId, companyId!);
+      const reservationData = await prepareReservationData(formData, formData.vehicleId, companyId!);
 
       if (isEditing && defaultValues?.id) {
         // Update existing reservation - toast is handled by the mutation
@@ -140,6 +162,7 @@ export const useFleetLoanFormHandlers = (
     handleDamageUpdate,
     handleDriverLicenseFrontUpload,
     handleDriverLicenseBackUpload,
+    handleLicenseAnalyzed,
     handleInsuranceSwitchChange,
     handleInsurancePhoneChange,
     handleSignatureChange,

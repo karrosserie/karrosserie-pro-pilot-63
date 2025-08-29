@@ -83,6 +83,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     handleDamageUpdate,
     handleDriverLicenseFrontUpload,
     handleDriverLicenseBackUpload,
+    handleLicenseAnalyzed,
     handleInsuranceSwitchChange,
     handleInsurancePhoneChange,
     handleSignatureChange,
@@ -149,6 +150,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             onClientSelect={handleClientSelect}
             onDriverLicenseFrontUpload={handleDriverLicenseFrontUpload}
             onDriverLicenseBackUpload={handleDriverLicenseBackUpload}
+            onLicenseAnalyzed={handleLicenseAnalyzed}
             isViewMode={isViewMode}
           />
         </TabsContent>

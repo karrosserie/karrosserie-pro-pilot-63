@@ -3,9 +3,9 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { SearchableSelect } from '@/components/ui/searchable-select';
-import { DocumentUploader } from '@/components/shared/DocumentUploader';
 import { useClients } from '@/hooks/use-clients';
 import { LoanFormData } from '../FleetLoanForm';
+import { DrivingLicenseUpload } from '../DrivingLicenseUpload';
 
 interface ClientInfoTabProps {
   formData: LoanFormData;
@@ -13,6 +13,7 @@ interface ClientInfoTabProps {
   onClientSelect: (clientId: string) => void;
   onDriverLicenseFrontUpload: (url: string) => void;
   onDriverLicenseBackUpload: (url: string) => void;
+  onLicenseAnalyzed?: (data: any) => void;
   isViewMode?: boolean;
 }
 
@@ -22,13 +23,14 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
   onClientSelect,
   onDriverLicenseFrontUpload,
   onDriverLicenseBackUpload,
+  onLicenseAnalyzed,
   isViewMode = false
 }) => {
   const { clients } = useClients();
 
   const clientOptions = (clients || []).map(client => ({
     value: client.id,
-    label: `${client.firstName} ${client.lastName}`
+    label: `${client.first_name} ${client.last_name}`
   }));
 
   // Validation des dates
@@ -90,32 +92,18 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
       </div>
 
       {/* Driver's License Documents */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label>
-            Permis de conduire (Recto) <span className="text-destructive">*</span>
-          </Label>
-          <DocumentUploader
-            documentType="license"
-            documentId={`${formData.clientId || 'new'}-front`}
-            currentDocumentUrl={formData.driverLicenseFrontUrl}
-            onUploadComplete={onDriverLicenseFrontUpload}
-            isViewMode={isViewMode}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label>
-            Permis de conduire (Verso) <span className="text-destructive">*</span>
-          </Label>
-          <DocumentUploader
-            documentType="license"
-            documentId={`${formData.clientId || 'new'}-back`}
-            currentDocumentUrl={formData.driverLicenseBackUrl}
-            onUploadComplete={onDriverLicenseBackUpload}
-            isViewMode={isViewMode}
-          />
-        </div>
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">Permis de conduire</h3>
+        <DrivingLicenseUpload
+          frontUrl={formData.driverLicenseFrontUrl}
+          backUrl={formData.driverLicenseBackUrl}
+          onFrontChange={onDriverLicenseFrontUpload}
+          onBackChange={onDriverLicenseBackUpload}
+          onFrontRemove={() => onDriverLicenseFrontUpload('')}
+          onBackRemove={() => onDriverLicenseBackUpload('')}  
+          onLicenseAnalyzed={onLicenseAnalyzed}
+          clientId={formData.clientId}
+        />
       </div>
 
       {/* License Details - First row: License Number, Issue Date, Prefecture */}

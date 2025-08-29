@@ -336,15 +336,20 @@ export type Database = {
           city: string | null
           company_id: string | null
           created_at: string
+          date_of_birth: string | null
           driver_license_back_url: string | null
           driver_license_front_url: string | null
           email: string | null
           first_name: string
           id: string
           last_name: string
+          license_issue_date: string | null
+          license_number: string | null
           oodrive_recipient_id: string | null
           phone: string | null
+          place_of_birth: string | null
           postal_code: string | null
+          prefecture: string | null
           updated_at: string
         }
         Insert: {
@@ -353,15 +358,20 @@ export type Database = {
           city?: string | null
           company_id?: string | null
           created_at?: string
+          date_of_birth?: string | null
           driver_license_back_url?: string | null
           driver_license_front_url?: string | null
           email?: string | null
           first_name: string
           id?: string
           last_name: string
+          license_issue_date?: string | null
+          license_number?: string | null
           oodrive_recipient_id?: string | null
           phone?: string | null
+          place_of_birth?: string | null
           postal_code?: string | null
+          prefecture?: string | null
           updated_at?: string
         }
         Update: {
@@ -370,15 +380,20 @@ export type Database = {
           city?: string | null
           company_id?: string | null
           created_at?: string
+          date_of_birth?: string | null
           driver_license_back_url?: string | null
           driver_license_front_url?: string | null
           email?: string | null
           first_name?: string
           id?: string
           last_name?: string
+          license_issue_date?: string | null
+          license_number?: string | null
           oodrive_recipient_id?: string | null
           phone?: string | null
+          place_of_birth?: string | null
           postal_code?: string | null
+          prefecture?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -1015,9 +1030,6 @@ export type Database = {
           company_id: string | null
           created_at: string
           damages: Json | null
-          date_of_birth: string | null
-          driver_license_back_url: string | null
-          driver_license_front_url: string | null
           end_mileage: number | null
           expected_return_date: string | null
           fleet_vehicle_id: string
@@ -1032,11 +1044,7 @@ export type Database = {
           insurance_email: string | null
           insurance_phone: string | null
           insurance_postal_code: string | null
-          license_issue_date: string | null
-          license_number: string | null
           notes: string | null
-          place_of_birth: string | null
-          prefecture: string | null
           start_date: string
           start_mileage: number
           status: string
@@ -1052,9 +1060,6 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           damages?: Json | null
-          date_of_birth?: string | null
-          driver_license_back_url?: string | null
-          driver_license_front_url?: string | null
           end_mileage?: number | null
           expected_return_date?: string | null
           fleet_vehicle_id: string
@@ -1069,11 +1074,7 @@ export type Database = {
           insurance_email?: string | null
           insurance_phone?: string | null
           insurance_postal_code?: string | null
-          license_issue_date?: string | null
-          license_number?: string | null
           notes?: string | null
-          place_of_birth?: string | null
-          prefecture?: string | null
           start_date: string
           start_mileage?: number
           status?: string
@@ -1089,9 +1090,6 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           damages?: Json | null
-          date_of_birth?: string | null
-          driver_license_back_url?: string | null
-          driver_license_front_url?: string | null
           end_mileage?: number | null
           expected_return_date?: string | null
           fleet_vehicle_id?: string
@@ -1106,11 +1104,7 @@ export type Database = {
           insurance_email?: string | null
           insurance_phone?: string | null
           insurance_postal_code?: string | null
-          license_issue_date?: string | null
-          license_number?: string | null
           notes?: string | null
-          place_of_birth?: string | null
-          prefecture?: string | null
           start_date?: string
           start_mileage?: number
           status?: string

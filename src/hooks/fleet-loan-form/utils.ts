@@ -1,3 +1,5 @@
+import { LoanFormData } from '@/components/fleet/FleetLoanForm';
+import { supabase } from '@/integrations/supabase/client';
 
 // Helper function to format date for datetime-local input
 export const formatDateTimeLocal = (dateString: string) => {
@@ -17,42 +19,63 @@ export const getCurrentDateTime = () => {
   return formatDateTimeLocal(now.toISOString());
 };
 
-// Helper function to prepare reservation data for database
-export const prepareReservationData = (formData: any, vehicleId: string, companyId: string) => {
-  return {
+export const prepareReservationData = async (formData: LoanFormData, vehicleId: string, companyId: string) => {
+  console.log('Preparing reservation data for form:', formData);
+  
+  // First, update the client with license information
+  if (formData.clientId) {
+    const clientUpdateData = {
+      driver_license_front_url: formData.driverLicenseFrontUrl || null,
+      driver_license_back_url: formData.driverLicenseBackUrl || null,
+      license_number: formData.licenseNumber || null,
+      license_issue_date: formData.licenseIssueDate || null,
+      prefecture: formData.prefecture || null,
+      date_of_birth: formData.dateOfBirth || null,
+      place_of_birth: formData.placeOfBirth || null
+    };
+    
+    // Remove null values
+    const filteredClientData = Object.fromEntries(
+      Object.entries(clientUpdateData).filter(([_, value]) => value !== null)
+    );
+    
+    if (Object.keys(filteredClientData).length > 0) {
+      const { error: clientError } = await supabase
+        .from('clients')
+        .update(filteredClientData)
+        .eq('id', formData.clientId);
+        
+      if (clientError) {
+        console.error('Error updating client:', clientError);
+        throw new Error('Failed to update client information');
+      }
+    }
+  }
+
+  // Prepare reservation data (without license fields that are now in clients table)
+  const reservationData = {
     fleet_vehicle_id: vehicleId,
     client_id: formData.clientId,
     start_date: formData.startDate,
-    expected_return_date: formData.expectedReturnDate || null, // Convert empty string to null
+    expected_return_date: formData.expectedReturnDate || null,
     start_mileage: formData.mileage,
     fuel_level_start: formData.fuelLevel,
-    notes: formData.notes || '',
-    status: 'active' as const,
-    company_id: companyId,
-    // License information
-    license_number: formData.licenseNumber,
-    license_issue_date: formData.licenseIssueDate || null, // Convert empty string to null
-    prefecture: formData.prefecture,
-    holder_info: formData.holderInfo,
-    date_of_birth: formData.dateOfBirth || null, // Convert empty string to null
-    place_of_birth: formData.placeOfBirth,
-    // Document URLs
-    driver_license_front_url: formData.driverLicenseFrontUrl,
-    driver_license_back_url: formData.driverLicenseBackUrl,
-    // Insurance information
-    client_insurance: formData.clientInsurance,
-    insurance_company_name: formData.insuranceCompanyName,
-    insurance_phone: formData.insurancePhone,
-    insurance_email: formData.insuranceEmail,
-    insurance_contract_number: formData.insuranceContractNumber,
-    insurance_address: formData.insuranceAddress,
-    insurance_city: formData.insuranceCity,
-    insurance_postal_code: formData.insurancePostalCode,
-    // Attestation
-    attestation_accepted: formData.attestationAccepted,
-    client_signature: formData.clientSignature,
-    // Convert arrays to JSON format for database storage
-    vehicle_images: formData.vehicleImages as any,
-    damages: formData.damages as any
+    vehicle_images: JSON.stringify(formData.vehicleImages),
+    damages: JSON.stringify(formData.damages),
+    client_insurance: formData.clientInsurance || false,
+    insurance_company_name: formData.insuranceCompanyName || null,
+    insurance_phone: formData.insurancePhone || null,
+    insurance_email: formData.insuranceEmail || null,
+    insurance_contract_number: formData.insuranceContractNumber || null,
+    insurance_address: formData.insuranceAddress || null,
+    insurance_city: formData.insuranceCity || null,
+    insurance_postal_code: formData.insurancePostalCode || null,
+    attestation_accepted: formData.attestationAccepted || false,
+    client_signature: formData.clientSignature || null,
+    notes: formData.notes || null,
+    company_id: companyId
   };
+
+  console.log('Final reservation data:', reservationData);
+  return reservationData;
 };
