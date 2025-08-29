@@ -885,46 +885,78 @@ Garage Martin`
         /* Phase de Relance View */
         <>
           {/* Tunnel de conversion */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">
-                Tunnel de conversion
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3 max-w-sm mx-auto">
-                {/* Factures impayées */}
-                <div className="bg-blue-500 text-white rounded-lg p-3 flex justify-between items-center">
-                  <span className="font-medium text-sm">Factures impayées</span>
-                  <span className="font-bold">45</span>
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wide">
+              Tunnel de conversion
+            </h3>
+            <div className="flex items-center gap-2 overflow-x-auto pb-2">
+              {/* Factures impayées */}
+              <div className="flex-shrink-0 relative">
+                <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl px-4 py-3 min-w-[140px] shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                  <div className="text-xs opacity-80">Factures impayées</div>
+                  <div className="text-xl font-bold">45</div>
                 </div>
-                
-                {/* Relances automatiques */}
-                <div className="bg-orange-500 text-white rounded-lg p-3 flex justify-between items-center">
-                  <span className="font-medium text-sm">Relances automatiques</span>
-                  <span className="font-bold">38</span>
-                </div>
-                
-                {/* Mises en demeure */}
-                <div className="bg-red-500 text-white rounded-lg p-3 flex justify-between items-center">
-                  <span className="font-medium text-sm">Mises en demeure</span>
-                  <span className="font-bold">15</span>
-                </div>
-                
-                {/* Procédures judiciaires */}
-                <div className="bg-purple-500 text-white rounded-lg p-3 flex justify-between items-center">
-                  <span className="font-medium text-sm">Procédures judiciaires</span>
-                  <span className="font-bold">8</span>
-                </div>
-                
-                {/* Montants récupérés */}
-                <div className="bg-green-500 text-white rounded-lg p-3 flex justify-between items-center">
-                  <span className="font-medium text-sm">Montants récupérés</span>
-                  <span className="font-bold">78%</span>
+                <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 text-blue-400">
+                  <svg width="8" height="16" viewBox="0 0 8 16" fill="currentColor">
+                    <path d="M0 0L8 8L0 16V0Z"/>
+                  </svg>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+
+              {/* Relances automatiques */}
+              <div className="flex-shrink-0 relative ml-1">
+                <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl px-4 py-3 min-w-[130px] shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                  <div className="text-xs opacity-80">Relances auto</div>
+                  <div className="text-xl font-bold">38</div>
+                </div>
+                <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 text-orange-400">
+                  <svg width="8" height="16" viewBox="0 0 8 16" fill="currentColor">
+                    <path d="M0 0L8 8L0 16V0Z"/>
+                  </svg>
+                </div>
+              </div>
+
+              {/* Mises en demeure */}
+              <div className="flex-shrink-0 relative ml-1">
+                <div className="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl px-4 py-3 min-w-[120px] shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                  <div className="text-xs opacity-80">Mises demeure</div>
+                  <div className="text-xl font-bold">15</div>
+                </div>
+                <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 text-red-400">
+                  <svg width="8" height="16" viewBox="0 0 8 16" fill="currentColor">
+                    <path d="M0 0L8 8L0 16V0Z"/>
+                  </svg>
+                </div>
+              </div>
+
+              {/* Procédures judiciaires */}
+              <div className="flex-shrink-0 relative ml-1">
+                <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl px-4 py-3 min-w-[110px] shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                  <div className="text-xs opacity-80">Judiciaires</div>
+                  <div className="text-xl font-bold">8</div>
+                </div>
+                <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 text-purple-400">
+                  <svg width="8" height="16" viewBox="0 0 8 16" fill="currentColor">
+                    <path d="M0 0L8 8L0 16V0Z"/>
+                  </svg>
+                </div>
+              </div>
+
+              {/* Montants récupérés */}
+              <div className="flex-shrink-0 ml-1">
+                <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl px-4 py-3 min-w-[100px] shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border-2 border-green-300">
+                  <div className="text-xs opacity-80">Récupérés</div>
+                  <div className="text-xl font-bold">78%</div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Indicateurs de performance */}
+            <div className="flex justify-between text-xs text-muted-foreground mt-2 px-1">
+              <span>Taux conversion: 84%</span>
+              <span>Temps moyen: 45j</span>
+            </div>
+          </div>
 
           {/* Journal d'Activité */}
           <Card>
