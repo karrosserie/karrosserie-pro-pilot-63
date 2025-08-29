@@ -1349,7 +1349,15 @@ export type Database = {
           violation_time?: string | null
           violation_type?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_fleet_violations_fleet_vehicle_id"
+            columns: ["fleet_vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       generated_reports: {
         Row: {
