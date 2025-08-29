@@ -344,20 +344,20 @@ export default function PresencePointages() {
               variant="ghost" 
               size="sm" 
               onClick={() => navigate('/payments/accounting')}
-              className="gap-2"
+              className="gap-2 hover:bg-karrosserie-orange/10 hover:text-karrosserie-orange"
             >
               <ArrowLeft className="w-4 h-4" />
               Retour à la comptabilité
             </Button>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground"><span>Karrosserie.pro</span><ChevronRight className="w-4 h-4" /><span>Paiements</span><ChevronRight className="w-4 h-4" /><span>Comptabilité</span><ChevronRight className="w-4 h-4" /><span>Présence & Pointages</span></div>
-          <h1 className="text-2xl font-semibold mt-1">Présence & Pointages (géolocalisé)</h1>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground"><span className="text-karrosserie-orange font-medium">Karrosserie.pro</span><ChevronRight className="w-4 h-4" /><span>Paiements</span><ChevronRight className="w-4 h-4" /><span>Comptabilité</span><ChevronRight className="w-4 h-4" /><span className="text-karrosserie-orange">Présence & Pointages</span></div>
+          <h1 className="text-2xl font-semibold mt-1 bg-gradient-to-r from-karrosserie-orange to-primary bg-clip-text text-transparent">Présence & Pointages (géolocalisé)</h1>
           <p className="text-sm text-muted-foreground">Contrôle GPS, demi-journées, pauses repas, calculs heures normales & supplémentaires, exports paie</p>
         </div>
         <div className="flex items-center gap-2">
           <Dialog open={reportDialogOpen} onOpenChange={setReportDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2">
+              <Button className="gap-2 bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white border-0">
                 <FileText className="w-4 h-4"/>
                 Générer un rapport
               </Button>
@@ -475,11 +475,11 @@ export default function PresencePointages() {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <Card className="shadow-sm"><CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Total heures</CardTitle></CardHeader><CardContent className="pt-0"><div className="text-2xl font-bold">{toHhMm(kpis.total)}</div><div className="text-xs text-muted-foreground">Période filtrée</div></CardContent></Card>
-        <Card className="shadow-sm"><CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Heures normales</CardTitle></CardHeader><CardContent className="pt-0"><div className="text-2xl font-bold">{toHhMm(kpis.normales)}</div><div className="text-xs text-muted-foreground">Seuil {HEURES_JOUR}h/j</div></CardContent></Card>
-        <Card className="shadow-sm"><CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Heures sup.</CardTitle></CardHeader><CardContent className="pt-0"><div className="text-2xl font-bold">{toHhMm(kpis.sup)}</div><div className="text-xs text-muted-foreground">Au-delà du seuil</div></CardContent></Card>
-        <Card className="shadow-sm"><CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Taux conformité GPS</CardTitle></CardHeader><CardContent className="pt-0"><div className="text-2xl font-bold">{kpis.tauxGps}%</div><div className="text-xs text-muted-foreground">{kpis.lignes} lignes</div></CardContent></Card>
-        <Card className="shadow-sm"><CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Absences</CardTitle></CardHeader><CardContent className="pt-0"><div className="text-2xl font-bold">{kpis.absences}</div><div className="text-xs text-muted-foreground">CP/RTT/MAL</div></CardContent></Card>
+        <Card className="shadow-sm border-l-4 border-l-karrosserie-orange bg-gradient-to-br from-karrosserie-orange/5 to-transparent"><CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Total heures</CardTitle></CardHeader><CardContent className="pt-0"><div className="text-2xl font-bold text-karrosserie-orange">{toHhMm(kpis.total)}</div><div className="text-xs text-muted-foreground">Période filtrée</div></CardContent></Card>
+        <Card className="shadow-sm border-l-4 border-l-primary bg-gradient-to-br from-primary/5 to-transparent"><CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Heures normales</CardTitle></CardHeader><CardContent className="pt-0"><div className="text-2xl font-bold text-primary">{toHhMm(kpis.normales)}</div><div className="text-xs text-muted-foreground">Seuil {HEURES_JOUR}h/j</div></CardContent></Card>
+        <Card className="shadow-sm border-l-4 border-l-amber-500 bg-gradient-to-br from-amber-500/5 to-transparent"><CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Heures sup.</CardTitle></CardHeader><CardContent className="pt-0"><div className="text-2xl font-bold text-amber-600">{toHhMm(kpis.sup)}</div><div className="text-xs text-muted-foreground">Au-delà du seuil</div></CardContent></Card>
+        <Card className="shadow-sm border-l-4 border-l-emerald-500 bg-gradient-to-br from-emerald-500/5 to-transparent"><CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Taux conformité GPS</CardTitle></CardHeader><CardContent className="pt-0"><div className="text-2xl font-bold text-emerald-600">{kpis.tauxGps}%</div><div className="text-xs text-muted-foreground">{kpis.lignes} lignes</div></CardContent></Card>
+        <Card className="shadow-sm border-l-4 border-l-red-500 bg-gradient-to-br from-red-500/5 to-transparent"><CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Absences</CardTitle></CardHeader><CardContent className="pt-0"><div className="text-2xl font-bold text-red-600">{kpis.absences}</div><div className="text-xs text-muted-foreground">CP/RTT/MAL</div></CardContent></Card>
       </div>
 
       {/* Graphs */}
@@ -494,7 +494,7 @@ export default function PresencePointages() {
                   <XAxis dataKey="date" />
                   <YAxis />
                   <Tooltip />
-                  <Bar dataKey="heures" />
+                  <Bar dataKey="heures" fill="hsl(var(--karrosserie-orange))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -506,7 +506,10 @@ export default function PresencePointages() {
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={pieData} dataKey="value" nameKey="name" outerRadius={90} label />
+                   <Pie data={pieData} dataKey="value" nameKey="name" outerRadius={90} label>
+                     <Cell key="gps-valide" fill="hsl(var(--karrosserie-orange))" />
+                     <Cell key="gps-refuse" fill="hsl(var(--karrosserie-gray))" />
+                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
             </div>
