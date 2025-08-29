@@ -90,10 +90,14 @@ const ReportContent = () => {
       <div className="card-container p-3 sm:p-4 md:p-6">
         <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Rapports financiers</h3>
         <div className="flex justify-center mb-4 sm:mb-6">
-          <Button variant="outline" className="flex flex-col p-4 sm:p-6 h-auto items-center justify-center min-h-[100px] sm:min-h-[120px] w-full max-w-xs" onClick={() => setOpenDialog('monthly')}>
-            <FileText className="h-6 w-6 sm:h-8 sm:w-8 mb-2" />
-            <span className="font-medium text-sm sm:text-base">Bilan sociale</span>
-            <span className="text-xs sm:text-sm text-gray-500 mt-1">Générer un PDF</span>
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/presence-pointages')} 
+            className="flex flex-col p-4 sm:p-6 h-auto items-center justify-center min-h-[100px] sm:min-h-[120px] w-full max-w-xs"
+          >
+            <Clock className="h-6 w-6 sm:h-8 sm:w-8 mb-2" />
+            <span className="font-medium text-sm sm:text-base">Présence & Pointages</span>
+            <span className="text-xs sm:text-sm text-gray-500 mt-1">Géolocalisé</span>
           </Button>
         </div>
         
@@ -107,21 +111,6 @@ const ReportContent = () => {
             <Button variant="outline" onClick={() => setOpenDialog('csv')} className="w-full justify-center h-10 sm:h-11">
               <Download className="h-4 w-4 mr-2" />
               <span className="text-sm sm:text-base">Format CSV</span>
-            </Button>
-          </div>
-        </div>
-
-        <div className="mb-4 sm:mb-6">
-          <h4 className="font-medium mb-3 sm:mb-4 text-sm sm:text-base">Gestion RH</h4>
-          <div className="flex justify-center">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/presence-pointages')} 
-              className="flex flex-col p-4 sm:p-6 h-auto items-center justify-center min-h-[100px] sm:min-h-[120px] w-full max-w-xs"
-            >
-              <Clock className="h-6 w-6 sm:h-8 sm:w-8 mb-2" />
-              <span className="font-medium text-sm sm:text-base">Présence & Pointages</span>
-              <span className="text-xs sm:text-sm text-gray-500 mt-1">Géolocalisé</span>
             </Button>
           </div>
         </div>
