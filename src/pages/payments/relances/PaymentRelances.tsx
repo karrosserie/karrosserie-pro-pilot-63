@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +14,8 @@ import {
   Mail,
   Calendar,
   Download,
-  X
+  X,
+  Clock
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -26,6 +27,7 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
   const [filter, setFilter] = useState<string>('all');
   const [drawerData, setDrawerData] = useState<any>(null);
   const [viewingContent, setViewingContent] = useState<any>(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   // Force rebuild - données fictives pour la démonstration
   const mockInvoices = [
@@ -403,6 +405,69 @@ Garage Martin`
 
   const viewContent = (content: any, type: string) => {
     setViewingContent({ content, type });
+  };
+
+  // Update current time every second for countdown
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Calculate countdown for next action
+  const getNextActionCountdown = (invoice: any) => {
+    const lastSmsAction = invoice.history
+      .filter((action: any) => action.type === 'sms')
+      .sort((a: any, b: any) => new Date(b.date + ' ' + (b.time || '00:00')).getTime() - new Date(a.date + ' ' + (a.time || '00:00')).getTime())[0];
+    
+    if (!lastSmsAction) return null;
+
+    const smsDate = new Date(lastSmsAction.date + ' ' + (lastSmsAction.time || '00:00'));
+    const miseEnDemeureDate = new Date(smsDate.getTime() + (8 * 24 * 60 * 60 * 1000)); // 8 jours après
+    const tribunalDate = new Date(miseEnDemeureDate.getTime() + (10 * 24 * 60 * 60 * 1000)); // 10 jours après mise en demeure
+    
+    const now = currentTime.getTime();
+    const miseEnDemeureTime = miseEnDemeureDate.getTime();
+    const tribunalTime = tribunalDate.getTime();
+
+    if (now < miseEnDemeureTime) {
+      // Compte à rebours pour mise en demeure
+      const timeLeft = miseEnDemeureTime - now;
+      const days = Math.floor(timeLeft / (24 * 60 * 60 * 1000));
+      const hours = Math.floor((timeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+      const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
+      const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
+      
+      return {
+        type: 'miseEnDemeure',
+        action: 'Envoyer mise en demeure',
+        timeLeft: { days, hours, minutes, seconds },
+        isActive: true
+      };
+    } else if (now < tribunalTime) {
+      // Compte à rebours pour tribunal
+      const timeLeft = tribunalTime - now;
+      const days = Math.floor(timeLeft / (24 * 60 * 60 * 1000));
+      const hours = Math.floor((timeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+      const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
+      const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
+      
+      return {
+        type: 'tribunal',
+        action: 'Générer dossier tribunal',
+        timeLeft: { days, hours, minutes, seconds },
+        isActive: true
+      };
+    }
+    
+    return {
+      type: 'expired',
+      action: 'Procédure automatique expirée',
+      timeLeft: null,
+      isActive: false
+    };
   };
 
   const getStatusColor = (status: string) => {
@@ -923,33 +988,60 @@ Garage Martin`
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-col gap-2 pt-4 border-t">
-                {drawerData.status === 'relance1' && (
-                  <Button className="w-full">
-                    <Mail className="h-4 w-4 mr-2" />
-                    Envoyer relance 2
-                  </Button>
-                )}
-                {drawerData.status === 'relance2' && (
-                  <Button className="w-full">
-                    <Phone className="h-4 w-4 mr-2" />
-                    Envoyer relance 3
-                  </Button>
-                )}
-                {drawerData.status === 'relance3' && (
-                  <Button variant="destructive" className="w-full">
-                    <AlertTriangle className="h-4 w-4 mr-2" />
-                    Mise en demeure
-                  </Button>
-                )}
-                {drawerData.status === 'contentieux' && (
-                  <Button variant="destructive" className="w-full">
-                    <Scale className="h-4 w-4 mr-2" />
-                    Dossier tribunal
-                  </Button>
-                )}
-              </div>
+                {/* Action Buttons / Countdown */}
+                <div className="pt-4 border-t">
+                  {drawerData.status.includes('relance') ? (
+                    (() => {
+                      const countdown = getNextActionCountdown(drawerData);
+                      if (!countdown) {
+                        return (
+                          <div className="text-center p-4 bg-muted rounded-lg">
+                            <div className="text-sm text-muted-foreground">
+                              Aucun SMS de rappel trouvé pour calculer le délai automatique
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div className="text-center p-4 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg">
+                          <div className="flex items-center justify-center mb-2">
+                            <Clock className="h-5 w-5 text-orange-600 mr-2" />
+                            <span className="font-semibold text-orange-800">
+                              {countdown.action}
+                            </span>
+                          </div>
+                          
+                          {countdown.isActive ? (
+                            <div className="space-y-2">
+                              <div className="text-2xl font-bold text-orange-700">
+                                {countdown.timeLeft.days > 0 && `${countdown.timeLeft.days}j `}
+                                {String(countdown.timeLeft.hours).padStart(2, '0')}:
+                                {String(countdown.timeLeft.minutes).padStart(2, '0')}:
+                                {String(countdown.timeLeft.seconds).padStart(2, '0')}
+                              </div>
+                              <div className="text-xs text-orange-600">
+                                {countdown.type === 'miseEnDemeure' 
+                                  ? 'Délai automatique de 8 jours après le dernier SMS'
+                                  : 'Délai automatique de 10 jours après la mise en demeure'
+                                }
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-sm text-red-600 font-medium">
+                              Délai dépassé - Action manuelle requise
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()
+                  ) : drawerData.status === 'contentieux' ? (
+                    <Button variant="destructive" className="w-full">
+                      <Scale className="h-4 w-4 mr-2" />
+                      Dossier tribunal actif
+                    </Button>
+                  ) : null}
+                </div>
             </div>
           </div>
         </>
