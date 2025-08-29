@@ -91,16 +91,23 @@ const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems
       
       {hasSubMenu && isSubMenuOpen && (
         <div className="ml-8 mt-1 space-y-1">
-          {subMenuItems.map((item, index) => (
-            <Link
-              key={index}
-              to={item.path}
-              onClick={onClose}
-              className="flex items-center py-2 px-3 rounded-md text-gray-600 hover:bg-gray-100 active:bg-gray-200 text-sm transition-colors"
-            >
-              {item.label}
-            </Link>
-          ))}
+          {subMenuItems.map((item, index) => {
+            const isSubItemActive = location.pathname === item.path;
+            return (
+              <Link
+                key={index}
+                to={item.path}
+                onClick={onClose}
+                className={`flex items-center py-2 px-3 rounded-md text-sm transition-colors ${
+                  isSubItemActive 
+                    ? 'bg-karrosserie-orange/20 text-karrosserie-orange font-medium border border-karrosserie-orange/30' 
+                    : 'text-gray-600 hover:bg-gray-100 active:bg-gray-200'
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>
