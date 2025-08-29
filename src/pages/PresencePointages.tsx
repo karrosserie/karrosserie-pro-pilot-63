@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Download, Calendar, MapPin, FileText, Filter, Clock, User, Building2, CheckCircle2, XCircle, AlertTriangle, Navigation, Truck, Waypoints, Phone, Mail, ChevronRight } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, CartesianGrid } from "recharts";
+import * as XLSX from 'xlsx';
 
 // ------------------ Types & Helpers ------------------
 type Pointage = {
@@ -211,6 +212,63 @@ export default function PresencePointages() {
   const employes = Array.from(new Set(SAMPLE.map(s => s.employe)));
   const chantiers = Array.from(new Set(SAMPLE.map(s => s.chantier)));
 
+  const handleExportExcel = () => {
+    // Préparer les données pour l'export
+    const excelData = filtered.map((p) => {
+      const d = durationHours(p, HEURES_JOUR);
+      const pauseTxt = p.typePause === "Repas" && p.pauseDebut && p.pauseFin
+        ? `${new Date(p.pauseDebut).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} – ${new Date(p.pauseFin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`
+        : (p.typePause?.startsWith("Demi-journée") ? p.typePause : "");
+      const statutOk = p.statutDebut === "VALIDE" && p.statutFin === "VALIDE";
+      
+      return {
+        'Date': p.date,
+        'Employé': p.employe,
+        'Matricule': p.matricule,
+        'Métier': p.metier,
+        'Chantier': p.chantier,
+        'Code Chantier': p.codeChantier,
+        'Début': p.debut ? new Date(p.debut).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '',
+        'Fin': p.fin ? new Date(p.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '',
+        'Pause': pauseTxt,
+        'Durée (HH:MM)': toHhMm(d.duree),
+        'Heures décimales': d.duree.toFixed(2),
+        'Heures normales': d.normales.toFixed(2),
+        'Heures supplémentaires': d.sup.toFixed(2),
+        'Statut GPS': statutOk ? 'VALIDE' : 'REFUSÉ',
+        'Distance début (m)': p.distDebut ?? 0,
+        'Distance fin (m)': p.distFin ?? 0,
+        'Absence': p.absence || '',
+        'Validation chef': p.validationChef ? 'Oui' : 'Non',
+        'GPS Début': p.gpsDebut || '',
+        'GPS Fin': p.gpsFin || '',
+        'Commentaire': p.commentaire || ''
+      };
+    });
+
+    // Créer le classeur
+    const ws = XLSX.utils.json_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Pointages");
+
+    // Ajouter une feuille de résumé avec les KPIs
+    const summaryData = [
+      { 'Indicateur': 'Total heures', 'Valeur': toHhMm(kpis.total) },
+      { 'Indicateur': 'Heures normales', 'Valeur': toHhMm(kpis.normales) },
+      { 'Indicateur': 'Heures supplémentaires', 'Valeur': toHhMm(kpis.sup) },
+      { 'Indicateur': 'Taux conformité GPS', 'Valeur': `${kpis.tauxGps}%` },
+      { 'Indicateur': 'Nombre d\'absences', 'Valeur': kpis.absences },
+      { 'Indicateur': 'Total lignes', 'Valeur': kpis.lignes }
+    ];
+    
+    const wsSummary = XLSX.utils.json_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(wb, wsSummary, "Résumé");
+
+    // Télécharger le fichier
+    const fileName = `pointages_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -222,7 +280,7 @@ export default function PresencePointages() {
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" className="gap-2"><FileText className="w-4 h-4"/> Générer rapport PDF</Button>
-          <Button variant="outline" className="gap-2"><Download className="w-4 h-4"/> Export Excel</Button>
+          <Button variant="outline" className="gap-2" onClick={handleExportExcel}><Download className="w-4 h-4"/> Export Excel</Button>
           <Button className="gap-2"><Mail className="w-4 h-4"/> Envoyer à l'expert-comptable</Button>
         </div>
       </div>
