@@ -660,14 +660,14 @@ Garage Martin`
                     className={campaignStatus.janvier2025 === 'active' ? "bg-green-600 hover:bg-green-700" : "bg-orange-600 hover:bg-orange-700"}
                     onClick={() => handleCampaignAction('janvier2025', campaignStatus.janvier2025 === 'active' ? 'stop' : 'restart')}
                   >
-                    {campaignStatus.janvier2025 === 'active' ? 'En cours' : campaignStatus.janvier2025 === 'stopped' ? 'Arrêtée' : 'Reprogrammée'}
+                    {campaignStatus.janvier2025 === 'active' ? 'Envoi actif' : campaignStatus.janvier2025 === 'stopped' ? 'Suspendue' : 'Reprogrammée'}
                   </Button>
                   <Button 
                     variant="outline" 
                     size="sm"
                     onClick={() => handleCampaignAction('janvier2025', campaignStatus.janvier2025 === 'active' ? 'stop' : 'restart')}
                   >
-                    {campaignStatus.janvier2025 === 'active' ? 'Arrêter' : 'Relancer'}
+                    {campaignStatus.janvier2025 === 'active' ? 'Suspendre' : 'Réactiver'}
                   </Button>
                   <Button 
                     variant="outline" 
@@ -711,14 +711,15 @@ Garage Martin`
                     size="sm" 
                     className={`text-blue-600 border-blue-300 ${campaignStatus.decembre2024 === 'programmed' ? 'bg-blue-50' : ''}`}
                   >
-                    {campaignStatus.decembre2024 === 'programmed' ? 'Reprogrammée' : 'Terminée'}
+                    {campaignStatus.decembre2024 === 'programmed' ? 'Reprogrammée' : 'Clôturée'}
                   </Button>
                   <Button 
-                    variant="destructive" 
+                    variant="default" 
                     size="sm"
                     onClick={() => handleCampaignAction('decembre2024', 'program')}
+                    className="bg-blue-600 hover:bg-blue-700"
                   >
-                    {campaignStatus.decembre2024 === 'programmed' ? 'Programmer à nouveau' : 'Programmer campagne'}
+                    {campaignStatus.decembre2024 === 'programmed' ? 'Programmer à nouveau' : 'Nouvelle relance'}
                   </Button>
                   <Button 
                     variant="outline" 
