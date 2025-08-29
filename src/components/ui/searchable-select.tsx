@@ -77,8 +77,13 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                   <CommandItem
                     key={option.value}
                     value={option.value}
-                    onSelect={() => {
+                    onSelect={(currentValue) => {
                       console.log('SearchableSelect - CommandItem onSelect triggered for:', option);
+                      console.log('SearchableSelect - CommandItem currentValue:', currentValue);
+                      handleSelect(option.value);
+                    }}
+                    onClick={() => {
+                      console.log('SearchableSelect - CommandItem onClick triggered for:', option);
                       handleSelect(option.value);
                     }}
                     className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
