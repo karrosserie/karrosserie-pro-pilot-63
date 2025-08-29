@@ -1014,45 +1014,120 @@ Garage Martin`
             <CardContent>
               <div className="space-y-3">
                 {[
-                  { time: "09/01/2025 17:02", client: "SAS Moreau", action: "Mise en demeure", status: "Envoyé", type: "success", details: "Mise en demeure envoyée par courrier recommandé. Accusé de réception en attente." },
-                  { time: "09/01/2025 16:58", client: "EURL Rousseau", action: "Email amiable", status: "Erreur", type: "error", details: "Adresse email invalide. Tentative d'envoi échouée. Vérifier les coordonnées client." },
-                  { time: "09/01/2025 16:45", client: "M. Pierre Dubois", action: "SMS message", status: "Lu", type: "info", details: "SMS de relance lu à 16h52. Taux de lecture: 100%. Aucune réponse reçue." },
-                  { time: "09/01/2025 16:12", client: "SAS Moreau", action: "Email amiable", status: "Lu", type: "info", details: "Email ouvert à 16h18. Lien de paiement cliqué mais transaction non finalisée." },
-                  { time: "09/01/2025 15:38", client: "SARL Petit Électricité", action: "SMS message", status: "Réception interrompue", type: "warning", details: "SMS partiellement délivré. Opérateur mobile a signalé une interruption de service." },
-                  { time: "09/01/2025 15:12", client: "SAS Moreau", action: "SMS message", status: "Envoyé", type: "success", details: "SMS de première relance envoyé avec succès. Coût: 0,08€" },
-                  { time: "09/01/2025 14:45", client: "SARL Dupont", action: "SMS message", status: "Envoyé", type: "success", details: "SMS automatique de rappel d'échéance. Facture FAC-2024-001 - 3450€" },
-                  { time: "09/01/2025 14:23", client: "Entreprise Leroy", action: "LTR message", status: "Envoyé", type: "success", details: "Lettre recommandée avec AR expédiée. Suivi: RR123456789FR" },
-                  { time: "09/01/2025 13:56", client: "SARL Petit Électricité", action: "SMS message", status: "Envoyé", type: "success", details: "SMS de relance 2. Message personnalisé avec historique des impayés." },
-                  { time: "09/01/2025 13:12", client: "SARL Dupont", action: "LTR message", status: "Envoyé", type: "success", details: "Courrier simple de première relance. Coût d'affranchissement: 1,16€" }
-                ].map((log, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg text-sm">
-                    <div className="flex items-center gap-4">
-                      <span className="text-muted-foreground font-mono">{log.time}</span>
-                      <span className="font-medium">{log.client}</span>
-                      <span className="text-muted-foreground">{log.action}</span>
+                  { time: "09/01/2025 17:02", client: "SAS Moreau", action: "Mise en demeure", status: "Envoyé", type: "success", details: "Mise en demeure envoyée par courrier recommandé. Accusé de réception en attente.", invoiceAmount: "5680€", dueDate: "01/10/2024" },
+                  { time: "09/01/2025 16:58", client: "EURL Rousseau", action: "Email amiable", status: "Erreur", type: "error", details: "Adresse email invalide. Tentative d'envoi échouée. Vérifier les coordonnées client.", invoiceAmount: "890€", dueDate: "15/12/2024" },
+                  { time: "09/01/2025 16:45", client: "M. Pierre Dubois", action: "SMS message", status: "Lu", type: "info", details: "SMS de relance lu à 16h52. Taux de lecture: 100%. Aucune réponse reçue.", invoiceAmount: "650€", dueDate: "20/12/2024" },
+                  { time: "09/01/2025 16:12", client: "SAS Moreau", action: "Email amiable", status: "Lu", type: "info", details: "Email ouvert à 16h18. Lien de paiement cliqué mais transaction non finalisée.", invoiceAmount: "5680€", dueDate: "01/10/2024" },
+                  { time: "09/01/2025 15:38", client: "SARL Petit Électricité", action: "SMS message", status: "Réception interrompue", type: "warning", details: "SMS partiellement délivré. Opérateur mobile a signalé une interruption de service.", invoiceAmount: "1890€", dueDate: "10/12/2024" },
+                  { time: "09/01/2025 15:12", client: "SAS Moreau", action: "SMS message", status: "Envoyé", type: "success", details: "SMS de première relance envoyé avec succès. Coût: 0,08€", invoiceAmount: "5680€", dueDate: "01/10/2024" },
+                  { time: "09/01/2025 14:45", client: "SARL Dupont", action: "SMS message", status: "Envoyé", type: "success", details: "SMS automatique de rappel d'échéance. Facture FAC-2024-001 - 3450€", invoiceAmount: "3450€", dueDate: "15/11/2024" },
+                  { time: "09/01/2025 14:23", client: "Entreprise Leroy", action: "LTR message", status: "Envoyé", type: "success", details: "Lettre recommandée avec AR expédiée. Suivi: RR123456789FR", invoiceAmount: "1250€", dueDate: "10/12/2024" },
+                  { time: "09/01/2025 13:56", client: "SARL Petit Électricité", action: "SMS message", status: "Envoyé", type: "success", details: "SMS de relance 2. Message personnalisé avec historique des impayés.", invoiceAmount: "1890€", dueDate: "10/12/2024" },
+                  { time: "09/01/2025 13:12", client: "SARL Dupont", action: "LTR message", status: "Envoyé", type: "success", details: "Courrier simple de première relance. Coût d'affranchissement: 1,16€", invoiceAmount: "3450€", dueDate: "15/11/2024" }
+                ].map((log, index) => {
+                  // Calculer le retard en jours depuis la date d'échéance
+                  const today = new Date('2025-01-09');
+                  const [day, month, year] = log.dueDate.split('/');
+                  const dueDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                  const daysOverdue = Math.max(0, Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24)));
+                  
+                  // Déterminer le niveau d'urgence basé sur le retard
+                  const getUrgencyLevel = (days) => {
+                    if (days >= 90) return 'critical'; // Rouge pastel
+                    if (days >= 60) return 'high';     // Orange pastel
+                    if (days >= 30) return 'medium';   // Jaune pastel
+                    if (days > 0) return 'low';        // Bleu pastel
+                    return 'none';                     // Vert pastel
+                  };
+                  
+                  const urgency = getUrgencyLevel(daysOverdue);
+                  
+                  // Couleurs pastels selon l'urgence
+                  const getUrgencyStyles = (urgencyLevel) => {
+                    switch (urgencyLevel) {
+                      case 'critical': return 'bg-red-50 border-l-4 border-red-300 hover:bg-red-100';
+                      case 'high': return 'bg-orange-50 border-l-4 border-orange-300 hover:bg-orange-100';
+                      case 'medium': return 'bg-yellow-50 border-l-4 border-yellow-300 hover:bg-yellow-100';
+                      case 'low': return 'bg-blue-50 border-l-4 border-blue-300 hover:bg-blue-100';
+                      default: return 'bg-green-50 border-l-4 border-green-300 hover:bg-green-100';
+                    }
+                  };
+                  
+                  const getUrgencyBadgeColor = (urgencyLevel, type) => {
+                    if (type === 'error') return 'bg-red-100 text-red-700 border-red-200';
+                    if (type === 'warning') return 'bg-amber-100 text-amber-700 border-amber-200';
+                    
+                    switch (urgencyLevel) {
+                      case 'critical': return 'bg-red-100 text-red-700 border-red-200';
+                      case 'high': return 'bg-orange-100 text-orange-700 border-orange-200';
+                      case 'medium': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+                      case 'low': return 'bg-blue-100 text-blue-700 border-blue-200';
+                      default: return 'bg-green-100 text-green-700 border-green-200';
+                    }
+                  };
+                  
+                  const getRetardText = (days) => {
+                    if (days === 0) return 'À jour';
+                    if (days === 1) return '1 jour de retard';
+                    return `${days} jours de retard`;
+                  };
+                  
+                  return (
+                    <div key={index} className={`p-4 rounded-lg transition-all duration-200 ${getUrgencyStyles(urgency)}`}>
+                      {/* Header avec temps et urgence */}
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs text-muted-foreground font-mono bg-white/50 px-2 py-1 rounded">
+                            {log.time}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-3 w-3 text-muted-foreground" />
+                            <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                              daysOverdue === 0 ? 'text-green-600' : 
+                              daysOverdue <= 30 ? 'text-blue-600' : 
+                              daysOverdue <= 60 ? 'text-yellow-600' : 
+                              daysOverdue <= 90 ? 'text-orange-600' : 'text-red-600'
+                            }`}>
+                              {getRetardText(daysOverdue)}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <Badge 
+                          className={`text-xs border ${getUrgencyBadgeColor(urgency, log.type)}`}
+                        >
+                          {log.status}
+                        </Badge>
+                      </div>
+                      
+                      {/* Content principal */}
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-semibold text-sm text-foreground">{log.client}</span>
+                            <span className="text-xs text-muted-foreground">•</span>
+                            <span className="text-sm text-muted-foreground">{log.action}</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <span>Montant: <span className="font-semibold text-foreground">{log.invoiceAmount}</span></span>
+                            <span>Échéance: <span className="font-medium">{log.dueDate}</span></span>
+                          </div>
+                        </div>
+                        
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 px-3 hover:bg-white/50"
+                          onClick={() => viewLogDetails(log)}
+                        >
+                          <Eye className="h-3 w-3 mr-1" />
+                          <span className="text-xs">Voir</span>
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge 
-                        variant={
-                          log.type === 'success' ? 'default' : 
-                          log.type === 'error' ? 'destructive' : 
-                          log.type === 'warning' ? 'secondary' : 'outline'
-                        }
-                        className="text-xs"
-                      >
-                        {log.status}
-                      </Badge>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-6 px-2"
-                        onClick={() => viewLogDetails(log)}
-                      >
-                        <Eye className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
