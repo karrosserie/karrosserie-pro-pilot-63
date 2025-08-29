@@ -199,19 +199,32 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
             <div className="space-y-4 text-sm text-gray-700">
               <div className="flex items-start gap-3">
                 <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
-                  2
+                  1
                 </div>
                 <p>Bridge (ACPR – Autorité de contrôle Banque de France) assure la connexion sécurisée.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
-                  3
+                  2
                 </div>
                 <p>Karrosserie.pro ne voit ni ne stocke vos codes d'accès.</p>
               </div>
-              <div className="text-sm text-gray-600 space-y-2 mt-4">
+              <div className="flex items-start gap-3">
+                <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  3
+                </div>
                 <p>L'accès est strictement en lecture-seule : il sert uniquement à lire le paiement de vos clients pour le rapprochement bancaire.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  4
+                </div>
                 <p>Aucun débit possible : ni virement, ni prélèvement via cette connexion.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  5
+                </div>
                 <p>Vous contrôlez tout : autorisation révocable en 1 clic, traçabilité complète.</p>
               </div>
             </div>
