@@ -9,6 +9,7 @@ import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { useFleetViolations } from '@/hooks/use-fleet-violations';
 import { useCompanyId } from '@/hooks/use-company-id';
 import { FleetViolation } from '@/services/supabase/fleet-violations';
+import { ViolationDocumentUpload } from './ViolationDocumentUpload';
 
 interface FleetViolationFormProps {
   open: boolean;
@@ -57,6 +58,7 @@ export const FleetViolationForm: React.FC<FleetViolationFormProps> = ({
     reference_number: violation?.reference_number || '',
     due_date: violation?.due_date || '',
     notes: violation?.notes || '',
+    document_url: violation?.document_url || '',
     borrower_name: violation?.borrower_name || '',
     borrower_phone: violation?.borrower_phone || '',
     borrower_email: violation?.borrower_email || ''
@@ -119,6 +121,7 @@ export const FleetViolationForm: React.FC<FleetViolationFormProps> = ({
       reference_number: '',
       due_date: '',
       notes: '',
+      document_url: '',
       borrower_name: '',
       borrower_phone: '',
       borrower_email: ''
@@ -317,6 +320,13 @@ export const FleetViolationForm: React.FC<FleetViolationFormProps> = ({
               rows={3}
             />
           </div>
+
+          {/* Document upload */}
+          <ViolationDocumentUpload
+            documentUrl={formData.document_url}
+            onDocumentChange={(url) => handleInputChange('document_url', url)}
+            onDocumentRemove={() => handleInputChange('document_url', '')}
+          />
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

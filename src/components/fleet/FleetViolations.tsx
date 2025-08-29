@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Car, Plus, FileText, Euro, Calendar, MapPin, Trash2, Edit } from 'lucide-react';
+import { Car, Plus, FileText, Euro, Calendar, MapPin, Trash2, Edit, Eye, File } from 'lucide-react';
 import { useFleetViolations } from '@/hooks/use-fleet-violations';
 import { FleetViolationForm } from './FleetViolationForm';
 import { Badge } from '@/components/ui/badge';
@@ -31,6 +31,17 @@ const FleetViolations: React.FC = () => {
   const handleEdit = (violation: any) => {
     setSelectedViolation(violation);
     setShowForm(true);
+  };
+
+  const handleViewDocument = (documentUrl: string) => {
+    window.open(documentUrl, '_blank');
+  };
+
+  const getDocumentIcon = (url: string) => {
+    if (url.toLowerCase().includes('.pdf')) {
+      return <File className="h-4 w-4" />;
+    }
+    return <Eye className="h-4 w-4" />;
   };
 
   const handleDelete = async (violationId: string) => {
@@ -92,6 +103,16 @@ const FleetViolations: React.FC = () => {
                   <Badge className={getStatusColor(violation.payment_status)}>
                     {violation.payment_status}
                   </Badge>
+                  {violation.document_url && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleViewDocument(violation.document_url!)}
+                      title="Voir le document"
+                    >
+                      {getDocumentIcon(violation.document_url)}
+                    </Button>
+                  )}
                   <Button variant="ghost" size="sm" onClick={() => handleEdit(violation)}>
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -130,6 +151,13 @@ const FleetViolations: React.FC = () => {
                 <div className="mt-2 text-sm text-muted-foreground">
                   Emprunteur: {violation.borrower_name}
                   {violation.borrower_phone && ` • ${violation.borrower_phone}`}
+                </div>
+              )}
+              
+              {violation.reference_number && (
+                <div className="mt-2 text-sm text-muted-foreground">
+                  Référence: {violation.reference_number}
+                  {violation.due_date && ` • Échéance: ${format(new Date(violation.due_date), 'dd/MM/yyyy', { locale: fr })}`}
                 </div>
               )}
               
