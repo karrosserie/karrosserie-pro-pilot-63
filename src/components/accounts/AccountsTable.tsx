@@ -196,30 +196,29 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
-            <div className="space-y-3 text-sm text-gray-700">
+            <div className="space-y-4 text-sm text-gray-700">
               <div className="flex items-start gap-3">
                 <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                   1
                 </div>
-                <p>
-                  Karrosserie.pro <strong className="text-karrosserie-orange">ne peut ni voir vos codes ni déplacer un centime</strong>.
-                </p>
+                <p>Pour pointer vos paiements dans Karrosserie.pro.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                   2
                 </div>
-                <p>
-                  Bridge, agréé ACPR par la Banque de France, se contente de <strong className="text-karrosserie-orange">lire vos lignes bancaires</strong> pour rapprocher automatiquement vos paiements reçus dans Karrosserie.pro.
-                </p>
+                <p>Bridge (ACPR – Autorité de contrôle Banque de France) assure la connexion sécurisée.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                   3
                 </div>
-                <p>
-                  <strong className="text-karrosserie-orange">Aucun virement, aucun prélèvement</strong> : connexion strictement « consultation de paiement ».
-                </p>
+                <p>Karrosserie.pro ne voit ni ne stocke vos codes d'accès.</p>
+              </div>
+              <div className="text-sm text-gray-600 space-y-2 mt-4">
+                <p>L'accès est strictement en lecture-seule : il sert uniquement à lire le paiement de vos clients pour le rapprochement bancaire.</p>
+                <p>Aucun débit possible : ni virement, ni prélèvement via cette connexion.</p>
+                <p>Vous contrôlez tout : autorisation révocable en 1 clic, traçabilité complète.</p>
               </div>
             </div>
             <div className="pt-4 border-t">
@@ -227,7 +226,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                 className="w-full bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white mt-2"
                 onClick={handleBankConnection}
               >
-                Je relie mon compte en 30 secondes →
+                je valide en 15 secondes
               </Button>
             </div>
           </div>
