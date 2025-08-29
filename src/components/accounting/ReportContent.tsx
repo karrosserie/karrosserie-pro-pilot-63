@@ -49,7 +49,7 @@ const ReportContent = () => {
   const getDialogTitle = (type: DialogType): string => {
     switch (type) {
       case 'monthly':
-        return 'Générer le bilan mensuel';
+        return 'Générer le bilan sociale';
       case 'quarterly':
         return 'Générer le bilan trimestriel';
       case 'yearly':
@@ -67,7 +67,7 @@ const ReportContent = () => {
   const getReportName = (type: DialogType): string => {
     switch (type) {
       case 'monthly':
-        return 'Bilan mensuel';
+        return 'Bilan sociale';
       case 'quarterly':
         return 'Bilan trimestriel';
       case 'yearly':
@@ -85,14 +85,12 @@ const ReportContent = () => {
   return <div className="space-y-4 sm:space-y-6">
       <div className="card-container p-3 sm:p-4 md:p-6">
         <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Rapports financiers</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
-          <Button variant="outline" className="flex flex-col p-4 sm:p-6 h-auto items-center justify-center min-h-[100px] sm:min-h-[120px]" onClick={() => setOpenDialog('monthly')}>
+        <div className="flex justify-center mb-4 sm:mb-6">
+          <Button variant="outline" className="flex flex-col p-4 sm:p-6 h-auto items-center justify-center min-h-[100px] sm:min-h-[120px] w-full max-w-xs" onClick={() => setOpenDialog('monthly')}>
             <FileText className="h-6 w-6 sm:h-8 sm:w-8 mb-2" />
-            <span className="font-medium text-sm sm:text-base">Bilan mensuel</span>
+            <span className="font-medium text-sm sm:text-base">Bilan sociale</span>
             <span className="text-xs sm:text-sm text-gray-500 mt-1">Générer un PDF</span>
           </Button>
-          
-          
         </div>
         
         <div className="mb-4 sm:mb-6">
