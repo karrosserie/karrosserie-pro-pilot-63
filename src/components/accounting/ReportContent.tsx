@@ -87,56 +87,70 @@ const ReportContent = () => {
     }
   };
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 max-w-2xl mx-auto">
       {/* Section Rapports sociaux */}
-      <div className="bg-card rounded-lg border p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-1 h-6 bg-karrosserie-orange rounded"></div>
-          <h3 className="text-lg font-semibold text-foreground">Rapports sociaux</h3>
-        </div>
-        
-        <div className="flex justify-center">
-          <Button 
-            variant="outline" 
+      <div>
+        <h2 className="text-xl font-medium text-slate-700 mb-4">Rapports sociaux</h2>
+        <div className="bg-white rounded-lg border border-gray-200 p-1">
+          <div 
             onClick={() => navigate('/presence-pointages')} 
-            className="flex flex-col items-center gap-3 p-6 h-auto min-h-[120px] w-full max-w-sm hover:bg-muted/50 transition-colors"
+            className="flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer transition-colors rounded-md"
           >
-            <div className="p-3 rounded-full bg-karrosserie-orange/10">
-              <Clock className="h-8 w-8 text-karrosserie-orange" />
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                <Clock className="h-4 w-4 text-orange-600" />
+              </div>
+              <div>
+                <div className="font-medium text-gray-900">Présence & Pointages</div>
+                <div className="text-sm text-gray-500">Géolocalisé</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="font-medium text-foreground">Présence & Pointages</div>
-              <div className="text-sm text-muted-foreground">Géolocalisé</div>
+            <div className="text-gray-400">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+              </svg>
             </div>
-          </Button>
+          </div>
         </div>
       </div>
 
       {/* Section Export comptable */}
-      <div className="bg-card rounded-lg border p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-1 h-6 bg-primary rounded"></div>
-          <h4 className="text-lg font-semibold text-foreground">Export pour cabinet comptable</h4>
-        </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Button 
-            variant="outline" 
+      <div>
+        <h2 className="text-xl font-medium text-slate-700 mb-4">Export pour cabinet comptable</h2>
+        <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
+          <div 
             onClick={() => setOpenDialog('fec')} 
-            className="flex items-center justify-center gap-3 p-4 h-16 hover:bg-muted/50 transition-colors"
+            className="flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer transition-colors"
           >
-            <Download className="h-5 w-5 text-primary" />
-            <span className="font-medium">Format FEC</span>
-          </Button>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                <Download className="h-4 w-4 text-orange-600" />
+              </div>
+              <span className="font-medium text-gray-900">Format FEC</span>
+            </div>
+            <div className="text-gray-400">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
           
-          <Button 
-            variant="outline" 
+          <div 
             onClick={() => setOpenDialog('csv')} 
-            className="flex items-center justify-center gap-3 p-4 h-16 hover:bg-muted/50 transition-colors"
+            className="flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer transition-colors"
           >
-            <Download className="h-5 w-5 text-karrosserie-orange" />
-            <span className="font-medium">Format CSV</span>
-          </Button>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                <Download className="h-4 w-4 text-orange-600" />
+              </div>
+              <span className="font-medium text-gray-900">Format CSV</span>
+            </div>
+            <div className="text-gray-400">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
 
