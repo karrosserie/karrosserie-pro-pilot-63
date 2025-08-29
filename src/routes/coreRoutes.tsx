@@ -9,7 +9,6 @@ import Clients from "@/pages/Clients";
 import Vehicles from "@/pages/Vehicles";
 import Fleet from "@/pages/Fleet";
 import Settings from "@/pages/Settings";
-import Accounting from "@/pages/Accounting";
 import Cessions from "@/pages/Cessions";
 import Help from "@/pages/Help";
 import KarrosseriePlanningPage from "@/pages/KarrosseriePlanningPage";
@@ -82,16 +81,6 @@ export const coreRoutes = [
       <ProtectedRoute>
         <AppLayout>
           <Fleet />
-        </AppLayout>
-      </ProtectedRoute>
-    )
-  },
-  {
-    path: "/accounting",
-    element: (
-      <ProtectedRoute>
-        <AppLayout>
-          <Accounting />
         </AppLayout>
       </ProtectedRoute>
     )

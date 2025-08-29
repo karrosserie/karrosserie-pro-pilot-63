@@ -1,10 +1,12 @@
 
 import { ProtectedRoute } from "@/components/router/ProtectedRoute";
+import { Navigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import Receipts from "@/pages/payments/receipts/Receipts";
 import Expenses from "@/pages/payments/expenses/Expenses";
 import Accounts from "@/pages/payments/accounts/Accounts";
 import PaymentRelances from "@/pages/payments/relances/PaymentRelances";
+import Accounting from "@/pages/Accounting";
 
 export const paymentRoutes = [
   {
@@ -46,5 +48,20 @@ export const paymentRoutes = [
         </AppLayout>
       </ProtectedRoute>
     )
+  },
+  {
+    path: "/payments/accounting",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <Accounting />
+        </AppLayout>
+      </ProtectedRoute>
+    )
+  },
+  // Redirection pour maintenir la compatibilité avec l'ancienne URL
+  {
+    path: "/accounting",
+    element: <Navigate to="/payments/accounting" replace />
   }
 ];

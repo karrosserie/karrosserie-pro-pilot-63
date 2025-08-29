@@ -157,11 +157,11 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
         { label: 'Dépenses', path: '/payments/expenses' },
         { label: 'Gestion des comptes', path: '/payments/accounts' },
         { label: 'Relance de paiement', path: '/payments/relances' },
+        { label: 'Comptabilité', path: '/payments/accounting' },
       ]
     },
     { icon: <CreditCard className="app-icon" />, label: 'Cession de créance', path: '/cessions' },
     { icon: <Clock className="app-icon" />, label: 'Véhicules de courtoisie', path: '/fleet' },
-    { icon: <Receipt className="app-icon" />, label: 'Comptabilité', path: '/accounting' },
     { icon: <HelpCircle className="app-icon" />, label: 'Aide', path: '/help' },
     ...(isAdmin ? [{ icon: <Shield className="app-icon" />, label: 'Accès aux comptes', path: '/admin/accounts' }] : []),
     { icon: <Settings className="app-icon" />, label: 'Paramètres', path: '/settings' },
@@ -202,7 +202,6 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
       item.path === '/documents' ||
       item.path === '/payments' ||
       item.path === '/cessions' ||
-      item.path === '/accounting' ||
       item.path === '/settings' ||
       item.path === '/help'
     );
