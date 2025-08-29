@@ -17,8 +17,8 @@ const Accounts = () => {
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-6">
-        <div className="flex justify-center items-center h-64">
+      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+        <div className="flex justify-center items-center h-32 sm:h-64">
           <LoadingSpinner />
         </div>
       </div>
@@ -28,10 +28,10 @@ const Accounts = () => {
   if (error) {
     console.error('Accounts page error:', error);
     return (
-      <div className="p-6 space-y-6">
+      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
+          <AlertDescription className="text-sm">
             {error.message?.includes('not authenticated') 
               ? 'Vous devez être connecté pour accéder à vos comptes.'
               : 'Erreur lors du chargement des comptes. Vérifiez votre connexion et réessayez.'
@@ -55,7 +55,7 @@ const Accounts = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
       <AccountsHeader
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}

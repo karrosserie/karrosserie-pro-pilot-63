@@ -16,12 +16,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Pencil, Trash, CreditCard, Building, Wallet, Link, RefreshCw } from 'lucide-react';
+import { Pencil, Trash, CreditCard, Building, Wallet, Link, RefreshCw, MoreVertical } from 'lucide-react';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { useCompanyId } from '@/hooks/use-company-id';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Account {
   id: string;
@@ -173,9 +180,93 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
     }
   };
 
+  // Composant de carte mobile pour chaque compte
+  const AccountCard = ({ account }: { account: Account }) => (
+    <Card className="w-full mb-4 hover:shadow-md transition-shadow">
+      <CardHeader className="pb-2">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center space-x-2">
+            {getTypeIcon(account.type)}
+            <CardTitle className="text-base font-semibold">{account.name}</CardTitle>
+          </div>
+          <div className="flex items-center space-x-1">
+            <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(account.status)}`}>
+              {account.status}
+            </span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-white z-50">
+                {isAccountConnected(account) ? (
+                  <DropdownMenuItem disabled className="text-green-600">
+                    <Link className="h-4 w-4 mr-2" />
+                    Connecté
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem onClick={() => {
+                    setSelectedAccount(account);
+                    setShowBankConnectDialog(true);
+                  }}>
+                    <Link className="h-4 w-4 mr-2" />
+                    Connecter
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={() => onEdit(account)}>
+                  <Pencil className="h-4 w-4 mr-2" />
+                  Modifier
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => onDelete(account)}
+                  className="text-red-600"
+                >
+                  <Trash className="h-4 w-4 mr-2" />
+                  Supprimer
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-2">
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Banque</span>
+            <span className="font-medium">{account.bank}</span>
+          </div>
+          
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Solde</span>
+            <span className="font-bold text-lg">{formatAmount(account.balance)}</span>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">IBAN</span>
+              <span className="font-mono text-xs text-right break-all">{account.iban}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">BIC</span>
+              <span className="font-mono text-sm">{account.bic}</span>
+            </div>
+          </div>
+          
+          {isAccountConnected(account) && formatLastSync(account) && (
+            <div className="text-xs text-gray-500 flex items-center gap-1 pt-2 border-t">
+              <RefreshCw className="h-3 w-3" />
+              Dernière sync : {formatLastSync(account)}
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   if (sortedData.length === 0) {
     return (
-      <div className="card-container">
+      <div className="w-full">
         <EmptyState
           icon={Wallet}
           title="Aucun compte"
@@ -188,49 +279,49 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
   return (
     <>
       <Dialog open={showBankConnectDialog} onOpenChange={setShowBankConnectDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[95vw] max-w-md mx-auto">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold text-center space-y-2">
               <div className="text-4xl">🔒</div>
-              <div>Pointer vos paiements dans Karrosserie.pro</div>
+              <div className="text-base sm:text-lg">Pointer vos paiements dans Karrosserie.pro</div>
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div className="space-y-4 text-sm text-gray-700">
               <div className="flex items-start gap-3">
-                <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                <div className="min-w-[28px] w-7 h-7 sm:min-w-[32px] sm:w-8 sm:h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0">
                   1
                 </div>
-                <p>Bridge (ACPR – Autorité de contrôle Banque de France) assure la connexion sécurisée.</p>
+                <p className="text-xs sm:text-sm">Bridge (ACPR – Autorité de contrôle Banque de France) assure la connexion sécurisée.</p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                <div className="min-w-[28px] w-7 h-7 sm:min-w-[32px] sm:w-8 sm:h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0">
                   2
                 </div>
-                <p>Karrosserie.pro ne voit ni ne stocke vos codes d'accès.</p>
+                <p className="text-xs sm:text-sm">Karrosserie.pro ne voit ni ne stocke vos codes d'accès.</p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                <div className="min-w-[28px] w-7 h-7 sm:min-w-[32px] sm:w-8 sm:h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0">
                   3
                 </div>
-                <p>L'accès est strictement en lecture-seule : il sert uniquement à lire le paiement de vos clients pour le rapprochement bancaire.</p>
+                <p className="text-xs sm:text-sm">L'accès est strictement en lecture-seule : il sert uniquement à lire le paiement de vos clients pour le rapprochement bancaire.</p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                <div className="min-w-[28px] w-7 h-7 sm:min-w-[32px] sm:w-8 sm:h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0">
                   4
                 </div>
-                <p>Aucun débit possible : ni virement, ni prélèvement via cette connexion.</p>
+                <p className="text-xs sm:text-sm">Aucun débit possible : ni virement, ni prélèvement via cette connexion.</p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="min-w-[32px] w-8 h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                <div className="min-w-[28px] w-7 h-7 sm:min-w-[32px] sm:w-8 sm:h-8 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0">
                   5
                 </div>
-                <p>Vous contrôlez tout : autorisation révocable en 1 clic, traçabilité complète.</p>
+                <p className="text-xs sm:text-sm">Vous contrôlez tout : autorisation révocable en 1 clic, traçabilité complète.</p>
               </div>
             </div>
             <div className="pt-4 border-t">
               <Button 
-                className="w-full bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white mt-2"
+                className="w-full bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white mt-2 text-sm sm:text-base"
                 onClick={handleBankConnection}
               >
                 je valide en 15 secondes
@@ -239,56 +330,65 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
           </div>
         </DialogContent>
       </Dialog>
-    <div className="card-container">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <SortableTableHeader sortKey="name" sortConfig={sortConfig} onSort={handleSort}>
-              Nom du compte
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="bank" sortConfig={sortConfig} onSort={handleSort}>
-              Banque
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="iban" sortConfig={sortConfig} onSort={handleSort}>
-              IBAN
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="bic" sortConfig={sortConfig} onSort={handleSort}>
-              BIC
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="balance" sortConfig={sortConfig} onSort={handleSort}>
-              Solde
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
-              Statut
-            </SortableTableHeader>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
+
+      {/* Vue mobile - Cartes */}
+      <div className="block lg:hidden">
+        <div className="space-y-4">
           {sortedData.map((account) => (
-            <React.Fragment key={account.id}>
-              <TableRow className="hover:bg-gray-50 border-b-0">
-                <TableCell>
-                  <div className="flex items-center">
-                    <span>{account.name}</span>
-                  </div>
-                </TableCell>
-                <TableCell>{account.bank}</TableCell>
-                <TableCell className="font-mono text-sm">{account.iban}</TableCell>
-                <TableCell className="font-mono text-sm">{account.bic}</TableCell>
-                <TableCell>
-                  {formatAmount(account.balance)}
-                </TableCell>
-                <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(account.status)}`}>
-                    {account.status}
-                  </span>
-                </TableCell>
+            <AccountCard key={account.id} account={account} />
+          ))}
+        </div>
+      </div>
+
+      {/* Vue tablette/desktop - Tableau */}
+      <div className="hidden lg:block">
+        <div className="card-container overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <SortableTableHeader sortKey="name" sortConfig={sortConfig} onSort={handleSort}>
+                  Nom du compte
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="bank" sortConfig={sortConfig} onSort={handleSort}>
+                  Banque
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="iban" sortConfig={sortConfig} onSort={handleSort}>
+                  IBAN
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="bic" sortConfig={sortConfig} onSort={handleSort}>
+                  BIC
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="balance" sortConfig={sortConfig} onSort={handleSort}>
+                  Solde
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                  Statut
+                </SortableTableHeader>
+                <TableHead>Actions</TableHead>
               </TableRow>
-              <TableRow className="border-t-0">
-                <TableCell colSpan={6} className="py-3 border-t-0">
-                  <div className="px-4 space-y-3">
-                    {/* Zone des boutons d'action */}
-                    <div className="flex flex-wrap gap-2 justify-end">
+            </TableHeader>
+            <TableBody>
+              {sortedData.map((account) => (
+                <TableRow key={account.id} className="hover:bg-gray-50">
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
+                      {getTypeIcon(account.type)}
+                      <span className="font-medium">{account.name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>{account.bank}</TableCell>
+                  <TableCell className="font-mono text-sm">{account.iban}</TableCell>
+                  <TableCell className="font-mono text-sm">{account.bic}</TableCell>
+                  <TableCell className="font-semibold">
+                    {formatAmount(account.balance)}
+                  </TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(account.status)}`}>
+                      {account.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
                       {isAccountConnected(account) ? (
                         <Button 
                           variant="outline"
@@ -304,7 +404,6 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                           variant="outline"
                           size="sm"
                           onClick={() => {
-                            console.log('Bouton Connecter cliqué pour:', account);
                             setSelectedAccount(account);
                             setShowBankConnectDialog(true);
                           }}
@@ -318,8 +417,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                         size="sm" 
                         onClick={() => onEdit(account)}
                       >
-                        <Pencil className="h-4 w-4 mr-1" />
-                        Modifier
+                        <Pencil className="h-4 w-4" />
                       </Button>
                       <Button 
                         variant="outline"
@@ -327,26 +425,22 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                         className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
                         onClick={() => onDelete(account)}
                       >
-                        <Trash className="h-4 w-4 mr-1" />
-                        Supprimer
+                        <Trash className="h-4 w-4" />
                       </Button>
                     </div>
-                    
-                    {/* Zone d'information de synchronisation */}
                     {isAccountConnected(account) && formatLastSync(account) && (
-                      <div className="text-sm text-gray-600 text-right flex items-center justify-end gap-1">
-                        <RefreshCw className="h-4 w-4" />
-                        Dernière synchronisation : {formatLastSync(account)}
+                      <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                        <RefreshCw className="h-3 w-3" />
+                        Dernière sync : {formatLastSync(account)}
                       </div>
                     )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            </React.Fragment>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
     </>
   );
 };
