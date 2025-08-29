@@ -192,7 +192,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold text-center space-y-2">
               <div className="text-4xl">🔒</div>
-              <div>Vérification bancaire 100 % sécurisée</div>
+              <div>Pointer vos paiements dans Karrosserie.pro</div>
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
