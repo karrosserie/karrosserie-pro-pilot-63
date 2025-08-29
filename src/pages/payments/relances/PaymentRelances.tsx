@@ -25,6 +25,7 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
   const { formattedInvoices: realInvoices, loading } = useUnpaidInvoices();
   const [filter, setFilter] = useState<string>('all');
   const [drawerData, setDrawerData] = useState<any>(null);
+  const [viewingContent, setViewingContent] = useState<any>(null);
 
   // Force rebuild - données fictives pour la démonstration
   const mockInvoices = [
@@ -44,8 +45,40 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
       status: 'relance2',
       availableActions: ['whatsapp', 'sms', 'mail'],
       history: [
-        { action: 'Relance email', date: '20/12/2024', status: 'Envoyé' },
-        { action: 'SMS de rappel', date: '25/12/2024', status: 'Lu' }
+        { 
+          action: 'Relance email', 
+          type: 'email',
+          date: '20/12/2024', 
+          time: '14:30',
+          status: 'Envoyé',
+          content: {
+            subject: 'Rappel de paiement - Facture FAC-2024-001',
+            body: `Madame, Monsieur,
+
+Nous vous rappelons qu'une facture d'un montant de 3 450,00 € est arrivée à échéance le 15/11/2024.
+
+Détails de la facture :
+- Numéro : FAC-2024-001
+- Véhicule : Renault Master (AB-123-CD)
+- Montant : 3 450,00 €
+- Date d'échéance : 15/11/2024
+
+Nous vous serions reconnaissants de bien vouloir procéder au règlement dans les meilleurs délais.
+
+Cordialement,
+Garage Martin`
+          }
+        },
+        { 
+          action: 'SMS de rappel', 
+          type: 'sms',
+          date: '25/12/2024', 
+          time: '10:15',
+          status: 'Lu',
+          content: {
+            message: 'GARAGE MARTIN: Facture FAC-2024-001 de 3450€ impayée depuis le 15/11. Merci de régulariser. Contact: 01.23.45.67.89'
+          }
+        }
       ],
       clientPhone: '06 12 34 56 78',
       clientEmail: 'contact@dupont-transport.fr',
@@ -70,7 +103,28 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
       status: 'relance1',
       availableActions: ['whatsapp', 'sms', 'vms', 'mail'],
       history: [
-        { action: 'Email automatique', date: '15/01/2025', status: 'Envoyé' }
+        { 
+          action: 'Email automatique', 
+          type: 'email',
+          date: '15/01/2025', 
+          time: '09:00',
+          status: 'Envoyé',
+          content: {
+            subject: 'Facture en retard - FAC-2024-015',
+            body: `Bonjour,
+
+Nous constatons qu'une facture reste impayée à ce jour.
+
+Référence : FAC-2024-015
+Véhicule : Peugeot Partner (EF-456-GH)
+Montant : 1 250,00 €
+Échéance dépassée depuis : 12 jours
+
+Merci de procéder au règlement rapidement.
+
+Garage Martin`
+          }
+        }
       ],
       clientPhone: '06 98 76 54 32',
       clientEmail: 'leroy.entreprise@gmail.com',
@@ -95,11 +149,60 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
       status: 'contentieux',
       availableActions: ['recommande', 'judiciaire'],
       history: [
-        { action: 'Relance email', date: '05/11/2024', status: 'Envoyé' },
-        { action: 'SMS de rappel', date: '20/11/2024', status: 'Lu' },
-        { action: 'Appel téléphonique', date: '05/12/2024', status: 'Répondeur' },
-        { action: 'Mise en demeure', date: '20/12/2024', status: 'Reçu' },
-        { action: 'Dépôt dossier tribunal', date: '15/01/2025', status: 'En cours' }
+        { 
+          action: 'Relance email', 
+          type: 'email',
+          date: '05/11/2024', 
+          time: '16:45',
+          status: 'Envoyé',
+          content: {
+            subject: 'Première relance - Facture FAC-2024-032',
+            body: 'Madame, Monsieur,\n\nVotre facture d\'un montant de 5 680,00 € est échue depuis le 01/10/2024...'
+          }
+        },
+        { 
+          action: 'SMS de rappel', 
+          type: 'sms',
+          date: '20/11/2024', 
+          time: '11:30',
+          status: 'Lu',
+          content: {
+            message: 'URGENT: Facture FAC-2024-032 de 5680€ impayée depuis 50 jours. Contactez-nous: 01.23.45.67.89'
+          }
+        },
+        { 
+          action: 'Relance téléphonique', 
+          type: 'phone',
+          date: '05/12/2024', 
+          time: '14:20',
+          status: 'Répondeur',
+          content: {
+            note: 'Appel effectué à 14h20. Messagerie vocale laissée: "Bonjour, Garage Martin au sujet de votre facture impayée FAC-2024-032 de 5680€. Merci de nous rappeler au 01.23.45.67.89"',
+            duration: '1min 30s'
+          }
+        },
+        { 
+          action: 'Mise en demeure', 
+          type: 'registered',
+          date: '20/12/2024', 
+          time: '08:00',
+          status: 'Reçu',
+          content: {
+            subject: 'MISE EN DEMEURE - Facture FAC-2024-032',
+            body: 'Par la présente, nous vous mettons en demeure de procéder au règlement de la facture...'
+          }
+        },
+        { 
+          action: 'Dépôt dossier tribunal', 
+          type: 'legal',
+          date: '15/01/2025', 
+          time: '09:30',
+          status: 'En cours',
+          content: {
+            note: 'Dossier déposé au tribunal de commerce. Référence tribunal: TC-2025-00142',
+            amount: '5 680,00 € + frais de procédure'
+          }
+        }
       ],
       clientPhone: '04 78 12 34 56',
       clientEmail: 'contact@moreau-fils.fr',
@@ -271,6 +374,11 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
 
   const closeDrawer = () => {
     setDrawerData(null);
+    setViewingContent(null);
+  };
+
+  const viewContent = (content: any, type: string) => {
+    setViewingContent({ content, type });
   };
 
   const getStatusColor = (status: string) => {
@@ -562,22 +670,139 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
                   <Calendar className="h-5 w-5 mr-2" />
                   Historique des relances
                 </h4>
-                <div className="space-y-3">
-                  {drawerData.history.map((entry: any, index: number) => (
-                    <div key={index} className="flex items-center p-3 bg-muted rounded-lg">
-                      <div className="flex-1">
-                        <div className="font-medium">{entry.action}</div>
-                        <div className="text-sm text-muted-foreground">{entry.date}</div>
-                      </div>
-                      <Badge 
-                        variant={entry.status === 'Envoyé' ? 'default' : entry.status === 'Lu' ? 'secondary' : 'outline'}
-                        className="text-xs"
+                
+                {viewingContent ? (
+                  /* Content Viewer */
+                  <div className="bg-muted p-4 rounded-lg">
+                    <div className="flex justify-between items-center mb-4">
+                      <h5 className="font-semibold">Contenu de la {viewingContent.type === 'email' ? 'relance email' : viewingContent.type === 'sms' ? 'relance SMS' : 'relance téléphonique'}</h5>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setViewingContent(null)}
                       >
-                        {entry.status}
-                      </Badge>
+                        <X className="h-4 w-4" />
+                      </Button>
                     </div>
-                  ))}
-                </div>
+                    
+                    {viewingContent.type === 'email' && (
+                      <div className="space-y-3">
+                        <div>
+                          <span className="font-medium text-muted-foreground">Sujet:</span>
+                          <div className="mt-1 p-2 bg-background rounded border">
+                            {viewingContent.content.subject}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="font-medium text-muted-foreground">Message:</span>
+                          <div className="mt-1 p-3 bg-background rounded border whitespace-pre-line text-sm">
+                            {viewingContent.content.body}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {viewingContent.type === 'sms' && (
+                      <div>
+                        <span className="font-medium text-muted-foreground">Message SMS:</span>
+                        <div className="mt-1 p-3 bg-background rounded border text-sm">
+                          {viewingContent.content.message}
+                        </div>
+                        <div className="mt-2 text-xs text-muted-foreground">
+                          Longueur: {viewingContent.content.message.length} caractères
+                        </div>
+                      </div>
+                    )}
+                    
+                    {viewingContent.type === 'phone' && (
+                      <div className="space-y-3">
+                        <div>
+                          <span className="font-medium text-muted-foreground">Notes d'appel:</span>
+                          <div className="mt-1 p-3 bg-background rounded border text-sm">
+                            {viewingContent.content.note}
+                          </div>
+                        </div>
+                        {viewingContent.content.duration && (
+                          <div>
+                            <span className="font-medium text-muted-foreground">Durée:</span>
+                            <span className="ml-2">{viewingContent.content.duration}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {viewingContent.type === 'registered' && (
+                      <div className="space-y-3">
+                        <div>
+                          <span className="font-medium text-muted-foreground">Objet:</span>
+                          <div className="mt-1 p-2 bg-background rounded border font-medium">
+                            {viewingContent.content.subject}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="font-medium text-muted-foreground">Contenu:</span>
+                          <div className="mt-1 p-3 bg-background rounded border text-sm">
+                            {viewingContent.content.body}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {viewingContent.type === 'legal' && (
+                      <div className="space-y-3">
+                        <div>
+                          <span className="font-medium text-muted-foreground">Informations:</span>
+                          <div className="mt-1 p-3 bg-background rounded border text-sm">
+                            {viewingContent.content.note}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="font-medium text-muted-foreground">Montant réclamé:</span>
+                          <div className="mt-1 font-semibold text-red-600">
+                            {viewingContent.content.amount}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  /* History Timeline */
+                  <div className="space-y-3">
+                    {drawerData.history
+                      .sort((a: any, b: any) => new Date(a.date + ' ' + (a.time || '00:00')).getTime() - new Date(b.date + ' ' + (b.time || '00:00')).getTime())
+                      .map((entry: any, index: number) => (
+                      <div key={index} className="flex items-center p-3 bg-muted rounded-lg">
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <div className="font-medium">{entry.action}</div>
+                            <div className="flex items-center gap-2">
+                              <Badge 
+                                variant={entry.status === 'Envoyé' ? 'default' : entry.status === 'Lu' ? 'secondary' : entry.status === 'Reçu' ? 'secondary' : 'outline'}
+                                className="text-xs"
+                              >
+                                {entry.status}
+                              </Badge>
+                              {entry.content && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => viewContent(entry.content, entry.type)}
+                                  className="text-xs px-2 py-1 h-6"
+                                >
+                                  <Eye className="h-3 w-3 mr-1" />
+                                  Voir
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-sm text-muted-foreground mt-1">
+                            {entry.date} {entry.time && `à ${entry.time}`}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* General Information */}
