@@ -70,6 +70,18 @@ Garage Martin`
           }
         },
         { 
+          action: 'Relance téléphonique', 
+          type: 'phone',
+          date: '22/12/2024', 
+          time: '16:15',
+          status: 'Conversation',
+          content: {
+            note: 'Appel effectué à 16h15. Contact établi avec M. Dupont. Il confirme avoir reçu la facture et s\'engage à effectuer le paiement avant la fin de semaine. Promesse de paiement obtenue pour le 27/12/2024.',
+            duration: '3min 45s',
+            outcome: 'Promesse de paiement - 27/12/2024'
+          }
+        },
+        { 
           action: 'SMS de rappel', 
           type: 'sms',
           date: '25/12/2024', 
@@ -123,6 +135,18 @@ Montant : 1 250,00 €
 Merci de procéder au règlement rapidement.
 
 Garage Martin`
+          }
+        },
+        { 
+          action: 'Relance téléphonique', 
+          type: 'phone',
+          date: '18/01/2025', 
+          time: '11:30',
+          status: 'Répondeur',
+          content: {
+            note: 'Appel effectué à 11h30. Pas de réponse, message laissé sur répondeur : "Bonjour, Jean Martin du Garage Martin. Je vous appelle concernant votre facture FAC-2024-015 d\'un montant de 1250€ qui est en retard depuis 15 jours. Merci de me rappeler au 01.23.45.67.89 pour régulariser la situation."',
+            duration: '1min 15s',
+            outcome: 'Message laissé sur répondeur'
           }
         }
       ],
@@ -716,18 +740,28 @@ Garage Martin`
                     
                     {viewingContent.type === 'phone' && (
                       <div className="space-y-3">
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <div className="flex items-center mb-2">
+                            <Phone className="h-4 w-4 text-blue-600 mr-2" />
+                            <span className="font-medium text-blue-800">Résumé de l'appel téléphonique</span>
+                          </div>
+                          {viewingContent.content.duration && (
+                            <div className="text-sm text-blue-700 mb-2">
+                              <strong>Durée:</strong> {viewingContent.content.duration}
+                            </div>
+                          )}
+                          {viewingContent.content.outcome && (
+                            <div className="text-sm text-blue-700">
+                              <strong>Résultat:</strong> {viewingContent.content.outcome}
+                            </div>
+                          )}
+                        </div>
                         <div>
-                          <span className="font-medium text-muted-foreground">Notes d'appel:</span>
+                          <span className="font-medium text-muted-foreground">Notes détaillées:</span>
                           <div className="mt-1 p-3 bg-background rounded border text-sm">
                             {viewingContent.content.note}
                           </div>
                         </div>
-                        {viewingContent.content.duration && (
-                          <div>
-                            <span className="font-medium text-muted-foreground">Durée:</span>
-                            <span className="ml-2">{viewingContent.content.duration}</span>
-                          </div>
-                        )}
                       </div>
                     )}
                     
