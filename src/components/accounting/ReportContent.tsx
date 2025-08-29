@@ -90,7 +90,7 @@ const ReportContent = () => {
       <div className="card-container p-3 sm:p-4 md:p-6 bg-gradient-to-br from-background to-muted/20 border border-karrosserie-orange/20 shadow-lg">
         <div className="flex items-center gap-2 mb-3 sm:mb-4">
           <div className="w-2 h-6 bg-gradient-to-b from-karrosserie-orange to-primary rounded-full"></div>
-          <h3 className="text-base sm:text-lg font-semibold bg-gradient-to-r from-karrosserie-orange to-primary bg-clip-text text-transparent">Rapports financiers</h3>
+          <h3 className="text-base sm:text-lg font-semibold bg-gradient-to-r from-karrosserie-orange to-primary bg-clip-text text-transparent">Rapports sociaux</h3>
         </div>
         
         <div className="flex justify-center mb-4 sm:mb-6">
