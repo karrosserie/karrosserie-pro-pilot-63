@@ -892,35 +892,35 @@ Garage Martin`
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4 max-w-md mx-auto">
+              <div className="space-y-3 max-w-sm mx-auto">
                 {/* Factures impayées */}
-                <div className="bg-blue-500 text-white rounded-lg p-4 flex justify-between items-center">
-                  <span className="font-medium">Factures impayées</span>
-                  <span className="font-bold text-lg">45</span>
+                <div className="bg-blue-500 text-white rounded-lg p-3 flex justify-between items-center">
+                  <span className="font-medium text-sm">Factures impayées</span>
+                  <span className="font-bold">45</span>
                 </div>
                 
                 {/* Relances automatiques */}
-                <div className="bg-orange-500 text-white rounded-lg p-4 flex justify-between items-center ml-4 mr-4">
-                  <span className="font-medium">Relances automatiques</span>
-                  <span className="font-bold text-lg">38</span>
+                <div className="bg-orange-500 text-white rounded-lg p-3 flex justify-between items-center">
+                  <span className="font-medium text-sm">Relances automatiques</span>
+                  <span className="font-bold">38</span>
                 </div>
                 
                 {/* Mises en demeure */}
-                <div className="bg-red-500 text-white rounded-lg p-4 flex justify-between items-center ml-8 mr-8">
-                  <span className="font-medium">Mises en demeure</span>
-                  <span className="font-bold text-lg">15</span>
+                <div className="bg-red-500 text-white rounded-lg p-3 flex justify-between items-center">
+                  <span className="font-medium text-sm">Mises en demeure</span>
+                  <span className="font-bold">15</span>
                 </div>
                 
                 {/* Procédures judiciaires */}
-                <div className="bg-purple-500 text-white rounded-lg p-4 flex justify-between items-center ml-12 mr-12">
-                  <span className="font-medium">Procédures judiciaires</span>
-                  <span className="font-bold text-lg">8</span>
+                <div className="bg-purple-500 text-white rounded-lg p-3 flex justify-between items-center">
+                  <span className="font-medium text-sm">Procédures judiciaires</span>
+                  <span className="font-bold">8</span>
                 </div>
                 
                 {/* Montants récupérés */}
-                <div className="bg-green-500 text-white rounded-lg p-4 flex justify-between items-center ml-16 mr-16">
-                  <span className="font-medium">Montants récupérés</span>
-                  <span className="font-bold text-lg">78%</span>
+                <div className="bg-green-500 text-white rounded-lg p-3 flex justify-between items-center">
+                  <span className="font-medium text-sm">Montants récupérés</span>
+                  <span className="font-bold">78%</span>
                 </div>
               </div>
             </CardContent>
