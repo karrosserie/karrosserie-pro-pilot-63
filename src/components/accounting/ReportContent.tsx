@@ -87,7 +87,7 @@ const ReportContent = () => {
     }
   };
   return (
-    <div className="space-y-8 max-w-2xl mx-auto">
+    <div className="space-y-8 w-full">
       {/* Section Rapports sociaux */}
       <div>
         <h2 className="text-xl font-medium text-slate-700 mb-4">Rapports sociaux</h2>
