@@ -29,6 +29,14 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
   const [viewingContent, setViewingContent] = useState<any>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentView, setCurrentView] = useState<'relances' | 'campagnes'>('relances');
+  
+  // États pour les campagnes
+  const [campaignStatus, setCampaignStatus] = useState({
+    janvier2025: 'active',
+    decembre2024: 'completed'
+  });
+  const [selectedTemplate, setSelectedTemplate] = useState('sms-relance-auto');
+  const [viewingLog, setViewingLog] = useState<any>(null);
 
   // Force rebuild - données fictives pour la démonstration
   const mockInvoices = [
@@ -390,6 +398,41 @@ Garage Martin`
     }
   };
 
+  // Fonctions pour les campagnes
+  const handleCampaignAction = (campaign: string, action: string) => {
+    if (campaign === 'janvier2025') {
+      if (action === 'stop') {
+        setCampaignStatus(prev => ({ ...prev, janvier2025: 'stopped' }));
+      } else if (action === 'restart') {
+        setCampaignStatus(prev => ({ ...prev, janvier2025: 'active' }));
+      }
+    } else if (campaign === 'decembre2024') {
+      if (action === 'program') {
+        setCampaignStatus(prev => ({ ...prev, decembre2024: 'programmed' }));
+      }
+    }
+  };
+
+  const handleTemplateAction = (templateId: string, action: string) => {
+    if (action === 'select') {
+      setSelectedTemplate(templateId);
+    } else if (action === 'modify') {
+      // Simuler l'ouverture d'un éditeur de template
+      console.log(`Modification du template: ${templateId}`);
+    } else if (action === 'configure') {
+      // Simuler l'ouverture des paramètres
+      console.log(`Configuration du template: ${templateId}`);
+    }
+  };
+
+  const viewLogDetails = (log: any) => {
+    setViewingLog(log);
+  };
+
+  const closeLogViewer = () => {
+    setViewingLog(null);
+  };
+
   const getOverdueColor = (days: number) => {
     if (days > 90) return 'text-red-600 font-bold';
     if (days > 60) return 'text-orange-500 font-medium';
@@ -664,11 +707,19 @@ Garage Martin`
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                    En cours
+                  <Button 
+                    size="sm" 
+                    className={campaignStatus.janvier2025 === 'active' ? "bg-green-600 hover:bg-green-700" : "bg-orange-600 hover:bg-orange-700"}
+                    onClick={() => handleCampaignAction('janvier2025', campaignStatus.janvier2025 === 'active' ? 'stop' : 'restart')}
+                  >
+                    {campaignStatus.janvier2025 === 'active' ? 'En cours' : campaignStatus.janvier2025 === 'stopped' ? 'Arrêtée' : 'Reprogrammée'}
                   </Button>
-                  <Button variant="outline" size="sm">
-                    Arrêter
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleCampaignAction('janvier2025', campaignStatus.janvier2025 === 'active' ? 'stop' : 'restart')}
+                  >
+                    {campaignStatus.janvier2025 === 'active' ? 'Arrêter' : 'Relancer'}
                   </Button>
                 </div>
               </CardContent>
@@ -698,11 +749,19 @@ Garage Martin`
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="text-blue-600 border-blue-300">
-                    Terminée
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className={`text-blue-600 border-blue-300 ${campaignStatus.decembre2024 === 'programmed' ? 'bg-blue-50' : ''}`}
+                  >
+                    {campaignStatus.decembre2024 === 'programmed' ? 'Reprogrammée' : 'Terminée'}
                   </Button>
-                  <Button variant="destructive" size="sm">
-                    Programmer campagne
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    onClick={() => handleCampaignAction('decembre2024', 'program')}
+                  >
+                    {campaignStatus.decembre2024 === 'programmed' ? 'Programmer à nouveau' : 'Programmer campagne'}
                   </Button>
                 </div>
               </CardContent>
@@ -719,7 +778,7 @@ Garage Martin`
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="border-2 border-green-200 bg-green-50">
+                <Card className={`border-2 ${selectedTemplate === 'sms-relance-auto' ? 'border-green-500 bg-green-50' : 'border-green-200 bg-green-50'}`}>
                   <CardContent className="p-4">
                     <div className="text-sm font-medium text-green-800 mb-2">SMS - RELANCE</div>
                     <div className="text-xs text-green-700 mb-3">
@@ -728,13 +787,18 @@ Garage Martin`
                     <div className="text-xs text-muted-foreground mb-3">
                       Template automatique - Utilise le montant XREPLACE et message générique.
                     </div>
-                    <Button size="sm" variant="outline" className="w-full text-green-700 border-green-300">
-                      Sélectionner template
+                    <Button 
+                      size="sm" 
+                      variant={selectedTemplate === 'sms-relance-auto' ? "default" : "outline"} 
+                      className={selectedTemplate === 'sms-relance-auto' ? "w-full bg-green-600 text-white" : "w-full text-green-700 border-green-300"}
+                      onClick={() => handleTemplateAction('sms-relance-auto', 'select')}
+                    >
+                      {selectedTemplate === 'sms-relance-auto' ? '✓ Sélectionné' : 'Sélectionner template'}
                     </Button>
                   </CardContent>
                 </Card>
 
-                <Card className="border border-border">
+                <Card className={`border ${selectedTemplate === 'sms-simple' ? 'border-blue-500 bg-blue-50' : 'border-border'}`}>
                   <CardContent className="p-4">
                     <div className="text-sm font-medium mb-2">SMS - RELANCE</div>
                     <div className="text-xs text-muted-foreground mb-3">
@@ -743,13 +807,18 @@ Garage Martin`
                     <div className="text-xs text-muted-foreground mb-3">
                       "Bonjour, nous vous rappelons..."
                     </div>
-                    <Button size="sm" variant="outline" className="w-full">
-                      Modifier template
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => handleTemplateAction('sms-simple', selectedTemplate === 'sms-simple' ? 'modify' : 'select')}
+                    >
+                      {selectedTemplate === 'sms-simple' ? '✓ Modifier template' : 'Sélectionner template'}
                     </Button>
                   </CardContent>
                 </Card>
 
-                <Card className="border border-border">
+                <Card className={`border ${selectedTemplate === 'email-relance' ? 'border-blue-500 bg-blue-50' : 'border-border'}`}>
                   <CardContent className="p-4">
                     <div className="text-sm font-medium mb-2">EMAIL - RELANCE</div>
                     <div className="text-xs text-muted-foreground mb-3">
@@ -758,13 +827,18 @@ Garage Martin`
                     <div className="text-xs text-muted-foreground mb-3">
                       Template formel pour étapes de procédure
                     </div>
-                    <Button size="sm" variant="outline" className="w-full">
-                      Modifier template
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => handleTemplateAction('email-relance', selectedTemplate === 'email-relance' ? 'modify' : 'select')}
+                    >
+                      {selectedTemplate === 'email-relance' ? '✓ Modifier template' : 'Sélectionner template'}
                     </Button>
                   </CardContent>
                 </Card>
 
-                <Card className="border border-border">
+                <Card className={`border ${selectedTemplate === 'lier-saisie' ? 'border-blue-500 bg-blue-50' : 'border-border'}`}>
                   <CardContent className="p-4">
                     <div className="text-sm font-medium mb-2">LIER SAISIE</div>
                     <div className="text-xs text-muted-foreground mb-3">
@@ -773,8 +847,13 @@ Garage Martin`
                     <div className="text-xs text-muted-foreground mb-3">
                       Template juridique automatique
                     </div>
-                    <Button size="sm" variant="outline" className="w-full">
-                      Paramétrer
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => handleTemplateAction('lier-saisie', selectedTemplate === 'lier-saisie' ? 'configure' : 'select')}
+                    >
+                      {selectedTemplate === 'lier-saisie' ? '✓ Paramétrer' : 'Sélectionner template'}
                     </Button>
                   </CardContent>
                 </Card>
@@ -793,16 +872,16 @@ Garage Martin`
             <CardContent>
               <div className="space-y-3">
                 {[
-                  { time: "09/01/2025 17:02", client: "SAS Moreau", action: "Mise en demeure", status: "Envoyé", type: "success" },
-                  { time: "09/01/2025 16:58", client: "EURL Rousseau", action: "Email amiable", status: "Erreur", type: "error" },
-                  { time: "09/01/2025 16:45", client: "M. Pierre Dubois", action: "SMS message", status: "Lu", type: "info" },
-                  { time: "09/01/2025 16:12", client: "SAS Moreau", action: "Email amiable", status: "Lu", type: "info" },
-                  { time: "09/01/2025 15:38", client: "SARL Petit Électricité", action: "SMS message", status: "Réception interrompue", type: "warning" },
-                  { time: "09/01/2025 15:12", client: "SAS Moreau", action: "SMS message", status: "Envoyé", type: "success" },
-                  { time: "09/01/2025 14:45", client: "SARL Dupont", action: "SMS message", status: "Envoyé", type: "success" },
-                  { time: "09/01/2025 14:23", client: "Entreprise Leroy", action: "LTR message", status: "Envoyé", type: "success" },
-                  { time: "09/01/2025 13:56", client: "SARL Petit Électricité", action: "SMS message", status: "Envoyé", type: "success" },
-                  { time: "09/01/2025 13:12", client: "SARL Dupont", action: "LTR message", status: "Envoyé", type: "success" }
+                  { time: "09/01/2025 17:02", client: "SAS Moreau", action: "Mise en demeure", status: "Envoyé", type: "success", details: "Mise en demeure envoyée par courrier recommandé. Accusé de réception en attente." },
+                  { time: "09/01/2025 16:58", client: "EURL Rousseau", action: "Email amiable", status: "Erreur", type: "error", details: "Adresse email invalide. Tentative d'envoi échouée. Vérifier les coordonnées client." },
+                  { time: "09/01/2025 16:45", client: "M. Pierre Dubois", action: "SMS message", status: "Lu", type: "info", details: "SMS de relance lu à 16h52. Taux de lecture: 100%. Aucune réponse reçue." },
+                  { time: "09/01/2025 16:12", client: "SAS Moreau", action: "Email amiable", status: "Lu", type: "info", details: "Email ouvert à 16h18. Lien de paiement cliqué mais transaction non finalisée." },
+                  { time: "09/01/2025 15:38", client: "SARL Petit Électricité", action: "SMS message", status: "Réception interrompue", type: "warning", details: "SMS partiellement délivré. Opérateur mobile a signalé une interruption de service." },
+                  { time: "09/01/2025 15:12", client: "SAS Moreau", action: "SMS message", status: "Envoyé", type: "success", details: "SMS de première relance envoyé avec succès. Coût: 0,08€" },
+                  { time: "09/01/2025 14:45", client: "SARL Dupont", action: "SMS message", status: "Envoyé", type: "success", details: "SMS automatique de rappel d'échéance. Facture FAC-2024-001 - 3450€" },
+                  { time: "09/01/2025 14:23", client: "Entreprise Leroy", action: "LTR message", status: "Envoyé", type: "success", details: "Lettre recommandée avec AR expédiée. Suivi: RR123456789FR" },
+                  { time: "09/01/2025 13:56", client: "SARL Petit Électricité", action: "SMS message", status: "Envoyé", type: "success", details: "SMS de relance 2. Message personnalisé avec historique des impayés." },
+                  { time: "09/01/2025 13:12", client: "SARL Dupont", action: "LTR message", status: "Envoyé", type: "success", details: "Courrier simple de première relance. Coût d'affranchissement: 1,16€" }
                 ].map((log, index) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg text-sm">
                     <div className="flex items-center gap-4">
@@ -821,7 +900,12 @@ Garage Martin`
                       >
                         {log.status}
                       </Badge>
-                      <Button variant="ghost" size="sm" className="h-6 px-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-6 px-2"
+                        onClick={() => viewLogDetails(log)}
+                      >
                         <Eye className="h-3 w-3" />
                       </Button>
                     </div>
@@ -830,6 +914,76 @@ Garage Martin`
               </div>
             </CardContent>
           </Card>
+        </>
+      )}
+
+      {/* Modal pour les détails du journal */}
+      {viewingLog && (
+        <>
+          {/* Overlay */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+            onClick={closeLogViewer}
+          />
+          
+          {/* Modal */}
+          <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-background border border-border rounded-lg shadow-xl z-50 w-[500px] max-w-[90vw]">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold flex items-center">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  Détails de l'activité
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={closeLogViewer}
+                  className="h-8 w-8"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Content */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium text-muted-foreground">Heure:</span>
+                    <div className="font-mono">{viewingLog.time}</div>
+                  </div>
+                  <div>
+                    <span className="font-medium text-muted-foreground">Client:</span>
+                    <div className="font-semibold">{viewingLog.client}</div>
+                  </div>
+                  <div>
+                    <span className="font-medium text-muted-foreground">Action:</span>
+                    <div>{viewingLog.action}</div>
+                  </div>
+                  <div>
+                    <span className="font-medium text-muted-foreground">Statut:</span>
+                    <Badge 
+                      variant={
+                        viewingLog.type === 'success' ? 'default' : 
+                        viewingLog.type === 'error' ? 'destructive' : 
+                        viewingLog.type === 'warning' ? 'secondary' : 'outline'
+                      }
+                      className="text-xs"
+                    >
+                      {viewingLog.status}
+                    </Badge>
+                  </div>
+                </div>
+                
+                <div>
+                  <span className="font-medium text-muted-foreground">Détails:</span>
+                  <div className="mt-1 p-3 bg-muted rounded border text-sm">
+                    {viewingLog.details}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </>
       )}
 
