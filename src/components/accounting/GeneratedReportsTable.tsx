@@ -90,17 +90,18 @@ export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, on
                 return (
                   <TableRow 
                     key={report.id}
-                    className={`hover:bg-gradient-to-r hover:from-karrosserie-orange/5 hover:to-primary/5 transition-all duration-300 ${
+                    onClick={() => handleDownload(report.id)}
+                    className={`cursor-pointer hover:bg-gradient-to-r hover:from-karrosserie-orange/10 hover:to-primary/10 hover:shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 border-l-2 border-l-transparent hover:border-l-karrosserie-orange ${
                       isNew ? 'animate-pulse bg-gradient-to-r from-karrosserie-orange/10 to-primary/10 border-l-4 border-l-karrosserie-orange shadow-md' : ''
                     }`}
                   >
-                    <TableCell className={`font-medium text-xs sm:text-sm ${isNew ? 'text-karrosserie-orange font-semibold' : ''}`}>
+                    <TableCell className={`font-medium text-xs sm:text-sm transition-colors duration-200 hover:text-karrosserie-orange ${isNew ? 'text-karrosserie-orange font-semibold' : ''}`}>
                       <div className="max-w-[100px] sm:max-w-none truncate flex items-center gap-2">
                         {report.name}
                         {isNew && <Badge variant="secondary" className="text-xs bg-gradient-to-r from-karrosserie-orange/20 to-primary/20 text-karrosserie-orange border border-karrosserie-orange/30">Nouveau</Badge>}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="transition-colors duration-200 hover:text-primary">
                       <div className="text-xs sm:text-sm">
                         <div className="sm:hidden">
                           {format(report.fromDate, 'dd/MM/yy', { locale: fr })} - {format(report.toDate, 'dd/MM/yy', { locale: fr })}
@@ -110,8 +111,8 @@ export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, on
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="hidden sm:table-cell">
-                      <div className="text-xs sm:text-sm text-muted-foreground">
+                    <TableCell className="hidden sm:table-cell transition-colors duration-200 hover:text-primary">
+                      <div className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors duration-200">
                         {format(report.generatedAt, 'dd/MM/yyyy à HH:mm', { locale: fr })}
                       </div>
                     </TableCell>
@@ -120,8 +121,11 @@ export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, on
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          onClick={() => handleDownload(report.id)}
-                          className="h-8 w-8 p-0 hover:bg-karrosserie-orange/10 hover:text-karrosserie-orange transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownload(report.id);
+                          }}
+                          className="h-8 w-8 p-0 hover:bg-karrosserie-orange/10 hover:text-karrosserie-orange hover:scale-110 transition-all duration-200"
                           title="Télécharger"
                         >
                           <Download className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -129,8 +133,11 @@ export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, on
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          onClick={() => onSendEmail(report.id)}
-                          className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSendEmail(report.id);
+                          }}
+                          className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary hover:scale-110 transition-all duration-200"
                           title="Envoyer par e-mail"
                         >
                           <Mail className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -138,8 +145,11 @@ export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, on
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          onClick={() => onDeleteReport(report.id)}
-                          className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteReport(report.id);
+                          }}
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 hover:scale-110 transition-all duration-200"
                           title="Supprimer"
                         >
                           <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
