@@ -686,7 +686,7 @@ Garage Martin`
             <Card className="border-l-4 border-l-blue-500">
               <CardHeader className="bg-blue-50">
                 <CardTitle className="text-lg font-bold text-blue-800">
-                  Campagne décembre 2024
+                  Relance décembre 2024
                 </CardTitle>
                 <p className="text-sm text-blue-700">Campagne terminée le 30 décembre 2024</p>
               </CardHeader>
