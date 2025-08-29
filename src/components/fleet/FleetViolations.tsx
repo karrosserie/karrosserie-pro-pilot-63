@@ -1,17 +1,23 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Car, Plus, FileText, Euro, Calendar, MapPin, Trash2, Edit, Eye, File } from 'lucide-react';
+import { Car, Plus, FileText, Euro, Calendar, MapPin, Trash2, Edit, Eye, File, UserCheck } from 'lucide-react';
 import { useFleetViolations } from '@/hooks/use-fleet-violations';
 import { FleetViolationForm } from './FleetViolationForm';
+import { DenunciationDialog } from './DenunciationDialog';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { fleetViolationsService } from '@/services/supabase/fleet-violations';
+import { useToast } from '@/hooks/use-toast';
 
 const FleetViolations: React.FC = () => {
   const { violations, isLoading, deleteViolation } = useFleetViolations();
   const [showForm, setShowForm] = useState(false);
   const [selectedViolation, setSelectedViolation] = useState(null);
+  const [denunciationData, setDenunciationData] = useState(null);
+  const [showDenunciation, setShowDenunciation] = useState(false);
+  const { toast } = useToast();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -42,6 +48,30 @@ const FleetViolations: React.FC = () => {
       return <File className="h-4 w-4" />;
     }
     return <Eye className="h-4 w-4" />;
+  };
+
+  const handleDenounce = async (violationId: string) => {
+    try {
+      const conductorData = await fleetViolationsService.findConductorForViolation(violationId);
+      
+      if (conductorData && conductorData.conductor) {
+        setDenunciationData(conductorData);
+        setShowDenunciation(true);
+      } else {
+        toast({
+          title: "Conducteur non trouvé",
+          description: "Impossible d'identifier le conducteur pour cette infraction. Vérifiez que le véhicule était bien prêté à cette date/heure.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error finding conductor:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de rechercher le conducteur pour cette infraction.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleDelete = async (violationId: string) => {
@@ -116,6 +146,15 @@ const FleetViolations: React.FC = () => {
                       {getDocumentIcon(violation.document_url)}
                     </Button>
                   )}
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleDenounce(violation.id)}
+                    title="Dénoncer le conducteur"
+                    className="text-orange-600 hover:text-orange-700"
+                  >
+                    <UserCheck className="h-4 w-4" />
+                  </Button>
                   <Button variant="ghost" size="sm" onClick={() => handleEdit(violation)}>
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -186,6 +225,12 @@ const FleetViolations: React.FC = () => {
           if (!open) setSelectedViolation(null);
         }}
         violation={selectedViolation}
+      />
+
+      <DenunciationDialog
+        open={showDenunciation}
+        onOpenChange={setShowDenunciation}
+        violationData={denunciationData}
       />
     </div>
   );
