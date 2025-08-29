@@ -14,7 +14,7 @@ interface EmailFormFieldsProps {
   isLoading: boolean;
   invoiceReference?: string;
   documentType?: 'invoice' | 'quote' | 'credit' | 'repair_order' | 'report';
-  reportType?: 'monthly' | 'quarterly' | 'yearly' | 'fec' | 'csv' | 'excel';
+  reportType?: 'monthly' | 'quarterly' | 'yearly' | 'fec' | 'csv' | 'excel' | 'social';
   reportFromDate?: Date;
   reportToDate?: Date;
 }
@@ -72,7 +72,11 @@ export const EmailFormFields = ({ data, onChange, isLoading, invoiceReference, d
             {(() => {
               if (documentType === 'report' && reportFromDate && reportToDate) {
                 // Utiliser la même logique de nommage que dans useReportEmail
-                if (reportType === 'monthly' || reportType === 'quarterly' || reportType === 'yearly') {
+                if (reportType === 'social') {
+                  const fromDateStr = format(reportFromDate, 'dd/MM/yyyy', { locale: fr });
+                  const toDateStr = format(reportToDate, 'dd/MM/yyyy', { locale: fr });
+                  return `bilan-social-${fromDateStr.replace(/\//g, '-')}-${toDateStr.replace(/\//g, '-')}.pdf`;
+                } else if (reportType === 'monthly' || reportType === 'quarterly' || reportType === 'yearly') {
                   const fromDateStr = format(reportFromDate, 'dd/MM/yyyy', { locale: fr });
                   const toDateStr = format(reportToDate, 'dd/MM/yyyy', { locale: fr });
                   const fileName = `${invoiceReference?.toLowerCase().replace(/\s+/g, '-')}-${fromDateStr.replace(/\//g, '-')}-${toDateStr.replace(/\//g, '-')}.pdf`;

@@ -11,7 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 export interface GeneratedReport {
   id: string;
   name: string;
-  type: 'monthly' | 'quarterly' | 'yearly' | 'fec' | 'csv' | 'excel';
+  type: 'monthly' | 'quarterly' | 'yearly' | 'fec' | 'csv' | 'excel' | 'social';
   fromDate: Date;
   toDate: Date;
   generatedAt: Date;
@@ -180,6 +180,197 @@ export const useGeneratedReports = () => {
     doc.save(`${reportName.toLowerCase().replace(/\s+/g, '-')}-${fromDateStr.replace(/\//g, '-')}-${toDateStr.replace(/\//g, '-')}.pdf`);
   };
 
+  const generateSocialReport = async (reportName: string, fromDate: Date, toDate: Date) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: userCompany } = await supabase
+        .from('user_companies')
+        .select('company_id')
+        .eq('user_id', user.id)
+        .eq('active', true)
+        .single();
+
+      if (!userCompany?.company_id) return;
+
+      const companyId = userCompany.company_id;
+
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.width;
+    
+      // Header
+      doc.setFontSize(20);
+      doc.text('BILAN SOCIAL', pageWidth / 2, 20, { align: 'center' });
+      
+      if (companyName) {
+        doc.setFontSize(16);
+        doc.text(companyName.toUpperCase(), pageWidth / 2, 35, { align: 'center' });
+      }
+      
+      doc.setFontSize(12);
+      const fromDateStr = format(fromDate, 'dd/MM/yyyy', { locale: fr });
+      const toDateStr = format(toDate, 'dd/MM/yyyy', { locale: fr });
+      doc.text(`Période: ${fromDateStr} - ${toDateStr}`, pageWidth / 2, 50, { align: 'center' });
+      
+      let yPosition = 70;
+      const lineHeight = 8;
+      
+      // Récupération des données réelles
+      const { data: employees } = await supabase
+        .from('employees')
+        .select(`
+          *,
+          employee_timesheets(*)
+        `)
+        .eq('company_id', companyId);
+      
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('*');
+      
+      const totalEmployees = employees?.length || 0;
+      
+      // 1. EMPLOI
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('1. EMPLOI', 20, yPosition);
+      yPosition += lineHeight * 1.5;
+      
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'normal');
+      doc.text(`• Effectif total : ${totalEmployees} salariés`, 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Répartition H/F : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Entrées dans l\'année : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Sorties dans l\'année : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Types de contrats : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Temps de travail : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight * 2;
+      
+      // 2. RÉMUNÉRATIONS
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('2. RÉMUNÉRATIONS', 20, yPosition);
+      yPosition += lineHeight * 1.5;
+      
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'normal');
+      doc.text('• Masse salariale brute annuelle : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Salaire moyen brut mensuel : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Écart salarial H/F : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Primes et avantages : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight * 2;
+      
+      // 3. SANTÉ & SÉCURITÉ
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('3. SANTÉ & SÉCURITÉ', 20, yPosition);
+      yPosition += lineHeight * 1.5;
+      
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'normal');
+      doc.text('• Accidents du travail : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Maladies professionnelles : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Jours d\'arrêt maladie cumulés : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Taux d\'absentéisme : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight * 2;
+      
+      // Vérifier si on a besoin d'une nouvelle page
+      if (yPosition > 250) {
+        doc.addPage();
+        yPosition = 30;
+      }
+      
+      // 4. FORMATION
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('4. FORMATION', 20, yPosition);
+      yPosition += lineHeight * 1.5;
+      
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'normal');
+      doc.text('• Budget formation : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Salariés formés : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Heures de formation : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Thèmes : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight * 2;
+      
+      // 5. CONDITIONS DE TRAVAIL
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('5. CONDITIONS DE TRAVAIL', 20, yPosition);
+      yPosition += lineHeight * 1.5;
+      
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'normal');
+      doc.text('• Postes aménagés : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Télétravail : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Équipements de protection : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight * 2;
+      
+      // 6. RELATIONS SOCIALES
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('6. RELATIONS SOCIALES', 20, yPosition);
+      yPosition += lineHeight * 1.5;
+      
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'normal');
+      doc.text('• CSE : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Réunions CSE tenues : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Accords collectifs signés : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight * 2;
+      
+      // 7. VIE DE L'ENTREPRISE
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('7. VIE DE L\'ENTREPRISE', 20, yPosition);
+      yPosition += lineHeight * 1.5;
+      
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'normal');
+      doc.text('• Événements : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Actions RSE : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight;
+      doc.text('• Turnover : Données en cours de collecte', 25, yPosition);
+      yPosition += lineHeight * 3;
+      
+      // Footer
+      doc.setFontSize(10);
+      doc.text(`Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}`, 20, yPosition);
+      
+      // Télécharger le PDF
+      doc.save(`bilan-social-${fromDateStr.replace(/\//g, '-')}-${toDateStr.replace(/\//g, '-')}.pdf`);
+      
+    } catch (error) {
+      console.error('Erreur lors de la génération du bilan social:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer le bilan social. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const generateCSVExport = (fromDate: Date, toDate: Date, filteredTransactions: any[]) => {
     const headers = ['Date', 'Description', 'Type', 'Méthode', 'Montant', 'Client', 'Statut'];
     const csvContent = [
@@ -247,6 +438,7 @@ export const useGeneratedReports = () => {
       'Bilan mensuel': 'monthly',
       'Bilan trimestriel': 'quarterly',
       'Bilan annuel': 'yearly',
+      'Bilan sociale': 'social',
       'Export FEC': 'fec',
       'Export CSV': 'csv',
       'Export Excel': 'excel'
@@ -301,7 +493,9 @@ export const useGeneratedReports = () => {
     // Génération immédiate selon le type
     setTimeout(async () => {
       try {
-        if (type.includes('Bilan')) {
+        if (type === 'Bilan sociale') {
+          await generateSocialReport(type, fromDate, toDate);
+        } else if (type.includes('Bilan')) {
           generatePDFReport(type, fromDate, toDate, filteredTransactions);
         } else if (type === 'Export CSV') {
           generateCSVExport(fromDate, toDate, filteredTransactions);
@@ -375,7 +569,9 @@ export const useGeneratedReports = () => {
 
     const filteredTransactions = filterTransactionsByDateRange(report.fromDate, report.toDate);
     
-    if (report.type === 'monthly' || report.type === 'quarterly' || report.type === 'yearly') {
+    if (report.type === 'social') {
+      generateSocialReport(report.name, report.fromDate, report.toDate);
+    } else if (report.type === 'monthly' || report.type === 'quarterly' || report.type === 'yearly') {
       generatePDFReport(report.name, report.fromDate, report.toDate, filteredTransactions);
     } else if (report.type === 'csv') {
       generateCSVExport(report.fromDate, report.toDate, filteredTransactions);

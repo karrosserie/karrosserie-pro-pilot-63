@@ -6,7 +6,7 @@ import { GeneratedReportsTable } from './GeneratedReportsTable';
 import { EmailReportDialog } from './EmailReportDialog';
 import { useToast } from '@/hooks/use-toast';
 import { useGeneratedReports, GeneratedReport } from '@/hooks/use-generated-reports';
-type DialogType = 'monthly' | 'quarterly' | 'yearly' | 'fec' | 'csv' | 'excel' | null;
+type DialogType = 'monthly' | 'quarterly' | 'yearly' | 'fec' | 'csv' | 'excel' | 'social' | null;
 const ReportContent = () => {
   const [openDialog, setOpenDialog] = useState<DialogType>(null);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
@@ -60,6 +60,8 @@ const ReportContent = () => {
         return 'Export au format CSV';
       case 'excel':
         return 'Export au format Excel';
+      case 'social':
+        return 'Générer le bilan sociale';
       default:
         return '';
     }
@@ -78,6 +80,8 @@ const ReportContent = () => {
         return 'Export CSV';
       case 'excel':
         return 'Export Excel';
+      case 'social':
+        return 'Bilan sociale';
       default:
         return '';
     }

@@ -34,6 +34,7 @@ export const useReportEmail = (report: GeneratedReport | null) => {
       'monthly': 'le bilan mensuel',
       'quarterly': 'le bilan trimestriel', 
       'yearly': 'le bilan annuel',
+      'social': 'le bilan social',
       'fec': 'l\'export au format FEC',
       'csv': 'l\'export au format CSV'
     };
@@ -81,7 +82,58 @@ AUTO PAINT`;
       let fileExtension = '';
       let fileName = '';
       
-      if (report.type === 'monthly' || report.type === 'quarterly' || report.type === 'yearly') {
+      if (report.type === 'social') {
+        // Pour le bilan social - génération du PDF
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.width;
+        
+        // Header
+        doc.setFontSize(20);
+        doc.text('BILAN SOCIAL', pageWidth / 2, 20, { align: 'center' });
+        
+        doc.setFontSize(12);
+        const fromDateStr = format(report.fromDate, 'dd/MM/yyyy', { locale: fr });
+        const toDateStr = format(report.toDate, 'dd/MM/yyyy', { locale: fr });
+        doc.text(`Période: du ${fromDateStr} au ${toDateStr}`, pageWidth / 2, 35, { align: 'center' });
+        
+        let yPosition = 60;
+        const lineHeight = 8;
+        
+        // Contenu du bilan social
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text('1. EMPLOI', 20, yPosition);
+        yPosition += lineHeight * 1.5;
+        
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'normal');
+        doc.text('• Effectif total : Données en cours de collecte', 25, yPosition);
+        yPosition += lineHeight;
+        doc.text('• Répartition H/F : Données en cours de collecte', 25, yPosition);
+        yPosition += lineHeight * 2;
+        
+        // Ajouter d'autres sections...
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text('2. RÉMUNÉRATIONS', 20, yPosition);
+        yPosition += lineHeight * 1.5;
+        
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'normal');
+        doc.text('• Masse salariale : Données en cours de collecte', 25, yPosition);
+        yPosition += lineHeight * 2;
+        
+        // Footer
+        doc.setFontSize(10);
+        doc.text(`Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}`, 20, yPosition + 20);
+        
+        // Convertir en base64
+        const pdfOutput = doc.output('datauristring');
+        fileBase64 = pdfOutput.split(',')[1];
+        fileExtension = 'pdf';
+        fileName = `bilan-social-${fromDateStr.replace(/\//g, '-')}-${toDateStr.replace(/\//g, '-')}.pdf`;
+        
+      } else if (report.type === 'monthly' || report.type === 'quarterly' || report.type === 'yearly') {
         // Pour les rapports PDF
         const doc = new jsPDF();
         const pageWidth = doc.internal.pageSize.width;
