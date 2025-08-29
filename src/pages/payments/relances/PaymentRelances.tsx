@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { useUnpaidInvoices } from '@/hooks/use-unpaid-invoices';
 import { 
   Scale, 
@@ -29,6 +31,7 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
   const [viewingContent, setViewingContent] = useState<any>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentView, setCurrentView] = useState<'relances' | 'campagnes'>('relances');
+  const [isAutoMode, setIsAutoMode] = useState(true); // true = auto, false = semi auto
   
   // États pour les campagnes
   const [campaignStatus, setCampaignStatus] = useState({
@@ -551,15 +554,34 @@ Garage Martin`
     <div className="min-h-screen bg-background p-4 sm:p-6">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center mb-2">
-          <Scale className="h-8 w-8 text-primary mr-3" />
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-            Module Juridique - Recouvrement
-          </h1>
+        <div className="flex justify-between items-start mb-2">
+          <div className="flex items-center">
+            <Scale className="h-8 w-8 text-primary mr-3" />
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+                Module Juridique - Recouvrement
+              </h1>
+              <p className="text-muted-foreground text-sm sm:text-base mt-1">
+                Gérez vos impayés et procédures judiciaires en toute simplicité
+              </p>
+            </div>
+          </div>
+          
+          {/* Auto/Semi Auto Toggle */}
+          <div className="flex items-center space-x-2">
+            <Label htmlFor="auto-mode" className="text-sm font-medium">
+              Semi Auto
+            </Label>
+            <Switch
+              id="auto-mode"
+              checked={isAutoMode}
+              onCheckedChange={setIsAutoMode}
+            />
+            <Label htmlFor="auto-mode" className="text-sm font-medium">
+              Auto
+            </Label>
+          </div>
         </div>
-        <p className="text-muted-foreground text-sm sm:text-base">
-          Gérez vos impayés et procédures judiciaires en toute simplicité
-        </p>
         
         {/* View Toggle Buttons */}
         <div className="flex gap-2 mt-4">
