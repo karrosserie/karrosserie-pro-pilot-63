@@ -439,39 +439,44 @@ Garage Martin`
   };
 
   const viewCampaignDetails = (campaign: string) => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+    const previousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+      .toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+
     const campaignData = {
       janvier2025: {
         id: 'janvier2025',
-        name: 'Campagne janvier 2025',
-        description: 'Dernière relance automatique envoyée le 15 janvier 2025',
+        name: `Relance ${currentMonth}`, // Mois en cours
+        description: `Relances en cours - Dernière automatique le ${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`,
         status: campaignStatus.janvier2025,
-        stats: { total: 8, envoyes: 4, ouverts: 2 },
+        stats: { total: 8, envoyes: 4, ouverts: 2, enAttente: 4 }, // Stats du mois en cours
         clients: [
-          { name: 'SARL Dupont Transport', facture: 'FAC-2024-001', montant: '3 450,00 €', statut: 'SMS envoyé', dateEnvoi: '15/01/2025', ouvert: true },
-          { name: 'Entreprise Leroy', facture: 'FAC-2024-015', montant: '1 250,00 €', statut: 'Email envoyé', dateEnvoi: '15/01/2025', ouvert: false },
-          { name: 'EURL Rousseau Plomberie', facture: 'FAC-2024-067', montant: '890,50 €', statut: 'SMS envoyé', dateEnvoi: '15/01/2025', ouvert: true },
-          { name: 'Mme Catherine Bernard', facture: 'FAC-2024-089', montant: '2 150,00 €', statut: 'Email envoyé', dateEnvoi: '15/01/2025', ouvert: false },
-          { name: 'M. Pierre Dubois', facture: 'FAC-2024-124', montant: '650,00 €', statut: 'SMS en attente', dateEnvoi: 'Programmé', ouvert: false },
-          { name: 'SARL Petit Électricité', facture: 'FAC-2024-156', montant: '1 890,00 €', statut: 'Email en attente', dateEnvoi: 'Programmé', ouvert: false },
-          { name: 'SCI Lambert Immobilier', facture: 'FAC-2024-103', montant: '4 320,00 €', statut: 'Email en attente', dateEnvoi: 'Programmé', ouvert: false },
-          { name: 'SAS Moreau & Fils', facture: 'FAC-2024-032', montant: '5 680,00 €', statut: 'SMS en attente', dateEnvoi: 'Programmé', ouvert: false }
+          { name: 'SARL Dupont Transport', facture: 'FAC-2025-001', montant: '3 450,00 €', statut: 'SMS envoyé', dateEnvoi: '15/01/2025', ouvert: true, type: 'actuel' },
+          { name: 'Entreprise Leroy', facture: 'FAC-2025-003', montant: '1 250,00 €', statut: 'Email envoyé', dateEnvoi: '16/01/2025', ouvert: false, type: 'actuel' },  
+          { name: 'EURL Rousseau Plomberie', facture: 'FAC-2025-005', montant: '890,50 €', statut: 'SMS envoyé', dateEnvoi: '17/01/2025', ouvert: true, type: 'actuel' },
+          { name: 'Mme Catherine Bernard', facture: 'FAC-2025-007', montant: '2 150,00 €', statut: 'Email envoyé', dateEnvoi: '18/01/2025', ouvert: false, type: 'actuel' },
+          { name: 'M. Pierre Dubois', facture: 'FAC-2025-009', montant: '650,00 €', statut: 'SMS programmé', dateEnvoi: 'Aujourd\'hui 14h30', ouvert: false, type: 'programme' },
+          { name: 'SARL Petit Électricité', facture: 'FAC-2025-011', montant: '1 890,00 €', statut: 'Email programmé', dateEnvoi: 'Demain 9h00', ouvert: false, type: 'programme' },
+          { name: 'SCI Lambert Immobilier', facture: 'FAC-2025-013', montant: '4 320,00 €', statut: 'SMS programmé', dateEnvoi: 'Demain 15h00', ouvert: false, type: 'programme' },
+          { name: 'SAS Moreau & Fils', facture: 'FAC-2025-015', montant: '5 680,00 €', statut: 'Email programmé', dateEnvoi: 'Demain 10h30', ouvert: false, type: 'programme' }
         ]
       },
       decembre2024: {
-        id: 'decembre2024',
-        name: 'Campagne décembre 2024',
-        description: 'Campagne terminée le 30 décembre 2024',
+        id: 'decembre2024', 
+        name: `Relance ${previousMonth}`, // Mois précédent
+        description: `Campagne clôturée le 31/${previousMonth.split(' ')[0] === 'décembre' ? '12' : '11'}/2024`,
         status: campaignStatus.decembre2024,
-        stats: { total: 34, payes: 5, enLitige: 3 },
+        stats: { total: 34, payes: 5, enLitige: 3, recupere: '18 450€' }, // Stats finales du mois précédent
         clients: [
-          { name: 'Garage Renault Lyon', facture: 'FAC-2024-198', montant: '2 450,00 €', statut: 'Payé', datePaiement: '28/12/2024', recouvre: true },
-          { name: 'Taxi Marseille SARL', facture: 'FAC-2024-201', montant: '1 890,00 €', statut: 'Payé', datePaiement: '30/12/2024', recouvre: true },
-          { name: 'Transport Bordeaux', facture: 'FAC-2024-189', montant: '3 200,00 €', statut: 'En litige', dateContentieux: '20/12/2024', recouvre: false },
-          { name: 'Flotte Auto Paris', facture: 'FAC-2024-203', montant: '5 400,00 €', statut: 'Payé', datePaiement: '29/12/2024', recouvre: true },
-          { name: 'EURL Transport Sud', facture: 'FAC-2024-156', montant: '1 200,00 €', statut: 'En litige', dateContentieux: '22/12/2024', recouvre: false },
-          { name: 'SAS Logistique Nord', facture: 'FAC-2024-134', montant: '2 800,00 €', statut: 'Payé', datePaiement: '27/12/2024', recouvre: true },
-          { name: 'Ambulances Urgences', facture: 'FAC-2024-167', montant: '950,00 €', statut: 'En litige', dateContentieux: '25/12/2024', recouvre: false },
-          { name: 'Société Maintenance', facture: 'FAC-2024-178', montant: '1 650,00 €', statut: 'Payé', datePaiement: '31/12/2024', recouvre: true }
+          { name: 'Garage Renault Lyon', facture: 'FAC-2024-198', montant: '2 450,00 €', statut: 'Payé', datePaiement: '28/12/2024', recouvre: true, type: 'recouvre' },
+          { name: 'Taxi Marseille SARL', facture: 'FAC-2024-201', montant: '1 890,00 €', statut: 'Payé', datePaiement: '30/12/2024', recouvre: true, type: 'recouvre' },
+          { name: 'Transport Bordeaux', facture: 'FAC-2024-189', montant: '3 200,00 €', statut: 'En contentieux', dateContentieux: '20/12/2024', recouvre: false, type: 'litige' },
+          { name: 'Flotte Auto Paris', facture: 'FAC-2024-203', montant: '5 400,00 €', statut: 'Payé', datePaiement: '29/12/2024', recouvre: true, type: 'recouvre' },
+          { name: 'EURL Transport Sud', facture: 'FAC-2024-156', montant: '1 200,00 €', statut: 'En contentieux', dateContentieux: '22/12/2024', recouvre: false, type: 'litige' },
+          { name: 'SAS Logistique Nord', facture: 'FAC-2024-134', montant: '2 800,00 €', statut: 'Payé', datePaiement: '27/12/2024', recouvre: true, type: 'recouvre' },
+          { name: 'Ambulances Urgences', facture: 'FAC-2024-167', montant: '950,00 €', statut: 'En contentieux', dateContentieux: '25/12/2024', recouvre: false, type: 'litige' },
+          { name: 'Société Maintenance', facture: 'FAC-2024-178', montant: '1 650,00 €', statut: 'Payé', datePaiement: '31/12/2024', recouvre: true, type: 'recouvre' }
         ]
       }
     };
@@ -653,13 +658,13 @@ Garage Martin`
 
           {/* Campaign Cards */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {/* Campagne Janvier 2025 */}
+            {/* Relance Mois en cours */}
             <Card className="border-l-4 border-l-green-500">
               <CardHeader className="bg-green-50">
                 <CardTitle className="text-lg font-bold text-green-800">
                   Relance janvier 2025
                 </CardTitle>
-                <p className="text-sm text-green-700">Dernière relance automatique envoyée le 15 janvier 2025</p>
+                <p className="text-sm text-green-700">Relances en cours - Dernière automatique envoyée aujourd'hui</p>
               </CardHeader>
               <CardContent className="p-4">
                 <div className="grid grid-cols-3 gap-4 mb-4">
@@ -672,8 +677,8 @@ Garage Martin`
                     <div className="text-xs text-muted-foreground">Envoyés</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-foreground">2</div>
-                    <div className="text-xs text-muted-foreground">Ouverts</div>
+                    <div className="text-2xl font-bold text-foreground">4</div>
+                    <div className="text-xs text-muted-foreground">Programmés</div>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -704,13 +709,13 @@ Garage Martin`
               </CardContent>
             </Card>
 
-            {/* Campagne Décembre 2024 */}
+            {/* Relance Mois précédent */}
             <Card className="border-l-4 border-l-blue-500">
               <CardHeader className="bg-blue-50">
                 <CardTitle className="text-lg font-bold text-blue-800">
                   Relance décembre 2024
                 </CardTitle>
-                <p className="text-sm text-blue-700">Campagne terminée le 30 décembre 2024</p>
+                <p className="text-sm text-blue-700">Campagne clôturée le 31 décembre 2024 - Résultats finalisés</p>
               </CardHeader>
               <CardContent className="p-4">
                 <div className="grid grid-cols-3 gap-4 mb-4">
@@ -720,7 +725,7 @@ Garage Martin`
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-foreground">5</div>
-                    <div className="text-xs text-muted-foreground">Payés</div>
+                    <div className="text-xs text-muted-foreground">Recouvrés</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-foreground">3</div>
