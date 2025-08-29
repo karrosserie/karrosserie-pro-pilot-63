@@ -2,6 +2,12 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { 
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { useUnpaidInvoices } from '@/hooks/use-unpaid-invoices';
 import { 
   Scale, 
@@ -24,7 +30,7 @@ interface PaymentRelancesProps {}
 const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
   const { formattedInvoices: realInvoices, loading } = useUnpaidInvoices();
   const [filter, setFilter] = useState<string>('all');
-  const [modalData, setModalData] = useState<any>(null);
+  const [drawerData, setDrawerData] = useState<any>(null);
 
   // Données fictives pour la démonstration
   const mockInvoices = [
@@ -266,11 +272,11 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
   };
 
   const showDetails = (invoice: any) => {
-    setModalData(invoice);
+    setDrawerData(invoice);
   };
 
-  const closeModal = () => {
-    setModalData(null);
+  const closeDrawer = () => {
+    setDrawerData(null);
   };
 
   const getStatusColor = (status: string) => {
@@ -518,203 +524,180 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
         </CardContent>
       </Card>
 
-      {/* Modal */}
-      {modalData && (
-        <InvoiceDetailModal 
-          invoice={modalData} 
-          isOpen={!!modalData} 
-          onClose={closeModal} 
-        />
-      )}
-    </div>
-  );
-};
-
-// Modal Component
-interface InvoiceDetailModalProps {
-  invoice: any;
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice, isOpen, onClose }) => {
-  const processSteps = [
-    { step: 1, text: 'Facture émise', status: 'facture' },
-    { step: 2, text: 'Relance 1', status: 'relance1' },
-    { step: 3, text: 'Relance 2', status: 'relance2' },
-    { step: 4, text: 'Relance 3', status: 'relance3' },
-    { step: 5, text: 'Contentieux', status: 'contentieux' }
-  ];
-
-  const currentStatusIndex = processSteps.findIndex(step => step.status === invoice.status);
-
-  const handleDownload = (documentName: string) => {
-    console.log(`Téléchargement simulé: ${documentName} pour ${invoice.id}`);
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-        <div className="flex justify-between items-center p-6 border-b">
-          <h3 className="text-xl font-bold text-foreground">
-            Détail de la facture {invoice.id}
-          </h3>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
-          {/* Process Steps */}
-          <div className="mb-8">
-            <h4 className="text-lg font-semibold mb-4">Progression du recouvrement</h4>
-            <div className="flex justify-between items-center mb-6 relative">
-              {processSteps.map((step, index) => (
-                <div key={step.step} className="flex flex-col items-center flex-1 relative">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm ${
-                    index < currentStatusIndex ? 'bg-green-500' : 
-                    index === currentStatusIndex ? 'bg-orange-500' : 'bg-gray-300'
-                  }`}>
-                    {step.step}
+      {/* Drawer pour les détails */}
+      <Drawer open={!!drawerData} onOpenChange={(open) => !open && closeDrawer()}>
+        <DrawerContent className="fixed right-0 top-0 h-screen w-[500px] max-w-[90vw] rounded-none border-l">
+          <div className="p-6 h-full overflow-y-auto">
+            {drawerData && (
+              <>
+                {/* Drawer Header */}
+                <DrawerHeader className="p-0 mb-6">
+                  <div className="flex justify-between items-center">
+                    <DrawerTitle className="text-xl font-bold flex items-center">
+                      <Eye className="h-6 w-6 mr-2" />
+                      Détails de la facture {drawerData.id}
+                    </DrawerTitle>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={closeDrawer}
+                      className="h-8 w-8"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <div className={`mt-2 text-center text-xs ${
-                    index < currentStatusIndex ? 'text-green-600 font-medium' : 
-                    index === currentStatusIndex ? 'text-orange-600 font-medium' : 'text-gray-500'
-                  }`}>
-                    {step.text}
+                </DrawerHeader>
+
+                {/* Status Badge */}
+                <div className="mb-6">
+                  <Badge 
+                    variant="outline" 
+                    className={`${getStatusColor(drawerData.status)} text-sm px-3 py-1`}
+                  >
+                    {getStatusText(drawerData.status)}
+                  </Badge>
+                </div>
+
+                {/* Relance History */}
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold mb-3 flex items-center">
+                    <Calendar className="h-5 w-5 mr-2" />
+                    Historique des relances
+                  </h4>
+                  <div className="space-y-3">
+                    {drawerData.history.map((entry: any, index: number) => (
+                      <div key={index} className="flex items-center p-3 bg-muted rounded-lg">
+                        <div className="flex-1">
+                          <div className="font-medium">{entry.action}</div>
+                          <div className="text-sm text-muted-foreground">{entry.date}</div>
+                        </div>
+                        <Badge 
+                          variant={entry.status === 'Envoyé' ? 'default' : entry.status === 'Lu' ? 'secondary' : 'outline'}
+                          className="text-xs"
+                        >
+                          {entry.status}
+                        </Badge>
+                      </div>
+                    ))}
                   </div>
-                  {index < processSteps.length - 1 && (
-                    <div 
-                      className={`absolute top-4 w-full h-0.5 transition-colors ${
-                        index < currentStatusIndex ? 'bg-green-500' : 'bg-gray-300'
-                      }`} 
-                      style={{ 
-                        left: '50%', 
-                        width: `calc(100% - 32px)`, 
-                        zIndex: -1 
-                      }}
-                    />
+                </div>
+
+                {/* General Information */}
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold mb-3 flex items-center">
+                    <FileText className="h-5 w-5 mr-2" />
+                    Informations générales
+                  </h4>
+                  <div className="grid grid-cols-1 gap-4 text-sm">
+                    <div>
+                      <span className="font-medium text-muted-foreground">Client:</span>
+                      <div className="font-semibold">{drawerData.client}</div>
+                    </div>
+                    <div>
+                      <span className="font-medium text-muted-foreground">Montant:</span>
+                      <div className="font-semibold">{drawerData.amount}</div>
+                    </div>
+                    <div>
+                      <span className="font-medium text-muted-foreground">Date d'échéance:</span>
+                      <div>{drawerData.dueDate}</div>
+                    </div>
+                    <div>
+                      <span className="font-medium text-muted-foreground">Retard:</span>
+                      <div className="font-medium text-red-600">{drawerData.daysOverdue} jours</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact Information */}
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold mb-3 flex items-center">
+                    <Phone className="h-5 w-5 mr-2" />
+                    Informations de contact
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    {drawerData.clientPhone && (
+                      <div className="flex items-center">
+                        <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <span>{drawerData.clientPhone}</span>
+                      </div>
+                    )}
+                    {drawerData.clientEmail && (
+                      <div className="flex items-center">
+                        <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <span>{drawerData.clientEmail}</span>
+                      </div>
+                    )}
+                    {drawerData.clientAddress && (
+                      <div className="flex items-start">
+                        <div className="h-4 w-4 mr-2 mt-0.5 text-muted-foreground">📍</div>
+                        <div className="whitespace-pre-line">{drawerData.clientAddress}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Documents */}
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold mb-3 flex items-center">
+                    <FileText className="h-5 w-5 mr-2" />
+                    Documents disponibles
+                  </h4>
+                  <div className="space-y-3">
+                    {[
+                      { name: "Facture originale", icon: "📄" },
+                      { name: "Devis signé", icon: "📝" },
+                      { name: "Historique des relances", icon: "📜" }
+                    ].map((doc) => (
+                      <div key={doc.name} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                        <div className="flex items-center">
+                          <span className="text-xl mr-3">{doc.icon}</span>
+                          <span className="font-medium">{doc.name}</span>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => console.log(`Téléchargement: ${doc.name}`)}
+                        >
+                          <Download className="h-4 w-4 mr-1" />
+                          Télécharger
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-2 pt-4 border-t">
+                  {drawerData.status === 'relance1' && (
+                    <Button className="w-full">
+                      <Mail className="h-4 w-4 mr-2" />
+                      Envoyer relance 2
+                    </Button>
+                  )}
+                  {drawerData.status === 'relance2' && (
+                    <Button className="w-full">
+                      <Phone className="h-4 w-4 mr-2" />
+                      Envoyer relance 3
+                    </Button>
+                  )}
+                  {drawerData.status === 'relance3' && (
+                    <Button variant="destructive" className="w-full">
+                      <AlertTriangle className="h-4 w-4 mr-2" />
+                      Mise en demeure
+                    </Button>
+                  )}
+                  {drawerData.status === 'contentieux' && (
+                    <Button variant="destructive" className="w-full">
+                      <Scale className="h-4 w-4 mr-2" />
+                      Dossier tribunal
+                    </Button>
                   )}
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* General Information */}
-          <div className="mb-6">
-            <h4 className="text-lg font-semibold mb-3 flex items-center">
-              <FileText className="h-5 w-5 mr-2" />
-              Informations générales
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium text-muted-foreground">Client:</span>
-                <div className="font-semibold">{invoice.client}</div>
-              </div>
-              <div>
-                <span className="font-medium text-muted-foreground">Montant:</span>
-                <div className="font-semibold">{invoice.amount}</div>
-              </div>
-              <div>
-                <span className="font-medium text-muted-foreground">Date d'échéance:</span>
-                <div>{invoice.dueDate}</div>
-              </div>
-              <div>
-                <span className="font-medium text-muted-foreground">Retard:</span>
-                <div className="font-medium text-red-600">{invoice.daysOverdue} jours</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Contact Information */}
-          <div className="mb-6">
-            <h4 className="text-lg font-semibold mb-3 flex items-center">
-              <Phone className="h-5 w-5 mr-2" />
-              Informations de contact
-            </h4>
-            <div className="space-y-2 text-sm">
-              {invoice.clientPhone && (
-                <div className="flex items-center">
-                  <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span>{invoice.clientPhone}</span>
-                </div>
-              )}
-              {invoice.clientEmail && (
-                <div className="flex items-center">
-                  <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span>{invoice.clientEmail}</span>
-                </div>
-              )}
-              {invoice.clientAddress && (
-                <div className="flex items-start">
-                  <div className="h-4 w-4 mr-2 mt-0.5 text-muted-foreground">📍</div>
-                  <div className="whitespace-pre-line">{invoice.clientAddress}</div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Documents */}
-          <div className="mb-6">
-            <h4 className="text-lg font-semibold mb-3 flex items-center">
-              <FileText className="h-5 w-5 mr-2" />
-              Documents disponibles
-            </h4>
-            <div className="space-y-3">
-              {[
-                { name: "Facture originale", icon: "📄" },
-                { name: "Devis signé", icon: "📝" },
-                { name: "Historique des relances", icon: "📜" }
-              ].map((doc) => (
-                <div key={doc.name} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                  <div className="flex items-center">
-                    <span className="text-xl mr-3">{doc.icon}</span>
-                    <span className="font-medium">{doc.name}</span>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDownload(doc.name)}
-                  >
-                    <Download className="h-4 w-4 mr-1" />
-                    Télécharger
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t">
-            {invoice.status === 'relance1' && (
-              <Button className="flex-1">
-                <Mail className="h-4 w-4 mr-2" />
-                Envoyer relance 2
-              </Button>
-            )}
-            {invoice.status === 'relance2' && (
-              <Button className="flex-1">
-                <Phone className="h-4 w-4 mr-2" />
-                Envoyer relance 3
-              </Button>
-            )}
-            {invoice.status === 'relance3' && (
-              <Button variant="destructive" className="flex-1">
-                <AlertTriangle className="h-4 w-4 mr-2" />
-                Mise en demeure
-              </Button>
-            )}
-            {invoice.status === 'contentieux' && (
-              <Button variant="destructive" className="flex-1">
-                <Scale className="h-4 w-4 mr-2" />
-                Dossier tribunal
-              </Button>
+              </>
             )}
           </div>
-        </div>
-      </div>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 };
