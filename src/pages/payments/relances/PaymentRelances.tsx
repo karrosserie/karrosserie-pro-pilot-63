@@ -2,12 +2,6 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
 import { useUnpaidInvoices } from '@/hooks/use-unpaid-invoices';
 import { 
   Scale, 
@@ -524,180 +518,183 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
         </CardContent>
       </Card>
 
-      {/* Drawer pour les détails */}
-      <Drawer open={!!drawerData} onOpenChange={(open) => !open && closeDrawer()}>
-        <DrawerContent className="fixed right-0 top-0 h-screen w-[500px] max-w-[90vw] rounded-none border-l">
-          <div className="p-6 h-full overflow-y-auto">
-            {drawerData && (
-              <>
-                {/* Drawer Header */}
-                <DrawerHeader className="p-0 mb-6">
-                  <div className="flex justify-between items-center">
-                    <DrawerTitle className="text-xl font-bold flex items-center">
-                      <Eye className="h-6 w-6 mr-2" />
-                      Détails de la facture {drawerData.id}
-                    </DrawerTitle>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={closeDrawer}
-                      className="h-8 w-8"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </DrawerHeader>
+      {/* Sidebar pour les détails */}
+      {drawerData && (
+        <>
+          {/* Overlay */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+            onClick={closeDrawer}
+          />
+          
+          {/* Sidebar */}
+          <div className="fixed right-0 top-0 h-screen w-[500px] max-w-[90vw] bg-background border-l border-border z-50 transform transition-transform duration-300 ease-in-out">
+            <div className="p-6 h-full overflow-y-auto">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold flex items-center">
+                  <Eye className="h-6 w-6 mr-2" />
+                  Détails de la facture {drawerData.id}
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={closeDrawer}
+                  className="h-8 w-8"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
 
-                {/* Status Badge */}
-                <div className="mb-6">
-                  <Badge 
-                    variant="outline" 
-                    className={`${getStatusColor(drawerData.status)} text-sm px-3 py-1`}
-                  >
-                    {getStatusText(drawerData.status)}
-                  </Badge>
-                </div>
+              {/* Status Badge */}
+              <div className="mb-6">
+                <Badge 
+                  variant="outline" 
+                  className={`${getStatusColor(drawerData.status)} text-sm px-3 py-1`}
+                >
+                  {getStatusText(drawerData.status)}
+                </Badge>
+              </div>
 
-                {/* Relance History */}
-                <div className="mb-6">
-                  <h4 className="text-lg font-semibold mb-3 flex items-center">
-                    <Calendar className="h-5 w-5 mr-2" />
-                    Historique des relances
-                  </h4>
-                  <div className="space-y-3">
-                    {drawerData.history.map((entry: any, index: number) => (
-                      <div key={index} className="flex items-center p-3 bg-muted rounded-lg">
-                        <div className="flex-1">
-                          <div className="font-medium">{entry.action}</div>
-                          <div className="text-sm text-muted-foreground">{entry.date}</div>
-                        </div>
-                        <Badge 
-                          variant={entry.status === 'Envoyé' ? 'default' : entry.status === 'Lu' ? 'secondary' : 'outline'}
-                          className="text-xs"
-                        >
-                          {entry.status}
-                        </Badge>
+              {/* Relance History */}
+              <div className="mb-6">
+                <h4 className="text-lg font-semibold mb-3 flex items-center">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  Historique des relances
+                </h4>
+                <div className="space-y-3">
+                  {drawerData.history.map((entry: any, index: number) => (
+                    <div key={index} className="flex items-center p-3 bg-muted rounded-lg">
+                      <div className="flex-1">
+                        <div className="font-medium">{entry.action}</div>
+                        <div className="text-sm text-muted-foreground">{entry.date}</div>
                       </div>
-                    ))}
+                      <Badge 
+                        variant={entry.status === 'Envoyé' ? 'default' : entry.status === 'Lu' ? 'secondary' : 'outline'}
+                        className="text-xs"
+                      >
+                        {entry.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* General Information */}
+              <div className="mb-6">
+                <h4 className="text-lg font-semibold mb-3 flex items-center">
+                  <FileText className="h-5 w-5 mr-2" />
+                  Informations générales
+                </h4>
+                <div className="grid grid-cols-1 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium text-muted-foreground">Client:</span>
+                    <div className="font-semibold">{drawerData.client}</div>
+                  </div>
+                  <div>
+                    <span className="font-medium text-muted-foreground">Montant:</span>
+                    <div className="font-semibold">{drawerData.amount}</div>
+                  </div>
+                  <div>
+                    <span className="font-medium text-muted-foreground">Date d'échéance:</span>
+                    <div>{drawerData.dueDate}</div>
+                  </div>
+                  <div>
+                    <span className="font-medium text-muted-foreground">Retard:</span>
+                    <div className="font-medium text-red-600">{drawerData.daysOverdue} jours</div>
                   </div>
                 </div>
+              </div>
 
-                {/* General Information */}
-                <div className="mb-6">
-                  <h4 className="text-lg font-semibold mb-3 flex items-center">
-                    <FileText className="h-5 w-5 mr-2" />
-                    Informations générales
-                  </h4>
-                  <div className="grid grid-cols-1 gap-4 text-sm">
-                    <div>
-                      <span className="font-medium text-muted-foreground">Client:</span>
-                      <div className="font-semibold">{drawerData.client}</div>
+              {/* Contact Information */}
+              <div className="mb-6">
+                <h4 className="text-lg font-semibold mb-3 flex items-center">
+                  <Phone className="h-5 w-5 mr-2" />
+                  Informations de contact
+                </h4>
+                <div className="space-y-2 text-sm">
+                  {drawerData.clientPhone && (
+                    <div className="flex items-center">
+                      <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
+                      <span>{drawerData.clientPhone}</span>
                     </div>
-                    <div>
-                      <span className="font-medium text-muted-foreground">Montant:</span>
-                      <div className="font-semibold">{drawerData.amount}</div>
+                  )}
+                  {drawerData.clientEmail && (
+                    <div className="flex items-center">
+                      <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
+                      <span>{drawerData.clientEmail}</span>
                     </div>
-                    <div>
-                      <span className="font-medium text-muted-foreground">Date d'échéance:</span>
-                      <div>{drawerData.dueDate}</div>
+                  )}
+                  {drawerData.clientAddress && (
+                    <div className="flex items-start">
+                      <div className="h-4 w-4 mr-2 mt-0.5 text-muted-foreground">📍</div>
+                      <div className="whitespace-pre-line">{drawerData.clientAddress}</div>
                     </div>
-                    <div>
-                      <span className="font-medium text-muted-foreground">Retard:</span>
-                      <div className="font-medium text-red-600">{drawerData.daysOverdue} jours</div>
-                    </div>
-                  </div>
+                  )}
                 </div>
+              </div>
 
-                {/* Contact Information */}
-                <div className="mb-6">
-                  <h4 className="text-lg font-semibold mb-3 flex items-center">
-                    <Phone className="h-5 w-5 mr-2" />
-                    Informations de contact
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    {drawerData.clientPhone && (
+              {/* Documents */}
+              <div className="mb-6">
+                <h4 className="text-lg font-semibold mb-3 flex items-center">
+                  <FileText className="h-5 w-5 mr-2" />
+                  Documents disponibles
+                </h4>
+                <div className="space-y-3">
+                  {[
+                    { name: "Facture originale", icon: "📄" },
+                    { name: "Devis signé", icon: "📝" },
+                    { name: "Historique des relances", icon: "📜" }
+                  ].map((doc) => (
+                    <div key={doc.name} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                       <div className="flex items-center">
-                        <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span>{drawerData.clientPhone}</span>
+                        <span className="text-xl mr-3">{doc.icon}</span>
+                        <span className="font-medium">{doc.name}</span>
                       </div>
-                    )}
-                    {drawerData.clientEmail && (
-                      <div className="flex items-center">
-                        <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span>{drawerData.clientEmail}</span>
-                      </div>
-                    )}
-                    {drawerData.clientAddress && (
-                      <div className="flex items-start">
-                        <div className="h-4 w-4 mr-2 mt-0.5 text-muted-foreground">📍</div>
-                        <div className="whitespace-pre-line">{drawerData.clientAddress}</div>
-                      </div>
-                    )}
-                  </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => console.log(`Téléchargement: ${doc.name}`)}
+                      >
+                        <Download className="h-4 w-4 mr-1" />
+                        Télécharger
+                      </Button>
+                    </div>
+                  ))}
                 </div>
+              </div>
 
-                {/* Documents */}
-                <div className="mb-6">
-                  <h4 className="text-lg font-semibold mb-3 flex items-center">
-                    <FileText className="h-5 w-5 mr-2" />
-                    Documents disponibles
-                  </h4>
-                  <div className="space-y-3">
-                    {[
-                      { name: "Facture originale", icon: "📄" },
-                      { name: "Devis signé", icon: "📝" },
-                      { name: "Historique des relances", icon: "📜" }
-                    ].map((doc) => (
-                      <div key={doc.name} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                        <div className="flex items-center">
-                          <span className="text-xl mr-3">{doc.icon}</span>
-                          <span className="font-medium">{doc.name}</span>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => console.log(`Téléchargement: ${doc.name}`)}
-                        >
-                          <Download className="h-4 w-4 mr-1" />
-                          Télécharger
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-col gap-2 pt-4 border-t">
-                  {drawerData.status === 'relance1' && (
-                    <Button className="w-full">
-                      <Mail className="h-4 w-4 mr-2" />
-                      Envoyer relance 2
-                    </Button>
-                  )}
-                  {drawerData.status === 'relance2' && (
-                    <Button className="w-full">
-                      <Phone className="h-4 w-4 mr-2" />
-                      Envoyer relance 3
-                    </Button>
-                  )}
-                  {drawerData.status === 'relance3' && (
-                    <Button variant="destructive" className="w-full">
-                      <AlertTriangle className="h-4 w-4 mr-2" />
-                      Mise en demeure
-                    </Button>
-                  )}
-                  {drawerData.status === 'contentieux' && (
-                    <Button variant="destructive" className="w-full">
-                      <Scale className="h-4 w-4 mr-2" />
-                      Dossier tribunal
-                    </Button>
-                  )}
-                </div>
-              </>
-            )}
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-2 pt-4 border-t">
+                {drawerData.status === 'relance1' && (
+                  <Button className="w-full">
+                    <Mail className="h-4 w-4 mr-2" />
+                    Envoyer relance 2
+                  </Button>
+                )}
+                {drawerData.status === 'relance2' && (
+                  <Button className="w-full">
+                    <Phone className="h-4 w-4 mr-2" />
+                    Envoyer relance 3
+                  </Button>
+                )}
+                {drawerData.status === 'relance3' && (
+                  <Button variant="destructive" className="w-full">
+                    <AlertTriangle className="h-4 w-4 mr-2" />
+                    Mise en demeure
+                  </Button>
+                )}
+                {drawerData.status === 'contentieux' && (
+                  <Button variant="destructive" className="w-full">
+                    <Scale className="h-4 w-4 mr-2" />
+                    Dossier tribunal
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
-        </DrawerContent>
-      </Drawer>
+        </>
+      )}
     </div>
   );
 };
