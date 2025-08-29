@@ -38,6 +38,7 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
   const [selectedTemplate, setSelectedTemplate] = useState('sms-relance-auto');
   const [viewingLog, setViewingLog] = useState<any>(null);
   const [viewingCampaignDetails, setViewingCampaignDetails] = useState<any>(null);
+  const [viewingStatDetails, setViewingStatDetails] = useState<{type: string, data: any} | null>(null);
 
   // Force rebuild - données fictives pour la démonstration
   const mockInvoices = [
@@ -479,6 +480,51 @@ Garage Martin`
     setViewingCampaignDetails(null);
   };
 
+  const viewStatDetails = (type: string) => {
+    const statData = {
+      enRelance: {
+        title: 'Factures en relance',
+        description: 'Factures avec au moins une relance envoyée',
+        count: stats.enRelance,
+        items: formattedInvoices
+          .filter(i => ['relance1', 'relance2', 'relance3'].includes(i.status))
+          .map(invoice => ({
+            id: invoice.id,
+            client: invoice.client,
+            montant: invoice.amount,
+            statut: getStatusText(invoice.status),
+            statutColor: getStatusColor(invoice.status),
+            retard: `${invoice.daysOverdue} jours`,
+            derniereAction: invoice.history[invoice.history.length - 1]?.action || 'Aucune action',
+            dateAction: invoice.history[invoice.history.length - 1]?.date || 'N/A'
+          }))
+      },
+      procedureJudiciaire: {
+        title: 'Procédures judiciaires',
+        description: 'Factures en contentieux ou procédure tribunal',
+        count: stats.procedureJudiciaire,
+        items: formattedInvoices
+          .filter(i => ['relance4', 'contentieux'].includes(i.status))
+          .map(invoice => ({
+            id: invoice.id,
+            client: invoice.client,
+            montant: invoice.amount,
+            statut: getStatusText(invoice.status),
+            statutColor: getStatusColor(invoice.status),
+            retard: `${invoice.daysOverdue} jours`,
+            derniereAction: invoice.history[invoice.history.length - 1]?.action || 'Aucune action',
+            dateAction: invoice.history[invoice.history.length - 1]?.date || 'N/A'
+          }))
+      }
+    };
+
+    setViewingStatDetails({ type, data: statData[type] });
+  };
+
+  const closeStatDetails = () => {
+    setViewingStatDetails(null);
+  };
+
   const getOverdueColor = (days: number) => {
     if (days > 90) return 'text-red-600 font-bold';
     if (days > 60) return 'text-orange-500 font-medium';
@@ -540,7 +586,10 @@ Garage Martin`
         <>
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
+            <Card 
+              className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => viewStatDetails('enRelance')}
+            >
               <CardContent className="p-4">
                 <div className="text-2xl sm:text-3xl font-bold text-foreground">{stats.enRelance}</div>
                 <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
@@ -549,7 +598,10 @@ Garage Martin`
               </CardContent>
             </Card>
             
-            <Card className="border-l-4 border-l-red-500 hover:shadow-lg transition-shadow">
+            <Card 
+              className="border-l-4 border-l-red-500 hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => viewStatDetails('procedureJudiciaire')}
+            >
               <CardContent className="p-4">
                 <div className="text-2xl sm:text-3xl font-bold text-foreground">{stats.procedureJudiciaire}</div>
                 <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
@@ -558,7 +610,7 @@ Garage Martin`
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-green-500 hover:shadow-lg transition-shadow">
+            <Card className="border-l-4 border-l-green-500">
               <CardContent className="p-4">
                 <div className="text-xl sm:text-2xl font-bold text-foreground">{stats.recupererCeMois}</div>
                 <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
@@ -567,7 +619,7 @@ Garage Martin`
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-primary hover:shadow-lg transition-shadow">
+            <Card className="border-l-4 border-l-primary">
               <CardContent className="p-4">
                 <div className="text-xl sm:text-2xl font-bold text-foreground">{stats.totalImpayes}</div>
                 <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
@@ -978,6 +1030,89 @@ Garage Martin`
               </div>
             </CardContent>
           </Card>
+        </>
+      )}
+
+      {/* Modal pour les détails de statistiques */}
+      {viewingStatDetails && (
+        <>
+          {/* Overlay */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+            onClick={closeStatDetails}
+          />
+          
+          {/* Modal */}
+          <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-background border border-border rounded-lg shadow-xl z-50 w-[600px] max-w-[90vw] max-h-[80vh] overflow-hidden">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-bold flex items-center">
+                  📊 {viewingStatDetails.data.title}
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={closeStatDetails}
+                  className="h-8 w-8"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Description */}
+              <div className="mb-6 p-4 bg-muted/30 rounded-lg">
+                <div className="text-sm text-muted-foreground mb-2">
+                  {viewingStatDetails.data.description}
+                </div>
+                <div className="text-2xl font-bold text-foreground">
+                  Total: {viewingStatDetails.data.count} factures
+                </div>
+              </div>
+
+              {/* Liste des factures */}
+              <div className="mb-6">
+                <h4 className="text-sm font-semibold mb-4 flex items-center">
+                  📋 Détail des factures
+                </h4>
+                
+                <div className="max-h-64 overflow-y-auto space-y-2">
+                  {viewingStatDetails.data.items.map((item, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-medium text-sm">{item.id}</span>
+                          <Badge className={`text-xs ${item.statutColor}`}>
+                            {item.statut}
+                          </Badge>
+                        </div>
+                        <div className="text-sm text-muted-foreground mb-1">
+                          {item.client}
+                        </div>
+                        <div className="flex items-center gap-4 text-xs">
+                          <span className="font-medium">{item.montant}</span>
+                          <span className="text-red-600">Retard: {item.retard}</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Dernière action: {item.derniereAction} ({item.dateAction})
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bouton Fermer */}
+              <div className="flex justify-center">
+                <Button 
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
+                  onClick={closeStatDetails}
+                >
+                  Fermer
+                </Button>
+              </div>
+            </div>
+          </div>
         </>
       )}
 
