@@ -1304,6 +1304,7 @@ export type Database = {
           location: string | null
           notes: string | null
           payment_status: string
+          points_lost: number | null
           reference_number: string | null
           updated_at: string
           violation_date: string
@@ -1325,6 +1326,7 @@ export type Database = {
           location?: string | null
           notes?: string | null
           payment_status?: string
+          points_lost?: number | null
           reference_number?: string | null
           updated_at?: string
           violation_date: string
@@ -1346,6 +1348,7 @@ export type Database = {
           location?: string | null
           notes?: string | null
           payment_status?: string
+          points_lost?: number | null
           reference_number?: string | null
           updated_at?: string
           violation_date?: string

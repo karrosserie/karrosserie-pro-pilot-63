@@ -13,12 +13,18 @@ interface ViolationDocumentUploadProps {
   documentUrl?: string;
   onDocumentChange: (url: string) => void;
   onDocumentRemove: () => void;
+  onDocumentAnalyzed?: (data: any) => void;
+  violationId?: string;
+  companyId?: string;
 }
 
 export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = ({
   documentUrl,
   onDocumentChange,
-  onDocumentRemove
+  onDocumentRemove,
+  onDocumentAnalyzed,
+  violationId,
+  companyId
 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
@@ -49,6 +55,11 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
         title: "Document ajouté",
         description: "Le document a été uploadé avec succès."
       });
+
+      // Call the analyze function if it's an image and we have the required IDs
+      if (file.type.startsWith('image/') && violationId && companyId) {
+        await analyzeViolation(urlData.publicUrl);
+      }
     } catch (error) {
       console.error('Error uploading file:', error);
       toast({
@@ -58,6 +69,37 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
       });
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const analyzeViolation = async (documentUrl: string) => {
+    if (!violationId || !companyId) return;
+
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-violation', {
+        body: {
+          violationId,
+          documentUrl,
+          companyId
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.success && onDocumentAnalyzed) {
+        onDocumentAnalyzed(data.extractedData);
+        toast({
+          title: "Analyse terminée",
+          description: "Les informations ont été extraites automatiquement de l'image."
+        });
+      }
+    } catch (error) {
+      console.error('Error analyzing violation:', error);
+      toast({
+        title: "Erreur d'analyse",
+        description: "Impossible d'analyser l'image automatiquement.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -133,6 +175,11 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
           title: "Photo ajoutée",
           description: "La photo a été prise et uploadée avec succès."
         });
+
+        // Call the analyze function if we have the required IDs
+        if (violationId && companyId) {
+          await analyzeViolation(urlData.publicUrl);
+        }
       }
     } catch (error) {
       console.error('Error taking photo:', error);

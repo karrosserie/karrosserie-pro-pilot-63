@@ -108,6 +108,25 @@ export const FleetViolationForm: React.FC<FleetViolationFormProps> = ({
     }
   };
 
+  const handleDocumentAnalyzed = (analyzedData: any) => {
+    // Update form data with analyzed information
+    if (analyzedData.numero_avis) {
+      setFormData(prev => ({ ...prev, reference_number: analyzedData.numero_avis }));
+    }
+    if (analyzedData.date_infraction) {
+      setFormData(prev => ({ ...prev, violation_date: analyzedData.date_infraction }));
+    }
+    if (analyzedData.heure_infraction) {
+      setFormData(prev => ({ ...prev, violation_time: analyzedData.heure_infraction }));
+    }
+    if (analyzedData.immatriculation) {
+      setFormData(prev => ({ ...prev, license_plate: analyzedData.immatriculation }));
+    }
+    if (analyzedData.montant_amende) {
+      setFormData(prev => ({ ...prev, fine_amount: parseFloat(analyzedData.montant_amende) }));
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       fleet_vehicle_id: preselectedVehicleId || '',
@@ -326,6 +345,9 @@ export const FleetViolationForm: React.FC<FleetViolationFormProps> = ({
             documentUrl={formData.document_url}
             onDocumentChange={(url) => handleInputChange('document_url', url)}
             onDocumentRemove={() => handleInputChange('document_url', '')}
+            onDocumentAnalyzed={handleDocumentAnalyzed}
+            violationId={violation?.id}
+            companyId={companyId?.companyId}
           />
 
           <div className="flex justify-end space-x-2 pt-4">

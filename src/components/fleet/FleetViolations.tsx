@@ -144,6 +144,11 @@ const FleetViolations: React.FC = () => {
                 <div className="flex items-center text-muted-foreground">
                   <Euro className="h-4 w-4 mr-2" />
                   {violation.fine_amount}€
+                  {violation.points_lost && violation.points_lost > 0 && (
+                    <span className="ml-2 text-destructive font-medium">
+                      -{violation.points_lost} pts
+                    </span>
+                  )}
                 </div>
               </div>
               

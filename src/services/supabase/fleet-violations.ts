@@ -29,6 +29,7 @@ export interface FleetViolation {
       name: string;
     } | null;
   } | null;
+  points_lost?: number;
 }
 
 export interface NewFleetViolation {
@@ -48,6 +49,7 @@ export interface NewFleetViolation {
   borrower_phone?: string;
   borrower_email?: string;
   company_id: string;
+  points_lost?: number;
 }
 
 export interface UpdateFleetViolation {
@@ -65,6 +67,7 @@ export interface UpdateFleetViolation {
   borrower_name?: string;
   borrower_phone?: string;
   borrower_email?: string;
+  points_lost?: number;
 }
 
 export const fleetViolationsService = {

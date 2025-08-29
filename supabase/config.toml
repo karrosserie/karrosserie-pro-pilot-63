@@ -1,5 +1,8 @@
 project_id = "jukdsypvuehnniskgpfd"
 
+[functions.analyze-violation]
+verify_jwt = true
+
 [functions.update-user]
 verify_jwt = true
 
