@@ -662,7 +662,7 @@ Garage Martin`
             <Card className="border-l-4 border-l-green-500">
               <CardHeader className="bg-green-50">
                 <CardTitle className="text-lg font-bold text-green-800">
-                  Relance janvier 2025
+                  {`Relance ${new Date().toLocaleString('fr-FR', { month: 'long', year: 'numeric' })}`}
                 </CardTitle>
                 <p className="text-sm text-green-700">Relances en cours - Dernière automatique envoyée aujourd'hui</p>
               </CardHeader>
@@ -683,20 +683,6 @@ Garage Martin`
                 </div>
                 <div className="flex gap-2">
                   <Button 
-                    size="sm" 
-                    className={campaignStatus.janvier2025 === 'active' ? "bg-green-600 hover:bg-green-700" : "bg-orange-600 hover:bg-orange-700"}
-                    onClick={() => handleCampaignAction('janvier2025', campaignStatus.janvier2025 === 'active' ? 'stop' : 'restart')}
-                  >
-                    {campaignStatus.janvier2025 === 'active' ? 'Envoi actif' : campaignStatus.janvier2025 === 'stopped' ? 'Suspendue' : 'Reprogrammée'}
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleCampaignAction('janvier2025', campaignStatus.janvier2025 === 'active' ? 'stop' : 'restart')}
-                  >
-                    {campaignStatus.janvier2025 === 'active' ? 'Suspendre' : 'Réactiver'}
-                  </Button>
-                  <Button 
                     variant="outline" 
                     size="sm"
                     onClick={() => viewCampaignDetails('janvier2025')}
@@ -713,9 +699,9 @@ Garage Martin`
             <Card className="border-l-4 border-l-blue-500">
               <CardHeader className="bg-blue-50">
                 <CardTitle className="text-lg font-bold text-blue-800">
-                  Relance décembre 2024
+                  {`Relance ${new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1).toLocaleString('fr-FR', { month: 'long', year: 'numeric' })}`}
                 </CardTitle>
-                <p className="text-sm text-blue-700">Campagne clôturée le 31 décembre 2024 - Résultats finalisés</p>
+                <p className="text-sm text-blue-700">Campagne clôturée - Résultats finalisés</p>
               </CardHeader>
               <CardContent className="p-4">
                 <div className="grid grid-cols-3 gap-4 mb-4">
@@ -733,21 +719,6 @@ Garage Martin`
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className={`text-blue-600 border-blue-300 ${campaignStatus.decembre2024 === 'programmed' ? 'bg-blue-50' : ''}`}
-                  >
-                    {campaignStatus.decembre2024 === 'programmed' ? 'Reprogrammée' : 'Clôturée'}
-                  </Button>
-                  <Button 
-                    variant="default" 
-                    size="sm"
-                    onClick={() => handleCampaignAction('decembre2024', 'program')}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    {campaignStatus.decembre2024 === 'programmed' ? 'Programmer à nouveau' : 'Nouvelle relance'}
-                  </Button>
                   <Button 
                     variant="outline" 
                     size="sm"
