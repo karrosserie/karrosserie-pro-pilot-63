@@ -32,6 +32,7 @@ const RelanceIATab = () => {
     channels: {
       email: true,
       sms: true,
+      whatsapp: false,
       phone: false,
       mail: false
     },
@@ -193,56 +194,69 @@ const RelanceIATab = () => {
             {/* Canaux de communication */}
             <div>
               <Label className="font-medium mb-3 block">Canaux de communication</Label>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <button
                   type="button"
                   onClick={() => handleSettingChange('channels', { ...settings.channels, email: !settings.channels.email })}
-                  className={`w-full flex items-center space-x-3 p-3 rounded-lg border transition-all ${
+                  className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl border transition-all ${
                     settings.channels.email 
                       ? 'bg-green-100 border-green-300 text-green-800' 
                       : 'bg-gray-100 border-gray-300 text-gray-600'
                   }`}
                 >
-                  <span className="text-blue-600 text-lg">📧</span>
+                  <span className="text-blue-600 text-base">📧</span>
                   <Label className="text-sm font-medium cursor-pointer">Email</Label>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleSettingChange('channels', { ...settings.channels, sms: !settings.channels.sms })}
-                  className={`w-full flex items-center space-x-3 p-3 rounded-lg border transition-all ${
+                  className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl border transition-all ${
                     settings.channels.sms 
                       ? 'bg-green-100 border-green-300 text-green-800' 
                       : 'bg-gray-100 border-gray-300 text-gray-600'
                   }`}
                 >
-                  <span className="text-green-600 text-lg">📱</span>
+                  <span className="text-green-600 text-base">📱</span>
                   <Label className="text-sm font-medium cursor-pointer">SMS</Label>
                 </button>
 
                 <button
                   type="button"
+                  onClick={() => handleSettingChange('channels', { ...settings.channels, whatsapp: !settings.channels.whatsapp })}
+                  className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl border transition-all ${
+                    settings.channels.whatsapp 
+                      ? 'bg-green-100 border-green-300 text-green-800' 
+                      : 'bg-gray-100 border-gray-300 text-gray-600'
+                  }`}
+                >
+                  <span className="text-green-600 text-base">💬</span>
+                  <Label className="text-sm font-medium cursor-pointer">WhatsApp</Label>
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => handleSettingChange('channels', { ...settings.channels, phone: !settings.channels.phone })}
-                  className={`w-full flex items-center space-x-3 p-3 rounded-lg border transition-all ${
+                  className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl border transition-all ${
                     settings.channels.phone 
                       ? 'bg-green-100 border-green-300 text-green-800' 
                       : 'bg-gray-100 border-gray-300 text-gray-600'
                   }`}
                 >
-                  <span className="text-red-600 text-lg">📞</span>
+                  <span className="text-red-600 text-base">📞</span>
                   <Label className="text-sm font-medium cursor-pointer">Appel vocal</Label>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleSettingChange('channels', { ...settings.channels, mail: !settings.channels.mail })}
-                  className={`w-full flex items-center space-x-3 p-3 rounded-lg border transition-all ${
+                  className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl border transition-all ${
                     settings.channels.mail 
                       ? 'bg-green-100 border-green-300 text-green-800' 
                       : 'bg-gray-100 border-gray-300 text-gray-600'
                   }`}
                 >
-                  <span className="text-purple-600 text-lg">📮</span>
+                  <span className="text-purple-600 text-base">📮</span>
                   <Label className="text-sm font-medium cursor-pointer">Courrier LRE</Label>
                 </button>
               </div>
@@ -330,7 +344,7 @@ const RelanceIATab = () => {
                   
                   {/* Show if this step type is enabled */}
                   {((step.id === 'email-aimable' || step.id === 'email-ferme') && settings.channels.email) ||
-                   (step.id === 'sms-rappel' && settings.channels.sms) ||
+                   (step.id === 'sms-rappel' && (settings.channels.sms || settings.channels.whatsapp)) ||
                    (step.id === 'appel-vocal' && settings.channels.phone) ||
                    (step.id === 'lrar' && settings.channels.mail) ||
                    (step.id === 'mise-demeure' && settings.autoMiseEnDemeure) ? (
