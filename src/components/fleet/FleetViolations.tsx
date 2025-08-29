@@ -63,12 +63,15 @@ const FleetViolations: React.FC = () => {
 
   return (
     <div className="card-container">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-foreground">Contraventions</h2>
-        <Button onClick={() => {
-          setSelectedViolation(null);
-          setShowForm(true);
-        }}>
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold text-foreground mb-3">Contraventions</h2>
+        <Button 
+          onClick={() => {
+            setSelectedViolation(null);
+            setShowForm(true);
+          }}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground"
+        >
           <Plus className="h-4 w-4 mr-2" />
           Ajouter une contravention
         </Button>
