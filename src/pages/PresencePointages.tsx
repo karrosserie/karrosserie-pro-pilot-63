@@ -350,7 +350,7 @@ export default function PresencePointages() {
               Retour à la comptabilité
             </Button>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground"><span className="text-karrosserie-orange font-medium">Karrosserie.pro</span><ChevronRight className="w-4 h-4" /><span>Paiements</span><ChevronRight className="w-4 h-4" /><span>Comptabilité</span><ChevronRight className="w-4 h-4" /><span className="text-karrosserie-orange">Présence & Pointages</span></div>
+          
           <h1 className="text-2xl font-semibold mt-1 bg-gradient-to-r from-karrosserie-orange to-primary bg-clip-text text-transparent">Présence & Pointages (géolocalisé)</h1>
           <p className="text-sm text-muted-foreground">Contrôle GPS, demi-journées, pauses repas, calculs heures normales & supplémentaires, exports paie</p>
         </div>
