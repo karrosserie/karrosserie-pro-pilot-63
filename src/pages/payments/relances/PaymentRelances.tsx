@@ -32,7 +32,7 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
   const [filter, setFilter] = useState<string>('all');
   const [drawerData, setDrawerData] = useState<any>(null);
 
-  // Données fictives pour la démonstration
+  // Force rebuild - données fictives pour la démonstration
   const mockInvoices = [
     {
       id: 'FAC-2024-001',
