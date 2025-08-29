@@ -587,7 +587,6 @@ export default function PresencePointages() {
                   <th className="text-left p-2">Distance</th>
                   <th className="text-left p-2">Absence</th>
                   <th className="text-left p-2">Chef</th>
-                  <th className="text-left p-2">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -616,16 +615,6 @@ export default function PresencePointages() {
                           <td className="p-2 whitespace-nowrap transition-colors duration-200 hover:text-primary">{(p.distDebut ?? 0)} / {(p.distFin ?? 0)} m</td>
                           <td className="p-2 whitespace-nowrap transition-colors duration-200 hover:text-primary">{p.absence || "—"}</td>
                           <td className="p-2 whitespace-nowrap">{p.validationChef ? <CheckCircle2 className="w-4 h-4"/> : <XCircle className="w-4 h-4"/>}</td>
-                          <td className="p-2 whitespace-nowrap">
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="h-8 hover:bg-karrosserie-orange/10 hover:text-karrosserie-orange hover:scale-110 transition-all duration-200"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              Détail
-                            </Button>
-                          </td>
                         </tr>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-2xl">
