@@ -1288,6 +1288,72 @@ export type Database = {
           },
         ]
       }
+      fleet_violations: {
+        Row: {
+          borrower_email: string | null
+          borrower_name: string | null
+          borrower_phone: string | null
+          company_id: string
+          created_at: string
+          document_url: string | null
+          due_date: string | null
+          fine_amount: number | null
+          fleet_vehicle_id: string
+          id: string
+          license_plate: string
+          location: string | null
+          notes: string | null
+          payment_status: string
+          reference_number: string | null
+          updated_at: string
+          violation_date: string
+          violation_time: string | null
+          violation_type: string
+        }
+        Insert: {
+          borrower_email?: string | null
+          borrower_name?: string | null
+          borrower_phone?: string | null
+          company_id: string
+          created_at?: string
+          document_url?: string | null
+          due_date?: string | null
+          fine_amount?: number | null
+          fleet_vehicle_id: string
+          id?: string
+          license_plate: string
+          location?: string | null
+          notes?: string | null
+          payment_status?: string
+          reference_number?: string | null
+          updated_at?: string
+          violation_date: string
+          violation_time?: string | null
+          violation_type: string
+        }
+        Update: {
+          borrower_email?: string | null
+          borrower_name?: string | null
+          borrower_phone?: string | null
+          company_id?: string
+          created_at?: string
+          document_url?: string | null
+          due_date?: string | null
+          fine_amount?: number | null
+          fleet_vehicle_id?: string
+          id?: string
+          license_plate?: string
+          location?: string | null
+          notes?: string | null
+          payment_status?: string
+          reference_number?: string | null
+          updated_at?: string
+          violation_date?: string
+          violation_time?: string | null
+          violation_type?: string
+        }
+        Relationships: []
+      }
       generated_reports: {
         Row: {
           company_id: string | null
