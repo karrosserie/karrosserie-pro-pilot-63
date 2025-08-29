@@ -584,6 +584,51 @@ Garage Martin`
 
       {currentView === 'relances' ? (
         <>
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <Card 
+              className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => viewStatDetails('enRelance')}
+            >
+              <CardContent className="p-4">
+                <div className="text-2xl sm:text-3xl font-bold text-foreground">{stats.enRelance}</div>
+                <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                  EN RELANCE
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card 
+              className="border-l-4 border-l-red-500 hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => viewStatDetails('procedureJudiciaire')}
+            >
+              <CardContent className="p-4">
+                <div className="text-2xl sm:text-3xl font-bold text-foreground">{stats.procedureJudiciaire}</div>
+                <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                  PROCÉDURE JUDICIAIRE
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-l-4 border-l-green-500">
+              <CardContent className="p-4">
+                <div className="text-xl sm:text-2xl font-bold text-foreground">{stats.recupererCeMois}</div>
+                <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                  RÉCUPÉRÉ CE MOIS
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-l-4 border-l-primary">
+              <CardContent className="p-4">
+                <div className="text-xl sm:text-2xl font-bold text-foreground">{stats.totalImpayes}</div>
+                <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                  TOTAL IMPAYÉS
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Campaign Cards */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* Campagne Janvier 2025 */}
@@ -688,8 +733,6 @@ Garage Martin`
               </CardContent>
             </Card>
           </div>
-
-          {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <Card 
               className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow cursor-pointer"
