@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { FileText, Download } from 'lucide-react';
+import { FileText, Download, Clock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { ReportDateRangeDialog } from './ReportDateRangeDialog';
 import { GeneratedReportsTable } from './GeneratedReportsTable';
 import { EmailReportDialog } from './EmailReportDialog';
@@ -11,9 +12,8 @@ const ReportContent = () => {
   const [openDialog, setOpenDialog] = useState<DialogType>(null);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<GeneratedReport | null>(null);
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+  const navigate = useNavigate();
   const {
     reports,
     addReport,
@@ -107,6 +107,21 @@ const ReportContent = () => {
             <Button variant="outline" onClick={() => setOpenDialog('csv')} className="w-full justify-center h-10 sm:h-11">
               <Download className="h-4 w-4 mr-2" />
               <span className="text-sm sm:text-base">Format CSV</span>
+            </Button>
+          </div>
+        </div>
+
+        <div className="mb-4 sm:mb-6">
+          <h4 className="font-medium mb-3 sm:mb-4 text-sm sm:text-base">Gestion RH</h4>
+          <div className="flex justify-center">
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/presence-pointages')} 
+              className="flex flex-col p-4 sm:p-6 h-auto items-center justify-center min-h-[100px] sm:min-h-[120px] w-full max-w-xs"
+            >
+              <Clock className="h-6 w-6 sm:h-8 sm:w-8 mb-2" />
+              <span className="font-medium text-sm sm:text-base">Présence & Pointages</span>
+              <span className="text-xs sm:text-sm text-gray-500 mt-1">Géolocalisé</span>
             </Button>
           </div>
         </div>

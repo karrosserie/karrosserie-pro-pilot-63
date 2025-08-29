@@ -13,6 +13,7 @@ import Cessions from "@/pages/Cessions";
 import Help from "@/pages/Help";
 import KarrosseriePlanningPage from "@/pages/KarrosseriePlanningPage";
 import Messageries from "@/pages/Messageries";
+import PresencePointages from "@/pages/PresencePointages";
 
 export const coreRoutes = [
   {
@@ -131,6 +132,16 @@ export const coreRoutes = [
       <ProtectedRoute>
         <AppLayout>
           <Messageries />
+        </AppLayout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/presence-pointages",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <PresencePointages />
         </AppLayout>
       </ProtectedRoute>
     )
