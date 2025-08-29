@@ -9,11 +9,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Download, Calendar, MapPin, FileText, Filter, Clock, User, Building2, CheckCircle2, XCircle, AlertTriangle, Navigation, Truck, Waypoints, Phone, Mail, ChevronRight } from "lucide-react";
+import { Download, Calendar, MapPin, FileText, Filter, Clock, User, Building2, CheckCircle2, XCircle, AlertTriangle, Navigation, Truck, Waypoints, Phone, Mail, ChevronRight, ArrowLeft } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, CartesianGrid } from "recharts";
 import * as XLSX from 'xlsx';
 import { useToast } from "@/hooks/use-toast";
 import { useGeneratedReports } from "@/hooks/use-generated-reports";
+import { useNavigate } from "react-router-dom";
 
 // ------------------ Types & Helpers ------------------
 type Pointage = {
@@ -177,6 +178,7 @@ export default function PresencePointages() {
   const [formatExport, setFormatExport] = useState<"fec" | "csv">("fec");
   const { toast } = useToast();
   const { addReport } = useGeneratedReports();
+  const navigate = useNavigate();
 
   const filtered = useMemo(() => {
     return SAMPLE.filter((p) =>
@@ -333,8 +335,19 @@ export default function PresencePointages() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground"><span>Karrosserie.pro</span><ChevronRight className="w-4 h-4" /><span>RH</span><ChevronRight className="w-4 h-4" /><span>Présence & Pointages</span></div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate('/payments/accounting')}
+              className="gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Retour à la comptabilité
+            </Button>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground"><span>Karrosserie.pro</span><ChevronRight className="w-4 h-4" /><span>Paiements</span><ChevronRight className="w-4 h-4" /><span>Comptabilité</span><ChevronRight className="w-4 h-4" /><span>Présence & Pointages</span></div>
           <h1 className="text-2xl font-semibold mt-1">Présence & Pointages (géolocalisé)</h1>
           <p className="text-sm text-muted-foreground">Contrôle GPS, demi-journées, pauses repas, calculs heures normales & supplémentaires, exports paie</p>
         </div>
