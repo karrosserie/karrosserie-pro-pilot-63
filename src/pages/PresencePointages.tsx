@@ -344,10 +344,9 @@ export default function PresencePointages() {
               variant="ghost" 
               size="sm" 
               onClick={() => navigate('/payments/accounting')}
-              className="gap-2 hover:bg-karrosserie-orange/10 hover:text-karrosserie-orange"
+              className="hover:bg-karrosserie-orange/10 hover:text-karrosserie-orange"
             >
               <ArrowLeft className="w-4 h-4" />
-              Retour à la comptabilité
             </Button>
           </div>
           
