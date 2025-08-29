@@ -28,6 +28,7 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
   const [drawerData, setDrawerData] = useState<any>(null);
   const [viewingContent, setViewingContent] = useState<any>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentView, setCurrentView] = useState<'relances' | 'campagnes'>('relances');
 
   // Force rebuild - données fictives pour la démonstration
   const mockInvoices = [
@@ -236,138 +237,6 @@ Garage Martin`
       daysOverdue: 95,
       autoRelancesDisabled: false,
       clientId: 'client-003'
-    },
-    {
-      id: 'FAC-2024-067',
-      uuid: 'uuid-004',
-      client: 'EURL Rousseau Plomberie',
-      vehicle: 'Ford Transit',
-      vehicleRef: 'MN-012-OP',
-      garage: 'Garage Martin',
-      garageRef: '12345678901234',
-      amount: '890,50 €',
-      dueDate: '20/12/2024',
-      lastRelanceDate: '10/01/2025',
-      relanceType: 'Relance 1',
-      relanceTypeColor: 'bg-blue-100 text-blue-800',
-      status: 'relance1',
-      availableActions: ['whatsapp', 'sms', 'mail'],
-      history: [
-        { action: 'Email de relance', date: '10/01/2025', status: 'Envoyé' }
-      ],
-      clientPhone: '02 40 56 78 90',
-      clientEmail: 'rousseau.plomberie@orange.fr',
-      clientAddress: '7 impasse des Artisans\n44000 Nantes\nFrance',
-      daysOverdue: 8,
-      autoRelancesDisabled: false,
-      clientId: 'client-004'
-    },
-    {
-      id: 'FAC-2024-089',
-      uuid: 'uuid-005',
-      client: 'Mme Catherine Bernard',
-      vehicle: 'Volkswagen Polo',
-      vehicleRef: 'QR-345-ST',
-      garage: 'Garage Martin',
-      garageRef: '12345678901234',
-      amount: '2 150,00 €',
-      dueDate: '15/11/2024',
-      lastRelanceDate: '02/01/2025',
-      relanceType: 'Relance 3',
-      relanceTypeColor: 'bg-orange-100 text-orange-800',
-      status: 'relance3',
-      availableActions: ['whatsapp', 'sms', 'vms', 'recommande'],
-      history: [
-        { action: 'Relance email', date: '20/12/2024', status: 'Envoyé' },
-        { action: 'SMS de rappel', date: '28/12/2024', status: 'Lu' },
-        { action: 'Appel téléphonique', date: '02/01/2025', status: 'Conversation' }
-      ],
-      clientPhone: '06 23 45 67 89',
-      clientEmail: 'c.bernard@hotmail.fr',
-      clientAddress: '3 rue des Roses\n13001 Marseille\nFrance',
-      daysOverdue: 42,
-      autoRelancesDisabled: false,
-      clientId: 'client-005'
-    },
-    {
-      id: 'FAC-2024-103',
-      uuid: 'uuid-006',
-      client: 'SCI Lambert Immobilier',
-      vehicle: 'Mercedes Sprinter',
-      vehicleRef: 'UV-678-WX',
-      garage: 'Garage Martin',
-      garageRef: '12345678901234',
-      amount: '4 320,00 €',
-      dueDate: '05/11/2024',
-      lastRelanceDate: '18/01/2025',
-      relanceType: 'Mise en demeure',
-      relanceTypeColor: 'bg-red-100 text-red-800',
-      status: 'relance4',
-      availableActions: ['recommande', 'judiciaire'],
-      history: [
-        { action: 'Relance email', date: '10/12/2024', status: 'Envoyé' },
-        { action: 'SMS de rappel', date: '20/12/2024', status: 'Lu' },
-        { action: 'Relance téléphonique', date: '05/01/2025', status: 'Promesse de paiement' },
-        { action: 'Mise en demeure', date: '18/01/2025', status: 'Envoyé' }
-      ],
-      clientPhone: '01 42 78 96 54',
-      clientEmail: 'gestion@lambert-immobilier.com',
-      clientAddress: '89 boulevard Haussmann\n75008 Paris\nFrance',
-      daysOverdue: 68,
-      autoRelancesDisabled: false,
-      clientId: 'client-006'
-    },
-    {
-      id: 'FAC-2024-124',
-      uuid: 'uuid-007',
-      client: 'M. Pierre Dubois',
-      vehicle: 'Opel Corsa',
-      vehicleRef: 'YZ-901-AB',
-      garage: 'Garage Martin',
-      garageRef: '12345678901234',
-      amount: '650,00 €',
-      dueDate: '28/12/2024',
-      lastRelanceDate: '12/01/2025',
-      relanceType: 'Relance 1',
-      relanceTypeColor: 'bg-blue-100 text-blue-800',
-      status: 'relance1',
-      availableActions: ['whatsapp', 'sms', 'mail'],
-      history: [
-        { action: 'Email automatique', date: '12/01/2025', status: 'Envoyé' }
-      ],
-      clientPhone: '03 20 45 67 89',
-      clientEmail: 'p.dubois@gmail.com',
-      clientAddress: '12 rue du Commerce\n59000 Lille\nFrance',
-      daysOverdue: 5,
-      autoRelancesDisabled: false,
-      clientId: 'client-007'
-    },
-    {
-      id: 'FAC-2024-156',
-      uuid: 'uuid-008',
-      client: 'SARL Petit Électricité',
-      vehicle: 'Nissan NV200',
-      vehicleRef: 'CD-234-EF',
-      garage: 'Garage Martin',
-      garageRef: '12345678901234',
-      amount: '1 890,00 €',
-      dueDate: '03/12/2024',
-      lastRelanceDate: '08/01/2025',
-      relanceType: 'Relance 2',
-      relanceTypeColor: 'bg-orange-100 text-orange-800',
-      status: 'relance2',
-      availableActions: ['whatsapp', 'sms', 'vms', 'mail'],
-      history: [
-        { action: 'Relance email', date: '18/12/2024', status: 'Envoyé' },
-        { action: 'SMS de rappel', date: '28/12/2024', status: 'Lu' },
-        { action: 'Email de relance ferme', date: '08/01/2025', status: 'Envoyé' }
-      ],
-      clientPhone: '05 56 78 90 12',
-      clientEmail: 'petit.electricite@wanadoo.fr',
-      clientAddress: '45 avenue de la Libération\n33000 Bordeaux\nFrance',
-      daysOverdue: 32,
-      autoRelancesDisabled: false,
-      clientId: 'client-008'
     }
   ];
 
@@ -556,193 +425,413 @@ Garage Martin`
         <p className="text-muted-foreground text-sm sm:text-base">
           Gérez vos impayés et procédures judiciaires en toute simplicité
         </p>
+        
+        {/* View Toggle Buttons */}
+        <div className="flex gap-2 mt-4">
+          <Button
+            variant={currentView === 'relances' ? 'default' : 'outline'}
+            onClick={() => setCurrentView('relances')}
+            className="flex items-center gap-2"
+          >
+            <AlertTriangle className="h-4 w-4" />
+            Relances de paiement
+          </Button>
+          <Button
+            variant={currentView === 'campagnes' ? 'default' : 'outline'}
+            onClick={() => setCurrentView('campagnes')}
+            className="flex items-center gap-2"
+          >
+            <Mail className="h-4 w-4" />
+            Campagnes en cours
+          </Button>
+        </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
-          <CardContent className="p-4">
-            <div className="text-2xl sm:text-3xl font-bold text-foreground">{stats.enRelance}</div>
-            <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
-              EN RELANCE
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-l-4 border-l-red-500 hover:shadow-lg transition-shadow">
-          <CardContent className="p-4">
-            <div className="text-2xl sm:text-3xl font-bold text-foreground">{stats.procedureJudiciaire}</div>
-            <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
-              PROCÉDURE JUDICIAIRE
-            </div>
-          </CardContent>
-        </Card>
+      {currentView === 'relances' ? (
+        <>
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
+              <CardContent className="p-4">
+                <div className="text-2xl sm:text-3xl font-bold text-foreground">{stats.enRelance}</div>
+                <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                  EN RELANCE
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-l-4 border-l-red-500 hover:shadow-lg transition-shadow">
+              <CardContent className="p-4">
+                <div className="text-2xl sm:text-3xl font-bold text-foreground">{stats.procedureJudiciaire}</div>
+                <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                  PROCÉDURE JUDICIAIRE
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="border-l-4 border-l-green-500 hover:shadow-lg transition-shadow">
-          <CardContent className="p-4">
-            <div className="text-xl sm:text-2xl font-bold text-foreground">{stats.recupererCeMois}</div>
-            <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
-              RÉCUPÉRÉ CE MOIS
-            </div>
-          </CardContent>
-        </Card>
+            <Card className="border-l-4 border-l-green-500 hover:shadow-lg transition-shadow">
+              <CardContent className="p-4">
+                <div className="text-xl sm:text-2xl font-bold text-foreground">{stats.recupererCeMois}</div>
+                <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                  RÉCUPÉRÉ CE MOIS
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="border-l-4 border-l-primary hover:shadow-lg transition-shadow">
-          <CardContent className="p-4">
-            <div className="text-xl sm:text-2xl font-bold text-foreground">{stats.totalImpayes}</div>
-            <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
-              TOTAL IMPAYÉS
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Main Table */}
-      <Card className="overflow-hidden">
-        <CardHeader className="border-b border-border">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-            <CardTitle className="text-xl font-semibold">Factures impayées</CardTitle>
-            <div className="flex flex-wrap gap-2">
-              <Button 
-                variant={filter === 'all' ? 'default' : 'outline'} 
-                size="sm"
-                onClick={() => setFilter('all')}
-                className="text-xs sm:text-sm"
-              >
-                Toutes
-              </Button>
-              <Button 
-                variant={filter === 'relance1' || filter === 'relance2' || filter === 'relance3' ? 'default' : 'outline'} 
-                size="sm"
-                onClick={() => setFilter('relance')}
-                className="text-xs sm:text-sm"
-              >
-                Relance
-              </Button>
-              <Button 
-                variant={filter === 'demeure' ? 'default' : 'outline'} 
-                size="sm"
-                onClick={() => setFilter('demeure')}
-                className="text-xs sm:text-sm"
-              >
-                Mise en demeure
-              </Button>
-              <Button 
-                variant={filter === 'contentieux' ? 'default' : 'outline'} 
-                size="sm"
-                onClick={() => setFilter('contentieux')}
-                className="text-xs sm:text-sm"
-              >
-                Judiciaire
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        
-        <CardContent className="p-0">
-          {/* Desktop Table */}
-          <div className="hidden lg:block overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-muted/50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Client</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Facture</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Montant</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Retard</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Statut</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {filteredInvoices.map((invoice) => (
-                  <tr key={invoice.uuid} className="hover:bg-muted/30 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-medium text-foreground">{invoice.client}</div>
-                      <div className="text-sm text-muted-foreground">{invoice.vehicle}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">{invoice.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-foreground">{invoice.amount}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={getOverdueColor(invoice.daysOverdue)}>
-                        {invoice.daysOverdue} jours
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge variant="outline" className={getStatusColor(invoice.status)}>
-                        {getStatusText(invoice.status)}
-                      </Badge>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => showDetails(invoice)}
-                        >
-                          <Eye className="h-4 w-4 mr-1" />
-                          Détails
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <Card className="border-l-4 border-l-primary hover:shadow-lg transition-shadow">
+              <CardContent className="p-4">
+                <div className="text-xl sm:text-2xl font-bold text-foreground">{stats.totalImpayes}</div>
+                <div className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                  TOTAL IMPAYÉS
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Mobile Cards */}
-          <div className="lg:hidden space-y-4 p-4">
-            {filteredInvoices.map((invoice) => (
-              <Card key={invoice.uuid} className="border border-border">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex-1">
-                      <div className="font-semibold text-foreground text-sm">{invoice.client}</div>
-                      <div className="text-xs text-muted-foreground">{invoice.vehicle}</div>
-                    </div>
-                    <Badge variant="outline" className={`${getStatusColor(invoice.status)} text-xs`}>
-                      {getStatusText(invoice.status)}
-                    </Badge>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-3 text-xs mb-3">
-                    <div>
-                      <span className="text-muted-foreground">Facture:</span>
-                      <div className="font-medium">{invoice.id}</div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Montant:</span>
-                      <div className="font-semibold">{invoice.amount}</div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Retard:</span>
-                      <div className={getOverdueColor(invoice.daysOverdue)}>{invoice.daysOverdue} jours</div>
-                    </div>
-                  </div>
-                  
-                  <Button
-                    variant="outline"
+          {/* Main Table */}
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                <CardTitle className="text-xl font-semibold">Factures impayées</CardTitle>
+                <div className="flex flex-wrap gap-2">
+                  <Button 
+                    variant={filter === 'all' ? 'default' : 'outline'} 
                     size="sm"
-                    onClick={() => showDetails(invoice)}
-                    className="w-full"
+                    onClick={() => setFilter('all')}
+                    className="text-xs sm:text-sm"
                   >
-                    <Eye className="h-4 w-4 mr-2" />
-                    Voir détails
+                    Toutes
                   </Button>
-                </CardContent>
-              </Card>
-            ))}
+                  <Button 
+                    variant={filter === 'relance1' || filter === 'relance2' || filter === 'relance3' ? 'default' : 'outline'} 
+                    size="sm"
+                    onClick={() => setFilter('relance')}
+                    className="text-xs sm:text-sm"
+                  >
+                    Relance
+                  </Button>
+                  <Button 
+                    variant={filter === 'demeure' ? 'default' : 'outline'} 
+                    size="sm"
+                    onClick={() => setFilter('demeure')}
+                    className="text-xs sm:text-sm"
+                  >
+                    Mise en demeure
+                  </Button>
+                  <Button 
+                    variant={filter === 'contentieux' ? 'default' : 'outline'} 
+                    size="sm"
+                    onClick={() => setFilter('contentieux')}
+                    className="text-xs sm:text-sm"
+                  >
+                    Judiciaire
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="p-0">
+              {/* Desktop Table */}
+              <div className="hidden lg:block overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-muted/50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Client</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Facture</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Montant</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Retard</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Statut</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {filteredInvoices.map((invoice) => (
+                      <tr key={invoice.uuid} className="hover:bg-muted/30 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="font-medium text-foreground">{invoice.client}</div>
+                          <div className="text-sm text-muted-foreground">{invoice.vehicle}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">{invoice.id}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-foreground">{invoice.amount}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <span className={getOverdueColor(invoice.daysOverdue)}>
+                            {invoice.daysOverdue} jours
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <Badge variant="outline" className={getStatusColor(invoice.status)}>
+                            {getStatusText(invoice.status)}
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => showDetails(invoice)}
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              Détails
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Cards */}
+              <div className="lg:hidden space-y-4 p-4">
+                {filteredInvoices.map((invoice) => (
+                  <Card key={invoice.uuid} className="border border-border">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex-1">
+                          <div className="font-semibold text-foreground text-sm">{invoice.client}</div>
+                          <div className="text-xs text-muted-foreground">{invoice.vehicle}</div>
+                        </div>
+                        <Badge variant="outline" className={`${getStatusColor(invoice.status)} text-xs`}>
+                          {getStatusText(invoice.status)}
+                        </Badge>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3 text-xs mb-3">
+                        <div>
+                          <span className="text-muted-foreground">Facture:</span>
+                          <div className="font-medium">{invoice.id}</div>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Montant:</span>
+                          <div className="font-semibold">{invoice.amount}</div>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Retard:</span>
+                          <div className={getOverdueColor(invoice.daysOverdue)}>{invoice.daysOverdue} jours</div>
+                        </div>
+                      </div>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => showDetails(invoice)}
+                        className="w-full"
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        Voir détails
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {filteredInvoices.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">
+                  <AlertTriangle className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                  <p className="text-lg font-medium mb-2">Aucune facture impayée</p>
+                  <p className="text-sm">Aucune facture ne correspond aux critères sélectionnés.</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </>
+      ) : (
+        /* Campagnes View */
+        <>
+          {/* Campaign Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Campagne Janvier 2025 */}
+            <Card className="border-l-4 border-l-green-500">
+              <CardHeader className="bg-green-50">
+                <CardTitle className="text-lg font-bold text-green-800">
+                  Campagne janvier 2025
+                </CardTitle>
+                <p className="text-sm text-green-700">Dernière relance automatique envoyée le 15 janvier 2025</p>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-foreground">8</div>
+                    <div className="text-xs text-muted-foreground">Total</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-foreground">4</div>
+                    <div className="text-xs text-muted-foreground">Envoyés</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-foreground">2</div>
+                    <div className="text-xs text-muted-foreground">Ouverts</div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                    En cours
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    Arrêter
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Campagne Décembre 2024 */}
+            <Card className="border-l-4 border-l-blue-500">
+              <CardHeader className="bg-blue-50">
+                <CardTitle className="text-lg font-bold text-blue-800">
+                  Campagne décembre 2024
+                </CardTitle>
+                <p className="text-sm text-blue-700">Campagne terminée le 30 décembre 2024</p>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-foreground">34</div>
+                    <div className="text-xs text-muted-foreground">Total</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-foreground">5</div>
+                    <div className="text-xs text-muted-foreground">Payés</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-foreground">3</div>
+                    <div className="text-xs text-muted-foreground">En litige</div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="text-blue-600 border-blue-300">
+                    Terminée
+                  </Button>
+                  <Button variant="destructive" size="sm">
+                    Programmer campagne
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          {filteredInvoices.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground">
-              <AlertTriangle className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-              <p className="text-lg font-medium mb-2">Aucune facture impayée</p>
-              <p className="text-sm">Aucune facture ne correspond aux critères sélectionnés.</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          {/* Templates de Messages */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold flex items-center">
+                <FileText className="h-5 w-5 mr-2" />
+                Templates de Messages
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card className="border-2 border-green-200 bg-green-50">
+                  <CardContent className="p-4">
+                    <div className="text-sm font-medium text-green-800 mb-2">SMS - RELANCE</div>
+                    <div className="text-xs text-green-700 mb-3">
+                      Rappel de facture échu
+                    </div>
+                    <div className="text-xs text-muted-foreground mb-3">
+                      Template automatique - Utilise le montant XREPLACE et message générique.
+                    </div>
+                    <Button size="sm" variant="outline" className="w-full text-green-700 border-green-300">
+                      Sélectionner template
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="border border-border">
+                  <CardContent className="p-4">
+                    <div className="text-sm font-medium mb-2">SMS - RELANCE</div>
+                    <div className="text-xs text-muted-foreground mb-3">
+                      SMS de rappel simple
+                    </div>
+                    <div className="text-xs text-muted-foreground mb-3">
+                      "Bonjour, nous vous rappelons..."
+                    </div>
+                    <Button size="sm" variant="outline" className="w-full">
+                      Modifier template
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="border border-border">
+                  <CardContent className="p-4">
+                    <div className="text-sm font-medium mb-2">EMAIL - RELANCE</div>
+                    <div className="text-xs text-muted-foreground mb-3">
+                      Relance ferme avec pièces
+                    </div>
+                    <div className="text-xs text-muted-foreground mb-3">
+                      Template formel pour étapes de procédure
+                    </div>
+                    <Button size="sm" variant="outline" className="w-full">
+                      Modifier template
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="border border-border">
+                  <CardContent className="p-4">
+                    <div className="text-sm font-medium mb-2">LIER SAISIE</div>
+                    <div className="text-xs text-muted-foreground mb-3">
+                      Mise en demeure officielle
+                    </div>
+                    <div className="text-xs text-muted-foreground mb-3">
+                      Template juridique automatique
+                    </div>
+                    <Button size="sm" variant="outline" className="w-full">
+                      Paramétrer
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Journal d'Activité */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold flex items-center">
+                <Calendar className="h-5 w-5 mr-2" />
+                Journal d'Activité Temps Réel
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {[
+                  { time: "09/01/2025 17:02", client: "SAS Moreau", action: "Mise en demeure", status: "Envoyé", type: "success" },
+                  { time: "09/01/2025 16:58", client: "EURL Rousseau", action: "Email amiable", status: "Erreur", type: "error" },
+                  { time: "09/01/2025 16:45", client: "M. Pierre Dubois", action: "SMS message", status: "Lu", type: "info" },
+                  { time: "09/01/2025 16:12", client: "SAS Moreau", action: "Email amiable", status: "Lu", type: "info" },
+                  { time: "09/01/2025 15:38", client: "SARL Petit Électricité", action: "SMS message", status: "Réception interrompue", type: "warning" },
+                  { time: "09/01/2025 15:12", client: "SAS Moreau", action: "SMS message", status: "Envoyé", type: "success" },
+                  { time: "09/01/2025 14:45", client: "SARL Dupont", action: "SMS message", status: "Envoyé", type: "success" },
+                  { time: "09/01/2025 14:23", client: "Entreprise Leroy", action: "LTR message", status: "Envoyé", type: "success" },
+                  { time: "09/01/2025 13:56", client: "SARL Petit Électricité", action: "SMS message", status: "Envoyé", type: "success" },
+                  { time: "09/01/2025 13:12", client: "SARL Dupont", action: "LTR message", status: "Envoyé", type: "success" }
+                ].map((log, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg text-sm">
+                    <div className="flex items-center gap-4">
+                      <span className="text-muted-foreground font-mono">{log.time}</span>
+                      <span className="font-medium">{log.client}</span>
+                      <span className="text-muted-foreground">{log.action}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge 
+                        variant={
+                          log.type === 'success' ? 'default' : 
+                          log.type === 'error' ? 'destructive' : 
+                          log.type === 'warning' ? 'secondary' : 'outline'
+                        }
+                        className="text-xs"
+                      >
+                        {log.status}
+                      </Badge>
+                      <Button variant="ghost" size="sm" className="h-6 px-2">
+                        <Eye className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      )}
 
       {/* Sidebar pour les détails */}
       {drawerData && (
@@ -1017,72 +1106,72 @@ Garage Martin`
                 </div>
               </div>
 
-                {/* Action Buttons / Countdown */}
-                <div className="pt-4 border-t">
-                  {drawerData.status.includes('relance') ? (
-                    (() => {
-                      const countdown = getNextActionCountdown(drawerData);
-                      if (!countdown) {
-                        return (
-                          <div className="text-center p-4 bg-muted rounded-lg">
-                            <div className="text-sm text-muted-foreground">
-                              Aucun SMS de rappel trouvé pour calculer le délai automatique
-                            </div>
-                          </div>
-                        );
-                      }
-
+              {/* Action Buttons / Countdown */}
+              <div className="pt-4 border-t">
+                {drawerData.status.includes('relance') ? (
+                  (() => {
+                    const countdown = getNextActionCountdown(drawerData);
+                    if (!countdown) {
                       return (
-                        <div className="text-center p-4 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg">
-                          <div className="flex items-center justify-center mb-2">
-                            <Clock className="h-5 w-5 text-orange-600 mr-2" />
-                            <span className="font-semibold text-orange-800">
-                              {countdown.action}
-                            </span>
+                        <div className="text-center p-4 bg-muted rounded-lg">
+                          <div className="text-sm text-muted-foreground">
+                            Aucun SMS de rappel trouvé pour calculer le délai automatique
                           </div>
-                          
-                          {countdown.isActive ? (
-                            <div className="space-y-2">
-                              <div className="text-2xl font-bold text-orange-700">
-                                {countdown.timeLeft.days > 0 && `${countdown.timeLeft.days}j `}
-                                {String(countdown.timeLeft.hours).padStart(2, '0')}:
-                                {String(countdown.timeLeft.minutes).padStart(2, '0')}:
-                                {String(countdown.timeLeft.seconds).padStart(2, '0')}
-                              </div>
-                              <div className="text-xs text-orange-600">
-                                {countdown.type === 'miseEnDemeure' 
-                                  ? `Délai automatique de 8 jours après le dernier SMS (échéance: ${countdown.deadline})`
-                                  : `Délai automatique de 10 jours après la mise en demeure (échéance: ${countdown.deadline})`
-                                }
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="space-y-1">
-                              <div className="text-sm text-red-600 font-medium">
-                                Délai dépassé depuis le {countdown.deadline}
-                              </div>
-                              <div className="text-xs text-red-500">
-                                Action manuelle requise
-                              </div>
-                            </div>
-                          )}
                         </div>
                       );
-                    })()
-                  ) : drawerData.status === 'contentieux' ? (
-                    <div className="text-center p-4 bg-gradient-to-r from-red-50 to-red-100 border border-red-300 rounded-lg">
-                      <div className="flex items-center justify-center mb-2">
-                        <Scale className="h-5 w-5 text-red-600 mr-2" />
-                        <span className="font-semibold text-red-800">
-                          Procédure judiciaire en cours
-                        </span>
+                    }
+
+                    return (
+                      <div className="text-center p-4 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg">
+                        <div className="flex items-center justify-center mb-2">
+                          <Clock className="h-5 w-5 text-orange-600 mr-2" />
+                          <span className="font-semibold text-orange-800">
+                            {countdown.action}
+                          </span>
+                        </div>
+                        
+                        {countdown.isActive ? (
+                          <div className="space-y-2">
+                            <div className="text-2xl font-bold text-orange-700">
+                              {countdown.timeLeft.days > 0 && `${countdown.timeLeft.days}j `}
+                              {String(countdown.timeLeft.hours).padStart(2, '0')}:
+                              {String(countdown.timeLeft.minutes).padStart(2, '0')}:
+                              {String(countdown.timeLeft.seconds).padStart(2, '0')}
+                            </div>
+                            <div className="text-xs text-orange-600">
+                              {countdown.type === 'miseEnDemeure' 
+                                ? `Délai automatique de 8 jours après le dernier SMS (échéance: ${countdown.deadline})`
+                                : `Délai automatique de 10 jours après la mise en demeure (échéance: ${countdown.deadline})`
+                              }
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="space-y-1">
+                            <div className="text-sm text-red-600 font-medium">
+                              Délai dépassé depuis le {countdown.deadline}
+                            </div>
+                            <div className="text-xs text-red-500">
+                              Action manuelle requise
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      <div className="text-sm text-red-600">
-                        Dossier déposé au tribunal
-                      </div>
+                    );
+                  })()
+                ) : drawerData.status === 'contentieux' ? (
+                  <div className="text-center p-4 bg-gradient-to-r from-red-50 to-red-100 border border-red-300 rounded-lg">
+                    <div className="flex items-center justify-center mb-2">
+                      <Scale className="h-5 w-5 text-red-600 mr-2" />
+                      <span className="font-semibold text-red-800">
+                        Procédure judiciaire en cours
+                      </span>
                     </div>
-                  ) : null}
-                </div>
+                    <div className="text-sm text-red-600">
+                      Dossier déposé au tribunal
+                    </div>
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
         </>
