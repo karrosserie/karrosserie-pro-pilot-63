@@ -991,17 +991,13 @@ Garage Martin`
           />
           
           {/* Modal */}
-          <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-background border border-border rounded-lg shadow-xl z-50 w-[700px] max-w-[90vw] max-h-[80vh] overflow-hidden">
+          <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-background border border-border rounded-lg shadow-xl z-50 w-[500px] max-w-[90vw] max-h-[80vh] overflow-hidden">
             <div className="p-6">
               {/* Header */}
-              <div className="flex justify-between items-center mb-4">
-                <div>
-                  <h3 className="text-lg font-bold flex items-center">
-                    <Mail className="h-5 w-5 mr-2" />
-                    {viewingCampaignDetails.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">{viewingCampaignDetails.description}</p>
-                </div>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-bold flex items-center">
+                  📊 Détail de la campagne
+                </h3>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -1012,105 +1008,174 @@ Garage Martin`
                 </Button>
               </div>
 
-              {/* Stats Summary */}
-              <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-muted rounded-lg">
-                {viewingCampaignDetails.id === 'janvier2025' ? (
-                  <>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-foreground">{viewingCampaignDetails.stats.total}</div>
-                      <div className="text-xs text-muted-foreground">Total</div>
+              {/* Statistiques détaillées */}
+              <div className="mb-6">
+                <h4 className="text-sm font-semibold mb-4 flex items-center">
+                  📈 Statistiques détaillées
+                </h4>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-4 bg-muted/30 rounded-lg">
+                    <div className="text-2xl font-bold text-foreground">
+                      {viewingCampaignDetails.id === 'janvier2025' ? '12' : '34'}
                     </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-foreground">{viewingCampaignDetails.stats.envoyes}</div>
-                      <div className="text-xs text-muted-foreground">Envoyés</div>
+                    <div className="text-xs text-muted-foreground">
+                      Factures ciblées
                     </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-foreground">{viewingCampaignDetails.stats.ouverts}</div>
-                      <div className="text-xs text-muted-foreground">Ouverts</div>
+                  </div>
+                  
+                  <div className="text-center p-4 bg-muted/30 rounded-lg">
+                    <div className="text-2xl font-bold text-foreground">
+                      {viewingCampaignDetails.id === 'janvier2025' ? '28' : '67'}
                     </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-foreground">{viewingCampaignDetails.stats.total}</div>
-                      <div className="text-xs text-muted-foreground">Total</div>
+                    <div className="text-xs text-muted-foreground">
+                      Actions réalisées
                     </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-foreground">{viewingCampaignDetails.stats.payes}</div>
-                      <div className="text-xs text-muted-foreground">Payés</div>
+                  </div>
+                  
+                  <div className="text-center p-4 bg-green-100 rounded-lg">
+                    <div className="text-2xl font-bold text-green-800">
+                      {viewingCampaignDetails.id === 'janvier2025' ? '3' : '5'}
                     </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-foreground">{viewingCampaignDetails.stats.enLitige}</div>
-                      <div className="text-xs text-muted-foreground">En litige</div>
+                    <div className="text-xs text-green-600">
+                      Paiements obtenus
                     </div>
-                  </>
-                )}
+                  </div>
+                  
+                  <div className="text-center p-4 bg-yellow-100 rounded-lg">
+                    <div className="text-2xl font-bold text-yellow-800">
+                      {viewingCampaignDetails.id === 'janvier2025' ? '25%' : '15%'}
+                    </div>
+                    <div className="text-xs text-yellow-600">
+                      Taux de succès
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Client List */}
-              <div className="max-h-96 overflow-y-auto">
-                <h4 className="font-semibold mb-3">Liste des clients</h4>
-                <div className="space-y-2">
-                  {viewingCampaignDetails.clients.map((client: any, index: number) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg text-sm">
-                      <div className="flex-1">
-                        <div className="font-medium">{client.name}</div>
-                        <div className="text-muted-foreground">
-                          {client.facture} • {client.montant}
+              {/* Factures en cours */}
+              <div className="mb-6">
+                <h4 className="text-sm font-semibold mb-4 flex items-center">
+                  📋 Factures en cours
+                </h4>
+                
+                <div className="max-h-64 overflow-y-auto space-y-2">
+                  {viewingCampaignDetails.id === 'janvier2025' ? (
+                    <>
+                      <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                        <div className="text-sm">
+                          <span className="font-medium">FAC-2024-001</span>
+                          <span className="text-muted-foreground"> - SARL Dupont</span>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Badge 
-                          variant={
-                            client.statut.includes('Payé') ? 'default' : 
-                            client.statut.includes('En litige') ? 'destructive' : 
-                            client.statut.includes('SMS envoyé') || client.statut.includes('Email envoyé') ? 'secondary' : 'outline'
-                          }
-                          className="text-xs"
-                        >
-                          {client.statut}
+                        <Badge variant="outline" className="text-xs bg-orange-50 text-orange-600 border-orange-200">
+                          Étape 2/5
                         </Badge>
-                        {client.ouvert && (
-                          <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                            Lu
-                          </Badge>
-                        )}
-                        <div className="text-xs text-muted-foreground">
-                          {client.dateEnvoi || client.datePaiement || client.dateContentieux}
-                        </div>
                       </div>
-                    </div>
-                  ))}
+                      
+                      <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                        <div className="text-sm">
+                          <span className="font-medium">FAC-2024-004</span>
+                          <span className="text-muted-foreground"> - EURL Rousseau</span>
+                        </div>
+                        <Badge variant="outline" className="text-xs bg-orange-50 text-orange-600 border-orange-200">
+                          Étape 3/5
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                        <div className="text-sm">
+                          <span className="font-medium">FAC-2024-007</span>
+                          <span className="text-muted-foreground"> - SAS Martin</span>
+                        </div>
+                        <Badge className="text-xs bg-green-500 text-white">
+                          ✓ Payée
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                        <div className="text-sm">
+                          <span className="font-medium">FAC-2024-015</span>
+                          <span className="text-muted-foreground"> - Entreprise Leroy</span>
+                        </div>
+                        <Badge variant="outline" className="text-xs bg-blue-50 text-blue-600 border-blue-200">
+                          Étape 1/5
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                        <div className="text-sm">
+                          <span className="font-medium">FAC-2024-032</span>
+                          <span className="text-muted-foreground"> - SAS Moreau & Fils</span>
+                        </div>
+                        <Badge variant="outline" className="text-xs bg-red-50 text-red-600 border-red-200">
+                          Étape 4/5
+                        </Badge>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                        <div className="text-sm">
+                          <span className="font-medium">FAC-2024-198</span>
+                          <span className="text-muted-foreground"> - Garage Renault Lyon</span>
+                        </div>
+                        <Badge className="text-xs bg-green-500 text-white">
+                          ✓ Payée
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                        <div className="text-sm">
+                          <span className="font-medium">FAC-2024-201</span>
+                          <span className="text-muted-foreground"> - Taxi Marseille SARL</span>
+                        </div>
+                        <Badge className="text-xs bg-green-500 text-white">
+                          ✓ Payée
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                        <div className="text-sm">
+                          <span className="font-medium">FAC-2024-189</span>
+                          <span className="text-muted-foreground"> - Transport Bordeaux</span>
+                        </div>
+                        <Badge variant="destructive" className="text-xs">
+                          En litige
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                        <div className="text-sm">
+                          <span className="font-medium">FAC-2024-203</span>
+                          <span className="text-muted-foreground"> - Flotte Auto Paris</span>
+                        </div>
+                        <Badge className="text-xs bg-green-500 text-white">
+                          ✓ Payée
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                        <div className="text-sm">
+                          <span className="font-medium">FAC-2024-156</span>
+                          <span className="text-muted-foreground"> - EURL Transport Sud</span>
+                        </div>
+                        <Badge variant="destructive" className="text-xs">
+                          En litige
+                        </Badge>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
-              {/* Summary */}
-              <div className="mt-6 pt-4 border-t">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium text-muted-foreground">Montant total concerné:</span>
-                    <div className="font-semibold text-lg">
-                      {viewingCampaignDetails.clients.reduce((sum: number, client: any) => {
-                        const amount = parseFloat(client.montant.replace(' €', '').replace(',', '.'));
-                        return sum + amount;
-                      }, 0).toLocaleString('fr-FR')} €
-                    </div>
-                  </div>
-                  <div>
-                    <span className="font-medium text-muted-foreground">
-                      {viewingCampaignDetails.id === 'janvier2025' ? 'Taux d\'ouverture:' : 'Montant récupéré:'}
-                    </span>
-                    <div className="font-semibold text-lg">
-                      {viewingCampaignDetails.id === 'janvier2025' 
-                        ? `${Math.round((viewingCampaignDetails.stats.ouverts / viewingCampaignDetails.stats.envoyes) * 100)}%`
-                        : `${viewingCampaignDetails.clients.filter((c: any) => c.recouvre).reduce((sum: number, client: any) => {
-                            const amount = parseFloat(client.montant.replace(' €', '').replace(',', '.'));
-                            return sum + amount;
-                          }, 0).toLocaleString('fr-FR')} €`
-                      }
-                    </div>
-                  </div>
-                </div>
+              {/* Bouton Fermer */}
+              <div className="flex justify-center">
+                <Button 
+                  className="bg-green-600 hover:bg-green-700 text-white px-8"
+                  onClick={closeCampaignDetails}
+                >
+                  Fermer
+                </Button>
               </div>
             </div>
           </div>
