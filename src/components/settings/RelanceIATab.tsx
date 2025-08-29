@@ -194,61 +194,57 @@ const RelanceIATab = () => {
             <div>
               <Label className="font-medium mb-3 block">Canaux de communication</Label>
               <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <input
-                    type="checkbox"
-                    id="email"
-                    checked={settings.channels.email}
-                    onChange={(e) => handleSettingChange('channels', { ...settings.channels, email: e.target.checked })}
-                    className="rounded border-gray-300"
-                  />
-                  <div className="flex items-center space-x-2">
-                    <span className="text-blue-600">📧</span>
-                    <Label htmlFor="email" className="text-sm">Email</Label>
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => handleSettingChange('channels', { ...settings.channels, email: !settings.channels.email })}
+                  className={`w-full flex items-center space-x-3 p-3 rounded-lg border transition-all ${
+                    settings.channels.email 
+                      ? 'bg-green-100 border-green-300 text-green-800' 
+                      : 'bg-gray-100 border-gray-300 text-gray-600'
+                  }`}
+                >
+                  <span className="text-blue-600 text-lg">📧</span>
+                  <Label className="text-sm font-medium cursor-pointer">Email</Label>
+                </button>
 
-                <div className="flex items-center space-x-3">
-                  <input
-                    type="checkbox"
-                    id="sms"
-                    checked={settings.channels.sms}
-                    onChange={(e) => handleSettingChange('channels', { ...settings.channels, sms: e.target.checked })}
-                    className="rounded border-gray-300"
-                  />
-                  <div className="flex items-center space-x-2">
-                    <span className="text-green-600">📱</span>
-                    <Label htmlFor="sms" className="text-sm">SMS</Label>
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => handleSettingChange('channels', { ...settings.channels, sms: !settings.channels.sms })}
+                  className={`w-full flex items-center space-x-3 p-3 rounded-lg border transition-all ${
+                    settings.channels.sms 
+                      ? 'bg-green-100 border-green-300 text-green-800' 
+                      : 'bg-gray-100 border-gray-300 text-gray-600'
+                  }`}
+                >
+                  <span className="text-green-600 text-lg">📱</span>
+                  <Label className="text-sm font-medium cursor-pointer">SMS</Label>
+                </button>
 
-                <div className="flex items-center space-x-3">
-                  <input
-                    type="checkbox"
-                    id="phone"
-                    checked={settings.channels.phone}
-                    onChange={(e) => handleSettingChange('channels', { ...settings.channels, phone: e.target.checked })}
-                    className="rounded border-gray-300"
-                  />
-                  <div className="flex items-center space-x-2">
-                    <span className="text-red-600">📞</span>
-                    <Label htmlFor="phone" className="text-sm">Appel vocal</Label>
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => handleSettingChange('channels', { ...settings.channels, phone: !settings.channels.phone })}
+                  className={`w-full flex items-center space-x-3 p-3 rounded-lg border transition-all ${
+                    settings.channels.phone 
+                      ? 'bg-green-100 border-green-300 text-green-800' 
+                      : 'bg-gray-100 border-gray-300 text-gray-600'
+                  }`}
+                >
+                  <span className="text-red-600 text-lg">📞</span>
+                  <Label className="text-sm font-medium cursor-pointer">Appel vocal</Label>
+                </button>
 
-                <div className="flex items-center space-x-3">
-                  <input
-                    type="checkbox"
-                    id="mail"
-                    checked={settings.channels.mail}
-                    onChange={(e) => handleSettingChange('channels', { ...settings.channels, mail: e.target.checked })}
-                    className="rounded border-gray-300"
-                  />
-                  <div className="flex items-center space-x-2">
-                    <span className="text-purple-600">📮</span>
-                    <Label htmlFor="mail" className="text-sm">Courrier LRE</Label>
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => handleSettingChange('channels', { ...settings.channels, mail: !settings.channels.mail })}
+                  className={`w-full flex items-center space-x-3 p-3 rounded-lg border transition-all ${
+                    settings.channels.mail 
+                      ? 'bg-green-100 border-green-300 text-green-800' 
+                      : 'bg-gray-100 border-gray-300 text-gray-600'
+                  }`}
+                >
+                  <span className="text-purple-600 text-lg">📮</span>
+                  <Label className="text-sm font-medium cursor-pointer">Courrier LRE</Label>
+                </button>
               </div>
             </div>
 
