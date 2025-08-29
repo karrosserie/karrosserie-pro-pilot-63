@@ -1,13 +1,14 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CreditCard, Settings as SettingsIcon, User, Bell, Sliders, Users } from 'lucide-react';
+import { CreditCard, Settings as SettingsIcon, User, Bell, Sliders, Users, Bot } from 'lucide-react';
 import CompanyTab from '@/components/settings/CompanyTab';
 import PreferencesTab from '@/components/settings/PreferencesTab';
 import TeamTab from '@/components/settings/TeamTab';
 import AppearanceTab from '@/components/settings/AppearanceTab';
 import NotificationsTab from '@/components/settings/NotificationsTab';
 import SubscriptionTab from '@/components/settings/SubscriptionTab';
+import RelanceIATab from '@/components/settings/RelanceIATab';
 import { useCompany } from '@/hooks/use-company';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useSearchParams } from 'react-router-dom';
@@ -73,6 +74,10 @@ const Settings = () => {
                 <Bell className="h-4 w-4 mr-2" />
                 Notifications
               </TabsTrigger>
+              <TabsTrigger value="relance-ia">
+                <Bot className="h-4 w-4 mr-2" />
+                Relance IA
+              </TabsTrigger>
             </>
           )}
           <TabsTrigger value="subscription">
@@ -101,6 +106,10 @@ const Settings = () => {
             
             <TabsContent value="notifications">
               <NotificationsTab />
+            </TabsContent>
+            
+            <TabsContent value="relance-ia">
+              <RelanceIATab />
             </TabsContent>
           </>
         )}
