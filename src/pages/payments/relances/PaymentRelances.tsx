@@ -889,72 +889,117 @@ Garage Martin`
             <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wide">
               Tunnel de conversion
             </h3>
-            <div className="flex items-center gap-2 overflow-x-auto pb-2">
+            
+            {/* Desktop & Tablet - Horizontal flow */}
+            <div className="hidden sm:flex items-center gap-1 lg:gap-2 xl:gap-3 w-full overflow-x-auto pb-2">
               {/* Factures impayées */}
-              <div className="flex-shrink-0 relative">
-                <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl px-4 py-3 min-w-[140px] shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
-                  <div className="text-xs opacity-80">Factures impayées</div>
-                  <div className="text-xl font-bold">45</div>
+              <div className="flex-1 relative min-w-0">
+                <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                  <div className="text-xs opacity-80 truncate">Factures impayées</div>
+                  <div className="text-xl lg:text-2xl font-bold">45</div>
                 </div>
-                <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 text-blue-400">
-                  <svg width="8" height="16" viewBox="0 0 8 16" fill="currentColor">
-                    <path d="M0 0L8 8L0 16V0Z"/>
+                <div className="absolute -right-0.5 top-1/2 transform -translate-y-1/2 text-blue-400">
+                  <svg width="6" height="12" viewBox="0 0 6 12" fill="currentColor" className="lg:w-2 lg:h-4">
+                    <path d="M0 0L6 6L0 12V0Z"/>
                   </svg>
                 </div>
               </div>
 
               {/* Relances automatiques */}
-              <div className="flex-shrink-0 relative ml-1">
-                <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl px-4 py-3 min-w-[130px] shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
-                  <div className="text-xs opacity-80">Relances auto</div>
-                  <div className="text-xl font-bold">38</div>
+              <div className="flex-1 relative min-w-0 ml-0.5">
+                <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                  <div className="text-xs opacity-80 truncate">Relances auto</div>
+                  <div className="text-xl lg:text-2xl font-bold">38</div>
                 </div>
-                <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 text-orange-400">
-                  <svg width="8" height="16" viewBox="0 0 8 16" fill="currentColor">
-                    <path d="M0 0L8 8L0 16V0Z"/>
+                <div className="absolute -right-0.5 top-1/2 transform -translate-y-1/2 text-orange-400">
+                  <svg width="6" height="12" viewBox="0 0 6 12" fill="currentColor" className="lg:w-2 lg:h-4">
+                    <path d="M0 0L6 6L0 12V0Z"/>
                   </svg>
                 </div>
               </div>
 
               {/* Mises en demeure */}
-              <div className="flex-shrink-0 relative ml-1">
-                <div className="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl px-4 py-3 min-w-[120px] shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
-                  <div className="text-xs opacity-80">Mises demeure</div>
-                  <div className="text-xl font-bold">15</div>
+              <div className="flex-1 relative min-w-0 ml-0.5">
+                <div className="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                  <div className="text-xs opacity-80 truncate">Mises demeure</div>
+                  <div className="text-xl lg:text-2xl font-bold">15</div>
                 </div>
-                <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 text-red-400">
-                  <svg width="8" height="16" viewBox="0 0 8 16" fill="currentColor">
-                    <path d="M0 0L8 8L0 16V0Z"/>
+                <div className="absolute -right-0.5 top-1/2 transform -translate-y-1/2 text-red-400">
+                  <svg width="6" height="12" viewBox="0 0 6 12" fill="currentColor" className="lg:w-2 lg:h-4">
+                    <path d="M0 0L6 6L0 12V0Z"/>
                   </svg>
                 </div>
               </div>
 
               {/* Procédures judiciaires */}
-              <div className="flex-shrink-0 relative ml-1">
-                <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl px-4 py-3 min-w-[110px] shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
-                  <div className="text-xs opacity-80">Judiciaires</div>
-                  <div className="text-xl font-bold">8</div>
+              <div className="flex-1 relative min-w-0 ml-0.5">
+                <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                  <div className="text-xs opacity-80 truncate">Judiciaires</div>
+                  <div className="text-xl lg:text-2xl font-bold">8</div>
                 </div>
-                <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 text-purple-400">
-                  <svg width="8" height="16" viewBox="0 0 8 16" fill="currentColor">
-                    <path d="M0 0L8 8L0 16V0Z"/>
+                <div className="absolute -right-0.5 top-1/2 transform -translate-y-1/2 text-purple-400">
+                  <svg width="6" height="12" viewBox="0 0 6 12" fill="currentColor" className="lg:w-2 lg:h-4">
+                    <path d="M0 0L6 6L0 12V0Z"/>
                   </svg>
                 </div>
               </div>
 
               {/* Montants récupérés */}
-              <div className="flex-shrink-0 ml-1">
-                <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl px-4 py-3 min-w-[100px] shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border-2 border-green-300">
-                  <div className="text-xs opacity-80">Récupérés</div>
-                  <div className="text-xl font-bold">78%</div>
+              <div className="flex-1 min-w-0 ml-0.5">
+                <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border-2 border-green-300">
+                  <div className="text-xs opacity-80 truncate">Récupérés</div>
+                  <div className="text-xl lg:text-2xl font-bold">78%</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile - Vertical stack */}
+            <div className="sm:hidden space-y-3">
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl p-4 shadow-lg">
+                <div className="flex justify-between items-center">
+                  <div className="text-sm opacity-90">Factures impayées</div>
+                  <div className="text-2xl font-bold">45</div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl p-4 shadow-lg mx-4">
+                <div className="flex justify-between items-center">
+                  <div className="text-sm opacity-90">Relances automatiques</div>
+                  <div className="text-2xl font-bold">38</div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl p-4 shadow-lg mx-8">
+                <div className="flex justify-between items-center">
+                  <div className="text-sm opacity-90">Mises en demeure</div>
+                  <div className="text-2xl font-bold">15</div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl p-4 shadow-lg mx-12">
+                <div className="flex justify-between items-center">
+                  <div className="text-sm opacity-90">Procédures judiciaires</div>
+                  <div className="text-2xl font-bold">8</div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl p-4 shadow-lg mx-16 border-2 border-green-300">
+                <div className="flex justify-between items-center">
+                  <div className="text-sm opacity-90">Montants récupérés</div>
+                  <div className="text-2xl font-bold">78%</div>
                 </div>
               </div>
             </div>
             
             {/* Indicateurs de performance */}
-            <div className="flex justify-between text-xs text-muted-foreground mt-2 px-1">
-              <span>Taux conversion: 84%</span>
-              <span>Temps moyen: 45j</span>
+            <div className="flex flex-col sm:flex-row sm:justify-between text-xs text-muted-foreground mt-4 gap-2 sm:gap-0 px-1">
+              <div className="flex gap-4">
+                <span>Taux conversion: <span className="font-semibold text-green-600">84%</span></span>
+                <span>Temps moyen: <span className="font-semibold">45j</span></span>
+              </div>
+              <div className="text-right">
+                <span>Dernière MàJ: <span className="font-semibold">il y a 2min</span></span>
+              </div>
             </div>
           </div>
 
