@@ -8,9 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Download, Calendar, MapPin, FileText, Filter, Clock, User, Building2, CheckCircle2, XCircle, AlertTriangle, Navigation, Truck, Waypoints, Phone, Mail, ChevronRight } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, CartesianGrid } from "recharts";
 import * as XLSX from 'xlsx';
+import { useToast } from "@/hooks/use-toast";
 
 // ------------------ Types & Helpers ------------------
 type Pointage = {
@@ -168,6 +170,11 @@ export default function PresencePointages() {
   const [chantier, setChantier] = useState<string>("tous");
   const [statutGps, setStatutGps] = useState<string>("tous");
   const [recherche, setRecherche] = useState("");
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
+  const [dateDebut, setDateDebut] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [dateFin, setDateFin] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [formatExport, setFormatExport] = useState<"fec" | "csv">("fec");
+  const { toast } = useToast();
 
   const filtered = useMemo(() => {
     return SAMPLE.filter((p) =>
@@ -212,61 +219,97 @@ export default function PresencePointages() {
   const employes = Array.from(new Set(SAMPLE.map(s => s.employe)));
   const chantiers = Array.from(new Set(SAMPLE.map(s => s.chantier)));
 
-  const handleExportExcel = () => {
-    // Préparer les données pour l'export
-    const excelData = filtered.map((p) => {
-      const d = durationHours(p, HEURES_JOUR);
-      const pauseTxt = p.typePause === "Repas" && p.pauseDebut && p.pauseFin
-        ? `${new Date(p.pauseDebut).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} – ${new Date(p.pauseFin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`
-        : (p.typePause?.startsWith("Demi-journée") ? p.typePause : "");
-      const statutOk = p.statutDebut === "VALIDE" && p.statutFin === "VALIDE";
-      
-      return {
-        'Date': p.date,
-        'Employé': p.employe,
-        'Matricule': p.matricule,
-        'Métier': p.metier,
-        'Chantier': p.chantier,
-        'Code Chantier': p.codeChantier,
-        'Début': p.debut ? new Date(p.debut).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '',
-        'Fin': p.fin ? new Date(p.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '',
-        'Pause': pauseTxt,
-        'Durée (HH:MM)': toHhMm(d.duree),
-        'Heures décimales': d.duree.toFixed(2),
-        'Heures normales': d.normales.toFixed(2),
-        'Heures supplémentaires': d.sup.toFixed(2),
-        'Statut GPS': statutOk ? 'VALIDE' : 'REFUSÉ',
-        'Distance début (m)': p.distDebut ?? 0,
-        'Distance fin (m)': p.distFin ?? 0,
-        'Absence': p.absence || '',
-        'Validation chef': p.validationChef ? 'Oui' : 'Non',
-        'GPS Début': p.gpsDebut || '',
-        'GPS Fin': p.gpsFin || '',
-        'Commentaire': p.commentaire || ''
-      };
+  const handleGenerateReport = () => {
+    // Filtrer les données selon la période sélectionnée
+    const filteredByDate = filtered.filter(p => {
+      return p.date >= dateDebut && p.date <= dateFin;
     });
 
-    // Créer le classeur
-    const ws = XLSX.utils.json_to_sheet(excelData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Pointages");
+    if (formatExport === "csv") {
+      // Export CSV
+      const csvData = filteredByDate.map((p) => {
+        const d = durationHours(p, HEURES_JOUR);
+        const pauseTxt = p.typePause === "Repas" && p.pauseDebut && p.pauseFin
+          ? `${new Date(p.pauseDebut).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} – ${new Date(p.pauseFin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`
+          : (p.typePause?.startsWith("Demi-journée") ? p.typePause : "");
+        const statutOk = p.statutDebut === "VALIDE" && p.statutFin === "VALIDE";
+        
+        return {
+          'Date': p.date,
+          'Employé': p.employe,
+          'Matricule': p.matricule,
+          'Métier': p.metier,
+          'Chantier': p.chantier,
+          'Code Chantier': p.codeChantier,
+          'Début': p.debut ? new Date(p.debut).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '',
+          'Fin': p.fin ? new Date(p.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '',
+          'Pause': pauseTxt,
+          'Durée (HH:MM)': toHhMm(d.duree),
+          'Heures décimales': d.duree.toFixed(2),
+          'Heures normales': d.normales.toFixed(2),
+          'Heures supplémentaires': d.sup.toFixed(2),
+          'Statut GPS': statutOk ? 'VALIDE' : 'REFUSÉ',
+          'Distance début (m)': p.distDebut ?? 0,
+          'Distance fin (m)': p.distFin ?? 0,
+          'Absence': p.absence || '',
+          'Validation chef': p.validationChef ? 'Oui' : 'Non',
+          'GPS Début': p.gpsDebut || '',
+          'GPS Fin': p.gpsFin || '',
+          'Commentaire': p.commentaire || ''
+        };
+      });
 
-    // Ajouter une feuille de résumé avec les KPIs
-    const summaryData = [
-      { 'Indicateur': 'Total heures', 'Valeur': toHhMm(kpis.total) },
-      { 'Indicateur': 'Heures normales', 'Valeur': toHhMm(kpis.normales) },
-      { 'Indicateur': 'Heures supplémentaires', 'Valeur': toHhMm(kpis.sup) },
-      { 'Indicateur': 'Taux conformité GPS', 'Valeur': `${kpis.tauxGps}%` },
-      { 'Indicateur': 'Nombre d\'absences', 'Valeur': kpis.absences },
-      { 'Indicateur': 'Total lignes', 'Valeur': kpis.lignes }
-    ];
-    
-    const wsSummary = XLSX.utils.json_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(wb, wsSummary, "Résumé");
+      const ws = XLSX.utils.json_to_sheet(csvData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Pointages_CSV");
+      
+      const fileName = `pointages_csv_${dateDebut}_${dateFin}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      toast({
+        title: "Export CSV généré",
+        description: `Fichier ${fileName} téléchargé avec succès.`,
+      });
+    } else {
+      // Export FEC
+      const fecData = filteredByDate.map((p) => {
+        const d = durationHours(p, HEURES_JOUR);
+        return {
+          'JournalCode': 'PAY',
+          'JournalLib': 'Paie',
+          'EcritureNum': p.id,
+          'EcritureDate': p.date,
+          'CompteNum': '641000',
+          'CompteLib': 'Rémunérations du personnel',
+          'CompAuxNum': p.matricule,
+          'CompAuxLib': p.employe,
+          'PieceRef': `POINT-${p.date}-${p.matricule}`,
+          'PieceDate': p.date,
+          'EcritureLib': `Pointage ${p.employe} - ${p.chantier}`,
+          'Debit': d.duree * 15, // Exemple: 15€/heure
+          'Credit': 0,
+          'EcritureLet': '',
+          'DateLet': '',
+          'ValidDate': p.validationChef ? p.date : '',
+          'Montantdevise': '',
+          'Idevise': ''
+        };
+      });
 
-    // Télécharger le fichier
-    const fileName = `pointages_${new Date().toISOString().split('T')[0]}.xlsx`;
-    XLSX.writeFile(wb, fileName);
+      const ws = XLSX.utils.json_to_sheet(fecData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Export_FEC");
+      
+      const fileName = `pointages_fec_${dateDebut}_${dateFin}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      toast({
+        title: "Export FEC généré",
+        description: `Fichier ${fileName} téléchargé avec succès.`,
+      });
+    }
+
+    setReportDialogOpen(false);
   };
 
   return (
@@ -279,9 +322,64 @@ export default function PresencePointages() {
           <p className="text-sm text-muted-foreground">Contrôle GPS, demi-journées, pauses repas, calculs heures normales & supplémentaires, exports paie</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="gap-2"><FileText className="w-4 h-4"/> Générer rapport PDF</Button>
-          <Button variant="outline" className="gap-2" onClick={handleExportExcel}><Download className="w-4 h-4"/> Export Excel</Button>
-          <Button className="gap-2"><Mail className="w-4 h-4"/> Envoyer à l'expert-comptable</Button>
+          <Dialog open={reportDialogOpen} onOpenChange={setReportDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2">
+                <FileText className="w-4 h-4"/>
+                Générer un rapport
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Générer un rapport de pointages</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="dateDebut">Date de début</Label>
+                    <Input
+                      id="dateDebut"
+                      type="date"
+                      value={dateDebut}
+                      onChange={(e) => setDateDebut(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="dateFin">Date de fin</Label>
+                    <Input
+                      id="dateFin"
+                      type="date"
+                      value={dateFin}
+                      onChange={(e) => setDateFin(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Format d'export</Label>
+                  <RadioGroup value={formatExport} onValueChange={(value: "fec" | "csv") => setFormatExport(value)} className="mt-2">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="fec" id="fec" />
+                      <Label htmlFor="fec">Format FEC</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="csv" id="csv" />
+                      <Label htmlFor="csv">Format CSV</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button variant="outline" onClick={() => setReportDialogOpen(false)}>
+                    Annuler
+                  </Button>
+                  <Button onClick={handleGenerateReport}>
+                    Générer le rapport
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
