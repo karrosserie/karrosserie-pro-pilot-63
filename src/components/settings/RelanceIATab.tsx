@@ -25,8 +25,6 @@ const RelanceIATab = () => {
   const { toast } = useToast();
   const [settings, setSettings] = useState({
     enabled: false,
-    apiKey: '',
-    model: 'gpt-4o-mini',
     delayBeforeFirst: 30,
     maxRelances: 5,
     channels: {
@@ -276,40 +274,6 @@ const RelanceIATab = () => {
               <p className="text-sm text-muted-foreground">
                 Après 5 relances infructueuses
               </p>
-            </div>
-
-            <Separator />
-
-            {/* Configuration IA */}
-            <div className="space-y-3">
-              <Label className="font-medium">Configuration IA</Label>
-              
-              <div>
-                <Label htmlFor="apiKey" className="text-xs text-muted-foreground">Clé API OpenAI</Label>
-                <Input
-                  id="apiKey"
-                  type="password"
-                  placeholder="sk-..."
-                  value={settings.apiKey}
-                  onChange={(e) => handleSettingChange('apiKey', e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="model" className="text-xs text-muted-foreground">Modèle IA</Label>
-                <select
-                  id="model"
-                  value={settings.model}
-                  onChange={(e) => handleSettingChange('model', e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border border-input bg-white rounded-md text-sm z-50 relative"
-                  style={{ background: 'white', zIndex: 50 }}
-                >
-                  <option value="gpt-4o-mini">GPT-4o Mini (Rapide)</option>
-                  <option value="gpt-4o">GPT-4o (Performant)</option>
-                  <option value="claude-3-5-haiku-20241022">Claude 3.5 Haiku</option>
-                </select>
-              </div>
             </div>
           </CardContent>
         </Card>
