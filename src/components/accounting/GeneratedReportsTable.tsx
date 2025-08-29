@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Table, 
   TableBody, 
@@ -24,6 +24,24 @@ interface GeneratedReportsTableProps {
 }
 
 export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, onDownloadReport }: GeneratedReportsTableProps) => {
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+
+  // Met à jour l'heure actuelle chaque seconde pour gérer l'animation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Vérifie si un rapport est nouveau (généré dans la dernière minute)
+  const isNewReport = (report: GeneratedReport): boolean => {
+    const reportTime = new Date(report.generatedAt);
+    const timeDifference = currentTime.getTime() - reportTime.getTime();
+    const oneMinuteInMs = 60 * 1000; // 1 minute en millisecondes
+    return timeDifference <= oneMinuteInMs;
+  };
 
   const handleDownload = (reportId: string) => {
     onDownloadReport(reportId);
@@ -59,64 +77,70 @@ export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, on
               </TableRow>
             </TableHeader>
             <TableBody>
-              {reports.map((report) => (
-                <TableRow 
-                  key={report.id}
-                  className="hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <TableCell className="font-medium text-xs sm:text-sm">
-                    <div className="max-w-[100px] sm:max-w-none truncate">
-                      {report.name}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-xs sm:text-sm">
-                      <div className="sm:hidden">
-                        {format(report.fromDate, 'dd/MM/yy', { locale: fr })} - {format(report.toDate, 'dd/MM/yy', { locale: fr })}
+              {reports.map((report) => {
+                const isNew = isNewReport(report);
+                return (
+                  <TableRow 
+                    key={report.id}
+                    className={`hover:bg-gray-50 transition-colors duration-200 ${
+                      isNew ? 'animate-pulse bg-blue-50 border border-blue-200 shadow-lg' : ''
+                    }`}
+                  >
+                    <TableCell className={`font-medium text-xs sm:text-sm ${isNew ? 'text-blue-700 font-semibold' : ''}`}>
+                      <div className="max-w-[100px] sm:max-w-none truncate flex items-center gap-2">
+                        {report.name}
+                        {isNew && <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">Nouveau</Badge>}
                       </div>
-                      <div className="hidden sm:block">
-                        Du {format(report.fromDate, 'dd/MM/yyyy', { locale: fr })} au {format(report.toDate, 'dd/MM/yyyy', { locale: fr })}
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-xs sm:text-sm">
+                        <div className="sm:hidden">
+                          {format(report.fromDate, 'dd/MM/yy', { locale: fr })} - {format(report.toDate, 'dd/MM/yy', { locale: fr })}
+                        </div>
+                        <div className="hidden sm:block">
+                          Du {format(report.fromDate, 'dd/MM/yyyy', { locale: fr })} au {format(report.toDate, 'dd/MM/yyyy', { locale: fr })}
+                        </div>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    <div className="text-xs sm:text-sm text-gray-600">
-                      {format(report.generatedAt, 'dd/MM/yyyy à HH:mm', { locale: fr })}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => handleDownload(report.id)}
-                        className="h-8 w-8 p-0"
-                        title="Télécharger"
-                      >
-                        <Download className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => onSendEmail(report.id)}
-                        className="h-8 w-8 p-0"
-                        title="Envoyer par e-mail"
-                      >
-                        <Mail className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => onDeleteReport(report.id)}
-                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                        title="Supprimer"
-                      >
-                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell">
+                      <div className="text-xs sm:text-sm text-gray-600">
+                        {format(report.generatedAt, 'dd/MM/yyyy à HH:mm', { locale: fr })}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleDownload(report.id)}
+                          className="h-8 w-8 p-0"
+                          title="Télécharger"
+                        >
+                          <Download className="h-3 w-3 sm:h-4 sm:w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => onSendEmail(report.id)}
+                          className="h-8 w-8 p-0"
+                          title="Envoyer par e-mail"
+                        >
+                          <Mail className="h-3 w-3 sm:h-4 sm:w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => onDeleteReport(report.id)}
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                          title="Supprimer"
+                        >
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
