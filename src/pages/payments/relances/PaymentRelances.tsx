@@ -37,6 +37,7 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
   });
   const [selectedTemplate, setSelectedTemplate] = useState('sms-relance-auto');
   const [viewingLog, setViewingLog] = useState<any>(null);
+  const [viewingCampaignDetails, setViewingCampaignDetails] = useState<any>(null);
 
   // Force rebuild - données fictives pour la démonstration
   const mockInvoices = [
@@ -433,6 +434,51 @@ Garage Martin`
     setViewingLog(null);
   };
 
+  const viewCampaignDetails = (campaign: string) => {
+    const campaignData = {
+      janvier2025: {
+        id: 'janvier2025',
+        name: 'Campagne janvier 2025',
+        description: 'Dernière relance automatique envoyée le 15 janvier 2025',
+        status: campaignStatus.janvier2025,
+        stats: { total: 8, envoyes: 4, ouverts: 2 },
+        clients: [
+          { name: 'SARL Dupont Transport', facture: 'FAC-2024-001', montant: '3 450,00 €', statut: 'SMS envoyé', dateEnvoi: '15/01/2025', ouvert: true },
+          { name: 'Entreprise Leroy', facture: 'FAC-2024-015', montant: '1 250,00 €', statut: 'Email envoyé', dateEnvoi: '15/01/2025', ouvert: false },
+          { name: 'EURL Rousseau Plomberie', facture: 'FAC-2024-067', montant: '890,50 €', statut: 'SMS envoyé', dateEnvoi: '15/01/2025', ouvert: true },
+          { name: 'Mme Catherine Bernard', facture: 'FAC-2024-089', montant: '2 150,00 €', statut: 'Email envoyé', dateEnvoi: '15/01/2025', ouvert: false },
+          { name: 'M. Pierre Dubois', facture: 'FAC-2024-124', montant: '650,00 €', statut: 'SMS en attente', dateEnvoi: 'Programmé', ouvert: false },
+          { name: 'SARL Petit Électricité', facture: 'FAC-2024-156', montant: '1 890,00 €', statut: 'Email en attente', dateEnvoi: 'Programmé', ouvert: false },
+          { name: 'SCI Lambert Immobilier', facture: 'FAC-2024-103', montant: '4 320,00 €', statut: 'Email en attente', dateEnvoi: 'Programmé', ouvert: false },
+          { name: 'SAS Moreau & Fils', facture: 'FAC-2024-032', montant: '5 680,00 €', statut: 'SMS en attente', dateEnvoi: 'Programmé', ouvert: false }
+        ]
+      },
+      decembre2024: {
+        id: 'decembre2024',
+        name: 'Campagne décembre 2024',
+        description: 'Campagne terminée le 30 décembre 2024',
+        status: campaignStatus.decembre2024,
+        stats: { total: 34, payes: 5, enLitige: 3 },
+        clients: [
+          { name: 'Garage Renault Lyon', facture: 'FAC-2024-198', montant: '2 450,00 €', statut: 'Payé', datePaiement: '28/12/2024', recouvre: true },
+          { name: 'Taxi Marseille SARL', facture: 'FAC-2024-201', montant: '1 890,00 €', statut: 'Payé', datePaiement: '30/12/2024', recouvre: true },
+          { name: 'Transport Bordeaux', facture: 'FAC-2024-189', montant: '3 200,00 €', statut: 'En litige', dateContentieux: '20/12/2024', recouvre: false },
+          { name: 'Flotte Auto Paris', facture: 'FAC-2024-203', montant: '5 400,00 €', statut: 'Payé', datePaiement: '29/12/2024', recouvre: true },
+          { name: 'EURL Transport Sud', facture: 'FAC-2024-156', montant: '1 200,00 €', statut: 'En litige', dateContentieux: '22/12/2024', recouvre: false },
+          { name: 'SAS Logistique Nord', facture: 'FAC-2024-134', montant: '2 800,00 €', statut: 'Payé', datePaiement: '27/12/2024', recouvre: true },
+          { name: 'Ambulances Urgences', facture: 'FAC-2024-167', montant: '950,00 €', statut: 'En litige', dateContentieux: '25/12/2024', recouvre: false },
+          { name: 'Société Maintenance', facture: 'FAC-2024-178', montant: '1 650,00 €', statut: 'Payé', datePaiement: '31/12/2024', recouvre: true }
+        ]
+      }
+    };
+    
+    setViewingCampaignDetails(campaignData[campaign]);
+  };
+
+  const closeCampaignDetails = () => {
+    setViewingCampaignDetails(null);
+  };
+
   const getOverdueColor = (days: number) => {
     if (days > 90) return 'text-red-600 font-bold';
     if (days > 60) return 'text-orange-500 font-medium';
@@ -721,6 +767,15 @@ Garage Martin`
                   >
                     {campaignStatus.janvier2025 === 'active' ? 'Arrêter' : 'Relancer'}
                   </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => viewCampaignDetails('janvier2025')}
+                    className="flex items-center gap-1"
+                  >
+                    <Eye className="h-3 w-3" />
+                    Détails
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -762,6 +817,15 @@ Garage Martin`
                     onClick={() => handleCampaignAction('decembre2024', 'program')}
                   >
                     {campaignStatus.decembre2024 === 'programmed' ? 'Programmer à nouveau' : 'Programmer campagne'}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => viewCampaignDetails('decembre2024')}
+                    className="flex items-center gap-1"
+                  >
+                    <Eye className="h-3 w-3" />
+                    Détails
                   </Button>
                 </div>
               </CardContent>
@@ -914,6 +978,142 @@ Garage Martin`
               </div>
             </CardContent>
           </Card>
+        </>
+      )}
+
+      {/* Modal pour les détails de campagne */}
+      {viewingCampaignDetails && (
+        <>
+          {/* Overlay */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+            onClick={closeCampaignDetails}
+          />
+          
+          {/* Modal */}
+          <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-background border border-border rounded-lg shadow-xl z-50 w-[700px] max-w-[90vw] max-h-[80vh] overflow-hidden">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <h3 className="text-lg font-bold flex items-center">
+                    <Mail className="h-5 w-5 mr-2" />
+                    {viewingCampaignDetails.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">{viewingCampaignDetails.description}</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={closeCampaignDetails}
+                  className="h-8 w-8"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Stats Summary */}
+              <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-muted rounded-lg">
+                {viewingCampaignDetails.id === 'janvier2025' ? (
+                  <>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-foreground">{viewingCampaignDetails.stats.total}</div>
+                      <div className="text-xs text-muted-foreground">Total</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-foreground">{viewingCampaignDetails.stats.envoyes}</div>
+                      <div className="text-xs text-muted-foreground">Envoyés</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-foreground">{viewingCampaignDetails.stats.ouverts}</div>
+                      <div className="text-xs text-muted-foreground">Ouverts</div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-foreground">{viewingCampaignDetails.stats.total}</div>
+                      <div className="text-xs text-muted-foreground">Total</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-foreground">{viewingCampaignDetails.stats.payes}</div>
+                      <div className="text-xs text-muted-foreground">Payés</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-foreground">{viewingCampaignDetails.stats.enLitige}</div>
+                      <div className="text-xs text-muted-foreground">En litige</div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Client List */}
+              <div className="max-h-96 overflow-y-auto">
+                <h4 className="font-semibold mb-3">Liste des clients</h4>
+                <div className="space-y-2">
+                  {viewingCampaignDetails.clients.map((client: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg text-sm">
+                      <div className="flex-1">
+                        <div className="font-medium">{client.name}</div>
+                        <div className="text-muted-foreground">
+                          {client.facture} • {client.montant}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Badge 
+                          variant={
+                            client.statut.includes('Payé') ? 'default' : 
+                            client.statut.includes('En litige') ? 'destructive' : 
+                            client.statut.includes('SMS envoyé') || client.statut.includes('Email envoyé') ? 'secondary' : 'outline'
+                          }
+                          className="text-xs"
+                        >
+                          {client.statut}
+                        </Badge>
+                        {client.ouvert && (
+                          <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                            Lu
+                          </Badge>
+                        )}
+                        <div className="text-xs text-muted-foreground">
+                          {client.dateEnvoi || client.datePaiement || client.dateContentieux}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Summary */}
+              <div className="mt-6 pt-4 border-t">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium text-muted-foreground">Montant total concerné:</span>
+                    <div className="font-semibold text-lg">
+                      {viewingCampaignDetails.clients.reduce((sum: number, client: any) => {
+                        const amount = parseFloat(client.montant.replace(' €', '').replace(',', '.'));
+                        return sum + amount;
+                      }, 0).toLocaleString('fr-FR')} €
+                    </div>
+                  </div>
+                  <div>
+                    <span className="font-medium text-muted-foreground">
+                      {viewingCampaignDetails.id === 'janvier2025' ? 'Taux d\'ouverture:' : 'Montant récupéré:'}
+                    </span>
+                    <div className="font-semibold text-lg">
+                      {viewingCampaignDetails.id === 'janvier2025' 
+                        ? `${Math.round((viewingCampaignDetails.stats.ouverts / viewingCampaignDetails.stats.envoyes) * 100)}%`
+                        : `${viewingCampaignDetails.clients.filter((c: any) => c.recouvre).reduce((sum: number, client: any) => {
+                            const amount = parseFloat(client.montant.replace(' €', '').replace(',', '.'));
+                            return sum + amount;
+                          }, 0).toLocaleString('fr-FR')} €`
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </>
       )}
 
