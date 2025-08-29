@@ -49,31 +49,39 @@ export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, on
 
   if (reports.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base sm:text-lg">Rapports générés</CardTitle>
+      <Card className="bg-gradient-to-br from-background to-muted/20 border border-karrosserie-orange/20">
+        <CardHeader className="bg-gradient-to-r from-karrosserie-orange/5 to-primary/5 border-b border-karrosserie-orange/10">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-6 bg-gradient-to-b from-karrosserie-orange to-primary rounded-full"></div>
+            <CardTitle className="text-base sm:text-lg bg-gradient-to-r from-karrosserie-orange to-primary bg-clip-text text-transparent">Rapports générés</CardTitle>
+          </div>
         </CardHeader>
         <CardContent className="text-center py-6 sm:py-8">
-          <p className="text-gray-500 text-sm sm:text-base">Aucun rapport généré pour le moment</p>
+          <div className="p-4 rounded-lg bg-gradient-to-br from-muted/30 to-muted/10 border border-muted-foreground/20">
+            <p className="text-muted-foreground text-sm sm:text-base">Aucun rapport généré pour le moment</p>
+          </div>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base sm:text-lg">Rapports générés</CardTitle>
+    <Card className="bg-gradient-to-br from-background to-muted/20 border border-primary/20 shadow-lg">
+      <CardHeader className="bg-gradient-to-r from-primary/5 to-karrosserie-orange/5 border-b border-primary/10">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-6 bg-gradient-to-b from-primary to-karrosserie-orange rounded-full"></div>
+          <CardTitle className="text-base sm:text-lg bg-gradient-to-r from-primary to-karrosserie-orange bg-clip-text text-transparent">Rapports générés</CardTitle>
+        </div>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="border-b border-gray-200">
-                <TableHead className="font-semibold text-xs sm:text-sm min-w-[120px]">Nom du rapport</TableHead>
-                <TableHead className="font-semibold text-xs sm:text-sm min-w-[140px]">Période</TableHead>
-                <TableHead className="font-semibold text-xs sm:text-sm min-w-[120px] hidden sm:table-cell">Date de génération</TableHead>
-                <TableHead className="font-semibold text-xs sm:text-sm text-right min-w-[100px]">Actions</TableHead>
+              <TableRow className="border-b border-primary/20 bg-gradient-to-r from-muted/30 to-transparent">
+                <TableHead className="font-semibold text-xs sm:text-sm min-w-[120px] text-primary">Nom du rapport</TableHead>
+                <TableHead className="font-semibold text-xs sm:text-sm min-w-[140px] text-primary">Période</TableHead>
+                <TableHead className="font-semibold text-xs sm:text-sm min-w-[120px] hidden sm:table-cell text-primary">Date de génération</TableHead>
+                <TableHead className="font-semibold text-xs sm:text-sm text-right min-w-[100px] text-primary">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -82,14 +90,14 @@ export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, on
                 return (
                   <TableRow 
                     key={report.id}
-                    className={`hover:bg-gray-50 transition-colors duration-200 ${
-                      isNew ? 'animate-pulse bg-blue-50 border border-blue-200 shadow-lg' : ''
+                    className={`hover:bg-gradient-to-r hover:from-karrosserie-orange/5 hover:to-primary/5 transition-all duration-300 ${
+                      isNew ? 'animate-pulse bg-gradient-to-r from-karrosserie-orange/10 to-primary/10 border-l-4 border-l-karrosserie-orange shadow-md' : ''
                     }`}
                   >
-                    <TableCell className={`font-medium text-xs sm:text-sm ${isNew ? 'text-blue-700 font-semibold' : ''}`}>
+                    <TableCell className={`font-medium text-xs sm:text-sm ${isNew ? 'text-karrosserie-orange font-semibold' : ''}`}>
                       <div className="max-w-[100px] sm:max-w-none truncate flex items-center gap-2">
                         {report.name}
-                        {isNew && <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">Nouveau</Badge>}
+                        {isNew && <Badge variant="secondary" className="text-xs bg-gradient-to-r from-karrosserie-orange/20 to-primary/20 text-karrosserie-orange border border-karrosserie-orange/30">Nouveau</Badge>}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -103,7 +111,7 @@ export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, on
                       </div>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
-                      <div className="text-xs sm:text-sm text-gray-600">
+                      <div className="text-xs sm:text-sm text-muted-foreground">
                         {format(report.generatedAt, 'dd/MM/yyyy à HH:mm', { locale: fr })}
                       </div>
                     </TableCell>
@@ -113,7 +121,7 @@ export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, on
                           variant="ghost" 
                           size="sm"
                           onClick={() => handleDownload(report.id)}
-                          className="h-8 w-8 p-0"
+                          className="h-8 w-8 p-0 hover:bg-karrosserie-orange/10 hover:text-karrosserie-orange transition-colors"
                           title="Télécharger"
                         >
                           <Download className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -122,7 +130,7 @@ export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, on
                           variant="ghost" 
                           size="sm"
                           onClick={() => onSendEmail(report.id)}
-                          className="h-8 w-8 p-0"
+                          className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors"
                           title="Envoyer par e-mail"
                         >
                           <Mail className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -131,7 +139,7 @@ export const GeneratedReportsTable = ({ reports, onSendEmail, onDeleteReport, on
                           variant="ghost" 
                           size="sm"
                           onClick={() => onDeleteReport(report.id)}
-                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
                           title="Supprimer"
                         >
                           <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />

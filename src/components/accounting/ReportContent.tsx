@@ -87,29 +87,46 @@ const ReportContent = () => {
     }
   };
   return <div className="space-y-4 sm:space-y-6">
-      <div className="card-container p-3 sm:p-4 md:p-6">
-        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Rapports financiers</h3>
+      <div className="card-container p-3 sm:p-4 md:p-6 bg-gradient-to-br from-background to-muted/20 border border-karrosserie-orange/20 shadow-lg">
+        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+          <div className="w-2 h-6 bg-gradient-to-b from-karrosserie-orange to-primary rounded-full"></div>
+          <h3 className="text-base sm:text-lg font-semibold bg-gradient-to-r from-karrosserie-orange to-primary bg-clip-text text-transparent">Rapports financiers</h3>
+        </div>
+        
         <div className="flex justify-center mb-4 sm:mb-6">
           <Button 
             variant="outline" 
             onClick={() => navigate('/presence-pointages')} 
-            className="flex flex-col p-4 sm:p-6 h-auto items-center justify-center min-h-[100px] sm:min-h-[120px] w-full max-w-xs"
+            className="flex flex-col p-4 sm:p-6 h-auto items-center justify-center min-h-[100px] sm:min-h-[120px] w-full max-w-xs border-karrosserie-orange/30 hover:border-karrosserie-orange hover:bg-karrosserie-orange/5 transition-all duration-300 hover:shadow-md hover:shadow-karrosserie-orange/20"
           >
-            <Clock className="h-6 w-6 sm:h-8 sm:w-8 mb-2" />
-            <span className="font-medium text-sm sm:text-base">Présence & Pointages</span>
-            <span className="text-xs sm:text-sm text-gray-500 mt-1">Géolocalisé</span>
+            <div className="p-2 rounded-full bg-karrosserie-orange/10 mb-2">
+              <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-karrosserie-orange" />
+            </div>
+            <span className="font-medium text-sm sm:text-base text-karrosserie-orange">Présence & Pointages</span>
+            <span className="text-xs sm:text-sm text-muted-foreground mt-1">Géolocalisé</span>
           </Button>
         </div>
         
-        <div className="mb-4 sm:mb-6">
-          <h4 className="font-medium mb-3 sm:mb-4 text-sm sm:text-base">Export pour cabinet comptable</h4>
+        <div className="mb-4 sm:mb-6 p-4 rounded-lg bg-gradient-to-r from-primary/5 to-karrosserie-orange/5 border border-primary/20">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
+            <div className="w-1.5 h-5 bg-primary rounded-full"></div>
+            <h4 className="font-medium text-sm sm:text-base text-primary">Export pour cabinet comptable</h4>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-            <Button variant="outline" onClick={() => setOpenDialog('fec')} className="w-full justify-center h-10 sm:h-11">
-              <Download className="h-4 w-4 mr-2" />
+            <Button 
+              variant="outline" 
+              onClick={() => setOpenDialog('fec')} 
+              className="w-full justify-center h-10 sm:h-11 border-primary/30 hover:border-primary hover:bg-primary/10 transition-all duration-200 hover:shadow-sm"
+            >
+              <Download className="h-4 w-4 mr-2 text-primary" />
               <span className="text-sm sm:text-base">Format FEC</span>
             </Button>
-            <Button variant="outline" onClick={() => setOpenDialog('csv')} className="w-full justify-center h-10 sm:h-11">
-              <Download className="h-4 w-4 mr-2" />
+            <Button 
+              variant="outline" 
+              onClick={() => setOpenDialog('csv')} 
+              className="w-full justify-center h-10 sm:h-11 border-karrosserie-orange/30 hover:border-karrosserie-orange hover:bg-karrosserie-orange/10 transition-all duration-200 hover:shadow-sm"
+            >
+              <Download className="h-4 w-4 mr-2 text-karrosserie-orange" />
               <span className="text-sm sm:text-base">Format CSV</span>
             </Button>
           </div>
