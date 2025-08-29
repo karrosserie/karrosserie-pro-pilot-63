@@ -22,9 +22,228 @@ import { fr } from 'date-fns/locale';
 interface PaymentRelancesProps {}
 
 const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
-  const { formattedInvoices, loading } = useUnpaidInvoices();
+  const { formattedInvoices: realInvoices, loading } = useUnpaidInvoices();
   const [filter, setFilter] = useState<string>('all');
   const [modalData, setModalData] = useState<any>(null);
+
+  // Données fictives pour la démonstration
+  const mockInvoices = [
+    {
+      id: 'FAC-2024-001',
+      uuid: 'uuid-001',
+      client: 'SARL Dupont Transport',
+      vehicle: 'Renault Master',
+      vehicleRef: 'AB-123-CD',
+      garage: 'Garage Martin',
+      garageRef: '12345678901234',
+      amount: '3 450,00 €',
+      dueDate: '15/11/2024',
+      lastRelanceDate: '20/12/2024',
+      relanceType: 'Relance 2',
+      relanceTypeColor: 'bg-orange-100 text-orange-800',
+      status: 'relance2',
+      availableActions: ['whatsapp', 'sms', 'mail'],
+      history: [
+        { action: 'Relance email', date: '20/12/2024', status: 'Envoyé' },
+        { action: 'SMS de rappel', date: '25/12/2024', status: 'Lu' }
+      ],
+      clientPhone: '06 12 34 56 78',
+      clientEmail: 'contact@dupont-transport.fr',
+      clientAddress: '15 rue de la République\n75001 Paris\nFrance',
+      daysOverdue: 25,
+      autoRelancesDisabled: false,
+      clientId: 'client-001'
+    },
+    {
+      id: 'FAC-2024-015',
+      uuid: 'uuid-002', 
+      client: 'Entreprise Leroy',
+      vehicle: 'Peugeot Partner',
+      vehicleRef: 'EF-456-GH',
+      garage: 'Garage Martin',
+      garageRef: '12345678901234',
+      amount: '1 250,00 €',
+      dueDate: '10/12/2024',
+      lastRelanceDate: '15/01/2025',
+      relanceType: 'Relance 1',
+      relanceTypeColor: 'bg-blue-100 text-blue-800',
+      status: 'relance1',
+      availableActions: ['whatsapp', 'sms', 'vms', 'mail'],
+      history: [
+        { action: 'Email automatique', date: '15/01/2025', status: 'Envoyé' }
+      ],
+      clientPhone: '06 98 76 54 32',
+      clientEmail: 'leroy.entreprise@gmail.com',
+      clientAddress: '28 avenue des Tilleuls\n69003 Lyon\nFrance',
+      daysOverdue: 12,
+      autoRelancesDisabled: false,
+      clientId: 'client-002'
+    },
+    {
+      id: 'FAC-2024-032',
+      uuid: 'uuid-003',
+      client: 'SAS Moreau & Fils',
+      vehicle: 'Citroën Berlingo',
+      vehicleRef: 'IJ-789-KL',
+      garage: 'Garage Martin',
+      garageRef: '12345678901234',
+      amount: '5 680,00 €',
+      dueDate: '01/10/2024',
+      lastRelanceDate: '15/01/2025',
+      relanceType: 'Contentieux',
+      relanceTypeColor: 'bg-red-100 text-red-800',
+      status: 'contentieux',
+      availableActions: ['recommande', 'judiciaire'],
+      history: [
+        { action: 'Relance email', date: '05/11/2024', status: 'Envoyé' },
+        { action: 'SMS de rappel', date: '20/11/2024', status: 'Lu' },
+        { action: 'Appel téléphonique', date: '05/12/2024', status: 'Répondeur' },
+        { action: 'Mise en demeure', date: '20/12/2024', status: 'Reçu' },
+        { action: 'Dépôt dossier tribunal', date: '15/01/2025', status: 'En cours' }
+      ],
+      clientPhone: '04 78 12 34 56',
+      clientEmail: 'contact@moreau-fils.fr',
+      clientAddress: '142 route de Grenoble\n38000 Grenoble\nFrance',
+      daysOverdue: 95,
+      autoRelancesDisabled: false,
+      clientId: 'client-003'
+    },
+    {
+      id: 'FAC-2024-067',
+      uuid: 'uuid-004',
+      client: 'EURL Rousseau Plomberie',
+      vehicle: 'Ford Transit',
+      vehicleRef: 'MN-012-OP',
+      garage: 'Garage Martin',
+      garageRef: '12345678901234',
+      amount: '890,50 €',
+      dueDate: '20/12/2024',
+      lastRelanceDate: '10/01/2025',
+      relanceType: 'Relance 1',
+      relanceTypeColor: 'bg-blue-100 text-blue-800',
+      status: 'relance1',
+      availableActions: ['whatsapp', 'sms', 'mail'],
+      history: [
+        { action: 'Email de relance', date: '10/01/2025', status: 'Envoyé' }
+      ],
+      clientPhone: '02 40 56 78 90',
+      clientEmail: 'rousseau.plomberie@orange.fr',
+      clientAddress: '7 impasse des Artisans\n44000 Nantes\nFrance',
+      daysOverdue: 8,
+      autoRelancesDisabled: false,
+      clientId: 'client-004'
+    },
+    {
+      id: 'FAC-2024-089',
+      uuid: 'uuid-005',
+      client: 'Mme Catherine Bernard',
+      vehicle: 'Volkswagen Polo',
+      vehicleRef: 'QR-345-ST',
+      garage: 'Garage Martin',
+      garageRef: '12345678901234',
+      amount: '2 150,00 €',
+      dueDate: '15/11/2024',
+      lastRelanceDate: '02/01/2025',
+      relanceType: 'Relance 3',
+      relanceTypeColor: 'bg-orange-100 text-orange-800',
+      status: 'relance3',
+      availableActions: ['whatsapp', 'sms', 'vms', 'recommande'],
+      history: [
+        { action: 'Relance email', date: '20/12/2024', status: 'Envoyé' },
+        { action: 'SMS de rappel', date: '28/12/2024', status: 'Lu' },
+        { action: 'Appel téléphonique', date: '02/01/2025', status: 'Conversation' }
+      ],
+      clientPhone: '06 23 45 67 89',
+      clientEmail: 'c.bernard@hotmail.fr',
+      clientAddress: '3 rue des Roses\n13001 Marseille\nFrance',
+      daysOverdue: 42,
+      autoRelancesDisabled: false,
+      clientId: 'client-005'
+    },
+    {
+      id: 'FAC-2024-103',
+      uuid: 'uuid-006',
+      client: 'SCI Lambert Immobilier',
+      vehicle: 'Mercedes Sprinter',
+      vehicleRef: 'UV-678-WX',
+      garage: 'Garage Martin',
+      garageRef: '12345678901234',
+      amount: '4 320,00 €',
+      dueDate: '05/11/2024',
+      lastRelanceDate: '18/01/2025',
+      relanceType: 'Mise en demeure',
+      relanceTypeColor: 'bg-red-100 text-red-800',
+      status: 'relance4',
+      availableActions: ['recommande', 'judiciaire'],
+      history: [
+        { action: 'Relance email', date: '10/12/2024', status: 'Envoyé' },
+        { action: 'SMS de rappel', date: '20/12/2024', status: 'Lu' },
+        { action: 'Relance téléphonique', date: '05/01/2025', status: 'Promesse de paiement' },
+        { action: 'Mise en demeure', date: '18/01/2025', status: 'Envoyé' }
+      ],
+      clientPhone: '01 42 78 96 54',
+      clientEmail: 'gestion@lambert-immobilier.com',
+      clientAddress: '89 boulevard Haussmann\n75008 Paris\nFrance',
+      daysOverdue: 68,
+      autoRelancesDisabled: false,
+      clientId: 'client-006'
+    },
+    {
+      id: 'FAC-2024-124',
+      uuid: 'uuid-007',
+      client: 'M. Pierre Dubois',
+      vehicle: 'Opel Corsa',
+      vehicleRef: 'YZ-901-AB',
+      garage: 'Garage Martin',
+      garageRef: '12345678901234',
+      amount: '650,00 €',
+      dueDate: '28/12/2024',
+      lastRelanceDate: '12/01/2025',
+      relanceType: 'Relance 1',
+      relanceTypeColor: 'bg-blue-100 text-blue-800',
+      status: 'relance1',
+      availableActions: ['whatsapp', 'sms', 'mail'],
+      history: [
+        { action: 'Email automatique', date: '12/01/2025', status: 'Envoyé' }
+      ],
+      clientPhone: '03 20 45 67 89',
+      clientEmail: 'p.dubois@gmail.com',
+      clientAddress: '12 rue du Commerce\n59000 Lille\nFrance',
+      daysOverdue: 5,
+      autoRelancesDisabled: false,
+      clientId: 'client-007'
+    },
+    {
+      id: 'FAC-2024-156',
+      uuid: 'uuid-008',
+      client: 'SARL Petit Électricité',
+      vehicle: 'Nissan NV200',
+      vehicleRef: 'CD-234-EF',
+      garage: 'Garage Martin',
+      garageRef: '12345678901234',
+      amount: '1 890,00 €',
+      dueDate: '03/12/2024',
+      lastRelanceDate: '08/01/2025',
+      relanceType: 'Relance 2',
+      relanceTypeColor: 'bg-orange-100 text-orange-800',
+      status: 'relance2',
+      availableActions: ['whatsapp', 'sms', 'vms', 'mail'],
+      history: [
+        { action: 'Relance email', date: '18/12/2024', status: 'Envoyé' },
+        { action: 'SMS de rappel', date: '28/12/2024', status: 'Lu' },
+        { action: 'Email de relance ferme', date: '08/01/2025', status: 'Envoyé' }
+      ],
+      clientPhone: '05 56 78 90 12',
+      clientEmail: 'petit.electricite@wanadoo.fr',
+      clientAddress: '45 avenue de la Libération\n33000 Bordeaux\nFrance',
+      daysOverdue: 32,
+      autoRelancesDisabled: false,
+      clientId: 'client-008'
+    }
+  ];
+
+  // Utiliser les données fictives au lieu des vraies données
+  const formattedInvoices = mockInvoices;
 
   // Filter invoices based on selected status
   const filteredInvoices = formattedInvoices.filter(invoice => {
