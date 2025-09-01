@@ -44,21 +44,9 @@ const Settings = () => {
   return (
     <div className="p-6 space-y-6">
       <div className="mb-6">
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Paramètres</h1>
-            <p className="text-gray-600 mt-1">Configurez votre compte et vos préférences.</p>
-          </div>
-          {hasFullAccess && (
-            <Button 
-              onClick={() => navigate('/gestion-templates')}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <FileText className="h-4 w-4" />
-              Gestion des templates
-            </Button>
-          )}
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Paramètres</h1>
+          <p className="text-gray-600 mt-1">Configurez votre compte et vos préférences.</p>
         </div>
         {!hasFullAccess && (
           <div className="mt-2 text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
@@ -82,6 +70,10 @@ const Settings = () => {
               <TabsTrigger value="team">
                 <Users className="h-4 w-4 mr-2" />
                 Équipe
+              </TabsTrigger>
+              <TabsTrigger value="templates">
+                <FileText className="h-4 w-4 mr-2" />
+                Templates
               </TabsTrigger>
               <TabsTrigger value="appearance" className="hidden">
                 <SettingsIcon className="h-4 w-4 mr-2" />
@@ -115,6 +107,21 @@ const Settings = () => {
             
             <TabsContent value="team" className="space-y-4">
               <TeamTab />
+            </TabsContent>
+            
+            <TabsContent value="templates" className="space-y-4">
+              <div className="text-center py-8">
+                <FileText className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Gestion des Templates Juridiques</h3>
+                <p className="text-gray-600 mb-4">Personnalisez et gérez vos templates juridiques</p>
+                <Button 
+                  onClick={() => navigate('/gestion-templates')}
+                  className="flex items-center gap-2"
+                >
+                  <FileText className="h-4 w-4" />
+                  Accéder à la gestion des templates
+                </Button>
+              </div>
             </TabsContent>
             
             <TabsContent value="appearance">
