@@ -171,6 +171,16 @@ export const coreRoutes = [
     )
   },
   {
+    path: "/contentieux/depot-dossier/:id",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <DepotDossier />
+        </AppLayout>
+      </ProtectedRoute>
+    )
+  },
+  {
     path: "/contentieux/suivi-procedures",
     element: (
       <ProtectedRoute>
