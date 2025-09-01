@@ -117,14 +117,14 @@ const PaymentManagement = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Gestion des paiements et des transactions</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Gestion des paiements et des transactions</h1>
         </div>
       </div>
 
       {/* Metrics Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -133,7 +133,7 @@ const PaymentManagement = () => {
             <TrendingUp className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">€24,580</div>
+            <div className="text-xl sm:text-2xl font-bold">€24,580</div>
             <p className="text-xs text-emerald-600">
               +12.5% vs mois dernier
             </p>
@@ -148,14 +148,14 @@ const PaymentManagement = () => {
             <TrendingDown className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">€8,240</div>
+            <div className="text-xl sm:text-2xl font-bold">€8,240</div>
             <p className="text-xs text-red-600">
               -3.2% vs mois dernier
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="sm:col-span-2 lg:col-span-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Comptes actifs
@@ -163,7 +163,7 @@ const PaymentManagement = () => {
             <CreditCard className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">15</div>
+            <div className="text-xl sm:text-2xl font-bold">15</div>
             <p className="text-xs text-muted-foreground">
               +2 vs mois dernier
             </p>
@@ -172,7 +172,7 @@ const PaymentManagement = () => {
       </div>
 
       {/* Action Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setReceiptsModalOpen(true)}>
           <CardContent className="flex flex-col items-center justify-center p-6">
             <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
@@ -207,36 +207,36 @@ const PaymentManagement = () => {
       {/* Recent Transactions */}
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
             <CardTitle>Transactions récentes</CardTitle>
-            <div className="relative">
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Rechercher..." className="pl-8 w-64" />
+              <Input placeholder="Rechercher..." className="pl-8 w-full" />
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {transactions.map((transaction) => (
-              <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg">
+              <div key={transaction.id} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-3 border rounded-lg">
                 <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${
+                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
                     transaction.type === 'Encaissement' ? 'bg-emerald-500' : 'bg-red-500'
                   }`} />
-                  <div>
-                    <p className="font-medium">{transaction.name}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium truncate">{transaction.name}</p>
                     <p className="text-sm text-muted-foreground">
                       {transaction.type} • {transaction.date}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between sm:justify-end gap-3 ml-5 sm:ml-0">
                   <span className={`font-semibold ${
                     transaction.amount.startsWith('+') ? 'text-emerald-600' : 'text-red-600'
                   }`}>
                     {transaction.amount}
                   </span>
-                  <Badge variant="secondary" className={`${transaction.statusColor} text-white`}>
+                  <Badge variant="secondary" className={`${transaction.statusColor} text-white flex-shrink-0`}>
                     {transaction.status}
                   </Badge>
                 </div>
@@ -248,7 +248,7 @@ const PaymentManagement = () => {
 
       {/* Receipts Modal */}
       <Dialog open={receiptsModalOpen} onOpenChange={setReceiptsModalOpen}>
-        <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] max-w-7xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Gestion des encaissements</DialogTitle>
           </DialogHeader>
@@ -286,7 +286,7 @@ const PaymentManagement = () => {
 
       {/* Expenses Modal */}
       <Dialog open={expensesModalOpen} onOpenChange={setExpensesModalOpen}>
-        <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] max-w-7xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Gestion des dépenses</DialogTitle>
           </DialogHeader>
@@ -323,7 +323,7 @@ const PaymentManagement = () => {
 
       {/* Accounts Modal */}
       <Dialog open={accountsModalOpen} onOpenChange={setAccountsModalOpen}>
-        <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] max-w-7xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Gestion des comptes</DialogTitle>
           </DialogHeader>
