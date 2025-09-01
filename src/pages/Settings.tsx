@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import CompanyTab from '@/components/settings/CompanyTab';
 import PreferencesTab from '@/components/settings/PreferencesTab';
 import TeamTab from '@/components/settings/TeamTab';
+import { TemplatesTab } from '@/components/settings/TemplatesTab';
 import AppearanceTab from '@/components/settings/AppearanceTab';
 import NotificationsTab from '@/components/settings/NotificationsTab';
 import SubscriptionTab from '@/components/settings/SubscriptionTab';
@@ -110,18 +111,7 @@ const Settings = () => {
             </TabsContent>
             
             <TabsContent value="templates" className="space-y-4">
-              <div className="text-center py-8">
-                <FileText className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Gestion des Templates Juridiques</h3>
-                <p className="text-gray-600 mb-4">Personnalisez et gérez vos templates juridiques</p>
-                <Button 
-                  onClick={() => navigate('/gestion-templates')}
-                  className="flex items-center gap-2"
-                >
-                  <FileText className="h-4 w-4" />
-                  Accéder à la gestion des templates
-                </Button>
-              </div>
+              <TemplatesTab />
             </TabsContent>
             
             <TabsContent value="appearance">
