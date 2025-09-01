@@ -751,7 +751,11 @@ Garage Martin`
                     variant={filter === 'relance1' || filter === 'relance2' || filter === 'relance3' ? 'default' : 'outline'} 
                     size="sm"
                     onClick={() => setFilter('relance')}
-                    className="text-xs sm:text-sm"
+                    className={`text-xs sm:text-sm ${
+                      filter === 'relance1' || filter === 'relance2' || filter === 'relance3' 
+                        ? 'bg-black text-white hover:bg-black/90' 
+                        : ''
+                    }`}
                   >
                     Relance
                   </Button>
