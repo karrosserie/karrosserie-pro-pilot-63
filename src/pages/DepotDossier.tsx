@@ -5,17 +5,23 @@ import { useJudicialCases } from '@/hooks/use-judicial-cases';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
 
 const DepotDossier = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { cases, loading } = useJudicialCases();
+  const { toast } = useToast();
   const [selectedCase, setSelectedCase] = useState(null);
   const [currentStep, setCurrentStep] = useState(2);
   const [isDepositing, setIsDepositing] = useState(false);
   const [loadingText, setLoadingText] = useState('');
   const [progress, setProgress] = useState(0);
   const [selectedTribunal, setSelectedTribunal] = useState('marseille');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [depositResult, setDepositResult] = useState(null);
 
   useEffect(() => {
     if (id && cases) {
@@ -26,10 +32,10 @@ const DepotDossier = () => {
 
   const steps = [
     { id: 1, label: "Dossier généré", icon: "✓", completed: true },
-    { id: 2, label: "Vérification", icon: "2", current: currentStep === 2 },
-    { id: 3, label: "Tribunal compétent", icon: "3", current: currentStep === 3 },
-    { id: 4, label: "Dépôt", icon: "4", current: currentStep === 4 },
-    { id: 5, label: "Suivi", icon: "5", current: currentStep === 5 },
+    { id: 2, label: "Vérification", icon: "2", current: currentStep === 2, completed: currentStep > 2 },
+    { id: 3, label: "Tribunal compétent", icon: "3", current: currentStep === 3, completed: currentStep > 3 },
+    { id: 4, label: "Dépôt", icon: "4", current: currentStep === 4, completed: currentStep > 4 },
+    { id: 5, label: "Suivi", icon: "5", current: currentStep === 5, completed: currentStep > 5 },
   ];
 
   const documents = [
@@ -77,11 +83,13 @@ const DepotDossier = () => {
     }
   ];
 
-  const handleProceedToDeposit = async () => {
-    if (!window.confirm('Voulez-vous procéder au dépôt de la requête en injonction de payer ?\n\nCette action engagera les frais de procédure (38€).')) {
-      return;
-    }
+  const handleProceedToDeposit = () => {
+    setShowConfirmModal(true);
+  };
 
+  const confirmDeposit = async () => {
+    setShowConfirmModal(false);
+    setCurrentStep(3); // Avancer à l'étape "Tribunal compétent"
     setIsDepositing(true);
     setProgress(0);
 
@@ -98,31 +106,32 @@ const DepotDossier = () => {
       setLoadingText(loadingSteps[i]);
       setProgress((i + 1) / loadingSteps.length * 100);
       await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Progresser les étapes pendant le processus
+      if (i === 1) setCurrentStep(4); // Étape Dépôt
+      if (i === 4) setCurrentStep(5); // Étape Suivi
     }
 
     setIsDepositing(false);
     
-    // Show success message
+    // Préparer les données de résultat
     const today = new Date().toLocaleDateString('fr-FR');
-    alert(`✅ Requête déposée avec succès !
+    setDepositResult({
+      number: 'RIP-2025-001234',
+      tribunal: 'TJ Marseille',
+      date: today
+    });
+    
+    setShowSuccessModal(true);
+  };
 
-📋 Numéro de dossier : RIP-2025-001234
-🏛️ Tribunal : TJ Marseille
-📅 Date de dépôt : ${today}
-
-📧 Vous recevrez une confirmation par email avec :
-• Le récépissé de dépôt
-• Le numéro de suivi
-• Les prochaines étapes
-
-⏱️ Délai de traitement estimé : 3-4 semaines
-
-🔔 Vous serez automatiquement notifié de l'évolution de votre dossier.`);
-
-    // Redirect to case list
-    setTimeout(() => {
-      navigate('/contentieux/depot-dossier');
-    }, 2000);
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false);
+    toast({
+      title: "Dépôt réussi",
+      description: "Votre requête a été déposée avec succès au tribunal.",
+    });
+    navigate('/contentieux/depot-dossier');
   };
 
   const selectTribunal = (tribunalId) => {
@@ -248,12 +257,12 @@ const DepotDossier = () => {
           <div className="flex justify-between w-full max-w-3xl items-center relative z-10">
             {steps.map((step) => (
               <div key={step.id} className="flex flex-col items-center">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-all duration-200 ${
-                  step.completed ? 'bg-green-600 text-white' : 
-                  step.current ? 'bg-red-600 text-white' : 
-                  'bg-slate-300 text-slate-600'
-                }`}>
-                  {step.icon}
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-all duration-200 ${
+              step.completed ? 'bg-green-600 text-white' : 
+              step.current ? 'bg-red-600 text-white' : 
+              'bg-slate-300 text-slate-600'
+            }`}>
+                  {step.completed ? '✓' : step.icon}
                 </div>
                 <span className={`text-sm mt-2 text-center font-medium max-w-24 ${
                   step.current ? 'text-red-600' : 'text-slate-600'
@@ -481,6 +490,81 @@ const DepotDossier = () => {
           </div>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              🏛️ Confirmer le dépôt
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p>Voulez-vous procéder au dépôt de la requête en injonction de payer ?</p>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <p className="text-yellow-800 text-sm font-medium">
+                ⚠️ Cette action engagera les frais de procédure (38€)
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowConfirmModal(false)}>
+              Annuler
+            </Button>
+            <Button onClick={confirmDeposit} className="bg-red-600 hover:bg-red-700">
+              Confirmer le dépôt
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Modal */}
+      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              ✅ Requête déposée avec succès !
+            </DialogTitle>
+          </DialogHeader>
+          {depositResult && (
+            <div className="space-y-4">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="font-medium">📋 Numéro de dossier :</span>
+                    <span>{depositResult.number}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium">🏛️ Tribunal :</span>
+                    <span>{depositResult.tribunal}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium">📅 Date de dépôt :</span>
+                    <span>{depositResult.date}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="text-sm text-slate-600 space-y-2">
+                <p className="font-medium">📧 Vous recevrez une confirmation par email avec :</p>
+                <ul className="list-disc list-inside space-y-1 ml-4">
+                  <li>Le récépissé de dépôt</li>
+                  <li>Le numéro de suivi</li>
+                  <li>Les prochaines étapes</li>
+                </ul>
+                
+                <p className="font-medium mt-4">⏱️ Délai de traitement estimé : 3-4 semaines</p>
+                <p className="text-xs">🔔 Vous serez automatiquement notifié de l'évolution de votre dossier.</p>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button onClick={handleSuccessModalClose} className="w-full">
+              Retour au tableau de bord
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Loading Modal */}
       {isDepositing && (
