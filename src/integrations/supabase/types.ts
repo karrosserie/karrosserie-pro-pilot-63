@@ -1581,6 +1581,81 @@ export type Database = {
           },
         ]
       }
+      judicial_cases: {
+        Row: {
+          chronologie: string | null
+          client_id: string | null
+          company_id: string
+          contexte: string | null
+          created_at: string
+          defendeur: string | null
+          demandes: string | null
+          demandeur: string | null
+          depens: boolean | null
+          depens_details: string | null
+          id: string
+          interets: boolean | null
+          interets_details: string | null
+          invoice_id: string | null
+          montant_dossier: number | null
+          obligations: string | null
+          pieces: string | null
+          reference: string
+          references_legales: string | null
+          relation: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          chronologie?: string | null
+          client_id?: string | null
+          company_id: string
+          contexte?: string | null
+          created_at?: string
+          defendeur?: string | null
+          demandes?: string | null
+          demandeur?: string | null
+          depens?: boolean | null
+          depens_details?: string | null
+          id?: string
+          interets?: boolean | null
+          interets_details?: string | null
+          invoice_id?: string | null
+          montant_dossier?: number | null
+          obligations?: string | null
+          pieces?: string | null
+          reference: string
+          references_legales?: string | null
+          relation?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          chronologie?: string | null
+          client_id?: string | null
+          company_id?: string
+          contexte?: string | null
+          created_at?: string
+          defendeur?: string | null
+          demandes?: string | null
+          demandeur?: string | null
+          depens?: boolean | null
+          depens_details?: string | null
+          id?: string
+          interets?: boolean | null
+          interets_details?: string | null
+          invoice_id?: string | null
+          montant_dossier?: number | null
+          obligations?: string | null
+          pieces?: string | null
+          reference?: string
+          references_legales?: string | null
+          relation?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       messageries: {
         Row: {
           archived: boolean
