@@ -2,6 +2,7 @@
 import { ProtectedRoute } from "@/components/router/ProtectedRoute";
 import { Navigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
+import PaymentDashboard from "@/pages/payments/PaymentDashboard";
 import Receipts from "@/pages/payments/receipts/Receipts";
 import Expenses from "@/pages/payments/expenses/Expenses";
 import Accounts from "@/pages/payments/accounts/Accounts";
@@ -9,6 +10,16 @@ import PaymentRelances from "@/pages/payments/relances/PaymentRelances";
 import Accounting from "@/pages/Accounting";
 
 export const paymentRoutes = [
+  {
+    path: "/payments",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <PaymentDashboard />
+        </AppLayout>
+      </ProtectedRoute>
+    )
+  },
   {
     path: "/payments/receipts",
     element: (
