@@ -16,7 +16,7 @@ interface Template {
   description: string;
   content: string;
   type: string;
-  status: 'active' | 'draft' | 'archived';
+  status: 'active' | 'draft' | 'inactive';
   usage: number;
   performance: {
     openRate?: number;
@@ -154,7 +154,7 @@ Fait à [VILLE], le [DATE]
   };
 
   const toggleTemplateStatus = (template: Template) => {
-    const newStatus = template.status === 'active' ? 'archived' : 'active';
+    const newStatus = template.status === 'active' ? 'inactive' : 'active';
     setTemplates(prev => prev.map(t => 
       t.id === template.id ? { ...t, status: newStatus } : t
     ));
@@ -166,8 +166,8 @@ Fait à [VILLE], le [DATE]
         return <Badge variant="default" className="bg-green-100 text-green-800">✅ Actif</Badge>;
       case 'draft':
         return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">⏳ Brouillon</Badge>;
-      case 'archived':
-        return <Badge variant="outline" className="bg-gray-100 text-gray-600">📦 Archivé</Badge>;
+      case 'inactive':
+        return <Badge variant="outline" className="bg-red-100 text-red-600">❌ Inactif</Badge>;
       default:
         return null;
     }
