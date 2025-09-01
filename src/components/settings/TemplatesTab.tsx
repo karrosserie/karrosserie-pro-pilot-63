@@ -32,7 +32,9 @@ export const TemplatesTab = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [currentTemplate, setCurrentTemplate] = useState<Template | null>(null);
+  const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
   const [templates, setTemplates] = useState<Template[]>([
     {
       id: 'relance-aimable',
@@ -146,6 +148,18 @@ Fait à [VILLE], le [DATE]
     setCurrentTemplate(null);
   };
 
+  const handlePreviewTemplate = (template: Template) => {
+    setPreviewTemplate(template);
+    setIsPreviewModalOpen(true);
+  };
+
+  const toggleTemplateStatus = (template: Template) => {
+    const newStatus = template.status === 'active' ? 'archived' : 'active';
+    setTemplates(prev => prev.map(t => 
+      t.id === template.id ? { ...t, status: newStatus } : t
+    ));
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
@@ -257,7 +271,13 @@ Fait à [VILLE], le [DATE]
                         <Badge variant="outline" className="text-xs">
                           {template.type}
                         </Badge>
-                        {getStatusBadge(template.status)}
+                        <div 
+                          className="cursor-pointer" 
+                          onClick={() => toggleTemplateStatus(template)}
+                          title="Cliquer pour activer/désactiver"
+                        >
+                          {getStatusBadge(template.status)}
+                        </div>
                       </div>
                       <CardTitle className="text-base">{template.name}</CardTitle>
                       <CardDescription className="text-sm line-clamp-2">
@@ -298,7 +318,13 @@ Fait à [VILLE], le [DATE]
                       )}
                       
                       <div className="flex gap-1">
-                        <Button variant="outline" size="sm" className="flex-1 text-xs">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1 text-xs"
+                          onClick={() => handlePreviewTemplate(template)}
+                          title="Aperçu du template"
+                        >
                           <Eye className="h-3 w-3" />
                         </Button>
                         <Button 
@@ -433,6 +459,50 @@ Fait à [VILLE], le [DATE]
             </Button>
             <Button onClick={handleSaveTemplate}>
               💾 Enregistrer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Preview Modal */}
+      <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>
+              👁️ Aperçu du template - {previewTemplate?.name}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {previewTemplate && (
+            <div className="overflow-y-auto max-h-[70vh]">
+              <div className="bg-white p-6 rounded border text-sm">
+                {previewTemplate.content
+                  .replace(/\[NOM_CLIENT\]/g, 'SARL Exemple')
+                  .replace(/\[NUMERO_FACTURE\]/g, 'FAC-2024-001')
+                  .replace(/\[MONTANT\]/g, '3 450,00')
+                  .replace(/\[DATE_EMISSION\]/g, '15/01/2024')
+                  .replace(/\[DATE_ECHEANCE\]/g, '15/02/2024')
+                  .replace(/\[NB_JOURS\]/g, '30')
+                  .replace(/\[NOM_ENTREPRISE\]/g, 'Votre Entreprise')
+                  .replace(/\[ADRESSE_ENTREPRISE\]/g, '123 Rue de la République, 75001 Paris')
+                  .split('\n').map((line, index) => (
+                    <div key={index} className="mb-1">{line || <br />}</div>
+                  ))}
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsPreviewModalOpen(false)}>
+              Fermer
+            </Button>
+            <Button onClick={() => {
+              if (previewTemplate) {
+                handleEditTemplate(previewTemplate);
+                setIsPreviewModalOpen(false);
+              }
+            }}>
+              ✏️ Éditer ce template
             </Button>
           </DialogFooter>
         </DialogContent>
