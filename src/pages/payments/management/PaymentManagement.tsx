@@ -11,6 +11,11 @@ import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { ReceiptWithClient } from '@/services/supabase/receipts/types';
+import { ExpensesHeader } from '@/components/expenses/ExpensesHeader';
+import { ExpensesTable } from '@/components/expenses/ExpensesTable';
+import ExpenseDialog from '@/components/expenses/ExpenseDialog';
+import { useExpenses } from '@/hooks/use-expenses';
+import { ExpenseWithRelations } from '@/services/supabase/expenses';
 
 const PaymentManagement = () => {
   // Receipts modal state
@@ -19,9 +24,19 @@ const PaymentManagement = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState<ReceiptWithClient | null>(null);
   
+  // Expenses modal state
+  const [expensesModalOpen, setExpensesModalOpen] = useState(false);
+  const [expenseSearchTerm, setExpenseSearchTerm] = useState('');
+  const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState<ExpenseWithRelations | null>(null);
+  
   // Receipts data
   const { receipts, isLoading, handleDelete, filterReceipts } = useReceiptsData();
   const filteredReceipts = filterReceipts(receipts, searchTerm);
+
+  // Expenses data
+  const { expenses, isLoading: expensesLoading, handleDelete: handleExpenseDelete, filterExpenses } = useExpenses();
+  const filteredExpenses = filterExpenses(expenses, expenseSearchTerm);
 
   // Receipts handlers
   const handleCreateReceipt = () => {
@@ -32,6 +47,17 @@ const PaymentManagement = () => {
   const handleEdit = (receipt: ReceiptWithClient) => {
     setSelectedReceipt(receipt);
     setDialogOpen(true);
+  };
+
+  // Expenses handlers
+  const handleCreateExpense = () => {
+    setSelectedExpense(null);
+    setExpenseDialogOpen(true);
+  };
+
+  const handleEditExpense = (expense: ExpenseWithRelations) => {
+    setSelectedExpense(expense);
+    setExpenseDialogOpen(true);
   };
 
   const transactions = [
@@ -145,7 +171,7 @@ const PaymentManagement = () => {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:shadow-md transition-shadow">
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setExpensesModalOpen(true)}>
           <CardContent className="flex flex-col items-center justify-center p-6">
             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
               <ArrowDownCircle className="h-6 w-6 text-red-600" />
@@ -244,6 +270,43 @@ const PaymentManagement = () => {
         receipt={selectedReceipt}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
+      />
+
+      {/* Expenses Modal */}
+      <Dialog open={expensesModalOpen} onOpenChange={setExpensesModalOpen}>
+        <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Gestion des dépenses</DialogTitle>
+          </DialogHeader>
+          
+          {expensesLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <LoadingSpinner />
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <ExpensesHeader
+                searchTerm={expenseSearchTerm}
+                onSearchChange={setExpenseSearchTerm}
+                onCreateExpense={handleCreateExpense}
+              />
+              
+              <ExpensesTable
+                expenses={filteredExpenses}
+                onEdit={handleEditExpense}
+                onDelete={handleExpenseDelete}
+                isLoading={expensesLoading}
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Expense Dialog */}
+      <ExpenseDialog
+        expense={selectedExpense}
+        open={expenseDialogOpen}
+        onOpenChange={setExpenseDialogOpen}
       />
     </div>
   );
