@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Users, FileText, Scale, ClipboardList, Paperclip, Euro, ArrowLeft } from "lucide-react";
+import { Users, FileText, Scale, ClipboardList, Paperclip, Euro, ArrowLeft, Plus, X } from "lucide-react";
+import { DocumentUploader } from '@/components/shared/DocumentUploader';
 import { useNavigate } from "react-router-dom";
 import { useJudicialCases } from "@/hooks/use-judicial-cases";
 import { useClients } from "@/hooks/use-clients";
@@ -25,6 +26,7 @@ const CreationDossierJudiciaire = () => {
   const [step, setStep] = useState(1);
   const [selectedClient, setSelectedClient] = useState("");
   const [selectedInvoice, setSelectedInvoice] = useState("");
+  const [attachedFiles, setAttachedFiles] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     demandeur: "",
     defendeur: "",
@@ -100,6 +102,22 @@ const CreationDossierJudiciaire = () => {
         ...prevData,
         [name]: !prevData[name as keyof typeof prevData],
     }));
+  };
+
+  const handleFileAdd = (url: string) => {
+    setAttachedFiles(prev => [...prev, url]);
+  };
+
+  const handleFileRemove = (index: number) => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleFileUpdate = (index: number, url: string) => {
+    setAttachedFiles(prev => prev.map((file, i) => (i === index ? url : file)));
+  };
+
+  const addNewFileSlot = () => {
+    setAttachedFiles(prev => [...prev, '']);
   };
 
   const handleSubmit = async () => {
@@ -445,22 +463,60 @@ const CreationDossierJudiciaire = () => {
                 </ul>
             </div>
             <div className="bg-card p-4 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
-              <label className="block text-sm font-medium text-foreground mb-1 flex items-center gap-2">
-                <Paperclip className="w-4 h-4 text-orange-700" /> Bordereau des pièces jointes au dossier :
-              </label>
-              <textarea 
-                name="pieces"
-                value={formData.pieces}
-                onChange={handleChange}
-                className="w-full border border-input rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-ring transition-shadow bg-background hover:bg-muted/50" 
-                rows={8} 
-                placeholder="Pièce n°1 : Contrat signé du [date].
-Pièce n°2 : Facture impayée n°XXX du [date].
-Pièce n°3 : Mise en demeure envoyée le [date] par LRAR.
-Pièce n°4 : Relevé bancaire / preuve de non-paiement.
-Pièce n°5 : Témoignage / attestation CERFA.
-(ajouter autant de pièces que nécessaire)"
-              />
+              <div className="flex items-center justify-between mb-4">
+                <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                  <Paperclip className="w-4 h-4 text-orange-700" /> Bordereau des pièces jointes au dossier
+                </label>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm"
+                  onClick={addNewFileSlot}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Ajouter une pièce
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                {attachedFiles.length === 0 && (
+                  <DocumentUploader
+                    documentType="judicial-document"
+                    documentId="new-case-0"
+                    currentDocumentUrl=""
+                    onUploadComplete={(url) => handleFileAdd(url)}
+                    isViewMode={false}
+                  />
+                )}
+                
+                {attachedFiles.map((fileUrl, index) => (
+                  <div key={index} className="relative">
+                    <div className="flex items-start gap-2">
+                      <div className="flex-1">
+                        <DocumentUploader
+                          documentType="judicial-document"
+                          documentId={`new-case-${index}`}
+                          currentDocumentUrl={fileUrl}
+                          onUploadComplete={(url) => handleFileUpdate(index, url)}
+                          isViewMode={false}
+                        />
+                      </div>
+                      {attachedFiles.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleFileRemove(index)}
+                          className="text-red-500 hover:text-red-600"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
