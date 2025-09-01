@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,9 +20,11 @@ import {
   TestTube
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 
 const RelanceIATab = () => {
   const { toast } = useToast();
+  const { preferences, updateAiRelanceSettings, isLoading } = useCompanyPreferences();
   const [settings, setSettings] = useState({
     enabled: false,
     delayBeforeFirst: 30,
@@ -39,6 +41,27 @@ const RelanceIATab = () => {
     tonality: 'professional'
   });
 
+  // Load settings from preferences when available
+  useEffect(() => {
+    if (preferences) {
+      setSettings({
+        enabled: preferences.ai_relance_enabled || false,
+        delayBeforeFirst: preferences.ai_relance_delay_before_first || 30,
+        maxRelances: preferences.ai_relance_max_relances || 5,
+        channels: {
+          email: preferences.ai_relance_channels_email ?? true,
+          sms: preferences.ai_relance_channels_sms ?? true,
+          whatsapp: preferences.ai_relance_channels_whatsapp ?? false,
+          phone: preferences.ai_relance_channels_phone ?? false,
+          mail: preferences.ai_relance_channels_mail ?? false
+        },
+        autoMiseEnDemeure: preferences.ai_relance_auto_mise_en_demeure ?? true,
+        prompt: preferences.ai_relance_prompt || 'Rédigez une relance de paiement professionnelle et courtoise pour la facture {facture_ref} d\'un montant de {montant}€ échue depuis {jours_retard} jours pour le client {nom_client}.',
+        tonality: preferences.ai_relance_tonality || 'professional'
+      });
+    }
+  }, [preferences]);
+
   const handleSettingChange = (key: string, value: any) => {
     setSettings(prev => ({
       ...prev,
@@ -46,11 +69,21 @@ const RelanceIATab = () => {
     }));
   };
 
-  const handleSave = () => {
-    // TODO: Implement save functionality
-    toast({
-      title: "Paramètres sauvegardés",
-      description: "Les paramètres de l'IA ont été mis à jour avec succès.",
+  const handleSave = async () => {
+    if (!updateAiRelanceSettings) return;
+    
+    await updateAiRelanceSettings({
+      ai_relance_enabled: settings.enabled,
+      ai_relance_delay_before_first: settings.delayBeforeFirst,
+      ai_relance_max_relances: settings.maxRelances,
+      ai_relance_channels_email: settings.channels.email,
+      ai_relance_channels_sms: settings.channels.sms,
+      ai_relance_channels_whatsapp: settings.channels.whatsapp,
+      ai_relance_channels_phone: settings.channels.phone,
+      ai_relance_channels_mail: settings.channels.mail,
+      ai_relance_auto_mise_en_demeure: settings.autoMiseEnDemeure,
+      ai_relance_prompt: settings.prompt,
+      ai_relance_tonality: settings.tonality
     });
   };
 

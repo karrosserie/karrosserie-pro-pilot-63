@@ -24,6 +24,16 @@ interface CompanyPreferences {
   next_invoice_ref: string;
   next_credit_ref: string;
   ai_relance_enabled: boolean;
+  ai_relance_delay_before_first?: number;
+  ai_relance_max_relances?: number;
+  ai_relance_channels_email?: boolean;
+  ai_relance_channels_sms?: boolean;
+  ai_relance_channels_whatsapp?: boolean;
+  ai_relance_channels_phone?: boolean;
+  ai_relance_channels_mail?: boolean;
+  ai_relance_auto_mise_en_demeure?: boolean;
+  ai_relance_prompt?: string;
+  ai_relance_tonality?: string;
   payment_details?: string;
   invoice_non_engagement_clause?: string;
   repair_order_non_engagement_clause?: string;
@@ -79,6 +89,16 @@ export function useCompanyPreferences() {
             next_invoice_ref: '1',
             next_credit_ref: '1',
             ai_relance_enabled: false,
+            ai_relance_delay_before_first: 30,
+            ai_relance_max_relances: 5,
+            ai_relance_channels_email: true,
+            ai_relance_channels_sms: true,
+            ai_relance_channels_whatsapp: false,
+            ai_relance_channels_phone: false,
+            ai_relance_channels_mail: false,
+            ai_relance_auto_mise_en_demeure: true,
+            ai_relance_prompt: 'Rédigez une relance de paiement professionnelle et courtoise pour la facture {facture_ref} d\'un montant de {montant}€ échue depuis {jours_retard} jours pour le client {nom_client}.',
+            ai_relance_tonality: 'professional',
             payment_details: '',
             invoice_non_engagement_clause: '',
             repair_order_non_engagement_clause: '',
@@ -144,9 +164,45 @@ export function useCompanyPreferences() {
     }
   };
 
+  const updateAiRelanceSettings = async (settings: Partial<CompanyPreferences>) => {
+    if (!companyData?.id || !preferences) return;
+
+    try {
+      const { error } = await supabase
+        .from('company_preferences')
+        .update(settings)
+        .eq('company_id', companyData.id);
+
+      if (error) {
+        console.error('Error updating AI relance settings:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de mettre à jour les paramètres de relance IA",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setPreferences(prev => prev ? { ...prev, ...settings } : null);
+      
+      toast({
+        title: "Succès",
+        description: "Paramètres de relance IA sauvegardés avec succès",
+      });
+    } catch (error) {
+      console.error('Error in updateAiRelanceSettings:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur inattendue s'est produite",
+        variant: "destructive",
+      });
+    }
+  };
+
   return {
     preferences,
     isLoading,
     updateAiRelanceStatus,
+    updateAiRelanceSettings,
   };
 }
