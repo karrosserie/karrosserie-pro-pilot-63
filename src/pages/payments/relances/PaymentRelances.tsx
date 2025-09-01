@@ -564,7 +564,7 @@ Garage Martin`
             <Scale className="h-8 w-8 text-primary mr-3" />
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-                Module Juridique - Recouvrement
+                Relance de paiement
               </h1>
               <p className="text-muted-foreground text-sm sm:text-base mt-1">
                 Gérez vos impayés et procédures judiciaires en toute simplicité
