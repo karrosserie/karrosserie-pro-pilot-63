@@ -157,6 +157,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
         { label: 'Encaissements', path: '/payments/receipts' },
         { label: 'Dépenses', path: '/payments/expenses' },
         { label: 'Gestion des comptes', path: '/payments/accounts' },
+        { label: 'Gestion des paiements et transactions', path: '/payments/management' },
         { label: 'Relance de paiement', path: '/payments/relances' },
         { label: 'Comptabilité', path: '/payments/accounting' },
       ]

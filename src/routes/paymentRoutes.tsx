@@ -7,6 +7,7 @@ import Expenses from "@/pages/payments/expenses/Expenses";
 import Accounts from "@/pages/payments/accounts/Accounts";
 import PaymentRelances from "@/pages/payments/relances/PaymentRelances";
 import Accounting from "@/pages/Accounting";
+import PaymentManagement from "@/pages/payments/management/PaymentManagement";
 
 export const paymentRoutes = [
   {
@@ -55,6 +56,16 @@ export const paymentRoutes = [
       <ProtectedRoute>
         <AppLayout>
           <Accounting />
+        </AppLayout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/payments/management",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <PaymentManagement />
         </AppLayout>
       </ProtectedRoute>
     )
