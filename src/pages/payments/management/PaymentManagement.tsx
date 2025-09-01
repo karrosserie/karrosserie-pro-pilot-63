@@ -3,8 +3,31 @@ import { Button } from "@/components/ui/button";
 import { Plus, Search, Filter, TrendingUp, TrendingDown, CreditCard, ArrowUpCircle, ArrowDownCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { ReceiptsTable } from "@/components/receipts/ReceiptsTable";
+import ReceiptDialog from "@/components/receipts/ReceiptDialog";
+import { useReceiptsData } from "@/hooks/use-receipts-data";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { ReceiptWithClient } from "@/services/supabase/receipts/types";
 
 const PaymentManagement = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedReceipt, setSelectedReceipt] = useState<ReceiptWithClient | null>(null);
+  
+  const { receipts, isLoading, handleDelete, filterReceipts } = useReceiptsData();
+  const filteredReceipts = filterReceipts(receipts, searchTerm);
+
+  const handleCreateReceipt = () => {
+    setSelectedReceipt(null);
+    setDialogOpen(true);
+  };
+
+  const handleEdit = (receipt: ReceiptWithClient) => {
+    setSelectedReceipt(receipt);
+    setDialogOpen(true);
+  };
+
   const transactions = [
     {
       id: 1,
@@ -104,38 +127,48 @@ const PaymentManagement = () => {
         </Card>
       </div>
 
-      {/* Action Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="cursor-pointer hover:shadow-md transition-shadow">
-          <CardContent className="flex flex-col items-center justify-center p-6">
-            <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
-              <ArrowUpCircle className="h-6 w-6 text-emerald-600" />
+      {/* Encaissements Section */}
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle className="flex items-center gap-2">
+              <ArrowUpCircle className="h-5 w-5 text-emerald-600" />
+              Encaissements
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input 
+                  placeholder="Rechercher un encaissement..." 
+                  className="pl-10 w-64"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <Button 
+                className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+                onClick={handleCreateReceipt}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Nouvel encaissement
+              </Button>
             </div>
-            <h3 className="font-semibold text-lg mb-2">Encaissements</h3>
-            <p className="text-sm text-muted-foreground text-center">Gérer les recettes</p>
-          </CardContent>
-        </Card>
-
-        <Card className="cursor-pointer hover:shadow-md transition-shadow">
-          <CardContent className="flex flex-col items-center justify-center p-6">
-            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
-              <ArrowDownCircle className="h-6 w-6 text-red-600" />
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex items-center justify-center h-32">
+              <LoadingSpinner />
             </div>
-            <h3 className="font-semibold text-lg mb-2">Dépenses</h3>
-            <p className="text-sm text-muted-foreground text-center">Suivre les coûts</p>
-          </CardContent>
-        </Card>
-
-        <Card className="cursor-pointer hover:shadow-md transition-shadow">
-          <CardContent className="flex flex-col items-center justify-center p-6">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-              <CreditCard className="h-6 w-6 text-blue-600" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Comptes</h3>
-            <p className="text-sm text-muted-foreground text-center">Gérer les comptes</p>
-          </CardContent>
-        </Card>
-      </div>
+          ) : (
+            <ReceiptsTable
+              receipts={filteredReceipts}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          )}
+        </CardContent>
+      </Card>
 
       {/* Recent Transactions */}
       <Card>
@@ -178,6 +211,12 @@ const PaymentManagement = () => {
           </div>
         </CardContent>
       </Card>
+
+      <ReceiptDialog
+        receipt={selectedReceipt}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </div>
   );
 };
