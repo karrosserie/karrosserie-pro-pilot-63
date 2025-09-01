@@ -154,6 +154,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
       path: '/payments',
       hasSubMenu: true,
       subMenuItems: [
+        { label: 'Gestion des comptes', path: '/payments/accounts' },
         { label: 'Relance de paiement', path: '/payments/relances' },
         { label: 'Comptabilité', path: '/payments/accounting' },
       ]
