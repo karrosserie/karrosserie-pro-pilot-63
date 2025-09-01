@@ -21,7 +21,8 @@ import {
   HelpCircle,
   Calendar,
   Shield,
-  MessageSquare
+  MessageSquare,
+  Scale
 } from 'lucide-react';
 import { useAdmin } from '@/hooks/use-admin';
 import { useUserRole } from '@/hooks/use-user-role';
@@ -161,6 +162,17 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
       ]
     },
     { icon: <CreditCard className="app-icon" />, label: 'Cession de créance', path: '/cessions' },
+    { 
+      icon: <Scale className="app-icon" />, 
+      label: 'Contentieux Tribunal', 
+      path: '/contentieux',
+      hasSubMenu: true,
+      subMenuItems: [
+        { label: 'Création d\'un dossier judiciaire', path: '/contentieux/creation-dossier' },
+        { label: 'Dépôt de dossier', path: '/contentieux/depot-dossier' },
+        { label: 'Suivi des procédures judiciaires', path: '/contentieux/suivi-procedures' },
+      ]
+    },
     { icon: <Clock className="app-icon" />, label: 'Véhicules de courtoisie', path: '/fleet' },
     { icon: <HelpCircle className="app-icon" />, label: 'Aide', path: '/help' },
     ...(isAdmin ? [{ icon: <Shield className="app-icon" />, label: 'Accès aux comptes', path: '/admin/accounts' }] : []),

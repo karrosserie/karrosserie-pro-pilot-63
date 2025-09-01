@@ -14,6 +14,9 @@ import Help from "@/pages/Help";
 import KarrosseriePlanningPage from "@/pages/KarrosseriePlanningPage";
 import Messageries from "@/pages/Messageries";
 import PresencePointages from "@/pages/PresencePointages";
+import CreationDossierJudiciaire from "@/pages/CreationDossierJudiciaire";
+import DepotDossier from "@/pages/DepotDossier";
+import SuiviProceduresJudiciaires from "@/pages/SuiviProceduresJudiciaires";
 
 export const coreRoutes = [
   {
@@ -142,6 +145,36 @@ export const coreRoutes = [
       <ProtectedRoute>
         <AppLayout>
           <PresencePointages />
+        </AppLayout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/contentieux/creation-dossier",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <CreationDossierJudiciaire />
+        </AppLayout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/contentieux/depot-dossier",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <DepotDossier />
+        </AppLayout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/contentieux/suivi-procedures",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <SuiviProceduresJudiciaires />
         </AppLayout>
       </ProtectedRoute>
     )
