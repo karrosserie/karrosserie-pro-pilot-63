@@ -1,10 +1,39 @@
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Filter, TrendingUp, TrendingDown, CreditCard, ArrowUpCircle, ArrowDownCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ReceiptsHeader } from '@/components/receipts/ReceiptsHeader';
+import { ReceiptsTable } from '@/components/receipts/ReceiptsTable';
+import ReceiptDialog from '@/components/receipts/ReceiptDialog';
+import { useReceiptsData } from '@/hooks/use-receipts-data';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { ReceiptWithClient } from '@/services/supabase/receipts/types';
 
 const PaymentManagement = () => {
+  // Receipts modal state
+  const [receiptsModalOpen, setReceiptsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedReceipt, setSelectedReceipt] = useState<ReceiptWithClient | null>(null);
+  
+  // Receipts data
+  const { receipts, isLoading, handleDelete, filterReceipts } = useReceiptsData();
+  const filteredReceipts = filterReceipts(receipts, searchTerm);
+
+  // Receipts handlers
+  const handleCreateReceipt = () => {
+    setSelectedReceipt(null);
+    setDialogOpen(true);
+  };
+
+  const handleEdit = (receipt: ReceiptWithClient) => {
+    setSelectedReceipt(receipt);
+    setDialogOpen(true);
+  };
+
   const transactions = [
     {
       id: 1,
@@ -106,7 +135,7 @@ const PaymentManagement = () => {
 
       {/* Action Cards */}
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="cursor-pointer hover:shadow-md transition-shadow">
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setReceiptsModalOpen(true)}>
           <CardContent className="flex flex-col items-center justify-center p-6">
             <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
               <ArrowUpCircle className="h-6 w-6 text-emerald-600" />
@@ -178,6 +207,44 @@ const PaymentManagement = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Receipts Modal */}
+      <Dialog open={receiptsModalOpen} onOpenChange={setReceiptsModalOpen}>
+        <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Gestion des encaissements</DialogTitle>
+          </DialogHeader>
+          
+          {isLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <LoadingSpinner />
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <ReceiptsHeader
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                onCreateReceipt={handleCreateReceipt}
+              />
+              
+              <div className="card-container">
+                <ReceiptsTable
+                  receipts={filteredReceipts}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Receipt Dialog */}
+      <ReceiptDialog
+        receipt={selectedReceipt}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </div>
   );
 };
