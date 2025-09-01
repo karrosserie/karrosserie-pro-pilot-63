@@ -16,6 +16,10 @@ import { ExpensesTable } from '@/components/expenses/ExpensesTable';
 import ExpenseDialog from '@/components/expenses/ExpenseDialog';
 import { useExpenses } from '@/hooks/use-expenses';
 import { ExpenseWithRelations } from '@/services/supabase/expenses';
+import { AccountsHeader } from '@/components/accounts/AccountsHeader';
+import { AccountsTable } from '@/components/accounts/AccountsTable';
+import AccountDialog from '@/components/accounts/AccountDialog';
+import { useAccounts } from '@/hooks/use-accounts';
 
 const PaymentManagement = () => {
   // Receipts modal state
@@ -30,6 +34,12 @@ const PaymentManagement = () => {
   const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<ExpenseWithRelations | null>(null);
   
+  // Accounts modal state
+  const [accountsModalOpen, setAccountsModalOpen] = useState(false);
+  const [accountSearchTerm, setAccountSearchTerm] = useState('');
+  const [accountDialogOpen, setAccountDialogOpen] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState<any>(null);
+  
   // Receipts data
   const { receipts, isLoading, handleDelete, filterReceipts } = useReceiptsData();
   const filteredReceipts = filterReceipts(receipts, searchTerm);
@@ -37,6 +47,10 @@ const PaymentManagement = () => {
   // Expenses data
   const { expenses, isLoading: expensesLoading, handleDelete: handleExpenseDelete, filterExpenses } = useExpenses();
   const filteredExpenses = filterExpenses(expenses, expenseSearchTerm);
+
+  // Accounts data
+  const { accounts, isLoading: accountsLoading, handleDelete: handleAccountDelete, handleSync, filterAccounts } = useAccounts();
+  const filteredAccounts = filterAccounts(accounts, accountSearchTerm);
 
   // Receipts handlers
   const handleCreateReceipt = () => {
@@ -58,6 +72,17 @@ const PaymentManagement = () => {
   const handleEditExpense = (expense: ExpenseWithRelations) => {
     setSelectedExpense(expense);
     setExpenseDialogOpen(true);
+  };
+
+  // Accounts handlers
+  const handleCreateAccount = () => {
+    setSelectedAccount(null);
+    setAccountDialogOpen(true);
+  };
+
+  const handleEditAccount = (account: any) => {
+    setSelectedAccount(account);
+    setAccountDialogOpen(true);
   };
 
   const transactions = [
@@ -181,7 +206,7 @@ const PaymentManagement = () => {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:shadow-md transition-shadow">
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setAccountsModalOpen(true)}>
           <CardContent className="flex flex-col items-center justify-center p-6">
             <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
               <CreditCard className="h-6 w-6 text-blue-600" />
@@ -307,6 +332,43 @@ const PaymentManagement = () => {
         expense={selectedExpense}
         open={expenseDialogOpen}
         onOpenChange={setExpenseDialogOpen}
+      />
+
+      {/* Accounts Modal */}
+      <Dialog open={accountsModalOpen} onOpenChange={setAccountsModalOpen}>
+        <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Gestion des comptes</DialogTitle>
+          </DialogHeader>
+          
+          {accountsLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <LoadingSpinner />
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <AccountsHeader
+                searchTerm={accountSearchTerm}
+                onSearchChange={setAccountSearchTerm}
+                onCreateAccount={handleCreateAccount}
+              />
+              
+              <AccountsTable
+                accounts={filteredAccounts}
+                onEdit={handleEditAccount}
+                onDelete={handleAccountDelete}
+                onSync={handleSync}
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Account Dialog */}
+      <AccountDialog
+        account={selectedAccount}
+        open={accountDialogOpen}
+        onOpenChange={setAccountDialogOpen}
       />
     </div>
   );
