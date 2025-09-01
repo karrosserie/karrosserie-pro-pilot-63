@@ -16,7 +16,7 @@ import Messageries from "@/pages/Messageries";
 import PresencePointages from "@/pages/PresencePointages";
 import CreationDossierJudiciaire from "@/pages/CreationDossierJudiciaire";
 import DepotDossier from "@/pages/DepotDossier";
-import SuiviProceduresJudiciaires from "@/pages/SuiviProceduresJudiciaires";
+
 import GestionTemplates from "@/pages/GestionTemplates";
 
 export const coreRoutes = [
@@ -176,16 +176,6 @@ export const coreRoutes = [
       <ProtectedRoute>
         <AppLayout>
           <DepotDossier />
-        </AppLayout>
-      </ProtectedRoute>
-    )
-  },
-  {
-    path: "/contentieux/suivi-procedures",
-    element: (
-      <ProtectedRoute>
-        <AppLayout>
-          <SuiviProceduresJudiciaires />
         </AppLayout>
       </ProtectedRoute>
     )

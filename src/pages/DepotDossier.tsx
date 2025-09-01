@@ -119,9 +119,9 @@ const DepotDossier = () => {
 
 🔔 Vous serez automatiquement notifié de l'évolution de votre dossier.`);
 
-    // Redirect to follow-up page
+    // Redirect to case list
     setTimeout(() => {
-      navigate('/contentieux/suivi-procedures');
+      navigate('/contentieux/depot-dossier');
     }, 2000);
   };
 
