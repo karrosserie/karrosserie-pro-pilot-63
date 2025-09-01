@@ -2131,6 +2131,51 @@ export type Database = {
         }
         Relationships: []
       }
+      templates: {
+        Row: {
+          category: string
+          company_id: string
+          content: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          performance_data: Json | null
+          status: string
+          type: string
+          updated_at: string
+          usage_count: number
+        }
+        Insert: {
+          category: string
+          company_id: string
+          content: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          performance_data?: Json | null
+          status?: string
+          type?: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Update: {
+          category?: string
+          company_id?: string
+          content?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          performance_data?: Json | null
+          status?: string
+          type?: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Relationships: []
+      }
       token_packages: {
         Row: {
           created_at: string

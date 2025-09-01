@@ -7,88 +7,26 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Plus, Eye, Edit2, Copy, Mail, MessageSquare, FileText, Scale, Receipt } from "lucide-react";
-
-interface Template {
-  id: string;
-  name: string;
-  category: string;
-  description: string;
-  content: string;
-  type: string;
-  status: 'active' | 'draft' | 'inactive';
-  usage: number;
-  performance: {
-    openRate?: number;
-    responseRate?: number;
-    paymentRate?: number;
-    deliveryRate?: number;
-    clickRate?: number;
-    successRate?: number;
-  };
-}
+import { Search, Plus, Eye, Edit2, Copy, Mail, MessageSquare, FileText, Scale, Receipt, Trash2 } from "lucide-react";
+import { useTemplates, Template } from '@/hooks/use-templates';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 export const TemplatesTab = () => {
+  const {
+    templates,
+    isLoading,
+    createTemplate,
+    updateTemplate,
+    deleteTemplate,
+    toggleTemplateStatus
+  } = useTemplates();
+  
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [currentTemplate, setCurrentTemplate] = useState<Template | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
-  const [templates, setTemplates] = useState<Template[]>([
-    {
-      id: 'relance-aimable',
-      name: 'Relance aimable - Première approche',
-      category: 'reminders',
-      description: 'Template pour première relance courte et cordiale, avec ton bienveillant pour maintenir la relation client.',
-      content: `Objet : Rappel aimable - Facture [NUMERO_FACTURE]
-
-Bonjour [NOM_CLIENT],
-
-J'espère que vous allez bien.
-
-Je me permets de vous contacter concernant votre facture [NUMERO_FACTURE] d'un montant de [MONTANT] €, émise le [DATE_EMISSION] et arrivée à échéance le [DATE_ECHEANCE].
-
-À ce jour, nous n'avons pas reçu votre règlement. Il s'agit peut-être d'un simple oubli de votre part ?
-
-Si le règlement a déjà été effectué, merci de ne pas tenir compte de ce message.
-
-Dans le cas contraire, je vous serais reconnaissant de bien vouloir procéder au règlement dans les plus brefs délais.
-
-Je reste à votre disposition pour tout renseignement complémentaire.
-
-Cordialement,
-[NOM_ENTREPRISE]`,
-      type: 'EMAIL - RELANCE',
-      status: 'active',
-      usage: 145,
-      performance: { openRate: 72, responseRate: 28, paymentRate: 15 }
-    },
-    {
-      id: 'mise-en-demeure',
-      name: 'Mise en demeure formelle',
-      category: 'notices',
-      description: 'Template juridique validé pour mise en demeure officielle avec toutes les mentions légales obligatoires.',
-      content: `MISE EN DEMEURE
-
-Madame, Monsieur,
-
-Nous vous mettons en demeure de procéder au règlement de votre dette d'un montant de [MONTANT] € correspondant à notre facture [NUMERO_FACTURE] émise le [DATE_EMISSION].
-
-Cette somme était exigible le [DATE_ECHEANCE] et demeure à ce jour impayée malgré nos relances.
-
-Nous vous accordons un délai de 8 jours à compter de la réception de la présente pour procéder au règlement.
-
-À défaut, nous nous réservons le droit d'engager toute action en recouvrement.
-
-Fait à [VILLE], le [DATE]
-[NOM_ENTREPRISE]`,
-      type: 'LRE - MISE EN DEMEURE',
-      status: 'active',
-      usage: 67,
-      performance: { deliveryRate: 95, paymentRate: 78 }
-    }
-  ]);
 
   const categories = [
     { id: 'all', name: 'Tous les templates', icon: FileText, count: templates.length },
@@ -132,16 +70,15 @@ Fait à [VILLE], le [DATE]
     setIsEditModalOpen(true);
   };
 
-  const handleSaveTemplate = () => {
+  const handleSaveTemplate = async () => {
     if (!currentTemplate) return;
     
     if (currentTemplate.id) {
       // Modifier template existant
-      setTemplates(prev => prev.map(t => t.id === currentTemplate.id ? currentTemplate : t));
+      await updateTemplate(currentTemplate.id, currentTemplate);
     } else {
       // Nouveau template
-      const newTemplate = { ...currentTemplate, id: Date.now().toString() };
-      setTemplates(prev => [...prev, newTemplate]);
+      await createTemplate(currentTemplate);
     }
     
     setIsEditModalOpen(false);
@@ -153,11 +90,12 @@ Fait à [VILLE], le [DATE]
     setIsPreviewModalOpen(true);
   };
 
-  const toggleTemplateStatus = (template: Template) => {
-    const newStatus = template.status === 'active' ? 'inactive' : 'active';
-    setTemplates(prev => prev.map(t => 
-      t.id === template.id ? { ...t, status: newStatus } : t
-    ));
+  const handleDeleteTemplate = async (template: Template) => {
+    await deleteTemplate(template.id);
+  };
+
+  const toggleTemplateStatusHandler = async (template: Template) => {
+    await toggleTemplateStatus(template);
   };
 
   const getStatusBadge = (status: string) => {
@@ -273,7 +211,7 @@ Fait à [VILLE], le [DATE]
                         </Badge>
                         <div 
                           className="cursor-pointer" 
-                          onClick={() => toggleTemplateStatus(template)}
+                          onClick={() => toggleTemplateStatusHandler(template)}
                           title="Cliquer pour activer/désactiver"
                         >
                           {getStatusBadge(template.status)}
@@ -338,6 +276,36 @@ Fait à [VILLE], le [DATE]
                         <Button variant="outline" size="sm" className="flex-1 text-xs">
                           <Copy className="h-3 w-3" />
                         </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="flex-1 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                              title="Supprimer le template"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Êtes-vous sûr de vouloir supprimer le template "{template.name}" ? 
+                                Cette action est irréversible.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Annuler</AlertDialogCancel>
+                              <AlertDialogAction 
+                                onClick={() => handleDeleteTemplate(template)}
+                                className="bg-red-600 hover:bg-red-700"
+                              >
+                                Supprimer
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </CardContent>
                   </Card>
@@ -504,6 +472,39 @@ Fait à [VILLE], le [DATE]
             }}>
               ✏️ Éditer ce template
             </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  🗑️ Supprimer ce template
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Êtes-vous sûr de vouloir supprimer le template "{previewTemplate?.name}" ? 
+                    Cette action est irréversible.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={() => {
+                      if (previewTemplate) {
+                        handleDeleteTemplate(previewTemplate);
+                        setIsPreviewModalOpen(false);
+                      }
+                    }}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    Supprimer
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </DialogFooter>
         </DialogContent>
       </Dialog>
