@@ -120,9 +120,6 @@ const PaymentManagement = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Gestion des paiements et des transactions</h1>
-          <p className="text-muted-foreground">
-            Gestion des paiements et transactions
-          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline">
