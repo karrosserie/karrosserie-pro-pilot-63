@@ -464,7 +464,17 @@ export type Database = {
       company_preferences: {
         Row: {
           accueil_preparation_time: string | null
+          ai_relance_auto_mise_en_demeure: boolean | null
+          ai_relance_channels_email: boolean | null
+          ai_relance_channels_mail: boolean | null
+          ai_relance_channels_phone: boolean | null
+          ai_relance_channels_sms: boolean | null
+          ai_relance_channels_whatsapp: boolean | null
+          ai_relance_delay_before_first: number | null
           ai_relance_enabled: boolean
+          ai_relance_max_relances: number | null
+          ai_relance_prompt: string | null
+          ai_relance_tonality: string | null
           cloture_livraison_time: string | null
           company_details: string | null
           company_id: string
@@ -499,7 +509,17 @@ export type Database = {
         }
         Insert: {
           accueil_preparation_time?: string | null
+          ai_relance_auto_mise_en_demeure?: boolean | null
+          ai_relance_channels_email?: boolean | null
+          ai_relance_channels_mail?: boolean | null
+          ai_relance_channels_phone?: boolean | null
+          ai_relance_channels_sms?: boolean | null
+          ai_relance_channels_whatsapp?: boolean | null
+          ai_relance_delay_before_first?: number | null
           ai_relance_enabled?: boolean
+          ai_relance_max_relances?: number | null
+          ai_relance_prompt?: string | null
+          ai_relance_tonality?: string | null
           cloture_livraison_time?: string | null
           company_details?: string | null
           company_id: string
@@ -534,7 +554,17 @@ export type Database = {
         }
         Update: {
           accueil_preparation_time?: string | null
+          ai_relance_auto_mise_en_demeure?: boolean | null
+          ai_relance_channels_email?: boolean | null
+          ai_relance_channels_mail?: boolean | null
+          ai_relance_channels_phone?: boolean | null
+          ai_relance_channels_sms?: boolean | null
+          ai_relance_channels_whatsapp?: boolean | null
+          ai_relance_delay_before_first?: number | null
           ai_relance_enabled?: boolean
+          ai_relance_max_relances?: number | null
+          ai_relance_prompt?: string | null
+          ai_relance_tonality?: string | null
           cloture_livraison_time?: string | null
           company_details?: string | null
           company_id?: string
