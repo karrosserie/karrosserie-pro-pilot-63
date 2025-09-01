@@ -170,7 +170,6 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
       subMenuItems: [
         { label: 'Création d\'un dossier judiciaire', path: '/contentieux/creation-dossier' },
         { label: 'Dépôt de dossier', path: '/contentieux/depot-dossier' },
-        { label: 'Suivi des procédures judiciaires', path: '/contentieux/suivi-procedures' },
       ]
     },
     { icon: <Clock className="app-icon" />, label: 'Véhicules de courtoisie', path: '/fleet' },
