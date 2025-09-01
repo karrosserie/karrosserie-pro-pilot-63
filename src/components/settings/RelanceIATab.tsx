@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -95,56 +95,87 @@ const RelanceIATab = () => {
     });
   };
 
-  const workflowSteps = [
-    {
-      id: 'email-aimable',
-      title: 'Email de relance aimable',
-      description: 'Rappel courtois avec facture jointe',
-      day: 'J+30',
-      icon: '📧',
-      color: 'bg-blue-50 border-blue-200 text-blue-700'
-    },
-    {
-      id: 'sms-rappel',
-      title: 'SMS de rappel',
-      description: 'Message court avec lien de paiement',
-      day: 'J+37',
-      icon: '📱',
-      color: 'bg-yellow-50 border-yellow-200 text-yellow-700'
-    },
-    {
-      id: 'email-ferme',
-      title: 'Email de relance ferme',
-      description: 'Ton plus direct, mention des pénalités',
-      day: 'J+45',
-      icon: '📩',
-      color: 'bg-orange-50 border-orange-200 text-orange-700'
-    },
-    {
-      id: 'appel-vocal',
-      title: 'Message vocal automatique',
-      description: 'Appel avec message pré-enregistré',
-      day: 'J+52',
-      icon: '📞',
-      color: 'bg-red-50 border-red-200 text-red-700'
-    },
-    {
-      id: 'lrar',
-      title: 'Courrier recommandé électronique',
-      description: 'Relance officielle avec AR numérique',
-      day: 'J+60',
-      icon: '📮',
-      color: 'bg-purple-50 border-purple-200 text-purple-700'
-    },
-    {
-      id: 'mise-demeure',
-      title: 'Mise en demeure automatique',
-      description: 'Génération et envoi LSE + passage en contentieux',
-      day: 'J+75',
-      icon: '⚖️',
-      color: 'bg-red-100 border-red-300 text-red-800'
+  // Calcul dynamique des étapes du workflow basé sur les paramètres
+  const workflowSteps = useMemo(() => {
+    const allStepTypes = [
+      {
+        id: 'email-aimable',
+        title: 'Email de relance aimable',
+        description: 'Rappel courtois avec facture jointe',
+        icon: '📧',
+        color: 'bg-blue-50 border-blue-200 text-blue-700',
+        channels: ['email'],
+        priority: 1
+      },
+      {
+        id: 'sms-rappel',
+        title: 'SMS de rappel',
+        description: 'Message court avec lien de paiement',
+        icon: '📱',
+        color: 'bg-yellow-50 border-yellow-200 text-yellow-700',
+        channels: ['sms', 'whatsapp'],
+        priority: 2
+      },
+      {
+        id: 'email-ferme',
+        title: 'Email de relance ferme',
+        description: 'Ton plus direct, mention des pénalités',
+        icon: '📩',
+        color: 'bg-orange-50 border-orange-200 text-orange-700',
+        channels: ['email'],
+        priority: 3
+      },
+      {
+        id: 'appel-vocal',
+        title: 'Message vocal automatique',
+        description: 'Appel avec message pré-enregistré',
+        icon: '📞',
+        color: 'bg-red-50 border-red-200 text-red-700',
+        channels: ['phone'],
+        priority: 4
+      },
+      {
+        id: 'lrar',
+        title: 'Courrier recommandé électronique',
+        description: 'Relance officielle avec AR numérique',
+        icon: '📮',
+        color: 'bg-purple-50 border-purple-200 text-purple-700',
+        channels: ['mail'],
+        priority: 5
+      }
+    ];
+
+    // Filtrer les étapes en fonction des canaux activés
+    const activeSteps = allStepTypes.filter(step =>
+      step.channels.some(channel => settings.channels[channel as keyof typeof settings.channels])
+    );
+
+    // Limiter au nombre max de relances
+    const limitedSteps = activeSteps.slice(0, settings.maxRelances);
+
+    // Calculer les jours dynamiquement
+    const stepsWithDays = limitedSteps.map((step, index) => ({
+      ...step,
+      day: `J+${settings.delayBeforeFirst + (index * 7)}`
+    }));
+
+    // Ajouter la mise en demeure si activée
+    if (settings.autoMiseEnDemeure && stepsWithDays.length > 0) {
+      const lastStepDay = settings.delayBeforeFirst + ((stepsWithDays.length - 1) * 7);
+      stepsWithDays.push({
+        id: 'mise-demeure',
+        title: 'Mise en demeure automatique',
+        description: 'Génération et envoi LSE + passage en contentieux',
+        icon: '⚖️',
+        color: 'bg-red-100 border-red-300 text-red-800',
+        channels: [],
+        priority: 999,
+        day: `J+${lastStepDay + 15}`
+      });
     }
-  ];
+
+    return stepsWithDays;
+  }, [settings.delayBeforeFirst, settings.maxRelances, settings.channels, settings.autoMiseEnDemeure]);
 
   return (
     <div className="space-y-6">
@@ -179,9 +210,9 @@ const RelanceIATab = () => {
                   onCheckedChange={(checked) => handleSettingChange('enabled', checked)}
                 />
               </div>
-              <p className="text-sm text-muted-foreground mb-2">
-                Activé dès +30 jours de retard
-              </p>
+               <p className="text-sm text-muted-foreground mb-2">
+                 Activé dès +{settings.delayBeforeFirst} jours de retard
+               </p>
             </div>
 
             <Separator />
@@ -339,24 +370,11 @@ const RelanceIATab = () => {
                   </div>
                   <p className="text-xs opacity-80">{step.description}</p>
                   
-                  {/* Show if this step type is enabled */}
-                  {((step.id === 'email-aimable' || step.id === 'email-ferme') && settings.channels.email) ||
-                   (step.id === 'sms-rappel' && (settings.channels.sms || settings.channels.whatsapp)) ||
-                   (step.id === 'appel-vocal' && settings.channels.phone) ||
-                   (step.id === 'lrar' && settings.channels.mail) ||
-                   (step.id === 'mise-demeure' && settings.autoMiseEnDemeure) ? (
-                    <div className="mt-2">
-                      <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                        ✓ Activé
-                      </Badge>
-                    </div>
-                  ) : step.id !== 'mise-demeure' ? (
-                    <div className="mt-2">
-                      <Badge variant="outline" className="text-xs bg-gray-50 text-gray-500 border-gray-200">
-                        ○ Désactivé
-                      </Badge>
-                    </div>
-                  ) : null}
+                   <div className="mt-2">
+                     <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                       ✓ Activé
+                     </Badge>
+                   </div>
                 </div>
               ))}
             </div>
