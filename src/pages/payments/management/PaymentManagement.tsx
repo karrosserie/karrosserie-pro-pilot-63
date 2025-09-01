@@ -121,16 +121,6 @@ const PaymentManagement = () => {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Gestion des paiements et des transactions</h1>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline">
-            <Filter className="mr-2 h-4 w-4" />
-            Filtrer
-          </Button>
-          <Button className="bg-purple-600 hover:bg-purple-700">
-            <Plus className="mr-2 h-4 w-4" />
-            Nouvelle transaction
-          </Button>
-        </div>
       </div>
 
       {/* Metrics Cards */}
