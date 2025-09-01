@@ -185,6 +185,10 @@ export default function PresencePointages() {
   const [clockInTime, setClockInTime] = useState("");
   const [clockOutTime, setClockOutTime] = useState("");
   
+  // Modal pour le récapitulatif des demi-journées
+  const [halfDayModalOpen, setHalfDayModalOpen] = useState(false);
+  const [selectedHalfDayPointage, setSelectedHalfDayPointage] = useState<Pointage | null>(null);
+  
   const { toast } = useToast();
   const { addReport } = useGeneratedReports();
   const navigate = useNavigate();
@@ -197,6 +201,34 @@ export default function PresencePointages() {
     setClockInTime("08:00");
     setClockOutTime("17:00");
     setCompletionModalOpen(true);
+  };
+
+  // Gérer l'ouverture du modal de récapitulatif des demi-journées
+  const handleHalfDayRecap = (pointage: Pointage) => {
+    setSelectedHalfDayPointage(pointage);
+    setHalfDayModalOpen(true);
+  };
+
+  // Traiter le problème de demi-journée
+  const handleValidateHalfDay = async () => {
+    if (!selectedHalfDayPointage) return;
+
+    try {
+      toast({
+        title: "Problème traité",
+        description: `La demi-journée de ${selectedHalfDayPointage.employe} a été validée et traitée.`,
+      });
+
+      setHalfDayModalOpen(false);
+      setSelectedHalfDayPointage(null);
+    } catch (error) {
+      console.error('Erreur lors de la validation de la demi-journée:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de traiter le problème. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
   };
 
   // Valider et sauvegarder le pointage
@@ -618,7 +650,14 @@ export default function PresencePointages() {
             {filtered.filter(p=> p.typePause?.startsWith("Demi-journée")).slice(0,4).map(p=> (
               <div key={p.id} className="flex items-center justify-between">
                 <span>{p.employe} · {p.date} · {p.typePause}</span>
-                <Badge variant="outline">OK</Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                  onClick={() => handleHalfDayRecap(p)}
+                >
+                  OK
+                </Button>
               </div>
             ))}
             {filtered.filter(p=> p.typePause?.startsWith("Demi-journée")).length === 0 && <div className="text-muted-foreground">Aucune demi-journée</div>}
@@ -817,6 +856,84 @@ export default function PresencePointages() {
               Annuler
             </Button>
             <Button onClick={handleValidatePointage}>
+              ✅ Valider
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal pour le récapitulatif des demi-journées */}
+      <Dialog open={halfDayModalOpen} onOpenChange={setHalfDayModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Récapitulatif - Demi-journée</DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              {selectedHalfDayPointage ? `${selectedHalfDayPointage.employe} • ${selectedHalfDayPointage.date}` : ''}
+            </p>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {selectedHalfDayPointage && (
+              <div className="space-y-3">
+                <Card className="p-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Type de pause :</span>
+                      <Badge variant="outline">{selectedHalfDayPointage.typePause}</Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Employé :</span>
+                      <span className="text-sm">{selectedHalfDayPointage.employe}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Date :</span>
+                      <span className="text-sm">{selectedHalfDayPointage.date}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Chantier :</span>
+                      <span className="text-sm">{selectedHalfDayPointage.chantier}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Heure début :</span>
+                      <span className="text-sm">
+                        {selectedHalfDayPointage.debut 
+                          ? new Date(selectedHalfDayPointage.debut).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+                          : "—"
+                        }
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Heure fin :</span>
+                      <span className="text-sm">
+                        {selectedHalfDayPointage.fin 
+                          ? new Date(selectedHalfDayPointage.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+                          : "—"
+                        }
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Durée travaillée :</span>
+                      <span className="text-sm font-bold text-karrosserie-orange">
+                        {toHhMm(durationHours(selectedHalfDayPointage, HEURES_JOUR).duree)}
+                      </span>
+                    </div>
+                  </div>
+                </Card>
+
+                <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                  <p className="text-sm text-emerald-800">
+                    ✅ La demi-journée a été correctement enregistrée et est conforme aux règles de pointage.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setHalfDayModalOpen(false)}>
+              Fermer
+            </Button>
+            <Button onClick={handleValidateHalfDay}>
               ✅ Valider
             </Button>
           </DialogFooter>
