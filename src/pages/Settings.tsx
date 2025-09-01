@@ -1,7 +1,9 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CreditCard, Settings as SettingsIcon, User, Bell, Sliders, Users, Bot } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { CreditCard, Settings as SettingsIcon, User, Bell, Sliders, Users, Bot, FileText } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import CompanyTab from '@/components/settings/CompanyTab';
 import PreferencesTab from '@/components/settings/PreferencesTab';
 import TeamTab from '@/components/settings/TeamTab';
@@ -14,6 +16,7 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { useSearchParams } from 'react-router-dom';
 
 const Settings = () => {
+  const navigate = useNavigate();
   const { isLoading } = useCompany();
   const { hasFullAccess } = useSubscription();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -41,8 +44,22 @@ const Settings = () => {
   return (
     <div className="p-6 space-y-6">
       <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Paramètres</h1>
-        <p className="text-gray-600 mt-1">Configurez votre compte et vos préférences.</p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Paramètres</h1>
+            <p className="text-gray-600 mt-1">Configurez votre compte et vos préférences.</p>
+          </div>
+          {hasFullAccess && (
+            <Button 
+              onClick={() => navigate('/gestion-templates')}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <FileText className="h-4 w-4" />
+              Gestion des templates
+            </Button>
+          )}
+        </div>
         {!hasFullAccess && (
           <div className="mt-2 text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
             ⚠️ Accès limité - Seuls les paramètres d'abonnement sont disponibles.
