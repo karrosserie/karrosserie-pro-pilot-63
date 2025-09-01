@@ -36,8 +36,9 @@ export const CreateFictiveReceipt = () => {
 
       await receiptMutations.create(fictiveReceipt);
 
-      // Invalider le cache pour mettre à jour les tableaux
+      // Invalider le cache pour mettre à jour les tableaux et statistiques
       await queryClient.invalidateQueries({ queryKey: ['receipts'] });
+      await queryClient.invalidateQueries({ queryKey: ['payment-statistics'] });
       
       toast({
         title: "Encaissement fictif créé",

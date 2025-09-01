@@ -21,6 +21,8 @@ import { AccountsTable } from '@/components/accounts/AccountsTable';
 import AccountDialog from '@/components/accounts/AccountDialog';
 import { useAccounts } from '@/hooks/use-accounts';
 import { CreateFictiveReceipt } from '@/components/receipts/CreateFictiveReceipt';
+import { usePaymentStatistics } from '@/hooks/use-payment-statistics';
+import { useQueryClient } from '@tanstack/react-query';
 
 const PaymentManagement = () => {
   // Receipts modal state
@@ -52,6 +54,15 @@ const PaymentManagement = () => {
   // Accounts data
   const { accounts, isLoading: accountsLoading, handleDelete: handleAccountDelete, handleSync, filterAccounts } = useAccounts();
   const filteredAccounts = filterAccounts(accounts, accountSearchTerm);
+
+  // Payment statistics
+  const { data: statistics, isLoading: statisticsLoading } = usePaymentStatistics();
+  const queryClient = useQueryClient();
+
+  // Invalidate statistics when receipts change
+  const handleReceiptChange = () => {
+    queryClient.invalidateQueries({ queryKey: ['payment-statistics'] });
+  };
 
   // Receipts handlers
   const handleCreateReceipt = () => {
@@ -134,9 +145,15 @@ const PaymentManagement = () => {
             <TrendingUp className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">€24,580</div>
-            <p className="text-xs text-emerald-600">
-              +12.5% vs mois dernier
+            <div className="text-xl sm:text-2xl font-bold">
+              {statisticsLoading ? "..." : statistics?.receipts.formatted || "0,00 €"}
+            </div>
+            <p className={`text-xs ${
+              !statistics?.receipts.change || statistics.receipts.change >= 0 
+                ? 'text-emerald-600' 
+                : 'text-red-600'
+            }`}>
+              {statisticsLoading ? "..." : statistics?.receipts.changeFormatted || "0.0%"} vs mois dernier
             </p>
           </CardContent>
         </Card>
@@ -149,9 +166,15 @@ const PaymentManagement = () => {
             <TrendingDown className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">€8,240</div>
-            <p className="text-xs text-red-600">
-              -3.2% vs mois dernier
+            <div className="text-xl sm:text-2xl font-bold">
+              {statisticsLoading ? "..." : statistics?.expenses.formatted || "0,00 €"}
+            </div>
+            <p className={`text-xs ${
+              !statistics?.expenses.change || statistics.expenses.change <= 0 
+                ? 'text-emerald-600' 
+                : 'text-red-600'
+            }`}>
+              {statisticsLoading ? "..." : statistics?.expenses.changeFormatted || "0.0%"} vs mois dernier
             </p>
           </CardContent>
         </Card>
@@ -164,9 +187,11 @@ const PaymentManagement = () => {
             <CreditCard className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">15</div>
+            <div className="text-xl sm:text-2xl font-bold">
+              {statisticsLoading ? "..." : statistics?.accounts.count || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
-              +2 vs mois dernier
+              comptes bancaires
             </p>
           </CardContent>
         </Card>
