@@ -184,6 +184,38 @@ const PaymentManagement = () => {
         </Card>
       </div>
 
+      {/* Action Cards */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setReceiptsModalOpen(true)}>
+          <CardContent className="flex flex-col items-center justify-center p-6">
+            <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
+              <ArrowUpCircle className="h-6 w-6 text-emerald-600" />
+            </div>
+            <h3 className="font-semibold text-lg mb-2">Encaissements</h3>
+            <p className="text-sm text-muted-foreground text-center">Gérer les recettes</p>
+          </CardContent>
+        </Card>
+
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setExpensesModalOpen(true)}>
+          <CardContent className="flex flex-col items-center justify-center p-6">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
+              <ArrowDownCircle className="h-6 w-6 text-red-600" />
+            </div>
+            <h3 className="font-semibold text-lg mb-2">Dépenses</h3>
+            <p className="text-sm text-muted-foreground text-center">Suivre les coûts</p>
+          </CardContent>
+        </Card>
+
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setAccountsModalOpen(true)}>
+          <CardContent className="flex flex-col items-center justify-center p-6">
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+              <CreditCard className="h-6 w-6 text-blue-600" />
+            </div>
+            <h3 className="font-semibold text-lg mb-2">Comptes</h3>
+            <p className="text-sm text-muted-foreground text-center">Gérer les comptes</p>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Recent Transactions */}
       <Card>
