@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, FileText, Building2, Euro, Calendar, AlertTriangle, CheckCircle, Clock, Download, Eye } from 'lucide-react';
+import { ArrowLeft, FileText, Building2, AlertTriangle, CheckCircle, Clock, Download, Eye } from 'lucide-react';
 import { useJudicialCases } from '@/hooks/use-judicial-cases';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Progress } from '@/components/ui/progress';
 
 const DepotDossier = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { cases, loading } = useJudicialCases();
   const [selectedCase, setSelectedCase] = useState(null);
-  const [depositStep, setDepositStep] = useState(2);
+  const [currentStep, setCurrentStep] = useState(2);
   const [isDepositing, setIsDepositing] = useState(false);
+  const [loadingText, setLoadingText] = useState('');
+  const [progress, setProgress] = useState(0);
+  const [selectedTribunal, setSelectedTribunal] = useState('marseille');
 
   useEffect(() => {
     if (id && cases) {
@@ -25,35 +26,35 @@ const DepotDossier = () => {
 
   const steps = [
     { id: 1, label: "Dossier généré", icon: "✓", completed: true },
-    { id: 2, label: "Vérification", icon: "2", current: true },
-    { id: 3, label: "Tribunal compétent", icon: "3", completed: false },
-    { id: 4, label: "Dépôt", icon: "4", completed: false },
-    { id: 5, label: "Suivi", icon: "5", completed: false },
+    { id: 2, label: "Vérification", icon: "2", current: currentStep === 2 },
+    { id: 3, label: "Tribunal compétent", icon: "3", current: currentStep === 3 },
+    { id: 4, label: "Dépôt", icon: "4", current: currentStep === 4 },
+    { id: 5, label: "Suivi", icon: "5", current: currentStep === 5 },
   ];
 
   const documents = [
     {
-      name: "Facture originale",
-      description: "Facture impayée • 15/11/2024 • 125 Ko",
+      name: "Facture FAC-2024-002",
+      description: "Facture originale • 15/11/2024 • 125 Ko",
       icon: "📄",
       type: "facture"
     },
     {
-      name: "Devis signé", 
+      name: "Devis signé",
       description: "Preuve d'accord contractuel • 02/11/2024 • 89 Ko",
       icon: "✍️",
       type: "devis"
     },
     {
       name: "Mise en demeure avec AR",
-      description: "LRE du 03/01/2025 • Accusé réception • 234 Ko", 
+      description: "LRE du 03/01/2025 • Accusé réception • 234 Ko",
       icon: "📮",
       type: "mise_en_demeure"
     },
     {
       name: "Historique des relances",
       description: "5 relances automatiques • Emails, SMS • 156 Ko",
-      icon: "📧", 
+      icon: "📧",
       type: "relances"
     },
     {
@@ -65,10 +66,25 @@ const DepotDossier = () => {
     }
   ];
 
+  const tribunals = [
+    {
+      id: 'marseille',
+      name: 'Tribunal Judiciaire de Marseille',
+      address: '6 Rue Joseph Autran, 13006 Marseille',
+      competence: 'Créances jusqu\'à 10 000€',
+      delay: '3-4 semaines',
+      mode: 'Téléprocédure disponible'
+    }
+  ];
+
   const handleProceedToDeposit = async () => {
+    if (!window.confirm('Voulez-vous procéder au dépôt de la requête en injonction de payer ?\n\nCette action engagera les frais de procédure (38€).')) {
+      return;
+    }
+
     setIsDepositing(true);
-    
-    // Simulate deposit process
+    setProgress(0);
+
     const loadingSteps = [
       'Vérification des documents...',
       'Connexion au portail du tribunal...',
@@ -79,15 +95,38 @@ const DepotDossier = () => {
     ];
 
     for (let i = 0; i < loadingSteps.length; i++) {
+      setLoadingText(loadingSteps[i]);
+      setProgress((i + 1) / loadingSteps.length * 100);
       await new Promise(resolve => setTimeout(resolve, 1500));
-      setDepositStep(i + 3);
     }
 
     setIsDepositing(false);
-    // Show success message and redirect
+    
+    // Show success message
+    const today = new Date().toLocaleDateString('fr-FR');
+    alert(`✅ Requête déposée avec succès !
+
+📋 Numéro de dossier : RIP-2025-001234
+🏛️ Tribunal : TJ Marseille
+📅 Date de dépôt : ${today}
+
+📧 Vous recevrez une confirmation par email avec :
+• Le récépissé de dépôt
+• Le numéro de suivi
+• Les prochaines étapes
+
+⏱️ Délai de traitement estimé : 3-4 semaines
+
+🔔 Vous serez automatiquement notifié de l'évolution de votre dossier.`);
+
+    // Redirect to follow-up page
     setTimeout(() => {
       navigate('/contentieux/suivi-procedures');
     }, 2000);
+  };
+
+  const selectTribunal = (tribunalId) => {
+    setSelectedTribunal(tribunalId);
   };
 
   if (loading) {
@@ -184,40 +223,40 @@ const DepotDossier = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-6">
+      <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-6 shadow-lg">
         <h1 className="text-2xl font-bold mb-2">🏛️ Dépôt de Requête Tribunal</h1>
-        <p className="opacity-90">Procédure d'injonction de payer simplifiée</p>
+        <p className="opacity-90 text-base">Procédure d'injonction de payer simplifiée</p>
       </div>
 
       {/* Breadcrumb */}
-      <div className="bg-card border-b px-6 py-4">
-        <Button variant="ghost" onClick={() => navigate('/contentieux/depot-dossier')} className="p-0">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Retour à la liste
-        </Button>
-        <span className="text-muted-foreground ml-2">
-          / Dépôt tribunal / {selectedCase.reference}
-        </span>
+      <div className="bg-white p-4 border-b border-slate-200">
+        <button 
+          onClick={() => navigate('/contentieux/depot-dossier')}
+          className="text-blue-600 hover:underline flex items-center gap-2"
+        >
+          ← Retour au tableau de bord
+        </button>
+        <span className="text-slate-600"> / Dépôt tribunal / {selectedCase.reference}</span>
       </div>
 
-      <div className="container mx-auto p-6 max-w-4xl">
+      <div className="container mx-auto p-8 max-w-5xl">
         {/* Process Steps */}
-        <div className="flex justify-center mb-8 relative">
-          <div className="absolute top-5 left-1/4 right-1/4 h-0.5 bg-border"></div>
-          <div className="flex justify-between w-full max-w-2xl relative z-10">
+        <div className="flex justify-center mb-12 relative">
+          <div className="absolute top-5 left-1/4 right-1/4 h-0.5 bg-slate-300 z-0"></div>
+          <div className="flex justify-between w-full max-w-3xl items-center relative z-10">
             {steps.map((step) => (
               <div key={step.id} className="flex flex-col items-center">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-all duration-200 ${
                   step.completed ? 'bg-green-600 text-white' : 
                   step.current ? 'bg-red-600 text-white' : 
-                  'bg-muted text-muted-foreground'
+                  'bg-slate-300 text-slate-600'
                 }`}>
                   {step.icon}
                 </div>
-                <span className={`text-sm mt-2 text-center ${
-                  step.current ? 'text-red-600 font-semibold' : 'text-muted-foreground'
+                <span className={`text-sm mt-2 text-center font-medium max-w-24 ${
+                  step.current ? 'text-red-600' : 'text-slate-600'
                 }`}>
                   {step.label}
                 </span>
@@ -226,177 +265,238 @@ const DepotDossier = () => {
           </div>
         </div>
 
-        <Card>
-          <CardHeader className="bg-muted">
-            <CardTitle>Requête en Injonction de Payer</CardTitle>
-            <p className="text-muted-foreground">
-              {selectedCase.defendeur?.split('\n')[0]} - {selectedCase.reference} - {selectedCase.montant_dossier}€
+        {/* Main Content */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          {/* Content Header */}
+          <div className="p-8 border-b border-slate-200 bg-slate-50">
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Requête en Injonction de Payer</h2>
+            <p className="text-slate-600 text-base">
+              {selectedCase.defendeur?.split('\n')[0]} - Facture {selectedCase.reference} - {selectedCase.montant_dossier || '8 200,00'} €
             </p>
-          </CardHeader>
+          </div>
 
-          <CardContent className="p-6 space-y-6">
-            {/* Info Alert */}
-            <Alert>
-              <CheckCircle className="h-4 w-4" />
-              <AlertDescription>
-                Votre dossier a été automatiquement généré avec tous les documents requis. 
-                Vérifiez les informations ci-dessous avant le dépôt au tribunal.
-              </AlertDescription>
-            </Alert>
+          {/* Form Section */}
+          <div className="p-8 space-y-8">
+            {/* Info Box */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="text-blue-800 text-sm font-semibold mb-2 flex items-center gap-2">
+                ℹ️ Procédure automatisée
+              </h4>
+              <p className="text-blue-700 text-sm">
+                Votre dossier a été automatiquement généré avec tous les documents requis. Vérifiez les informations ci-dessous avant le dépôt au tribunal.
+              </p>
+            </div>
 
             {/* Case Summary */}
             <div>
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <h3 className="text-xl font-semibold mb-6 text-slate-900 flex items-center gap-2">
                 📋 Récapitulatif de la créance
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Débiteur</label>
-                  <p className="font-medium">{selectedCase.defendeur?.split('\n')[0]}</p>
+                  <label className="block font-medium mb-2 text-slate-900">Débiteur</label>
+                  <input 
+                    type="text" 
+                    value={selectedCase.defendeur?.split('\n')[0] || "Entreprise Martin SARL"} 
+                    readOnly 
+                    className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm"
+                  />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Montant principal</label>
-                  <p className="font-medium">{selectedCase.montant_dossier}€</p>
+                  <label className="block font-medium mb-2 text-slate-900">SIRET</label>
+                  <input 
+                    type="text" 
+                    value="12345678901234" 
+                    readOnly 
+                    className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm"
+                  />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Pénalités de retard</label>
-                  <p className="font-medium">287,00 €</p>
+                  <label className="block font-medium mb-2 text-slate-900">Montant principal</label>
+                  <input 
+                    type="text" 
+                    value={`${selectedCase.montant_dossier || '8 200,00'} €`} 
+                    readOnly 
+                    className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm"
+                  />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Total réclamé</label>
-                  <p className="font-semibold text-lg text-primary">
-                    {(parseFloat(selectedCase.montant_dossier) + 287 + 40).toFixed(2)}€
-                  </p>
+                  <label className="block font-medium mb-2 text-slate-900">Pénalités de retard</label>
+                  <input 
+                    type="text" 
+                    value="287,00 €" 
+                    readOnly 
+                    className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium mb-2 text-slate-900">Indemnité forfaitaire</label>
+                  <input 
+                    type="text" 
+                    value="40,00 €" 
+                    readOnly 
+                    className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium mb-2 text-slate-900">Total réclamé</label>
+                  <input 
+                    type="text" 
+                    value={`${(parseFloat(selectedCase.montant_dossier || '8200') + 287 + 40).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €`}
+                    readOnly 
+                    className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm font-semibold"
+                  />
                 </div>
               </div>
             </div>
 
             {/* Documents */}
             <div>
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <h3 className="text-xl font-semibold mb-6 text-slate-900 flex items-center gap-2">
                 📎 Documents joints au dossier
               </h3>
-              <div className="bg-muted p-4 rounded-lg space-y-3">
-                {documents.map((doc, index) => (
-                  <div key={index} className="flex items-center justify-between bg-card p-4 rounded border">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary text-primary-foreground rounded flex items-center justify-center text-sm">
-                        {doc.icon}
+              <div className="bg-slate-50 p-6 rounded-lg">
+                <div className="space-y-4">
+                  {documents.map((doc, index) => (
+                    <div key={index} className="flex items-center justify-between bg-white p-4 rounded-md border border-slate-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-blue-600 text-white rounded flex items-center justify-center text-sm">
+                          {doc.icon}
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-sm text-slate-900">{doc.name}</h4>
+                          <p className="text-xs text-slate-600">{doc.description}</p>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="font-medium text-sm">{doc.name}</h4>
-                        <p className="text-xs text-muted-foreground">{doc.description}</p>
+                      <div className="flex gap-2">
+                        <button className="px-4 py-2 bg-slate-600 text-white text-sm font-medium rounded-md hover:bg-slate-700 transition-colors">
+                          Prévisualiser
+                        </button>
+                        {doc.primary && (
+                          <button className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
+                            Prévisualiser
+                          </button>
+                        )}
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        <Eye className="w-4 h-4 mr-1" />
-                        Prévisualiser
-                      </Button>
-                      {doc.primary && (
-                        <Button size="sm">
-                          <Download className="w-4 h-4 mr-1" />
-                          Télécharger
-                        </Button>
-                      )}
-                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Tribunal Selection */}
+            <div>
+              <h3 className="text-xl font-semibold mb-6 text-slate-900 flex items-center gap-2">
+                🏛️ Tribunal compétent
+              </h3>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <h4 className="text-blue-800 text-sm font-semibold mb-2 flex items-center gap-2">
+                  ✅ Tribunal automatiquement déterminé
+                </h4>
+                <p className="text-blue-700 text-sm">
+                  Basé sur l'adresse du débiteur et le montant de la créance (&lt; 10 000€)
+                </p>
+              </div>
+
+              <div className="grid gap-4">
+                {tribunals.map((tribunal) => (
+                  <div 
+                    key={tribunal.id}
+                    className={`border-2 rounded-lg p-6 cursor-pointer transition-all hover:bg-slate-50 ${
+                      selectedTribunal === tribunal.id ? 'border-blue-600 bg-blue-50' : 'border-slate-300'
+                    }`}
+                    onClick={() => selectTribunal(tribunal.id)}
+                  >
+                    <h4 className="font-semibold text-slate-900 mb-2">{tribunal.name}</h4>
+                    <p className="text-sm text-slate-600 mb-1">
+                      <strong>Adresse :</strong> {tribunal.address}
+                    </p>
+                    <p className="text-sm text-slate-600 mb-1">
+                      <strong>Compétence :</strong> {tribunal.competence}
+                    </p>
+                    <p className="text-sm text-slate-600 mb-1">
+                      <strong>Délai moyen :</strong> {tribunal.delay}
+                    </p>
+                    <p className="text-sm text-slate-600">
+                      <strong>Mode de dépôt :</strong> {tribunal.mode}
+                    </p>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Tribunal */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                🏛️ Tribunal compétent
-              </h3>
-              <Alert>
-                <CheckCircle className="h-4 w-4" />
-                <AlertDescription>
-                  Tribunal automatiquement déterminé basé sur l'adresse du débiteur et le montant de la créance
-                </AlertDescription>
-              </Alert>
-              
-              <Card className="mt-4 border-2 border-primary">
-                <CardContent className="p-4">
-                  <h4 className="font-semibold">Tribunal Judiciaire de Marseille</h4>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    <strong>Adresse :</strong> 6 Rue Joseph Autran, 13006 Marseille
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    <strong>Compétence :</strong> Créances jusqu'à 10 000€
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    <strong>Délai moyen :</strong> 3-4 semaines
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-
             {/* Cost Breakdown */}
             <div>
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <h3 className="text-xl font-semibold mb-6 text-slate-900 flex items-center gap-2">
                 💰 Frais de procédure
               </h3>
-              <div className="bg-muted p-4 rounded-lg space-y-2">
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span>Droit de greffe (injonction de payer)</span>
-                  <span className="font-medium">38,00 €</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span>Frais de signification (si nécessaire)</span>
-                  <span className="font-medium">~80,00 €</span>
-                </div>
-                <div className="flex justify-between py-2 font-semibold text-lg">
-                  <span>Total estimé</span>
-                  <span>118,00 €</span>
+              <div className="bg-slate-100 p-6 rounded-lg">
+                <div className="space-y-2">
+                  <div className="flex justify-between py-2 border-b border-slate-300">
+                    <span className="text-slate-700">Droit de greffe (injonction de payer)</span>
+                    <span className="font-medium text-slate-900">38,00 €</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-slate-300">
+                    <span className="text-slate-700">Frais de signification (si nécessaire)</span>
+                    <span className="font-medium text-slate-900">~80,00 €</span>
+                  </div>
+                  <div className="flex justify-between py-2 font-semibold text-lg text-slate-900">
+                    <span>Total estimé</span>
+                    <span>118,00 €</span>
+                  </div>
                 </div>
               </div>
-              
-              <Alert className="mt-4" variant="destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  Les frais de procédure seront à votre charge. En cas de succès, vous pourrez demander 
-                  leur remboursement au débiteur lors de l'exécution du jugement.
-                </AlertDescription>
-              </Alert>
-            </div>
 
-            {isDepositing && (
-              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                <Card className="w-full max-w-md">
-                  <CardContent className="p-6 text-center">
-                    <h3 className="font-semibold mb-4">🏛️ Dépôt en cours...</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Connexion au portail du tribunal...
-                    </p>
-                    <Progress value={75} className="w-full" />
-                  </CardContent>
-                </Card>
+              <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mt-6">
+                <h4 className="text-yellow-800 text-sm font-semibold mb-2 flex items-center gap-2">
+                  ⚠️ Important
+                </h4>
+                <p className="text-yellow-700 text-sm">
+                  Les frais de procédure seront à votre charge. En cas de succès, vous pourrez demander leur remboursement au débiteur lors de l'exécution du jugement.
+                </p>
               </div>
-            )}
-          </CardContent>
-
-          {/* Actions Footer */}
-          <div className="bg-muted p-6 flex items-center justify-between border-t">
-            <div className="text-sm text-muted-foreground">
-              Étape 2/5 - Vérification du dossier
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => navigate('/contentieux/depot-dossier')}>
-                ← Précédent
-              </Button>
-              <Button 
-                variant="destructive" 
-                onClick={handleProceedToDeposit}
-                disabled={isDepositing}
-              >
-                {isDepositing ? 'Dépôt en cours...' : 'Procéder au dépôt →'}
-              </Button>
             </div>
           </div>
-        </Card>
+
+          {/* Actions Footer */}
+          <div className="bg-slate-50 p-8 border-t border-slate-200 flex items-center justify-between">
+            <div className="text-sm text-slate-600">
+              Étape 2/5 - Vérification du dossier
+            </div>
+            <div className="flex gap-4">
+              <button 
+                onClick={() => navigate('/contentieux/depot-dossier')}
+                className="px-4 py-2 bg-slate-600 text-white text-sm font-medium rounded-md hover:bg-slate-700 transition-colors"
+              >
+                ← Précédent
+              </button>
+              <button 
+                onClick={handleProceedToDeposit}
+                disabled={isDepositing}
+                className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors disabled:opacity-50"
+              >
+                {isDepositing ? 'Dépôt en cours...' : 'Procéder au dépôt →'}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Loading Modal */}
+      {isDepositing && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-xl max-w-md w-full mx-4 text-center">
+            <h3 className="text-lg font-semibold mb-4">🏛️ Dépôt en cours...</h3>
+            <div className="text-slate-600 mb-4">{loadingText}</div>
+            <div className="bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div 
+                className="bg-blue-600 h-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
