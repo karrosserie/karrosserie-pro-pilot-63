@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,39 +16,17 @@ import {
   Clock,
   Calendar,
   Tag,
-  X
+  X,
+  Loader2
 } from "lucide-react";
+import { useMessageries } from "@/hooks/use-messageries";
 
 // -------------------------------
-// MessageriePriorites (autonome)
+// MessageriePriorites (connecté à Supabase)
 // - Version basée sur un tableau de bord par priorité.
 // - Onglets: Urgent / Haute / Normale / Basse
 // - Vue détaillée par priorité
 // -------------------------------
-
-const INCIDENTS = [
-  // PRIORITÉ 1 – CRITIQUE
-  { id: 1, priority: 1, title: "Accident en cours / véhicule immobilisé", channel: "Téléphone", eta: "2h", time: "16:46:42", summary: "Véhicule impliqué dans un accident, immobilisation immédiate, intervention urgente requise.", message: "Le client signale que son véhicule est à l'arrêt complet sur le côté de la route après un impact. Il y a de la fumée qui s'échappe du capot et il ne peut pas le déplacer. Il demande une assistance immédiate pour sécuriser la zone et remorquer le véhicule.", tags: ["sécurité", "immédiat"], resolved: false, archived: false },
-  { id: 2, priority: 1, title: "Pare-brise fissuré dans le champ de vision", channel: "Mail", eta: "2h", time: "09:22:10", summary: "Pare-brise fissuré dans le champ de vision du conducteur, nécessite remplacement rapide.", message: "Client a envoyé une photo de son pare-brise. Il y a une longue fissure en étoile, juste devant le siège du conducteur. Il est sur le point de partir en vacances et a besoin d'une réparation le plus tôt possible pour éviter d'être verbalisé.", tags: ["sécurité"], resolved: false, archived: false },
-  { id: 3, priority: 1, title: "Problème sécurité post-intervention (airbag / ADAS)", channel: "Message", eta: "2h", time: "08:12:33", summary: "Client signale dysfonctionnement airbag / ADAS après intervention — à traiter immédiatement.", message: "Message du client : 'Le voyant de l'airbag est resté allumé après votre réparation. Je ne me sens pas en sécurité, je dois savoir si je peux rouler.'", tags: ["sécurité", "post-interv"], resolved: false, archived: false },
-  { id: 4, priority: 1, title: "Restitution urgente avec paiement bloqué", channel: "WhatsApp", eta: "2h", time: "14:05:00", summary: "Le véhicule doit être restitué mais le paiement est bloqué — risque de litige immédiat.", message: "Le client est sur place pour récupérer son véhicule mais le paiement en ligne ne passe pas. Il est pressé et menace de laisser le véhicule si le problème n'est pas résolu dans l'heure.", tags: ["finance"], resolved: false, archived: false },
-  { id: 5, priority: 1, title: "Accident avec véhicule de prêt", channel: "Téléphone", eta: "2h", time: "07:15:11", summary: "Accident impliquant le véhicule de prêt — gestion assurance et immobilisation.", message: "Un de nos véhicules de prêt a été impliqué dans un accident. Le client signale que les dégâts sont mineurs mais la voiture n'est plus en état de rouler. Il faut organiser le remorquage et la gestion de l'assurance immédiatement.", tags: ["prêt", "assurance"], resolved: false, archived: false },
-  { id: 6, priority: 1, title: "Fuite liquide / chauffe moteur après choc", channel: "Message", eta: "2h", time: "12:01:05", summary: "Fuite ou surchauffe moteur signalée immédiatement après choc — risque sécurité.", message: "Message du client: 'Ma voiture a heurté un trottoir et maintenant il y a un liquide qui coule en dessous et le moteur chauffe. Je l'ai éteinte, qu'est-ce que je dois faire ?'", tags: ["fuite", "moteur"], resolved: false, archived: false },
-  { id: 7, priority: 1, title: "Réparation non conforme visible (teinte, alignements)", channel: "Mail", eta: "2h", time: "10:30:00", summary: "Client signale réparation non conforme et défaut visible post-livraison.", message: "Le client a constaté que la couleur du nouveau pare-chocs ne correspond pas exactement à celle de la carrosserie. Il a également noté un léger décalage dans l'alignement des pièces. Il demande une nouvelle intervention de toute urgence.", tags: ["qualité"], resolved: false, archived: false },
-
-  // PRIORITÉ 2 – HAUTE
-  { id: 10, priority: 2, title: "Autorisation assurance manquante / expertise à programmer", channel: "Mail", eta: "24h", time: "13:02:22", summary: "Autorisation assurance absente — expertise à programmer pour débloquer dossier.", message: "L'assurance nous a informé que l'autorisation de réparation n'a pas encore été validée. Le client attend de pouvoir récupérer son véhicule. Il est crucial d'obtenir cette validation rapidement pour ne pas impacter le planning.", tags: ["assurance", "expertise"], resolved: false, archived: false },
-  { id: 11, priority: 2, title: "Complément d'expertise après démontage", channel: "Message", eta: "24h", time: "11:11:11", summary: "Nécessité d'un complément d'expertise après démontage — planning impacté.", message: "L'expert a demandé des photos supplémentaires suite au démontage de la carrosserie pour évaluer les dégâts internes. Le client est en attente.", tags: ["expertise"], resolved: false, archived: false },
-  { id: 12, priority: 2, title: "Changement de RDV client en urgence", channel: "Message", eta: "24h", time: "15:40:50", summary: "Client demande changement de RDV — affecte planning et ressources.", message: "Le client nous a contactés pour décaler son rendez-vous de remise de véhicule. Il a une urgence personnelle et ne peut pas venir à l'heure prévue. Il faut trouver un nouveau créneau rapidement pour ne pas perturber le planning.", tags: ["planning"], resolved: false, archived: false },
-
-  // PRIORITÉ 3 – NORMALE
-  { id: 30, priority: 3, title: "Demande devis (rayure, poc, DSP, smart repair)", channel: "Mail", eta: "3j", time: "10:00:00", summary: "Demande classique de devis pour réparation cosmétique.", message: "Client nous a contactés par mail pour demander un devis pour une petite rayure sur la porte avant. Il a joint une photo.", tags: ["devis"], resolved: false, archived: false },
-  { id: 31, priority: 3, title: "Aide déclaration assurance / envoi constat", channel: "Téléphone", eta: "48h", time: "09:30:00", summary: "Assistance pour remplir déclaration et envoyer constat.", message: "Client nous a appelés pour obtenir de l'aide pour remplir son constat après un accident. Il a des difficultés et souhaite que nous l'assistions par téléphone.", tags: ["assurance"], resolved: false, archived: false },
-
-  // PRIORITÉ 4 – BASSE
-  { id: 50, priority: 4, title: "Demande info sur délais standards", channel: "WhatsApp", eta: "7j", time: "09:00:00", summary: "Question sur délais moyens de réparation.", message: "Le client nous demande le délai moyen pour une réparation de carrosserie.", tags: ["info"], resolved: false, archived: false },
-  { id: 51, priority: 4, title: "Questions sur garanties légales / constructeur", channel: "Mail", eta: "7j", time: "10:00:00", summary: "Interrogation sur garanties légales et constructeur.", message: "Le client a une question sur les garanties qui s'appliquent à ses réparations.", tags: ["garantie"], resolved: false, archived: false },
-];
 
 const PRIORITY_META = {
   1: { 
@@ -95,31 +73,31 @@ const getChannelIcon = (channel: string) => {
 };
 
 export default function MessageriePriorites() {
-  const [items, setItems] = useState(INCIDENTS);
+  const {
+    messageries,
+    loading,
+    toggleResolved,
+    toggleArchived,
+    escalateMessage,
+    autoManage,
+    handleReply,
+    handleSemiAuto,
+  } = useMessageries();
+
   const [selectedPriority, setSelectedPriority] = useState<number | null>(null);
-  const [selectedItem, setSelectedItem] = useState<typeof INCIDENTS[0] | null>(null);
+  const [selectedItem, setSelectedItem] = useState<typeof messageries[0] | null>(null);
   const [showResolved, setShowResolved] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
-  const [notificationMessage, setNotificationMessage] = useState("");
-
-  useEffect(() => {
-    if (notificationMessage) {
-      const timer = setTimeout(() => {
-        setNotificationMessage("");
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [notificationMessage]);
 
   const activeItems = useMemo(() => {
     if (showResolved) {
-      return items.filter(item => item.resolved);
+      return messageries.filter(item => item.resolved);
     }
     if (showArchived) {
-      return items.filter(item => item.archived);
+      return messageries.filter(item => item.archived);
     }
-    return items.filter(item => !item.resolved && !item.archived);
-  }, [items, showResolved, showArchived]);
+    return messageries.filter(item => !item.resolved && !item.archived);
+  }, [messageries, showResolved, showArchived]);
 
   const priorityCounts = useMemo(() => {
     return activeItems.reduce((acc, item) => {
@@ -128,72 +106,16 @@ export default function MessageriePriorites() {
     }, {} as Record<number, number>);
   }, [activeItems]);
 
-  function toggleResolved(id: number) {
-    setItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id ? { ...item, resolved: !item.resolved } : item
-      )
-    );
-    setNotificationMessage("Message envoyé dans les messages traités !");
-  }
-
-  function toggleArchived(id: number) {
-    setItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id ? { ...item, archived: !item.archived } : item
-      )
-    );
-    setNotificationMessage("Le message a bien été archivé !");
-  }
-
-  function handleViewDetails(id: number) {
-    const it = items.find((i) => i.id === id);
+  function handleViewDetails(id: string) {
+    const it = messageries.find((i) => i.id === id);
     if (it) setSelectedItem(it);
-  }
-
-  function handleReply(id: number) {
-    const it = items.find((i) => i.id === id);
-    alert(`Répondre → ${it?.title}`);
-  }
-
-  function handleAutoManage(id: number) {
-    const it = items.find((i) => i.id === id);
-    if (it?.priority === 1) return;
-    setItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id ? { ...item, resolved: true } : item
-      )
-    );
-    setNotificationMessage("Le message a bien été traité automatiquement !");
-  }
-
-  function handleSemiAuto(id: number) {
-    const it = items.find((i) => i.id === id);
-    if (it?.priority === 1) return;
-    setNotificationMessage("Un brouillon de réponse a été généré pour vous !");
-  }
-
-  function handleEscalate(id: number) {
-    const it = items.find((i) => i.id === id);
-    if (it?.priority === 1) {
-      setNotificationMessage("Le message est déjà en priorité 1 et ne peut pas être escaladé davantage.");
-      return;
-    }
-
-    const newPriority = (it?.priority || 2) - 1;
-    setItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id ? { ...item, priority: newPriority } : item
-      )
-    );
-    setNotificationMessage("Le niveau d'urgence a bien été augmenté !");
   }
 
   const handleBack = () => {
     setSelectedPriority(null);
   };
 
-  const handleArchive = (id: number) => {
+  const handleArchive = (id: string) => {
     toggleArchived(id);
   };
 
@@ -317,17 +239,17 @@ export default function MessageriePriorites() {
                         <Button size="sm" className="bg-teal-500 hover:bg-teal-600 text-white" onClick={() => handleReply(it.id)}>
                           Répondre
                         </Button>
-                        {it.priority !== 1 && (
-                          <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => handleAutoManage(it.id)}>
-                            Réponse auto
-                          </Button>
-                        )}
-                        <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => handleSemiAuto(it.id)}>
-                          Semi auto
-                        </Button>
-                        <Button size="sm" variant="destructive" onClick={() => handleEscalate(it.id)}>
-                          Escalader
-                        </Button>
+                         {it.priority !== 1 && (
+                           <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => autoManage(it.id)}>
+                             Réponse auto
+                           </Button>
+                         )}
+                         <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => handleSemiAuto(it.id)}>
+                           Semi auto
+                         </Button>
+                         <Button size="sm" variant="destructive" onClick={() => escalateMessage(it.id)}>
+                           Escalader
+                         </Button>
                       </>
                     )}
                     <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => toggleResolved(it.id)}>
@@ -387,9 +309,10 @@ export default function MessageriePriorites() {
         </div>
       </header>
 
-      {notificationMessage && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 px-6 py-3 bg-primary text-primary-foreground rounded-lg shadow-lg transition-all duration-300 z-50 animate-fade-in">
-          {notificationMessage}
+      {loading && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 px-6 py-3 bg-primary text-primary-foreground rounded-lg shadow-lg transition-all duration-300 z-50 animate-fade-in flex items-center gap-2">
+          <Loader2 size={16} className="animate-spin" />
+          Chargement des messages...
         </div>
       )}
 
@@ -484,7 +407,7 @@ export default function MessageriePriorites() {
                   </Button>
                   {selectedItem.priority !== 1 && (
                     <>
-                      <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => { handleAutoManage(selectedItem.id); setSelectedItem(null); }}>
+                      <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => { autoManage(selectedItem.id); setSelectedItem(null); }}>
                         Réponse auto
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => { handleSemiAuto(selectedItem.id); setSelectedItem(null); }}>
@@ -492,7 +415,7 @@ export default function MessageriePriorites() {
                       </Button>
                     </>
                   )}
-                  <Button size="sm" variant="outline" onClick={() => { handleEscalate(selectedItem.id); setSelectedItem(null); }}>
+                  <Button size="sm" variant="outline" onClick={() => { escalateMessage(selectedItem.id); setSelectedItem(null); }}>
                     Escalader
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => { toggleResolved(selectedItem.id); setSelectedItem(null); }}>

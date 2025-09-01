@@ -1581,6 +1581,60 @@ export type Database = {
           },
         ]
       }
+      messageries: {
+        Row: {
+          archived: boolean
+          channel: string
+          company_id: string
+          created_at: string
+          date: string
+          eta: string
+          id: string
+          message: string
+          priority: number
+          resolved: boolean
+          summary: string
+          tags: string[] | null
+          time: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          archived?: boolean
+          channel: string
+          company_id: string
+          created_at?: string
+          date?: string
+          eta: string
+          id?: string
+          message: string
+          priority: number
+          resolved?: boolean
+          summary: string
+          tags?: string[] | null
+          time?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          archived?: boolean
+          channel?: string
+          company_id?: string
+          created_at?: string
+          date?: string
+          eta?: string
+          id?: string
+          message?: string
+          priority?: number
+          resolved?: boolean
+          summary?: string
+          tags?: string[] | null
+          time?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
