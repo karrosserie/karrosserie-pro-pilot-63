@@ -20,7 +20,6 @@ import { AccountsHeader } from '@/components/accounts/AccountsHeader';
 import { AccountsTable } from '@/components/accounts/AccountsTable';
 import AccountDialog from '@/components/accounts/AccountDialog';
 import { useAccounts } from '@/hooks/use-accounts';
-import { CreateFictiveReceipt } from '@/components/receipts/CreateFictiveReceipt';
 import { usePaymentStatistics } from '@/hooks/use-payment-statistics';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -136,7 +135,7 @@ const PaymentManagement = () => {
       </div>
 
       {/* Metrics Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -196,9 +195,6 @@ const PaymentManagement = () => {
           </CardContent>
         </Card>
 
-        <div className="sm:col-span-2 lg:col-span-1">
-          <CreateFictiveReceipt />
-        </div>
       </div>
 
       {/* Action Cards */}
