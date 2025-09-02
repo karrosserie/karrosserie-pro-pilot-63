@@ -78,7 +78,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
   return (
     <div className="space-y-4">
       {/* VIN and Engine Number */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="vin" required>
             Numéro de série (VIN)
@@ -122,7 +122,7 @@ const FleetVehicleBasicInfo: React.FC<FleetVehicleBasicInfoProps> = ({
       </div>
 
       {/* Brand, Model and Status */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
           <Label htmlFor="brand_id" required>Marque</Label>
           <SearchableSelect
