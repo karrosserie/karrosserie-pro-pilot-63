@@ -37,7 +37,7 @@ export const InvoiceFormActions = ({ invoice, isSubmitting, onCancel, isConversi
         <Button 
           type="submit"
           disabled={isSubmitting}
-          className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+          variant="validation"
         >
           {getButtonText()}
         </Button>

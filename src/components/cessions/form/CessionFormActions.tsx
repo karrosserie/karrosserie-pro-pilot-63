@@ -27,7 +27,7 @@ export const CessionFormActions = ({
       
       <Button
         type="submit"
-        className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+        variant="validation"
         disabled={isSubmitting}
       >
         {isSubmitting 

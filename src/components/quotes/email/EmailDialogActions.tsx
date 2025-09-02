@@ -26,7 +26,7 @@ const EmailDialogActions: React.FC<EmailDialogActionsProps> = ({
       <Button
         onClick={onSend}
         disabled={isLoading}
-        className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+        variant="send"
       >
         {isLoading ? (
           <>

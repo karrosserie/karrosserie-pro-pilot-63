@@ -19,7 +19,7 @@ const ClientFormActions: React.FC<ClientFormActionsProps> = ({
         {isViewMode ? "Fermer" : "Annuler"}
       </Button>
       {!isViewMode && (
-        <Button type="submit" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
+        <Button type="submit" variant="validation">
           {hasId ? "Mettre à jour" : "Enregistrer"}
         </Button>
       )}

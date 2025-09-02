@@ -37,7 +37,7 @@ export const QuoteFormActions = ({ quote, isSubmitting, onCancel, isConversionFr
         <Button 
           type="submit"
           disabled={isSubmitting}
-          className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+          variant="validation"
         >
           {getButtonText()}
         </Button>
