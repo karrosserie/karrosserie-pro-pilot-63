@@ -60,6 +60,7 @@ export const CessionsTable = ({
   const { companyData } = useCompany();
   const { insuranceCompanies } = useInsuranceCompanies();
   const { sortedData, sortConfig, handleSort } = useTableSorting(cessions, 'created_at');
+  const isMobile = useIsMobile();
 
   
   const parseValidationError = (validationError: string) => {
@@ -394,7 +395,6 @@ export const CessionsTable = ({
   }
 
   console.log('Rendering table with cessions:', cessions);
-  const isMobile = useIsMobile();
 
   return (
     <div className="card-container">
