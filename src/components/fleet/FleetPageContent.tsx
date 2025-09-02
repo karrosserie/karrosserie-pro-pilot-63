@@ -72,6 +72,7 @@ const FleetPageContent = () => {
 
   const { reservations } = useFleetReservations();
   const { companyData } = useCompany();
+  const isMobile = useIsMobile();
 
   // Fonction pour gérer le téléchargement de l'attestation
   const handleDownloadAttestation = async (loanId: string) => {
@@ -107,8 +108,6 @@ const FleetPageContent = () => {
       <div className="text-red-500">Error: {error.message}</div>
     );
   }
-
-  const isMobile = useIsMobile();
 
   return (
     <div className="p-4 md:p-6 space-y-4 md:space-y-6">
