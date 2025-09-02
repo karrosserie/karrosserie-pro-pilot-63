@@ -156,7 +156,19 @@ export const CreditBasicInfoSection = ({
           <SearchableSelect
             options={invoiceOptions}
             value={formData.invoice_id || ''}
-            onValueChange={(value) => !readOnly && onFieldChange('invoice_id', value)}
+            onValueChange={(value) => {
+              console.log('=== CREDIT FORM DEBUG ===');
+              console.log('onValueChange called with value:', value);
+              console.log('readOnly:', readOnly);
+              console.log('Current formData.invoice_id:', formData.invoice_id);
+              
+              if (!readOnly) {
+                console.log('Calling onFieldChange with invoice_id:', value);
+                onFieldChange('invoice_id', value);
+              } else {
+                console.log('Not calling onFieldChange because readOnly is true');
+              }
+            }}
             placeholder="Sélectionner une facture"
             searchPlaceholder="Rechercher une facture..."
             disabled={readOnly}

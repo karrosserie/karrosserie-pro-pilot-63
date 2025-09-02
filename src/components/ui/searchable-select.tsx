@@ -31,11 +31,15 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const selectedOption = options.find(option => option.value === value);
 
   const handleSelect = (selectedValue: string) => {
+    console.log('=== HANDLE SELECT DEBUG ===');
+    console.log('selectedValue:', selectedValue);
+    console.log('current value:', value);
+    console.log('onValueChange type:', typeof onValueChange);
+    
     setOpen(false);
     
-    if (selectedValue !== value) {
-      onValueChange(selectedValue);
-    }
+    console.log('Calling onValueChange with:', selectedValue);
+    onValueChange(selectedValue);
   };
 
   return (
