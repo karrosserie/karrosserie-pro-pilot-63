@@ -15,6 +15,8 @@ import { StatusBadge } from '@/components/ui/status-badge';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import { Client } from '@/services/supabase/clients';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { ClientMobileCard } from './ClientMobileCard';
 
 interface ClientsTableProps {
   clients: Client[];
@@ -36,6 +38,36 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
   onCreateCredit
 }) => {
   const { sortedData: sortedClients, sortConfig, handleSort } = useTableSorting(clients, 'last_name');
+  const isMobile = useIsMobile();
+  
+  if (isMobile) {
+    return (
+      <div className="space-y-4">
+        {sortedClients.length > 0 ? (
+          sortedClients.map((client) => (
+            <ClientMobileCard
+              key={client.id}
+              client={client}
+              onViewClient={onViewClient}
+              onEditClient={onEditClient}
+              onDeleteClient={onDeleteClient}
+              onCreateQuote={onCreateQuote}
+              onCreateInvoice={onCreateInvoice}
+              onCreateCredit={onCreateCredit}
+            />
+          ))
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <UserPlus className="h-16 w-16 text-gray-300 mb-4" />
+            <h3 className="font-medium text-gray-900 mb-2">Aucun résultat</h3>
+            <p className="text-gray-500">
+              Aucun client correspondant à votre recherche n'a été trouvé.
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  }
   
   return (
     <div className="card-container">

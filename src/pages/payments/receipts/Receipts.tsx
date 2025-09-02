@@ -6,6 +6,7 @@ import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { ReceiptWithClient } from '@/services/supabase/receipts/types';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Receipts = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -14,6 +15,7 @@ const Receipts = () => {
   
   const { receipts, isLoading, handleDelete, filterReceipts } = useReceiptsData();
   const filteredReceipts = filterReceipts(receipts, searchTerm);
+  const isMobile = useIsMobile();
 
   const handleCreateReceipt = () => {
     setSelectedReceipt(null);
@@ -36,7 +38,7 @@ const Receipts = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className={`${isMobile ? 'p-4' : 'p-6'} space-y-4 md:space-y-6`}>
       <ReceiptsHeader
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
