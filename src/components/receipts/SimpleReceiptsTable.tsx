@@ -131,20 +131,11 @@ export const SimpleReceiptsTable = ({
             <TableRow className="border-t-0">
               <TableCell colSpan={6} className="py-3 border-t-0">
                 <div className="flex flex-wrap gap-2 justify-end px-4">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => onEdit(receipt)}
-                  >
+                  <Button variant="edit" size="sm" onClick={() => onEdit(receipt)}>
                     <Pencil className="h-4 w-4 mr-1" />
                     Modifier
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                    onClick={() => onDelete(receipt)}
-                  >
+                  <Button variant="delete" size="sm" onClick={() => onDelete(receipt)}>
                     <Trash className="h-4 w-4 mr-1" />
                     Supprimer
                   </Button>
