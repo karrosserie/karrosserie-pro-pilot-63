@@ -110,21 +110,52 @@ export const FleetViolationForm: React.FC<FleetViolationFormProps> = ({
 
   const handleDocumentAnalyzed = (analyzedData: any) => {
     // Update form data with analyzed information
-    if (analyzedData.numero_avis) {
-      setFormData(prev => ({ ...prev, reference_number: analyzedData.numero_avis }));
+    const updates: any = {};
+    
+    if (analyzedData.numero_avis || analyzedData.reference_number) {
+      updates.reference_number = analyzedData.numero_avis || analyzedData.reference_number;
     }
-    if (analyzedData.date_infraction) {
-      setFormData(prev => ({ ...prev, violation_date: analyzedData.date_infraction }));
+    if (analyzedData.date_infraction || analyzedData.violation_date) {
+      updates.violation_date = analyzedData.date_infraction || analyzedData.violation_date;
     }
-    if (analyzedData.heure_infraction) {
-      setFormData(prev => ({ ...prev, violation_time: analyzedData.heure_infraction }));
+    if (analyzedData.heure_infraction || analyzedData.violation_time) {
+      updates.violation_time = analyzedData.heure_infraction || analyzedData.violation_time;
     }
-    if (analyzedData.immatriculation) {
-      setFormData(prev => ({ ...prev, license_plate: analyzedData.immatriculation }));
+    if (analyzedData.immatriculation || analyzedData.license_plate) {
+      const plate = analyzedData.immatriculation || analyzedData.license_plate;
+      updates.license_plate = plate;
+      
+      // Try to find matching vehicle by license plate
+      const matchingVehicle = vehicles?.find(v => 
+        v.license_plate && plate && 
+        v.license_plate.replace(/[^A-Z0-9]/g, '') === plate.replace(/[^A-Z0-9]/g, '')
+      );
+      if (matchingVehicle) {
+        updates.fleet_vehicle_id = matchingVehicle.id;
+      }
     }
-    if (analyzedData.montant_amende) {
-      setFormData(prev => ({ ...prev, fine_amount: parseFloat(analyzedData.montant_amende) }));
+    if (analyzedData.montant_amende || analyzedData.fine_amount) {
+      updates.fine_amount = parseFloat(analyzedData.montant_amende || analyzedData.fine_amount) || 0;
     }
+    if (analyzedData.lieu || analyzedData.location) {
+      updates.location = analyzedData.lieu || analyzedData.location;
+    }
+    if (analyzedData.type_infraction || analyzedData.violation_type) {
+      const detectedType = analyzedData.type_infraction || analyzedData.violation_type;
+      // Map detected type to available violation types
+      const matchingType = violationTypes.find(type => 
+        type.toLowerCase().includes(detectedType.toLowerCase()) ||
+        detectedType.toLowerCase().includes(type.toLowerCase())
+      );
+      if (matchingType) {
+        updates.violation_type = matchingType;
+      }
+    }
+    if (analyzedData.date_limite || analyzedData.due_date) {
+      updates.due_date = analyzedData.date_limite || analyzedData.due_date;
+    }
+    
+    setFormData(prev => ({ ...prev, ...updates }));
   };
 
   const resetForm = () => {
@@ -156,7 +187,23 @@ export const FleetViolationForm: React.FC<FleetViolationFormProps> = ({
           </DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Document upload - Section prioritaire */}
+          <div className="p-4 border rounded-lg bg-muted/50">
+            <h3 className="text-sm font-medium mb-3">Document de contravention</h3>
+            <p className="text-xs text-muted-foreground mb-4">
+              Uploadez le document de contravention pour remplir automatiquement les champs ci-dessous
+            </p>
+            <ViolationDocumentUpload
+              documentUrl={formData.document_url}
+              onDocumentChange={(url) => handleInputChange('document_url', url)}
+              onDocumentRemove={() => handleInputChange('document_url', '')}
+              onDocumentAnalyzed={handleDocumentAnalyzed}
+              violationId={violation?.id}
+              companyId={companyId?.companyId}
+            />
+          </div>
+
           {/* Véhicule */}
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -340,15 +387,6 @@ export const FleetViolationForm: React.FC<FleetViolationFormProps> = ({
             />
           </div>
 
-          {/* Document upload */}
-          <ViolationDocumentUpload
-            documentUrl={formData.document_url}
-            onDocumentChange={(url) => handleInputChange('document_url', url)}
-            onDocumentRemove={() => handleInputChange('document_url', '')}
-            onDocumentAnalyzed={handleDocumentAnalyzed}
-            violationId={violation?.id}
-            companyId={companyId?.companyId}
-          />
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
