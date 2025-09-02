@@ -147,35 +147,30 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                   <TableRow className="border-t-0">
                     <TableCell colSpan={5} className="py-3 border-t-0">
                       <div className="flex flex-wrap gap-2 justify-end px-4">
-                        <Button variant="outline" size="sm" onClick={() => onViewClient(client)}>
+                        <Button variant="view" size="sm" onClick={() => onViewClient(client)}>
                           <Eye className="h-4 w-4 mr-1" />
                           Voir
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => onEditClient(client)}>
+                        <Button variant="edit" size="sm" onClick={() => onEditClient(client)}>
                           <Pencil className="h-4 w-4 mr-1" />
                           Modifier
                         </Button>
-                        <Button variant="outline" size="sm" onClick={handleCreateQuote}>
+                        <Button variant="create" size="sm" onClick={handleCreateQuote}>
                           <FileText className="h-4 w-4 mr-1" />
                           Créer un devis
                         </Button>
-                        <Button variant="outline" size="sm" onClick={handleCreateInvoice}>
+                        <Button variant="create" size="sm" onClick={handleCreateInvoice}>
                           <Receipt className="h-4 w-4 mr-1" />
                           Créer une facture
                         </Button>
-                        <Button variant="outline" size="sm" onClick={handleCreateCredit}>
+                        <Button variant="create" size="sm" onClick={handleCreateCredit}>
                           <CreditCard className="h-4 w-4 mr-1" />
                           Créer un avoir
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700" 
-                          onClick={() => onDeleteClient(client)}
-                          >
+                        <Button variant="delete" size="sm" onClick={() => onDeleteClient(client)}>
                           <Trash className="h-4 w-4 mr-1" />
                           Supprimer
-                        </Button>                      
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
