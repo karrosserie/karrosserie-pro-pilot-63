@@ -568,8 +568,8 @@ export default function PresencePointages() {
       </div>
 
       {/* Graphique circulaire et cartes d'alertes */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <Card>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card className="lg:col-span-2">
           <CardHeader className="pb-2"><CardTitle className="text-sm">Répartition conformité GPS</CardTitle></CardHeader>
           <CardContent>
             <div className="h-64">
@@ -585,66 +585,95 @@ export default function PresencePointages() {
           </CardContent>
         </Card>
 
-        {/* Cartes d'alertes */}
-        <Card>
-          <CardHeader className="pb-1 flex flex-row items-center justify-between">
-            <CardTitle className="text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4"/>Pointage manquant</CardTitle>
-            <Badge variant="secondary">{filtered.filter(p=>!p.debut || !p.fin).length}</Badge>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            {filtered.filter(p=>!p.debut || !p.fin).slice(0,4).map(p=> (
-              <div key={p.id} className="flex items-center justify-between">
-                <span>{p.employe} · {p.date}</span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-xs"
-                  onClick={() => handleCompletePointage(p)}
-                >
-                  Compléter
-                </Button>
-              </div>
-            ))}
-            {filtered.filter(p=>!p.debut || !p.fin).length === 0 && <div className="text-muted-foreground">Aucune anomalie</div>}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-1 flex flex-row items-center justify-between">
-            <CardTitle className="text-sm flex items-center gap-2"><MapPin className="w-4 h-4"/>Hors zone GPS</CardTitle>
-            <Badge variant="secondary">{filtered.filter(p=> (p.distDebut||0) > 100 || (p.distFin||0) > 100).length}</Badge>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            {filtered.filter(p=> (p.distDebut||0) > 100 || (p.distFin||0) > 100).slice(0,4).map(p=> (
-              <div key={p.id} className="flex items-center justify-between">
-                <span>{p.employe} · {p.date}</span>
-                <Badge variant="destructive">Vérifier</Badge>
-              </div>
-            ))}
-            {filtered.filter(p=> (p.distDebut||0) > 100 || (p.distFin||0) > 100).length === 0 && <div className="text-muted-foreground">Aucune alerte</div>}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-1 flex flex-row items-center justify-between">
-            <CardTitle className="text-sm flex items-center gap-2"><Clock className="w-4 h-4"/>Demi-journées</CardTitle>
-            <Badge variant="secondary">{filtered.filter(p=> p.typePause?.startsWith("Demi-journée")).length}</Badge>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            {filtered.filter(p=> p.typePause?.startsWith("Demi-journée")).slice(0,4).map(p=> (
-              <div key={p.id} className="flex items-center justify-between">
-                <span>{p.employe} · {p.date} · {p.typePause}</span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-xs"
-                  onClick={() => handleHalfDayRecap(p)}
-                >
-                  OK
-                </Button>
-              </div>
-            ))}
-            {filtered.filter(p=> p.typePause?.startsWith("Demi-journée")).length === 0 && <div className="text-muted-foreground">Aucune demi-journée</div>}
-          </CardContent>
-        </Card>
+        {/* Cartes d'alertes empilées verticalement */}
+        <div className="space-y-4">
+          <Card>
+            <CardHeader className="pb-1 flex flex-row items-center justify-between">
+              <CardTitle className="text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-orange-500"/>Pointage manquant</CardTitle>
+              <Badge variant="secondary">{filtered.filter(p=>!p.debut || !p.fin).length}</Badge>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm">
+              {filtered.filter(p=>!p.debut || !p.fin).slice(0,1).map(p=> (
+                <div key={p.id} className="flex items-center justify-between">
+                  <div>
+                    <div className="text-orange-600 font-medium">Compléter</div>
+                    <div className="text-xs text-muted-foreground">{p.employe} · {p.date}</div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => handleCompletePointage(p)}
+                  >
+                    Compléter
+                  </Button>
+                </div>
+              ))}
+              {filtered.filter(p=>!p.debut || !p.fin).length === 0 && (
+                <div>
+                  <div className="text-orange-600 font-medium">Compléter</div>
+                  <div className="text-xs text-muted-foreground">Aucune anomalie</div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-1 flex flex-row items-center justify-between">
+              <CardTitle className="text-sm flex items-center gap-2"><MapPin className="w-4 h-4 text-blue-500"/>Hors zone GPS</CardTitle>
+              <Badge variant="secondary">{filtered.filter(p=> (p.distDebut||0) > 100 || (p.distFin||0) > 100).length}</Badge>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm">
+              {filtered.filter(p=> (p.distDebut||0) > 100 || (p.distFin||0) > 100).length > 0 ? (
+                filtered.filter(p=> (p.distDebut||0) > 100 || (p.distFin||0) > 100).slice(0,1).map(p=> (
+                  <div key={p.id} className="flex items-center justify-between">
+                    <div>
+                      <div className="text-red-600 font-medium">Vérifier</div>
+                      <div className="text-xs text-muted-foreground">{p.employe} · {p.date}</div>
+                    </div>
+                    <Badge variant="destructive">Vérifier</Badge>
+                  </div>
+                ))
+              ) : (
+                <div>
+                  <div className="text-blue-600 font-medium">Aucune alerte</div>
+                  <div className="text-xs text-muted-foreground">Tous les GPS sont conformes</div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-1 flex flex-row items-center justify-between">
+              <CardTitle className="text-sm flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500"/>Demi-journées</CardTitle>
+              <Badge variant="secondary">{filtered.filter(p=> p.typePause?.startsWith("Demi-journée")).length}</Badge>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm">
+              {filtered.filter(p=> p.typePause?.startsWith("Demi-journée")).slice(0,1).map(p=> (
+                <div key={p.id} className="flex items-center justify-between">
+                  <div>
+                    <div className="text-green-600 font-medium">OK</div>
+                    <div className="text-xs text-muted-foreground">{p.employe} · {p.date}</div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => handleHalfDayRecap(p)}
+                  >
+                    OK
+                  </Button>
+                </div>
+              ))}
+              {filtered.filter(p=> p.typePause?.startsWith("Demi-journée")).length === 0 && (
+                <div>
+                  <div className="text-green-600 font-medium">OK</div>
+                  <div className="text-xs text-muted-foreground">Aucune demi-journée</div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Graphique heures par jour */}
