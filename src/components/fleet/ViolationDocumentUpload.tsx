@@ -56,8 +56,9 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
         description: "Le document a été uploadé avec succès."
       });
 
-      // Call the analyze function if it's an image and we have the required IDs
-      if (file.type.startsWith('image/') && violationId && companyId) {
+      // Call the analyze function if it's an image and we have companyId
+      // We can analyze even without violationId during creation
+      if (file.type.startsWith('image/') && companyId) {
         await analyzeViolation(urlData.publicUrl);
       }
     } catch (error) {
@@ -73,12 +74,17 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
   };
 
   const analyzeViolation = async (documentUrl: string) => {
-    if (!violationId || !companyId) return;
+    if (!companyId) return;
 
     try {
-      const { data, error } = await supabase.functions.invoke('analyze-violation', {
+      toast({
+        title: "Analyse en cours...",
+        description: "Extraction des informations du document en cours."
+      });
+
+      const { data, error } = await supabase.functions.invoke('analyze-violation-simple', {
         body: {
-          violationId,
+          violationId: violationId || null, // Allow null for new violations
           documentUrl,
           companyId
         }
@@ -87,6 +93,13 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
       if (error) throw error;
 
       if (data?.success && onDocumentAnalyzed) {
+        onDocumentAnalyzed(data.extractedData);
+        toast({
+          title: "Analyse terminée",
+          description: "Les informations ont été extraites automatiquement de l'image."
+        });
+      } else if (data?.extractedData && onDocumentAnalyzed) {
+        // Fallback: even if success is not explicitly true, use extracted data if available
         onDocumentAnalyzed(data.extractedData);
         toast({
           title: "Analyse terminée",
@@ -176,8 +189,8 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
           description: "La photo a été prise et uploadée avec succès."
         });
 
-        // Call the analyze function if we have the required IDs
-        if (violationId && companyId) {
+        // Call the analyze function if we have companyId
+        if (companyId) {
           await analyzeViolation(urlData.publicUrl);
         }
       }
@@ -223,9 +236,31 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
     }
   };
 
-  const handleViewDocument = () => {
-    if (documentUrl) {
-      window.open(documentUrl, '_blank');
+  const handleViewDocument = async () => {
+    if (!documentUrl) return;
+
+    try {
+      // Extract file path from URL for signed URL generation
+      const urlParts = documentUrl.split('/');
+      const filePath = urlParts.slice(-2).join('/'); // Get last two parts (user_id/filename)
+      
+      // Generate signed URL for secure viewing
+      const { data, error } = await supabase.storage
+        .from('violations')
+        .createSignedUrl(filePath, 3600); // Valid for 1 hour
+
+      if (error) throw error;
+
+      if (data?.signedUrl) {
+        window.open(data.signedUrl, '_blank');
+      }
+    } catch (error) {
+      console.error('Error creating signed URL:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ouvrir le document.",
+        variant: "destructive"
+      });
     }
   };
 
