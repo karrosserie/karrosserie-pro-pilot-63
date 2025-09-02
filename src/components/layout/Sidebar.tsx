@@ -12,7 +12,7 @@ import {
   CreditCard, 
   ChevronDown, 
   ChevronRight,
-  DollarSign,
+  Euro,
   TrendingUp,
   TrendingDown,
   Wallet,
@@ -170,7 +170,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
       ]
     },
     { 
-      icon: <DollarSign className="app-icon" />, 
+      icon: <Euro className="app-icon" />, 
       label: 'Paiements', 
       path: '/payments',
       hasSubMenu: true,
