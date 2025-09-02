@@ -77,6 +77,8 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
     if (!companyId) return;
 
     try {
+      console.log('Starting document analysis:', { documentUrl, companyId, violationId });
+      
       toast({
         title: "Analyse en cours...",
         description: "Extraction des informations du document en cours."
@@ -90,9 +92,15 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
         }
       });
 
-      if (error) throw error;
+      console.log('Analysis response:', { data, error });
+
+      if (error) {
+        console.error('Analysis error:', error);
+        throw error;
+      }
 
       if (data?.success && onDocumentAnalyzed) {
+        console.log('Analysis successful, calling onDocumentAnalyzed with:', data.extractedData);
         onDocumentAnalyzed(data.extractedData);
         toast({
           title: "Analyse terminée",
@@ -100,17 +108,29 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
         });
       } else if (data?.extractedData && onDocumentAnalyzed) {
         // Fallback: even if success is not explicitly true, use extracted data if available
+        console.log('Analysis data available, calling onDocumentAnalyzed with:', data.extractedData);
         onDocumentAnalyzed(data.extractedData);
         toast({
           title: "Analyse terminée",
           description: "Les informations ont été extraites automatiquement de l'image."
+        });
+      } else {
+        console.log('No analysis data available or callback missing:', { 
+          hasData: !!data?.extractedData, 
+          hasCallback: !!onDocumentAnalyzed,
+          data 
+        });
+        toast({
+          title: "Analyse terminée",
+          description: "Aucune donnée n'a pu être extraite du document.",
+          variant: "destructive"
         });
       }
     } catch (error) {
       console.error('Error analyzing violation:', error);
       toast({
         title: "Erreur d'analyse",
-        description: "Impossible d'analyser l'image automatiquement.",
+        description: "Impossible d'analyser l'image automatiquement. Détails: " + (error as Error).message,
         variant: "destructive"
       });
     }
@@ -240,25 +260,45 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
     if (!documentUrl) return;
 
     try {
-      // Extract file path from URL for signed URL generation
+      // For better compatibility, try to download the file and create a blob URL
       const urlParts = documentUrl.split('/');
       const filePath = urlParts.slice(-2).join('/'); // Get last two parts (user_id/filename)
       
-      // Generate signed URL for secure viewing
-      const { data, error } = await supabase.storage
+      console.log('Attempting to view document:', filePath);
+      
+      // Download the file as blob
+      const { data: fileData, error: downloadError } = await supabase.storage
         .from('violations')
-        .createSignedUrl(filePath, 3600); // Valid for 1 hour
+        .download(filePath);
 
-      if (error) throw error;
+      if (downloadError) {
+        console.error('Download error:', downloadError);
+        throw downloadError;
+      }
 
-      if (data?.signedUrl) {
-        window.open(data.signedUrl, '_blank');
+      if (fileData) {
+        // Create blob URL and open in new tab
+        const blobUrl = URL.createObjectURL(fileData);
+        const newWindow = window.open(blobUrl, '_blank');
+        
+        // Clean up blob URL after a delay
+        setTimeout(() => {
+          URL.revokeObjectURL(blobUrl);
+        }, 60000);
+
+        if (!newWindow) {
+          toast({
+            title: "Bloqueur de fenêtres",
+            description: "Veuillez autoriser les fenêtres contextuelles pour voir le document.",
+            variant: "destructive"
+          });
+        }
       }
     } catch (error) {
-      console.error('Error creating signed URL:', error);
+      console.error('Error viewing document:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible d'ouvrir le document.",
+        title: "Erreur d'accès",
+        description: "Impossible d'accéder au document. Vérifiez vos extensions de navigateur (bloqueurs de pub).",
         variant: "destructive"
       });
     }

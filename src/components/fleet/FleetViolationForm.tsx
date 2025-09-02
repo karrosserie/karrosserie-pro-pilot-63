@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { useFleetViolations } from '@/hooks/use-fleet-violations';
 import { useCompanyId } from '@/hooks/use-company-id';
+import { useToast } from '@/hooks/use-toast';
 import { FleetViolation } from '@/services/supabase/fleet-violations';
 import { ViolationDocumentUpload } from './ViolationDocumentUpload';
 
@@ -45,6 +46,7 @@ export const FleetViolationForm: React.FC<FleetViolationFormProps> = ({
   const { vehicles } = useFleetVehicles();
   const { createViolation, updateViolation } = useFleetViolations();
   const companyId = useCompanyId();
+  const { toast } = useToast();
   
   const [formData, setFormData] = useState({
     fleet_vehicle_id: preselectedVehicleId || violation?.fleet_vehicle_id || '',
@@ -109,6 +111,8 @@ export const FleetViolationForm: React.FC<FleetViolationFormProps> = ({
   };
 
   const handleDocumentAnalyzed = (analyzedData: any) => {
+    console.log('FleetViolationForm: handleDocumentAnalyzed called with:', analyzedData);
+    
     // Update form data with analyzed information
     const updates: any = {};
     
@@ -155,7 +159,18 @@ export const FleetViolationForm: React.FC<FleetViolationFormProps> = ({
       updates.due_date = analyzedData.date_limite || analyzedData.due_date;
     }
     
-    setFormData(prev => ({ ...prev, ...updates }));
+    console.log('FleetViolationForm: Applying updates:', updates);
+    setFormData(prev => {
+      const newData = { ...prev, ...updates };
+      console.log('FleetViolationForm: New form data:', newData);
+      return newData;
+    });
+    
+    // Show success message
+    toast({
+      title: "Données extraites",
+      description: `${Object.keys(updates).length} champs ont été remplis automatiquement.`,
+    });
   };
 
   const resetForm = () => {
