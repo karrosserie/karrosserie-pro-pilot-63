@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Users, FileText, Scale, ClipboardList, Paperclip, Euro, ArrowLeft, Plus, X } from "lucide-react";
+import { Users, FileText, Scale, ClipboardList, Paperclip, Euro, Plus, X } from "lucide-react";
 import { DocumentUploader } from '@/components/shared/DocumentUploader';
 import { useNavigate } from "react-router-dom";
 import { useJudicialCases } from "@/hooks/use-judicial-cases";
@@ -149,15 +149,6 @@ const CreationDossierJudiciaire = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-background p-5">
       <div className="w-full max-w-3xl mb-6">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/contentieux')}
-          className="mb-4"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Retour
-        </Button>
-        
         <h1 className="text-3xl font-extrabold text-foreground mb-2 flex items-center gap-2">
           <Scale className="w-8 h-8 text-primary" />
           Dossier Judiciaire Carrosserie
