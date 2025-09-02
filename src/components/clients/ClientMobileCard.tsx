@@ -71,12 +71,12 @@ export const ClientMobileCard = ({
       </div>
 
       <div className="flex flex-wrap gap-2 pt-2">
-        <Button variant="outline" size="sm" onClick={() => onViewClient(client)}>
+        <Button variant="view" size="sm" onClick={() => onViewClient(client)}>
           <Eye className="h-4 w-4 mr-1" />
           Voir
         </Button>
         
-        <Button variant="outline" size="sm" onClick={() => onEditClient(client)}>
+        <Button variant="edit" size="sm" onClick={() => onEditClient(client)}>
           <Pencil className="h-4 w-4 mr-1" />
           Modifier
         </Button>
@@ -84,32 +84,27 @@ export const ClientMobileCard = ({
 
       <div className="flex flex-wrap gap-2 pt-1 border-t">
         {onCreateQuote && (
-          <Button variant="outline" size="sm" onClick={() => onCreateQuote(client)}>
+          <Button variant="create" size="sm" onClick={() => onCreateQuote(client)}>
             <FileText className="h-4 w-4 mr-1" />
             Devis
           </Button>
         )}
         
         {onCreateInvoice && (
-          <Button variant="outline" size="sm" onClick={() => onCreateInvoice(client)}>
+          <Button variant="create" size="sm" onClick={() => onCreateInvoice(client)}>
             <Receipt className="h-4 w-4 mr-1" />
             Facture
           </Button>
         )}
         
         {onCreateCredit && (
-          <Button variant="outline" size="sm" onClick={() => onCreateCredit(client)}>
+          <Button variant="create" size="sm" onClick={() => onCreateCredit(client)}>
             <CreditCard className="h-4 w-4 mr-1" />
             Avoir
           </Button>
         )}
         
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="text-destructive hover:text-destructive border-destructive/20 hover:border-destructive" 
-          onClick={() => onDeleteClient(client)}
-        >
+        <Button variant="delete" size="sm" onClick={() => onDeleteClient(client)}>
           <Trash className="h-4 w-4 mr-1" />
           Supprimer
         </Button>
