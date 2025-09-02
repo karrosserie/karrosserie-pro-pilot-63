@@ -37,8 +37,10 @@ export function IframePlanning({ className = "" }: IframePlanningProps) {
       if (error) throw error;
 
       if (data?.success && data?.token) {
+        console.log('IframePlanning - Token generated successfully:', data.token.substring(0, 50) + '...');
         setIframeToken(data.token);
       } else {
+        console.error('IframePlanning - Failed to generate token, response:', data);
         throw new Error('Failed to generate token');
       }
     } catch (error) {
@@ -51,11 +53,21 @@ export function IframePlanning({ className = "" }: IframePlanningProps) {
   
   // Construire l'URL avec le token sécurisé
   const getIframeUrl = () => {
-    if (!iframeToken) return baseUrl;
+    console.log('IframePlanning - getIframeUrl called, iframeToken:', iframeToken);
+    
+    if (!iframeToken) {
+      console.log('IframePlanning - No token, returning base URL:', baseUrl);
+      return baseUrl;
+    }
+    
     const params = new URLSearchParams();
     params.append('token', iframeToken);
     params.append('app_context', 'embedded');
-    return `${baseUrl}?${params.toString()}`;
+    
+    const finalUrl = `${baseUrl}?${params.toString()}`;
+    console.log('IframePlanning - Final iframe URL with token:', finalUrl);
+    
+    return finalUrl;
   };
 
   const handleIframeError = () => {
