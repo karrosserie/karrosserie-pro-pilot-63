@@ -6,6 +6,8 @@ import { Loading } from '@/components/ui/loading';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { Table, TableHeader, TableRow, TableBody, TableCell, TableHead } from '@/components/ui/table';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { FleetVehiclesMobileCard } from './FleetVehiclesMobileCard';
 
 interface FleetVehiclesTableProps {
   vehicles: FleetVehicle[];
@@ -62,6 +64,24 @@ const FleetVehiclesTable: React.FC<FleetVehiclesTableProps> = ({
       
       {isLoading ? (
         <Loading text="Chargement des véhicules..." />
+      ) : useIsMobile() ? (
+        <div className="space-y-4">
+          {filteredVehicles.length > 0 ? (
+            filteredVehicles.map((vehicle) => (
+              <FleetVehiclesMobileCard
+                key={vehicle.id}
+                vehicle={vehicle}
+                onViewVehicle={onViewVehicle}
+                onEditVehicle={onEditVehicle}
+                onLendVehicle={onLendVehicle}
+              />
+            ))
+          ) : (
+            <div className="text-center text-muted-foreground py-8">
+              {searchTerm ? 'Aucun véhicule trouvé' : 'Aucun véhicule de courtoisie'}
+            </div>
+          )}
+        </div>
       ) : (
         <div className="overflow-x-auto">
           <Table>

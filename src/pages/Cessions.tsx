@@ -7,6 +7,7 @@ import { CessionsTable } from '@/components/cessions/CessionsTable';
 import { Cession } from '@/services/supabase/cessions';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Cessions = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -171,8 +172,10 @@ const Cessions = () => {
     }
   };
   
+  const isMobile = useIsMobile();
+  
   return (
-    <div className="p-6 space-y-6">
+    <div className={`${isMobile ? 'p-4' : 'p-6'} space-y-4 md:space-y-6`}>
       <CessionsHeader />
       
       <CessionsFilters
