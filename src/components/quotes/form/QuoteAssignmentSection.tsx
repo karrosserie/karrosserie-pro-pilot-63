@@ -37,15 +37,15 @@ export const QuoteAssignmentSection = ({
   console.log('QuoteAssignmentSection - clientVehicles:', clientVehicles);
 
   const handleClientChange = (clientId: string) => {
-    console.log('Client changed to:', clientId);
-    console.log('Calling onChange with client_id:', clientId);
+    console.log('QuoteAssignmentSection - Client changed to:', clientId);
+    console.log('QuoteAssignmentSection - Calling onChange with client_id:', clientId);
     onChange('client_id', clientId);
     // Réinitialiser le véhicule quand on change de client
-    onChange('vehicle_id', null);
+    onChange('vehicle_id', '');
   };
 
   const handleVehicleChange = (vehicleId: string) => {
-    console.log('Vehicle changed to:', vehicleId);
+    console.log('QuoteAssignmentSection - Vehicle changed to:', vehicleId);
     onChange('vehicle_id', vehicleId);
   };
 

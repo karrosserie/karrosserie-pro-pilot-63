@@ -43,10 +43,16 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
       return; // Empêcher les modifications si en lecture seule
     }
     
+    console.log(`QuoteFormLogic - handleChange called with field: ${field}, value:`, value);
+    
     if (field === 'notes') {
       setNotes(value);
     } else {
-      setFormData(prev => ({ ...prev, [field]: value }));
+      setFormData(prev => {
+        const newFormData = { ...prev, [field]: value };
+        console.log('QuoteFormLogic - Updated formData:', newFormData);
+        return newFormData;
+      });
     }
     
     // Effacer l'erreur quand l'utilisateur commence à taper
