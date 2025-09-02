@@ -567,24 +567,8 @@ export default function PresencePointages() {
         <Card className="shadow-sm border-l-4 border-l-red-500 bg-gradient-to-br from-red-500/5 to-transparent"><CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Absences</CardTitle></CardHeader><CardContent className="pt-0"><div className="text-2xl font-bold text-red-600">{kpis.absences}</div><div className="text-xs text-muted-foreground">CP/RTT/MAL</div></CardContent></Card>
       </div>
 
-      {/* Graphs */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-2">
-          <CardHeader className="pb-2"><CardTitle className="text-sm">Heures par jour</CardTitle></CardHeader>
-          <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={barData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="heures" fill="hsl(var(--karrosserie-orange))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Graphique circulaire et cartes d'alertes */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2"><CardTitle className="text-sm">Répartition conformité GPS</CardTitle></CardHeader>
           <CardContent>
@@ -600,10 +584,8 @@ export default function PresencePointages() {
             </div>
           </CardContent>
         </Card>
-      </div>
 
-      {/* Anomalies */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Cartes d'alertes */}
         <Card>
           <CardHeader className="pb-1 flex flex-row items-center justify-between">
             <CardTitle className="text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4"/>Pointage manquant</CardTitle>
@@ -664,6 +646,24 @@ export default function PresencePointages() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Graphique heures par jour */}
+      <Card>
+        <CardHeader className="pb-2"><CardTitle className="text-sm">Heures par jour</CardTitle></CardHeader>
+        <CardContent>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={barData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="heures" fill="hsl(var(--karrosserie-orange))" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Tableau */}
       <Card>
