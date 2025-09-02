@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useCredits } from '@/hooks/use-credits';
 import { useTableSorting } from '@/hooks/use-table-sorting';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { 
   Table, 
   TableBody, 
@@ -30,6 +31,8 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
+import ClientInvoiceMobileCard from './ClientInvoiceMobileCard';
+
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import InvoiceViewerModal from '@/components/invoices/InvoiceViewerModal';
 import InvoiceEmailDialog from '@/components/invoices/InvoiceEmailDialog';
@@ -51,6 +54,7 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   const { companyData } = useCompany();
+  const isMobile = useIsMobile();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
@@ -234,6 +238,41 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  if (isMobile) {
+    return (
+      <>
+        <div className="space-y-4 p-4">
+          {sortedData.length > 0 ? (
+            sortedData.map((invoice) => {
+              const invoiceCredits = getInvoiceCredits(invoice.id);
+              return (
+                <ClientInvoiceMobileCard
+                  key={invoice.id}
+                  invoice={invoice}
+                  credits={invoiceCredits}
+                  onView={handleView}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onDownload={handleDownload}
+                  onPrint={handlePrint}
+                  onSendEmail={handleSendEmail}
+                  onAddPayment={handleAddPayment}
+                  onAddCredit={handleAddCredit}
+                />
+              );
+            })
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8">
+              <Receipt className="h-10 w-10 text-gray-400 mb-2" />
+              <h3 className="font-medium text-gray-900">Aucune facture</h3>
+              <p className="text-gray-500 mt-1">Ce client n'a pas encore de facture.</p>
+            </div>
+          )}
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

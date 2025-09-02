@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useTableSorting } from '@/hooks/use-table-sorting';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { 
   Table, 
   TableBody, 
@@ -22,6 +23,8 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
+import ClientQuoteMobileCard from './ClientQuoteMobileCard';
+
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import QuoteViewerModal from '@/components/quotes/QuoteViewerModal';
 import QuoteEmailDialog from '@/components/quotes/QuoteEmailDialog';
@@ -39,6 +42,7 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
   const { quotes, isLoading, deleteQuote } = useQuotes();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
+  const isMobile = useIsMobile();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
@@ -202,6 +206,37 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
       maximumFractionDigits: 2 
     }) + ' €';
   };
+
+  if (isMobile) {
+    return (
+      <>
+        <div className="space-y-4 p-4">
+          {sortedData.length > 0 ? (
+            sortedData.map((quote) => (
+              <ClientQuoteMobileCard
+                key={quote.id}
+                quote={quote}
+                onView={handleView}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onDownload={handleDownload}
+                onPrint={handlePrint}
+                onSendEmail={handleSendEmail}
+                onRequestDocuments={handleRequestDocuments}
+                onConvertToRepairOrder={handleConvertToRepairOrder}
+              />
+            ))
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8">
+              <FileText className="h-10 w-10 text-gray-400 mb-2" />
+              <h3 className="font-medium text-gray-900">Aucun devis</h3>
+              <p className="text-gray-500 mt-1">Ce client n'a pas encore de devis.</p>
+            </div>
+          )}
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
