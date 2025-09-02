@@ -56,18 +56,22 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 z-[100] bg-background shadow-lg border rounded-md min-w-[var(--radix-popover-trigger-width)]" align="start" sideOffset={4}>
+      <PopoverContent className="w-full p-0 z-50 bg-background border rounded-md shadow-md min-w-[var(--radix-popover-trigger-width)]" align="start" sideOffset={4}>
         <Command>
           <CommandInput placeholder={searchPlaceholder} />
-          <CommandList>
+          <CommandList className="max-h-[200px] overflow-y-auto">
             <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => (
                 <CommandItem
                   key={option.value}
                   value={option.label}
-                  onSelect={() => handleSelect(option.value)}
-                  className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                  onSelect={() => {
+                    console.log('=== COMMAND ITEM CLICKED ===');
+                    console.log('option:', option);
+                    handleSelect(option.value);
+                  }}
+                  className="cursor-pointer hover:bg-accent hover:text-accent-foreground px-2 py-1.5"
                 >
                   <Check
                     className={cn(
