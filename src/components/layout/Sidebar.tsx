@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Car, 
   FileText, 
@@ -41,28 +41,42 @@ interface NavItemProps {
   hasSubMenu?: boolean;
   subMenuItems?: { label: string; path: string }[];
   onClose?: () => void;
+  openMenuPath: string | null;
+  onMenuToggle: (path: string | null) => void;
 }
 
-const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems = [], onClose }: NavItemProps) => {
+const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems = [], onClose, openMenuPath, onMenuToggle }: NavItemProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
   
   // Check if any submenu item is active to determine if submenu should be open by default
   const hasActiveSubItem = hasSubMenu && subMenuItems.some(item => location.pathname === item.path);
-  const [isSubMenuOpen, setIsSubMenuOpen] = useState(hasActiveSubItem);
+  const isSubMenuOpen = openMenuPath === path || hasActiveSubItem;
   
-  // Update submenu state when location changes
+  // Update global menu state when location changes to ensure active submenu stays open
   React.useEffect(() => {
-    if (hasSubMenu) {
-      const shouldBeOpen = subMenuItems.some(item => location.pathname === item.path);
-      setIsSubMenuOpen(shouldBeOpen);
+    if (hasSubMenu && hasActiveSubItem && openMenuPath !== path) {
+      onMenuToggle(path);
     }
-  }, [location.pathname, hasSubMenu, subMenuItems]);
+  }, [location.pathname, hasSubMenu, hasActiveSubItem, path, openMenuPath, onMenuToggle]);
   
-  const toggleSubMenu = (e: React.MouseEvent) => {
+  const handleClick = (e: React.MouseEvent) => {
     if (hasSubMenu) {
       e.preventDefault();
-      setIsSubMenuOpen(!isSubMenuOpen);
+      
+      if (isSubMenuOpen) {
+        // Si le menu est ouvert, le fermer
+        onMenuToggle(null);
+      } else {
+        // Si le menu est fermé, l'ouvrir et rediriger vers le premier sous-onglet
+        onMenuToggle(path);
+        if (subMenuItems.length > 0) {
+          navigate(subMenuItems[0].path);
+        }
+      }
     } else if (onClose) {
+      // Pour les éléments sans sous-menu, fermer la sidebar mobile et fermer tous les menus
+      onMenuToggle(null);
       onClose();
     }
   };
@@ -70,8 +84,8 @@ const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems
   return (
     <div className="mb-1">
       <Link
-        to={path}
-        onClick={toggleSubMenu}
+        to={hasSubMenu ? '#' : path}
+        onClick={handleClick}
         className={`flex items-center py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
           isActive 
             ? 'bg-karrosserie-orange/10 text-karrosserie-orange border border-karrosserie-orange/20' 
@@ -98,7 +112,11 @@ const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems
               <Link
                 key={index}
                 to={item.path}
-                onClick={onClose}
+                onClick={() => {
+                  // Fermer tous les menus et la sidebar mobile
+                  onMenuToggle(null);
+                  if (onClose) onClose();
+                }}
                 className={`flex items-center py-2 px-3 rounded-md text-sm transition-colors ${
                   isSubItemActive 
                     ? 'bg-karrosserie-orange/20 text-karrosserie-orange font-medium border border-karrosserie-orange/30' 
@@ -119,6 +137,9 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
   const location = useLocation();
   const { isAdmin } = useAdmin();
   const { userRole, isCarrossierCourtesy, isCarrossier, isResponsable, isResponsableAdmin } = useUserRole();
+  
+  // État global pour gérer quel menu déroulant est ouvert
+  const [openMenuPath, setOpenMenuPath] = useState<string | null>(null);
   
   const isActivePath = (path: string): boolean => {
     if (path === '/') {
@@ -267,6 +288,8 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
                 hasSubMenu={item.hasSubMenu}
                 subMenuItems={item.subMenuItems}
                 onClose={isMobile ? onClose : undefined}
+                openMenuPath={openMenuPath}
+                onMenuToggle={setOpenMenuPath}
               />
             ))}
           </nav>

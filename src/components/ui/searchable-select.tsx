@@ -31,14 +31,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const selectedOption = options.find(option => option.value === value);
 
   const handleSelect = (selectedValue: string) => {
-    console.log('=== HANDLE SELECT DEBUG ===');
-    console.log('selectedValue:', selectedValue);
-    console.log('current value:', value);
-    console.log('onValueChange type:', typeof onValueChange);
-    
     setOpen(false);
-    
-    console.log('Calling onValueChange with:', selectedValue);
     onValueChange(selectedValue);
   };
 
@@ -66,11 +59,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                 <CommandItem
                   key={option.value}
                   value={option.label}
-                  onSelect={() => {
-                    console.log('=== COMMAND ITEM CLICKED ===');
-                    console.log('option:', option);
-                    handleSelect(option.value);
-                  }}
+                  onSelect={() => handleSelect(option.value)}
                   className="cursor-pointer hover:bg-accent hover:text-accent-foreground px-2 py-1.5"
                 >
                   <Check
