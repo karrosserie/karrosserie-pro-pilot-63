@@ -17,6 +17,7 @@ import { Loading } from '@/components/ui/loading';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const FleetPageContent = () => {
+  // ALL HOOKS MUST BE CALLED AT THE TOP LEVEL
   // État pour le dialog d'attestation
   const [isAttestationDialogOpen, setIsAttestationDialogOpen] = useState(false);
   const [selectedLoanForAttestation, setSelectedLoanForAttestation] = useState<string | null>(null);
@@ -53,6 +54,10 @@ const FleetPageContent = () => {
     handleDeleteLoan
   } = useFleetPage();
 
+  const { reservations } = useFleetReservations();
+  const { companyData } = useCompany();
+  const isMobile = useIsMobile();
+
   // Fonction pour gérer l'ouverture du dialog d'attestation
   const handleViewAttestation = (loanId: string) => {
     setSelectedLoanForAttestation(loanId);
@@ -69,10 +74,6 @@ const FleetPageContent = () => {
   const selectedLoanData = selectedLoanForAttestation 
     ? currentLoans.find(loan => loan.id === selectedLoanForAttestation)
     : null;
-
-  const { reservations } = useFleetReservations();
-  const { companyData } = useCompany();
-  const isMobile = useIsMobile();
 
   // Fonction pour gérer le téléchargement de l'attestation
   const handleDownloadAttestation = async (loanId: string) => {
