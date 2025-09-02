@@ -370,49 +370,44 @@ const Quotes = () => {
                   <TableRow className="border-t-0">
                     <TableCell colSpan={6} className="py-3 border-t-0">
                       <div className="flex flex-wrap gap-2 justify-end px-4">
-                        <Button variant="outline" size="sm" onClick={() => handleViewQuote(quote)}>
+                        <Button variant="view" size="sm" onClick={() => handleViewQuote(quote)}>
                           <Eye className="h-4 w-4 mr-1" />
                           Voir
                         </Button>
 
-                        <Button variant="outline" size="sm" onClick={() => handleEditQuote(quote)}>
+                        <Button variant="edit" size="sm" onClick={() => handleEditQuote(quote)}>
                           <Pencil className="h-4 w-4 mr-1" />
                           Modifier
                         </Button>
 
-                        <Button variant="outline" size="sm" onClick={() => handleDownload(quote)}>
+                        <Button variant="download" size="sm" onClick={() => handleDownload(quote)}>
                           <Download className="h-4 w-4 mr-1" />
                           Télécharger
                         </Button>
 
-                        <Button variant="outline" size="sm" onClick={() => handlePrint(quote)}>
+                        <Button variant="print" size="sm" onClick={() => handlePrint(quote)}>
                           <Printer className="h-4 w-4 mr-1" />
                           Imprimer
                         </Button>
 
-                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(quote)}>
+                        <Button variant="send" size="sm" onClick={() => handleSendEmail(quote)}>
                           <Mail className="h-4 w-4 mr-1" />
                           E-mail
                         </Button>
 
-                        <Button variant="outline" size="sm" className="hidden" onClick={() => handleRequestDocuments(quote)}>
+                        <Button variant="create" size="sm" className="hidden" onClick={() => handleRequestDocuments(quote)}>
                           <FileCheck className="h-4 w-4 mr-1" />
                           Justificatifs
                         </Button>
 
                         {!quote.repair_orders || quote.repair_orders.length === 0 ? (
-                          <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={() => handleConvertToRepairOrder(quote)}>
+                          <Button size="sm" variant="validation" onClick={() => handleConvertToRepairOrder(quote)}>
                             <ArrowRight className="h-4 w-4 mr-1" />
                             Convertir
                           </Button>
                         ) : null}
 
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700" 
-                          onClick={() => handleDeleteQuote(quote.id)}
-                        >
+                        <Button variant="delete" size="sm" onClick={() => handleDeleteQuote(quote.id)}>
                           <Trash className="h-4 w-4 mr-1" />
                           Supprimer
                         </Button>

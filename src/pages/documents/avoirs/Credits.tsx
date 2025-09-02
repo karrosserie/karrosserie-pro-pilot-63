@@ -451,33 +451,27 @@ const Credits = () => {
                   <TableRow className="border-t-0">
                     <TableCell colSpan={6} className="py-3 border-t-0">
                       <div className="flex flex-wrap gap-2 justify-end px-4">
-                        <Button variant="outline" size="sm" onClick={() => handleViewCredit(credit)}>
+                        <Button variant="view" size="sm" onClick={() => handleViewCredit(credit)}>
                           <Eye className="h-4 w-4 mr-1" />
                           Voir
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleEditCredit(credit)}>
+                        <Button variant="edit" size="sm" onClick={() => handleEditCredit(credit)}>
                           <Pencil className="h-4 w-4 mr-1" />
                           Modifier
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleDownload(credit)}>
+                        <Button variant="download" size="sm" onClick={() => handleDownload(credit)}>
                           <Download className="h-4 w-4 mr-1" />
                           Télécharger
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handlePrint(credit)}>
+                        <Button variant="print" size="sm" onClick={() => handlePrint(credit)}>
                           <Printer className="h-4 w-4 mr-1" />
                           Imprimer
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(credit)}>
+                        <Button variant="send" size="sm" onClick={() => handleSendEmail(credit)}>
                           <Mail className="h-4 w-4 mr-1" />
                           Envoyer
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                          onClick={() => handleDelete(credit)}
-                          disabled={deleteCredit.isPending}
-                        >
+                        <Button variant="delete" size="sm" onClick={() => handleDelete(credit)} disabled={deleteCredit.isPending}>
                           <Trash className="h-4 w-4 mr-1" />
                           Supprimer
                         </Button>
