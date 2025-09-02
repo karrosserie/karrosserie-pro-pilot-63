@@ -39,6 +39,8 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Printer, Mail, Signature, CreditCard, FileX, Download } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import InvoiceMobileCard from '@/components/invoices/InvoiceMobileCard';
 
 const Invoices = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -57,6 +59,7 @@ const Invoices = () => {
   const { receipts } = useReceiptsData();
   const { companyData } = useCompany();
   const { sortedData: sortedInvoices, sortConfig, handleSort } = useTableSorting(invoices || [], 'reference');
+  const isMobile = useIsMobile();
   
   console.log('=== DONNÉES FACTURES DANS LE COMPOSANT ===');
   console.log('invoices:', invoices);
@@ -291,8 +294,42 @@ const Invoices = () => {
         </div>
       </div>
       
-      <div className="card-container">
-        <Table>
+      {isMobile ? (
+        <div className="space-y-3">
+          {filteredInvoices.length > 0 ? (
+            filteredInvoices.map((invoice) => {
+              const invoiceCredits = getInvoiceCredits(invoice.id);
+              return (
+                <InvoiceMobileCard
+                  key={invoice.id}
+                  invoice={invoice}
+                  onViewInvoice={handleViewInvoice}
+                  onEditInvoice={handleEditInvoice}
+                  onDelete={handleDelete}
+                  onDownload={handleDownload}
+                  onPrint={handlePrint}
+                  onSendEmail={handleSendEmail}
+                  onAddPayment={handleAddPayment}
+                  onAddCredit={handleAddCredit}
+                  invoiceCredits={invoiceCredits}
+                />
+              );
+            })
+          ) : (
+            <div className="card-container">
+              <div className="flex flex-col items-center justify-center py-8">
+                <FileText className="h-10 w-10 text-gray-400 mb-2" />
+                <h3 className="font-medium text-gray-900">Aucun résultat</h3>
+                <p className="text-gray-500 mt-1">
+                  Aucune facture correspondant à votre recherche n'a été trouvée.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="card-container">
+          <Table>
           <TableHeader>
             <TableRow>
               <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
@@ -404,6 +441,7 @@ const Invoices = () => {
           </TableBody>
         </Table>
       </div>
+      )}
 
       <InvoiceDialog
         invoice={selectedInvoice}

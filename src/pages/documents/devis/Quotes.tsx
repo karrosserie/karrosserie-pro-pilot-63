@@ -26,6 +26,8 @@ import { Quote } from '@/services/supabase/quotes';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { useIsMobile } from '@/hooks/use-mobile';
+import QuoteMobileCard from '@/components/quotes/QuoteMobileCard';
 
 const Quotes = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -42,6 +44,7 @@ const Quotes = () => {
   const [prefilledRepairOrder, setPrefilledRepairOrder] = useState<Partial<RepairOrder> | null>(null);
   const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   
   const filteredQuotes = sortedQuotes?.filter(quote => 
     quote.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -312,8 +315,38 @@ const Quotes = () => {
         </div>
       </div>
       
-      <div className="card-container">
-        <Table>
+      {isMobile ? (
+        <div className="space-y-3">
+          {filteredQuotes.length > 0 ? (
+            filteredQuotes.map((quote) => (
+              <QuoteMobileCard
+                key={quote.id}
+                quote={quote}
+                onViewQuote={handleViewQuote}
+                onEditQuote={handleEditQuote}
+                onDeleteQuote={handleDeleteQuote}
+                onDownload={handleDownload}
+                onPrint={handlePrint}
+                onSendEmail={handleSendEmail}
+                onRequestDocuments={handleRequestDocuments}
+                onConvertToRepairOrder={handleConvertToRepairOrder}
+              />
+            ))
+          ) : (
+            <div className="card-container">
+              <div className="flex flex-col items-center justify-center py-8">
+                <FileText className="h-10 w-10 text-gray-400 mb-2" />
+                <h3 className="font-medium text-gray-900">Aucun résultat</h3>
+                <p className="text-gray-500 mt-1">
+                  Aucun devis correspondant à votre recherche n'a été trouvé.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="card-container">
+          <Table>
           <TableHeader>
             <TableRow>
               <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
@@ -432,6 +465,7 @@ const Quotes = () => {
           </TableBody>
         </Table>
       </div>
+      )}
 
       <QuoteDialog
         quote={selectedQuote}
