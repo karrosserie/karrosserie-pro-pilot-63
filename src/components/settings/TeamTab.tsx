@@ -17,6 +17,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { isValidPhoneNumber } from 'react-phone-number-input';
+import { useIsMobile } from '@/hooks/use-mobile';
+import TeamMobileCard from './TeamMobileCard';
 
 interface TeamMember {
   id: string;
@@ -68,6 +70,7 @@ const TeamTab = () => {
   const { signUp } = useAuth();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
+  const isMobile = useIsMobile();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -354,29 +357,32 @@ const TeamTab = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-start">
-        <div>
-          <h3 className="text-lg font-medium">Gestion de l'équipe</h3>
-          <p className="text-sm text-muted-foreground">
+    <div className="space-y-4 sm:space-y-6">
+      <div className={`${isMobile ? 'space-y-3' : 'flex justify-between items-start'}`}>
+        <div className={isMobile ? 'text-center' : ''}>
+          <h3 className="text-base sm:text-lg font-medium">Gestion de l'équipe</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Gérez les membres de votre équipe et leurs accès.
           </p>
         </div>
         
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
-              <UserPlus className="h-4 w-4 mr-2" />
-              Ajouter un membre
+            <Button 
+              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+              size={isMobile ? "sm" : "default"}
+            >
+              <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="text-xs sm:text-sm">Ajouter un membre</span>
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Ajouter un nouveau membre</DialogTitle>
             </DialogHeader>
             <Form {...addForm}>
-              <form onSubmit={addForm.handleSubmit(handleAddMember)} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={addForm.handleSubmit(handleAddMember)} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField
                     control={addForm.control}
                     name="firstName"
@@ -511,82 +517,106 @@ const TeamTab = () => {
       </div>
 
       {/* Current Team Members */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Membres de l'équipe ({teamMembers.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {teamMembers.map((member) => (
-              <div key={member.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
-                    {getRoleIcon(member.role)}
-                  </div>
-                  <div>
-                    <p className="font-medium">
-                      {member.profiles?.first_name && member.profiles?.last_name
-                        ? `${member.profiles.first_name} ${member.profiles.last_name}`
-                        : member.profiles?.email || 'Utilisateur'}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {member.profiles?.email}
-                    </p>
-                    {member.profiles?.phone_number && (
-                      <p className="text-sm text-muted-foreground">
-                        {member.profiles.phone_number}
+      {isMobile ? (
+        <div className="space-y-3">
+          <h3 className="text-base font-medium text-center">Membres de l'équipe ({teamMembers.length})</h3>
+          {teamMembers.length > 0 ? (
+            teamMembers.map((member) => (
+              <TeamMobileCard
+                key={member.id}
+                member={member}
+                onEditMember={openEditDialog}
+                onRemoveMember={handleRemoveMember}
+              />
+            ))
+          ) : (
+            <Card>
+              <CardContent className="p-6 text-center">
+                <p className="text-muted-foreground">
+                  Aucun membre dans l'équipe
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Membres de l'équipe ({teamMembers.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {teamMembers.map((member) => (
+                <div key={member.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
+                      {getRoleIcon(member.role)}
+                    </div>
+                    <div>
+                      <p className="font-medium">
+                        {member.profiles?.first_name && member.profiles?.last_name
+                          ? `${member.profiles.first_name} ${member.profiles.last_name}`
+                          : member.profiles?.email || 'Utilisateur'}
                       </p>
+                      <p className="text-sm text-muted-foreground">
+                        {member.profiles?.email}
+                      </p>
+                      {member.profiles?.phone_number && (
+                        <p className="text-sm text-muted-foreground">
+                          {member.profiles.phone_number}
+                        </p>
+                      )}
+                    </div>
+                    <Badge variant={getRoleBadgeVariant(member.role)}>
+                      {getRoleLabel(member.role)}
+                    </Badge>
+                    {!member.active && (
+                      <Badge variant="destructive">
+                        Désactivé
+                      </Badge>
                     )}
                   </div>
-                  <Badge variant={getRoleBadgeVariant(member.role)}>
-                    {getRoleLabel(member.role)}
-                  </Badge>
-                  {!member.active && (
-                    <Badge variant="destructive">
-                      Désactivé
-                    </Badge>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => openEditDialog(member)}
-                    className="hover:bg-muted"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  {member.role !== 'Propriétaire' && (
+                  <div className="flex gap-2">
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleRemoveMember(member.id)}
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => openEditDialog(member)}
+                      className="hover:bg-muted"
                     >
-                      <Trash className="h-4 w-4" />
+                      <Pencil className="h-4 w-4" />
                     </Button>
-                  )}
+                    {member.role !== 'Propriétaire' && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveMember(member.id)}
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-            {teamMembers.length === 0 && (
-              <p className="text-center text-muted-foreground py-4">
-                Aucun membre dans l'équipe
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+              ))}
+              {teamMembers.length === 0 && (
+                <p className="text-center text-muted-foreground py-4">
+                  Aucun membre dans l'équipe
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Edit Member Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Modifier le membre</DialogTitle>
           </DialogHeader>
           <Form {...editForm}>
             <form onSubmit={editForm.handleSubmit(handleEditMember)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField
                   control={editForm.control}
                   name="firstName"

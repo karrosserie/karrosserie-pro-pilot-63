@@ -21,6 +21,7 @@ import { CheckIcon, CreditCardIcon, PackageIcon, PlusIcon } from 'lucide-react';
 import { useSubscription } from '@/hooks/use-subscription';
 import { formatDate } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const SubscriptionTab: React.FC = () => {
   const {
@@ -37,6 +38,7 @@ const SubscriptionTab: React.FC = () => {
     isCreatingSubscription,
     isAddingTokens,
   } = useSubscription();
+  const isMobile = useIsMobile();
 
   if (isLoading) {
     return (
@@ -54,12 +56,12 @@ const SubscriptionTab: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Current Subscription */}
       <Card>
         <CardHeader>
-          <CardTitle>Abonnement actuel</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-lg sm:text-xl">Abonnement actuel</CardTitle>
+          <CardDescription className="text-sm">
             Gérez votre abonnement et vos jetons.
           </CardDescription>
         </CardHeader>
@@ -82,8 +84,8 @@ const SubscriptionTab: React.FC = () => {
                 </div>
               )}
 
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <div className="flex justify-between items-center">
+              <div className="bg-muted/50 p-3 sm:p-4 rounded-lg">
+                <div className={`${isMobile ? 'space-y-2' : 'flex justify-between items-center'}`}>
                   <div>
                     <h3 className="font-semibold">{(companySubscription as any).subscription_plans?.name}</h3>
                     <p className="text-sm text-muted-foreground">
@@ -230,7 +232,7 @@ const SubscriptionTab: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
               {subscriptionPlans?.filter(plan => plan.price > 0).map((plan) => (
                 <div key={plan.id} className="border rounded-lg p-6 space-y-4">
                   <div>
@@ -282,7 +284,7 @@ const SubscriptionTab: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {tokenPackages?.map((tokenPackage) => (
               <div key={tokenPackage.id} className="border rounded-lg p-4 text-center space-y-3">
                 <div>

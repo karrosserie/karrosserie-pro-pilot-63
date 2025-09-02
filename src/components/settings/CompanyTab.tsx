@@ -15,11 +15,13 @@ import { useStorage } from '@/hooks/use-storage';
 import { useCompany } from '@/hooks/use-company';
 import { useAuth } from '@/contexts/AuthContext';
 import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const CompanyTab: React.FC = () => {
   const { uploadDocument } = useStorage();
   const { companyData, isSaving, isLoading, updateCompanyData, saveCompanyData } = useCompany();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
 
   console.log('CompanyTab render - Auth user:', user ? { id: user.id, email: user.email } : null);
   console.log('CompanyTab render - companyData:', companyData);
@@ -66,21 +68,21 @@ const CompanyTab: React.FC = () => {
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Logo de l'entreprise</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-lg sm:text-xl">Logo de l'entreprise</CardTitle>
+          <CardDescription className="text-sm">
             Ajoutez votre logo pour l'afficher sur vos documents.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-start space-x-6">
-            <div className="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+          <div className={`${isMobile ? 'flex flex-col space-y-4' : 'flex items-start space-x-6'}`}>
+            <div className={`${isMobile ? 'w-32 h-32 mx-auto' : 'w-48 h-48'} bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300`}>
               {companyData.logo_url ? (
                 <img src={companyData.logo_url} alt="Logo" className="max-w-full max-h-full object-contain rounded-lg" />
               ) : (
-                <FileText className="h-16 w-16 text-gray-400" />
+                <FileText className={`${isMobile ? 'h-8 w-8' : 'h-16 w-16'} text-gray-400`} />
               )}
             </div>
-            <div className="space-y-2">
+            <div className={`space-y-2 ${isMobile ? 'text-center' : ''}`}>
               <div className="flex items-center space-x-2">
                 <Input 
                   type="file" 
@@ -92,9 +94,11 @@ const CompanyTab: React.FC = () => {
                 <Button 
                   type="button" 
                   variant="outline"
+                  size={isMobile ? "sm" : "default"}
                   onClick={() => document.getElementById('logo')?.click()}
+                  className={isMobile ? "text-xs" : ""}
                 >
-                  <Upload className="h-4 w-4 mr-2" />
+                  <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   Choisir un fichier
                 </Button>
               </div>
@@ -108,8 +112,8 @@ const CompanyTab: React.FC = () => {
       
       <Card>
         <CardHeader>
-          <CardTitle>Informations de l'entreprise</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-lg sm:text-xl">Informations de l'entreprise</CardTitle>
+          <CardDescription className="text-sm">
             Mettez à jour les informations de votre entreprise.
           </CardDescription>
         </CardHeader>
@@ -147,7 +151,7 @@ const CompanyTab: React.FC = () => {
             />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="zipcode">Code postal</Label>
               <Input 
@@ -178,7 +182,7 @@ const CompanyTab: React.FC = () => {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="siren">SIREN</Label>
               <Input 
@@ -213,6 +217,7 @@ const CompanyTab: React.FC = () => {
           <div className="flex justify-end">
             <Button 
               className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+              size={isMobile ? "sm" : "default"}
               onClick={saveCompanyData}
               disabled={isSaving}
             >
