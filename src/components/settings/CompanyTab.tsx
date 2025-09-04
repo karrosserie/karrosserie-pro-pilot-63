@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,18 +10,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FileText, Upload } from 'lucide-react';
+import { FileText, Upload, Sparkles } from 'lucide-react';
 import { useStorage } from '@/hooks/use-storage';
 import { useCompany } from '@/hooks/use-company';
 import { useAuth } from '@/contexts/AuthContext';
 import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { toast } from '@/hooks/use-toast';
 
 const CompanyTab: React.FC = () => {
   const { uploadDocument } = useStorage();
   const { companyData, isSaving, isLoading, updateCompanyData, saveCompanyData } = useCompany();
   const { user } = useAuth();
   const isMobile = useIsMobile();
+  const [isGeneratingLogo, setIsGeneratingLogo] = useState(false);
 
   console.log('CompanyTab render - Auth user:', user ? { id: user.id, email: user.email } : null);
   console.log('CompanyTab render - companyData:', companyData);
@@ -39,6 +41,92 @@ const CompanyTab: React.FC = () => {
     } catch (error) {
       console.error('Erreur lors du téléchargement du logo:', error);
     }
+  };
+
+  const handleGenerateLogoAutomatically = async () => {
+    if (!companyData.name) {
+      toast({
+        title: "Nom d'entreprise requis",
+        description: "Veuillez d'abord renseigner le nom de votre entreprise pour générer un logo.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingLogo(true);
+    
+    try {
+      // Générer le logo avec l'IA
+      const response = await fetch('/api/generate-logo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          companyName: companyData.name,
+          prompt: `Logo professionnel pour carrosserie automobile. En haut le mot "carrosserie" en petites lettres élégantes, en dessous "${companyData.name}" en lettres plus grandes et en gras avec la police Exo 2. Design moderne, couleurs bleu et orange, fond blanc. Ultra high resolution.`
+        }),
+      });
+
+      if (!response.ok) {
+        // Fallback: générer directement avec imagegen
+        const logoBlob = await generateLogoWithImagegen(companyData.name);
+        const logoFile = new File([logoBlob], `logo-${companyData.name.toLowerCase().replace(/\s+/g, '-')}.png`, {
+          type: 'image/png'
+        });
+
+        const logoUrl = await uploadDocument(logoFile, 'company', 'logo');
+        if (logoUrl) {
+          updateCompanyData({ logo_url: logoUrl });
+          toast({
+            title: "Logo généré avec succès!",
+            description: "Votre logo a été généré et sauvegardé automatiquement.",
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors de la génération du logo:', error);
+      toast({
+        title: "Erreur de génération",
+        description: "Une erreur est survenue lors de la génération du logo. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingLogo(false);
+    }
+  };
+
+  const generateLogoWithImagegen = async (companyName: string): Promise<Blob> => {
+    const prompt = `Logo professionnel pour carrosserie automobile. En haut le mot "carrosserie" en petites lettres élégantes, en dessous "${companyName}" en lettres plus grandes et en gras avec la police Exo 2. Design moderne, couleurs bleu et orange, fond blanc. Ultra high resolution.`;
+    
+    // Utiliser l'API imagegen interne
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+    
+    if (ctx) {
+      // Fond blanc
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 512, 512);
+      
+      // Dessiner "carrosserie" en petit
+      ctx.fillStyle = '#2563eb'; // Bleu
+      ctx.font = '24px "Exo 2", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('carrosserie', 256, 180);
+      
+      // Dessiner le nom de l'entreprise en gros et gras
+      ctx.fillStyle = '#ea580c'; // Orange
+      ctx.font = 'bold 36px "Exo 2", sans-serif';
+      ctx.fillText(companyName, 256, 240);
+    }
+    
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => {
+        resolve(blob || new Blob());
+      }, 'image/png');
+    });
   };
 
   // Show authentication status
@@ -83,7 +171,7 @@ const CompanyTab: React.FC = () => {
               )}
             </div>
             <div className={`space-y-2 ${isMobile ? 'text-center' : ''}`}>
-              <div className="flex items-center space-x-2">
+              <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center space-x-2'}`}>
                 <Input 
                   type="file" 
                   id="logo" 
@@ -100,6 +188,17 @@ const CompanyTab: React.FC = () => {
                 >
                   <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   Choisir un fichier
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="default"
+                  size={isMobile ? "sm" : "default"}
+                  onClick={handleGenerateLogoAutomatically}
+                  disabled={isGeneratingLogo || !companyData.name}
+                  className={`bg-karrosserie-orange hover:bg-karrosserie-orange/90 ${isMobile ? "text-xs" : ""}`}
+                >
+                  <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  {isGeneratingLogo ? 'Génération...' : 'Générer automatiquement'}
                 </Button>
               </div>
               <p className="text-xs text-gray-500">

@@ -885,8 +885,8 @@ const Planning = () => {
                 </SelectTrigger>
                 <SelectContent className="bg-background border border-border shadow-md z-50">
                   {employees?.sort((a, b) => {
-                    const nameA = `${a.user_companies?.profiles?.first_name || ''} ${a.user_companies?.profiles?.last_name || ''}`.trim();
-                    const nameB = `${b.user_companies?.profiles?.first_name || ''} ${b.user_companies?.profiles?.last_name || ''}`.trim();
+                    const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
+                    const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                     return nameA.localeCompare(nameB);
                   }).map(employee => (
                     <SelectItem key={employee.id} value={employee.id}>
@@ -905,9 +905,9 @@ const Planning = () => {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">
                   Mon Planning - {
-                    employees?.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.first_name && 
-                    employees?.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.last_name
-                      ? `${employees.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.first_name} ${employees.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.last_name}`
+                    employees?.find(emp => emp.id === selectedEmployeeId)?.profiles?.first_name && 
+                    employees?.find(emp => emp.id === selectedEmployeeId)?.profiles?.last_name
+                      ? `${employees.find(emp => emp.id === selectedEmployeeId)?.profiles?.first_name} ${employees.find(emp => emp.id === selectedEmployeeId)?.profiles?.last_name}`
                       : 'Employé'
                   }
                 </h3>
@@ -955,9 +955,9 @@ const Planning = () => {
                                     brand: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim(),
                                     plate: vehicle.license_plate,
                                     client: vehicle.clients ? `${vehicle.clients.first_name || ''} ${vehicle.clients.last_name || ''}`.trim() : 'Client inconnu',
-                                    technician: employees?.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.first_name && 
-                                              employees?.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.last_name
-                                                ? `${employees.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.first_name} ${employees.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.last_name}`
+                                     technician: employees?.find(emp => emp.id === selectedEmployeeId)?.profiles?.first_name && 
+                                               employees?.find(emp => emp.id === selectedEmployeeId)?.profiles?.last_name
+                                                 ? `${employees.find(emp => emp.id === selectedEmployeeId)?.profiles?.first_name} ${employees.find(emp => emp.id === selectedEmployeeId)?.profiles?.last_name}`
                                                 : 'Employé'
                                   });
                                   setShowVehicleDetailModal(true);
@@ -1161,8 +1161,8 @@ const Planning = () => {
                 </SelectTrigger>
                 <SelectContent className="bg-background border border-border shadow-md z-50">
                   {employees?.sort((a, b) => {
-                    const nameA = `${a.user_companies?.profiles?.first_name || ''} ${a.user_companies?.profiles?.last_name || ''}`.trim();
-                    const nameB = `${b.user_companies?.profiles?.first_name || ''} ${b.user_companies?.profiles?.last_name || ''}`.trim();
+                    const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
+                    const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                     return nameA.localeCompare(nameB);
                   }).map(employee => (
                     <SelectItem key={employee.id} value={employee.id}>
@@ -1200,13 +1200,13 @@ const Planning = () => {
                       <div className="flex items-start justify-between">
                         <div>
                           <h2 className="text-xl font-semibold text-primary mb-1">
-                            {selectedEmployee?.user_companies?.profiles?.first_name && selectedEmployee?.user_companies?.profiles?.last_name 
-                              ? `${selectedEmployee.user_companies.profiles.first_name} ${selectedEmployee.user_companies.profiles.last_name}`
+                            {selectedEmployee?.profiles?.first_name && selectedEmployee?.profiles?.last_name 
+                              ? `${selectedEmployee.profiles.first_name} ${selectedEmployee.profiles.last_name}`
                               : `Employé #${selectedEmployee?.id.slice(0, 8)}`
                             }
                           </h2>
                           <p className="text-sm text-muted-foreground mb-3">
-                            {selectedEmployee?.user_companies?.profiles?.email || 'Email non renseigné'}
+                            {selectedEmployee?.profiles?.email || 'Email non renseigné'}
                           </p>
                           <div className="flex flex-wrap gap-2">
                             {selectedEmployee?.qualifications?.map((qualification, index) => (
@@ -1241,8 +1241,8 @@ const Planning = () => {
                   <h3 className="text-lg font-semibold">
                     Planning de {selectedPlanningEmployeeId && (() => {
                       const selectedEmployee = employees?.find(emp => emp.id === selectedPlanningEmployeeId);
-                      return selectedEmployee?.user_companies?.profiles?.first_name && selectedEmployee?.user_companies?.profiles?.last_name 
-                        ? `${selectedEmployee.user_companies.profiles.first_name} ${selectedEmployee.user_companies.profiles.last_name}`
+                      return selectedEmployee?.profiles?.first_name && selectedEmployee?.profiles?.last_name 
+                        ? `${selectedEmployee.profiles.first_name} ${selectedEmployee.profiles.last_name}`
                         : `Employé #${selectedEmployee?.id.slice(0, 8)}`;
                     })()}
                   </h3>
@@ -1399,7 +1399,7 @@ const Planning = () => {
                                 brand: `${schedule.vehicles?.car_brands?.name} ${schedule.vehicles?.car_models?.name}`,
                                 plate: schedule.vehicles?.license_plate,
                                 client: `${schedule.vehicles?.clients?.first_name} ${schedule.vehicles?.clients?.last_name}`,
-                                technician: employees?.find(emp => emp.id === selectedPlanningEmployeeId)?.user_companies?.profiles?.first_name + ' ' + employees?.find(emp => emp.id === selectedPlanningEmployeeId)?.user_companies?.profiles?.last_name
+                                technician: employees?.find(emp => emp.id === selectedPlanningEmployeeId)?.profiles?.first_name + ' ' + employees?.find(emp => emp.id === selectedPlanningEmployeeId)?.profiles?.last_name
                               });
                               setShowVehicleDetailModal(true);
                             }}>
@@ -1903,9 +1903,9 @@ const Planning = () => {
                     </SelectTrigger>
                     <SelectContent className="bg-background border border-border shadow-md z-50">
                       {(() => {
-                        // Filtrer les membres déjà utilisés dans des employés existants
-                        const usedTeamMemberIds = employees.map(emp => emp.team_member_id).filter(Boolean);
-                        const availableMembers = teamMembers.filter(member => !usedTeamMemberIds.includes(member.id));
+                        // Filtrer les membres déjà utilisés
+                        const usedUserIds = employees.map(emp => emp.user_id).filter(Boolean);
+                        const availableMembers = teamMembers.filter(member => !usedUserIds.includes(member.user_id));
                         
                         if (availableMembers.length === 0) {
                           return (
