@@ -13,13 +13,33 @@ interface UseQuoteFormLogicProps {
 }
 
 export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps) => {
-  const [formData, setFormData] = useState<Partial<Quote>>({
-    reference: '',
-    client_id: '',
-    vehicle_id: '',
-    status: 'En attente',
-    valid_until: '',
-    notes: ''
+  const [formData, setFormData] = useState<Partial<Quote>>(() => {
+    // Initialiser immédiatement avec les données préfillées si disponibles
+    const initialData = {
+      reference: '',
+      client_id: '',
+      vehicle_id: '',
+      status: 'En attente',
+      valid_until: '',
+      notes: ''
+    };
+    
+    // Appliquer les données de pré-remplissage immédiatement
+    if (prefillData) {
+      return {
+        ...initialData,
+        client_id: prefillData.client_id || '',
+        vehicle_id: prefillData.vehicle_id || '',
+        report_id: prefillData.report_id || '',
+        report_number: prefillData.report_number || '',
+        policy_number: prefillData.policy_number || '',
+        report_date: prefillData.report_date || '',
+        expert_name: prefillData.expert_name || '',
+        incident_date: prefillData.incident_date || ''
+      };
+    }
+    
+    return initialData;
   });
 
   const [notes, setNotes] = useState('');
@@ -137,18 +157,8 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
         setFormData(prev => ({
           ...prev,
           reference: nextNumber,
-          valid_until: today,
-          // Appliquer les données de pré-remplissage si disponibles
-          ...(prefillData && {
-            client_id: prefillData.client_id || '',
-            vehicle_id: prefillData.vehicle_id || '',
-            report_id: prefillData.report_id || '',
-            report_number: prefillData.report_number || '',
-            policy_number: prefillData.policy_number || '',
-            report_date: prefillData.report_date || '',
-            expert_name: prefillData.expert_name || '',
-            incident_date: prefillData.incident_date || ''
-          })
+          valid_until: today
+          // Les données préfillées sont déjà appliquées à l'initialisation
         }));
       });
       
