@@ -83,9 +83,13 @@ export const QuoteForm = ({
         amount: globalTotals.total
       };
       
+      console.log('🔄 QuoteForm - About to submit quote with data:', JSON.stringify(submitData, null, 2));
+      console.log('🔄 QuoteForm - client_id type and value:', typeof submitData.client_id, submitData.client_id);
+      console.log('🔄 QuoteForm - vehicle_id type and value:', typeof submitData.vehicle_id, submitData.vehicle_id);
+      
       await onSubmit(submitData);
     } catch (error: any) {
-      console.error('Error submitting quote:', error);
+      console.error('❌ QuoteForm - Error submitting quote:', error);
       // Don't show toast here as it might be already handled in the parent
     }
   };
