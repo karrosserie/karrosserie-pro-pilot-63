@@ -284,52 +284,47 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
                   <TableRow className="border-t-0">
                     <TableCell colSpan={6} className="py-3 border-t-0">
                       <div className="flex flex-wrap gap-2 justify-end px-4">
-                        <Button variant="outline" size="sm" onClick={() => handleViewOrder(order)}>
+                        <Button variant="view" size="sm" onClick={() => handleViewOrder(order)}>
                           <Eye className="h-4 w-4 mr-1" />
                           Voir
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleEditOrder(order)}>
+                        <Button variant="edit" size="sm" onClick={() => handleEditOrder(order)}>
                           <Pencil className="h-4 w-4 mr-1" />
                           Modifier
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleDownload(order)}>
+                        <Button variant="download" size="sm" onClick={() => handleDownload(order)}>
                           <Download className="h-4 w-4 mr-1" />
                           Télécharger
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handlePrint(order)}>
+                        <Button variant="print" size="sm" onClick={() => handlePrint(order)}>
                           <Printer className="h-4 w-4 mr-1" />
                           Imprimer
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(order)}>
+                        <Button variant="send" size="sm" onClick={() => handleSendEmail(order)}>
                           <Mail className="h-4 w-4 mr-1" />
                           Envoyer
                         </Button>
                         {order.status !== 'Signé' && (
-                          <Button variant="outline" size="sm" onClick={() => handleSignOrder(order)}>
+                          <Button variant="create" size="sm" onClick={() => handleSignOrder(order)}>
                             <Signature className="h-4 w-4 mr-1" />
                             Signature du client
                           </Button>
                         )}
-                        <Button variant="outline" size="sm" onClick={() => handleRequestDocuments(order)} className="hidden">
+                        <Button variant="create" size="sm" onClick={() => handleRequestDocuments(order)} className="hidden">
                           <FileCheck className="h-4 w-4 mr-1" />
                           Demander docs
                         </Button>
                         {!order.invoices || order.invoices.length === 0 ? (
                           <Button 
                             size="sm"
-                            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+                            variant="validation"
                             onClick={() => handleConvertToInvoice(order)}
                           >
                             <ArrowRight className="h-4 w-4 mr-1" />
                             Convertir
                           </Button>
                         ) : null}
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                          onClick={() => handleDeleteOrder(order)}
-                        >
+                        <Button variant="delete" size="sm" onClick={() => handleDeleteOrder(order)}>
                           <Trash className="h-4 w-4 mr-1" />
                           Supprimer
                         </Button>

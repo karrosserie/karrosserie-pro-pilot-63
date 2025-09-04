@@ -23,6 +23,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useIsMobile } from '@/hooks/use-mobile';
+import RepairOrderMobileCard from '@/components/repair-orders/RepairOrderMobileCard';
 
 const RepairOrders = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -41,6 +43,7 @@ const RepairOrders = () => {
   const [selectedOrderForDeletion, setSelectedOrderForDeletion] = useState<RepairOrder | null>(null);
   const [prefilledInvoice, setPrefilledInvoice] = useState<Partial<Invoice> | null>(null);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   
   const { orders, isLoading, error, deleteOrder } = useRepairOrders();
   
@@ -261,20 +264,54 @@ const RepairOrders = () => {
         onCreateOrder={handleCreateOrder}
       />
       
-      <RepairOrdersTable
-        orders={filteredOrders}
-        onEditOrder={handleEditOrder}
-        onDeleteOrder={handleDeleteOrder}
-        onViewOrder={handleViewOrder}
-        contextMenuProps={{
-          onDownload: handleDownload,
-          onPrint: handlePrint,
-          onSendEmail: handleSendEmail,
-          onSignOrder: handleSignOrder,
-          onRequestDocuments: handleRequestDocuments,
-          onConvertToInvoice: handleConvertToInvoice
-        }}
-      />
+      {isMobile ? (
+        <div className="space-y-3">
+          {filteredOrders.length > 0 ? (
+            filteredOrders.map((order) => (
+              <RepairOrderMobileCard
+                key={order.id}
+                order={order}
+                onViewOrder={handleViewOrder}
+                onEditOrder={handleEditOrder}
+                onDeleteOrder={handleDeleteOrder}
+                contextMenuProps={{
+                  onDownload: handleDownload,
+                  onPrint: handlePrint,
+                  onSendEmail: handleSendEmail,
+                  onSignOrder: handleSignOrder,
+                  onRequestDocuments: handleRequestDocuments,
+                  onConvertToInvoice: handleConvertToInvoice
+                }}
+              />
+            ))
+          ) : (
+            <div className="card-container">
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="h-10 w-10 text-gray-400 mb-2" />
+                <h3 className="font-medium text-gray-900">Aucun résultat</h3>
+                <p className="text-gray-500 mt-1">
+                  Aucun ordre de réparation correspondant à votre recherche n'a été trouvé.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <RepairOrdersTable
+          orders={filteredOrders}
+          onEditOrder={handleEditOrder}
+          onDeleteOrder={handleDeleteOrder}
+          onViewOrder={handleViewOrder}
+          contextMenuProps={{
+            onDownload: handleDownload,
+            onPrint: handlePrint,
+            onSendEmail: handleSendEmail,
+            onSignOrder: handleSignOrder,
+            onRequestDocuments: handleRequestDocuments,
+            onConvertToInvoice: handleConvertToInvoice
+          }}
+        />
+      )}
 
       <RepairOrderDialog
         order={selectedOrder}

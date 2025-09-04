@@ -19,6 +19,15 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         validation: "bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90",
+        // Nouvelles variantes pour les actions de documents
+        view: "bg-blue-500 text-white hover:bg-blue-600",
+        edit: "bg-gray-500 text-white hover:bg-gray-600",
+        download: "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300",
+        print: "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300",
+        send: "bg-green-500 text-white hover:bg-green-600",
+        payment: "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300",
+        create: "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300",
+        delete: "bg-red-500 text-white hover:bg-red-600",
       },
       size: {
         default: "h-10 px-4 py-2",

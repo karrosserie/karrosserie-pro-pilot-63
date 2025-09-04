@@ -14,8 +14,10 @@ import FleetLoansHistory from './FleetLoansHistory';
 import FleetAttestationDialog from './FleetAttestationDialog';
 import FleetViolations from './FleetViolations';
 import { Loading } from '@/components/ui/loading';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const FleetPageContent = () => {
+  // ALL HOOKS MUST BE CALLED AT THE TOP LEVEL
   // État pour le dialog d'attestation
   const [isAttestationDialogOpen, setIsAttestationDialogOpen] = useState(false);
   const [selectedLoanForAttestation, setSelectedLoanForAttestation] = useState<string | null>(null);
@@ -52,6 +54,10 @@ const FleetPageContent = () => {
     handleDeleteLoan
   } = useFleetPage();
 
+  const { reservations } = useFleetReservations();
+  const { companyData } = useCompany();
+  const isMobile = useIsMobile();
+
   // Fonction pour gérer l'ouverture du dialog d'attestation
   const handleViewAttestation = (loanId: string) => {
     setSelectedLoanForAttestation(loanId);
@@ -68,9 +74,6 @@ const FleetPageContent = () => {
   const selectedLoanData = selectedLoanForAttestation 
     ? currentLoans.find(loan => loan.id === selectedLoanForAttestation)
     : null;
-
-  const { reservations } = useFleetReservations();
-  const { companyData } = useCompany();
 
   // Fonction pour gérer le téléchargement de l'attestation
   const handleDownloadAttestation = async (loanId: string) => {
@@ -108,17 +111,16 @@ const FleetPageContent = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-4 md:space-y-6">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-2">Flotte de véhicules</h1>
-        <p className="text-gray-600">Gérez vos véhicules de courtoisie et les prêts clients.</p>
+      <div className="mb-4 md:mb-6">
+        <h1 className="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Flotte de véhicules</h1>
+        <p className="text-sm md:text-base text-gray-600">Gérez vos véhicules de courtoisie et les prêts clients.</p>
       </div>
 
-      {/* Two column layout with asymmetric columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left column - wider (2/3) */}
-        <div className="lg:col-span-2 space-y-6">
+      {/* Responsive layout */}
+      {isMobile ? (
+        <div className="space-y-6">
           <FleetVehiclesTable
             vehicles={vehicles}
             isLoading={isLoading}
@@ -130,14 +132,46 @@ const FleetPageContent = () => {
             onLendVehicle={handleLendVehicle}
           />
 
+          <FleetCurrentLoans
+            currentLoans={currentLoans}
+            onViewDetails={handleViewLoanDetails}
+            onReturnVehicle={handleReturnVehicle}
+            onNewLoan={handleNewLoan}
+            onDeleteLoan={handleDeleteLoan}
+            onViewAttestation={handleViewAttestation}
+            onDownloadAttestation={handleDownloadAttestation}
+          />
+
           <FleetLoansHistory 
             onViewLoan={handleViewLoan}
             onViewReturn={handleViewReturn}
           />
-        </div>
 
-        {/* Right column - narrower (1/3) */}
-        <div className="space-y-6">
+          <FleetViolations />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left column - wider (2/3) */}
+          <div className="lg:col-span-2 space-y-6">
+            <FleetVehiclesTable
+              vehicles={vehicles}
+              isLoading={isLoading}
+              searchTerm={searchTerm}
+              onSearchTermChange={setSearchTerm}
+              onAddVehicle={handleAddVehicle}
+              onEditVehicle={handleEditVehicle}
+              onViewVehicle={handleViewVehicle}
+              onLendVehicle={handleLendVehicle}
+            />
+
+            <FleetLoansHistory 
+              onViewLoan={handleViewLoan}
+              onViewReturn={handleViewReturn}
+            />
+          </div>
+
+          {/* Right column - narrower (1/3) */}
+          <div className="space-y-6">
             <FleetCurrentLoans
               currentLoans={currentLoans}
               onViewDetails={handleViewLoanDetails}
@@ -148,9 +182,10 @@ const FleetPageContent = () => {
               onDownloadAttestation={handleDownloadAttestation}
             />
 
-          <FleetViolations />
+            <FleetViolations />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Dialogs */}
       <FleetVehicleDialog

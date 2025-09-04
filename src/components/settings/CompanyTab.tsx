@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,16 +10,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FileText, Upload } from 'lucide-react';
+import { FileText, Upload, Sparkles } from 'lucide-react';
 import { useStorage } from '@/hooks/use-storage';
 import { useCompany } from '@/hooks/use-company';
 import { useAuth } from '@/contexts/AuthContext';
 import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { toast } from '@/hooks/use-toast';
+import { companyService } from '@/services/supabase/company';
 
 const CompanyTab: React.FC = () => {
   const { uploadDocument } = useStorage();
-  const { companyData, isSaving, isLoading, updateCompanyData, saveCompanyData } = useCompany();
+  const { companyData, isSaving, isLoading, updateCompanyData, saveCompanyData, reloadCompanyData } = useCompany();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
+  const [isGeneratingLogo, setIsGeneratingLogo] = useState(false);
 
   console.log('CompanyTab render - Auth user:', user ? { id: user.id, email: user.email } : null);
   console.log('CompanyTab render - companyData:', companyData);
@@ -32,11 +37,125 @@ const CompanyTab: React.FC = () => {
     try {
       const logoUrl = await uploadDocument(file, 'company', 'logo');
       if (logoUrl) {
+        console.log('Logo uploaded manually, URL:', logoUrl);
+        
+        // Créer les nouvelles données avec le logo_url
+        const updatedCompanyData = { ...companyData, logo_url: logoUrl };
+        
+        // Mettre à jour l'état local
         updateCompanyData({ logo_url: logoUrl });
+        
+        // Sauvegarder directement les données mises à jour
+        await companyService.updateCompanyInfo(undefined, updatedCompanyData);
+        await reloadCompanyData();
+        
+        toast({
+          title: "Logo téléchargé",
+          description: "Votre logo a été téléchargé et sauvegardé avec succès.",
+        });
       }
     } catch (error) {
       console.error('Erreur lors du téléchargement du logo:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de télécharger le logo.",
+        variant: "destructive",
+      });
     }
+  };
+
+  const handleGenerateLogoAutomatically = async () => {
+    if (!companyData.name) {
+      toast({
+        title: "Nom d'entreprise requis",
+        description: "Veuillez d'abord renseigner le nom de votre entreprise pour générer un logo.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingLogo(true);
+    
+    try {
+      // Générer le logo directement avec la police Vezla Font
+      const logoBlob = await generateLogoWithImagegen(companyData.name);
+      const logoFile = new File([logoBlob], `logo-${companyData.name.toLowerCase().replace(/\s+/g, '-')}.png`, {
+        type: 'image/png'
+      });
+
+      const logoUrl = await uploadDocument(logoFile, 'company', 'logo');
+      if (logoUrl) {
+        console.log('Logo uploaded successfully, URL:', logoUrl);
+        
+        // Créer les nouvelles données avec le logo_url
+        const updatedCompanyData = { ...companyData, logo_url: logoUrl };
+        console.log('Updated company data with logo:', updatedCompanyData);
+        
+        // Mettre à jour l'état local
+        updateCompanyData({ logo_url: logoUrl });
+        
+        // Sauvegarder directement les données mises à jour
+        await companyService.updateCompanyInfo(undefined, updatedCompanyData);
+        await reloadCompanyData();
+        toast({
+          title: "Logo généré avec succès!",
+          description: "Votre logo a été généré et sauvegardé automatiquement.",
+        });
+      } else {
+        throw new Error('Échec de l\'upload du logo');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la génération du logo:', error);
+      toast({
+        title: "Erreur de génération",
+        description: "Une erreur est survenue lors de la génération du logo. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingLogo(false);
+    }
+  };
+
+  const generateLogoWithImagegen = async (companyName: string): Promise<Blob> => {
+    // Attendre que la police Vezla Font soit chargée
+    try {
+      await document.fonts.load('24px "Vezla Font"');
+      await document.fonts.load('bold 36px "Vezla Font"');
+    } catch (error) {
+      console.warn('Erreur lors du chargement de la police Vezla Font:', error);
+    }
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+    
+    if (ctx) {
+      // Fond blanc
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 512, 512);
+      
+      // Vérifier si la police Vezla Font est disponible
+      const fontAvailable = document.fonts.check('24px "Vezla Font"');
+      const fontFamily = fontAvailable ? '"Vezla Font", sans-serif' : 'Arial, sans-serif';
+      
+      // Dessiner "carrosserie" en petit et noir, aligné à gauche
+      ctx.fillStyle = '#000000';
+      ctx.font = `24px ${fontFamily}`;
+      ctx.textAlign = 'left';
+      ctx.fillText('carrosserie', 50, 180);
+      
+      // Dessiner le nom de l'entreprise en gros, gras et noir, aligné à gauche
+      ctx.fillStyle = '#000000';
+      ctx.font = `bold 36px ${fontFamily}`;
+      ctx.fillText(companyName, 50, 240);
+    }
+    
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => {
+        resolve(blob || new Blob());
+      }, 'image/png');
+    });
   };
 
   // Show authentication status
@@ -66,22 +185,22 @@ const CompanyTab: React.FC = () => {
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Logo de l'entreprise</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-lg sm:text-xl">Logo de l'entreprise</CardTitle>
+          <CardDescription className="text-sm">
             Ajoutez votre logo pour l'afficher sur vos documents.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-start space-x-6">
-            <div className="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+          <div className={`${isMobile ? 'flex flex-col space-y-4' : 'flex items-start space-x-6'}`}>
+            <div className={`${isMobile ? 'w-32 h-32 mx-auto' : 'w-48 h-48'} bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300`}>
               {companyData.logo_url ? (
                 <img src={companyData.logo_url} alt="Logo" className="max-w-full max-h-full object-contain rounded-lg" />
               ) : (
-                <FileText className="h-16 w-16 text-gray-400" />
+                <FileText className={`${isMobile ? 'h-8 w-8' : 'h-16 w-16'} text-gray-400`} />
               )}
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
+            <div className={`space-y-2 ${isMobile ? 'text-center' : ''}`}>
+              <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center space-x-2'}`}>
                 <Input 
                   type="file" 
                   id="logo" 
@@ -92,10 +211,23 @@ const CompanyTab: React.FC = () => {
                 <Button 
                   type="button" 
                   variant="outline"
+                  size={isMobile ? "sm" : "default"}
                   onClick={() => document.getElementById('logo')?.click()}
+                  className={isMobile ? "text-xs" : ""}
                 >
-                  <Upload className="h-4 w-4 mr-2" />
+                  <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   Choisir un fichier
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="default"
+                  size={isMobile ? "sm" : "default"}
+                  onClick={handleGenerateLogoAutomatically}
+                  disabled={isGeneratingLogo || !companyData.name}
+                  className={`bg-karrosserie-orange hover:bg-karrosserie-orange/90 ${isMobile ? "text-xs" : ""}`}
+                >
+                  <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  {isGeneratingLogo ? 'Génération...' : 'Générer automatiquement'}
                 </Button>
               </div>
               <p className="text-xs text-gray-500">
@@ -108,8 +240,8 @@ const CompanyTab: React.FC = () => {
       
       <Card>
         <CardHeader>
-          <CardTitle>Informations de l'entreprise</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-lg sm:text-xl">Informations de l'entreprise</CardTitle>
+          <CardDescription className="text-sm">
             Mettez à jour les informations de votre entreprise.
           </CardDescription>
         </CardHeader>
@@ -147,7 +279,7 @@ const CompanyTab: React.FC = () => {
             />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="zipcode">Code postal</Label>
               <Input 
@@ -178,7 +310,7 @@ const CompanyTab: React.FC = () => {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="siren">SIREN</Label>
               <Input 
@@ -213,6 +345,7 @@ const CompanyTab: React.FC = () => {
           <div className="flex justify-end">
             <Button 
               className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+              size={isMobile ? "sm" : "default"}
               onClick={saveCompanyData}
               disabled={isSaving}
             >

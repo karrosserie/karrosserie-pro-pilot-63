@@ -13,7 +13,7 @@ import StatsCard from '@/components/dashboard/StatsCard';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompany } from '@/hooks/use-company';
-import { useEmployees, Employee } from '@/hooks/use-employees';
+import { useTeamMembers, TeamMember } from '@/hooks/use-team-members';
 import { EmployeesList } from '@/components/planning/EmployeesList';
 import TaskDetailsModal from '@/components/planning/TaskDetailsModal';
 import { WorkshopPlanningInterface } from '@/components/planning/WorkshopPlanningInterface';
@@ -68,7 +68,7 @@ const Planning = () => {
   const [showTaskDetailsModal, setShowTaskDetailsModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [canStartTasks, setCanStartTasks] = useState<{ [key: string]: boolean }>({});
-  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  const [editingEmployee, setEditingEmployee] = useState<TeamMember | null>(null);
   const [employeeFormData, setEmployeeFormData] = useState({
     teamMemberId: "",
     qualifications: [] as string[]
@@ -134,7 +134,7 @@ const Planning = () => {
     }
   });
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
-  const { employees, createEmployee, updateEmployee } = useEmployees();
+  const { teamMembers: employees, updateTeamMember: updateEmployee } = useTeamMembers();
   const { workflowSteps, refetch: refetchWorkflow } = useVehicleWorkflow(companyInfo?.id);
   const { schedules: employeeSchedules, refetch: refetchEmployeeSchedule } = useEmployeeSchedule(selectedEmployeeId);
   const { schedules: planningEmployeeSchedules } = useEmployeeSchedule(selectedPlanningEmployeeId);
@@ -885,13 +885,13 @@ const Planning = () => {
                 </SelectTrigger>
                 <SelectContent className="bg-background border border-border shadow-md z-50">
                   {employees?.sort((a, b) => {
-                    const nameA = `${a.user_companies?.profiles?.first_name || ''} ${a.user_companies?.profiles?.last_name || ''}`.trim();
-                    const nameB = `${b.user_companies?.profiles?.first_name || ''} ${b.user_companies?.profiles?.last_name || ''}`.trim();
+                    const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
+                    const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                     return nameA.localeCompare(nameB);
                   }).map(employee => (
                     <SelectItem key={employee.id} value={employee.id}>
-                      {employee.user_companies?.profiles?.first_name && employee.user_companies?.profiles?.last_name 
-                        ? `${employee.user_companies.profiles.first_name} ${employee.user_companies.profiles.last_name}`
+                      {employee.profiles?.first_name && employee.profiles?.last_name 
+                        ? `${employee.profiles.first_name} ${employee.profiles.last_name}`
                         : `Employé #${employee.id.slice(0, 8)}`
                       }
                     </SelectItem>
@@ -905,9 +905,9 @@ const Planning = () => {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">
                   Mon Planning - {
-                    employees?.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.first_name && 
-                    employees?.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.last_name
-                      ? `${employees.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.first_name} ${employees.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.last_name}`
+                    employees?.find(emp => emp.id === selectedEmployeeId)?.profiles?.first_name && 
+                    employees?.find(emp => emp.id === selectedEmployeeId)?.profiles?.last_name
+                      ? `${employees.find(emp => emp.id === selectedEmployeeId)?.profiles?.first_name} ${employees.find(emp => emp.id === selectedEmployeeId)?.profiles?.last_name}`
                       : 'Employé'
                   }
                 </h3>
@@ -955,9 +955,9 @@ const Planning = () => {
                                     brand: `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim(),
                                     plate: vehicle.license_plate,
                                     client: vehicle.clients ? `${vehicle.clients.first_name || ''} ${vehicle.clients.last_name || ''}`.trim() : 'Client inconnu',
-                                    technician: employees?.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.first_name && 
-                                              employees?.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.last_name
-                                                ? `${employees.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.first_name} ${employees.find(emp => emp.id === selectedEmployeeId)?.user_companies?.profiles?.last_name}`
+                                     technician: employees?.find(emp => emp.id === selectedEmployeeId)?.profiles?.first_name && 
+                                               employees?.find(emp => emp.id === selectedEmployeeId)?.profiles?.last_name
+                                                 ? `${employees.find(emp => emp.id === selectedEmployeeId)?.profiles?.first_name} ${employees.find(emp => emp.id === selectedEmployeeId)?.profiles?.last_name}`
                                                 : 'Employé'
                                   });
                                   setShowVehicleDetailModal(true);
@@ -1161,13 +1161,13 @@ const Planning = () => {
                 </SelectTrigger>
                 <SelectContent className="bg-background border border-border shadow-md z-50">
                   {employees?.sort((a, b) => {
-                    const nameA = `${a.user_companies?.profiles?.first_name || ''} ${a.user_companies?.profiles?.last_name || ''}`.trim();
-                    const nameB = `${b.user_companies?.profiles?.first_name || ''} ${b.user_companies?.profiles?.last_name || ''}`.trim();
+                    const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
+                    const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                     return nameA.localeCompare(nameB);
                   }).map(employee => (
                     <SelectItem key={employee.id} value={employee.id}>
-                      {employee.user_companies?.profiles?.first_name && employee.user_companies?.profiles?.last_name 
-                        ? `${employee.user_companies.profiles.first_name} ${employee.user_companies.profiles.last_name}`
+                      {employee.profiles?.first_name && employee.profiles?.last_name 
+                        ? `${employee.profiles.first_name} ${employee.profiles.last_name}`
                         : `Employé #${employee.id.slice(0, 8)}`
                       }
                     </SelectItem>
@@ -1200,13 +1200,13 @@ const Planning = () => {
                       <div className="flex items-start justify-between">
                         <div>
                           <h2 className="text-xl font-semibold text-primary mb-1">
-                            {selectedEmployee?.user_companies?.profiles?.first_name && selectedEmployee?.user_companies?.profiles?.last_name 
-                              ? `${selectedEmployee.user_companies.profiles.first_name} ${selectedEmployee.user_companies.profiles.last_name}`
+                            {selectedEmployee?.profiles?.first_name && selectedEmployee?.profiles?.last_name 
+                              ? `${selectedEmployee.profiles.first_name} ${selectedEmployee.profiles.last_name}`
                               : `Employé #${selectedEmployee?.id.slice(0, 8)}`
                             }
                           </h2>
                           <p className="text-sm text-muted-foreground mb-3">
-                            {selectedEmployee?.user_companies?.profiles?.email || 'Email non renseigné'}
+                            {selectedEmployee?.profiles?.email || 'Email non renseigné'}
                           </p>
                           <div className="flex flex-wrap gap-2">
                             {selectedEmployee?.qualifications?.map((qualification, index) => (
@@ -1241,8 +1241,8 @@ const Planning = () => {
                   <h3 className="text-lg font-semibold">
                     Planning de {selectedPlanningEmployeeId && (() => {
                       const selectedEmployee = employees?.find(emp => emp.id === selectedPlanningEmployeeId);
-                      return selectedEmployee?.user_companies?.profiles?.first_name && selectedEmployee?.user_companies?.profiles?.last_name 
-                        ? `${selectedEmployee.user_companies.profiles.first_name} ${selectedEmployee.user_companies.profiles.last_name}`
+                      return selectedEmployee?.profiles?.first_name && selectedEmployee?.profiles?.last_name 
+                        ? `${selectedEmployee.profiles.first_name} ${selectedEmployee.profiles.last_name}`
                         : `Employé #${selectedEmployee?.id.slice(0, 8)}`;
                     })()}
                   </h3>
@@ -1399,7 +1399,7 @@ const Planning = () => {
                                 brand: `${schedule.vehicles?.car_brands?.name} ${schedule.vehicles?.car_models?.name}`,
                                 plate: schedule.vehicles?.license_plate,
                                 client: `${schedule.vehicles?.clients?.first_name} ${schedule.vehicles?.clients?.last_name}`,
-                                technician: employees?.find(emp => emp.id === selectedPlanningEmployeeId)?.user_companies?.profiles?.first_name + ' ' + employees?.find(emp => emp.id === selectedPlanningEmployeeId)?.user_companies?.profiles?.last_name
+                                technician: employees?.find(emp => emp.id === selectedPlanningEmployeeId)?.profiles?.first_name + ' ' + employees?.find(emp => emp.id === selectedPlanningEmployeeId)?.profiles?.last_name
                               });
                               setShowVehicleDetailModal(true);
                             }}>
@@ -1439,8 +1439,8 @@ const Planning = () => {
               onEditEmployee={(employee) => {
                 setEditingEmployee(employee);
                 setEmployeeFormData({
-                  teamMemberId: employee.team_member_id || "",
-                  qualifications: employee.qualifications
+                  teamMemberId: employee.id || "",
+                  qualifications: employee.qualifications || []
                 });
                 setShowEmployeeDialog(true);
               }}
@@ -1903,9 +1903,9 @@ const Planning = () => {
                     </SelectTrigger>
                     <SelectContent className="bg-background border border-border shadow-md z-50">
                       {(() => {
-                        // Filtrer les membres déjà utilisés dans des employés existants
-                        const usedTeamMemberIds = employees.map(emp => emp.team_member_id).filter(Boolean);
-                        const availableMembers = teamMembers.filter(member => !usedTeamMemberIds.includes(member.id));
+                        // Filtrer les membres déjà utilisés
+                        const usedUserIds = employees.map(emp => emp.user_id).filter(Boolean);
+                        const availableMembers = teamMembers.filter(member => !usedUserIds.includes(member.user_id));
                         
                         if (availableMembers.length === 0) {
                           return (
@@ -2008,16 +2008,18 @@ const Planning = () => {
                       await updateEmployee.mutateAsync({
                         id: editingEmployee.id,
                         data: {
-                          team_member_id: employeeFormData.teamMemberId,
                           qualifications: employeeFormData.qualifications
                         }
                       });
                     } else {
                       // Création
-                      await createEmployee.mutateAsync({
-                        team_member_id: employeeFormData.teamMemberId,
+                      // Créer nouveau membre 
+                      const newTeamMember = {
+                        user_id: employeeFormData.teamMemberId,
+                        role: 'Technicien',
                         qualifications: employeeFormData.qualifications
-                      });
+                      };
+                      console.log('Creating new team member:', newTeamMember);
                     }
                     
                     setShowEmployeeDialog(false);
@@ -2640,13 +2642,13 @@ const Planning = () => {
                           {employees?.filter(emp => 
                             emp.qualifications.includes('Accueil & Préparation du dossier')
                           ).sort((a, b) => {
-                            const nameA = `${a.user_companies?.profiles?.first_name || ''} ${a.user_companies?.profiles?.last_name || ''}`.trim();
-                            const nameB = `${b.user_companies?.profiles?.first_name || ''} ${b.user_companies?.profiles?.last_name || ''}`.trim();
+                            const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
+                            const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                             return nameA.localeCompare(nameB);
                           }).map(emp => (
                             <SelectItem key={emp.id} value={emp.id}>
-                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              {emp.profiles?.first_name && emp.profiles?.last_name 
+                                ? `${emp.profiles.first_name} ${emp.profiles.last_name}`
                                 : `Employé #${emp.id.slice(0, 8)}`
                               }
                             </SelectItem>
@@ -2711,13 +2713,13 @@ const Planning = () => {
                           {employees?.filter(emp => 
                             emp.qualifications.includes('Remplacement ou débosselage')
                           ).sort((a, b) => {
-                            const nameA = `${a.user_companies?.profiles?.first_name || ''} ${a.user_companies?.profiles?.last_name || ''}`.trim();
-                            const nameB = `${b.user_companies?.profiles?.first_name || ''} ${b.user_companies?.profiles?.last_name || ''}`.trim();
+                            const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
+                            const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                             return nameA.localeCompare(nameB);
                           }).map(emp => (
                             <SelectItem key={emp.id} value={emp.id}>
-                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              {emp.profiles?.first_name && emp.profiles?.last_name 
+                                ? `${emp.profiles.first_name} ${emp.profiles.last_name}`
                                 : `Employé #${emp.id.slice(0, 8)}`
                               }
                             </SelectItem>
@@ -2782,13 +2784,13 @@ const Planning = () => {
                           {employees?.filter(emp => 
                             emp.qualifications.includes('Préparation peinture')
                           ).sort((a, b) => {
-                            const nameA = `${a.user_companies?.profiles?.first_name || ''} ${a.user_companies?.profiles?.last_name || ''}`.trim();
-                            const nameB = `${b.user_companies?.profiles?.first_name || ''} ${b.user_companies?.profiles?.last_name || ''}`.trim();
+                            const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
+                            const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                             return nameA.localeCompare(nameB);
                           }).map(emp => (
                             <SelectItem key={emp.id} value={emp.id}>
-                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              {emp.profiles?.first_name && emp.profiles?.last_name 
+                                ? `${emp.profiles.first_name} ${emp.profiles.last_name}`
                                 : `Employé #${emp.id.slice(0, 8)}`
                               }
                             </SelectItem>
@@ -2853,13 +2855,13 @@ const Planning = () => {
                           {employees?.filter(emp => 
                             emp.qualifications.includes('Mise en peinture')
                           ).sort((a, b) => {
-                            const nameA = `${a.user_companies?.profiles?.first_name || ''} ${a.user_companies?.profiles?.last_name || ''}`.trim();
-                            const nameB = `${b.user_companies?.profiles?.first_name || ''} ${b.user_companies?.profiles?.last_name || ''}`.trim();
+                            const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
+                            const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                             return nameA.localeCompare(nameB);
                           }).map(emp => (
                             <SelectItem key={emp.id} value={emp.id}>
-                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              {emp.profiles?.first_name && emp.profiles?.last_name 
+                                ? `${emp.profiles.first_name} ${emp.profiles.last_name}`
                                 : `Employé #${emp.id.slice(0, 8)}`
                               }
                             </SelectItem>
@@ -2924,13 +2926,13 @@ const Planning = () => {
                           {employees?.filter(emp => 
                             emp.qualifications.includes('Finitions & remontage')
                           ).sort((a, b) => {
-                            const nameA = `${a.user_companies?.profiles?.first_name || ''} ${a.user_companies?.profiles?.last_name || ''}`.trim();
-                            const nameB = `${b.user_companies?.profiles?.first_name || ''} ${b.user_companies?.profiles?.last_name || ''}`.trim();
+                            const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
+                            const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                             return nameA.localeCompare(nameB);
                           }).map(emp => (
                             <SelectItem key={emp.id} value={emp.id}>
-                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              {emp.profiles?.first_name && emp.profiles?.last_name 
+                                ? `${emp.profiles.first_name} ${emp.profiles.last_name}`
                                 : `Employé #${emp.id.slice(0, 8)}`
                               }
                             </SelectItem>
@@ -3003,13 +3005,13 @@ const Planning = () => {
                           {employees?.filter(emp => 
                             emp.qualifications.includes('Clôture du dossier et livraison')
                           ).sort((a, b) => {
-                            const nameA = `${a.user_companies?.profiles?.first_name || ''} ${a.user_companies?.profiles?.last_name || ''}`.trim();
-                            const nameB = `${b.user_companies?.profiles?.first_name || ''} ${b.user_companies?.profiles?.last_name || ''}`.trim();
+                            const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
+                            const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                             return nameA.localeCompare(nameB);
                           }).map(emp => (
                             <SelectItem key={emp.id} value={emp.id}>
-                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              {emp.profiles?.first_name && emp.profiles?.last_name 
+                                ? `${emp.profiles.first_name} ${emp.profiles.last_name}`
                                 : `Employé #${emp.id.slice(0, 8)}`
                               }
                             </SelectItem>

@@ -24,6 +24,8 @@ import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useCredits } from '@/hooks/use-credits';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 
 interface ClientDialogProps {
@@ -52,6 +54,7 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
   const { invoices } = useInvoices();
   const { credits } = useCredits();
   const { receipts } = useReceiptsData();
+  const isMobile = useIsMobile();
   
 
   const handleCancel = () => {
@@ -135,6 +138,66 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
 
   // Si c'est en mode visualisation, on affiche la sidebar
   if (mode === 'view') {
+    if (isMobile) {
+      return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+          <DialogContent className="w-[95vw] h-[95vh] overflow-hidden p-0 max-w-none">
+            <DialogHeader className="px-4 pt-4 pb-2">
+              <DialogTitle className="text-lg">{title}</DialogTitle>
+              {description && <DialogDescription className="text-sm">{description}</DialogDescription>}
+            </DialogHeader>
+            
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col h-[calc(95vh-80px)]">
+              <TabsList className="grid w-full grid-cols-4 mx-4 mb-2">
+                <TabsTrigger value="details" className="text-xs">Détails</TabsTrigger>
+                <TabsTrigger value="vehicles" className="text-xs">
+                  Véhicules {clientVehicles.length > 0 && `(${clientVehicles.length})`}
+                </TabsTrigger>
+                <TabsTrigger value="invoices" className="text-xs">
+                  Factures {clientInvoices.length > 0 && `(${clientInvoices.length})`}
+                </TabsTrigger>
+                <TabsTrigger value="quotes" className="text-xs">
+                  Devis {clientQuotes.length > 0 && `(${clientQuotes.length})`}
+                </TabsTrigger>
+              </TabsList>
+              
+              <div className="flex-1 overflow-y-auto px-4 pb-4">
+                <TabsContent value="details" className="mt-0">
+                  <ClientForm 
+                    onSubmit={handleSubmit}
+                    defaultValues={defaultValues || {}}
+                    isViewMode={true}
+                    onCancel={handleCancel}
+                  />
+                </TabsContent>
+                <TabsContent value="vehicles" className="mt-0">
+                  <ClientVehiclesTab clientId={defaultValues?.id} />
+                </TabsContent>
+                <TabsContent value="expertise" className="mt-0">
+                  <ClientExpertiseReportsTab clientId={defaultValues?.id} />
+                </TabsContent>
+                <TabsContent value="quotes" className="mt-0">
+                  <ClientQuotesTab clientId={defaultValues?.id} />
+                </TabsContent>
+                <TabsContent value="repair-orders" className="mt-0">
+                  <ClientRepairOrdersTab clientId={defaultValues?.id} />
+                </TabsContent>
+                <TabsContent value="invoices" className="mt-0">
+                  <ClientInvoicesTab clientId={defaultValues?.id} />
+                </TabsContent>
+                <TabsContent value="credits" className="mt-0">
+                  <ClientCreditsTab clientId={defaultValues?.id} />
+                </TabsContent>
+                <TabsContent value="receipts" className="mt-0">
+                  <ClientReceiptsTab clientId={defaultValues?.id} />
+                </TabsContent>
+              </div>
+            </Tabs>
+          </DialogContent>
+        </Dialog>
+      );
+    }
+
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-7xl max-h-[90vh] overflow-hidden p-0">
@@ -162,17 +225,19 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
   // Pour les modes create et edit, on garde l'ancien comportement
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className={isMobile ? "w-[95vw] h-[95vh] max-w-none" : "max-w-4xl"}>
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
+          <DialogTitle className={isMobile ? "text-lg" : ""}>{title}</DialogTitle>
+          {description && <DialogDescription className={isMobile ? "text-sm" : ""}>{description}</DialogDescription>}
         </DialogHeader>
-        <ClientForm 
-          onSubmit={handleSubmit}
-          defaultValues={defaultValues || {}}
-          isViewMode={false}
-          onCancel={handleCancel}
-        />
+        <div className={isMobile ? "overflow-y-auto flex-1" : ""}>
+          <ClientForm 
+            onSubmit={handleSubmit}
+            defaultValues={defaultValues || {}}
+            isViewMode={false}
+            onCancel={handleCancel}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

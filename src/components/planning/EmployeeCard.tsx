@@ -3,11 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Pencil, Trash } from 'lucide-react';
-import { Employee } from '@/hooks/use-employees';
+import { TeamMember } from '@/hooks/use-team-members';
 
 interface EmployeeCardProps {
-  employee: Employee;
-  onEdit: (employee: Employee) => void;
+  employee: TeamMember;
+  onEdit: (employee: TeamMember) => void;
   onDelete: (id: string) => void;
 }
 
@@ -29,12 +29,12 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({
     return colors[index % colors.length];
   };
 
-  const fullName = employee.user_companies?.profiles
-    ? `${employee.user_companies.profiles.first_name} ${employee.user_companies.profiles.last_name}`
+  const fullName = employee.profiles
+    ? `${employee.profiles.first_name} ${employee.profiles.last_name}`
     : 'Membre non assigné';
 
-  const email = employee.user_companies?.profiles?.email || '';
-  const role = employee.user_companies?.role || '';
+  const email = employee.profiles?.email || '';
+  const role = employee.role || '';
 
   return (
     <Card>
@@ -69,7 +69,7 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({
         <div>
           <h4 className="text-sm font-medium text-gray-700 mb-2">Qualifications :</h4>
           <div className="flex flex-wrap gap-2">
-            {employee.qualifications.map((qualification, index) => (
+            {employee.qualifications && employee.qualifications.map((qualification, index) => (
               <Badge 
                 key={qualification} 
                 className={`${getQualificationColor(index)} text-xs`}
@@ -77,7 +77,7 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({
                 {qualification}
               </Badge>
             ))}
-            {employee.qualifications.length === 0 && (
+            {(!employee.qualifications || employee.qualifications.length === 0) && (
               <p className="text-sm text-gray-500 italic">Aucune qualification assignée</p>
             )}
           </div>

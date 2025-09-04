@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { User } from 'lucide-react';
-import { useEmployees, Employee } from '@/hooks/use-employees';
+import { useTeamMembers, TeamMember } from '@/hooks/use-team-members';
 import { EmployeeCard } from './EmployeeCard';
 import { 
   AlertDialog,
@@ -16,14 +16,14 @@ import {
 
 interface EmployeesListProps {
   onAddEmployee: () => void;
-  onEditEmployee: (employee: Employee) => void;
+  onEditEmployee: (employee: TeamMember) => void;
 }
 
 export const EmployeesList: React.FC<EmployeesListProps> = ({
   onAddEmployee,
   onEditEmployee
 }) => {
-  const { employees, isLoading, deleteEmployee } = useEmployees();
+  const { teamMembers, isLoading, removeTeamMember } = useTeamMembers();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
 
@@ -34,7 +34,7 @@ export const EmployeesList: React.FC<EmployeesListProps> = ({
 
   const handleConfirmDelete = () => {
     if (employeeToDelete) {
-      deleteEmployee.mutate(employeeToDelete);
+      removeTeamMember.mutate(employeeToDelete);
       setDeleteDialogOpen(false);
       setEmployeeToDelete(null);
     }
@@ -69,7 +69,7 @@ export const EmployeesList: React.FC<EmployeesListProps> = ({
       </div>
 
       {/* Liste des employés */}
-      {employees.length === 0 ? (
+      {teamMembers.length === 0 ? (
         <div className="text-center py-12">
           <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun employé</h3>
@@ -86,12 +86,12 @@ export const EmployeesList: React.FC<EmployeesListProps> = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {employees
+          {teamMembers
             .sort((a, b) => {
-              const firstNameA = a.user_companies?.profiles?.first_name || '';
-              const lastNameA = a.user_companies?.profiles?.last_name || '';
-              const firstNameB = b.user_companies?.profiles?.first_name || '';
-              const lastNameB = b.user_companies?.profiles?.last_name || '';
+              const firstNameA = a.profiles?.first_name || '';
+              const lastNameA = a.profiles?.last_name || '';
+              const firstNameB = b.profiles?.first_name || '';
+              const lastNameB = b.profiles?.last_name || '';
               
               const fullNameA = `${firstNameA} ${lastNameA}`.trim();
               const fullNameB = `${firstNameB} ${lastNameB}`.trim();

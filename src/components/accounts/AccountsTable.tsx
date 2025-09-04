@@ -401,7 +401,7 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                         </Button>
                       ) : (
                         <Button 
-                          variant="outline"
+                          variant="create"
                           size="sm"
                           onClick={() => {
                             setSelectedAccount(account);
@@ -412,21 +412,12 @@ export const AccountsTable = ({ accounts, onEdit, onDelete, onSync }: AccountsTa
                           Connecter
                         </Button>
                       )}
-                      <Button 
-                        variant="outline"
-                        size="sm" 
-                        onClick={() => onEdit(account)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="outline"
-                        size="sm" 
-                        className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                        onClick={() => onDelete(account)}
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
+                       <Button variant="edit" size="sm" onClick={() => onEdit(account)}>
+                         <Pencil className="h-4 w-4" />
+                       </Button>
+                       <Button variant="delete" size="sm" onClick={() => onDelete(account)}>
+                         <Trash className="h-4 w-4" />
+                       </Button>
                     </div>
                     {isAccountConnected(account) && formatLastSync(account) && (
                       <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">

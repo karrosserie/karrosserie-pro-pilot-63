@@ -22,6 +22,7 @@ import AccountDialog from '@/components/accounts/AccountDialog';
 import { useAccounts } from '@/hooks/use-accounts';
 import { usePaymentStatistics } from '@/hooks/use-payment-statistics';
 import { useQueryClient } from '@tanstack/react-query';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const PaymentManagement = () => {
   // Receipts modal state
@@ -41,6 +42,8 @@ const PaymentManagement = () => {
   const [accountSearchTerm, setAccountSearchTerm] = useState('');
   const [accountDialogOpen, setAccountDialogOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<any>(null);
+  
+  const isMobile = useIsMobile();
   
   // Receipts data
   const { receipts, isLoading, handleDelete, filterReceipts } = useReceiptsData();
@@ -127,10 +130,12 @@ const PaymentManagement = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className={`${isMobile ? 'p-4' : 'p-6'} space-y-4 md:space-y-6`}>
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Gestion des paiements et des transactions</h1>
+          <h1 className={`${isMobile ? 'text-xl' : 'text-2xl sm:text-3xl'} font-bold tracking-tight`}>
+            {isMobile ? 'Gestion paiements' : 'Gestion des paiements et des transactions'}
+          </h1>
         </div>
       </div>
 
@@ -274,7 +279,7 @@ const PaymentManagement = () => {
 
       {/* Receipts Modal */}
       <Dialog open={receiptsModalOpen} onOpenChange={setReceiptsModalOpen}>
-        <DialogContent className="w-[95vw] max-w-7xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className={`${isMobile ? 'w-[95vw] h-[95vh]' : 'w-[95vw] max-w-7xl max-h-[90vh]'} overflow-y-auto`}>
           <DialogHeader>
             <DialogTitle>Gestion des encaissements</DialogTitle>
           </DialogHeader>
@@ -312,7 +317,7 @@ const PaymentManagement = () => {
 
       {/* Expenses Modal */}
       <Dialog open={expensesModalOpen} onOpenChange={setExpensesModalOpen}>
-        <DialogContent className="w-[95vw] max-w-7xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className={`${isMobile ? 'w-[95vw] h-[95vh]' : 'w-[95vw] max-w-7xl max-h-[90vh]'} overflow-y-auto`}>
           <DialogHeader>
             <DialogTitle>Gestion des dépenses</DialogTitle>
           </DialogHeader>
@@ -349,7 +354,7 @@ const PaymentManagement = () => {
 
       {/* Accounts Modal */}
       <Dialog open={accountsModalOpen} onOpenChange={setAccountsModalOpen}>
-        <DialogContent className="w-[95vw] max-w-7xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className={`${isMobile ? 'w-[95vw] h-[95vh]' : 'w-[95vw] max-w-7xl max-h-[90vh]'} overflow-y-auto`}>
           <DialogHeader>
             <DialogTitle>Gestion des comptes</DialogTitle>
           </DialogHeader>

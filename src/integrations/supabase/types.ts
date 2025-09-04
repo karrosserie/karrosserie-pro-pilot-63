@@ -738,7 +738,6 @@ export type Database = {
         Row: {
           company_id: string
           created_at: string
-          employee_id: string
           end_datetime: string
           id: string
           real_end_datetime: string | null
@@ -747,12 +746,12 @@ export type Database = {
           status: Database["public"]["Enums"]["task_status"]
           task_type: Database["public"]["Enums"]["schedule_task_type"]
           updated_at: string
+          user_id: string
           vehicle_id: string | null
         }
         Insert: {
           company_id: string
           created_at?: string
-          employee_id: string
           end_datetime: string
           id?: string
           real_end_datetime?: string | null
@@ -761,12 +760,12 @@ export type Database = {
           status?: Database["public"]["Enums"]["task_status"]
           task_type: Database["public"]["Enums"]["schedule_task_type"]
           updated_at?: string
+          user_id: string
           vehicle_id?: string | null
         }
         Update: {
           company_id?: string
           created_at?: string
-          employee_id?: string
           end_datetime?: string
           id?: string
           real_end_datetime?: string | null
@@ -775,6 +774,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["task_status"]
           task_type?: Database["public"]["Enums"]["schedule_task_type"]
           updated_at?: string
+          user_id?: string
           vehicle_id?: string | null
         }
         Relationships: [
@@ -783,13 +783,6 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "company_info"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "employee_schedule_employee_id_fkey"
-            columns: ["employee_id"]
-            isOneToOne: false
-            referencedRelation: "employees"
             referencedColumns: ["id"]
           },
           {
@@ -810,11 +803,11 @@ export type Database = {
           company_id: string
           created_at: string
           date: string
-          employee_id: string
           id: string
           location_verified: boolean | null
           total_work_minutes: number | null
           updated_at: string
+          user_id: string
         }
         Insert: {
           clock_in_latitude?: number | null
@@ -824,11 +817,11 @@ export type Database = {
           company_id: string
           created_at?: string
           date?: string
-          employee_id: string
           id?: string
           location_verified?: boolean | null
           total_work_minutes?: number | null
           updated_at?: string
+          user_id: string
         }
         Update: {
           clock_in_latitude?: number | null
@@ -838,56 +831,13 @@ export type Database = {
           company_id?: string
           created_at?: string
           date?: string
-          employee_id?: string
           id?: string
           location_verified?: boolean | null
           total_work_minutes?: number | null
           updated_at?: string
+          user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "employee_timesheets_employee_id_fkey"
-            columns: ["employee_id"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      employees: {
-        Row: {
-          company_id: string
-          created_at: string
-          id: string
-          qualifications: Json
-          team_member_id: string | null
-          updated_at: string
-        }
-        Insert: {
-          company_id: string
-          created_at?: string
-          id?: string
-          qualifications?: Json
-          team_member_id?: string | null
-          updated_at?: string
-        }
-        Update: {
-          company_id?: string
-          created_at?: string
-          id?: string
-          qualifications?: Json
-          team_member_id?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "employees_team_member_id_fkey"
-            columns: ["team_member_id"]
-            isOneToOne: false
-            referencedRelation: "user_companies"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       environment: {
         Row: {
@@ -2280,6 +2230,7 @@ export type Database = {
           company_id: string
           created_at: string
           id: string
+          qualifications: Json | null
           role: string
           updated_at: string
           user_id: string
@@ -2289,6 +2240,7 @@ export type Database = {
           company_id: string
           created_at?: string
           id?: string
+          qualifications?: Json | null
           role?: string
           updated_at?: string
           user_id: string
@@ -2298,6 +2250,7 @@ export type Database = {
           company_id?: string
           created_at?: string
           id?: string
+          qualifications?: Json | null
           role?: string
           updated_at?: string
           user_id?: string

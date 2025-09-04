@@ -14,6 +14,8 @@ import { ExpenseWithRelations } from '@/services/supabase/expenses';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { ExpenseMobileCard } from './ExpenseMobileCard';
 
 interface ExpensesTableProps {
   expenses: ExpenseWithRelations[];
@@ -24,6 +26,7 @@ interface ExpensesTableProps {
 
 export const ExpensesTable = ({ expenses, onEdit, onDelete, isLoading }: ExpensesTableProps) => {
   const { sortedData, sortConfig, handleSort } = useTableSorting(expenses, 'date');
+  const isMobile = useIsMobile();
   
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat('fr-FR', {
@@ -41,6 +44,31 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete, isLoading }: Expense
             <p className="text-gray-500">Chargement des dépenses...</p>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (isMobile) {
+    return (
+      <div className="space-y-4">
+        {sortedData.length > 0 ? (
+          sortedData.map((expense) => (
+            <ExpenseMobileCard
+              key={expense.id}
+              expense={expense}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          ))
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <TrendingDown className="h-16 w-16 text-gray-300 mb-4" />
+            <h3 className="font-medium text-gray-900 mb-2">Aucune dépense</h3>
+            <p className="text-gray-500">
+              Aucune dépense n'a été trouvée. Créez votre première dépense.
+            </p>
+          </div>
+        )}
       </div>
     );
   }
@@ -103,20 +131,11 @@ export const ExpensesTable = ({ expenses, onEdit, onDelete, isLoading }: Expense
                 <TableRow className="border-t-0">
                   <TableCell colSpan={8} className="py-3 border-t-0">
                     <div className="flex flex-wrap gap-2 justify-end px-4">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => onEdit(expense)}
-                      >
+                      <Button variant="edit" size="sm" onClick={() => onEdit(expense)}>
                         <Pencil className="h-4 w-4 mr-1" />
                         Modifier
                       </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                        onClick={() => onDelete(expense)}
-                      >
+                      <Button variant="delete" size="sm" onClick={() => onDelete(expense)}>
                         <Trash className="h-4 w-4 mr-1" />
                         Supprimer
                       </Button>

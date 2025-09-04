@@ -57,14 +57,10 @@ const DocumentItem = ({
       </div>
       
       <div className="ml-4 flex space-x-2">
-        <Button variant="outline" size="icon" onClick={onView}>
+        <Button variant="view" size="icon" onClick={onView}>
           <Eye className="h-4 w-4" />
         </Button>
-        <Button 
-          size="icon" 
-          onClick={onEdit}
-          className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
-        >
+        <Button variant="edit" size="icon" onClick={onEdit}>
           <Pencil className="h-4 w-4" />
         </Button>
       </div>

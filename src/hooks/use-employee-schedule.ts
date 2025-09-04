@@ -5,7 +5,7 @@ import { useCompany } from '@/hooks/use-company';
 export interface EmployeeSchedule {
   id: string;
   company_id: string;
-  employee_id: string;
+  user_id: string;
   vehicle_id: string | null;
   task_type: string;
   start_datetime: string;
@@ -26,7 +26,7 @@ export interface EmployeeSchedule {
   } | null;
 }
 
-export const useEmployeeSchedule = (employeeId?: string) => {
+export const useEmployeeSchedule = (userId?: string) => {
   const { companyInfo } = useCompany();
 
   const {
@@ -35,9 +35,9 @@ export const useEmployeeSchedule = (employeeId?: string) => {
     error,
     refetch
   } = useQuery({
-    queryKey: ['employee-schedule', companyInfo?.id, employeeId],
+    queryKey: ['employee-schedule', companyInfo?.id, userId],
     queryFn: async () => {
-      if (!companyInfo?.id || !employeeId) return [];
+      if (!companyInfo?.id || !userId) return [];
 
       try {
         const { data, error } = await (supabase as any)
@@ -52,7 +52,7 @@ export const useEmployeeSchedule = (employeeId?: string) => {
             )
           `)
           .eq('company_id', companyInfo.id)
-          .eq('employee_id', employeeId)
+          .eq('user_id', userId)
           .order('start_datetime', { ascending: true });
 
         if (error) throw error;
@@ -62,7 +62,7 @@ export const useEmployeeSchedule = (employeeId?: string) => {
         return [];
       }
     },
-    enabled: !!companyInfo?.id && !!employeeId
+    enabled: !!companyInfo?.id && !!userId
   });
 
   return {

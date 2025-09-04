@@ -13,12 +13,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import DefaultInvoicePreview from '@/components/invoices/templates/DefaultInvoicePreview';
 import AlternativeInvoicePreview from '@/components/invoices/templates/AlternativeInvoicePreview';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const PreferencesTab = () => {
   const { user } = useAuth();
   const { companyData } = useCompany();
   const { preferences, isLoading } = useCompanyPreferences();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [selectedTemplate, setSelectedTemplate] = useState('default');
   const [language, setLanguage] = useState('fr');
   const [timezone, setTimezone] = useState('Europe/Paris');
@@ -127,10 +129,10 @@ const PreferencesTab = () => {
       {/* Paramètres généraux */}
       <Card>
         <CardHeader>
-          <CardTitle>Paramètres généraux</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Paramètres généraux</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <CardContent className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             <div>
               <Label htmlFor="language-select" className="text-sm font-medium mb-2 block">Langue</Label>
               <Select value={language} onValueChange={setLanguage}>
@@ -177,11 +179,11 @@ const PreferencesTab = () => {
 
           {/* Options d'affichage */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Options d'affichage</h3>
+            <h3 className="text-base sm:text-lg font-medium">Options d'affichage</h3>
             
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="repair-order-on-documents" className="text-sm font-medium">Afficher l'ordre de réparation sur vos ordres de réparation et factures</Label>
+            <div className={`${isMobile ? 'flex flex-col space-y-2' : 'flex items-center justify-between'}`}>
+              <div className="space-y-0.5 flex-1">
+                <Label htmlFor="repair-order-on-documents" className="text-xs sm:text-sm font-medium">Afficher l'ordre de réparation sur vos ordres de réparation et factures</Label>
               </div>
               <Switch
                 id="repair-order-on-documents"
@@ -282,10 +284,10 @@ const PreferencesTab = () => {
       {/* Numérotation */}
       <Card>
         <CardHeader>
-          <CardTitle>Numérotation</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Numérotation</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             <div>
               <Label htmlFor="next-repair-order-ref" className="text-sm font-medium mb-2 block">
                 Référence pour le prochain ordre de réparation
@@ -343,9 +345,9 @@ const PreferencesTab = () => {
       {/* Modèles de factures */}
       <Card>
         <CardHeader>
-          <CardTitle>Modèle des documents</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Modèle des documents</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 sm:space-y-6">
           <div>
             <Label htmlFor="template-select" className="text-lg font-medium mb-4 block">Choisir un modèle</Label>
             <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
@@ -360,8 +362,8 @@ const PreferencesTab = () => {
           </div>
 
            <div>
-             <h3 className="text-lg font-medium mb-4">Aperçu du modèle sélectionné</h3>
-             <div className="border rounded-lg h-[48rem] overflow-auto bg-white">
+             <h3 className="text-base sm:text-lg font-medium mb-4">Aperçu du modèle sélectionné</h3>
+             <div className={`border rounded-lg ${isMobile ? 'h-96' : 'h-[48rem]'} overflow-auto bg-white`}>
                {selectedTemplate === 'default' ? (
                  <DefaultInvoicePreview 
                    companyData={companyData}

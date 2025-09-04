@@ -35,6 +35,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { clientsService } from '@/services/supabase/clients';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { CessionMobileCard } from './CessionMobileCard';
 
 interface CessionsTableProps {
   cessions: Cession[];
@@ -58,6 +60,7 @@ export const CessionsTable = ({
   const { companyData } = useCompany();
   const { insuranceCompanies } = useInsuranceCompanies();
   const { sortedData, sortConfig, handleSort } = useTableSorting(cessions, 'created_at');
+  const isMobile = useIsMobile();
 
   
   const parseValidationError = (validationError: string) => {
@@ -395,7 +398,36 @@ export const CessionsTable = ({
 
   return (
     <div className="card-container">
-      <Table>
+      {isMobile ? (
+        <div className="space-y-4">
+          {sortedData.length > 0 ? (
+            sortedData.map((cession) => (
+              <CessionMobileCard
+                key={cession.id}
+                cession={cession}
+                onEditCession={onEditCession}
+                onDeleteCession={onDeleteCession}
+                onViewPreview={(cession) => {
+                  setSelectedCession(cession);
+                  setPreviewOpen(true);
+                }}
+                onDownloadPDF={handleDownloadPDF}
+                onInitializeProcedure={handleInitializeProcedure}
+                isGeneratingPDF={isGeneratingPDF}
+              />
+            ))
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12">
+              <FileText className="h-16 w-16 text-gray-300 mb-4" />
+              <h3 className="font-medium text-gray-900 mb-2">Aucun résultat</h3>
+              <p className="text-gray-500 text-center">
+                Aucune cession correspondant à votre recherche n'a été trouvée.
+              </p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <Table>
         <TableHeader>
           <TableRow>
             <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
@@ -440,7 +472,7 @@ export const CessionsTable = ({
                     <div className="flex flex-wrap gap-2 justify-end px-4">
                       {cession.status === 'en_attente' && (
                         <Button 
-                          variant="outline" 
+                          variant="view" 
                           size="sm"
                           onClick={() => {
                             setSelectedCession(cession);
@@ -453,7 +485,7 @@ export const CessionsTable = ({
                       )}
                       {cession.status !== 'en_attente' && cession.status !== 'en_attente_signature' && (
                         <Button 
-                          variant="outline" 
+                          variant="download" 
                           size="sm"
                           onClick={() => handleDownloadPDF(cession)}
                         >
@@ -463,7 +495,7 @@ export const CessionsTable = ({
                       )}
                       {cession.status === 'en_attente' && (
                         <Button 
-                          variant="outline" 
+                          variant="edit" 
                           size="sm"
                           onClick={() => onEditCession(cession)}
                         >
@@ -473,7 +505,7 @@ export const CessionsTable = ({
                       )}
                       {cession.status === 'en_attente' && (
                         <Button 
-                          variant="outline" 
+                          variant="create" 
                           size="sm"
                           onClick={() => handleInitializeProcedure(cession)}
                           disabled={isGeneratingPDF}
@@ -493,9 +525,8 @@ export const CessionsTable = ({
                       )}
                       {cession.status === 'en_attente' && (
                         <Button 
-                          variant="outline" 
+                          variant="delete" 
                           size="sm" 
-                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
                           onClick={() => onDeleteCession(cession.id)}
                         >
                           <Trash className="h-4 w-4 mr-1" />
@@ -521,7 +552,8 @@ export const CessionsTable = ({
             </TableRow>
           )}
         </TableBody>
-      </Table>
+        </Table>
+      )}
       
       <AlertDialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
         <AlertDialogContent className="max-w-md">

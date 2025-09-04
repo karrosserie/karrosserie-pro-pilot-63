@@ -86,9 +86,9 @@ const ClientForm: React.FC<ClientFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <Tabs defaultValue="info" className="w-full">
-        <TabsList className="grid grid-cols-2 mb-6">
-          <TabsTrigger value="info">Informations personnelles</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
+        <TabsList className="grid grid-cols-2 mb-6 w-full">
+          <TabsTrigger value="info" className="text-sm">Informations personnelles</TabsTrigger>
+          <TabsTrigger value="documents" className="text-sm">Documents</TabsTrigger>
         </TabsList>
         
         <TabsContent value="info">

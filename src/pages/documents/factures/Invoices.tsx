@@ -39,6 +39,8 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Printer, Mail, Signature, CreditCard, FileX, Download } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import InvoiceMobileCard from '@/components/invoices/InvoiceMobileCard';
 
 const Invoices = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -52,11 +54,12 @@ const Invoices = () => {
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   
-  const { invoices, isLoading, error, deleteInvoice } = useInvoices();
+  const { invoices, isLoading, error, deleteInvoice, createInvoice } = useInvoices();
   const { credits } = useCredits();
   const { receipts } = useReceiptsData();
   const { companyData } = useCompany();
   const { sortedData: sortedInvoices, sortConfig, handleSort } = useTableSorting(invoices || [], 'reference');
+  const isMobile = useIsMobile();
   
   console.log('=== DONNÉES FACTURES DANS LE COMPOSANT ===');
   console.log('invoices:', invoices);
@@ -288,11 +291,101 @@ const Invoices = () => {
             <Plus className="h-4 w-4 mr-2" />
             Nouvelle facture
           </Button>
+          
+          <Button 
+            variant="outline"
+            onClick={async () => {
+              try {
+                const testInvoice = {
+                  reference: `TEST-${Date.now().toString().slice(-6)}`,
+                  created_at: new Date().toISOString(),
+                  status: "En attente de paiement",
+                  amount: 1250.00,
+                  description: "Facture de test pour vérifier l'affichage du logo",
+                  client_id: null,
+                  vehicle_id: null,
+                  client_name: "Jean Dupont",
+                  client_email: "jean.dupont@email.com",
+                  client_phone: "06 12 34 56 78",
+                  client_address: "123 Rue de la Paix\n75001 Paris",
+                  vehicle_brand: "Peugeot",
+                  vehicle_model: "308",
+                  vehicle_license_plate: "AB-123-CD",
+                  vehicle_vin: "VF3XXXXXXXXXXXXXXX",
+                  repairs: [{
+                    id: '1',
+                    description: 'Réparation pare-choc avant',
+                    quantity: 1,
+                    unit_price: 800.00,
+                    total: 800.00
+                  }],
+                  parts: [{
+                    id: '1',
+                    description: 'Pare-choc avant',
+                    quantity: 1,
+                    unit_price: 450.00,
+                    total: 450.00
+                  }]
+                };
+                
+                await createInvoice.mutateAsync(testInvoice);
+                
+                toast({
+                  title: "Facture test créée",
+                  description: "Une facture fictive a été créée pour tester le logo."
+                });
+              } catch (error) {
+                console.error('Erreur lors de la création de la facture test:', error);
+                toast({
+                  title: "Erreur",
+                  description: "Impossible de créer la facture test.",
+                  variant: "destructive"
+                });
+              }
+            }}
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            Créer facture test
+          </Button>
         </div>
       </div>
       
-      <div className="card-container">
-        <Table>
+      {isMobile ? (
+        <div className="space-y-3">
+          {filteredInvoices.length > 0 ? (
+            filteredInvoices.map((invoice) => {
+              const invoiceCredits = getInvoiceCredits(invoice.id);
+              return (
+                <InvoiceMobileCard
+                  key={invoice.id}
+                  invoice={invoice}
+                  onViewInvoice={handleViewInvoice}
+                  onEditInvoice={handleEditInvoice}
+                  onDelete={handleDelete}
+                  onDownload={handleDownload}
+                  onPrint={handlePrint}
+                  onSendEmail={handleSendEmail}
+                  onAddPayment={handleAddPayment}
+                  onAddCredit={handleAddCredit}
+                  invoiceCredits={invoiceCredits}
+                />
+              );
+            })
+          ) : (
+            <div className="card-container">
+              <div className="flex flex-col items-center justify-center py-8">
+                <FileText className="h-10 w-10 text-gray-400 mb-2" />
+                <h3 className="font-medium text-gray-900">Aucun résultat</h3>
+                <p className="text-gray-500 mt-1">
+                  Aucune facture correspondant à votre recherche n'a été trouvée.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="card-container">
+          <Table>
           <TableHeader>
             <TableRow>
               <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
@@ -350,40 +443,35 @@ const Invoices = () => {
                   <TableRow className="border-t-0">
                     <TableCell colSpan={7} className="py-3 border-t-0">
                       <div className="flex flex-wrap gap-2 justify-end px-4">
-                        <Button variant="outline" size="sm" onClick={() => handleViewInvoice(invoice)}>
+                        <Button variant="view" size="sm" onClick={() => handleViewInvoice(invoice)}>
                           <Eye className="h-4 w-4 mr-1" />
                           Voir
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleEditInvoice(invoice)}>
+                        <Button variant="edit" size="sm" onClick={() => handleEditInvoice(invoice)}>
                           <Pencil className="h-4 w-4 mr-1" />
                           Modifier
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleDownload(invoice)}>
+                        <Button variant="download" size="sm" onClick={() => handleDownload(invoice)}>
                           <Download className="h-4 w-4 mr-1" />
                           Télécharger
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handlePrint(invoice)}>
+                        <Button variant="print" size="sm" onClick={() => handlePrint(invoice)}>
                           <Printer className="h-4 w-4 mr-1" />
                           Imprimer
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(invoice)}>
+                        <Button variant="send" size="sm" onClick={() => handleSendEmail(invoice)}>
                           <Mail className="h-4 w-4 mr-1" />
                           Envoyer
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleAddPayment(invoice)}>
+                        <Button variant="payment" size="sm" onClick={() => handleAddPayment(invoice)}>
                           <CreditCard className="h-4 w-4 mr-1" />
                           Créer un paiement
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleAddCredit(invoice)}>
+                        <Button variant="create" size="sm" onClick={() => handleAddCredit(invoice)}>
                           <FileX className="h-4 w-4 mr-1" />
                           Créer un avoir
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                          onClick={() => handleDelete(invoice)}
-                        >
+                        <Button variant="delete" size="sm" onClick={() => handleDelete(invoice)}>
                           <Trash className="h-4 w-4 mr-1" />
                           Supprimer
                         </Button>
@@ -409,6 +497,7 @@ const Invoices = () => {
           </TableBody>
         </Table>
       </div>
+      )}
 
       <InvoiceDialog
         invoice={selectedInvoice}

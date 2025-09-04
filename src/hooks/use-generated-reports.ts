@@ -217,19 +217,21 @@ export const useGeneratedReports = () => {
       const lineHeight = 8;
       
       // Récupération des données réelles
-      const { data: employees } = await supabase
-        .from('employees')
+      const { data: teamMembers } = await supabase
+        .from('user_companies')
         .select(`
           *,
-          employee_timesheets(*)
+          profiles (first_name, last_name, email)
         `)
+        .eq('company_id', companyId)
+        .eq('active', true);
+      
+      const { data: timesheets } = await supabase
+        .from('employee_timesheets')
+        .select('*')
         .eq('company_id', companyId);
       
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('*');
-      
-      const totalEmployees = employees?.length || 0;
+      const totalEmployees = teamMembers?.length || 0;
       
       // 1. EMPLOI
       doc.setFontSize(14);

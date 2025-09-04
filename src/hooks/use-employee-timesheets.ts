@@ -6,7 +6,7 @@ import { useCompany } from '@/hooks/use-company';
 export interface TimesheetEntry {
   id?: string;
   date: string;
-  employee_id: string;
+  user_id: string;
   clock_in_time: string | null;
   clock_out_time: string | null;
   status?: 'present' | 'sick_leave' | 'absent';
@@ -50,12 +50,12 @@ export const useEmployeeTimesheets = () => {
     if (!companyData?.id) return null;
 
     try {
-      // Vérifier si un timesheet existe déjà pour cet employé à cette date
+      // Vérifier si un timesheet existe déjà pour cet utilisateur à cette date
       const { data: existing, error: fetchError } = await supabase
         .from('employee_timesheets')
         .select('*')
         .eq('company_id', companyData.id)
-        .eq('employee_id', entry.employee_id)
+        .eq('user_id', entry.user_id)
         .eq('date', entry.date)
         .single();
 
@@ -88,7 +88,7 @@ export const useEmployeeTimesheets = () => {
           .from('employee_timesheets')
           .insert({
             company_id: companyData.id,
-            employee_id: entry.employee_id,
+            user_id: entry.user_id,
             date: entry.date,
             clock_in_time: entry.clock_in_time,
             clock_out_time: entry.clock_out_time,
@@ -105,7 +105,7 @@ export const useEmployeeTimesheets = () => {
       // Mettre à jour l'état local
       setTimesheets(prev => {
         const filtered = prev.filter(t => 
-          !(t.employee_id === entry.employee_id && t.date === entry.date)
+          !(t.user_id === entry.user_id && t.date === entry.date)
         );
         return [result, ...filtered];
       });
@@ -127,9 +127,9 @@ export const useEmployeeTimesheets = () => {
     }
   };
 
-  const markAsSickLeave = async (employeeId: string, date: string) => {
+  const markAsSickLeave = async (userId: string, date: string) => {
     return await createOrUpdateTimesheet({
-      employee_id: employeeId,
+      user_id: userId,
       date: date,
       clock_in_time: null,
       clock_out_time: null,
@@ -139,9 +139,9 @@ export const useEmployeeTimesheets = () => {
     });
   };
 
-  const markAsAbsent = async (employeeId: string, date: string) => {
+  const markAsAbsent = async (userId: string, date: string) => {
     return await createOrUpdateTimesheet({
-      employee_id: employeeId,
+      user_id: userId,
       date: date,
       clock_in_time: null,
       clock_out_time: null,

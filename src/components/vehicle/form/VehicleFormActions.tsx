@@ -19,7 +19,7 @@ const VehicleFormActions: React.FC<VehicleFormActionsProps> = ({
         {isViewMode ? "Fermer" : "Annuler"}
       </Button>
       {!isViewMode && (
-        <Button type="submit" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
+        <Button type="submit" variant="validation">
           {defaultValues?.id ? "Mettre à jour" : "Enregistrer"}
         </Button>
       )}

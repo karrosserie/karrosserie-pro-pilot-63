@@ -28,7 +28,7 @@ interface InvoiceViewerModalProps {
 }
 
 const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalProps) => {
-  const { companyData } = useCompany();
+  const { companyData, reloadCompanyData } = useCompany();
   const { preferences } = useCompanyPreferences();
   const { deleteInvoice } = useInvoices();
   const { confirm } = useConfirmation();
@@ -134,6 +134,8 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
 
     if (open && currentInvoice) {
       fetchRelatedData();
+      // Forcer le rechargement des données de l'entreprise pour s'assurer d'avoir le logo le plus récent
+      reloadCompanyData();
     }
   }, [currentInvoice, open]);
 
@@ -259,7 +261,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
 
   const handleDownload = async () => {
     const { generateInvoicePDFWithTemplate } = await import('@/utils/invoicePDFGeneration');
-    const result = await generateInvoicePDFWithTemplate(currentInvoice, {});
+    const result = await generateInvoicePDFWithTemplate(currentInvoice, companyData);
     if (result.success) {
       toast({
         title: "Téléchargement réussi",
@@ -276,7 +278,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
 
   const handlePrint = async () => {
     const { printInvoicePDFWithTemplate } = await import('@/utils/invoicePDFGeneration');
-    const result = await printInvoicePDFWithTemplate(currentInvoice, {});
+    const result = await printInvoicePDFWithTemplate(currentInvoice, companyData);
     if (result.success) {
       toast({
         title: "Impression",

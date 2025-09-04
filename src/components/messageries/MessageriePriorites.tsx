@@ -20,6 +20,8 @@ import {
   Loader2
 } from "lucide-react";
 import { useMessageries } from "@/hooks/use-messageries";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { MessagerieMobileCard } from './MessagerieMobileCard';
 
 // -------------------------------
 // MessageriePriorites (connecté à Supabase)
@@ -88,6 +90,7 @@ export default function MessageriePriorites() {
   const [selectedItem, setSelectedItem] = useState<typeof messageries[0] | null>(null);
   const [showResolved, setShowResolved] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
+  const isMobile = useIsMobile();
 
   const activeItems = useMemo(() => {
     if (showResolved) {
@@ -196,73 +199,92 @@ export default function MessageriePriorites() {
         </div>
 
         {filteredItems.length > 0 ? (
-          filteredItems.map(it => {
-            const ChannelIcon = getChannelIcon(it.channel);
-            
-            return (
-              <Card key={it.id} className={`border-l-4 ${meta.borderColor}`}>
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-4 flex-1">
-                      <div className={`w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center ${meta.bgColor} ${meta.textColor}`}>
-                        <IconComponent size={20} />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold">{it.title}</h3>
-                        <p className="text-sm text-muted-foreground mt-1">{it.summary}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <Badge variant="secondary" className={meta.textColor}>
-                            {meta.label}
-                          </Badge>
-                          <Badge variant="outline">
-                            <ChannelIcon size={12} className="mr-1" />
-                            {it.channel}
-                          </Badge>
-                          <Badge variant="outline">
-                            <Clock size={12} className="mr-1" />
-                            {it.eta}
-                          </Badge>
+          isMobile ? (
+            <div className="space-y-4">
+              {filteredItems.map(it => (
+                <MessagerieMobileCard
+                  key={it.id}
+                  item={it}
+                  onViewDetails={handleViewDetails}
+                  onReply={handleReply}
+                  onToggleResolved={toggleResolved}
+                  onArchive={handleArchive}
+                  onEscalate={escalateMessage}
+                  onAutoManage={autoManage}
+                  onSemiAuto={handleSemiAuto}
+                  showResolved={showResolved}
+                />
+              ))}
+            </div>
+          ) : (
+            filteredItems.map(it => {
+              const ChannelIcon = getChannelIcon(it.channel);
+              
+              return (
+                <Card key={it.id} className={`border-l-4 ${meta.borderColor}`}>
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-4 flex-1">
+                        <div className={`w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center ${meta.bgColor} ${meta.textColor}`}>
+                          <IconComponent size={20} />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold">{it.title}</h3>
+                          <p className="text-sm text-muted-foreground mt-1">{it.summary}</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge variant="secondary" className={meta.textColor}>
+                              {meta.label}
+                            </Badge>
+                            <Badge variant="outline">
+                              <ChannelIcon size={12} className="mr-1" />
+                              {it.channel}
+                            </Badge>
+                            <Badge variant="outline">
+                              <Clock size={12} className="mr-1" />
+                              {it.eta}
+                            </Badge>
+                          </div>
                         </div>
                       </div>
+                      <div className="text-xs text-muted-foreground">{it.time}</div>
                     </div>
-                    <div className="text-xs text-muted-foreground">{it.time}</div>
-                  </div>
-                  
-                  <p className="mt-4 text-sm">{it.message}</p>
+                    
+                    <p className="mt-4 text-sm">{it.message}</p>
 
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <Button size="sm" className="bg-cyan-500 hover:bg-cyan-600 text-white" onClick={() => handleViewDetails(it.id)}>
-                      Détails complets
-                    </Button>
-                    {!showResolved && (
-                      <>
-                        <Button size="sm" className="bg-teal-500 hover:bg-teal-600 text-white" onClick={() => handleReply(it.id)}>
-                          Répondre
-                        </Button>
-                         {it.priority !== 1 && (
-                           <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => autoManage(it.id)}>
-                             Réponse auto
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <Button size="sm" className="bg-cyan-500 hover:bg-cyan-600 text-white" onClick={() => handleViewDetails(it.id)}>
+                        Détails complets
+                      </Button>
+                      {!showResolved && (
+                        <>
+                          <Button size="sm" className="bg-teal-500 hover:bg-teal-600 text-white" onClick={() => handleReply(it.id)}>
+                            Répondre
+                          </Button>
+                           {it.priority !== 1 && (
+                             <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => autoManage(it.id)}>
+                               Réponse auto
+                             </Button>
+                           )}
+                           <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => handleSemiAuto(it.id)}>
+                             Semi auto
                            </Button>
-                         )}
-                         <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => handleSemiAuto(it.id)}>
-                           Semi auto
-                         </Button>
-                         <Button size="sm" variant="destructive" onClick={() => escalateMessage(it.id)}>
-                           Escalader
-                         </Button>
-                      </>
-                    )}
-                    <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => toggleResolved(it.id)}>
-                      {it.resolved ? "Marquer non résolu" : "Marquer résolu"}
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleArchive(it.id)}>
-                      {it.archived ? "Désarchiver" : "Archiver"}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })
+                           <Button size="sm" variant="destructive" onClick={() => escalateMessage(it.id)}>
+                             Escalader
+                           </Button>
+                        </>
+                      )}
+                      <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => toggleResolved(it.id)}>
+                        {it.resolved ? "Marquer non résolu" : "Marquer résolu"}
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => handleArchive(it.id)}>
+                        {it.archived ? "Désarchiver" : "Archiver"}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })
+          )
         ) : (
           <Card>
             <CardContent className="text-center py-6">
@@ -275,36 +297,39 @@ export default function MessageriePriorites() {
   };
 
   return (
-    <div className="p-6 bg-background min-h-screen">
-      <header className="flex items-center justify-between gap-4 mb-6">
+    <div className={`${isMobile ? 'p-4' : 'p-6'} bg-background min-h-screen`}>
+      <header className={`flex ${isMobile ? 'flex-col space-y-4' : 'items-center justify-between'} gap-4 mb-6`}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
             <MessageSquare size={20} />
           </div>
           <div>
-            <h1 className="text-xl font-semibold">Centre de messages</h1>
-            <p className="text-sm text-muted-foreground">Tous vos canaux de communication</p>
+            <h1 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold`}>Centre de messages</h1>
+            <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>Tous vos canaux de communication</p>
           </div>
         </div>
         
-        <div className="flex gap-2">
+        <div className={`flex gap-2 ${isMobile ? 'flex-wrap' : ''}`}>
           <Button
+            size={isMobile ? "sm" : "default"}
             variant={!showResolved && !showArchived ? "default" : "outline"}
             onClick={() => { setShowResolved(false); setShowArchived(false); }}
           >
-            Messages en attente
+            {isMobile ? 'En attente' : 'Messages en attente'}
           </Button>
           <Button
+            size={isMobile ? "sm" : "default"}
             variant={showResolved ? "default" : "outline"}
             onClick={() => { setShowResolved(true); setShowArchived(false); }}
           >
-            Messages traités
+            {isMobile ? 'Traités' : 'Messages traités'}
           </Button>
           <Button
+            size={isMobile ? "sm" : "default"}
             variant={showArchived ? "default" : "outline"}
             onClick={() => { setShowArchived(true); setShowResolved(false); }}
           >
-            Messages archivés
+            {isMobile ? 'Archivés' : 'Messages archivés'}
           </Button>
         </div>
       </header>

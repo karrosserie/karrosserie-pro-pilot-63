@@ -29,6 +29,8 @@ import { useCredits } from '@/hooks/use-credits';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
+import { useIsMobile } from '@/hooks/use-mobile';
+import CreditMobileCard from '@/components/credits/CreditMobileCard';
 
 // Mock data for credits - to be replaced with real data later
 const mockCredits = [
@@ -94,6 +96,7 @@ const Credits = () => {
   const { credits = [], isLoading, deleteCredit, error } = useCredits();
   const { invoices } = useInvoices();
   const { sortedData, sortConfig, handleSort } = useTableSorting(credits, 'created_at');
+  const isMobile = useIsMobile();
   
   const formatVehicleDisplay = (credit: any) => {
     console.log('Formatting vehicle display for credit:', credit.id, 'credit data:', credit);
@@ -404,8 +407,38 @@ const Credits = () => {
         </div>
       </div>
       
-      <div className="card-container">
-        <Table>
+      {isMobile ? (
+        <div className="space-y-3">
+          {filteredCredits.length > 0 ? (
+            filteredCredits.map((credit) => (
+              <CreditMobileCard
+                key={credit.id}
+                credit={credit}
+                onViewCredit={handleViewCredit}
+                onEditCredit={handleEditCredit}
+                onDelete={handleDelete}
+                onDownload={handleDownload}
+                onPrint={handlePrint}
+                onSendEmail={handleSendEmail}
+                getInvoiceDisplay={getInvoiceDisplay}
+                formatVehicleDisplay={formatVehicleDisplay}
+              />
+            ))
+          ) : (
+            <div className="card-container">
+              <div className="flex flex-col items-center justify-center py-8">
+                <FileText className="h-10 w-10 text-gray-400 mb-2" />
+                <h3 className="font-medium text-gray-900">Aucun résultat</h3>
+                <p className="text-gray-500 mt-1">
+                  Aucun avoir correspondant à votre recherche n'a été trouvé.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="card-container">
+          <Table>
           <TableHeader>
             <TableRow>
               <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
@@ -451,33 +484,27 @@ const Credits = () => {
                   <TableRow className="border-t-0">
                     <TableCell colSpan={6} className="py-3 border-t-0">
                       <div className="flex flex-wrap gap-2 justify-end px-4">
-                        <Button variant="outline" size="sm" onClick={() => handleViewCredit(credit)}>
+                        <Button variant="view" size="sm" onClick={() => handleViewCredit(credit)}>
                           <Eye className="h-4 w-4 mr-1" />
                           Voir
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleEditCredit(credit)}>
+                        <Button variant="edit" size="sm" onClick={() => handleEditCredit(credit)}>
                           <Pencil className="h-4 w-4 mr-1" />
                           Modifier
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleDownload(credit)}>
+                        <Button variant="download" size="sm" onClick={() => handleDownload(credit)}>
                           <Download className="h-4 w-4 mr-1" />
                           Télécharger
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handlePrint(credit)}>
+                        <Button variant="print" size="sm" onClick={() => handlePrint(credit)}>
                           <Printer className="h-4 w-4 mr-1" />
                           Imprimer
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(credit)}>
+                        <Button variant="send" size="sm" onClick={() => handleSendEmail(credit)}>
                           <Mail className="h-4 w-4 mr-1" />
                           Envoyer
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                          onClick={() => handleDelete(credit)}
-                          disabled={deleteCredit.isPending}
-                        >
+                        <Button variant="delete" size="sm" onClick={() => handleDelete(credit)} disabled={deleteCredit.isPending}>
                           <Trash className="h-4 w-4 mr-1" />
                           Supprimer
                         </Button>
@@ -502,6 +529,7 @@ const Credits = () => {
           </TableBody>
         </Table>
       </div>
+      )}
 
       <CreditDialog 
         open={isDialogOpen} 

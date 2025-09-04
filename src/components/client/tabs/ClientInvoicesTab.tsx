@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useCredits } from '@/hooks/use-credits';
 import { useTableSorting } from '@/hooks/use-table-sorting';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { 
   Table, 
   TableBody, 
@@ -30,6 +31,8 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
+import ClientInvoiceMobileCard from './ClientInvoiceMobileCard';
+
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import InvoiceViewerModal from '@/components/invoices/InvoiceViewerModal';
 import InvoiceEmailDialog from '@/components/invoices/InvoiceEmailDialog';
@@ -51,6 +54,7 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   const { companyData } = useCompany();
+  const isMobile = useIsMobile();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
@@ -235,6 +239,41 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
     }
   };
 
+  if (isMobile) {
+    return (
+      <>
+        <div className="space-y-4 p-4">
+          {sortedData.length > 0 ? (
+            sortedData.map((invoice) => {
+              const invoiceCredits = getInvoiceCredits(invoice.id);
+              return (
+                <ClientInvoiceMobileCard
+                  key={invoice.id}
+                  invoice={invoice}
+                  credits={invoiceCredits}
+                  onView={handleView}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onDownload={handleDownload}
+                  onPrint={handlePrint}
+                  onSendEmail={handleSendEmail}
+                  onAddPayment={handleAddPayment}
+                  onAddCredit={handleAddCredit}
+                />
+              );
+            })
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8">
+              <Receipt className="h-10 w-10 text-gray-400 mb-2" />
+              <h3 className="font-medium text-gray-900">Aucune facture</h3>
+              <p className="text-gray-500 mt-1">Ce client n'a pas encore de facture.</p>
+            </div>
+          )}
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <ContextMenu>
@@ -299,40 +338,35 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
                   <TableRow className="border-t-0">
                     <TableCell colSpan={7} className="py-3 border-t-0">
                       <div className="flex flex-wrap gap-2 justify-end px-4">
-                        <Button variant="outline" size="sm" onClick={() => handleView(invoice)}>
+                        <Button variant="view" size="sm" onClick={() => handleView(invoice)}>
                           <Eye className="h-4 w-4 mr-1" />
                           Voir
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleEdit(invoice)}>
+                        <Button variant="edit" size="sm" onClick={() => handleEdit(invoice)}>
                           <Pencil className="h-4 w-4 mr-1" />
                           Modifier
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleDownload(invoice)}>
+                        <Button variant="download" size="sm" onClick={() => handleDownload(invoice)}>
                           <Download className="h-4 w-4 mr-1" />
                           Télécharger
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handlePrint(invoice)}>
+                        <Button variant="print" size="sm" onClick={() => handlePrint(invoice)}>
                           <Printer className="h-4 w-4 mr-1" />
                           Imprimer
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(invoice)}>
+                        <Button variant="send" size="sm" onClick={() => handleSendEmail(invoice)}>
                           <Mail className="h-4 w-4 mr-1" />
                           Envoyer
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleAddPayment(invoice)}>
+                        <Button variant="payment" size="sm" onClick={() => handleAddPayment(invoice)}>
                           <CreditCard className="h-4 w-4 mr-1" />
                           Créer un paiement
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleAddCredit(invoice)}>
+                        <Button variant="create" size="sm" onClick={() => handleAddCredit(invoice)}>
                           <FileX className="h-4 w-4 mr-1" />
                           Créer un avoir
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                          onClick={() => handleDelete(invoice)}
-                        >
+                        <Button variant="delete" size="sm" onClick={() => handleDelete(invoice)}>
                           <Trash className="h-4 w-4 mr-1" />
                           Supprimer
                         </Button>

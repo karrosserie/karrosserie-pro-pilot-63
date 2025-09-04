@@ -26,7 +26,7 @@ export const FormActions = ({ report, isSubmitting, onCancel }: FormActionsProps
         <Button 
           type="submit"
           disabled={isSubmitting}
-          className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+          variant="validation"
         >
           {isSubmitting ? 'Enregistrement...' : report ? 'Mettre à jour' : 'Créer le rapport'}
         </Button>

@@ -24,7 +24,7 @@ const FleetVehicleFormNavigation: React.FC<FleetVehicleFormNavigationProps> = ({
   onSubmit
 }) => {
   return (
-    <div className="flex justify-end space-x-2 pt-4 border-t">
+    <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4 border-t">
       <Button type="button" variant="outline" onClick={onCancel}>
         {isViewMode ? "Fermer" : "Annuler"}
       </Button>

@@ -21,10 +21,12 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useCompanyPreferences } from '@/hooks/use-company-preferences';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const RelanceIATab = () => {
   const { toast } = useToast();
   const { preferences, updateAiRelanceSettings, isLoading } = useCompanyPreferences();
+  const isMobile = useIsMobile();
   const [settings, setSettings] = useState({
     enabled: false,
     delayBeforeFirst: 30,
@@ -178,39 +180,39 @@ const RelanceIATab = () => {
   }, [settings.delayBeforeFirst, settings.maxRelances, settings.channels, settings.autoMiseEnDemeure]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center space-x-3">
-        <Bot className="h-6 w-6 text-purple-600" />
-        <div>
-          <h2 className="text-2xl font-bold text-foreground">Configuration Automatique</h2>
-          <p className="text-muted-foreground text-sm">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+        <Bot className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+        <div className="text-center sm:text-left">
+          <h2 className="text-lg sm:text-2xl font-bold text-foreground">Configuration Automatique</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Paramétrez vos relances multicanales selon vos besoins
           </p>
         </div>
       </div>
 
-      {/* Main Content - Two columns layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* Main Content - Responsive layout */}
+      <div className={`grid grid-cols-1 ${isMobile ? 'gap-4' : 'lg:grid-cols-2 gap-6 lg:gap-8'}`}>
         {/* Left Column - Paramètres Généraux */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center text-red-600">
-              <Settings className="h-5 w-5 mr-2" />
+            <CardTitle className="flex items-center text-red-600 text-base sm:text-lg">
+              <Settings className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
               Paramètres Généraux
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4 sm:space-y-6">
             {/* Déclenchement automatique */}
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <Label className="font-medium">Déclenchement automatique</Label>
+              <div className={`${isMobile ? 'flex flex-col space-y-2' : 'flex items-center justify-between'} mb-3`}>
+                <Label className="font-medium text-sm">Déclenchement automatique</Label>
                 <Switch
                   checked={settings.enabled}
                   onCheckedChange={(checked) => handleSettingChange('enabled', checked)}
                 />
               </div>
-               <p className="text-sm text-muted-foreground mb-2">
+               <p className="text-xs sm:text-sm text-muted-foreground mb-2">
                  Activé dès +{settings.delayBeforeFirst} jours de retard
                </p>
             </div>
@@ -219,11 +221,11 @@ const RelanceIATab = () => {
 
             {/* Délai avant première relance */}
             <div>
-              <Label className="font-medium mb-2 block">Délai avant première relance</Label>
+              <Label className="font-medium mb-2 block text-sm">Délai avant première relance</Label>
               <select
                 value={settings.delayBeforeFirst}
                 onChange={(e) => handleSettingChange('delayBeforeFirst', parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-input bg-white rounded-md text-sm z-50 relative"
+                className="w-full px-3 py-2 border border-input bg-white rounded-md text-xs sm:text-sm z-50 relative"
                 style={{ background: 'white', zIndex: 50 }}
               >
                 <option value={15}>15 jours (recommandé)</option>
@@ -237,11 +239,11 @@ const RelanceIATab = () => {
 
             {/* Nombre max de relances */}
             <div>
-              <Label className="font-medium mb-2 block">Nombre max de relances</Label>
+              <Label className="font-medium mb-2 block text-sm">Nombre max de relances</Label>
               <select
                 value={settings.maxRelances}
                 onChange={(e) => handleSettingChange('maxRelances', parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-input bg-white rounded-md text-sm z-50 relative"
+                className="w-full px-3 py-2 border border-input bg-white rounded-md text-xs sm:text-sm z-50 relative"
                 style={{ background: 'white', zIndex: 50 }}
               >
                 <option value={3}>3 relances</option>
@@ -255,19 +257,19 @@ const RelanceIATab = () => {
 
             {/* Canaux de communication */}
             <div>
-              <Label className="font-medium mb-3 block">Canaux de communication</Label>
+              <Label className="font-medium mb-3 block text-sm">Canaux de communication</Label>
               <div className="space-y-2">
                 <button
                   type="button"
                   onClick={() => handleSettingChange('channels', { ...settings.channels, email: !settings.channels.email })}
-                  className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl border transition-all ${
+                  className={`w-full flex items-center space-x-3 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border transition-all ${
                     settings.channels.email 
                       ? 'bg-green-100 border-green-300 text-green-800' 
                       : 'bg-gray-100 border-gray-300 text-gray-600'
                   }`}
                 >
-                  <span className="text-blue-600 text-base">📧</span>
-                  <Label className="text-sm font-medium cursor-pointer">Email</Label>
+                  <span className="text-blue-600 text-sm sm:text-base">📧</span>
+                  <Label className="text-xs sm:text-sm font-medium cursor-pointer">Email</Label>
                 </button>
 
                 <button
@@ -328,14 +330,14 @@ const RelanceIATab = () => {
 
             {/* Passage automatique en mise en demeure */}
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <Label className="font-medium">Passage automatique en mise en demeure</Label>
+              <div className={`${isMobile ? 'flex flex-col space-y-2' : 'flex items-center justify-between'} mb-2`}>
+                <Label className="font-medium text-sm">Passage automatique en mise en demeure</Label>
                 <Switch
                   checked={settings.autoMiseEnDemeure}
                   onCheckedChange={(checked) => handleSettingChange('autoMiseEnDemeure', checked)}
                 />
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Après 5 relances infructueuses
               </p>
             </div>
@@ -345,24 +347,24 @@ const RelanceIATab = () => {
         {/* Right Column - Aperçu du Workflow */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center text-blue-600">
-              <Zap className="h-5 w-5 mr-2" />
+            <CardTitle className="flex items-center text-blue-600 text-base sm:text-lg">
+              <Zap className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
               Aperçu du Workflow
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {workflowSteps.map((step, index) => (
                 <div
                   key={step.id}
-                  className={`p-4 rounded-lg border-2 transition-all ${step.color} ${
+                  className={`p-3 sm:p-4 rounded-lg border-2 transition-all ${step.color} ${
                     !settings.enabled ? 'opacity-50' : ''
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
-                      <span className="text-lg">{step.icon}</span>
-                      <span className="font-medium text-sm">{step.title}</span>
+                      <span className="text-base sm:text-lg">{step.icon}</span>
+                      <span className="font-medium text-xs sm:text-sm">{step.title}</span>
                     </div>
                     <Badge variant="outline" className="text-xs">
                       {step.day}
@@ -383,14 +385,23 @@ const RelanceIATab = () => {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-3 justify-center">
-        <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
-          <Save className="h-4 w-4 mr-2" />
-          Sauvegarder la configuration
+      <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'gap-3 justify-center'}`}>
+        <Button 
+          onClick={handleSave} 
+          className="bg-green-600 hover:bg-green-700"
+          size={isMobile ? "sm" : "default"}
+        >
+          <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+          <span className="text-xs sm:text-sm">Sauvegarder la configuration</span>
         </Button>
-        <Button variant="outline" onClick={handleTest} className="border-gray-400">
-          <TestTube className="h-4 w-4 mr-2" />
-          Tester le workflow
+        <Button 
+          variant="outline" 
+          onClick={handleTest} 
+          className="border-gray-400"
+          size={isMobile ? "sm" : "default"}
+        >
+          <TestTube className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+          <span className="text-xs sm:text-sm">Tester le workflow</span>
         </Button>
       </div>
     </div>
