@@ -59,6 +59,32 @@ export function useCompany() {
     loadCompanyData();
   }, [user?.id, isImpersonating, impersonationData?.company_id]);
 
+  const reloadCompanyData = async () => {
+    if (!user) {
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      // Forcer le rechargement des données depuis la base de données
+      const data = await companyService.getCompanyInfo();
+      
+      if (data) {
+        setCompanyData(data);
+      }
+    } catch (error) {
+      console.error('useCompany: Erreur lors du rechargement des données:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de recharger les données de l'entreprise.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const saveCompanyData = async () => {
     if (!user) {
       return;
@@ -109,6 +135,7 @@ export function useCompany() {
     isSaving,
     updateCompanyData,
     updateNotifications,
-    saveCompanyData
+    saveCompanyData,
+    reloadCompanyData
   };
 }

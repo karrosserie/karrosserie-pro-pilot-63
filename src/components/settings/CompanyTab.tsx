@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast';
 
 const CompanyTab: React.FC = () => {
   const { uploadDocument } = useStorage();
-  const { companyData, isSaving, isLoading, updateCompanyData, saveCompanyData } = useCompany();
+  const { companyData, isSaving, isLoading, updateCompanyData, saveCompanyData, reloadCompanyData } = useCompany();
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const [isGeneratingLogo, setIsGeneratingLogo] = useState(false);
@@ -65,6 +65,9 @@ const CompanyTab: React.FC = () => {
       const logoUrl = await uploadDocument(logoFile, 'company', 'logo');
       if (logoUrl) {
         updateCompanyData({ logo_url: logoUrl });
+        // Sauvegarder les données et recharger pour s'assurer que le cache est à jour
+        await saveCompanyData();
+        await reloadCompanyData();
         toast({
           title: "Logo généré avec succès!",
           description: "Votre logo a été généré et sauvegardé automatiquement.",
