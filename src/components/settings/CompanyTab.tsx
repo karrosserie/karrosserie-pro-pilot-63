@@ -97,9 +97,14 @@ const CompanyTab: React.FC = () => {
   };
 
   const generateLogoWithImagegen = async (companyName: string): Promise<Blob> => {
-    const prompt = `Logo professionnel pour carrosserie automobile. En haut le mot "carrosserie" en petites lettres élégantes noires, en dessous "${companyName}" en lettres plus grandes et en gras noires avec la police Vezla Font. Design moderne, fond blanc. Ultra high resolution.`;
+    // Attendre que la police Vezla Font soit chargée
+    try {
+      await document.fonts.load('24px "Vezla Font"');
+      await document.fonts.load('bold 36px "Vezla Font"');
+    } catch (error) {
+      console.warn('Erreur lors du chargement de la police Vezla Font:', error);
+    }
     
-    // Utiliser l'API imagegen interne
     const canvas = document.createElement('canvas');
     canvas.width = 512;
     canvas.height = 512;
@@ -110,15 +115,19 @@ const CompanyTab: React.FC = () => {
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, 512, 512);
       
+      // Vérifier si la police Vezla Font est disponible
+      const fontAvailable = document.fonts.check('24px "Vezla Font"');
+      const fontFamily = fontAvailable ? '"Vezla Font", sans-serif' : 'Arial, sans-serif';
+      
       // Dessiner "carrosserie" en petit et noir
-      ctx.fillStyle = '#000000'; // Noir
-      ctx.font = '24px "Vezla Font", sans-serif';
+      ctx.fillStyle = '#000000';
+      ctx.font = `24px ${fontFamily}`;
       ctx.textAlign = 'center';
       ctx.fillText('carrosserie', 256, 180);
       
       // Dessiner le nom de l'entreprise en gros, gras et noir
-      ctx.fillStyle = '#000000'; // Noir
-      ctx.font = 'bold 36px "Vezla Font", sans-serif';
+      ctx.fillStyle = '#000000';
+      ctx.font = `bold 36px ${fontFamily}`;
       ctx.fillText(companyName, 256, 240);
     }
     
