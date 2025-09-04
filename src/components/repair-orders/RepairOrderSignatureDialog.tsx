@@ -31,6 +31,8 @@ const RepairOrderSignatureDialog: React.FC<RepairOrderSignatureDialogProps> = ({
   const { updateOrder } = useRepairOrders();
   const [clientName, setClientName] = useState('');
   const [documentAccepted, setDocumentAccepted] = useState(false);
+  const [disputeClauseAccepted, setDisputeClauseAccepted] = useState(false);
+  const [mandatoryValidation, setMandatoryValidation] = useState(false);
   const [clientSignature, setClientSignature] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -54,6 +56,24 @@ const RepairOrderSignatureDialog: React.FC<RepairOrderSignatureDialogProps> = ({
       toast({
         title: "Erreur",
         description: "Veuillez accepter les conditions du document.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!disputeClauseAccepted) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez accepter la clause de règlement des litiges.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!mandatoryValidation) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez cocher la case obligatoire pour valider l'ordre de réparation.",
         variant: "destructive"
       });
       return;
@@ -112,6 +132,8 @@ const RepairOrderSignatureDialog: React.FC<RepairOrderSignatureDialogProps> = ({
   const handleClose = () => {
     setClientName('');
     setDocumentAccepted(false);
+    setDisputeClauseAccepted(false);
+    setMandatoryValidation(false);
     setClientSignature('');
     onOpenChange(false);
   };
@@ -169,6 +191,41 @@ const RepairOrderSignatureDialog: React.FC<RepairOrderSignatureDialogProps> = ({
               vaut engagement ferme et personnel. Je confirme que cette signature constitue 
               l'expression de mon consentement libre et éclairé, et engage ma pleine 
               responsabilité juridique.
+            </Label>
+          </div>
+
+          {/* Dispute clause checkbox */}
+          <div className="flex items-start space-x-2">
+            <Checkbox
+              id="disputeClauseAccepted"
+              checked={disputeClauseAccepted}
+              onCheckedChange={(checked) => setDisputeClauseAccepted(checked === true)}
+              className="data-[state=checked]:bg-karrosserie-orange data-[state=checked]:border-karrosserie-orange"
+            />
+            <Label htmlFor="disputeClauseAccepted" className="text-sm leading-relaxed font-normal">
+              <strong>CLAUSE DE RÈGLEMENT DES LITIGES</strong><br/>
+              Je soussigné(e) accepte expressément qu'en cas de litige relatif au présent ordre de réparation :
+              <ul className="mt-2 ml-4 list-disc space-y-1">
+                <li>La procédure applicable soit exclusivement une procédure écrite sur pièces (art. 753 et suivants du Code de procédure civile)</li>
+                <li>Je renonce expressément à toute audience de plaidoirie</li>
+                <li>Compétence exclusive : Tribunal Judiciaire de Votre Ville</li>
+                <li>Tentative de règlement amiable obligatoire de 30 jours préalablement à toute procédure</li>
+              </ul>
+              <br/>
+              Cette acceptation vaut pour toute réclamation, contestation ou litige découlant de la présente réparation.
+            </Label>
+          </div>
+
+          {/* Mandatory validation checkbox */}
+          <div className="flex items-start space-x-2">
+            <Checkbox
+              id="mandatoryValidation"
+              checked={mandatoryValidation}
+              onCheckedChange={(checked) => setMandatoryValidation(checked === true)}
+              className="data-[state=checked]:bg-karrosserie-orange data-[state=checked]:border-karrosserie-orange"
+            />
+            <Label htmlFor="mandatoryValidation" className="text-sm leading-relaxed font-normal">
+              Case obligatoire à cocher pour valider l'ordre de réparation
             </Label>
           </div>
 
