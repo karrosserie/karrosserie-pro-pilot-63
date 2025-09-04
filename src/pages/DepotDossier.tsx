@@ -278,7 +278,7 @@ const DepotDossier = () => {
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           {/* Content Header */}
           <div className="p-8 border-b border-slate-200 bg-slate-50">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Requête en Injonction de Payer</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Requete au tribunal de jugement sur pieces</h2>
             <p className="text-slate-600 text-base">
               {selectedCase.defendeur?.split('\n')[0]} - Facture {selectedCase.reference} - {selectedCase.montant_dossier || '8 200,00'} €
             </p>
