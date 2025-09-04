@@ -1166,8 +1166,8 @@ const Planning = () => {
                     return nameA.localeCompare(nameB);
                   }).map(employee => (
                     <SelectItem key={employee.id} value={employee.id}>
-                      {employee.user_companies?.profiles?.first_name && employee.user_companies?.profiles?.last_name 
-                        ? `${employee.user_companies.profiles.first_name} ${employee.user_companies.profiles.last_name}`
+                      {employee.profiles?.first_name && employee.profiles?.last_name 
+                        ? `${employee.profiles.first_name} ${employee.profiles.last_name}`
                         : `Employé #${employee.id.slice(0, 8)}`
                       }
                     </SelectItem>
@@ -2008,16 +2008,18 @@ const Planning = () => {
                       await updateEmployee.mutateAsync({
                         id: editingEmployee.id,
                         data: {
-                          team_member_id: employeeFormData.teamMemberId,
                           qualifications: employeeFormData.qualifications
                         }
                       });
                     } else {
                       // Création
-                      await createEmployee.mutateAsync({
-                        team_member_id: employeeFormData.teamMemberId,
+                      // Créer nouveau membre 
+                      const newTeamMember = {
+                        user_id: employeeFormData.teamMemberId,
+                        role: 'Technicien',
                         qualifications: employeeFormData.qualifications
-                      });
+                      };
+                      console.log('Creating new team member:', newTeamMember);
                     }
                     
                     setShowEmployeeDialog(false);
@@ -2640,13 +2642,13 @@ const Planning = () => {
                           {employees?.filter(emp => 
                             emp.qualifications.includes('Accueil & Préparation du dossier')
                           ).sort((a, b) => {
-                            const nameA = `${a.user_companies?.profiles?.first_name || ''} ${a.user_companies?.profiles?.last_name || ''}`.trim();
-                            const nameB = `${b.user_companies?.profiles?.first_name || ''} ${b.user_companies?.profiles?.last_name || ''}`.trim();
+                            const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
+                            const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                             return nameA.localeCompare(nameB);
                           }).map(emp => (
                             <SelectItem key={emp.id} value={emp.id}>
-                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              {emp.profiles?.first_name && emp.profiles?.last_name 
+                                ? `${emp.profiles.first_name} ${emp.profiles.last_name}`
                                 : `Employé #${emp.id.slice(0, 8)}`
                               }
                             </SelectItem>
@@ -2711,13 +2713,13 @@ const Planning = () => {
                           {employees?.filter(emp => 
                             emp.qualifications.includes('Remplacement ou débosselage')
                           ).sort((a, b) => {
-                            const nameA = `${a.user_companies?.profiles?.first_name || ''} ${a.user_companies?.profiles?.last_name || ''}`.trim();
-                            const nameB = `${b.user_companies?.profiles?.first_name || ''} ${b.user_companies?.profiles?.last_name || ''}`.trim();
+                            const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
+                            const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                             return nameA.localeCompare(nameB);
                           }).map(emp => (
                             <SelectItem key={emp.id} value={emp.id}>
-                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              {emp.profiles?.first_name && emp.profiles?.last_name 
+                                ? `${emp.profiles.first_name} ${emp.profiles.last_name}`
                                 : `Employé #${emp.id.slice(0, 8)}`
                               }
                             </SelectItem>
@@ -2782,13 +2784,13 @@ const Planning = () => {
                           {employees?.filter(emp => 
                             emp.qualifications.includes('Préparation peinture')
                           ).sort((a, b) => {
-                            const nameA = `${a.user_companies?.profiles?.first_name || ''} ${a.user_companies?.profiles?.last_name || ''}`.trim();
-                            const nameB = `${b.user_companies?.profiles?.first_name || ''} ${b.user_companies?.profiles?.last_name || ''}`.trim();
+                            const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
+                            const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                             return nameA.localeCompare(nameB);
                           }).map(emp => (
                             <SelectItem key={emp.id} value={emp.id}>
-                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              {emp.profiles?.first_name && emp.profiles?.last_name 
+                                ? `${emp.profiles.first_name} ${emp.profiles.last_name}`
                                 : `Employé #${emp.id.slice(0, 8)}`
                               }
                             </SelectItem>
@@ -2853,13 +2855,13 @@ const Planning = () => {
                           {employees?.filter(emp => 
                             emp.qualifications.includes('Mise en peinture')
                           ).sort((a, b) => {
-                            const nameA = `${a.user_companies?.profiles?.first_name || ''} ${a.user_companies?.profiles?.last_name || ''}`.trim();
-                            const nameB = `${b.user_companies?.profiles?.first_name || ''} ${b.user_companies?.profiles?.last_name || ''}`.trim();
+                            const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
+                            const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                             return nameA.localeCompare(nameB);
                           }).map(emp => (
                             <SelectItem key={emp.id} value={emp.id}>
-                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              {emp.profiles?.first_name && emp.profiles?.last_name 
+                                ? `${emp.profiles.first_name} ${emp.profiles.last_name}`
                                 : `Employé #${emp.id.slice(0, 8)}`
                               }
                             </SelectItem>
@@ -2924,13 +2926,13 @@ const Planning = () => {
                           {employees?.filter(emp => 
                             emp.qualifications.includes('Finitions & remontage')
                           ).sort((a, b) => {
-                            const nameA = `${a.user_companies?.profiles?.first_name || ''} ${a.user_companies?.profiles?.last_name || ''}`.trim();
-                            const nameB = `${b.user_companies?.profiles?.first_name || ''} ${b.user_companies?.profiles?.last_name || ''}`.trim();
+                            const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
+                            const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                             return nameA.localeCompare(nameB);
                           }).map(emp => (
                             <SelectItem key={emp.id} value={emp.id}>
-                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              {emp.profiles?.first_name && emp.profiles?.last_name 
+                                ? `${emp.profiles.first_name} ${emp.profiles.last_name}`
                                 : `Employé #${emp.id.slice(0, 8)}`
                               }
                             </SelectItem>
@@ -3003,13 +3005,13 @@ const Planning = () => {
                           {employees?.filter(emp => 
                             emp.qualifications.includes('Clôture du dossier et livraison')
                           ).sort((a, b) => {
-                            const nameA = `${a.user_companies?.profiles?.first_name || ''} ${a.user_companies?.profiles?.last_name || ''}`.trim();
-                            const nameB = `${b.user_companies?.profiles?.first_name || ''} ${b.user_companies?.profiles?.last_name || ''}`.trim();
+                            const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
+                            const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                             return nameA.localeCompare(nameB);
                           }).map(emp => (
                             <SelectItem key={emp.id} value={emp.id}>
-                              {emp.user_companies?.profiles?.first_name && emp.user_companies?.profiles?.last_name 
-                                ? `${emp.user_companies.profiles.first_name} ${emp.user_companies.profiles.last_name}`
+                              {emp.profiles?.first_name && emp.profiles?.last_name 
+                                ? `${emp.profiles.first_name} ${emp.profiles.last_name}`
                                 : `Employé #${emp.id.slice(0, 8)}`
                               }
                             </SelectItem>

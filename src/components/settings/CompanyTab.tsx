@@ -64,7 +64,7 @@ const CompanyTab: React.FC = () => {
         },
         body: JSON.stringify({
           companyName: companyData.name,
-          prompt: `Logo professionnel pour carrosserie automobile. En haut le mot "carrosserie" en petites lettres élégantes, en dessous "${companyData.name}" en lettres plus grandes et en gras avec la police Exo 2. Design moderne, couleurs bleu et orange, fond blanc. Ultra high resolution.`
+          prompt: `Logo professionnel pour carrosserie automobile. En haut le mot "carrosserie" en petites lettres élégantes noires, en dessous "${companyData.name}" en lettres plus grandes et en gras noires avec la police Vezla Font. Design moderne, fond blanc. Ultra high resolution.`
         }),
       });
 
@@ -97,7 +97,7 @@ const CompanyTab: React.FC = () => {
   };
 
   const generateLogoWithImagegen = async (companyName: string): Promise<Blob> => {
-    const prompt = `Logo professionnel pour carrosserie automobile. En haut le mot "carrosserie" en petites lettres élégantes, en dessous "${companyName}" en lettres plus grandes et en gras avec la police Exo 2. Design moderne, couleurs bleu et orange, fond blanc. Ultra high resolution.`;
+    const prompt = `Logo professionnel pour carrosserie automobile. En haut le mot "carrosserie" en petites lettres élégantes noires, en dessous "${companyName}" en lettres plus grandes et en gras noires avec la police Vezla Font. Design moderne, fond blanc. Ultra high resolution.`;
     
     // Utiliser l'API imagegen interne
     const canvas = document.createElement('canvas');
@@ -110,15 +110,15 @@ const CompanyTab: React.FC = () => {
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, 512, 512);
       
-      // Dessiner "carrosserie" en petit
-      ctx.fillStyle = '#2563eb'; // Bleu
-      ctx.font = '24px "Exo 2", sans-serif';
+      // Dessiner "carrosserie" en petit et noir
+      ctx.fillStyle = '#000000'; // Noir
+      ctx.font = '24px "Vezla Font", sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('carrosserie', 256, 180);
       
-      // Dessiner le nom de l'entreprise en gros et gras
-      ctx.fillStyle = '#ea580c'; // Orange
-      ctx.font = 'bold 36px "Exo 2", sans-serif';
+      // Dessiner le nom de l'entreprise en gros, gras et noir
+      ctx.fillStyle = '#000000'; // Noir
+      ctx.font = 'bold 36px "Vezla Font", sans-serif';
       ctx.fillText(companyName, 256, 240);
     }
     
