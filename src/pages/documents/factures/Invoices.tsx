@@ -54,7 +54,7 @@ const Invoices = () => {
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   
-  const { invoices, isLoading, error, deleteInvoice } = useInvoices();
+  const { invoices, isLoading, error, deleteInvoice, createInvoice } = useInvoices();
   const { credits } = useCredits();
   const { receipts } = useReceiptsData();
   const { companyData } = useCompany();
@@ -290,6 +290,62 @@ const Invoices = () => {
           >
             <Plus className="h-4 w-4 mr-2" />
             Nouvelle facture
+          </Button>
+          
+          <Button 
+            variant="outline"
+            onClick={async () => {
+              try {
+                const testInvoice = {
+                  reference: `TEST-${Date.now().toString().slice(-6)}`,
+                  created_at: new Date().toISOString(),
+                  status: "En attente de paiement",
+                  amount: 1250.00,
+                  description: "Facture de test pour vérifier l'affichage du logo",
+                  client_id: null,
+                  vehicle_id: null,
+                  client_name: "Jean Dupont",
+                  client_email: "jean.dupont@email.com",
+                  client_phone: "06 12 34 56 78",
+                  client_address: "123 Rue de la Paix\n75001 Paris",
+                  vehicle_brand: "Peugeot",
+                  vehicle_model: "308",
+                  vehicle_license_plate: "AB-123-CD",
+                  vehicle_vin: "VF3XXXXXXXXXXXXXXX",
+                  repairs: [{
+                    id: '1',
+                    description: 'Réparation pare-choc avant',
+                    quantity: 1,
+                    unit_price: 800.00,
+                    total: 800.00
+                  }],
+                  parts: [{
+                    id: '1',
+                    description: 'Pare-choc avant',
+                    quantity: 1,
+                    unit_price: 450.00,
+                    total: 450.00
+                  }]
+                };
+                
+                await createInvoice.mutateAsync(testInvoice);
+                
+                toast({
+                  title: "Facture test créée",
+                  description: "Une facture fictive a été créée pour tester le logo."
+                });
+              } catch (error) {
+                console.error('Erreur lors de la création de la facture test:', error);
+                toast({
+                  title: "Erreur",
+                  description: "Impossible de créer la facture test.",
+                  variant: "destructive"
+                });
+              }
+            }}
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            Créer facture test
           </Button>
         </div>
       </div>
