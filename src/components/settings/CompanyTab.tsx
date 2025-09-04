@@ -17,6 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/hooks/use-toast';
+import { companyService } from '@/services/supabase/company';
 
 const CompanyTab: React.FC = () => {
   const { uploadDocument } = useStorage();
@@ -36,10 +37,30 @@ const CompanyTab: React.FC = () => {
     try {
       const logoUrl = await uploadDocument(file, 'company', 'logo');
       if (logoUrl) {
+        console.log('Logo uploaded manually, URL:', logoUrl);
+        
+        // Créer les nouvelles données avec le logo_url
+        const updatedCompanyData = { ...companyData, logo_url: logoUrl };
+        
+        // Mettre à jour l'état local
         updateCompanyData({ logo_url: logoUrl });
+        
+        // Sauvegarder directement les données mises à jour
+        await companyService.updateCompanyInfo(undefined, updatedCompanyData);
+        await reloadCompanyData();
+        
+        toast({
+          title: "Logo téléchargé",
+          description: "Votre logo a été téléchargé et sauvegardé avec succès.",
+        });
       }
     } catch (error) {
       console.error('Erreur lors du téléchargement du logo:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de télécharger le logo.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -64,9 +85,17 @@ const CompanyTab: React.FC = () => {
 
       const logoUrl = await uploadDocument(logoFile, 'company', 'logo');
       if (logoUrl) {
+        console.log('Logo uploaded successfully, URL:', logoUrl);
+        
+        // Créer les nouvelles données avec le logo_url
+        const updatedCompanyData = { ...companyData, logo_url: logoUrl };
+        console.log('Updated company data with logo:', updatedCompanyData);
+        
+        // Mettre à jour l'état local
         updateCompanyData({ logo_url: logoUrl });
-        // Sauvegarder les données et recharger pour s'assurer que le cache est à jour
-        await saveCompanyData();
+        
+        // Sauvegarder directement les données mises à jour
+        await companyService.updateCompanyInfo(undefined, updatedCompanyData);
         await reloadCompanyData();
         toast({
           title: "Logo généré avec succès!",
