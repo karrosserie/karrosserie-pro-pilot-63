@@ -56,33 +56,21 @@ const CompanyTab: React.FC = () => {
     setIsGeneratingLogo(true);
     
     try {
-      // Générer le logo avec l'IA
-      const response = await fetch('/api/generate-logo', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          companyName: companyData.name,
-          prompt: `Logo professionnel pour carrosserie automobile. En haut le mot "carrosserie" en petites lettres élégantes noires, en dessous "${companyData.name}" en lettres plus grandes et en gras noires avec la police Vezla Font. Design moderne, fond blanc. Ultra high resolution.`
-        }),
+      // Générer le logo directement avec la police Vezla Font
+      const logoBlob = await generateLogoWithImagegen(companyData.name);
+      const logoFile = new File([logoBlob], `logo-${companyData.name.toLowerCase().replace(/\s+/g, '-')}.png`, {
+        type: 'image/png'
       });
 
-      if (!response.ok) {
-        // Fallback: générer directement avec imagegen
-        const logoBlob = await generateLogoWithImagegen(companyData.name);
-        const logoFile = new File([logoBlob], `logo-${companyData.name.toLowerCase().replace(/\s+/g, '-')}.png`, {
-          type: 'image/png'
+      const logoUrl = await uploadDocument(logoFile, 'company', 'logo');
+      if (logoUrl) {
+        updateCompanyData({ logo_url: logoUrl });
+        toast({
+          title: "Logo généré avec succès!",
+          description: "Votre logo a été généré et sauvegardé automatiquement.",
         });
-
-        const logoUrl = await uploadDocument(logoFile, 'company', 'logo');
-        if (logoUrl) {
-          updateCompanyData({ logo_url: logoUrl });
-          toast({
-            title: "Logo généré avec succès!",
-            description: "Votre logo a été généré et sauvegardé automatiquement.",
-          });
-        }
+      } else {
+        throw new Error('Échec de l\'upload du logo');
       }
     } catch (error) {
       console.error('Erreur lors de la génération du logo:', error);
