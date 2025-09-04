@@ -70,6 +70,11 @@ export const paymentRoutes = [
       </ProtectedRoute>
     )
   },
+  // Redirection par défaut pour /payments vers management
+  {
+    path: "/payments",
+    element: <Navigate to="/payments/management" replace />
+  },
   // Redirection pour maintenir la compatibilité avec l'ancienne URL
   {
     path: "/accounting",

@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { STATIC_SUBSCRIPTIONS, STATIC_TOKENS, mockApiDelay } from '@/data/staticData';
 import { Tables, TablesInsert } from '@/integrations/supabase/types';
 
 export type SubscriptionPlan = Tables<'subscription_plans'>;
@@ -6,45 +6,91 @@ export type TokenPackage = Tables<'token_packages'>;
 export type CompanySubscription = Tables<'company_subscriptions'>;
 export type TokenUsage = Tables<'token_usage'>;
 
+// Variables pour stocker les données modifiées
+let subscriptionsData = [...STATIC_SUBSCRIPTIONS];
+let tokensData = [...STATIC_TOKENS];
+
+// Mock subscription plans
+const mockSubscriptionPlans = [
+  {
+    id: 'plan-starter',
+    name: 'Starter',
+    price: 29,
+    tokens_included: 500,
+    features: ['Gestion de base', 'Support email'],
+    is_active: true
+  },
+  {
+    id: 'plan-premium',
+    name: 'Premium', 
+    price: 79,
+    tokens_included: 1500,
+    features: ['Toutes les fonctionnalités', 'Support prioritaire', 'IA avancée'],
+    is_active: true
+  }
+];
+
+const mockTokenPackages = [
+  {
+    id: 'tokens-100',
+    name: '100 jetons',
+    price: 9,
+    token_count: 100,
+    is_active: true
+  },
+  {
+    id: 'tokens-500',
+    name: '500 jetons',
+    price: 39,
+    token_count: 500,
+    is_active: true
+  },
+  {
+    id: 'tokens-1000',
+    name: '1000 jetons',
+    price: 69,
+    token_count: 1000,
+    is_active: true
+  }
+];
+
 export const subscriptionService = {
   // Get all available subscription plans
   async getSubscriptionPlans(): Promise<SubscriptionPlan[]> {
-    const { data, error } = await supabase
-      .from('subscription_plans')
-      .select('*')
-      .eq('is_active', true)
-      .order('price', { ascending: true });
-    
-    if (error) throw error;
-    return data || [];
+    console.log('Getting subscription plans...');
+    await mockApiDelay(200);
+    return mockSubscriptionPlans as any;
   },
 
   // Get all available token packages
   async getTokenPackages(): Promise<TokenPackage[]> {
-    const { data, error } = await supabase
-      .from('token_packages')
-      .select('*')
-      .eq('is_active', true)
-      .order('price', { ascending: true });
-    
-    if (error) throw error;
-    return data || [];
+    console.log('Getting token packages...');
+    await mockApiDelay(200);
+    return mockTokenPackages as any;
   },
 
   // Get company's current subscription
   async getCompanySubscription(companyId: string): Promise<CompanySubscription | null> {
-    const { data, error } = await supabase
-      .from('company_subscriptions')
-      .select(`
-        *,
-        subscription_plans:subscription_plan_id (*)
-      `)
-      .eq('company_id', companyId)
-      .eq('status', 'active')
-      .single();
+    console.log('Getting subscription for company:', companyId);
+    await mockApiDelay(200);
     
-    if (error && error.code !== 'PGRST116') throw error;
-    return data || null;
+    const subscription = subscriptionsData.find(s => s.company_id === companyId);
+    
+    if (!subscription) {
+      console.log('No active subscription found');
+      return null;
+    }
+    
+    // Enrich with plan details
+    const plan = mockSubscriptionPlans.find(p => p.id === 'plan-premium');
+    
+    const enrichedSubscription = {
+      ...subscription,
+      subscription_plans: plan
+    };
+    
+    console.log('Subscription found:', enrichedSubscription);
+    return enrichedSubscription as any;
   },
 
   // Get company's token usage history

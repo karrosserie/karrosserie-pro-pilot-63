@@ -1,67 +1,75 @@
-import { supabase } from '@/integrations/supabase/client';
+import { STATIC_TOKENS, mockApiDelay, filterByCompanyId } from '@/data/staticData';
 import { Tables, TablesInsert } from '@/integrations/supabase/types';
 
 export type Token = Tables<'tokens'>;
 export type TokenInsert = TablesInsert<'tokens'>;
 
+// Variable pour stocker les tokens modifiés
+let tokensData = [...STATIC_TOKENS];
+
 export const tokensService = {
   async createToken(tokenData: Omit<TokenInsert, 'id' | 'created_at' | 'updated_at'>) {
+    console.log('Creating token with data:', tokenData);
+    await mockApiDelay(500);
+
     const companyId = tokenData.company_id;
 
     if (!companyId) throw new Error('Company ID is required');
 
-    const { data, error } = await supabase
-      .from('tokens')
-      .insert([{
-        ...tokenData,
-        company_id: companyId
-      }])
-      .select()
-      .single();
+    const newToken = {
+      ...tokenData,
+      id: `token-${Date.now()}`,
+      company_id: companyId,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
 
-    if (error) throw error;
+    tokensData.push(newToken as any);
 
-    console.log('Token créé avec succès:', data);
+    console.log('Token créé avec succès:', newToken);
 
-    // Envoyer l'email de demande de justificatifs
-    try {
-      console.log('Tentative d\'envoi de l\'email pour le token:', data.id);
-      
-      const { data: emailResponse, error: emailError } = await supabase.functions.invoke('send-documents-request-email', {
-        body: { tokenId: data.id }
-      });
+    // Simuler l'envoi d'email
+    console.log('Email de demande de justificatifs envoyé avec succès (simulation)');
 
-      console.log('Réponse de l\'edge function:', emailResponse);
-      
-      if (emailError) {
-        console.error('Erreur lors de l\'envoi de l\'email:', emailError);
-        // Ne pas faire échouer la création du token si l'email échoue
-      } else {
-        console.log('Email envoyé avec succès');
-      }
-    } catch (emailError) {
-      console.error('Exception lors de l\'envoi de l\'email:', emailError);
-    }
-
-    return data;
+    return newToken;
   },
 
   async getTokens() {
-    const { data, error } = await supabase
-      .from('tokens')
-      .select('*')
-      .order('created_at', { ascending: false });
+    console.log('Getting tokens...');
+    await mockApiDelay(200);
+    
+    // Handle impersonation
+    const impersonationData = localStorage.getItem('admin_impersonation');
+    let companyId = 'demo-company-123';
+    
+    if (impersonationData) {
+      try {
+        const data = JSON.parse(impersonationData);
+        companyId = data.company_id;
+      } catch (error) {
+        console.error('Error parsing impersonation data:', error);
+      }
+    }
 
-    if (error) throw error;
-    return data;
+    const filteredTokens = filterByCompanyId(tokensData, companyId)
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    console.log('Tokens retrieved:', filteredTokens);
+    return filteredTokens;
   },
 
   async deleteToken(id: string) {
-    const { error } = await supabase
-      .from('tokens')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
+    console.log('Deleting token:', id);
+    await mockApiDelay(300);
+    
+    const tokenIndex = tokensData.findIndex(t => t.id === id);
+    
+    if (tokenIndex === -1) {
+      throw new Error(`Token with id ${id} not found`);
+    }
+    
+    tokensData.splice(tokenIndex, 1);
+    
+    console.log('Token deleted successfully');
   }
 };

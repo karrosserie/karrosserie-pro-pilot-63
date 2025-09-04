@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { STATIC_USER_COMPANIES, mockApiDelay } from '@/data/staticData';
 
 /**
  * Récupère l'ID de l'entreprise effective (en tenant compte de l'impersonation)
@@ -9,6 +9,7 @@ export async function getCurrentUserCompanyId(): Promise<string> {
   if (impersonationData) {
     try {
       const data = JSON.parse(impersonationData);
+      console.log('Using impersonation company_id:', data.company_id);
       return data.company_id;
     } catch (error) {
       console.error('Error parsing impersonation data:', error);
@@ -18,43 +19,29 @@ export async function getCurrentUserCompanyId(): Promise<string> {
   }
 
   // Mode normal : récupérer la company_id de l'utilisateur
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  await mockApiDelay(100);
   
-  if (userError || !user) {
-    throw new Error('User not authenticated');
-  }
-
-  const { data, error } = await supabase
-    .from('user_companies')
-    .select('company_id')
-    .eq('user_id', user.id)
-    .eq('active', true)
-    .single();
-
-  if (error || !data) {
+  // Pour la démo, retourner directement l'ID de l'entreprise par défaut
+  const userCompany = STATIC_USER_COMPANIES.find(uc => uc.user_id === 'demo-user-123' && uc.active);
+  
+  if (!userCompany) {
     throw new Error('No active company found for user');
   }
 
-  return data.company_id;
+  console.log('Using company_id:', userCompany.company_id);
+  return userCompany.company_id;
 }
 
 /**
  * Service pour vérifier si l'utilisateur appartient à une entreprise
  */
 export async function checkUserBelongsToCompany(companyId: string): Promise<boolean> {
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  await mockApiDelay(100);
   
-  if (userError || !user) {
-    return false;
-  }
+  // Pour la démo, l'utilisateur appartient toujours à l'entreprise demo-company-123
+  const userCompany = STATIC_USER_COMPANIES.find(
+    uc => uc.user_id === 'demo-user-123' && uc.company_id === companyId && uc.active
+  );
 
-  const { data } = await supabase
-    .from('user_companies')
-    .select('id')
-    .eq('user_id', user.id)
-    .eq('company_id', companyId)
-    .eq('active', true)
-    .single();
-
-  return !!data;
+  return !!userCompany;
 }

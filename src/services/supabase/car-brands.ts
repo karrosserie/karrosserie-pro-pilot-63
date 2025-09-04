@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { STATIC_CAR_BRANDS, mockApiDelay } from '@/data/staticData';
 
 export type CarBrand = {
   id: string;
@@ -8,25 +8,17 @@ export type CarBrand = {
   updated_at: string;
 };
 
+// Variable pour stocker les marques modifiées
+let carBrandsData = [...STATIC_CAR_BRANDS];
+
 export const carBrandsService = {
   getAll: async (): Promise<CarBrand[]> => {
     console.log('carBrandsService.getAll - Starting query');
+    await mockApiDelay(200);
     
-    const { data, error } = await supabase
-      .from('car_brands')
-      .select('*')
-      .order('name');
-
-    console.log('carBrandsService.getAll - Query result:');
-    console.log('  - data:', data);
-    console.log('  - error:', error);
-
-    if (error) {
-      console.error('Error fetching car brands:', error);
-      throw new Error(error.message);
-    }
-
-    console.log('carBrandsService.getAll - Returning:', data || []);
-    return data || [];
+    const sortedBrands = [...carBrandsData].sort((a, b) => a.name.localeCompare(b.name));
+    
+    console.log('carBrandsService.getAll - Returning:', sortedBrands);
+    return sortedBrands;
   }
 };

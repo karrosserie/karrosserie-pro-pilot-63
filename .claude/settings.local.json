@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\integrations\\supabase/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\services\\supabase/**)",
+      "Bash(npm run dev:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\services\\supabase/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\services\\supabase/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\services\\supabase/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\services\\supabase/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\services\\supabase/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\services\\supabase/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\data/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\data/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\data/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,6 +1,6 @@
 
 import { Session, User } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { STATIC_AUTH, mockApiDelay } from '@/data/staticData';
 
 export interface AuthSignUpData {
   firstName: string;
@@ -17,115 +17,104 @@ export interface AuthError {
 
 export const authService = {
   /**
-   * Get the current session from Supabase
+   * Get the current session from static data
    */
   getSession: async () => {
-    const { data } = await supabase.auth.getSession();
-    return data.session;
+    await mockApiDelay(200);
+    return STATIC_AUTH.session as Session;
   },
 
   /**
-   * Sign in with email and password
+   * Sign in with email and password (mock)
    */
   signInWithPassword: async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      throw error;
-    }
-
-    return data;
+    await mockApiDelay(800);
+    
+    // Simuler une authentification réussie pour tous les cas
+    return {
+      user: STATIC_AUTH.session.user as User,
+      session: STATIC_AUTH.session as Session,
+    };
   },
 
   /**
-   * Sign up with email and password
+   * Sign up with email and password (mock)
    */
   signUp: async ({ email, password, firstName, lastName, phoneNumber, isTeamMember = false }: AuthSignUpData) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
+    await mockApiDelay(1000);
+    
+    // Simuler une inscription réussie
+    return {
+      user: {
+        ...STATIC_AUTH.session.user,
+        email,
+        user_metadata: {
           first_name: firstName,
           last_name: lastName,
           phone_number: phoneNumber,
           is_team_member: isTeamMember.toString(),
-        },
-        emailRedirectTo: `${window.location.origin}/auth`,
-      },
-    });
-
-    if (error) {
-      throw error;
-    }
-
-    return data;
+        }
+      } as User,
+      session: {
+        ...STATIC_AUTH.session,
+        user: {
+          ...STATIC_AUTH.session.user,
+          email,
+          user_metadata: {
+            first_name: firstName,
+            last_name: lastName,
+            phone_number: phoneNumber,
+            is_team_member: isTeamMember.toString(),
+          }
+        }
+      } as Session,
+    };
   },
 
   /**
-   * Sign out the current user
+   * Sign out the current user (mock)
    */
   signOut: async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      throw error;
-    }
+    await mockApiDelay(300);
+    // Ne rien faire pour la démo
   },
 
   /**
-   * Set up auth state change listener
+   * Set up auth state change listener (mock)
    */
   onAuthStateChange: (callback: (session: Session | null, user: User | null) => void) => {
-    const { data } = supabase.auth.onAuthStateChange((_, session) => {
-      callback(session, session?.user ?? null);
-    });
-
-    return data.subscription;
+    // Simuler immédiatement un utilisateur connecté
+    setTimeout(() => {
+      callback(STATIC_AUTH.session as Session, STATIC_AUTH.session.user as User);
+    }, 100);
+    
+    // Retourner un mock de subscription
+    return {
+      unsubscribe: () => {},
+    };
   },
 
   /**
-   * Resend email verification
+   * Resend email verification (mock)
    */
   resendEmailVerification: async (email: string) => {
-    const { error } = await supabase.auth.resend({
-      type: 'signup',
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth`,
-      },
-    });
-    
-    if (error) {
-      throw error;
-    }
+    await mockApiDelay(500);
+    // Ne rien faire pour la démo
   },
 
   /**
-   * Send password reset email
+   * Send password reset email (mock)
    */
   resetPassword: async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
-    });
-    
-    if (error) {
-      throw error;
-    }
+    await mockApiDelay(500);
+    // Ne rien faire pour la démo
   },
 
   /**
-   * Update password
+   * Update password (mock)
    */
   updatePassword: async (password: string) => {
-    const { error } = await supabase.auth.updateUser({
-      password,
-    });
-    
-    if (error) {
-      throw error;
-    }
+    await mockApiDelay(500);
+    // Ne rien faire pour la démo
   },
 };

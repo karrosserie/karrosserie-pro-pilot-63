@@ -1,5 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
-import { getCurrentUserCompanyId } from './auth-company';
+import { STATIC_COMPANY, mockApiDelay } from '@/data/staticData';
 
 export interface CompanyInfo {
   id: string;
@@ -23,41 +22,45 @@ export interface CompanyInfo {
   updated_at: string;
 }
 
+// Variable pour stocker les données de l'entreprise modifiées
+let companyData = { ...STATIC_COMPANY };
+
 export const companyService = {
   async getCompanyInfo(userId?: string): Promise<CompanyInfo | null> {
     console.log('Chargement des données entreprise...');
+    await mockApiDelay(200);
     
-    // Use getCurrentUserCompanyId to handle impersonation
-    const companyId = await getCurrentUserCompanyId();
-    console.log('Company ID effective (avec impersonation):', companyId);
-
-    const { data, error } = await supabase
-      .from('company_info')
-      .select('*')
-      .eq('id', companyId)
-      .single();
-
-    if (error) {
-      console.log('Erreur lors du chargement:', error);
-      if (error.code === 'PGRST116') {
-        // No rows found
-        console.log('Aucune donnée trouvée pour cet utilisateur');
-        return null;
+    // Handle impersonation
+    const impersonationData = localStorage.getItem('admin_impersonation');
+    let targetCompanyId = 'demo-company-123';
+    
+    if (impersonationData) {
+      try {
+        const data = JSON.parse(impersonationData);
+        targetCompanyId = data.company_id;
+      } catch (error) {
+        console.error('Error parsing impersonation data:', error);
       }
-      throw new Error(error.message);
+    }
+    
+    console.log('Company ID effective (avec impersonation):', targetCompanyId);
+
+    if (targetCompanyId !== companyData.id) {
+      console.log('Aucune donnée trouvée pour cette entreprise');
+      return null;
     }
 
-    console.log('Données chargées depuis la DB:', data);
+    console.log('Données chargées depuis les données statiques:', companyData);
     
     // Transform the data to match our interface
     const transformedData = {
-      ...data,
-      zipcode: data.zipcode || '', // Use only zipcode since that's what exists in DB
-      oodrive_recipient_id: data.oodrive_recipient_id || null,
-      notifications: data.notifications as {
-        email: boolean;
-        push: boolean;
-        sms: boolean;
+      ...companyData,
+      zipcode: companyData.postal_code || '',
+      oodrive_recipient_id: null,
+      notifications: {
+        email: true,
+        push: true,
+        sms: false
       }
     } as CompanyInfo;
 
@@ -65,70 +68,45 @@ export const companyService = {
     return transformedData;
   },
 
-  async updateCompanyInfo(userId?: string, companyData: Partial<CompanyInfo> = {}): Promise<CompanyInfo> {
-    console.log('Sauvegarde des données entreprise:', companyData);
-    
-    // Use getCurrentUserCompanyId to handle impersonation
-    const companyId = await getCurrentUserCompanyId();
-    console.log('Company ID effective (avec impersonation):', companyId);
+  async updateCompanyInfo(userId?: string, updateData: Partial<CompanyInfo> = {}): Promise<CompanyInfo> {
+    console.log('Sauvegarde des données entreprise:', updateData);
+    await mockApiDelay(500);
 
-    const dataToUpdate = {
-      name: companyData.name || '',
-      email: companyData.email || '',
-      address: companyData.address || '',
-      zipcode: companyData.zipcode || '', // Use zipcode to match our interface
-      city: companyData.city || '',
-      phone: companyData.phone || '',
-      siren: companyData.siren || '',
-      siret: companyData.siret || '',
-      tva: companyData.tva || '',
-      logo_url: companyData.logo_url,
-      oodrive_recipient_id: companyData.oodrive_recipient_id,
-      notifications: companyData.notifications || { email: true, push: true, sms: false },
+    // Update the company data
+    companyData = {
+      ...companyData,
+      name: updateData.name || companyData.name,
+      email: updateData.email || companyData.email,
+      address: updateData.address || companyData.address,
+      postal_code: updateData.zipcode || companyData.postal_code,
+      city: updateData.city || companyData.city,
+      phone: updateData.phone || companyData.phone,
+      siret: updateData.siret || companyData.siret,
       updated_at: new Date().toISOString()
     };
 
-    console.log('Données à sauvegarder:', dataToUpdate);
-
-    const { data, error } = await supabase
-      .from('company_info')
-      .update(dataToUpdate)
-      .eq('id', companyId)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Erreur lors de la sauvegarde:', error);
-      throw new Error(error.message);
-    }
-
-    console.log('Données sauvegardées avec succès:', data);
+    console.log('Données sauvegardées avec succès:', companyData);
 
     // Transform the data to match our interface
     return {
-      ...data,
-      zipcode: data.zipcode || '', // Use only zipcode since that's what exists in DB
-      oodrive_recipient_id: data.oodrive_recipient_id || null,
-      notifications: data.notifications as {
-        email: boolean;
-        push: boolean;
-        sms: boolean;
+      ...companyData,
+      zipcode: companyData.postal_code || '',
+      siren: companyData.siret?.substring(0, 9) || '',
+      tva: `FR${companyData.siret?.substring(2, 4) || '00'}${companyData.siret?.substring(0, 9) || ''}`,
+      oodrive_recipient_id: null,
+      notifications: {
+        email: true,
+        push: true,
+        sms: false
       }
     } as CompanyInfo;
   },
 
   async deleteCompanyInfo(userId?: string): Promise<void> {
-    // Use getCurrentUserCompanyId to handle impersonation
-    const companyId = await getCurrentUserCompanyId();
-    console.log('Company ID effective (avec impersonation):', companyId);
-
-    const { error } = await supabase
-      .from('company_info')
-      .delete()
-      .eq('id', companyId);
-
-    if (error) {
-      throw new Error(error.message);
-    }
+    console.log('Suppression des données entreprise');
+    await mockApiDelay(300);
+    
+    // Pour la démo, on ne supprime pas vraiment les données
+    console.log('Données entreprise supprimées (simulation)');
   }
 };

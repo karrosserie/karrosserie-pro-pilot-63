@@ -1,35 +1,21 @@
-import { supabase } from '@/integrations/supabase/client';
+import { mockApiDelay } from '@/data/staticData';
 
 export const setImpersonationSession = async (companyId: string | null) => {
   try {
     console.log('Setting impersonation session for company:', companyId);
+    await mockApiDelay(100);
     
     if (companyId) {
-      // Définir le paramètre de session pour l'impersonation
-      const { error } = await supabase.rpc('set_config' as any, {
-        setting_name: 'app.impersonation_company_id',
-        setting_value: companyId,
-        is_local: true
-      });
-      
-      if (error) {
-        console.error('Error setting impersonation session:', error);
-      } else {
-        console.log('Impersonation session set successfully');
-      }
+      // Stocker l'impersonation dans localStorage
+      localStorage.setItem('admin_impersonation', JSON.stringify({
+        company_id: companyId,
+        timestamp: Date.now()
+      }));
+      console.log('Impersonation session set successfully');
     } else {
-      // Supprimer le paramètre de session
-      const { error } = await supabase.rpc('set_config' as any, {
-        setting_name: 'app.impersonation_company_id',
-        setting_value: '',
-        is_local: true
-      });
-      
-      if (error) {
-        console.error('Error clearing impersonation session:', error);
-      } else {
-        console.log('Impersonation session cleared successfully');
-      }
+      // Supprimer l'impersonation
+      localStorage.removeItem('admin_impersonation');
+      console.log('Impersonation session cleared successfully');
     }
   } catch (error) {
     console.error('Error managing impersonation session:', error);
@@ -38,19 +24,19 @@ export const setImpersonationSession = async (companyId: string | null) => {
 
 export const getCurrentImpersonationCompanyId = async (): Promise<string | null> => {
   try {
-    const { data, error } = await supabase.rpc('current_setting' as any, {
-      setting_name: 'app.impersonation_company_id'
-    });
+    await mockApiDelay(50);
     
-    if (error || !data) {
+    const impersonationData = localStorage.getItem('admin_impersonation');
+    if (!impersonationData) {
       return null;
     }
     
-    // Assurer que nous avons une chaîne de caractères
-    const result = typeof data === 'string' ? data : String(data);
-    return result && result !== '' ? result : null;
+    const data = JSON.parse(impersonationData);
+    return data.company_id || null;
   } catch (error) {
     console.error('Error getting impersonation company id:', error);
+    // Nettoyer les données corrompues
+    localStorage.removeItem('admin_impersonation');
     return null;
   }
 };

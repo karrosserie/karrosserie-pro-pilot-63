@@ -1,6 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
+import { STATIC_CLIENTS, mockApiDelay, filterByCompanyId } from '@/data/staticData';
 import { Database } from '@/integrations/supabase/types';
-import { getCurrentUserCompanyId } from './auth-company';
 
 export type Client = Database['public']['Tables']['clients']['Row'] & {
   company?: string;
@@ -15,62 +14,58 @@ export type UpdateClient = Database['public']['Tables']['clients']['Update'] & {
   oodrive_recipient_id?: string | null;
 };
 
+// Variable pour stocker les clients modifiés
+let clientsData = [...STATIC_CLIENTS];
+
 export const clientsService = {
   getAll: async () => {
     console.log('Fetching all clients...');
+    await mockApiDelay(300);
     
     // Gérer l'impersonation côté client
     const impersonationData = localStorage.getItem('admin_impersonation');
-    let query = supabase
-      .from('clients')
-      .select('*')
-      .order('last_name');
+    let companyId = 'demo-company-123';
     
     if (impersonationData) {
       try {
         const data = JSON.parse(impersonationData);
         console.log('Using impersonation company_id:', data.company_id);
-        // Filtrer par la company_id d'impersonation
-        query = query.eq('company_id', data.company_id);
+        companyId = data.company_id;
       } catch (error) {
         console.error('Error parsing impersonation data:', error);
       }
     }
     
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('Error fetching clients:', error);
-      throw new Error(error.message);
-    }
+    const filteredClients = filterByCompanyId(clientsData, companyId)
+      .sort((a, b) => a.last_name.localeCompare(b.last_name));
     
-    console.log('Clients fetched successfully:', data);
-    return data;
+    console.log('Clients fetched successfully:', filteredClients);
+    return filteredClients;
   },
 
   getById: async (id: string) => {
     console.log(`Fetching client with id: ${id}`);
-    const { data, error } = await supabase
-      .from('clients')
-      .select('*')
-      .eq('id', id)
-      .single();
-      
-    if (error) {
-      console.error(`Error fetching client with id ${id}:`, error);
-      throw new Error(error.message);
+    await mockApiDelay(200);
+    
+    const client = clientsData.find(c => c.id === id);
+    
+    if (!client) {
+      console.error(`Client with id ${id} not found`);
+      throw new Error(`Client with id ${id} not found`);
     }
     
-    console.log('Client fetched successfully:', data);
-    return data;
+    console.log('Client fetched successfully:', client);
+    return client;
   },
   
   create: async (client: any) => {
-    // Extract company field and create clientData without it
+    await mockApiDelay(500);
+    
     const company = client.company;
-    const companyId = await getCurrentUserCompanyId();
+    const companyId = 'demo-company-123';
     
     const clientData = {
+      id: `client-${Date.now()}`,
       first_name: client.firstName,
       last_name: client.lastName,
       email: client.email,
@@ -81,43 +76,32 @@ export const clientsService = {
       company_id: companyId,
       driver_license_front_url: client.driverLicenseFrontUrl || null,
       driver_license_back_url: client.driverLicenseBackUrl || null,
-      oodrive_recipient_id: client.oodrive_recipient_id || null
+      oodrive_recipient_id: client.oodrive_recipient_id || null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
 
     console.log('Creating client with data:', clientData);
-    console.log('Client data structure:', {
-      hasDriverLicenseFront: !!clientData.driver_license_front_url,
-      hasDriverLicenseBack: !!clientData.driver_license_back_url,
-      frontUrl: clientData.driver_license_front_url,
-      backUrl: clientData.driver_license_back_url
-    });
-
-    const { data, error } = await supabase
-      .from('clients')
-      .insert([clientData])
-      .select()
-      .single();
-      
-    if (error) {
-      console.error('Error creating client:', error);
-      console.error('Error details:', {
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        code: error.code
-      });
-      throw new Error(error.message);
-    }
     
-    console.log('Client created successfully:', data);
-    // Add back the company field to the returned data for the frontend
-    return { ...data, company };
+    // Ajouter le client aux données en mémoire
+    clientsData.push(clientData);
+    
+    console.log('Client created successfully:', clientData);
+    return { ...clientData, company };
   },
   
   update: async (id: string, client: any) => {
-    // Extract company field and create clientData without it
+    await mockApiDelay(500);
+    
     const company = client.company;
-    const clientData = {
+    const clientIndex = clientsData.findIndex(c => c.id === id);
+    
+    if (clientIndex === -1) {
+      throw new Error(`Client with id ${id} not found`);
+    }
+    
+    const updatedClientData = {
+      ...clientsData[clientIndex],
       first_name: client.firstName,
       last_name: client.lastName,
       email: client.email,
@@ -127,39 +111,31 @@ export const clientsService = {
       postal_code: client.zipCode,
       driver_license_front_url: client.driverLicenseFrontUrl || null,
       driver_license_back_url: client.driverLicenseBackUrl || null,
-      oodrive_recipient_id: client.oodrive_recipient_id || null
+      oodrive_recipient_id: client.oodrive_recipient_id || null,
+      updated_at: new Date().toISOString(),
     };
 
-    console.log('Updating client with data:', clientData);
-
-    const { data, error } = await supabase
-      .from('clients')
-      .update(clientData)
-      .eq('id', id)
-      .select()
-      .single();
-      
-    if (error) {
-      console.error(`Error updating client with id ${id}:`, error);
-      throw new Error(error.message);
-    }
+    console.log('Updating client with data:', updatedClientData);
     
-    console.log('Client updated successfully:', data);
-    // Add back the company field to the returned data for the frontend
-    return { ...data, company };
+    // Mettre à jour dans les données en mémoire
+    clientsData[clientIndex] = updatedClientData;
+    
+    console.log('Client updated successfully:', updatedClientData);
+    return { ...updatedClientData, company };
   },
   
   delete: async (id: string) => {
+    await mockApiDelay(300);
+    
     console.log(`Deleting client with id: ${id}`);
-    const { error } = await supabase
-      .from('clients')
-      .delete()
-      .eq('id', id);
-      
-    if (error) {
-      console.error(`Error deleting client with id ${id}:`, error);
-      throw new Error(error.message);
+    const clientIndex = clientsData.findIndex(c => c.id === id);
+    
+    if (clientIndex === -1) {
+      throw new Error(`Client with id ${id} not found`);
     }
+    
+    // Supprimer des données en mémoire
+    clientsData.splice(clientIndex, 1);
     
     console.log('Client deleted successfully');
     return true;
