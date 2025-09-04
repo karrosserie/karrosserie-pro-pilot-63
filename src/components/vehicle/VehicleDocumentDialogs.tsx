@@ -29,9 +29,9 @@ const VehicleDocumentDialogs: React.FC<VehicleDocumentDialogsProps> = ({
     <>
       {/* Dialogue de création de devis */}
       <QuoteDialog
-        open={quoteDialogOpen}
+        open={quoteDialogOpen && !!selectedVehicleForDocument}
         onOpenChange={(open) => {
-          console.log('Quote dialog open state changing to:', open);
+          console.log('Quote dialog open state changing to:', open, 'Selected vehicle:', selectedVehicleForDocument);
           setQuoteDialogOpen(open);
           if (!open) {
             setSelectedVehicleForDocument(null);
@@ -52,7 +52,7 @@ const VehicleDocumentDialogs: React.FC<VehicleDocumentDialogsProps> = ({
             car_brands: selectedVehicleForDocument.car_brands,
             car_models: selectedVehicleForDocument.car_models
           }
-        } : null}
+        } : undefined}
       />
 
       {/* Dialogue de création de facture */}
