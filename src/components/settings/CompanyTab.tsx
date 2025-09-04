@@ -139,16 +139,16 @@ const CompanyTab: React.FC = () => {
       const fontAvailable = document.fonts.check('24px "Vezla Font"');
       const fontFamily = fontAvailable ? '"Vezla Font", sans-serif' : 'Arial, sans-serif';
       
-      // Dessiner "carrosserie" en petit et noir
+      // Dessiner "carrosserie" en petit et noir, aligné à gauche
       ctx.fillStyle = '#000000';
       ctx.font = `24px ${fontFamily}`;
-      ctx.textAlign = 'center';
-      ctx.fillText('carrosserie', 256, 180);
+      ctx.textAlign = 'left';
+      ctx.fillText('carrosserie', 50, 180);
       
-      // Dessiner le nom de l'entreprise en gros, gras et noir
+      // Dessiner le nom de l'entreprise en gros, gras et noir, aligné à gauche
       ctx.fillStyle = '#000000';
       ctx.font = `bold 36px ${fontFamily}`;
-      ctx.fillText(companyName, 256, 240);
+      ctx.fillText(companyName, 50, 240);
     }
     
     return new Promise((resolve) => {
