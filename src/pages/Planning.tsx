@@ -13,7 +13,7 @@ import StatsCard from '@/components/dashboard/StatsCard';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompany } from '@/hooks/use-company';
-import { useEmployees, Employee } from '@/hooks/use-employees';
+import { useTeamMembers, TeamMember } from '@/hooks/use-team-members';
 import { EmployeesList } from '@/components/planning/EmployeesList';
 import TaskDetailsModal from '@/components/planning/TaskDetailsModal';
 import { WorkshopPlanningInterface } from '@/components/planning/WorkshopPlanningInterface';
@@ -68,7 +68,7 @@ const Planning = () => {
   const [showTaskDetailsModal, setShowTaskDetailsModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [canStartTasks, setCanStartTasks] = useState<{ [key: string]: boolean }>({});
-  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  const [editingEmployee, setEditingEmployee] = useState<TeamMember | null>(null);
   const [employeeFormData, setEmployeeFormData] = useState({
     teamMemberId: "",
     qualifications: [] as string[]
@@ -134,7 +134,7 @@ const Planning = () => {
     }
   });
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
-  const { employees, createEmployee, updateEmployee } = useEmployees();
+  const { teamMembers: employees, updateTeamMember: updateEmployee } = useTeamMembers();
   const { workflowSteps, refetch: refetchWorkflow } = useVehicleWorkflow(companyInfo?.id);
   const { schedules: employeeSchedules, refetch: refetchEmployeeSchedule } = useEmployeeSchedule(selectedEmployeeId);
   const { schedules: planningEmployeeSchedules } = useEmployeeSchedule(selectedPlanningEmployeeId);
@@ -890,8 +890,8 @@ const Planning = () => {
                     return nameA.localeCompare(nameB);
                   }).map(employee => (
                     <SelectItem key={employee.id} value={employee.id}>
-                      {employee.user_companies?.profiles?.first_name && employee.user_companies?.profiles?.last_name 
-                        ? `${employee.user_companies.profiles.first_name} ${employee.user_companies.profiles.last_name}`
+                      {employee.profiles?.first_name && employee.profiles?.last_name 
+                        ? `${employee.profiles.first_name} ${employee.profiles.last_name}`
                         : `Employé #${employee.id.slice(0, 8)}`
                       }
                     </SelectItem>
@@ -1439,8 +1439,8 @@ const Planning = () => {
               onEditEmployee={(employee) => {
                 setEditingEmployee(employee);
                 setEmployeeFormData({
-                  teamMemberId: employee.team_member_id || "",
-                  qualifications: employee.qualifications
+                  teamMemberId: employee.id || "",
+                  qualifications: employee.qualifications || []
                 });
                 setShowEmployeeDialog(true);
               }}

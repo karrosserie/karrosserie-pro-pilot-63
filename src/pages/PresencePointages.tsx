@@ -246,7 +246,7 @@ export default function PresencePointages() {
         const clockOutDateTime = `${selectedPointage.date}T${clockOutTime}:00`;
         
         await createOrUpdateTimesheet({
-          employee_id: employeeId,
+          user_id: employeeId,
           date: selectedPointage.date,
           clock_in_time: clockInDateTime,
           clock_out_time: clockOutDateTime,

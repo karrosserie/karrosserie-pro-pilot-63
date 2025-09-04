@@ -5,14 +5,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Pencil, Trash } from 'lucide-react';
 import { TeamMember } from '@/hooks/use-team-members';
 
-interface EmployeeCardProps {
-  employee: TeamMember;
-  onEdit: (employee: TeamMember) => void;
+interface TeamMemberCardProps {
+  teamMember: TeamMember;
+  onEdit: (teamMember: TeamMember) => void;
   onDelete: (id: string) => void;
 }
 
-export const EmployeeCard: React.FC<EmployeeCardProps> = ({
-  employee,
+export const TeamMemberCard: React.FC<TeamMemberCardProps> = ({
+  teamMember,
   onEdit,
   onDelete
 }) => {
@@ -29,12 +29,11 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({
     return colors[index % colors.length];
   };
 
-  const fullName = employee.profiles
-    ? `${employee.profiles.first_name} ${employee.profiles.last_name}`
+  const fullName = teamMember.profiles
+    ? `${teamMember.profiles.first_name} ${teamMember.profiles.last_name}`
     : 'Membre non assigné';
 
-  const email = employee.profiles?.email || '';
-  const role = employee.role || '';
+  const email = teamMember.profiles?.email || '';
 
   return (
     <Card>
@@ -43,13 +42,13 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({
           <div>
             <h3 className="text-xl font-semibold text-gray-800">{fullName}</h3>
             {email && <p className="text-sm text-gray-600">{email}</p>}
-            {role && <p className="text-sm text-gray-500 font-medium">{role}</p>}
+            <p className="text-sm text-gray-500 font-medium">{teamMember.role}</p>
           </div>
           <div className="flex gap-2">
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => onEdit(employee)}
+              onClick={() => onEdit(teamMember)}
             >
               <Pencil className="h-4 w-4 mr-1" />
               Modifier
@@ -58,7 +57,7 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({
               variant="outline" 
               size="sm" 
               className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-              onClick={() => onDelete(employee.id)}
+              onClick={() => onDelete(teamMember.id)}
             >
               <Trash className="h-4 w-4 mr-1" />
               Supprimer
@@ -69,7 +68,7 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({
         <div>
           <h4 className="text-sm font-medium text-gray-700 mb-2">Qualifications :</h4>
           <div className="flex flex-wrap gap-2">
-            {employee.qualifications && employee.qualifications.map((qualification, index) => (
+            {teamMember.qualifications && teamMember.qualifications.map((qualification, index) => (
               <Badge 
                 key={qualification} 
                 className={`${getQualificationColor(index)} text-xs`}
@@ -77,7 +76,7 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({
                 {qualification}
               </Badge>
             ))}
-            {(!employee.qualifications || employee.qualifications.length === 0) && (
+            {(!teamMember.qualifications || teamMember.qualifications.length === 0) && (
               <p className="text-sm text-gray-500 italic">Aucune qualification assignée</p>
             )}
           </div>
