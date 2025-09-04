@@ -50,7 +50,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 z-[60] bg-background border rounded-md shadow-md min-w-[var(--radix-popover-trigger-width)]" align="start" sideOffset={4}>
+      <PopoverContent className="w-full p-0 z-[120] bg-background border rounded-md shadow-md min-w-[var(--radix-popover-trigger-width)] pointer-events-auto" align="start" sideOffset={4}>
         <Command>
           <CommandInput placeholder={searchPlaceholder} />
           <CommandList className="max-h-[200px] overflow-y-auto">
@@ -64,7 +64,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                     console.log('CommandItem clicked, option:', option);
                     handleSelect(option.value);
                   }}
-                  className="cursor-pointer hover:bg-accent hover:text-accent-foreground px-2 py-1.5 select-none"
+                  className="cursor-pointer hover:bg-accent hover:text-accent-foreground px-2 py-1.5 select-none pointer-events-auto"
                 >
                   <Check
                     className={cn(
