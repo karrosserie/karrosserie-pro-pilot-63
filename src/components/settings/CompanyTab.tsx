@@ -141,13 +141,13 @@ const CompanyTab: React.FC = () => {
       
       // Dessiner "carrosserie" en petit et noir, aligné à gauche
       ctx.fillStyle = '#000000';
-      ctx.font = `24px ${fontFamily}`;
+      ctx.font = `36px ${fontFamily}`;
       ctx.textAlign = 'left';
       ctx.fillText('carrosserie', 50, 180);
       
       // Dessiner le nom de l'entreprise en gros, gras et noir, aligné à gauche
       ctx.fillStyle = '#000000';
-      ctx.font = `bold 36px ${fontFamily}`;
+      ctx.font = `bold 48px ${fontFamily}`;
       ctx.fillText(companyName, 50, 240);
     }
     
