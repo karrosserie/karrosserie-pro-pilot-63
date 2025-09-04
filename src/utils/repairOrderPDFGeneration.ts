@@ -231,6 +231,10 @@ export const generateRepairOrderPDFWithTemplate = async (repairOrder: RepairOrde
       parts_data: Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data : []
     } as any;
 
+    console.log('Creating PDF with documentType: repair_order');
+    console.log('Company data for PDF:', data.companyData);
+    console.log('Client data for PDF:', data.clientData);
+
     const doc = InvoicePDF({ 
       invoice: invoiceData, 
       companyData: data.companyData, 
@@ -279,6 +283,8 @@ export const printRepairOrderPDFWithTemplate = async (repairOrder: RepairOrder, 
       parts_data: Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data : []
     } as any;
 
+    console.log('Creating PDF for print with documentType: repair_order');
+    
     const doc = InvoicePDF({ 
       invoice: invoiceData, 
       companyData: data.companyData, 

@@ -525,6 +525,163 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             Tel : {companyData?.phone || ''} - Email : {companyData?.email || ''}
           </Text>
         </Page>
+
+        {/* Pages supplémentaires pour les ordres de réparation - Template alternatif */}
+        {documentType === 'repair_order' && (
+          <>
+            {/* Page CONDITIONS GÉNÉRALES */}
+            <Page size="A4" style={alternativeStyles.page}>
+              <View style={{ marginBottom: 20 }}>
+                <Text style={[{ fontSize: 16, fontWeight: 'bold', color: 'white', backgroundColor: '#404348', padding: 8, textAlign: 'center' }]}>CONDITIONS GÉNÉRALES</Text>
+              </View>
+
+              <View style={{ marginBottom: 15 }}>
+                <Text style={[{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#404348' }]}>1. Application des conditions générales</Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.4, marginBottom: 10 }}>
+                  Le présent ordre de réparation est soumis aux conditions générales de service de l'entreprise, dont le client reconnaît avoir
+                  pris connaissance et les avoir acceptées.
+                </Text>
+              </View>
+
+              <View style={{ marginBottom: 15 }}>
+                <Text style={[{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#404348' }]}>2. Base légale</Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.4, marginBottom: 10 }}>
+                  Conformément à l'arrêté du 27 avril 1995 relatif à la vente et aux prestations de service dans le secteur de la réparation
+                  automobile, et aux articles R.311-1 et suivants du Code de la route.
+                </Text>
+              </View>
+
+              <View style={{ marginBottom: 15 }}>
+                <Text style={[{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#404348' }]}>3. Garantie légale et obligation de résultat</Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.4, marginBottom: 10 }}>
+                  Les travaux réalisés bénéficient de la garantie légale de conformité et de la garantie des vices cachés. L'atelier s'engage à
+                  une obligation de résultat pour les réparations effectuées.
+                </Text>
+              </View>
+
+              <View style={{ marginBottom: 15 }}>
+                <Text style={[{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#404348' }]}>4. Pièces remplacées et réserve de propriété</Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.4, marginBottom: 10 }}>
+                  Les pièces remplacées seront tenues à disposition du client pendant 48 heures et restent la propriété de l'atelier jusqu'au
+                  paiement intégral.
+                </Text>
+              </View>
+
+              <View style={{ marginBottom: 15 }}>
+                <Text style={[{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#404348' }]}>5. Expertise</Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.4, marginBottom: 10 }}>
+                  Les travaux ne débuteront qu'après accord de l'expert et/ou de la compagnie d'assurance.
+                </Text>
+              </View>
+
+              <View style={{ marginBottom: 15 }}>
+                <Text style={[{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#404348' }]}>6. Supplément de travaux</Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.4, marginBottom: 10 }}>
+                  Tout supplément de travaux nécessitera un accord préalable du client et un avenant signé si supérieur à 10% du devis
+                  initial.
+                </Text>
+              </View>
+
+              <View style={{ marginBottom: 15 }}>
+                <Text style={[{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#404348' }]}>7. Délais et responsabilité</Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.4, marginBottom: 10 }}>
+                  En cas de retard dû à des circonstances indépendantes de notre volonté, le délai sera révisé sans indemnité
+                  compensatoire.
+                </Text>
+              </View>
+
+              <View style={{ marginBottom: 15 }}>
+                <Text style={[{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#404348' }]}>8. Effets personnels et responsabilité</Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.4, marginBottom: 10 }}>
+                  L'entreprise décline toute responsabilité en cas de perte, vol ou détérioration d'objets personnels non mentionnés à la
+                  réception du véhicule.
+                </Text>
+              </View>
+
+              <View style={{ marginBottom: 15 }}>
+                <Text style={[{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#404348' }]}>9. Protection des données personnelles</Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.4, marginBottom: 10 }}>
+                  Conformément au RGPD, le client dispose d'un droit d'accès, de rectification et de suppression de ses données.
+                </Text>
+              </View>
+
+              <View style={{ marginBottom: 15 }}>
+                <Text style={[{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#404348' }]}>10. Droit de rétractation</Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.4, marginBottom: 10 }}>
+                  Le droit de rétractation de 14 jours ne s'applique pas aux prestations de réparation automobile.
+                </Text>
+              </View>
+
+              <View style={{ marginBottom: 15 }}>
+                <Text style={[{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#404348' }]}>11. Conditions de paiement et pénalités de retard</Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.4, marginBottom: 10 }}>
+                  Le paiement est exigible à la réception du véhicule. Tout retard entraînera des pénalités légales.
+                </Text>
+              </View>
+
+              <View style={{ marginBottom: 20 }}>
+                <Text style={[{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#404348' }]}>12. Médiation et règlement des litiges</Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.4, marginBottom: 10 }}>
+                  En cas de litige, le client peut recourir au service de médiation de la consommation ou saisir la justice compétente.
+                </Text>
+              </View>
+
+              <View style={{ marginTop: 20 }}>
+                <Text style={[{ fontSize: 12, fontWeight: 'bold', backgroundColor: '#404348', color: 'white', padding: 8, textAlign: 'center' }]}>
+                  ASSURANCE PROFESSIONNELLE
+                </Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.4, marginTop: 10 }}>
+                  L'entreprise a souscrit une assurance Responsabilité Civile Professionnelle auprès de :{'\n'}
+                  Allianz{'\n'}
+                  Couvrant les dommages matériels et corporels pouvant survenir pendant les travaux.
+                </Text>
+              </View>
+            </Page>
+
+            {/* Page RÉFÉRENCES JURIDIQUES */}
+            <Page size="A4" style={alternativeStyles.page}>
+              <View style={{ marginBottom: 20 }}>
+                <Text style={[{ fontSize: 16, fontWeight: 'bold', color: 'white', backgroundColor: '#404348', padding: 8, textAlign: 'center' }]}>RÉFÉRENCES JURIDIQUES</Text>
+              </View>
+
+              <View style={{ marginBottom: 10 }}>
+                <Text style={{ fontSize: 9, lineHeight: 1.6, marginBottom: 8 }}>
+                  • Article L.111-1 et L.111-2 du Code de la consommation : obligation d'information précontractuelle
+                </Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.6, marginBottom: 8 }}>
+                  • Article L.113-3 du Code de la consommation : affichage des prix
+                </Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.6, marginBottom: 8 }}>
+                  • Article L.217-4 à L.217-14 du Code de la consommation : garantie légale de conformité
+                </Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.6, marginBottom: 8 }}>
+                  • Articles 1641 à 1649 du Code civil : garantie des vices cachés
+                </Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.6, marginBottom: 8 }}>
+                  • Article L.616-1 du Code de la consommation : médiation de la consommation
+                </Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.6, marginBottom: 8 }}>
+                  • Article L.441-6 du Code de commerce : pénalités de retard
+                </Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.6, marginBottom: 8 }}>
+                  • Article 2286 du Code civil : droit de rétention
+                </Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.6, marginBottom: 8 }}>
+                  • Article L.123-33-3 du Code de commerce : résolution des litiges en ligne
+                </Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.6, marginBottom: 8 }}>
+                  • Directive 2013/11/UE du 21 mai 2013 relative au règlement extrajudiciaire des litiges de consommation
+                </Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.6, marginBottom: 8 }}>
+                  • Jurisprudence Cass. civ. 1ère, 8 mars 2012 : obligation d'information et de conseil du professionnel
+                </Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.6, marginBottom: 8 }}>
+                  • Jurisprudence Cass. civ. 1ère, 15 mai 2015 : obligation de résultat pour les réparations effectuées
+                </Text>
+              </View>
+            </Page>
+          </>
+        )}
       </Document>
     );
   }
@@ -743,7 +900,10 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
       </Page>
 
       {/* Pages supplémentaires pour les ordres de réparation */}
-      {documentType === 'repair_order' && (
+      {documentType === 'repair_order' && (() => {
+        console.log('Rendering additional pages for repair order, documentType:', documentType);
+        return true;
+      })() && (
         <>
           {/* Page CONDITIONS GÉNÉRALES */}
           <Page size="A4" style={defaultStyles.page}>
