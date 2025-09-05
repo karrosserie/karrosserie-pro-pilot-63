@@ -105,7 +105,7 @@ const RepairOrderMobileCard: React.FC<RepairOrderMobileCardProps> = ({
           </Button>
         )}
         {contextMenuProps?.onRequestDocuments && (
-          <Button variant="create" size="sm" className="hidden" onClick={() => contextMenuProps.onRequestDocuments!(order)}>
+          <Button variant="create" size="sm" onClick={() => contextMenuProps.onRequestDocuments!(order)}>
             <FileCheck className="h-3 w-3 mr-1" />
             Justificatifs
           </Button>

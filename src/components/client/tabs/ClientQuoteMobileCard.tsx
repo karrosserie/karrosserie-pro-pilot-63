@@ -84,6 +84,10 @@ const ClientQuoteMobileCard: React.FC<ClientQuoteMobileCardProps> = ({
                   <Mail className="h-4 w-4 mr-2" />
                   E-mail
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onRequestDocuments(quote)}>
+                  <FileCheck className="h-4 w-4 mr-2" />
+                  Demander justificatifs
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 {canConvert && (
                   <DropdownMenuItem onClick={() => onConvertToRepairOrder(quote)}>

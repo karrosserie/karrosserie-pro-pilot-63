@@ -306,7 +306,7 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
                           <Mail className="h-4 w-4 mr-1" />
                           E-mail
                         </Button>
-                        <Button variant="create" size="sm" className="hidden" onClick={() => handleRequestDocuments(quote)}>
+                        <Button variant="create" size="sm" onClick={() => handleRequestDocuments(quote)}>
                           <FileCheck className="h-4 w-4 mr-1" />
                           Justificatifs
                         </Button>

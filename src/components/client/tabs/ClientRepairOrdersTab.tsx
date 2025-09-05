@@ -310,7 +310,7 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
                             Signature du client
                           </Button>
                         )}
-                        <Button variant="create" size="sm" onClick={() => handleRequestDocuments(order)} className="hidden">
+                        <Button variant="create" size="sm" onClick={() => handleRequestDocuments(order)}>
                           <FileCheck className="h-4 w-4 mr-1" />
                           Demander docs
                         </Button>
