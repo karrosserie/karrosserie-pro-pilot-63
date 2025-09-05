@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { creditsService } from '@/services/supabase/credits';
 import { useToast } from '@/hooks/use-toast';
+import { STATIC_CREDITS, mockApiDelay } from '@/data/staticData';
 
 export function useCredits() {
   const queryClient = useQueryClient();
@@ -13,7 +14,10 @@ export function useCredits() {
     error
   } = useQuery({
     queryKey: ['credits'],
-    queryFn: creditsService.getCredits
+    queryFn: async () => {
+      await mockApiDelay(600);
+      return STATIC_CREDITS;
+    }
   });
 
   const createCredit = useMutation({

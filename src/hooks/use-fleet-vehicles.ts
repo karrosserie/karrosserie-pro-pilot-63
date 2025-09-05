@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fleetVehiclesService, NewFleetVehicle, UpdateFleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useToast } from '@/hooks/use-toast';
+import { STATIC_FLEET_VEHICLES, mockApiDelay } from '@/data/staticData';
 
 export function useFleetVehicles() {
   const queryClient = useQueryClient();
@@ -13,7 +14,10 @@ export function useFleetVehicles() {
     error
   } = useQuery({
     queryKey: ['fleetVehicles'],
-    queryFn: fleetVehiclesService.getAll
+    queryFn: async () => {
+      await mockApiDelay(600);
+      return STATIC_FLEET_VEHICLES;
+    }
   });
   
   const createVehicle = useMutation({
@@ -88,7 +92,11 @@ export function useFleetVehicle(id?: string) {
     error
   } = useQuery({
     queryKey: ['fleetVehicles', id],
-    queryFn: () => id ? fleetVehiclesService.getById(id) : null,
+    queryFn: async () => {
+      if (!id) return null;
+      await mockApiDelay(400);
+      return STATIC_FLEET_VEHICLES.find(v => v.id === id) || null;
+    },
     enabled: !!id
   });
   

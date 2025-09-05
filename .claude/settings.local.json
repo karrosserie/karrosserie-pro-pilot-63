@@ -15,7 +15,19 @@
       "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src/**)",
       "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\data/**)",
       "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\data/**)",
-      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\data/**)"
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\data/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\hooks/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\components\\messageries/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\hooks/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\data/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\services\\supabase/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\services\\supabase\\credits/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\services\\supabase\\credits/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\services\\supabase\\cessions/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\services\\supabase/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\services\\supabase/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\services\\supabase/**)",
+      "Read(/C:\\Users\\geoffrey\\Documents\\code\\karrosseries-slot\\slot1-static\\src\\hooks/**)"
     ],
     "deny": [],
     "ask": []

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { STATIC_MESSAGERIES, mockApiDelay } from "@/data/staticData";
 
 export interface Messagerie {
   id: string;
@@ -29,22 +30,15 @@ export function useMessageries() {
   const fetchMessageries = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('messageries')
-        .select('*')
-        .order('created_at', { ascending: false });
+      
+      // Utiliser les données statiques au lieu de Supabase
+      await mockApiDelay(800); // Simuler un délai d'API
+      
+      const staticData = [...STATIC_MESSAGERIES].sort((a, b) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
 
-      if (error) {
-        console.error('Erreur lors du chargement des messageries:', error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de charger les messageries",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setMessageries(data || []);
+      setMessageries(staticData);
     } catch (error) {
       console.error('Erreur:', error);
       toast({
@@ -63,24 +57,12 @@ export function useMessageries() {
       const messagerie = messageries.find(m => m.id === id);
       if (!messagerie) return;
 
-      const { error } = await supabase
-        .from('messageries')
-        .update({ resolved: !messagerie.resolved })
-        .eq('id', id);
-
-      if (error) {
-        console.error('Erreur lors de la mise à jour:', error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de mettre à jour le message",
-          variant: "destructive",
-        });
-        return;
-      }
+      // Simuler un délai d'API
+      await mockApiDelay(300);
 
       setMessageries(prev => 
         prev.map(m => 
-          m.id === id ? { ...m, resolved: !m.resolved } : m
+          m.id === id ? { ...m, resolved: !m.resolved, updated_at: new Date().toISOString() } : m
         )
       );
 
@@ -106,24 +88,12 @@ export function useMessageries() {
       const messagerie = messageries.find(m => m.id === id);
       if (!messagerie) return;
 
-      const { error } = await supabase
-        .from('messageries')
-        .update({ archived: !messagerie.archived })
-        .eq('id', id);
-
-      if (error) {
-        console.error('Erreur lors de l\'archivage:', error);
-        toast({
-          title: "Erreur",
-          description: "Impossible d'archiver le message",
-          variant: "destructive",
-        });
-        return;
-      }
+      // Simuler un délai d'API
+      await mockApiDelay(300);
 
       setMessageries(prev => 
         prev.map(m => 
-          m.id === id ? { ...m, archived: !m.archived } : m
+          m.id === id ? { ...m, archived: !m.archived, updated_at: new Date().toISOString() } : m
         )
       );
 
@@ -159,24 +129,12 @@ export function useMessageries() {
 
       const newPriority = messagerie.priority - 1;
 
-      const { error } = await supabase
-        .from('messageries')
-        .update({ priority: newPriority })
-        .eq('id', id);
-
-      if (error) {
-        console.error('Erreur lors de l\'escalade:', error);
-        toast({
-          title: "Erreur",
-          description: "Impossible d'escalader le message",
-          variant: "destructive",
-        });
-        return;
-      }
+      // Simuler un délai d'API
+      await mockApiDelay(300);
 
       setMessageries(prev => 
         prev.map(m => 
-          m.id === id ? { ...m, priority: newPriority } : m
+          m.id === id ? { ...m, priority: newPriority, updated_at: new Date().toISOString() } : m
         )
       );
 
@@ -200,24 +158,12 @@ export function useMessageries() {
       const messagerie = messageries.find(m => m.id === id);
       if (!messagerie || messagerie.priority === 1) return;
 
-      const { error } = await supabase
-        .from('messageries')
-        .update({ resolved: true })
-        .eq('id', id);
-
-      if (error) {
-        console.error('Erreur lors du traitement auto:', error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de traiter automatiquement le message",
-          variant: "destructive",
-        });
-        return;
-      }
+      // Simuler un délai d'API plus long pour le traitement automatique
+      await mockApiDelay(1200);
 
       setMessageries(prev => 
         prev.map(m => 
-          m.id === id ? { ...m, resolved: true } : m
+          m.id === id ? { ...m, resolved: true, updated_at: new Date().toISOString() } : m
         )
       );
 

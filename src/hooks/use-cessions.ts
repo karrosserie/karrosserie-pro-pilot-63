@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { cessionsService, NewCession, UpdateCession } from '@/services/supabase/cessions';
 import { useToast } from '@/hooks/use-toast';
+import { STATIC_CESSIONS, mockApiDelay } from '@/data/staticData';
 
 export function useCessions() {
   const queryClient = useQueryClient();
@@ -13,7 +14,10 @@ export function useCessions() {
     error
   } = useQuery({
     queryKey: ['cessions'],
-    queryFn: cessionsService.getAll
+    queryFn: async () => {
+      await mockApiDelay(650);
+      return STATIC_CESSIONS;
+    }
   });
   
   const createCession = useMutation({
@@ -92,7 +96,11 @@ export function useCession(id?: string) {
     error
   } = useQuery({
     queryKey: ['cessions', id],
-    queryFn: () => id ? cessionsService.getById(id) : null,
+    queryFn: async () => {
+      if (!id) return null;
+      await mockApiDelay(400);
+      return STATIC_CESSIONS.find(c => c.id === id) || null;
+    },
     enabled: !!id
   });
   

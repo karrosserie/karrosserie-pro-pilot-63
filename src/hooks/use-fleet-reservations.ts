@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fleetReservationsService, NewFleetReservation, UpdateFleetReservation } from '@/services/supabase/fleet-reservations';
 import { useToast } from '@/hooks/use-toast';
+import { STATIC_FLEET_RESERVATIONS, mockApiDelay } from '@/data/staticData';
 
 export function useFleetReservations() {
   const queryClient = useQueryClient();
@@ -12,7 +13,10 @@ export function useFleetReservations() {
     error
   } = useQuery({
     queryKey: ['fleetReservations'],
-    queryFn: fleetReservationsService.getAll
+    queryFn: async () => {
+      await mockApiDelay(700);
+      return STATIC_FLEET_RESERVATIONS;
+    }
   });
   
   const createReservation = useMutation({
@@ -77,7 +81,11 @@ export function useFleetReservation(id?: string) {
     error
   } = useQuery({
     queryKey: ['fleetReservations', id],
-    queryFn: () => id ? fleetReservationsService.getById(id) : null,
+    queryFn: async () => {
+      if (!id) return null;
+      await mockApiDelay(400);
+      return STATIC_FLEET_RESERVATIONS.find(r => r.id === id) || null;
+    },
     enabled: !!id
   });
   
@@ -95,7 +103,11 @@ export function useVehicleReservations(vehicleId?: string) {
     error
   } = useQuery({
     queryKey: ['fleetReservations', 'vehicle', vehicleId],
-    queryFn: () => vehicleId ? fleetReservationsService.getByVehicleId(vehicleId) : [],
+    queryFn: async () => {
+      if (!vehicleId) return [];
+      await mockApiDelay(300);
+      return STATIC_FLEET_RESERVATIONS.filter(r => r.fleet_vehicle_id === vehicleId);
+    },
     enabled: !!vehicleId
   });
   

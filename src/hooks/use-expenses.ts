@@ -101,9 +101,9 @@ export const useExpenses = () => {
 
   const filterExpenses = (expenses: ExpenseWithRelations[], searchTerm: string) => {
     return expenses.filter(expense => 
-      expense.supplier.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      expense.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      expense.type.toLowerCase().includes(searchTerm.toLowerCase())
+      expense.supplier?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      expense.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      expense.type?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   };
 

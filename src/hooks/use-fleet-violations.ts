@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fleetViolationsService, NewFleetViolation, UpdateFleetViolation } from '@/services/supabase/fleet-violations';
 import { useToast } from '@/hooks/use-toast';
+import { STATIC_FLEET_VIOLATIONS, mockApiDelay } from '@/data/staticData';
 
 export function useFleetViolations() {
   const queryClient = useQueryClient();
@@ -12,7 +13,10 @@ export function useFleetViolations() {
     error
   } = useQuery({
     queryKey: ['fleetViolations'],
-    queryFn: fleetViolationsService.getAll
+    queryFn: async () => {
+      await mockApiDelay(500);
+      return STATIC_FLEET_VIOLATIONS;
+    }
   });
   
   const createViolation = useMutation({
@@ -87,7 +91,11 @@ export function useFleetViolation(id?: string) {
     error
   } = useQuery({
     queryKey: ['fleetViolations', id],
-    queryFn: () => id ? fleetViolationsService.getById(id) : null,
+    queryFn: async () => {
+      if (!id) return null;
+      await mockApiDelay(300);
+      return STATIC_FLEET_VIOLATIONS.find(v => v.id === id) || null;
+    },
     enabled: !!id
   });
   
@@ -105,7 +113,11 @@ export function useVehicleViolations(vehicleId?: string) {
     error
   } = useQuery({
     queryKey: ['fleetViolations', 'vehicle', vehicleId],
-    queryFn: () => vehicleId ? fleetViolationsService.getByVehicleId(vehicleId) : [],
+    queryFn: async () => {
+      if (!vehicleId) return [];
+      await mockApiDelay(250);
+      return STATIC_FLEET_VIOLATIONS.filter(v => v.fleet_vehicle_id === vehicleId);
+    },
     enabled: !!vehicleId
   });
   

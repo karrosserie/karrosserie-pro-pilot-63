@@ -4,6 +4,7 @@ import { expertiseReportsService, NewExpertiseReport, UpdateExpertiseReport, Exp
 import { useToast } from '@/hooks/use-toast';
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { STATIC_EXPERTISE_REPORTS, mockApiDelay } from '@/data/staticData';
 
 export function useExpertiseReports() {
   const queryClient = useQueryClient();
@@ -15,7 +16,10 @@ export function useExpertiseReports() {
     error
   } = useQuery({
     queryKey: ['expertiseReports'],
-    queryFn: expertiseReportsService.getAll,
+    queryFn: async () => {
+      await mockApiDelay(800);
+      return STATIC_EXPERTISE_REPORTS;
+    },
     staleTime: 0, // Considérer les données comme obsolètes immédiatement
     refetchOnWindowFocus: true, // Refetch quand la fenêtre reprend le focus
   });
@@ -133,7 +137,11 @@ export function useExpertiseReport(id?: string) {
     error
   } = useQuery({
     queryKey: ['expertiseReports', id],
-    queryFn: () => id ? expertiseReportsService.getById(id) : null,
+    queryFn: async () => {
+      if (!id) return null;
+      await mockApiDelay(400);
+      return STATIC_EXPERTISE_REPORTS.find(r => r.id === id) || null;
+    },
     enabled: !!id
   });
   
