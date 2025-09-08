@@ -245,6 +245,13 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
     totalTTC: `${totalTTC.toFixed(2).replace('.', ',')} €`
   };
 
+  // Préparer les données de signature
+  const signatureData = {
+    signature: currentRepairOrder.client_signature || null,
+    clientName: currentRepairOrder.client_name_signature || '',
+    signatureDate: currentRepairOrder.signature_date ? formatDateFr(currentRepairOrder.signature_date) : null
+  };
+
   // Action handlers
   const handleEdit = () => {
     setEditDialogOpen(true);
@@ -445,6 +452,7 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
                 vehicleData={vehicleDataForTemplate}
                 items={items}
                 totals={totalsData}
+                signatureData={signatureData}
               />
             ) : (
               <AlternativeRepairOrderPreview 
@@ -454,6 +462,7 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
                 vehicleData={vehicleDataForTemplate}
                 items={items}
                 totals={totalsData}
+                signatureData={signatureData}
               />
             )}
           </div>

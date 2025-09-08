@@ -45,9 +45,14 @@ interface AlternativeRepairOrderPreviewProps {
     totalDiscount?: string;
     totalTTC?: string;
   };
+  signatureData?: {
+    signature: string | null;
+    clientName: string;
+    signatureDate: string | null;
+  };
 }
 
-const AlternativeRepairOrderPreview = ({ companyData, orderData, clientData, vehicleData, items, totals }: AlternativeRepairOrderPreviewProps) => {
+const AlternativeRepairOrderPreview = ({ companyData, orderData, clientData, vehicleData, items, totals, signatureData }: AlternativeRepairOrderPreviewProps) => {
   // Utiliser uniquement les données réelles, pas de valeurs par défaut
   const orderDataToUse = orderData || {};
   const clientDataToUse = clientData || {};
@@ -182,6 +187,35 @@ const AlternativeRepairOrderPreview = ({ companyData, orderData, clientData, veh
         <div className="mt-6">
           <h3 className="text-lg font-bold mb-2">Notes</h3>
           <p className="text-sm">{orderDataToUse.notes}</p>
+        </div>
+      )}
+
+      {/* Section signature client */}
+      {signatureData && (
+        <div className="mt-8 flex justify-center">
+          <div className="text-center">
+            <h3 className="text-lg font-bold mb-4">Signature du client</h3>
+            {signatureData.signature ? (
+              <div className="border-2 border-black rounded-lg p-4">
+                <img 
+                  src={signatureData.signature} 
+                  alt="Signature du client"
+                  className="mx-auto mb-2"
+                  style={{ maxWidth: '200px', maxHeight: '100px' }}
+                />
+                <p className="text-sm font-bold">{signatureData.clientName}</p>
+                {signatureData.signatureDate && (
+                  <p className="text-xs text-gray-600">Signé le {signatureData.signatureDate}</p>
+                )}
+              </div>
+            ) : (
+              <div className="border-2 border-black border-dashed rounded-lg p-4 text-gray-500">
+                <div style={{ width: '200px', height: '100px' }} className="mx-auto flex items-center justify-center">
+                  <span className="text-sm font-bold">Signature en attente</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
