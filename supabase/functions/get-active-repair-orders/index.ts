@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
 
     console.log(`Fetching active repair orders for company: ${companyId}`)
 
-    // Fetch repair orders with active statuses (En cours and En attente) and filter by company_id
+    // Fetch repair orders with active statuses (En cours, En attente and Signé) and filter by company_id
     const { data: repairOrders, error } = await supabase
       .from('repair_orders')
       .select(`
@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
           postal_code
         )
       `)
-      .in('status', ['En cours', 'En attente'])
+      .in('status', ['En cours', 'En attente', 'Signé'])
       .eq('company_id', companyId)
       .order('created_at', { ascending: false })
 
