@@ -9,6 +9,11 @@ interface InvoicePDFProps {
   receipts?: any[];
   clientData?: any;
   vehicleData?: any;
+  signatureData?: {
+    signature: string | null;
+    clientName: string;
+    signatureDate: string | null;
+  };
   template?: string;
   documentType?: 'invoice' | 'repair_order' | 'credit' | 'quote';
 }
@@ -356,7 +361,7 @@ const alternativeStyles = StyleSheet.create({
   },
 });
 
-const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleData, template = 'default', documentType = 'invoice' }: InvoicePDFProps) => {
+const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleData, signatureData, template = 'default', documentType = 'invoice' }: InvoicePDFProps) => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
     try {
@@ -515,6 +520,31 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             <View style={{ marginTop: 15, marginBottom: 15 }}>
               <Text style={{ fontSize: 10, fontWeight: 'bold', marginBottom: 8 }}>Détails de paiement :</Text>
               <Text style={{ fontSize: 9, lineHeight: 1.4 }}>{invoice.payment_details}</Text>
+            </View>
+          )}
+
+          {/* Section signature client pour les ordres de réparation */}
+          {documentType === 'repair_order' && signatureData && (
+            <View style={{ marginTop: 30, alignItems: 'center' }}>
+              <Text style={{ fontSize: 10, fontWeight: 'bold', marginBottom: 15 }}>Signature du client</Text>
+              {signatureData.signature ? (
+                <View style={{ alignItems: 'center' }}>
+                  <Image 
+                    src={signatureData.signature} 
+                    style={{ width: 150, height: 75, marginBottom: 8 }} 
+                  />
+                  <Text style={{ fontSize: 9, marginBottom: 2 }}>
+                    {signatureData.clientName}
+                  </Text>
+                  <Text style={{ fontSize: 8, color: '#666' }}>
+                    Signé le {signatureData.signatureDate ? formatDate(signatureData.signatureDate) : ''}
+                  </Text>
+                </View>
+              ) : (
+                <View style={{ height: 75, width: 150, borderWidth: 1, borderColor: '#ccc', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 9, color: '#666' }}>Signature en attente</Text>
+                </View>
+              )}
             </View>
           )}
 
@@ -888,6 +918,31 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
           <View style={{ marginTop: 15, marginBottom: 15 }}>
             <Text style={[defaultStyles.sectionTitle, { marginBottom: 8 }]}>Détails de paiement</Text>
             <Text style={{ fontSize: 9, lineHeight: 1.4 }}>{invoice.payment_details}</Text>
+          </View>
+        )}
+
+        {/* Section signature client pour les ordres de réparation */}
+        {documentType === 'repair_order' && signatureData && (
+          <View style={{ marginTop: 30, alignItems: 'center' }}>
+            <Text style={[defaultStyles.sectionTitle, { textAlign: 'center', marginBottom: 15 }]}>Signature du client</Text>
+            {signatureData.signature ? (
+              <View style={{ alignItems: 'center' }}>
+                <Image 
+                  src={signatureData.signature} 
+                  style={{ width: 150, height: 75, marginBottom: 8 }} 
+                />
+                <Text style={{ fontSize: 9, marginBottom: 2 }}>
+                  {signatureData.clientName}
+                </Text>
+                <Text style={{ fontSize: 8, color: '#666' }}>
+                  Signé le {signatureData.signatureDate ? formatDate(signatureData.signatureDate) : ''}
+                </Text>
+              </View>
+            ) : (
+              <View style={{ height: 75, width: 150, borderWidth: 1, borderColor: '#ccc', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 9, color: '#666' }}>Signature en attente</Text>
+              </View>
+            )}
           </View>
         )}
 

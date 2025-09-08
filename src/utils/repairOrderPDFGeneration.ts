@@ -166,6 +166,11 @@ export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, com
       companyData: finalCompanyData,
       template,
       repairOrderData,
+      signatureData: {
+        signature: repairOrder.client_signature || null,
+        clientName: repairOrder.client_name_signature || '',
+        signatureDate: repairOrder.signature_date || null
+      },
       clientData: {
         number: repairOrder.reference,
         name: clientData?.clientName || '',
@@ -241,6 +246,7 @@ export const generateRepairOrderPDFWithTemplate = async (repairOrder: RepairOrde
       receipts: [],
       clientData: data.clientData,
       vehicleData: data.vehicleData,
+      signatureData: data.signatureData,
       template: data.template,
       documentType: 'repair_order'
     });
@@ -291,6 +297,7 @@ export const printRepairOrderPDFWithTemplate = async (repairOrder: RepairOrder, 
       receipts: [],
       clientData: data.clientData,
       vehicleData: data.vehicleData,
+      signatureData: data.signatureData,
       template: data.template,
       documentType: 'repair_order'
     });
