@@ -52,14 +52,27 @@ export const QuotePartsSection = ({ parts, onPartsChange, isReadOnly = false }: 
   const calculateTotals = () => {
     const subTotal = parts.reduce((sum, part) => sum + (part.quantity * part.unitCost), 0);
     const totalVat = parts.reduce((sum, part) => {
-      const subtotal = part.quantity * part.unitCost;
-      return sum + (subtotal * (part.vat / 100));
+      const quantity = isNaN(Number(part.quantity)) ? 0 : Number(part.quantity);
+      const unitCost = isNaN(Number(part.unitCost)) ? 0 : Number(part.unitCost);
+      const discount = isNaN(Number(part.discount)) ? 0 : Number(part.discount);
+      const vat = isNaN(Number(part.vat)) ? 0 : Number(part.vat);
+      
+      const subtotal = quantity * unitCost;
+      const discountAmount = subtotal * (discount / 100);
+      const afterDiscount = subtotal - discountAmount;
+      return sum + (afterDiscount * (vat / 100));
     }, 0);
     const totalDiscount = parts.reduce((sum, part) => {
-      const subtotal = part.quantity * part.unitCost;
-      return sum + (subtotal * (part.discount / 100));
+      const quantity = isNaN(Number(part.quantity)) ? 0 : Number(part.quantity);
+      const unitCost = isNaN(Number(part.unitCost)) ? 0 : Number(part.unitCost);
+      const discount = isNaN(Number(part.discount)) ? 0 : Number(part.discount);
+      
+      const subtotal = quantity * unitCost;
+      return sum + (subtotal * (discount / 100));
     }, 0);
-    const total = parts.reduce((sum, part) => sum + part.total, 0);
+    const total = parts.reduce((sum, part) => {
+      return sum + (isNaN(Number(part.total)) ? 0 : Number(part.total));
+    }, 0);
 
     return { subTotal, totalVat, totalDiscount, total };
   };

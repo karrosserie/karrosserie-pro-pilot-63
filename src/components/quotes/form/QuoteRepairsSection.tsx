@@ -64,16 +64,27 @@ export const QuoteRepairsSection = ({ repairs, onRepairsChange, isReadOnly = fal
   const calculateTotals = () => {
     const subTotal = repairs.reduce((sum, repair) => sum + (repair.quantity * repair.unitCost), 0);
     const totalVat = repairs.reduce((sum, repair) => {
-      const subtotal = repair.quantity * repair.unitCost;
-      const discountAmount = subtotal * (repair.discount / 100);
+      const quantity = isNaN(Number(repair.quantity)) ? 0 : Number(repair.quantity);
+      const unitCost = isNaN(Number(repair.unitCost)) ? 0 : Number(repair.unitCost);
+      const discount = isNaN(Number(repair.discount)) ? 0 : Number(repair.discount);
+      const vat = isNaN(Number(repair.vat)) ? 0 : Number(repair.vat);
+      
+      const subtotal = quantity * unitCost;
+      const discountAmount = subtotal * (discount / 100);
       const afterDiscount = subtotal - discountAmount;
-      return sum + (afterDiscount * (repair.vat / 100));
+      return sum + (afterDiscount * (vat / 100));
     }, 0);
     const totalDiscount = repairs.reduce((sum, repair) => {
-      const subtotal = repair.quantity * repair.unitCost;
-      return sum + (subtotal * (repair.discount / 100));
+      const quantity = isNaN(Number(repair.quantity)) ? 0 : Number(repair.quantity);
+      const unitCost = isNaN(Number(repair.unitCost)) ? 0 : Number(repair.unitCost);
+      const discount = isNaN(Number(repair.discount)) ? 0 : Number(repair.discount);
+      
+      const subtotal = quantity * unitCost;
+      return sum + (subtotal * (discount / 100));
     }, 0);
-    const total = repairs.reduce((sum, repair) => sum + repair.total, 0);
+    const total = repairs.reduce((sum, repair) => {
+      return sum + (isNaN(Number(repair.total)) ? 0 : Number(repair.total));
+    }, 0);
 
     return { subTotal, totalVat, totalDiscount, total };
   };
