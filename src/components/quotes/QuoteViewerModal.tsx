@@ -145,21 +145,27 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
   let discounts = [];
   
   try {
-    repairs = currentQuote.repairs_data ? JSON.parse(currentQuote.repairs_data as string) : [];
+    const parsedRepairs = currentQuote.repairs_data ? JSON.parse(currentQuote.repairs_data as string) : [];
+    repairs = Array.isArray(parsedRepairs) ? parsedRepairs : [];
   } catch (e) {
     console.error('Error parsing repairs data:', e);
+    repairs = [];
   }
   
   try {
-    parts = currentQuote.parts_data ? JSON.parse(currentQuote.parts_data as string) : [];
+    const parsedParts = currentQuote.parts_data ? JSON.parse(currentQuote.parts_data as string) : [];
+    parts = Array.isArray(parsedParts) ? parsedParts : [];
   } catch (e) {
     console.error('Error parsing parts data:', e);
+    parts = [];
   }
   
   try {
-    discounts = currentQuote.discounts_data ? JSON.parse(currentQuote.discounts_data as string) : [];
+    const parsedDiscounts = currentQuote.discounts_data ? JSON.parse(currentQuote.discounts_data as string) : [];
+    discounts = Array.isArray(parsedDiscounts) ? parsedDiscounts : [];
   } catch (e) {
     console.error('Error parsing discounts data:', e);
+    discounts = [];
   }
 
   const totals = calculateGlobalTotals(repairs, parts, discounts);
