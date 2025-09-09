@@ -144,9 +144,27 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
   let parts = [];
   let discounts = [];
   
+  // Helper function to clean numeric values and replace NaN with 0
+  const cleanNumericValue = (value: any): number => {
+    const num = Number(value);
+    return isNaN(num) ? 0 : num;
+  };
+
+  // Helper function to clean data arrays
+  const cleanDataArray = (data: any[]): any[] => {
+    return data.map(item => ({
+      ...item,
+      quantity: cleanNumericValue(item.quantity),
+      unitCost: cleanNumericValue(item.unitCost),
+      discount: cleanNumericValue(item.discount),
+      vat: cleanNumericValue(item.vat),
+      total: cleanNumericValue(item.total)
+    }));
+  };
+
   try {
     const parsedRepairs = currentQuote.repairs_data ? JSON.parse(currentQuote.repairs_data as string) : [];
-    repairs = Array.isArray(parsedRepairs) ? parsedRepairs : [];
+    repairs = Array.isArray(parsedRepairs) ? cleanDataArray(parsedRepairs) : [];
   } catch (e) {
     console.error('Error parsing repairs data:', e);
     repairs = [];
@@ -154,7 +172,7 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
   
   try {
     const parsedParts = currentQuote.parts_data ? JSON.parse(currentQuote.parts_data as string) : [];
-    parts = Array.isArray(parsedParts) ? parsedParts : [];
+    parts = Array.isArray(parsedParts) ? cleanDataArray(parsedParts) : [];
   } catch (e) {
     console.error('Error parsing parts data:', e);
     parts = [];
@@ -162,7 +180,10 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
   
   try {
     const parsedDiscounts = currentQuote.discounts_data ? JSON.parse(currentQuote.discounts_data as string) : [];
-    discounts = Array.isArray(parsedDiscounts) ? parsedDiscounts : [];
+    discounts = Array.isArray(parsedDiscounts) ? parsedDiscounts.map(item => ({
+      ...item,
+      amount: cleanNumericValue(item.amount)
+    })) : [];
   } catch (e) {
     console.error('Error parsing discounts data:', e);
     discounts = [];
