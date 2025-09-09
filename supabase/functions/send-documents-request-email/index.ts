@@ -207,6 +207,12 @@ const handler = async (req: Request): Promise<Response> => {
     const immatriculation = vehicleData.license_plate || 'Immatriculation inconnue';
     const nomEntreprise = companyData.name || 'Notre entreprise';
 
+    // Déterminer l'URL de base pour le lien
+    const baseUrl = Deno.env.get('FRONTEND_BASE_URL') || 
+                   req.headers.get('origin') || 
+                   req.headers.get('referer')?.split('/').slice(0, 3).join('/') ||
+                   'https://app.karrosserie.pro';
+
     const subject = 'Justificatifs manquants - Réparation véhicule';
     const emailContent = `
       <html>
@@ -221,7 +227,7 @@ const handler = async (req: Request): Promise<Response> => {
             <p>Vous pouvez nous les fournir en vous rendant sur cette page :</p>
             
             <div style="text-align: center; margin: 30px 0;">
-              <a href="https://app.karrosserie.pro/documents/upload/${tokenId}" 
+              <a href="${baseUrl}/documents/upload/${tokenId}" 
                  style="background-color: #e67e22; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
                 Télécharger mes justificatifs
               </a>
