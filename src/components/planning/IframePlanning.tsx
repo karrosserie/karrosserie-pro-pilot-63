@@ -13,7 +13,7 @@ export function IframePlanning({ className = "" }: IframePlanningProps) {
   const [iframeToken, setIframeToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const baseUrl = 'https://karrosserie-planning.lovable.app/';
+  const baseUrl = import.meta.env.VITE_PLANNING_IFRAME_URL || 'https://karrosserie-planning.lovable.app/';
 
   useEffect(() => {
     generateIframeToken();
