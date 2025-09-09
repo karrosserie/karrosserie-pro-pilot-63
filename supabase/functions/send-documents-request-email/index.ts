@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface EmailRequest {
+interface DocumentsRequest {
   tokenId: string;
   targetEmail?: string; // Email de destination optionnel pour override
 }
@@ -73,6 +73,41 @@ const sendEmail = async (to: string, subject: string, html: string) => {
   }
 };
 
+const sendSMS = async (phone: string, link: string) => {
+  try {
+    console.log('📱 Début de sendSMS');
+    console.log('📱 Envoi SMS vers:', phone);
+    console.log('📱 Lien:', link);
+
+    const response = await fetch('https://n8n.karrosserie.pro/webhook/edb07668-2f9a-4815-b4f9-2e1b64ba2a7f', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        phone: phone,
+        link: link
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ SMS envoyé avec succès:', result);
+    
+    return { 
+      success: true, 
+      message: 'SMS envoyé avec succès'
+    };
+    
+  } catch (error) {
+    console.error('❌ Erreur dans sendSMS:', error);
+    throw error;
+  }
+};
+
 const detectEnvironment = () => {
   const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
   const isLovable = supabaseUrl.includes('lovable') || supabaseUrl.includes('localhost');
@@ -89,7 +124,7 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     console.log('Début de la fonction send-documents-request-email');
     
-    const { tokenId, targetEmail }: EmailRequest = await req.json();
+    const { tokenId, targetEmail }: DocumentsRequest = await req.json();
     console.log('Paramètres reçus:', { tokenId, targetEmail });
 
     if (!tokenId) {
@@ -116,10 +151,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('Données du token récupérées:', tokenData);
 
-    // Récupérer les informations du client
+    // Récupérer les informations du client avec le numéro de téléphone
     const { data: clientData, error: clientError } = await supabase
       .from('clients')
-      .select('id, first_name, last_name, email')
+      .select('id, first_name, last_name, email, phone_number')
       .eq('id', tokenData.client_id)
       .single();
 
@@ -177,89 +212,109 @@ const handler = async (req: Request): Promise<Response> => {
     console.log('Modèle:', modelData);
     console.log('Entreprise:', companyData);
 
-    // Déterminer l'email de destination
-    let finalEmail: string;
-    
-    if (targetEmail) {
-      // Si un email cible est spécifié, l'utiliser
-      finalEmail = targetEmail;
-      console.log('📧 Email cible spécifié:', finalEmail);
-    } else {
-      // Sinon, utiliser la logique de détection d'environnement
-      const isLovable = detectEnvironment();
-      
-      if (isLovable) {
-        finalEmail = 'karrosseriepro@yopmail.com';
-        console.log('📧 Environnement Lovable détecté, utilisation de l\'email de test');
-      } else {
-        if (!clientData.email) {
-          throw new Error('Email du client non trouvé');
-        }
-        finalEmail = clientData.email;
-        console.log('📧 Environnement de production, utilisation de l\'email client');
-      }
-    }
-
-    // Construire le contenu de l'email
-    const prenom = clientData.first_name || 'Client';
-    const marque = brandData?.name || 'Marque inconnue';
-    const modele = modelData?.name || 'Modèle inconnu';
-    const immatriculation = vehicleData.license_plate || 'Immatriculation inconnue';
-    const nomEntreprise = companyData.name || 'Notre entreprise';
-
-    // Déterminer l'URL de base pour le lien
+    // Construire le lien de téléchargement
     const baseUrl = Deno.env.get('FRONTEND_BASE_URL') || 
                    req.headers.get('origin') || 
                    req.headers.get('referer')?.split('/').slice(0, 3).join('/') ||
                    'https://app.karrosserie.pro';
-
-    const subject = 'Justificatifs manquants - Réparation véhicule';
-    const emailContent = `
-      <html>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-          <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h2 style="color: #2c3e50;">Demande de justificatifs</h2>
-            
-            <p>Bonjour ${prenom},</p>
-            
-            <p>Des justificatifs manquent dans le cadre des travaux sur votre véhicule <strong>${marque} ${modele}</strong> immatriculé <strong>${immatriculation}</strong>.</p>
-            
-            <p>Vous pouvez nous les fournir en vous rendant sur cette page :</p>
-            
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${baseUrl}/documents/upload/${tokenId}" 
-                 style="background-color: #e67e22; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
-                Télécharger mes justificatifs
-              </a>
-            </div>
-            
-            <p>Cordialement,</p>
-            <p><strong>${nomEntreprise}</strong></p>
-            
-            <hr style="margin-top: 40px; border: none; border-top: 1px solid #eee;">
-            <p style="font-size: 12px; color: #666;">
-              Ce message a été envoyé automatiquement. Si vous avez des questions, veuillez contacter ${nomEntreprise}.
-            </p>
-          </div>
-        </body>
-      </html>
-    `;
-
-    console.log('Envoi de l\'email à:', finalEmail);
     
-    // Envoyer l'email
-    console.log('Tentative d\'envoi de l\'email...');
-    const emailResult = await sendEmail(finalEmail, subject, emailContent);
-    console.log('Résultat de l\'envoi email:', emailResult);
+    const uploadLink = `${baseUrl}/documents/upload/${tokenId}`;
 
-    console.log('Email envoyé avec succès');
+    // Déterminer le mode d'envoi : email ou SMS
+    let sendMode: 'email' | 'sms' | 'none' = 'none';
+    let recipient: string = '';
+
+    if (targetEmail) {
+      // Si un email cible est spécifié, l'utiliser
+      sendMode = 'email';
+      recipient = targetEmail;
+      console.log('📧 Email cible spécifié:', recipient);
+    } else {
+      // Logique de choix automatique
+      const isLovable = detectEnvironment();
+      
+      if (isLovable) {
+        // En environnement de test, privilégier l'email
+        sendMode = 'email';
+        recipient = 'karrosseriepro@yopmail.com';
+        console.log('📧 Environnement Lovable détecté, utilisation de l\'email de test');
+      } else {
+        // En production, choisir selon les données disponibles
+        if (clientData.email) {
+          sendMode = 'email';
+          recipient = clientData.email;
+          console.log('📧 Email client disponible:', recipient);
+        } else if (clientData.phone_number) {
+          sendMode = 'sms';
+          recipient = clientData.phone_number;
+          console.log('📱 Pas d\'email, utilisation du SMS vers:', recipient);
+        } else {
+          throw new Error('Aucun moyen de contact disponible (email ou téléphone)');
+        }
+      }
+    }
+
+    let result;
+    
+    if (sendMode === 'email') {
+      // Envoyer par email
+      const prenom = clientData.first_name || 'Client';
+      const marque = brandData?.name || 'Marque inconnue';
+      const modele = modelData?.name || 'Modèle inconnu';
+      const immatriculation = vehicleData.license_plate || 'Immatriculation inconnue';
+      const nomEntreprise = companyData.name || 'Notre entreprise';
+
+      const subject = 'Justificatifs manquants - Réparation véhicule';
+      const emailContent = `
+        <html>
+          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+              <h2 style="color: #2c3e50;">Demande de justificatifs</h2>
+              
+              <p>Bonjour ${prenom},</p>
+              
+              <p>Des justificatifs manquent dans le cadre des travaux sur votre véhicule <strong>${marque} ${modele}</strong> immatriculé <strong>${immatriculation}</strong>.</p>
+              
+              <p>Vous pouvez nous les fournir en vous rendant sur cette page :</p>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${uploadLink}" 
+                   style="background-color: #e67e22; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                  Télécharger mes justificatifs
+                </a>
+              </div>
+              
+              <p>Cordialement,</p>
+              <p><strong>${nomEntreprise}</strong></p>
+              
+              <hr style="margin-top: 40px; border: none; border-top: 1px solid #eee;">
+              <p style="font-size: 12px; color: #666;">
+                Ce message a été envoyé automatiquement. Si vous avez des questions, veuillez contacter ${nomEntreprise}.
+              </p>
+            </div>
+          </body>
+        </html>
+      `;
+
+      console.log('Envoi de l\'email à:', recipient);
+      result = await sendEmail(recipient, subject, emailContent);
+      
+    } else if (sendMode === 'sms') {
+      // Envoyer par SMS
+      console.log('Envoi du SMS à:', recipient);
+      result = await sendSMS(recipient, uploadLink);
+    }
+
+    console.log('Demande de justificatifs envoyée avec succès via', sendMode);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Email envoyé avec succès',
-        recipient: finalEmail,
-        originalClientEmail: clientData.email
+        message: `Demande de justificatifs envoyée avec succès via ${sendMode}`,
+        sendMode: sendMode,
+        recipient: recipient,
+        originalClientEmail: clientData.email,
+        originalClientPhone: clientData.phone_number
       }),
       {
         status: 200,
