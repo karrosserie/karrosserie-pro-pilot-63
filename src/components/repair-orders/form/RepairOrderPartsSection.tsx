@@ -39,10 +39,10 @@ export const RepairOrderPartsSection = ({ parts, onPartsChange, isReadOnly = fal
       if (part.id === id) {
         const updated = { ...part, [field]: value };
         // Calculate total
-        const subtotal = updated.quantity * updated.unitCost;
-        const discountAmount = subtotal * (updated.discount / 100);
+        const subtotal = (updated.quantity || 0) * (updated.unitCost || 0);
+        const discountAmount = subtotal * ((updated.discount || 0) / 100);
         const afterDiscount = subtotal - discountAmount;
-        const vatAmount = afterDiscount * (updated.vat / 100);
+        const vatAmount = afterDiscount * ((updated.vat || 20) / 100);
         updated.total = afterDiscount + vatAmount;
         return updated;
       }
@@ -52,7 +52,7 @@ export const RepairOrderPartsSection = ({ parts, onPartsChange, isReadOnly = fal
   };
 
   const formatForDisplay = (value: number) => {
-    return value.toString().replace('.', ',');
+    return (value || 0).toString().replace('.', ',');
   };
 
   const parseFromDisplay = (value: string) => {
@@ -60,16 +60,16 @@ export const RepairOrderPartsSection = ({ parts, onPartsChange, isReadOnly = fal
   };
 
   const calculateTotals = () => {
-    const subTotal = parts.reduce((sum, part) => sum + (part.quantity * part.unitCost), 0);
+    const subTotal = parts.reduce((sum, part) => sum + ((part.quantity || 0) * (part.unitCost || 0)), 0);
     const totalVat = parts.reduce((sum, part) => {
-      const subtotal = part.quantity * part.unitCost;
-      return sum + (subtotal * (part.vat / 100));
+      const subtotal = (part.quantity || 0) * (part.unitCost || 0);
+      return sum + (subtotal * ((part.vat || 20) / 100));
     }, 0);
     const totalDiscount = parts.reduce((sum, part) => {
-      const subtotal = part.quantity * part.unitCost;
-      return sum + (subtotal * (part.discount / 100));
+      const subtotal = (part.quantity || 0) * (part.unitCost || 0);
+      return sum + (subtotal * ((part.discount || 0) / 100));
     }, 0);
-    const total = parts.reduce((sum, part) => sum + part.total, 0);
+    const total = parts.reduce((sum, part) => sum + (part.total || 0), 0);
 
     return { subTotal, totalVat, totalDiscount, total };
   };
@@ -144,7 +144,7 @@ export const RepairOrderPartsSection = ({ parts, onPartsChange, isReadOnly = fal
                   className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <div className="text-right font-medium">
-                  {part.total.toFixed(2).replace('.', ',')} €
+                  {(part.total || 0).toFixed(2).replace('.', ',')} €
                 </div>
                 {!isReadOnly && (
                   <Button
