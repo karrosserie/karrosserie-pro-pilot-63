@@ -7,12 +7,10 @@ import { WorkshopStats } from "./WorkshopStats";
 import { WorkflowStep } from "./WorkflowStep";
 import { EmployeeView } from "./EmployeeView";
 import { VehiclesWaitingTab } from "./VehiclesWaitingTab";
-import { PlanningDetailedView } from "./PlanningDetailedView";
+import { PlanningCalendar } from "./PlanningCalendar";
 import { EmployeePlanningTab } from "./EmployeePlanningTab";
 import { EmployeesManagement } from "./EmployeesManagement";
 import { ProcessConfig } from "./ProcessConfig";
-import { QuickPlanningModal } from "./QuickPlanningModal";
-import { VehicleDetailModal } from "./VehicleDetailModal";
 import { useUserRole } from "@/hooks/use-user-role";
 
 
@@ -40,9 +38,6 @@ export const WorkshopPlanningInterface = ({
   
   const [activeView, setActiveView] = useState<'manager' | 'employee'>(getDefaultView());
   const [urgentVehicles, setUrgentVehicles] = useState(false);
-  const [isQuickPlanningOpen, setIsQuickPlanningOpen] = useState(false);
-  const [isVehicleDetailOpen, setIsVehicleDetailOpen] = useState(false);
-  const [selectedVehicleId, setSelectedVehicleId] = useState<string | undefined>();
 
   // Mettre à jour la vue si le rôle change
   useEffect(() => {
@@ -202,22 +197,10 @@ export const WorkshopPlanningInterface = ({
 
   const handlePlanVehicle = (vehicleId: string) => {
     console.log('Planning vehicle:', vehicleId);
-    setSelectedVehicleId(vehicleId);
-    setIsVehicleDetailOpen(true);
+    // TODO: Implement vehicle planning logic
     if (onScheduleUpdate) {
       onScheduleUpdate({ vehicleId, action: 'plan' });
     }
-  };
-
-  const handleQuickPlanningSubmit = (data: any) => {
-    console.log('Quick planning data:', data);
-    if (onScheduleUpdate) {
-      onScheduleUpdate({ action: 'quick_plan', data });
-    }
-  };
-
-  const handleUrgentVehicleClick = () => {
-    setIsQuickPlanningOpen(true);
   };
 
   return (
@@ -271,7 +254,7 @@ export const WorkshopPlanningInterface = ({
         <Button
           variant={urgentVehicles ? 'destructive' : 'outline'}
           size="sm"
-          onClick={handleUrgentVehicleClick}
+          onClick={() => setUrgentVehicles(!urgentVehicles)}
           className="flex items-center gap-2"
         >
           <AlertTriangle className="w-4 h-4" />
@@ -359,7 +342,7 @@ export const WorkshopPlanningInterface = ({
             </TabsContent>
 
             <TabsContent value="planning" className="space-y-6">
-              <PlanningDetailedView />
+              <PlanningCalendar />
             </TabsContent>
 
             <TabsContent value="employee-planning" className="space-y-6">
@@ -382,19 +365,6 @@ export const WorkshopPlanningInterface = ({
           <EmployeeView />
         </div>
       )}
-
-      {/* Modals */}
-      <QuickPlanningModal
-        isOpen={isQuickPlanningOpen}
-        onOpenChange={setIsQuickPlanningOpen}
-        onSubmit={handleQuickPlanningSubmit}
-      />
-      
-      <VehicleDetailModal
-        isOpen={isVehicleDetailOpen}
-        onOpenChange={setIsVehicleDetailOpen}
-        vehicleId={selectedVehicleId}
-      />
     </div>
   );
 };

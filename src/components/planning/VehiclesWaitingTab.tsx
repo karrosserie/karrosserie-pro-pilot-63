@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Car, User, Euro, ArrowRight, AlertTriangle } from 'lucide-react';
+import { Clock, Car, User, Euro, ArrowRight } from 'lucide-react';
 
 interface WaitingVehicle {
   id: string;
@@ -20,55 +20,68 @@ interface WaitingVehicle {
 const mockWaitingVehicles: WaitingVehicle[] = [
   {
     id: '1',
-    brand: 'Peugeot',
-    model: '308',
-    licensePlate: 'AB-123-CD',
-    client: 'M. Dupont',
-    price: '2500€',
-    estimatedDuration: '252 jour(s)',
-    description: 'Raison du blocage : Attente pièces',
+    brand: 'Toyota',
+    model: 'Corolla',
+    licensePlate: 'BC-456-DE',
+    client: 'M. Durand',
+    price: '850€',
+    estimatedDuration: '2h30',
+    description: 'Réparation pare-brise',
     priority: 'Urgent',
     arrivalDate: '2024-01-15',
-    waitingTime: '252 jour(s)'
+    waitingTime: '2 jours'
   },
   {
     id: '2',
-    brand: 'Renault',
-    model: 'Megane',
-    licensePlate: 'FG-456-GH',
+    brand: 'Opel',
+    model: 'Corsa',
+    licensePlate: 'FG-789-HI',
     client: 'Mme Martin',
-    price: '3800€',
-    estimatedDuration: '248 jour(s)',
-    description: 'Raison du blocage : Validation assurance',
+    price: '650€',
+    estimatedDuration: '3h00',
+    description: 'Peinture portière',
     priority: 'Normal',
     arrivalDate: '2024-01-16',
-    waitingTime: '248 jour(s)'
+    waitingTime: '1 jour'
   },
   {
     id: '3',
-    brand: 'BMW',
-    model: 'Série 3',
-    licensePlate: 'PQ-012-UV',
-    client: 'M. Leroy',
-    price: '3200€',
-    estimatedDuration: '251 jour(s)',
-    description: 'Raison du blocage : Attente technicien',
+    brand: 'Seat',
+    model: 'Ibiza',
+    licensePlate: 'JK-012-LM',
+    client: 'M. Bernard',
+    price: '1200€',
+    estimatedDuration: '4h00',
+    description: 'Remplacement capot + peinture',
     priority: 'Très urgent',
     arrivalDate: '2024-01-17',
-    waitingTime: '251 jour(s)'
+    waitingTime: '6h'
   },
   {
     id: '4',
-    brand: 'Volkswagen',
-    model: 'Golf',
-    licensePlate: 'XY-789-ZA',
-    client: 'M. Durand',
-    price: '1800€',
-    estimatedDuration: '252 jour(s)',
-    description: 'Raison du blocage : Attente pièces',
+    brand: 'Skoda',
+    model: 'Octavia',
+    licensePlate: 'NO-345-PQ',
+    client: 'Mme Rousseau',
+    price: '450€',
+    estimatedDuration: '1h30',
+    description: 'Polissage rayures',
     priority: 'Normal',
     arrivalDate: '2024-01-17',
-    waitingTime: '252 jour(s)'
+    waitingTime: '4h'
+  },
+  {
+    id: '5',
+    brand: 'Hyundai',
+    model: 'i30',
+    licensePlate: 'RS-678-TU',
+    client: 'M. Petit',
+    price: '950€',
+    estimatedDuration: '3h30',
+    description: 'Débosselage + retouche peinture',
+    priority: 'Normal',
+    arrivalDate: '2024-01-18',
+    waitingTime: '2h'
   }
 ];
 
@@ -111,15 +124,9 @@ export const VehiclesWaitingTab = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-6 h-6 text-orange-500" />
-            <h2 className="text-xl font-bold">Véhicules en Attente</h2>
-            <Badge className="bg-red-100 text-red-800">{mockWaitingVehicles.length} véhicule(s) bloqué(s)</Badge>
-          </div>
-          <p className="text-muted-foreground mt-1">{mockWaitingVehicles.length} véhicule(s) bloqué(s) dans les étapes atelier</p>
-        </div>
+      <div>
+        <h2 className="text-2xl font-bold mb-2">Véhicules en Attente</h2>
+        <p className="text-muted-foreground">Véhicules prêts à intégrer le processus de réparation</p>
       </div>
 
       {/* Statistics */}
@@ -151,63 +158,58 @@ export const VehiclesWaitingTab = () => {
       </div>
 
       {/* Vehicles List */}
-      <div className="space-y-4">
+      <div className="grid gap-4">
         {sortedVehicles.map((vehicle) => (
-          <Card key={vehicle.id} className="overflow-hidden">
-            <CardContent className="p-0">
-              <div className="flex items-center justify-between p-6">
-                <div className="flex items-center gap-4">
-                  <div>
-                    <h3 className="font-semibold text-lg">{vehicle.brand} {vehicle.model}</h3>
-                    <p className="text-sm text-muted-foreground">{vehicle.licensePlate}</p>
+          <Card key={vehicle.id} className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1 space-y-3">
+                  {/* Vehicle Info */}
+                  <div className="flex items-center gap-3">
+                    <Car className="w-5 h-5 text-primary" />
+                    <div>
+                      <h3 className="font-semibold text-lg">
+                        {vehicle.brand} {vehicle.model}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">{vehicle.licensePlate}</p>
+                    </div>
+                    {getPriorityBadge(vehicle.priority)}
                   </div>
+
+                  {/* Client & Details */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4 text-muted-foreground" />
+                      <span>{vehicle.client}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Euro className="w-4 h-4 text-muted-foreground" />
+                      <span className="font-medium">{vehicle.price}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-muted-foreground" />
+                      <span>~{vehicle.estimatedDuration}</span>
+                    </div>
+                    <div className="text-muted-foreground">
+                      En attente: <span className="font-medium">{vehicle.waitingTime}</span>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-sm bg-muted p-2 rounded">
+                    <strong>Travaux:</strong> {vehicle.description}
+                  </p>
                 </div>
-                
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <div className="text-sm text-muted-foreground">Client :</div>
-                    <div className="font-medium">{vehicle.client}</div>
-                  </div>
-                  
-                  <div className="text-right">
-                    <div className="text-sm text-muted-foreground">Prix :</div>
-                    <div className="font-medium">{vehicle.price}</div>
-                  </div>
-                  
-                  <div className="text-right">
-                    <div className="text-sm text-muted-foreground">Étape bloquée :</div>
-                    <div className="font-medium">Réparation carrosserie</div>
-                  </div>
-                  
-                  <div className="text-right">
-                    <div className="text-sm text-muted-foreground">En attente depuis :</div>
-                    <div className="font-medium text-orange-600">{vehicle.waitingTime}</div>
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline"
-                      className="bg-green-500 text-white hover:bg-green-600"
-                      onClick={() => handleAddToWorkflow(vehicle.id)}
-                    >
-                      Débloquer
-                    </Button>
-                    <Button variant="outline">
-                      Planifier
-                    </Button>
-                    <Button variant="outline">
-                      Modifier
-                    </Button>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Blocking reason */}
-              <div className="bg-orange-50 border-t border-orange-200 px-6 py-3">
-                <div className="flex items-center gap-2 text-sm text-orange-800">
-                  <AlertTriangle className="w-4 h-4" />
-                  <span>{vehicle.description}</span>
-                  <span className="text-muted-foreground">- Pare-chocs avant en commande - Délai 5-7 jours</span>
+
+                {/* Actions */}
+                <div className="ml-4 flex flex-col gap-2">
+                  <Button 
+                    onClick={() => handleAddToWorkflow(vehicle.id)}
+                    className="flex items-center gap-2"
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                    Démarrer
+                  </Button>
                 </div>
               </div>
             </CardContent>
