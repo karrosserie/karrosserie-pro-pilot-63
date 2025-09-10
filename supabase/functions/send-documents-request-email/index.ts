@@ -154,7 +154,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Récupérer les informations du client avec le numéro de téléphone
     const { data: clientData, error: clientError } = await supabase
       .from('clients')
-      .select('id, first_name, last_name, email, phone_number')
+      .select('id, first_name, last_name, email, phone')
       .eq('id', tokenData.client_id)
       .single();
 
@@ -244,9 +244,9 @@ const handler = async (req: Request): Promise<Response> => {
           sendMode = 'email';
           recipient = clientData.email;
           console.log('📧 Email client disponible:', recipient);
-        } else if (clientData.phone_number) {
+        } else if (clientData.phone) {
           sendMode = 'sms';
-          recipient = clientData.phone_number;
+          recipient = clientData.phone;
           console.log('📱 Pas d\'email, utilisation du SMS vers:', recipient);
         } else {
           throw new Error('Aucun moyen de contact disponible (email ou téléphone)');
@@ -314,7 +314,7 @@ const handler = async (req: Request): Promise<Response> => {
         sendMode: sendMode,
         recipient: recipient,
         originalClientEmail: clientData.email,
-        originalClientPhone: clientData.phone_number
+        originalClientPhone: clientData.phone
       }),
       {
         status: 200,
