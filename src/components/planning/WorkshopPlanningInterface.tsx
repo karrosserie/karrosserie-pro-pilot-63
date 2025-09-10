@@ -8,8 +8,7 @@ import { WorkflowStep } from "./WorkflowStep";
 import { EmployeeView } from "./EmployeeView";
 import { VehiclesWaitingTab } from "./VehiclesWaitingTab";
 import { PlanningCalendar } from "./PlanningCalendar";
-
-import { EmployeesManagement } from "./EmployeesManagement";
+import { EmployeePlanningTab } from "./EmployeePlanningTab";
 import { ProcessConfig } from "./ProcessConfig";
 import { useUserRole } from "@/hooks/use-user-role";
 
@@ -269,7 +268,7 @@ export const WorkshopPlanningInterface = ({
       {/* Navigation Tabs - Only show for manager view */}
       {activeView === 'manager' && (
         <Tabs defaultValue="workshop" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="workshop" className="flex items-center gap-1">
             <Wrench className="w-4 h-4" />
             <span className="hidden sm:inline">Étapes atelier</span>
@@ -289,11 +288,6 @@ export const WorkshopPlanningInterface = ({
             <Users className="w-4 h-4" />
             <span className="hidden sm:inline">Planning Employés</span>
             <span className="sm:hidden">P.Emp</span>
-          </TabsTrigger>
-          <TabsTrigger value="employees" className="flex items-center gap-1">
-            <Users className="w-4 h-4" />
-            <span className="hidden sm:inline">Employés</span>
-            <span className="sm:hidden">Emp</span>
           </TabsTrigger>
           <TabsTrigger value="process" className="flex items-center gap-1">
             <Cog className="w-4 h-4" />
@@ -358,9 +352,11 @@ export const WorkshopPlanningInterface = ({
               />
             </TabsContent>
 
-
-            <TabsContent value="employees" className="space-y-6">
-              <EmployeesManagement />
+            <TabsContent value="employee-planning" className="space-y-6">
+              <EmployeePlanningTab 
+                employees={employees}
+                schedules={schedules}
+              />
             </TabsContent>
 
             <TabsContent value="process" className="space-y-6">
