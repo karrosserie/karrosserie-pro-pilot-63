@@ -15,7 +15,7 @@ const CreationDossierJudiciaire = () => {
   const { createCase } = useJudicialCases();
   const { clients } = useClients();
   const { invoices } = useInvoices();
-  const { companyData } = useCompany();
+  const { companyData, isLoading: isCompanyLoading } = useCompany();
 
   const steps = [
     { id: 1, label: "Parties", icon: <Users className="w-5 h-5" />, colorClass: "text-blue-700", bgColorClass: "bg-blue-100" },
@@ -50,17 +50,18 @@ const CreationDossierJudiciaire = () => {
 
   // Auto-fill company data for demandeur field
   useEffect(() => {
-    if (companyData && (!formData.demandeur || formData.demandeur.trim() === '')) {
+    if (!isCompanyLoading && companyData && companyData.name && formData.demandeur === '') {
       const companyInfo = [];
       
-      if (companyData.name) {
-        companyInfo.push(companyData.name);
-      }
+      // Add company name
+      companyInfo.push(companyData.name);
       
+      // Add address
       if (companyData.address) {
         companyInfo.push(companyData.address);
       }
       
+      // Add postal code and city
       const cityLine = [];
       if (companyData.zipcode) {
         cityLine.push(companyData.zipcode);
@@ -72,20 +73,19 @@ const CreationDossierJudiciaire = () => {
         companyInfo.push(cityLine.join(' '));
       }
       
+      // Add SIRET or SIREN
       if (companyData.siret) {
         companyInfo.push(`SIRET: ${companyData.siret}`);
       } else if (companyData.siren) {
         companyInfo.push(`SIREN: ${companyData.siren}`);
       }
       
-      if (companyInfo.length > 0) {
-        setFormData(prev => ({
-          ...prev,
-          demandeur: companyInfo.join('\n')
-        }));
-      }
+      setFormData(prev => ({
+        ...prev,
+        demandeur: companyInfo.join('\n')
+      }));
     }
-  }, [companyData, formData.demandeur]);
+  }, [companyData, isCompanyLoading, formData.demandeur]);
 
   // Auto-fill form data when client or invoice is selected
   useEffect(() => {
