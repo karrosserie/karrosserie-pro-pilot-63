@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,7 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Settings, Clock, Users, Plus, Edit, Trash2, Move, ArrowRight } from 'lucide-react';
+import { Settings, Clock, Users, Plus, Edit, Trash2, Move, ArrowRight, Loader2 } from 'lucide-react';
+import { useProcessTemplates, useCreateWorkflowStep, useUpdateWorkflowStep, useDeleteWorkflowStep } from '@/hooks/useProcessTemplates';
+import { ProcessTemplateWithSteps, WorkflowStep as DBWorkflowStep } from '@/services/supabase/processTemplates';
 
 interface WorkflowStep {
   id: string;
@@ -32,6 +34,45 @@ interface ProcessTemplate {
   isDefault: boolean;
 }
 
+// Fonction pour convertir les données DB vers le format UI
+const convertDBStepToUI = (dbStep: DBWorkflowStep): WorkflowStep => ({
+  id: dbStep.id,
+  name: dbStep.name,
+  description: dbStep.description || '',
+  estimatedDuration: Number(dbStep.estimated_duration),
+  requiredQualifications: dbStep.required_qualifications,
+  isRequired: dbStep.is_required,
+  canRunInParallel: dbStep.can_run_in_parallel,
+  dependencies: dbStep.dependencies,
+  color: dbStep.color,
+  order: dbStep.step_order
+});
+
+// Fonction pour convertir les données UI vers le format DB
+const convertUIStepToDB = (uiStep: Partial<WorkflowStep>, processTemplateId: string): Omit<DBWorkflowStep, 'id' | 'created_at' | 'updated_at'> => ({
+  process_template_id: processTemplateId,
+  step_key: uiStep.name?.toLowerCase().replace(/\s+/g, '_') || '',
+  name: uiStep.name || '',
+  description: uiStep.description || null,
+  estimated_duration: uiStep.estimatedDuration || 0,
+  required_qualifications: uiStep.requiredQualifications || [],
+  is_required: uiStep.isRequired || false,
+  can_run_in_parallel: uiStep.canRunInParallel || false,
+  dependencies: uiStep.dependencies || [],
+  color: uiStep.color || 'bg-blue-100 text-blue-800',
+  step_order: uiStep.order || 1
+});
+
+// Fonction pour convertir les données DB vers le format UI pour les processus
+const convertDBProcessToUI = (dbProcess: ProcessTemplateWithSteps): ProcessTemplate => ({
+  id: dbProcess.id,
+  name: dbProcess.name,
+  description: dbProcess.description || '',
+  estimatedTotalDuration: Number(dbProcess.estimated_total_duration),
+  isDefault: dbProcess.is_default,
+  steps: dbProcess.workflow_steps.map(convertDBStepToUI)
+});
+
 const availableQualifications = [
   'Carrosserie',
   'Peinture',
@@ -52,93 +93,15 @@ const stepColors = [
   'bg-orange-100 text-orange-800'
 ];
 
-const mockProcessTemplates: ProcessTemplate[] = [
-  {
-    id: '1',
-    name: 'Processus Standard Carrosserie',
-    description: 'Processus complet pour réparations de carrosserie avec peinture',
-    isDefault: true,
-    estimatedTotalDuration: 12,
-    steps: [
-      {
-        id: 'accueil',
-        name: 'Accueil & Préparation du dossier',
-        description: 'Réception du véhicule, évaluation des dégâts, création du dossier client',
-        estimatedDuration: 1,
-        requiredQualifications: ['Diagnostic'],
-        isRequired: true,
-        canRunInParallel: false,
-        dependencies: [],
-        color: stepColors[0],
-        order: 1
-      },
-      {
-        id: 'remplacement',
-        name: 'Remplacement ou débosselage',
-        description: 'Remplacement des pièces endommagées ou débosselage',
-        estimatedDuration: 2.5,
-        requiredQualifications: ['Carrosserie', 'Débosselage'],
-        isRequired: true,
-        canRunInParallel: false,
-        dependencies: ['accueil'],
-        color: stepColors[1],
-        order: 2
-      },
-      {
-        id: 'preparation',
-        name: 'Préparation peinture',
-        description: 'Ponçage, masquage, apprêt',
-        estimatedDuration: 2.5,
-        requiredQualifications: ['Peinture', 'Préparation'],
-        isRequired: true,
-        canRunInParallel: false,
-        dependencies: ['remplacement'],
-        color: stepColors[2],
-        order: 3
-      },
-      {
-        id: 'peinture',
-        name: 'Mise en peinture',
-        description: 'Application de la peinture, séchage',
-        estimatedDuration: 4,
-        requiredQualifications: ['Peinture'],
-        isRequired: true,
-        canRunInParallel: false,
-        dependencies: ['preparation'],
-        color: stepColors[3],
-        order: 4
-      },
-      {
-        id: 'finitions',
-        name: 'Finitions & remontage',
-        description: 'Polissage, remontage des éléments',
-        estimatedDuration: 1.5,
-        requiredQualifications: ['Polissage', 'Carrosserie'],
-        isRequired: true,
-        canRunInParallel: false,
-        dependencies: ['peinture'],
-        color: stepColors[4],
-        order: 5
-      },
-      {
-        id: 'cloture',
-        name: 'Clôture du dossier et livraison',
-        description: 'Contrôle qualité final, nettoyage, livraison',
-        estimatedDuration: 0.5,
-        requiredQualifications: ['Diagnostic'],
-        isRequired: true,
-        canRunInParallel: false,
-        dependencies: ['finitions'],
-        color: stepColors[5],
-        order: 6
-      }
-    ]
-  }
-];
 
 export const ProcessConfig = () => {
-  const [processes, setProcesses] = useState<ProcessTemplate[]>(mockProcessTemplates);
-  const [selectedProcess, setSelectedProcess] = useState<ProcessTemplate>(mockProcessTemplates[0]);
+  const { data: dbProcesses, isLoading } = useProcessTemplates();
+  const createStepMutation = useCreateWorkflowStep();
+  const updateStepMutation = useUpdateWorkflowStep();
+  const deleteStepMutation = useDeleteWorkflowStep();
+
+  const [processes, setProcesses] = useState<ProcessTemplate[]>([]);
+  const [selectedProcess, setSelectedProcess] = useState<ProcessTemplate | null>(null);
   const [isStepDialogOpen, setIsStepDialogOpen] = useState(false);
   const [editingStep, setEditingStep] = useState<WorkflowStep | null>(null);
   const [newStep, setNewStep] = useState<Partial<WorkflowStep>>({
@@ -152,24 +115,32 @@ export const ProcessConfig = () => {
     color: stepColors[0]
   });
 
-  const handleAddStep = () => {
-    const id = Date.now().toString();
-    const step: WorkflowStep = {
-      ...newStep as WorkflowStep,
-      id,
+  // Synchroniser les données de la base avec l'état local
+  useEffect(() => {
+    if (dbProcesses) {
+      const convertedProcesses = dbProcesses.map(convertDBProcessToUI);
+      setProcesses(convertedProcesses);
+      
+      if (!selectedProcess && convertedProcesses.length > 0) {
+        setSelectedProcess(convertedProcesses[0]);
+      }
+    }
+  }, [dbProcesses, selectedProcess]);
+
+  const handleAddStep = async () => {
+    if (!selectedProcess) return;
+    
+    const stepData = convertUIStepToDB({
+      ...newStep,
       order: selectedProcess.steps.length + 1
-    };
-    
-    const updatedProcess = {
-      ...selectedProcess,
-      steps: [...selectedProcess.steps, step],
-      estimatedTotalDuration: selectedProcess.estimatedTotalDuration + step.estimatedDuration
-    };
-    
-    setSelectedProcess(updatedProcess);
-    setProcesses(prev => prev.map(p => p.id === selectedProcess.id ? updatedProcess : p));
-    setIsStepDialogOpen(false);
-    resetNewStep();
+    }, selectedProcess.id);
+
+    createStepMutation.mutate(stepData, {
+      onSuccess: () => {
+        setIsStepDialogOpen(false);
+        resetNewStep();
+      }
+    });
   };
 
   const handleEditStep = (step: WorkflowStep) => {
@@ -178,36 +149,31 @@ export const ProcessConfig = () => {
     setIsStepDialogOpen(true);
   };
 
-  const handleUpdateStep = () => {
-    if (!editingStep) return;
+  const handleUpdateStep = async () => {
+    if (!editingStep || !selectedProcess) return;
 
-    const updatedSteps = selectedProcess.steps.map(step => 
-      step.id === editingStep.id ? { ...newStep as WorkflowStep, id: editingStep.id } : step
-    );
-    
-    const updatedProcess = {
-      ...selectedProcess,
-      steps: updatedSteps,
-      estimatedTotalDuration: updatedSteps.reduce((acc, step) => acc + step.estimatedDuration, 0)
-    };
-    
-    setSelectedProcess(updatedProcess);
-    setProcesses(prev => prev.map(p => p.id === selectedProcess.id ? updatedProcess : p));
-    setIsStepDialogOpen(false);
-    setEditingStep(null);
-    resetNewStep();
+    const updates = convertUIStepToDB(newStep, selectedProcess.id);
+
+    updateStepMutation.mutate({
+      id: editingStep.id,
+      updates,
+      processTemplateId: selectedProcess.id
+    }, {
+      onSuccess: () => {
+        setIsStepDialogOpen(false);
+        setEditingStep(null);
+        resetNewStep();
+      }
+    });
   };
 
-  const handleDeleteStep = (stepId: string) => {
-    const updatedSteps = selectedProcess.steps.filter(step => step.id !== stepId);
-    const updatedProcess = {
-      ...selectedProcess,
-      steps: updatedSteps,
-      estimatedTotalDuration: updatedSteps.reduce((acc, step) => acc + step.estimatedDuration, 0)
-    };
-    
-    setSelectedProcess(updatedProcess);
-    setProcesses(prev => prev.map(p => p.id === selectedProcess.id ? updatedProcess : p));
+  const handleDeleteStep = async (stepId: string) => {
+    if (!selectedProcess) return;
+
+    deleteStepMutation.mutate({
+      id: stepId,
+      processTemplateId: selectedProcess.id
+    });
   };
 
   const resetNewStep = () => {
@@ -231,6 +197,27 @@ export const ProcessConfig = () => {
         : (prev.requiredQualifications || []).filter(q => q !== qualification)
     }));
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Chargement des processus...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!selectedProcess) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <p className="text-muted-foreground">Aucun processus disponible</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -346,8 +333,18 @@ export const ProcessConfig = () => {
                 <Button variant="outline" onClick={() => setIsStepDialogOpen(false)}>
                   Annuler
                 </Button>
-                <Button onClick={editingStep ? handleUpdateStep : handleAddStep}>
-                  {editingStep ? 'Mettre à jour' : 'Ajouter'}
+                <Button 
+                  onClick={editingStep ? handleUpdateStep : handleAddStep}
+                  disabled={createStepMutation.isPending || updateStepMutation.isPending}
+                >
+                  {createStepMutation.isPending || updateStepMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      {editingStep ? 'Mise à jour...' : 'Ajout...'}
+                    </>
+                  ) : (
+                    editingStep ? 'Mettre à jour' : 'Ajouter'
+                  )}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -463,9 +460,14 @@ export const ProcessConfig = () => {
                         variant="outline" 
                         size="sm" 
                         onClick={() => handleDeleteStep(step.id)}
+                        disabled={deleteStepMutation.isPending}
                         className="flex items-center gap-1 text-red-600 hover:text-red-700"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        {deleteStepMutation.isPending ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-3 h-3" />
+                        )}
                         Supprimer
                       </Button>
                     </div>

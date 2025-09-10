@@ -816,6 +816,13 @@ export type Database = {
             referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_employee_schedule_user_id"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       employee_timesheets: {
@@ -1762,6 +1769,39 @@ export type Database = {
         }
         Relationships: []
       }
+      process_templates: {
+        Row: {
+          company_id: string
+          created_at: string
+          description: string | null
+          estimated_total_duration: number
+          id: string
+          is_default: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          description?: string | null
+          estimated_total_duration?: number
+          id?: string
+          is_default?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          estimated_total_duration?: number
+          id?: string
+          is_default?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -2553,6 +2593,65 @@ export type Database = {
             columns: ["paint_type_id"]
             isOneToOne: false
             referencedRelation: "paint_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_steps: {
+        Row: {
+          can_run_in_parallel: boolean
+          color: string
+          created_at: string
+          dependencies: string[] | null
+          description: string | null
+          estimated_duration: number
+          id: string
+          is_required: boolean
+          name: string
+          process_template_id: string
+          required_qualifications: string[] | null
+          step_key: string
+          step_order: number
+          updated_at: string
+        }
+        Insert: {
+          can_run_in_parallel?: boolean
+          color?: string
+          created_at?: string
+          dependencies?: string[] | null
+          description?: string | null
+          estimated_duration?: number
+          id?: string
+          is_required?: boolean
+          name: string
+          process_template_id: string
+          required_qualifications?: string[] | null
+          step_key: string
+          step_order?: number
+          updated_at?: string
+        }
+        Update: {
+          can_run_in_parallel?: boolean
+          color?: string
+          created_at?: string
+          dependencies?: string[] | null
+          description?: string | null
+          estimated_duration?: number
+          id?: string
+          is_required?: boolean
+          name?: string
+          process_template_id?: string
+          required_qualifications?: string[] | null
+          step_key?: string
+          step_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_steps_process_template_id_fkey"
+            columns: ["process_template_id"]
+            isOneToOne: false
+            referencedRelation: "process_templates"
             referencedColumns: ["id"]
           },
         ]
