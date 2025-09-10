@@ -98,7 +98,34 @@ serve(async (req) => {
       purpose: 'iframe-context'
     }
 
-    console.log('generate-iframe-token: Creating JWT with payload for role:', payload.role)
+    console.log('generate-iframe-token: JWT Payload Details:', {
+      user: {
+        id: payload.user.id,
+        email: payload.user.email,
+        first_name: payload.user.first_name,
+        last_name: payload.user.last_name,
+        phone_number: payload.user.phone_number
+      },
+      company: {
+        id: payload.company?.id,
+        name: payload.company?.name,
+        email: payload.company?.email,
+        phone: payload.company?.phone,
+        address: payload.company?.address,
+        city: payload.company?.city,
+        zipcode: payload.company?.zipcode,
+        siren: payload.company?.siren,
+        siret: payload.company?.siret,
+        logo_url: payload.company?.logo_url
+      },
+      role: payload.role,
+      iat: payload.iat,
+      exp: payload.exp,
+      expiresInMinutes: Math.floor((payload.exp - payload.iat) / 60),
+      purpose: payload.purpose
+    })
+
+    console.log('generate-iframe-token: Full payload stringified:', JSON.stringify(payload, null, 2))
 
     // Generate JWT token using crypto.subtle
     const key = await crypto.subtle.importKey(
