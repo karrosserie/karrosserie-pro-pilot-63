@@ -27,6 +27,8 @@ export const WorkshopPlanningInterface = ({
   schedules = [], 
   onScheduleUpdate 
 }: WorkshopPlanningInterfaceProps) => {
+  // Force cache refresh
+  console.log('🔄 WorkshopPlanningInterface reloaded with real data');
   const { userRole, isCarrossier, isCarrossierCourtesy, isResponsable, isOwner, isLoading } = useUserRole();
   
   // Debug logs pour comprendre le problème de rôle
