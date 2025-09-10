@@ -1,9 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import React, { useState, useEffect } from 'react';
+
+// Planning Interface Component
+import { WorkshopPlanningInterface } from '@/components/planning/WorkshopPlanningInterface';
 
 // Data hooks
 import { useEmployeeData } from '@/hooks/useEmployeeData';
@@ -13,20 +11,16 @@ import { usePlanningManager } from '@/hooks/usePlanningManager';
 
 // UI Components
 import { useToast } from '@/hooks/use-toast';
-import { EnhancedButton } from '@/components/ui/enhanced-button';
-import { StatusBadge } from '@/components/ui/status-badge';
-import { QuickActions, type QuickAction } from '@/components/ui/quick-actions';
 import { FloatingNotifications, type FloatingNotification } from '@/components/ui/floating-notifications';
 
 // Modals
 import { VehiculeUrgenceModal } from '@/components/VehiculeUrgenceModal';
 import { PointageModal } from '@/components/PointageModal';
 import { DeplacerTacheModal } from '@/components/planning/DeplacerTacheModal';
-import { VehiculeModal } from '@/components/VehiculeModal';
+import { VehicleDetailsModal } from '@/components/planning/VehicleDetailsModal';
 
 // Utilities
 import { aPointe as aPointeUtil, enregistrerArrivee, aPauseEnCours, enregistrerDepart, terminerPause } from '@/utils/pointageUtils';
-import { getCurrentCompanyId } from '@/utils/pointageSupabaseUtils';
 
 // Auth and role management
 import { useAuth } from '@/contexts/AuthContext';
@@ -37,25 +31,16 @@ import { useViewManagement } from '@/hooks/use-view-management';
 const CarrosseriePlanning = () => {
   console.log('🚀 COMPOSANT CARROSSERIE PLANNING CHARGÉ - DEBUT');
   
-  // Enhanced state variables for all modals and actions
-  const [showEmployeModal, setShowEmployeModal] = useState(false);
-  const [editingEmploye, setEditingEmploye] = useState(null);
-  const [showAttenteModal, setShowAttenteModal] = useState(false);
+  // Enhanced state variables for modals and actions
   const [selectedVehicule, setSelectedVehicule] = useState<any>(null);
-  const [showVehiculeModal, setShowVehiculeModal] = useState(false);
-  const [selectedPlanningTache, setSelectedPlanningTache] = useState<any>(null);
-  const [showPlanningModal, setShowPlanningModal] = useState(false);
-  const [selectedTab, setSelectedTab] = useState('etapes-atelier');
-  const [searchFilter, setSearchFilter] = useState('');
   const [floatingNotifications, setFloatingNotifications] = useState<FloatingNotification[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   
-  // New modal states for advanced features
+  // Modal states for advanced features
   const [showVehiculeUrgenceModal, setShowVehiculeUrgenceModal] = useState(false);
   const [showPointageModal, setShowPointageModal] = useState(false);
   const [showDeplacerModal, setShowDeplacerModal] = useState(false);
+  const [showVehicleDetailsModal, setShowVehicleDetailsModal] = useState(false);
   const [selectedTacheForDeplacement, setSelectedTacheForDeplacement] = useState<any>(null);
-  const [employePointageInfo, setEmployePointageInfo] = useState<{[key: string]: {aPointe: boolean, enPause: boolean}}>({});
   
   // Supabase authentication and role management
   const { user } = useAuth();
@@ -126,6 +111,26 @@ const CarrosseriePlanning = () => {
   // Final selected employee view based on role
   const finalSelectedEmployeView = currentView === 'employe' ? (selectedEmployeView || user?.id) : selectedEmployeView;
 
+  // Enhanced schedule update handler for WorkshopPlanningInterface
+  const handleScheduleUpdate = (data: any) => {
+    console.log('Schedule update:', data);
+    
+    // Add notification for user feedback
+    setFloatingNotifications(prev => [...prev, {
+      id: Date.now().toString(),
+      type: 'success' as const,
+      title: 'Planning mis à jour',
+      message: 'Les modifications ont été enregistrées',
+      duration: 3000
+    }]);
+  };
+
+  // Vehicle details handler
+  const handleVehicleDetails = (vehicle: any) => {
+    setSelectedVehicule(vehicle);
+    setShowVehicleDetailsModal(true);
+  };
+
   // Loading state
   if (employesLoading || planningLoading || !companyId) {
     return (
@@ -139,185 +144,16 @@ const CarrosseriePlanning = () => {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Header avec contrôles de vue */}
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Planning Carrosserie</h1>
-          
-          {/* Debug info - temporaire */}
-          <div className="text-sm text-muted-foreground bg-muted p-2 rounded">
-            {userRole} - {currentView} - {isOwner ? 'Propriétaire' : 'Autre'}
-          </div>
-        </div>
+    <div className="space-y-6">
+      {/* Main Planning Interface */}
+      <WorkshopPlanningInterface
+        employees={employes}
+        vehicles={vehicles}
+        schedules={getTodayTasks()}
+        onScheduleUpdate={handleScheduleUpdate}
+      />
 
-        {/* Contrôles de vue */}
-        {canSwitchViews && (
-          <div className="flex gap-2">
-            <Button
-              variant={currentView === 'manager' ? 'default' : 'outline'}
-              onClick={() => setCurrentView('manager')}
-              className="min-w-32"
-            >
-              Vue Manager
-            </Button>
-            <Button
-              variant={currentView === 'employe' ? 'default' : 'outline'}
-              onClick={() => setCurrentView('employe')}
-              className="min-w-32"
-            >
-              Vue Employé
-            </Button>
-          </div>
-        )}
-
-        {/* Sélection d'employé pour vue employé */}
-        {currentView === 'employe' && (
-          <div className="flex gap-2 items-center">
-            <span className="text-sm font-medium">Employé :</span>
-            <Select 
-              value={selectedEmployeView || ''} 
-              onValueChange={setSelectedEmployeView}
-            >
-              <SelectTrigger className="w-64">
-                <SelectValue placeholder="Sélectionner un employé" />
-              </SelectTrigger>
-              <SelectContent>
-                {employes.map(employe => (
-                  <SelectItem key={employe.user_id} value={employe.user_id}>
-                    {employe.nom}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-      </div>
-
-      {/* Contenu principal */}
-      <Tabs defaultValue="planning" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="planning">Planning</TabsTrigger>
-          <TabsTrigger value="employes">Employés</TabsTrigger>
-          <TabsTrigger value="vehicules">Véhicules</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="planning" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Planning des tâches</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {currentView === 'manager' ? (
-                <div className="space-y-4">
-                  <p className="text-green-600 font-medium">🎯 Vue Manager - Accès complet au planning</p>
-                  <div className="grid gap-4">
-                    {planningTaches.map((tache, index) => (
-                      <div key={index} className="p-4 border rounded-lg">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="font-medium">{tache.vehicule}</h4>
-                            <p className="text-sm text-muted-foreground">{tache.etape}</p>
-                            <p className="text-sm">{tache.client}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm font-medium">{tache.technicien}</p>
-                            <p className="text-sm text-muted-foreground">{tache.heure}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <p className="text-blue-600 font-medium">👤 Vue Employé - Mes tâches</p>
-                  {finalSelectedEmployeView ? (
-                    <div className="space-y-2">
-                      <p className="text-sm">Employé sélectionné : {employes.find(e => e.user_id === finalSelectedEmployeView)?.nom}</p>
-                      <div className="grid gap-4">
-                        {getTodayTasks()
-                          .filter(tache => tache.user_id === finalSelectedEmployeView)
-                          .map((tache, index) => (
-                            <div key={index} className="p-4 border rounded-lg bg-blue-50">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <h4 className="font-medium">{tache.vehicule}</h4>
-                                  <p className="text-sm text-muted-foreground">{tache.etape}</p>
-                                  <p className="text-sm">{tache.client}</p>
-                                </div>
-                                <StatusBadge status={tache.status} />
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground">Veuillez sélectionner un employé</p>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="employes" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Gestion des employés</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4">
-                {employes.map((employe, index) => (
-                  <div key={index} className="p-4 border rounded-lg">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="font-medium">{employe.nom}</h4>
-                        <p className="text-sm text-muted-foreground">{employe.email}</p>
-                        <Badge variant="outline">{employe.role}</Badge>
-                      </div>
-                      <div className="flex gap-2">
-                        {canManageUsers && (
-                          <Button size="sm" variant="outline">Modifier</Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="vehicules" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Véhicules en cours</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4">
-                {vehicles.map((vehicule, index) => (
-                  <div key={index} className="p-4 border rounded-lg">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-medium">{vehicule.plaque}</h4>
-                        <p className="text-sm text-muted-foreground">{vehicule.modele}</p>
-                        <p className="text-sm">{vehicule.client}</p>
-                      </div>
-                      <div className="text-right">
-                        <StatusBadge status={vehicule.status} />
-                        <p className="text-sm text-muted-foreground mt-1">{vehicule.etape}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      {/* Modals */}
+      {/* Enhanced Modals */}
       <VehiculeUrgenceModal
         isOpen={showVehiculeUrgenceModal}
         onClose={() => setShowVehiculeUrgenceModal(false)}
@@ -328,7 +164,7 @@ const CarrosseriePlanning = () => {
             id: Date.now().toString(),
             type: 'success' as const,
             title: 'Véhicule urgent',
-            message: `Véhicule ${selectedVehicule?.vehicule} marqué comme urgent`,
+            message: `Véhicule ${selectedVehicule?.vehicule || selectedVehicule?.license_plate} marqué comme urgent`,
             duration: 3000
           }]);
         }}
@@ -371,6 +207,27 @@ const CarrosseriePlanning = () => {
             message: 'Tâche déplacée avec succès',
             duration: 3000
           }]);
+        }}
+      />
+
+      <VehicleDetailsModal
+        isOpen={showVehicleDetailsModal}
+        onClose={() => {
+          setShowVehicleDetailsModal(false);
+          setSelectedVehicule(null);
+        }}
+        vehicle={selectedVehicule}
+        onPlan={() => {
+          console.log('Planifier véhicule:', selectedVehicule);
+          setShowVehicleDetailsModal(false);
+        }}
+        onUnblock={() => {
+          console.log('Débloquer véhicule:', selectedVehicule);
+          setShowVehicleDetailsModal(false);
+        }}
+        onModify={() => {
+          console.log('Modifier véhicule:', selectedVehicule);
+          setShowVehicleDetailsModal(false);
         }}
       />
 
