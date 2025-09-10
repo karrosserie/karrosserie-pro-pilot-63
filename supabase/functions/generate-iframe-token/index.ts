@@ -16,7 +16,7 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const jwtSecret = Deno.env.get('SUPABASE_JWT_SECRET') || 'your-secret-key'
+    const jwtSecret = Deno.env.get('JWT_SECRET') || 'your-secret-key'
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
     
