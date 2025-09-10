@@ -10,32 +10,40 @@ const corsHeaders = {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
+    console.log('generate-iframe-token: Function called')
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const jwtSecret = Deno.env.get('JWT_SECRET') || 'your-secret-key'
     
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error('Missing Supabase configuration')
+    }
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
     
     // Get JWT token from Authorization header
     const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      throw new Error('Missing authorization header')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new Error('Missing or invalid authorization header')
     }
 
     const token = authHeader.replace('Bearer ', '')
+    console.log('generate-iframe-token: Token received, length:', token.length)
     
     // Verify the user with Supabase
     const { data: { user }, error: authError } = await supabase.auth.getUser(token)
     
     if (authError || !user) {
+      console.error('generate-iframe-token: Auth error:', authError?.message)
       throw new Error('Invalid or expired token')
     }
 
-    console.log('Generating iframe token for user:', user.id)
+    console.log('generate-iframe-token: User authenticated:', user.id)
 
     // Get user profile
     const { data: profile, error: profileError } = await supabase
@@ -45,8 +53,11 @@ serve(async (req) => {
       .single()
 
     if (profileError) {
+      console.error('generate-iframe-token: Profile error:', profileError.message)
       throw new Error('Failed to fetch user profile')
     }
+
+    console.log('generate-iframe-token: Profile fetched for user:', profile?.email)
 
     // Get user company and role
     const { data: userCompany, error: companyError } = await supabase
@@ -62,24 +73,34 @@ serve(async (req) => {
       .single()
 
     if (companyError) {
+      console.error('generate-iframe-token: Company error:', companyError.message)
       throw new Error('Failed to fetch user company')
     }
 
-    // Create token payload
+    console.log('generate-iframe-token: Company fetched:', userCompany?.company_info?.name, 'Role:', userCompany?.role)
+
+    // Create token payload with 30 minutes expiration
+    const now = Math.floor(Date.now() / 1000)
+    const exp = now + (30 * 60) // 30 minutes
+
     const payload = {
       user: {
         id: user.id,
         email: user.email,
-        ...profile
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        phone_number: profile.phone_number
       },
       company: userCompany.company_info,
       role: userCompany.role,
-      iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + (30 * 60), // 30 minutes expiration
+      iat: now,
+      exp: exp,
       purpose: 'iframe-context'
     }
 
-    // Generate JWT token
+    console.log('generate-iframe-token: Creating JWT with payload for role:', payload.role)
+
+    // Generate JWT token using crypto.subtle
     const key = await crypto.subtle.importKey(
       'raw',
       new TextEncoder().encode(jwtSecret),
@@ -90,29 +111,40 @@ serve(async (req) => {
 
     const iframeToken = await create({ alg: 'HS256', typ: 'JWT' }, payload, key)
 
-    console.log('Successfully generated iframe token for user:', user.id)
+    console.log('generate-iframe-token: JWT created successfully, length:', iframeToken.length)
+
+    const response = {
+      success: true,
+      token: iframeToken,
+      expiresAt: exp * 1000 // Convert to milliseconds
+    }
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        token: iframeToken,
-        expiresAt: payload.exp * 1000 // Convert to milliseconds
-      }),
+      JSON.stringify(response),
       {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        },
       },
     )
     
   } catch (error) {
-    console.error('Error generating iframe token:', error)
+    console.error('generate-iframe-token: Error:', error.message, error.stack)
+    
+    const errorResponse = {
+      success: false,
+      error: error.message || 'Internal server error'
+    }
+
     return new Response(
-      JSON.stringify({
-        success: false,
-        error: error.message
-      }),
+      JSON.stringify(errorResponse),
       {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        },
       },
     )
   }
