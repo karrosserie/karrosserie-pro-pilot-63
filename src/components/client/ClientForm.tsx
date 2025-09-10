@@ -29,7 +29,8 @@ const ClientForm: React.FC<ClientFormProps> = ({
     zipCode: defaultValues?.zipCode || '',
     company: defaultValues?.company || '',
     driverLicenseFrontUrl: defaultValues?.driverLicenseFrontUrl || '',
-    driverLicenseBackUrl: defaultValues?.driverLicenseBackUrl || ''
+    driverLicenseBackUrl: defaultValues?.driverLicenseBackUrl || '',
+    autoRelancesDisabled: defaultValues?.autoRelancesDisabled || false
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,6 +48,10 @@ const ClientForm: React.FC<ClientFormProps> = ({
 
   const handleDriverLicenseBackUpload = (url: string) => {
     setFormData(prev => ({ ...prev, driverLicenseBackUrl: url }));
+  };
+
+  const handleAutoRelancesToggle = (checked: boolean) => {
+    setFormData(prev => ({ ...prev, autoRelancesDisabled: !checked }));
   };
 
   const validateForm = () => {
@@ -96,6 +101,7 @@ const ClientForm: React.FC<ClientFormProps> = ({
             formData={formData} 
             handleChange={handleChange}
             handlePhoneChange={handlePhoneChange}
+            handleAutoRelancesToggle={handleAutoRelancesToggle}
             isViewMode={isViewMode}
           />
         </TabsContent>

@@ -81,6 +81,7 @@ export const clientsService = {
       company_id: companyId,
       driver_license_front_url: client.driverLicenseFrontUrl || null,
       driver_license_back_url: client.driverLicenseBackUrl || null,
+      auto_relances_disabled: client.autoRelancesDisabled || false,
       oodrive_recipient_id: client.oodrive_recipient_id || null
     };
 
@@ -127,6 +128,7 @@ export const clientsService = {
       postal_code: client.zipCode,
       driver_license_front_url: client.driverLicenseFrontUrl || null,
       driver_license_back_url: client.driverLicenseBackUrl || null,
+      auto_relances_disabled: client.autoRelancesDisabled || false,
       oodrive_recipient_id: client.oodrive_recipient_id || null
     };
 

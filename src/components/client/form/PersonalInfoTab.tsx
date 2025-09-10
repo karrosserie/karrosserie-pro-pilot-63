@@ -1,12 +1,14 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
 
 interface PersonalInfoTabProps {
   formData: any;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handlePhoneChange?: (value: string | undefined) => void;
+  handleAutoRelancesToggle?: (checked: boolean) => void;
   isViewMode: boolean;
 }
 
@@ -14,6 +16,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
   formData,
   handleChange,
   handlePhoneChange,
+  handleAutoRelancesToggle,
   isViewMode
 }) => {
   return (
@@ -125,6 +128,25 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
             onChange={handleChange}
             disabled={isViewMode}
             required
+          />
+        </div>
+      </div>
+      
+      {/* Section relances automatiques */}
+      <div className="border-t pt-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label className="text-base font-medium">
+              Relances automatiques
+            </Label>
+            <p className="text-sm text-muted-foreground">
+              Activer ou désactiver les relances automatiques pour ce client
+            </p>
+          </div>
+          <Switch
+            checked={!formData.autoRelancesDisabled}
+            onCheckedChange={handleAutoRelancesToggle || (() => {})}
+            disabled={isViewMode}
           />
         </div>
       </div>
