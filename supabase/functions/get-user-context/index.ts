@@ -14,7 +14,7 @@ serve(async (req) => {
   }
 
   try {
-    const jwtSecret = Deno.env.get('SUPABASE_JWT_SECRET') || 'your-secret-key'
+    const jwtSecret = Deno.env.get('JWT_SECRET') || 'your-secret-key'
     
     // Check if this is a token validation request
     const url = new URL(req.url)
