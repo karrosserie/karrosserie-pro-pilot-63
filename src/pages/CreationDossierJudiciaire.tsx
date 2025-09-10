@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useJudicialCases } from "@/hooks/use-judicial-cases";
 import { useClients } from "@/hooks/use-clients";
 import { useInvoices } from "@/hooks/use-invoices";
+import { useCompany } from "@/hooks/use-company";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -14,6 +15,7 @@ const CreationDossierJudiciaire = () => {
   const { createCase } = useJudicialCases();
   const { clients } = useClients();
   const { invoices } = useInvoices();
+  const { companyData } = useCompany();
 
   const steps = [
     { id: 1, label: "Parties", icon: <Users className="w-5 h-5" />, colorClass: "text-blue-700", bgColorClass: "bg-blue-100" },
@@ -46,15 +48,77 @@ const CreationDossierJudiciaire = () => {
     invoice_id: "",
   });
 
+  // Auto-fill company data for demandeur field
+  useEffect(() => {
+    if (companyData && (!formData.demandeur || formData.demandeur.trim() === '')) {
+      const companyInfo = [];
+      
+      if (companyData.name) {
+        companyInfo.push(companyData.name);
+      }
+      
+      if (companyData.address) {
+        companyInfo.push(companyData.address);
+      }
+      
+      const cityLine = [];
+      if (companyData.zipcode) {
+        cityLine.push(companyData.zipcode);
+      }
+      if (companyData.city) {
+        cityLine.push(companyData.city);
+      }
+      if (cityLine.length > 0) {
+        companyInfo.push(cityLine.join(' '));
+      }
+      
+      if (companyData.siret) {
+        companyInfo.push(`SIRET: ${companyData.siret}`);
+      } else if (companyData.siren) {
+        companyInfo.push(`SIREN: ${companyData.siren}`);
+      }
+      
+      if (companyInfo.length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          demandeur: companyInfo.join('\n')
+        }));
+      }
+    }
+  }, [companyData, formData.demandeur]);
+
   // Auto-fill form data when client or invoice is selected
   useEffect(() => {
     if (selectedClient && clients) {
       const client = clients.find(c => c.id === selectedClient);
       if (client) {
+        const addressParts = [];
+        
+        // Add client name
+        const clientName = `${client.firstName} ${client.lastName}`;
+        addressParts.push(clientName);
+        
+        // Add address if available
+        if (client.address) {
+          addressParts.push(client.address);
+        }
+        
+        // Add postal code and city
+        const cityLine = [];
+        if (client.zipCode) {
+          cityLine.push(client.zipCode);
+        }
+        if (client.city) {
+          cityLine.push(client.city);
+        }
+        if (cityLine.length > 0) {
+          addressParts.push(cityLine.join(' '));
+        }
+        
         setFormData(prev => ({
           ...prev,
           client_id: client.id,
-          defendeur: `${client.firstName} ${client.lastName}\n${client.address || ''}\n${client.postalCode || ''} ${client.city || ''}`,
+          defendeur: addressParts.join('\n'),
         }));
       }
     }
