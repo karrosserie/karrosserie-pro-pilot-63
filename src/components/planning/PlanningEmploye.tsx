@@ -167,8 +167,13 @@ export const PlanningEmploye: React.FC<PlanningEmployeProps> = ({
   }, [taches]); // Se rafraîchit automatiquement quand les tâches changent
 
   // Filtrage des tâches triées par statut
+  const tachesAFaire = useMemo(() => 
+    tachesTriees.filter(t => t.status === 'planifie'), 
+    [tachesTriees]
+  );
+  
   const tachesEnCours = useMemo(() => 
-    tachesTriees.filter(t => t.status === 'en_cours' || t.status === 'planifie'), 
+    tachesTriees.filter(t => t.status === 'en_cours'), 
     [tachesTriees]
   );
   
