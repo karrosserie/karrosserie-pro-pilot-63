@@ -1,7 +1,7 @@
-import CarrosseriePlanning from '@/components/planning/CarrosseriePlanning';
+import CarrosseriePlanningSimple from '@/components/planning/CarrosseriePlanning-Simple';
 
 const Index = () => {
-  return <CarrosseriePlanning />;
+  return <CarrosseriePlanningSimple />;
 };
 
 export default Index;
