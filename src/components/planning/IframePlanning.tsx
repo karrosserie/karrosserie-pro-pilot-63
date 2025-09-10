@@ -19,7 +19,10 @@ export function IframePlanning({ className = "" }: IframePlanningProps) {
     generateIframeToken();
   }, []);
 
-  const generateIframeToken = async () => {
+  const generateIframeToken = async (retryCount = 0) => {
+    const maxRetries = 3;
+    const timeout = 10000; // 10 secondes
+    
     try {
       setIsLoading(true);
       const { data: { session } } = await supabase.auth.getSession();
@@ -28,37 +31,66 @@ export function IframePlanning({ className = "" }: IframePlanningProps) {
         throw new Error('No active session');
       }
 
-      console.log('IframePlanning - Attempting to call generate-iframe-token edge function...');
+      console.log('IframePlanning - Attempting to call generate-iframe-token edge function...', { retryCount });
 
-      const { data, error } = await supabase.functions.invoke('generate-iframe-token', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: {}, // Ajout d'un body vide pour forcer POST
-      });
+      // Créer un AbortController pour gérer le timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-      console.log('IframePlanning - Edge function response:', { data, error });
+      try {
+        const { data, error } = await supabase.functions.invoke('generate-iframe-token', {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: {}, // Body vide pour forcer POST
+        });
 
-      if (error) {
-        console.error('IframePlanning - Edge function error:', error);
-        throw error;
+        clearTimeout(timeoutId);
+        console.log('IframePlanning - Edge function response:', { data, error });
+
+        if (error) {
+          console.error('IframePlanning - Edge function error:', error);
+          throw error;
+        }
+
+        if (data?.success && data?.token) {
+          console.log('IframePlanning - Token generated successfully:', data.token.substring(0, 50) + '...');
+          setIframeToken(data.token);
+          setIframeError(false); // Reset error state on success
+          return; // Succès, on sort
+        } else {
+          console.error('IframePlanning - Failed to generate token, response:', data);
+          throw new Error('Failed to generate token');
+        }
+      } catch (invokeError) {
+        clearTimeout(timeoutId);
+        throw invokeError;
       }
-
-      if (data?.success && data?.token) {
-        console.log('IframePlanning - Token generated successfully:', data.token.substring(0, 50) + '...');
-        setIframeToken(data.token);
-        setIframeError(false); // Reset error state on success
-      } else {
-        console.error('IframePlanning - Failed to generate token, response:', data);
-        throw new Error('Failed to generate token');
-      }
+      
     } catch (error) {
-      console.error('IframePlanning - Full error details:', {
+      console.error('IframePlanning - Error on attempt', retryCount + 1, ':', {
         message: error.message,
         name: error.name,
         context: error.context,
         stack: error.stack
       });
+
+      // Retry logic
+      if (retryCount < maxRetries && (
+        error.message?.includes('Failed to fetch') || 
+        error.message?.includes('network') ||
+        error.name === 'AbortError'
+      )) {
+        const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff: 1s, 2s, 4s
+        console.log(`IframePlanning - Retrying in ${delay}ms... (${retryCount + 1}/${maxRetries})`);
+        
+        setTimeout(() => {
+          generateIframeToken(retryCount + 1);
+        }, delay);
+        return;
+      }
+      
+      // Si on arrive ici, toutes les tentatives ont échoué
       setIframeError(true);
     } finally {
       setIsLoading(false);
