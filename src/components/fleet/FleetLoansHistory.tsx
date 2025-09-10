@@ -12,11 +12,19 @@ interface FleetLoansHistoryProps {
 
 const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ onViewLoan, onViewReturn }) => {
   const { reservations, isLoading } = useFleetReservations();
+  const isMobile = useIsMobile(); // MUST be called before any conditional returns
 
   // Filter for completed/past reservations
   const completedReservations = (reservations || [])
     .filter(reservation => reservation.status === 'completed' || reservation.status === 'returned')
     .slice(0, 10); // Show only the 10 most recent
+
+  const getVehicleDisplayName = (fleetVehicle: any) => {
+    if (fleetVehicle?.car_brands?.name && fleetVehicle?.car_models?.name) {
+      return `${fleetVehicle.car_brands.name} ${fleetVehicle.car_models.name}`;
+    }
+    return 'Véhicule non spécifié';
+  };
 
   if (isLoading) {
     return (
@@ -29,15 +37,6 @@ const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ onViewLoan, onVie
       </div>
     );
   }
-
-  const getVehicleDisplayName = (fleetVehicle: any) => {
-    if (fleetVehicle?.car_brands?.name && fleetVehicle?.car_models?.name) {
-      return `${fleetVehicle.car_brands.name} ${fleetVehicle.car_models.name}`;
-    }
-    return 'Véhicule non spécifié';
-  };
-
-  const isMobile = useIsMobile();
 
   return (
     <div className="card-container">
