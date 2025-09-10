@@ -19,13 +19,15 @@ interface WorkshopPlanningInterfaceProps {
   vehicles?: any[];
   schedules?: any[];
   onScheduleUpdate?: (data: any) => void;
+  onOpenUrgenceModal?: () => void;
 }
 
 export const WorkshopPlanningInterface = ({ 
   employees = [], 
   vehicles = [], 
   schedules = [], 
-  onScheduleUpdate 
+  onScheduleUpdate,
+  onOpenUrgenceModal
 }: WorkshopPlanningInterfaceProps) => {
   // Force cache refresh
   console.log('🔄 WorkshopPlanningInterface reloaded with real data');
@@ -50,7 +52,6 @@ export const WorkshopPlanningInterface = ({
   };
   
   const [activeView, setActiveView] = useState<'manager' | 'employee'>(getDefaultView());
-  const [urgentVehicles, setUrgentVehicles] = useState(false);
 
   // Mettre à jour la vue si le rôle change
   useEffect(() => {
@@ -255,10 +256,10 @@ export const WorkshopPlanningInterface = ({
         </div>
         
         <Button
-          variant={urgentVehicles ? 'destructive' : 'outline'}
+          variant="destructive"
           size="sm"
-          onClick={() => setUrgentVehicles(!urgentVehicles)}
-          className="flex items-center gap-2"
+          onClick={onOpenUrgenceModal}
+          className="flex items-center gap-2 bg-destructive hover:bg-destructive/90"
         >
           <AlertTriangle className="w-4 h-4" />
           Véhicule Urgence

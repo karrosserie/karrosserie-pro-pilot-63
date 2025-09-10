@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { FloatingNotifications, type FloatingNotification } from '@/components/ui/floating-notifications';
 
 // Modals
-import { VehiculeUrgenceModal } from '@/components/VehiculeUrgenceModal';
+import { VehiculeUrgenceModal } from '@/components/planning/VehiculeUrgenceModal';
 import { PointageModal } from '@/components/PointageModal';
 import { DeplacerTacheModal } from '@/components/planning/DeplacerTacheModal';
 import { VehicleDetailsModal } from '@/components/planning/VehicleDetailsModal';
@@ -151,22 +151,35 @@ const CarrosseriePlanning = () => {
         vehicles={vehicles}
         schedules={getTodayTasks()}
         onScheduleUpdate={handleScheduleUpdate}
+        onOpenUrgenceModal={() => setShowVehiculeUrgenceModal(true)}
       />
 
       {/* Enhanced Modals */}
       <VehiculeUrgenceModal
         isOpen={showVehiculeUrgenceModal}
         onClose={() => setShowVehiculeUrgenceModal(false)}
-        vehicule={selectedVehicule}
-        onConfirm={(reason) => {
-          console.log('Véhicule marqué urgent:', reason);
-          setFloatingNotifications(prev => [...prev, {
-            id: Date.now().toString(),
-            type: 'success' as const,
-            title: 'Véhicule urgent',
-            message: `Véhicule ${selectedVehicule?.vehicule || selectedVehicule?.license_plate} marqué comme urgent`,
-            duration: 3000
-          }]);
+        employes={employes}
+        onAjouterVehicule={async (vehiculeUrgence) => {
+          console.log('Véhicule urgence ajouté:', vehiculeUrgence);
+          if (companyId) {
+            try {
+              await ajouterVehiculeUrgence(vehiculeUrgence, companyId, {});
+              setFloatingNotifications(prev => [...prev, {
+                id: Date.now().toString(),
+                type: 'success' as const,
+                title: 'Véhicule urgent ajouté',
+                message: `${vehiculeUrgence.plaque} ajouté en urgence au planning`,
+                duration: 3000
+              }]);
+            } catch (error) {
+              console.error('Erreur ajout véhicule urgence:', error);
+              toast({
+                variant: "destructive",
+                title: "Erreur",
+                description: "Impossible d'ajouter le véhicule en urgence"
+              });
+            }
+          }
         }}
       />
 
