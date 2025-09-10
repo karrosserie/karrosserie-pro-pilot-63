@@ -10,8 +10,15 @@ const corsHeaders = {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response('ok', { headers: corsHeaders })
   }
+
+  console.log('get-user-context: Request received', { 
+    method: req.method, 
+    url: req.url,
+    hasAuth: !!req.headers.get('Authorization'),
+    userAgent: req.headers.get('User-Agent')
+  })
 
   try {
     const jwtSecret = Deno.env.get('JWT_SECRET') || 'your-secret-key'
@@ -20,9 +27,14 @@ serve(async (req) => {
     const url = new URL(req.url)
     const iframeToken = url.searchParams.get('token')
     
+    console.log('get-user-context: Token check', { 
+      hasToken: !!iframeToken,
+      tokenLength: iframeToken ? iframeToken.length : 0 
+    })
+    
     if (iframeToken) {
       // Validate iframe token
-      console.log('Validating iframe token')
+      console.log('get-user-context: Processing iframe token')
       
       const key = await crypto.subtle.importKey(
         'raw',
@@ -34,12 +46,26 @@ serve(async (req) => {
 
       try {
         const payload = await verify(iframeToken, key)
+        console.log('get-user-context: Token decoded successfully', { 
+          userId: payload.user?.id,
+          role: payload.role,
+          purpose: payload.purpose,
+          exp: payload.exp
+        })
         
         if (payload.purpose !== 'iframe-context') {
+          console.error('get-user-context: Invalid token purpose:', payload.purpose)
           throw new Error('Invalid token purpose')
         }
 
-        console.log('Successfully validated iframe token for user:', payload.user?.id)
+        // Check expiration
+        const now = Math.floor(Date.now() / 1000)
+        if (payload.exp && payload.exp < now) {
+          console.error('get-user-context: Token expired', { exp: payload.exp, now })
+          throw new Error('Token expired')
+        }
+
+        console.log('get-user-context: Token validation successful for user:', payload.user?.id)
 
         // Build role permissions from the stored role
         const userRole = payload.role
@@ -55,50 +81,65 @@ serve(async (req) => {
                          userRole === 'responsable' ? 'manager' : null
         }
 
-        return new Response(
-          JSON.stringify({
-            user: {
-              id: payload.user.id,
-              email: payload.user.email,
-              profile: {
-                firstName: payload.user.first_name || '',
-                lastName: payload.user.last_name || '',
-                phoneNumber: payload.user.phone_number || '',
-                role: payload.user.role || 'user'
-              }
-            },
-            company: {
-              id: payload.company?.id || '',
-              name: payload.company?.name || '',
-              email: payload.company?.email || '',
-              address: payload.company?.address || '',
-              city: payload.company?.city || '',
-              zipcode: payload.company?.zipcode || '',
-              phone: payload.company?.phone || '',
-              siret: payload.company?.siret || '',
-              siren: payload.company?.siren || '',
-              tva: payload.company?.tva || '',
-              logoUrl: payload.company?.logo_url || '',
-              notifications: payload.company?.notifications || { email: true, push: true, sms: false }
-            },
-            role: {
-              current: userRole,
-              permissions: rolePermissions
-            },
-            impersonation: {
-              isActive: false,
-              originalUser: null,
-              companyName: null
+        const response = {
+          user: {
+            id: payload.user.id,
+            email: payload.user.email,
+            profile: {
+              firstName: payload.user.first_name || '',
+              lastName: payload.user.last_name || '',
+              phoneNumber: payload.user.phone_number || '',
+              role: payload.user.role || 'user'
             }
-          }),
+          },
+          company: {
+            id: payload.company?.id || '',
+            name: payload.company?.name || '',
+            email: payload.company?.email || '',
+            address: payload.company?.address || '',
+            city: payload.company?.city || '',
+            zipcode: payload.company?.zipcode || '',
+            phone: payload.company?.phone || '',
+            siret: payload.company?.siret || '',
+            siren: payload.company?.siren || '',
+            tva: payload.company?.tva || '',
+            logoUrl: payload.company?.logo_url || '',
+            notifications: payload.company?.notifications || { email: true, push: true, sms: false }
+          },
+          role: {
+            current: userRole,
+            permissions: rolePermissions
+          },
+          impersonation: {
+            isActive: false,
+            originalUser: null,
+            companyName: null
+          }
+        }
+
+        console.log('get-user-context: Returning user context for iframe', { 
+          userId: response.user.id,
+          companyId: response.company.id,
+          role: response.role.current
+        })
+
+        return new Response(
+          JSON.stringify(response),
           {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           },
         )
       } catch (tokenError) {
-        console.error('Invalid iframe token:', tokenError)
+        console.error('get-user-context: Invalid iframe token:', {
+          message: tokenError.message,
+          name: tokenError.name,
+          stack: tokenError.stack
+        })
         return new Response(
-          JSON.stringify({ error: 'Invalid or expired iframe token' }),
+          JSON.stringify({ 
+            error: 'Invalid or expired iframe token',
+            details: tokenError.message 
+          }),
           { 
             status: 401, 
             headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -107,13 +148,27 @@ serve(async (req) => {
       }
     }
 
+    console.log('get-user-context: Processing regular authentication request')
+
     // Original authentication flow for regular requests
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('get-user-context: Missing or invalid authorization header')
+      return new Response(
+        JSON.stringify({ error: 'Missing or invalid authorization header' }),
+        { 
+          status: 401, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
+          headers: { Authorization: authHeader },
         },
       }
     )
@@ -122,9 +177,15 @@ serve(async (req) => {
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser()
     
     if (userError || !user) {
-      console.error('Authentication error:', userError)
+      console.error('get-user-context: Authentication error:', {
+        error: userError?.message,
+        hasUser: !!user
+      })
       return new Response(
-        JSON.stringify({ error: 'Authentication required' }),
+        JSON.stringify({ 
+          error: 'Authentication required',
+          details: userError?.message 
+        }),
         { 
           status: 401, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -132,7 +193,7 @@ serve(async (req) => {
       )
     }
 
-    console.log('Fetching user context for user:', user.id)
+    console.log('get-user-context: Fetching user context for user:', user.id)
 
     // Fetch user profile
     const { data: profile, error: profileError } = await supabaseClient
@@ -142,7 +203,7 @@ serve(async (req) => {
       .single()
 
     if (profileError) {
-      console.error('Profile fetch error:', profileError)
+      console.error('get-user-context: Profile fetch error:', profileError)
     }
 
     // Get user's company through user_companies
@@ -159,9 +220,12 @@ serve(async (req) => {
       .single()
 
     if (userCompanyError) {
-      console.error('User company fetch error:', userCompanyError)
+      console.error('get-user-context: User company fetch error:', userCompanyError)
       return new Response(
-        JSON.stringify({ error: 'No active company found for user' }),
+        JSON.stringify({ 
+          error: 'No active company found for user',
+          details: userCompanyError.message 
+        }),
         { 
           status: 404, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -234,7 +298,7 @@ serve(async (req) => {
       }
     }
 
-    console.log('User context successfully built for user:', user.id)
+    console.log('get-user-context: User context successfully built for user:', user.id)
 
     return new Response(
       JSON.stringify(userContext),
@@ -245,7 +309,11 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error in get-user-context function:', error)
+    console.error('get-user-context: Unexpected error:', {
+      message: error.message,
+      name: error.name,
+      stack: error.stack
+    })
     return new Response(
       JSON.stringify({ 
         error: 'Internal server error',
