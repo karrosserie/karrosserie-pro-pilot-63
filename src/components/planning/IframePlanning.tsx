@@ -173,7 +173,7 @@ export function IframePlanning({ className = "" }: IframePlanningProps) {
         onError={handleIframeError}
         title="Interface de Planning Carrosserie"
         sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-geolocation"
-        allow="clipboard-write; geolocation"
+        allow="clipboard-write; geolocation; camera; microphone"
       />
     </div>
   );
