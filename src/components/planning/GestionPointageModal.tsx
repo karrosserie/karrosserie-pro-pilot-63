@@ -25,15 +25,15 @@ export const GestionPointageModal: React.FC<GestionPointageModalProps> = ({
   const { toast } = useToast();
 
 
-  const handleDepointer = () => {
-    const heureActuelle = enregistrerDepart(employeId);
+  const handleDepointer = async () => {
+    const success = await enregistrerDepart(employeId.toString());
     
     onDepointer(); // Appeler la fonction pour remettre aPointe à false
     onClose();
     
     toast({
       title: "👋 Fin de journée",
-      description: `Dépointe enregistré à ${heureActuelle}. À bientôt !`,
+      description: success ? "Départ enregistré avec succès. À bientôt !" : "Erreur lors de l'enregistrement",
     });
   };
 

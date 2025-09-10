@@ -20,15 +20,15 @@ export const RetourPauseModal: React.FC<RetourPauseModalProps> = ({
 }) => {
   const { toast } = useToast();
 
-  const handleRevenirDePause = () => {
-    const heureActuelle = terminerPause(employeId);
+  const handleRevenirDePause = async () => {
+    const success = await terminerPause(employeId.toString());
     
-    if (heureActuelle) {
+    if (success) {
       onRevenir();
       
       toast({
         title: "🎯 Retour de pause",
-        description: `Bon retour ${employeNom} ! Retour enregistré à ${heureActuelle}`,
+        description: `Bon retour ${employeNom} ! Retour enregistré avec succès`,
       });
     } else {
       toast({

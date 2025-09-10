@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Clock, Coffee, LogOut, Settings, Play } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { demarrerPause, enregistrerDepart, aPauseEnCours, terminerPause } from '@/utils/pointageUtils';
+import { commencerPause as demarrerPause, enregistrerDepart, aPauseEnCours, terminerPause } from '@/utils/pointageUtils';
 
 interface GestionPointageDropdownProps {
   employeNom: string;
@@ -27,7 +27,7 @@ export const GestionPointageDropdown: React.FC<GestionPointageDropdownProps> = (
   // Vérifier l'état de pause au montage du composant
   useEffect(() => {
     const checkPauseStatus = async () => {
-      const hasBreak = await aPauseEnCours(employeId);
+      const hasBreak = await aPauseEnCours(employeId.toString());
       setEnPause(hasBreak);
     };
     checkPauseStatus();
@@ -35,14 +35,14 @@ export const GestionPointageDropdown: React.FC<GestionPointageDropdownProps> = (
 
   const handlePartirEnPause = async () => {
     try {
-      const message = await demarrerPause(employeId);
+      const success = await demarrerPause(employeId.toString());
       setEnPause(true);
       onPauseStart();
       setIsOpen(false);
       
       toast({
         title: "☕ Pause commencée",
-        description: message,
+        description: success ? "Pause démarrée avec succès" : "Erreur lors du démarrage de la pause",
       });
     } catch (error) {
       toast({
@@ -55,15 +55,15 @@ export const GestionPointageDropdown: React.FC<GestionPointageDropdownProps> = (
 
   const handleRevenirDePause = async () => {
     try {
-      const message = await terminerPause(employeId);
-      if (message) {
+      const success = await terminerPause(employeId.toString());
+      if (success) {
         setEnPause(false);
         onPauseEnd?.();
         setIsOpen(false);
         
         toast({
           title: "🔄 Retour de pause",
-          description: message,
+          description: "Retour de pause enregistré",
         });
       }
     } catch (error) {
@@ -77,13 +77,13 @@ export const GestionPointageDropdown: React.FC<GestionPointageDropdownProps> = (
 
   const handleDepointer = async () => {
     try {
-      const message = await enregistrerDepart(employeId);
+      const success = await enregistrerDepart(employeId.toString());
       onDepointer();
       setIsOpen(false);
       
       toast({
         title: "👋 Fin de journée",
-        description: message,
+        description: success ? "Départ enregistré avec succès" : "Erreur lors de l'enregistrement",
       });
     } catch (error) {
       toast({

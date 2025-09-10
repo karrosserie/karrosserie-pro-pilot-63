@@ -32,26 +32,26 @@ export const StatsPointageEmploye: React.FC<StatsPointageEmployeProps> = ({
       try {
         // Try to get data from Supabase first
         const supabaseData = await getTodayTimesheet(employeId.toString());
-        if (supabaseData) {
+        if (supabaseData && supabaseData.breaks) {
           const workTime = calculateWorkTime(supabaseData);
           setTempsTravail(workTime);
-          setPauseEnCours(supabaseData.breaks.find(b => !b.break_end_time));
+          setPauseEnCours(supabaseData.breaks.find((b: any) => !b.break_end_time));
           setData(supabaseData);
         } else {
           // Fallback to localStorage data
-          const localData = getPointageData(employeId, date);
+          const localData = await getPointageData(employeId.toString());
           const workTime = calculerTempsTravail(localData);
           setTempsTravail(workTime);
-          setPauseEnCours(localData.pauses.find(p => !p.heureFin));
+          setPauseEnCours(localData?.pauses?.find((p: any) => !p.heureFin));
           setData(localData);
         }
       } catch (error) {
         console.error('Error loading pointage data:', error);
         // Fallback to localStorage only
-        const localData = getPointageData(employeId, date);
+        const localData = await getPointageData(employeId.toString());
         const workTime = calculerTempsTravail(localData);
         setTempsTravail(workTime);
-        setPauseEnCours(localData.pauses.find(p => !p.heureFin));
+        setPauseEnCours(localData?.pauses?.find((p: any) => !p.heureFin));
         setData(localData);
       }
     };
