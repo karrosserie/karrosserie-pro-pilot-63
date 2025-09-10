@@ -31,9 +31,10 @@ export const WorkshopPlanningInterface = ({
   
   // Déterminer la vue par défaut selon le rôle
   const getDefaultView = () => {
-    if (isCarrossier || isCarrossierCourtesy) return 'employee';
+    if (isOwner) return 'manager';
     if (isResponsable) return 'manager';
-    return 'manager'; // Par défaut pour owner et autres
+    if (isCarrossier || isCarrossierCourtesy) return 'employee';
+    return 'manager'; // Par défaut pour manager
   };
   
   const [activeView, setActiveView] = useState<'manager' | 'employee'>(getDefaultView());
