@@ -5,92 +5,56 @@ import { Badge } from '@/components/ui/badge';
 import { Clock, Play, Pause, CheckCircle, Calendar, User } from 'lucide-react';
 import { useEmployeeSchedule } from '@/hooks/use-employee-schedule';
 import { useCompany } from '@/hooks/use-company';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface EmployeeViewProps {
   employeeId?: string;
 }
 
-interface Task {
-  id: string;
-  vehicleBrand: string;
-  vehicleModel: string;
-  licensePlate: string;
-  client: string;
-  taskType: string;
-  startTime: string;
-  endTime: string;
-  status: 'En attente' | 'En cours' | 'Terminé';
-  description: string;
-}
-
-// Mock data pour l'employé courant
-const mockEmployeeTasks: Task[] = [
-  {
-    id: '1',
-    vehicleBrand: 'Peugeot',
-    vehicleModel: '308',
-    licensePlate: 'AB-789-XY',
-    client: 'Mme Moreau',
-    taskType: 'Préparation peinture',
-    startTime: '08:00',
-    endTime: '10:30',
-    status: 'En cours',
-    description: 'Ponçage aile avant'
-  },
-  {
-    id: '2',
-    vehicleBrand: 'Renault',
-    vehicleModel: 'Clio',
-    licensePlate: 'CD-123-ZW',
-    client: 'M. Petit',
-    taskType: 'Mise en peinture',
-    startTime: '11:00',
-    endTime: '15:00',
-    status: 'En attente',
-    description: 'Application base'
-  },
-  {
-    id: '3',
-    vehicleBrand: 'Volkswagen',
-    vehicleModel: 'Golf',
-    licensePlate: 'EF-456-UV',
-    client: 'Mme Blanc',
-    taskType: 'Finitions & remontage',
-    startTime: '15:30',
-    endTime: '17:00',
-    status: 'En attente',
-    description: 'Polissage final'
-  }
-];
-
 export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
+  const { user } = useAuth();
   const { companyInfo } = useCompany();
   const [currentTimer, setCurrentTimer] = useState<string | null>(null);
-  const [tasks, setTasks] = useState<Task[]>(mockEmployeeTasks);
+
+  // Utiliser l'ID de l'utilisateur connecté ou celui passé en prop
+  const currentUserId = employeeId || user?.id;
+  
+  // Récupérer les vraies données depuis Supabase
+  const { schedules, isLoading } = useEmployeeSchedule(currentUserId);
+
+  // Convertir les données Supabase au format attendu par l'interface
+  const tasks = schedules.map(schedule => ({
+    id: schedule.id,
+    vehicleBrand: schedule.vehicles?.car_brands?.name || 'Marque inconnue',
+    vehicleModel: schedule.vehicles?.car_models?.name || 'Modèle inconnu',
+    licensePlate: schedule.vehicles?.license_plate || 'Plaque inconnue',
+    client: schedule.vehicles?.clients 
+      ? `${schedule.vehicles.clients.first_name} ${schedule.vehicles.clients.last_name}` 
+      : 'Client inconnu',
+    taskType: schedule.task_type,
+    startTime: new Date(schedule.start_datetime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+    endTime: new Date(schedule.end_datetime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+    status: schedule.status,
+    description: `${schedule.task_type} - ${schedule.vehicles?.license_plate || ''}`
+  }));
 
   const currentTask = tasks.find(task => task.status === 'En cours');
   const upcomingTasks = tasks.filter(task => task.status === 'En attente');
   const completedTasks = tasks.filter(task => task.status === 'Terminé');
 
   const handleStartTask = (taskId: string) => {
-    setTasks(prev => prev.map(task => 
-      task.id === taskId 
-        ? { ...task, status: 'En cours' as const }
-        : { ...task, status: task.status === 'En cours' ? 'En attente' as const : task.status }
-    ));
+    // TODO: Mettre à jour le statut de la tâche dans Supabase
+    console.log('Démarrage de la tâche:', taskId);
     setCurrentTimer(taskId);
   };
 
   const handleCompleteTask = (taskId: string) => {
-    setTasks(prev => prev.map(task => 
-      task.id === taskId 
-        ? { ...task, status: 'Terminé' as const }
-        : task
-    ));
+    // TODO: Mettre à jour le statut de la tâche dans Supabase
+    console.log('Fin de la tâche:', taskId);
     setCurrentTimer(null);
   };
 
-  const getStatusBadge = (status: Task['status']) => {
+  const getStatusBadge = (status: 'En attente' | 'En cours' | 'Terminé') => {
     switch (status) {
       case 'En cours':
         return <Badge className="bg-blue-100 text-blue-800">En cours</Badge>;
@@ -100,6 +64,18 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
         return <Badge className="bg-green-100 text-green-800">Terminé</Badge>;
     }
   };
+
+  // Afficher un loader pendant le chargement
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+          <p>Chargement du planning...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
