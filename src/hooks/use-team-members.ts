@@ -89,6 +89,53 @@ export const useTeamMembers = () => {
     enabled: !!companyInfo?.id
   });
 
+  // Ajouter un nouveau membre d'équipe
+  const addTeamMember = useMutation({
+    mutationFn: async (data: CreateTeamMemberData) => {
+      // Récupérer l'ID de l'entreprise courante
+      const { data: userCompany } = await supabase
+        .from('user_companies')
+        .select('company_id')
+        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+        .eq('active', true)
+        .single();
+
+      if (!userCompany?.company_id) {
+        throw new Error("Impossible de déterminer l'entreprise");
+      }
+
+      const { data: teamMember, error } = await supabase
+        .from('user_companies')
+        .insert({
+          user_id: data.user_id,
+          company_id: userCompany.company_id,
+          role: data.role,
+          qualifications: data.qualifications,
+          active: true
+        })
+        .select('*')
+        .single();
+
+      if (error) throw error;
+      return teamMember;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['team-members'] });
+      toast({
+        title: "Succès",
+        description: "Nouveau membre ajouté à l'équipe avec succès"
+      });
+    },
+    onError: (error: any) => {
+      console.error('Error adding team member:', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Erreur lors de l'ajout du membre d'équipe",
+        variant: "destructive"
+      });
+    }
+  });
+
   // Mettre à jour un membre d'équipe
   const updateTeamMember = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateTeamMemberData }) => {
@@ -150,6 +197,7 @@ export const useTeamMembers = () => {
     teamMembers,
     isLoading,
     error,
+    addTeamMember,
     updateTeamMember,
     removeTeamMember
   };

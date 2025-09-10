@@ -8,7 +8,7 @@ import { WorkflowStep } from "./WorkflowStep";
 import { EmployeeView } from "./EmployeeView";
 import { VehiclesWaitingTab } from "./VehiclesWaitingTab";
 import { PlanningCalendar } from "./PlanningCalendar";
-import { EmployeePlanningTab } from "./EmployeePlanningTab";
+
 import { EmployeesManagement } from "./EmployeesManagement";
 import { ProcessConfig } from "./ProcessConfig";
 import { useUserRole } from "@/hooks/use-user-role";
@@ -357,13 +357,6 @@ export const WorkshopPlanningInterface = ({
               />
             </TabsContent>
 
-            <TabsContent value="employee-planning" className="space-y-6">
-              <EmployeePlanningTab 
-                employees={employees}
-                schedules={schedules}
-                vehicles={vehicles}
-              />
-            </TabsContent>
 
             <TabsContent value="employees" className="space-y-6">
               <EmployeesManagement />
