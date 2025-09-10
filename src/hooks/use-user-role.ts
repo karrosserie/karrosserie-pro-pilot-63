@@ -61,5 +61,8 @@ export function useUserRole() {
     isCarrossierCourtesy: userRole === 'carrossier-vehicule de courtoisie',
     isResponsable: userRole === 'responsable',
     isResponsableAdmin: userRole === 'responsable administratif',
+    // Combined role checks
+    canManage: userRole === 'Propriétaire' || userRole === 'responsable' || userRole === 'responsable administratif',
+    isEmployee: userRole === 'carrossier' || userRole === 'carrossier-vehicule de courtoisie',
   };
 }

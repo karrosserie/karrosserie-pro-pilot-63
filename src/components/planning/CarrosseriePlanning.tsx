@@ -32,14 +32,17 @@ import { EmployePointageModal } from '@/components/EmployePointageModal';
 
 
 
-import { useToast } from '@/hooks/use-toast';
 import { EnhancedButton } from '@/components/ui/enhanced-button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { QuickActions, type QuickAction } from '@/components/ui/quick-actions';
 import { aPointe as aPointeUtil, enregistrerArrivee, aPauseEnCours, enregistrerDepart, terminerPause } from '@/utils/pointageUtils';
 import { getCurrentCompanyId } from '@/utils/pointageSupabaseUtils';
 import { FloatingNotifications, type FloatingNotification } from '@/components/ui/floating-notifications';
-import { useParentCommunication } from '@/hooks/useParentCommunication';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCompanyId } from '@/hooks/use-company-id';
+import { useUserRole } from '@/hooks/use-user-role';
+import { useViewManagement } from '@/hooks/use-view-management';
+import { useToast } from '@/hooks/use-toast';
 
 const CarrosseriePlanning = () => {
   console.log('🚀 COMPOSANT CARROSSERIE PLANNING CHARGÉ - DEBUT');
@@ -53,35 +56,21 @@ const CarrosseriePlanning = () => {
   const [showPlanningModal, setShowPlanningModal] = useState(false);
   const [selectedTab, setSelectedTab] = useState('etapes-atelier');
   
-  // Parent communication integration
-  const parentComm = useParentCommunication();
+  // Supabase authentication
+  const { user } = useAuth();
+  const { companyId } = useCompanyId();
+  const { userRole, isOwner, isResponsable, isCarrossier, isCarrossierCourtesy, canManage, isEmployee } = useUserRole();
+  const { 
+    currentView, 
+    selectedEmployeView, 
+    setCurrentView, 
+    setSelectedEmployeView,
+    canSwitchViews,
+    isEmployeeRole,
+    canManageUsers
+  } = useViewManagement();
   
-  // Local state for view management - Default to employee view
-  const [localCurrentView, setLocalCurrentView] = useState<'manager' | 'employe'>('employe');
-  const [selectedEmployeView, setSelectedEmployeView] = useState<string | null>(null);
-  
-  // Memoize parent-derived values to prevent recalculations
-  const parentData = useMemo(() => {
-    const parentCurrentView = parentComm.getCurrentView();
-    const parentUserRole = parentComm.getUserRole();
-    const parentEmployeeId = parentComm.getEmployeeId();
-    const parentCompanyId = parentComm.getCompanyId();
-    
-    // Map parent view types to existing types
-    const mappedView: 'manager' | 'employe' = parentCurrentView === 'employee' ? 'employe' : 'manager';
-    const employeeIdString = parentEmployeeId ? parentEmployeeId : null;
-    
-    return {
-      currentView: mappedView,
-      userRole: parentUserRole,
-      employeeId: employeeIdString,
-      companyId: parentCompanyId,
-    };
-  }, [parentComm.isParentConnected, parentComm.getCurrentView(), parentComm.getUserRole(), parentComm.getEmployeeId(), parentComm.getCompanyId()]);
-  
-  // Final values that respect parent communication or fallback to local state
-  const currentView = parentComm.isParentConnected ? parentData.currentView : localCurrentView;
-  const finalSelectedEmployeView = parentComm.isParentConnected ? parentData.employeeId : selectedEmployeView;
+  const { toast } = useToast();
 
   const [searchFilter, setSearchFilter] = useState('');
   const [floatingNotifications, setFloatingNotifications] = useState<FloatingNotification[]>([]);
@@ -101,35 +90,9 @@ const CarrosseriePlanning = () => {
   const [selectedTacheToMove, setSelectedTacheToMove] = useState<any>(null);
   
   const [aPointe, setAPointe] = useState(false);
-  const [localCompanyId, setLocalCompanyId] = useState<string | null>(null);
   
-  // Final values that respect parent communication or fallback to local state
-  const companyId = parentComm.isParentConnected ? parentData.companyId : localCompanyId;
-
-  // Récupérer le company_id au chargement du composant (only if not using parent)
-  useEffect(() => {
-    if (!parentComm.isParentConnected) {
-      const fetchCompanyId = async () => {
-        try {
-          const id = await getCurrentCompanyId();
-          setLocalCompanyId(id);
-        } catch (error) {
-          console.error('Erreur lors de la récupération du company_id:', error);
-          toast({
-            title: "Erreur",
-            description: "Impossible de récupérer les informations de l'entreprise",
-            variant: "destructive",
-          });
-        }
-      };
-      
-      fetchCompanyId();
-    }
-  }, [parentComm.isParentConnected]);
-  
-  
-
-  const { toast } = useToast();
+  // Final selected employee view - use selectedEmployeView from useViewManagement
+  const finalSelectedEmployeView = selectedEmployeView;
 
   // Enhanced floating notifications handler
   const dismissFloatingNotification = (id: string) => {
@@ -139,23 +102,17 @@ const CarrosseriePlanning = () => {
   // Récupérer les données réelles depuis la base de données
   console.log('🔍 CarrosseriePlanning: companyId utilisé pour les hooks:', {
     companyId,
-    isParentConnected: parentComm.isParentConnected,
-    parentCompanyId: parentData.companyId,
-    localCompanyId,
-    fullParentData: parentData,
-    companyData: parentComm.companyData
+    userId: user?.id,
+    userRole,
+    isOwner,
+    canManage
   });
   
-  // Log spécifique pour le debug du company ID
-  console.log('🚨 DEBUG COMPANY ID COMPLET:', {
-    'parentComm.getCompanyId()': parentComm.getCompanyId(),
-    'parentComm.companyData': parentComm.companyData,
-    'parentComm.companyData?.id': parentComm.companyData?.id,
-    'parentComm.company?.id': parentComm.company?.id,
-    'parentData.companyId': parentData.companyId,
-    'companyId final': companyId,
-    'Type de companyId': typeof companyId,
-    'CompanyId truthy': !!companyId
+  // Log spécifique pour le debug du company ID  
+  console.log('🚨 DEBUG COMPANY ID:', {
+    companyId,
+    userId: user?.id,
+    userRole
   });
   
   // Log avant d'appeler useEmployeeData
