@@ -11,7 +11,7 @@ import Fleet from "@/pages/Fleet";
 import Settings from "@/pages/Settings";
 import Cessions from "@/pages/Cessions";
 import Help from "@/pages/Help";
-import KarrosseriePlanningPage from "@/pages/KarrosseriePlanningPage";
+import Planning from "@/pages/Planning";
 import Messageries from "@/pages/Messageries";
 import PresencePointages from "@/pages/PresencePointages";
 import CreationDossierJudiciaire from "@/pages/CreationDossierJudiciaire";
@@ -125,7 +125,7 @@ export const coreRoutes = [
     element: (
       <ProtectedRoute>
         <AppLayout>
-          <KarrosseriePlanningPage />
+          <Planning />
         </AppLayout>
       </ProtectedRoute>
     )
