@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,81 +18,79 @@ interface PlanningEvent {
   status: 'Planifié' | 'En cours' | 'Terminé' | 'En retard';
 }
 
-const mockEvents: Record<string, PlanningEvent[]> = {
-  '2024-01-15': [
-    {
-      id: '1',
-      title: 'Préparation peinture',
-      vehicleBrand: 'Peugeot',
-      vehicleModel: '308',
-      licensePlate: 'AB-789-XY',
-      client: 'Mme Moreau',
-      technician: 'Sophie Martin',
-      startTime: '08:00',
-      endTime: '10:30',
-      taskType: 'Préparation peinture',
-      status: 'En cours'
-    },
-    {
-      id: '2',
-      title: 'Débosselage',
-      vehicleBrand: 'Audi',
-      vehicleModel: 'A4',
-      licensePlate: 'VS-901-AB',
-      client: 'M. Bernard',
-      technician: 'Sophie Martin',
-      startTime: '11:00',
-      endTime: '13:00',
-      taskType: 'Remplacement ou débosselage',
-      status: 'Planifié'
-    },
-    {
-      id: '3',
-      title: 'Finitions',
-      vehicleBrand: 'Volkswagen',
-      vehicleModel: 'Golf',
-      licensePlate: 'EF-456-UV',
-      client: 'Mme Blanc',
-      technician: 'Martin Dubois',
-      startTime: '14:00',
-      endTime: '15:30',
-      taskType: 'Finitions & remontage',
-      status: 'Planifié'
-    }
-  ],
-  '2024-01-16': [
-    {
-      id: '4',
-      title: 'Mise en peinture',
-      vehicleBrand: 'Renault',
-      vehicleModel: 'Clio',
-      licensePlate: 'CD-123-ZW',
-      client: 'M. Petit',
-      technician: 'Sophie Martin',
-      startTime: '09:00',
-      endTime: '13:00',
-      taskType: 'Mise en peinture',
-      status: 'Planifié'
-    },
-    {
-      id: '5',
-      title: 'Contrôle qualité',
-      vehicleBrand: 'Ford',
-      vehicleModel: 'Focus',
-      licensePlate: 'GH-789-ST',
-      client: 'M. Roux',
-      technician: 'Martin Dubois',
-      startTime: '14:30',
-      endTime: '15:00',
-      taskType: 'Clôture du dossier et livraison',
-      status: 'Planifié'
-    }
-  ]
-};
+interface PlanningCalendarProps {
+  schedules?: any[];
+  employees?: any[];
+  vehicles?: any[];
+}
 
-export const PlanningCalendar = () => {
-  const [selectedDate, setSelectedDate] = useState('2024-01-15');
+export const PlanningCalendar = ({ 
+  schedules = [], 
+  employees = [], 
+  vehicles = [] 
+}: PlanningCalendarProps) => {
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  });
   const [currentWeek, setCurrentWeek] = useState(0);
+
+  // Helper functions
+  const findEmployeeName = (userId: string): string => {
+    const employee = employees.find(emp => emp.user_id === userId);
+    return employee ? employee.nom : 'Technicien non assigné';
+  };
+
+  const findVehicleInfo = (vehicleId: string) => {
+    const vehicle = vehicles.find(v => v.id === vehicleId);
+    return {
+      brand: vehicle?.car_brands?.name || 'Marque inconnue',
+      model: vehicle?.car_models?.name || 'Modèle inconnu',
+      licensePlate: vehicle?.license_plate || 'Plaque inconnue',
+      client: vehicle?.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Client inconnu'
+    };
+  };
+
+  const mapScheduleStatus = (status: string): PlanningEvent['status'] => {
+    switch (status) {
+      case 'En cours': return 'En cours';
+      case 'Terminé': return 'Terminé';
+      case 'En retard': return 'En retard';
+      default: return 'Planifié';
+    }
+  };
+
+  // Convert schedules to events grouped by date
+  const eventsByDate = useMemo(() => {
+    const events: Record<string, PlanningEvent[]> = {};
+    
+    schedules.forEach(schedule => {
+      const startDate = new Date(schedule.start_datetime);
+      const dateKey = startDate.toISOString().split('T')[0];
+      const vehicleInfo = findVehicleInfo(schedule.vehicle_id);
+      
+      const event: PlanningEvent = {
+        id: schedule.id,
+        title: schedule.task_type,
+        vehicleBrand: vehicleInfo.brand,
+        vehicleModel: vehicleInfo.model,
+        licensePlate: vehicleInfo.licensePlate,
+        client: vehicleInfo.client,
+        technician: findEmployeeName(schedule.user_id),
+        startTime: startDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+        endTime: new Date(schedule.end_datetime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+        taskType: schedule.task_type,
+        status: mapScheduleStatus(schedule.status)
+      };
+
+      if (!events[dateKey]) {
+        events[dateKey] = [];
+      }
+      events[dateKey].push(event);
+    });
+
+    return events;
+  }, [schedules, employees, vehicles]);
 
   const getStatusBadge = (status: PlanningEvent['status']) => {
     switch (status) {
@@ -108,8 +106,9 @@ export const PlanningCalendar = () => {
   };
 
   const getWeekDays = () => {
-    const baseDate = new Date('2024-01-15');
-    baseDate.setDate(baseDate.getDate() + (currentWeek * 7));
+    const today = new Date();
+    const baseDate = new Date(today);
+    baseDate.setDate(today.getDate() + (currentWeek * 7) - today.getDay() + 1); // Start from Monday
     
     const weekDays = [];
     for (let i = 0; i < 7; i++) {
@@ -119,6 +118,7 @@ export const PlanningCalendar = () => {
         date: date.toISOString().split('T')[0],
         dayName: date.toLocaleDateString('fr-FR', { weekday: 'short' }),
         dayNumber: date.getDate(),
+        monthName: date.toLocaleDateString('fr-FR', { month: 'short' }),
         isWeekend: date.getDay() === 0 || date.getDay() === 6
       });
     }
@@ -126,7 +126,7 @@ export const PlanningCalendar = () => {
   };
 
   const weekDays = getWeekDays();
-  const selectedEvents = mockEvents[selectedDate] || [];
+  const selectedEvents = eventsByDate[selectedDate] || [];
 
   const timeSlots = Array.from({ length: 10 }, (_, i) => {
     const hour = 8 + i;
@@ -156,7 +156,7 @@ export const PlanningCalendar = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="w-5 h-5" />
-            Semaine du {weekDays[0]?.dayNumber} au {weekDays[6]?.dayNumber} janvier 2024
+            Semaine du {weekDays[0]?.dayNumber} {weekDays[0]?.monthName} au {weekDays[6]?.dayNumber} {weekDays[6]?.monthName}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -190,7 +190,7 @@ export const PlanningCalendar = () => {
                 
                 {/* Events for this day */}
                 <div className="space-y-1 min-h-[400px]">
-                  {(mockEvents[day.date] || []).map(event => (
+                  {(eventsByDate[day.date] || []).map(event => (
                     <div 
                       key={event.id}
                       className="bg-blue-50 border border-blue-200 rounded p-2 text-xs cursor-pointer hover:bg-blue-100 transition-colors"
