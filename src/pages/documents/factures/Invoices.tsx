@@ -38,9 +38,11 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Printer, Mail, Signature, CreditCard, FileX, Download } from 'lucide-react';
+import { Printer, Mail, Signature, CreditCard, FileX, Download, Send } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import InvoiceMobileCard from '@/components/invoices/InvoiceMobileCard';
+import RelanceModal from '@/components/invoices/RelanceModal';
+import { useSendRelance } from '@/hooks/use-send-relance';
 
 const Invoices = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -50,6 +52,7 @@ const Invoices = () => {
   const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
   const [creditDialogOpen, setCreditDialogOpen] = useState(false);
   const [viewerModalOpen, setViewerModalOpen] = useState(false);
+  const [relanceModalOpen, setRelanceModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const { toast } = useToast();
   const { confirm } = useConfirmation();
@@ -60,6 +63,7 @@ const Invoices = () => {
   const { companyData } = useCompany();
   const { sortedData: sortedInvoices, sortConfig, handleSort } = useTableSorting(invoices || [], 'reference');
   const isMobile = useIsMobile();
+  const { sendRelance } = useSendRelance();
   
   console.log('=== DONNÉES FACTURES DANS LE COMPOSANT ===');
   console.log('invoices:', invoices);
@@ -224,6 +228,38 @@ const Invoices = () => {
     setViewerModalOpen(true);
   };
 
+  const handleRelance = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setRelanceModalOpen(true);
+  };
+
+  const handleSendRelance = async (invoice: Invoice, channel: string, relanceNumber: string) => {
+    try {
+      const success = await sendRelance({
+        invoice,
+        channel,
+        tone: 'professional',
+        message: `Relance n°${relanceNumber} pour la facture ${invoice.reference}`,
+      });
+
+      if (success) {
+        toast({
+          title: "Relance envoyée",
+          description: `La relance n°${relanceNumber} a été envoyée avec succès via ${channel}.`
+        });
+      } else {
+        throw new Error("Échec de l'envoi de la relance");
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi de la relance:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'envoyer la relance. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
+  };
+
   // Effet pour ouvrir automatiquement une facture depuis l'URL
   useEffect(() => {
     const openInvoiceId = searchParams.get('openInvoice');
@@ -305,7 +341,7 @@ const Invoices = () => {
                   invoice={invoice}
                   onViewInvoice={handleViewInvoice}
                   onEditInvoice={handleEditInvoice}
-                  onDelete={handleDelete}
+                  onRelance={handleRelance}
                   onDownload={handleDownload}
                   onPrint={handlePrint}
                   onSendEmail={handleSendEmail}
@@ -415,9 +451,9 @@ const Invoices = () => {
                           <FileX className="h-4 w-4 mr-1" />
                           Créer un avoir
                         </Button>
-                        <Button variant="delete" size="sm" onClick={() => handleDelete(invoice)}>
-                          <Trash className="h-4 w-4 mr-1" />
-                          Supprimer
+                        <Button variant="send" size="sm" onClick={() => handleRelance(invoice)}>
+                          <Send className="h-4 w-4 mr-1" />
+                          Relance
                         </Button>
                       </div>
                     </TableCell>
@@ -481,6 +517,13 @@ const Invoices = () => {
         invoice={selectedInvoice}
         open={viewerModalOpen}
         onOpenChange={setViewerModalOpen}
+      />
+
+      <RelanceModal
+        invoice={selectedInvoice}
+        open={relanceModalOpen}
+        onOpenChange={setRelanceModalOpen}
+        onRelance={handleSendRelance}
       />
     </div>
   );

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Pencil, Trash, Download, Printer, Mail, CreditCard, FileX, Calendar, User, Car, Euro } from 'lucide-react';
+import { Eye, Pencil, Send, Download, Printer, Mail, CreditCard, FileX, Calendar, User, Car, Euro } from 'lucide-react';
 import { Invoice } from '@/services/supabase/invoices';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -10,7 +10,7 @@ interface InvoiceMobileCardProps {
   invoice: Invoice;
   onViewInvoice: (invoice: Invoice) => void;
   onEditInvoice: (invoice: Invoice) => void;
-  onDelete: (invoice: Invoice) => void;
+  onRelance: (invoice: Invoice) => void;
   onDownload: (invoice: Invoice) => void;
   onPrint: (invoice: Invoice) => void;
   onSendEmail: (invoice: Invoice) => void;
@@ -23,7 +23,7 @@ const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
   invoice,
   onViewInvoice,
   onEditInvoice,
-  onDelete,
+  onRelance,
   onDownload,
   onPrint,
   onSendEmail,
@@ -152,9 +152,9 @@ const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
           <FileX className="h-3 w-3 mr-1" />
           Avoir
         </Button>
-        <Button variant="delete" size="sm" onClick={() => onDelete(invoice)}>
-          <Trash className="h-3 w-3 mr-1" />
-          Supprimer
+        <Button variant="send" size="sm" onClick={() => onRelance(invoice)}>
+          <Send className="h-3 w-3 mr-1" />
+          Relance
         </Button>
       </div>
     </div>
