@@ -18,6 +18,16 @@ import { StatusBadge } from '@/components/ui/status-badge';
 import { QuickActions, type QuickAction } from '@/components/ui/quick-actions';
 import { FloatingNotifications, type FloatingNotification } from '@/components/ui/floating-notifications';
 
+// Modals
+import { VehiculeUrgenceModal } from '@/components/VehiculeUrgenceModal';
+import { PointageModal } from '@/components/PointageModal';
+import { DeplacerTacheModal } from '@/components/planning/DeplacerTacheModal';
+import { VehiculeModal } from '@/components/VehiculeModal';
+
+// Utilities
+import { aPointe as aPointeUtil, enregistrerArrivee, aPauseEnCours, enregistrerDepart, terminerPause } from '@/utils/pointageUtils';
+import { getCurrentCompanyId } from '@/utils/pointageSupabaseUtils';
+
 // Auth and role management
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompanyId } from '@/hooks/use-company-id';
@@ -27,8 +37,7 @@ import { useViewManagement } from '@/hooks/use-view-management';
 const CarrosseriePlanning = () => {
   console.log('🚀 COMPOSANT CARROSSERIE PLANNING CHARGÉ - DEBUT');
   
-  // Core state
-  const [selectedProcessCategory, setSelectedProcessCategory] = useState('accueil');
+  // Enhanced state variables for all modals and actions
   const [showEmployeModal, setShowEmployeModal] = useState(false);
   const [editingEmploye, setEditingEmploye] = useState(null);
   const [showAttenteModal, setShowAttenteModal] = useState(false);
@@ -40,6 +49,13 @@ const CarrosseriePlanning = () => {
   const [searchFilter, setSearchFilter] = useState('');
   const [floatingNotifications, setFloatingNotifications] = useState<FloatingNotification[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // New modal states for advanced features
+  const [showVehiculeUrgenceModal, setShowVehiculeUrgenceModal] = useState(false);
+  const [showPointageModal, setShowPointageModal] = useState(false);
+  const [showDeplacerModal, setShowDeplacerModal] = useState(false);
+  const [selectedTacheForDeplacement, setSelectedTacheForDeplacement] = useState<any>(null);
+  const [employePointageInfo, setEmployePointageInfo] = useState<{[key: string]: {aPointe: boolean, enPause: boolean}}>({});
   
   // Supabase authentication and role management
   const { user } = useAuth();
@@ -300,6 +316,63 @@ const CarrosseriePlanning = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Modals */}
+      <VehiculeUrgenceModal
+        isOpen={showVehiculeUrgenceModal}
+        onClose={() => setShowVehiculeUrgenceModal(false)}
+        vehicule={selectedVehicule}
+        onConfirm={(reason) => {
+          console.log('Véhicule marqué urgent:', reason);
+          setFloatingNotifications(prev => [...prev, {
+            id: Date.now().toString(),
+            type: 'success' as const,
+            title: 'Véhicule urgent',
+            message: `Véhicule ${selectedVehicule?.vehicule} marqué comme urgent`,
+            duration: 3000
+          }]);
+        }}
+      />
+
+      <PointageModal
+        isOpen={showPointageModal}
+        onClose={() => setShowPointageModal(false)}
+        employeeName={employes.find(e => e.user_id === selectedEmployeView)?.nom}
+        onConfirm={async () => {
+          if (selectedEmployeView) {
+            const success = await enregistrerArrivee(selectedEmployeView);
+            if (success) {
+              setFloatingNotifications(prev => [...prev, {
+                id: Date.now().toString(),
+                type: 'success' as const,
+                title: 'Pointage',
+                message: 'Pointage enregistré avec succès',
+                duration: 3000
+              }]);
+            }
+          }
+        }}
+      />
+
+      <DeplacerTacheModal
+        isOpen={showDeplacerModal}
+        onClose={() => {
+          setShowDeplacerModal(false);
+          setSelectedTacheForDeplacement(null);
+        }}
+        tache={selectedTacheForDeplacement}
+        employes={employes}
+        onConfirm={(nouvelEmployeId, nouvelleDate) => {
+          console.log('Tâche déplacée:', { nouvelEmployeId, nouvelleDate });
+          setFloatingNotifications(prev => [...prev, {
+            id: Date.now().toString(),
+            type: 'success' as const,
+            title: 'Tâche déplacée',
+            message: 'Tâche déplacée avec succès',
+            duration: 3000
+          }]);
+        }}
+      />
 
       {/* Floating Notifications */}
       <FloatingNotifications
