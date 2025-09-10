@@ -17,75 +17,19 @@ interface WaitingVehicle {
   waitingTime: string;
 }
 
-const mockWaitingVehicles: WaitingVehicle[] = [
-  {
-    id: '1',
-    brand: 'Toyota',
-    model: 'Corolla',
-    licensePlate: 'BC-456-DE',
-    client: 'M. Durand',
-    price: '850€',
-    estimatedDuration: '2h30',
-    description: 'Réparation pare-brise',
-    priority: 'Urgent',
-    arrivalDate: '2024-01-15',
-    waitingTime: '2 jours'
-  },
-  {
-    id: '2',
-    brand: 'Opel',
-    model: 'Corsa',
-    licensePlate: 'FG-789-HI',
-    client: 'Mme Martin',
-    price: '650€',
-    estimatedDuration: '3h00',
-    description: 'Peinture portière',
-    priority: 'Normal',
-    arrivalDate: '2024-01-16',
-    waitingTime: '1 jour'
-  },
-  {
-    id: '3',
-    brand: 'Seat',
-    model: 'Ibiza',
-    licensePlate: 'JK-012-LM',
-    client: 'M. Bernard',
-    price: '1200€',
-    estimatedDuration: '4h00',
-    description: 'Remplacement capot + peinture',
-    priority: 'Très urgent',
-    arrivalDate: '2024-01-17',
-    waitingTime: '6h'
-  },
-  {
-    id: '4',
-    brand: 'Skoda',
-    model: 'Octavia',
-    licensePlate: 'NO-345-PQ',
-    client: 'Mme Rousseau',
-    price: '450€',
-    estimatedDuration: '1h30',
-    description: 'Polissage rayures',
-    priority: 'Normal',
-    arrivalDate: '2024-01-17',
-    waitingTime: '4h'
-  },
-  {
-    id: '5',
-    brand: 'Hyundai',
-    model: 'i30',
-    licensePlate: 'RS-678-TU',
-    client: 'M. Petit',
-    price: '950€',
-    estimatedDuration: '3h30',
-    description: 'Débosselage + retouche peinture',
-    priority: 'Normal',
-    arrivalDate: '2024-01-18',
-    waitingTime: '2h'
-  }
-];
+interface VehiclesWaitingTabProps {
+  vehicles?: any[];
+  schedules?: any[];
+  employees?: any[];
+  onAddToWorkflow?: (vehicleId: string) => void;
+}
 
-export const VehiclesWaitingTab = () => {
+export const VehiclesWaitingTab = ({ 
+  vehicles = [], 
+  schedules = [], 
+  employees = [],
+  onAddToWorkflow 
+}: VehiclesWaitingTabProps) => {
   const getPriorityBadge = (priority: WaitingVehicle['priority']) => {
     switch (priority) {
       case 'Très urgent':
@@ -105,20 +49,71 @@ export const VehiclesWaitingTab = () => {
     }
   };
 
-  const sortedVehicles = [...mockWaitingVehicles].sort((a, b) => 
+  // Helper functions
+  const calculateWaitingTime = (createdAt: string): string => {
+    const now = new Date();
+    const created = new Date(createdAt);
+    const diffInHours = Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 24) {
+      return `${diffInHours}h`;
+    } else {
+      const days = Math.floor(diffInHours / 24);
+      return `${days} jour${days > 1 ? 's' : ''}`;
+    }
+  };
+
+  const getVehiclePriority = (vehicle: any): 'Normal' | 'Urgent' | 'Très urgent' => {
+    // Déterminer la priorité basée sur certains critères
+    // Pour l'instant, on retourne Normal par défaut
+    return 'Normal';
+  };
+
+  const findEmployeeName = (userId: string): string => {
+    const employee = employees.find(emp => emp.user_id === userId);
+    return employee ? employee.nom : 'Non assigné';
+  };
+
+  // Convertir les véhicules de la base de données en format WaitingVehicle
+  const waitingVehicles: WaitingVehicle[] = vehicles
+    .filter(vehicle => {
+      // Filtrer les véhicules qui ne sont pas encore dans un planning actif
+      const hasActiveSchedule = schedules.some(schedule => 
+        schedule.vehicle_id === vehicle.id && 
+        (schedule.status === 'En cours' || schedule.status === 'En attente')
+      );
+      return !hasActiveSchedule;
+    })
+    .map(vehicle => ({
+      id: vehicle.id,
+      brand: vehicle.car_brands?.name || 'Marque inconnue',
+      model: vehicle.car_models?.name || 'Modèle inconnu',
+      licensePlate: vehicle.license_plate || 'Plaque inconnue',
+      client: vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Client inconnu',
+      price: '0€', // TODO: Calculer le prix réel depuis les ordres de réparation
+      estimatedDuration: '2h', // TODO: Calculer la durée estimée
+      description: 'En attente de planification',
+      priority: getVehiclePriority(vehicle),
+      arrivalDate: new Date(vehicle.created_at).toLocaleDateString('fr-FR'),
+      waitingTime: calculateWaitingTime(vehicle.created_at)
+    }));
+
+  const sortedVehicles = [...waitingVehicles].sort((a, b) => 
     getPriorityOrder(a.priority) - getPriorityOrder(b.priority)
   );
 
   const handleAddToWorkflow = (vehicleId: string) => {
     console.log('Adding vehicle to workflow:', vehicleId);
-    // TODO: Implement add to workflow logic
+    if (onAddToWorkflow) {
+      onAddToWorkflow(vehicleId);
+    }
   };
 
   const stats = {
-    total: mockWaitingVehicles.length,
-    urgent: mockWaitingVehicles.filter(v => v.priority === 'Urgent').length,
-    veryUrgent: mockWaitingVehicles.filter(v => v.priority === 'Très urgent').length,
-    totalValue: mockWaitingVehicles.reduce((acc, v) => acc + parseFloat(v.price.replace('€', '')), 0)
+    total: waitingVehicles.length,
+    urgent: waitingVehicles.filter(v => v.priority === 'Urgent').length,
+    veryUrgent: waitingVehicles.filter(v => v.priority === 'Très urgent').length,
+    totalValue: waitingVehicles.reduce((acc, v) => acc + parseFloat(v.price.replace('€', '')), 0)
   };
 
   return (
@@ -217,7 +212,7 @@ export const VehiclesWaitingTab = () => {
         ))}
       </div>
 
-      {mockWaitingVehicles.length === 0 && (
+      {waitingVehicles.length === 0 && (
         <Card>
           <CardContent className="text-center py-12">
             <Car className="w-12 h-12 text-muted-foreground mx-auto mb-4" />

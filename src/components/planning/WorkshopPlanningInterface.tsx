@@ -341,7 +341,12 @@ export const WorkshopPlanningInterface = ({
         </TabsContent>
 
             <TabsContent value="waiting" className="space-y-6">
-              <VehiclesWaitingTab />
+              <VehiclesWaitingTab 
+                vehicles={vehicles}
+                schedules={schedules}
+                employees={employees}
+                onAddToWorkflow={handlePlanVehicle}
+              />
             </TabsContent>
 
             <TabsContent value="planning" className="space-y-6">
