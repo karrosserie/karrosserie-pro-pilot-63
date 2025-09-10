@@ -29,6 +29,16 @@ export const WorkshopPlanningInterface = ({
 }: WorkshopPlanningInterfaceProps) => {
   const { userRole, isCarrossier, isCarrossierCourtesy, isResponsable, isOwner, isLoading } = useUserRole();
   
+  // Debug logs pour comprendre le problème de rôle
+  console.log('🔍 WorkshopPlanningInterface - User Role Debug:', {
+    userRole,
+    isOwner,
+    isCarrossier,
+    isCarrossierCourtesy,
+    isResponsable,
+    isLoading
+  });
+  
   // Déterminer la vue par défaut selon le rôle
   const getDefaultView = () => {
     if (isOwner) return 'manager';
