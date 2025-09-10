@@ -696,6 +696,30 @@ export type Database = {
           },
         ]
       }
+      document_sav: {
+        Row: {
+          content: string
+          created_at: string | null
+          embedding: string | null
+          id: number
+          metadata: Json | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          embedding?: string | null
+          id?: number
+          metadata?: Json | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          embedding?: string | null
+          id?: number
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
       employee_breaks: {
         Row: {
           break_end_time: string | null
@@ -1690,6 +1714,54 @@ export type Database = {
         }
         Relationships: []
       }
+      paint_types: {
+        Row: {
+          brand: string
+          color_code: string | null
+          company_id: string
+          coverage_per_liter: number | null
+          created_at: string
+          density: number
+          dilution_ratio: number
+          id: string
+          is_active: boolean
+          name: string
+          price_per_liter: number
+          thinner_price_per_liter: number
+          updated_at: string
+        }
+        Insert: {
+          brand: string
+          color_code?: string | null
+          company_id: string
+          coverage_per_liter?: number | null
+          created_at?: string
+          density?: number
+          dilution_ratio?: number
+          id?: string
+          is_active?: boolean
+          name: string
+          price_per_liter?: number
+          thinner_price_per_liter?: number
+          updated_at?: string
+        }
+        Update: {
+          brand?: string
+          color_code?: string | null
+          company_id?: string
+          coverage_per_liter?: number | null
+          created_at?: string
+          density?: number
+          dilution_ratio?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          price_per_liter?: number
+          thinner_price_per_liter?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -2417,6 +2489,74 @@ export type Database = {
           },
         ]
       }
+      weighing_reports: {
+        Row: {
+          actual_weight: number
+          company_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          operator_name: string | null
+          paint_cost: number | null
+          paint_type_id: string
+          repair_order_reference: string | null
+          surface_area: number | null
+          theoretical_weight: number
+          total_cost: number | null
+          updated_at: string
+          variance: number | null
+          variance_percentage: number | null
+          vehicle_id: string | null
+          weighing_timestamp: string
+        }
+        Insert: {
+          actual_weight: number
+          company_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          operator_name?: string | null
+          paint_cost?: number | null
+          paint_type_id: string
+          repair_order_reference?: string | null
+          surface_area?: number | null
+          theoretical_weight: number
+          total_cost?: number | null
+          updated_at?: string
+          variance?: number | null
+          variance_percentage?: number | null
+          vehicle_id?: string | null
+          weighing_timestamp?: string
+        }
+        Update: {
+          actual_weight?: number
+          company_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          operator_name?: string | null
+          paint_cost?: number | null
+          paint_type_id?: string
+          repair_order_reference?: string | null
+          surface_area?: number | null
+          theoretical_weight?: number
+          total_cost?: number | null
+          updated_at?: string
+          variance?: number | null
+          variance_percentage?: number | null
+          vehicle_id?: string | null
+          weighing_timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weighing_reports_paint_type_id_fkey"
+            columns: ["paint_type_id"]
+            isOneToOne: false
+            referencedRelation: "paint_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workshop_schedule: {
         Row: {
           afternoon_end: string | null
@@ -2464,6 +2604,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      binary_quantize: {
+        Args: { "": string } | { "": unknown }
+        Returns: unknown
+      }
       bytea_to_text: {
         Args: { data: string }
         Returns: string
@@ -2479,6 +2623,38 @@ export type Database = {
       get_effective_company_id: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      halfvec_avg: {
+        Args: { "": number[] }
+        Returns: unknown
+      }
+      halfvec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      halfvec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      halfvec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      hnsw_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_sparsevec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnswhandler: {
+        Args: { "": unknown }
+        Returns: unknown
       }
       http: {
         Args: { request: Database["public"]["CompositeTypes"]["http_request"] }
@@ -2535,6 +2711,35 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      ivfflat_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflathandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      l2_norm: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: number
+      }
+      l2_normalize: {
+        Args: { "": string } | { "": unknown } | { "": unknown }
+        Returns: string
+      }
+      match_documents: {
+        Args: { filter?: Json; match_count: number; query_embedding: string }
+        Returns: {
+          content: string
+          id: number
+          metadata: Json
+          similarity: number
+        }[]
+      }
       set_config: {
         Args: {
           is_local?: boolean
@@ -2542,6 +2747,18 @@ export type Database = {
           setting_value: string
         }
         Returns: undefined
+      }
+      sparsevec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      sparsevec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      sparsevec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
       }
       text_to_bytea: {
         Args: { data: string }
@@ -2558,6 +2775,30 @@ export type Database = {
       user_is_company_owner: {
         Args: { p_company_id: string; p_user_id: string }
         Returns: boolean
+      }
+      vector_avg: {
+        Args: { "": number[] }
+        Returns: string
+      }
+      vector_dims: {
+        Args: { "": string } | { "": unknown }
+        Returns: number
+      }
+      vector_norm: {
+        Args: { "": string }
+        Returns: number
+      }
+      vector_out: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      vector_send: {
+        Args: { "": string }
+        Returns: string
+      }
+      vector_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
       }
     }
     Enums: {
