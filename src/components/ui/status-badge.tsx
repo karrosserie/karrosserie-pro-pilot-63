@@ -1,45 +1,78 @@
+import React from 'react';
+import { Badge, BadgeProps } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-
-interface StatusBadgeProps {
+interface StatusBadgeProps extends Omit<BadgeProps, 'variant'> {
   status: string;
-  className?: string;
+  showDot?: boolean;
 }
 
-export function StatusBadge({ status, className }: StatusBadgeProps) {
-  const getStatusColor = (status: string) => {
-    const lowerStatus = status.toLowerCase();
-    
-    if (lowerStatus.includes('payé') || lowerStatus.includes('terminé') || lowerStatus.includes('validé') || lowerStatus.includes('accepté') || lowerStatus.includes('disponible')) {
-      return "bg-green-100 text-green-800 hover:bg-green-100";
+export const StatusBadge: React.FC<StatusBadgeProps> = ({
+  status,
+  showDot = true,
+  children,
+  className,
+  ...props
+}) => {
+  const getStatusConfig = (status: string) => {
+    switch (status) {
+      case 'active':
+        return {
+          variant: 'default' as const,
+          dotColor: 'bg-green-500',
+          label: 'Actif'
+        };
+      case 'inactive':
+        return {
+          variant: 'secondary' as const,
+          dotColor: 'bg-gray-500',
+          label: 'Inactif'
+        };
+      case 'pending':
+        return {
+          variant: 'outline' as const,
+          dotColor: 'bg-yellow-500',
+          label: 'En attente'
+        };
+      case 'completed':
+        return {
+          variant: 'secondary' as const,
+          dotColor: 'bg-green-500',
+          label: 'Terminé'
+        };
+      case 'error':
+        return {
+          variant: 'destructive' as const,
+          dotColor: 'bg-red-500',
+          label: 'Erreur'
+        };
+      case 'warning':
+        return {
+          variant: 'outline' as const,
+          dotColor: 'bg-yellow-500',
+          label: 'Attention'
+        };
+      default:
+        return {
+          variant: 'secondary' as const,
+          dotColor: 'bg-gray-500',
+          label: status
+        };
     }
-    
-    if (lowerStatus.includes('attente') || lowerStatus.includes('confirmé') || lowerStatus.includes('brouillon') || lowerStatus.includes('cours') || lowerStatus.includes('importé')) {
-      return "bg-amber-100 text-amber-800 hover:bg-amber-100";
-    }
-    
-    if (lowerStatus.includes('annulé') || lowerStatus.includes('refusé')) {
-      return "bg-red-100 text-red-800 hover:bg-red-100";
-    }
-    
-    if (lowerStatus.includes('réservé')) {
-      return "bg-blue-100 text-blue-800 hover:bg-blue-100";
-    }
-    
-    return "bg-gray-100 text-gray-800 hover:bg-gray-100";
   };
 
+  const config = getStatusConfig(status);
+
   return (
-    <Badge 
-      className={cn(
-        "font-normal text-xs",
-        getStatusColor(status),
-        className
-      )}
-      variant="outline"
+    <Badge
+      variant={config.variant}
+      className={cn('flex items-center gap-1.5', className)}
+      {...props}
     >
-      {status}
+      {showDot && (
+        <div className={cn('w-2 h-2 rounded-full', config.dotColor)} />
+      )}
+      {children || config.label}
     </Badge>
   );
-}
+};

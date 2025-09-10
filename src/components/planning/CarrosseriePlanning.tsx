@@ -561,23 +561,16 @@ const CarrosseriePlanning = () => {
       toast({
         title: "🚨 Véhicule d'urgence ajouté",
         description: `${vehiculeUrgence.plaque} assigné à ${employesFromData.find(e => e.user_id === vehiculeUrgence.employeId.toString() || e.id === vehiculeUrgence.employeId.toString())?.nom} à ${vehiculeUrgence.heure}`,
-        duration: 5000,
       });
 
       // Ajouter notification flottante
       const newFloatingNotif: FloatingNotification = {
         id: `urgent_${Date.now()}`,
         title: "Véhicule urgent ajouté",
-        message: `${vehiculeUrgence.plaque} - Traitement immédiat ${companyId ? '(Persisté en BD)' : '(Local)'}`,
-        type: "success",
-        duration: 8000,
-        actions: [{
-          label: "Voir planning",
-          onClick: () => {
-            setLocalCurrentView('employe' as 'employe');
-            setSelectedEmployeView(vehiculeUrgence.employeId.toString());
-          }
-        }]
+        message: `${vehiculeUrgence.plaque} prêt pour traitement`,
+        type: 'warning',
+        duration: 3000
+      };
       };
       
       setFloatingNotifications(prev => [newFloatingNotif, ...prev]);
@@ -592,12 +585,11 @@ const CarrosseriePlanning = () => {
         }
       }
     } else {
-      toast({
-        title: "❌ Erreur",
-        description: result.message,
-        variant: "destructive",
-        duration: 5000,
-      });
+        toast({
+          title: "❌ Erreur",
+          description: result.message,
+          variant: "destructive"
+        });
     }
   };
   // Handlers pour les actions véhicules en attente

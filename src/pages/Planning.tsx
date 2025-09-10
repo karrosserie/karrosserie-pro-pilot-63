@@ -1,4 +1,4 @@
-import CarrosseriePlanning from '@/components/CarrosseriePlanning';
+import CarrosseriePlanning from '@/components/planning/CarrosseriePlanning';
 
 const Index = () => {
   return <CarrosseriePlanning />;
