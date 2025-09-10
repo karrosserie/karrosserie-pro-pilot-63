@@ -215,14 +215,14 @@ export const PlanningEmploye: React.FC<PlanningEmployeProps> = ({
         {/* Header avec stats et bouton de gestion des pointages pour les employés */}
         <div className="flex justify-between items-start">
           <EmployeStats 
-            userRole={userRole}
-            employeNom={employe?.nom || ''}
+            employeId={employe.id}
+            employeNom={employe.nom}
+            tachesAFaire={tachesAFaire.length}
             tachesEnCours={tachesEnCours.length}
             tachesTerminees={tachesTerminees.length}
-            totalTaches={tachesTriees.length}
           />
           
-          {userRole === 'employe' && employe?.id && (
+          {employe?.id && (
             <GestionPointageDropdown
               employeNom={employe?.nom || ''}
               employeId={employe?.id || 0}

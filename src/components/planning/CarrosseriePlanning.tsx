@@ -571,7 +571,6 @@ const CarrosseriePlanning = () => {
         type: 'warning',
         duration: 3000
       };
-      };
       
       setFloatingNotifications(prev => [newFloatingNotif, ...prev]);
 
@@ -1082,8 +1081,9 @@ const CarrosseriePlanning = () => {
 
         {/* ✅ UTILISATION DU COMPOSANT PlanningEmploye avec le hook usePointageStatus */}
         <PlanningEmploye
-          employe={employe}
-          taches={(() => {
+          employeId={employe.user_id || employe.id}
+          companyId={companyId}
+          planningTaches={(() => {
             console.log('🔍 CarrosseriePlanning: Récupération tâches pour employé:', {
               employeId: employe.id,
               employeUserId: employe.user_id,
@@ -1156,8 +1156,6 @@ const CarrosseriePlanning = () => {
               setShowVehiculeModal(true);
             }
           }}
-          userRole={userRole} // ✅ CRITIQUE: Passer le userRole correct ('employe')
-          companyId={companyId || "temp-company-id"}
         />
 
         {/* Notifications pour l'employé */}
@@ -1638,10 +1636,11 @@ const CarrosseriePlanning = () => {
 
                      {/* Planning détaillé de l'employé */}
                      {planningEmploye.length > 0 ? (
-                       <PlanningEmploye
-                         employe={employe}
-                         taches={planningEmploye}
-                         onTerminerTache={(tacheId) => {
+                        <PlanningEmploye
+                          employeId={employe.user_id || employe.id}
+                          companyId={companyId}
+                          planningTaches={planningEmploye}
+                          onTerminerTache={(tacheId) => {
                            console.log('🚫 ISOLATION TOTALE - Terminer tâche sans pointage:', tacheId);
                            console.log('🚨 Mode BYPASS - Aucune vérification de pointage autorisée');
                            
@@ -1679,10 +1678,8 @@ const CarrosseriePlanning = () => {
                                setShowVehiculeModal(true);
                              }
                            }
-                         }}
-                         userRole={userRole}
-                         companyId={companyId || "temp-company-id"}
-                       />
+                          }}
+                        />
                      ) : (
                        <Card className="border-dashed border-2 border-muted">
                          <CardContent className="p-8 text-center">
@@ -2383,10 +2380,9 @@ const CarrosseriePlanning = () => {
         {/* Modal de pointage employé */}
         {showEmployePointageModal && selectedEmployePointage && (
           <EmployePointageModal
-            open={showEmployePointageModal}
-            onOpenChange={setShowEmployePointageModal}
-            employeId={selectedEmployePointage.id}
-            employeNom={selectedEmployePointage.nom}
+            isOpen={showEmployePointageModal}
+            onClose={() => setShowEmployePointageModal(false)}
+            employe={selectedEmployePointage}
           />
         )}
 
@@ -2569,57 +2565,48 @@ const CarrosseriePlanning = () => {
         vehicule={selectedVehicule}
         isOpen={showVehiculeModal}
         onClose={() => setShowVehiculeModal(false)}
-        userRole={userRole}
-        onAssignerTache={(vehicule) => {
-          const tacheAssignee = assignerTacheAutomatique(vehicule);
-          if (tacheAssignee) {
-            toast({
-              title: "Tâche assignée",
-              description: `${vehicule.sousEtape} assignée à ${tacheAssignee.technicien}`,
-            });
-          }
-          setShowVehiculeModal(false);
-        }}
       />
 
       {/* Modale véhicule urgence */}
       <VehiculeUrgenceModal
         isOpen={showVehiculeUrgenceModal}
         onClose={() => setShowVehiculeUrgenceModal(false)}
-        employes={employes}
-        onAjouterVehicule={handleAjouterVehiculeUrgence}
+        vehicule={selectedVehiculeAction}
+        onConfirm={(reason) => {
+          console.log('Urgence confirmée:', reason);
+          setShowVehiculeUrgenceModal(false);
+        }}
       />
 
       {/* Modales d'actions véhicules en attente */}
       <VehiculeDebloquerModal
         isOpen={showDebloquerModal}
-        onClose={() => {
-          setShowDebloquerModal(false);
-          setSelectedVehiculeAction(null);
-        }}
+        onClose={() => setShowDebloquerModal(false)}
         vehicule={selectedVehiculeAction}
-        onDebloquer={handleDebloquer}
+        onConfirm={(reason) => {
+          console.log('Déblocage confirmé:', reason);
+          setShowDebloquerModal(false);
+        }}
       />
 
       <VehiculePlanifierModal
         isOpen={showPlanifierModal}
-        onClose={() => {
-          setShowPlanifierModal(false);
-          setSelectedVehiculeAction(null);
-        }}
+        onClose={() => setShowPlanifierModal(false)}
         vehicule={selectedVehiculeAction}
-        employes={employes}
-        onPlanifier={handlePlanifier}
+        onConfirm={(planningData) => {
+          console.log('Planning confirmé:', planningData);
+          setShowPlanifierModal(false);
+        }}
       />
 
       <VehiculeModifierModal
         isOpen={showModifierModal}
-        onClose={() => {
-          setShowModifierModal(false);
-          setSelectedVehiculeAction(null);
-        }}
+        onClose={() => setShowModifierModal(false)}
         vehicule={selectedVehiculeAction}
-        onModifier={handleModifier}
+        onSave={(data) => {
+          console.log('Modification sauvegardée:', data);
+          setShowModifierModal(false);
+        }}
       />
 
       {/* Modal pour déplacer une tâche */}
