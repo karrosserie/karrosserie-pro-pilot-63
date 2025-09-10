@@ -28,23 +28,37 @@ export function IframePlanning({ className = "" }: IframePlanningProps) {
         throw new Error('No active session');
       }
 
+      console.log('IframePlanning - Attempting to call generate-iframe-token edge function...');
+
       const { data, error } = await supabase.functions.invoke('generate-iframe-token', {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
+        body: {}, // Ajout d'un body vide pour forcer POST
       });
 
-      if (error) throw error;
+      console.log('IframePlanning - Edge function response:', { data, error });
+
+      if (error) {
+        console.error('IframePlanning - Edge function error:', error);
+        throw error;
+      }
 
       if (data?.success && data?.token) {
         console.log('IframePlanning - Token generated successfully:', data.token.substring(0, 50) + '...');
         setIframeToken(data.token);
+        setIframeError(false); // Reset error state on success
       } else {
         console.error('IframePlanning - Failed to generate token, response:', data);
         throw new Error('Failed to generate token');
       }
     } catch (error) {
-      console.error('Error generating iframe token:', error);
+      console.error('IframePlanning - Full error details:', {
+        message: error.message,
+        name: error.name,
+        context: error.context,
+        stack: error.stack
+      });
       setIframeError(true);
     } finally {
       setIsLoading(false);
@@ -93,15 +107,26 @@ export function IframePlanning({ className = "" }: IframePlanningProps) {
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription className="flex items-center justify-between">
           <span>Impossible de charger l'interface de planning. Essayez d'ouvrir l'application dans un nouvel onglet.</span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => window.open(baseUrl, '_blank')}
-            className="ml-4"
-          >
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Ouvrir
-          </Button>
+          <div className="flex gap-2 ml-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setIframeError(false);
+                generateIframeToken();
+              }}
+            >
+              Réessayer
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open(baseUrl, '_blank')}
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Ouvrir
+            </Button>
+          </div>
         </AlertDescription>
       </Alert>
     );
