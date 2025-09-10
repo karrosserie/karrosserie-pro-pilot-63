@@ -61,146 +61,136 @@ export const WorkshopPlanningInterface = ({
   // Déterminer si l'utilisateur peut changer de vue
   const canSwitchView = isOwner;
 
-  // Mock data based on the karrosserie-planning interface
-  const mockWorkflowSteps = [
+  // Convert real data to workflow steps format
+  const workflowSteps = [
     {
       id: 'accueil',
       title: 'Accueil & Préparation du dossier',
-      vehicles: [
-        {
-          id: '1',
-          brand: 'Citroën',
-          model: 'C4',
-          licensePlate: 'EZ-787-KL',
-          client: 'M. Durand',
-          price: '800€',
-          duration: '0.5h',
-          description: 'Devis en cours',
-          technician: 'Martin Dubois',
-          status: 'En cours' as const
-        },
-        {
-          id: '2',
-          brand: 'Mercedes',
-          model: 'Classe C',
-          licensePlate: 'QR-345-ST',
-          client: 'Mme Leclerc',
-          price: '400€',
-          duration: '1h',
-          description: 'Expertise assurance',
-          status: 'À planifier' as const
-        }
-      ]
+      vehicles: schedules.filter(s => s.task_type === 'Accueil & Préparation du dossier').map(schedule => ({
+        id: schedule.id,
+        brand: schedule.vehicles?.car_brands?.name || 'Marque inconnue',
+        model: schedule.vehicles?.car_models?.name || 'Modèle inconnu',
+        licensePlate: schedule.vehicles?.license_plate || 'Plaque inconnue',
+        client: schedule.vehicles?.clients ? `${schedule.vehicles.clients.first_name} ${schedule.vehicles.clients.last_name}` : 'Client inconnu',
+        price: '0€', // TODO: Calculate real price
+        duration: calculateDuration(schedule.start_datetime, schedule.end_datetime),
+        description: schedule.task_type,
+        technician: findEmployeeName(schedule.user_id, employees),
+        status: mapScheduleStatus(schedule.status)
+      }))
     },
     {
       id: 'remplacement',
       title: 'Remplacement ou débosselage',
-      vehicles: [
-        {
-          id: '3',
-          brand: 'Audi',
-          model: 'A4',
-          licensePlate: 'VS-901-AB',
-          client: 'M. Bernard',
-          price: '520€',
-          duration: '2h',
-          description: 'Débosselage portière',
-          technician: 'Sophie Martin',
-          status: 'En cours' as const
-        },
-        {
-          id: '4',
-          brand: 'BMW',
-          model: 'Série 1',
-          licensePlate: 'HT-556-GH',
-          client: 'M. Rousseau',
-          price: '950€',
-          duration: '3h',
-          description: 'Remplacement pare-chocs',
-          status: 'À planifier' as const
-        }
-      ]
+      vehicles: schedules.filter(s => s.task_type === 'Remplacement ou débosselage').map(schedule => ({
+        id: schedule.id,
+        brand: schedule.vehicles?.car_brands?.name || 'Marque inconnue',
+        model: schedule.vehicles?.car_models?.name || 'Modèle inconnu',
+        licensePlate: schedule.vehicles?.license_plate || 'Plaque inconnue',
+        client: schedule.vehicles?.clients ? `${schedule.vehicles.clients.first_name} ${schedule.vehicles.clients.last_name}` : 'Client inconnu',
+        price: '0€',
+        duration: calculateDuration(schedule.start_datetime, schedule.end_datetime),
+        description: schedule.task_type,
+        technician: findEmployeeName(schedule.user_id, employees),
+        status: mapScheduleStatus(schedule.status)
+      }))
     },
     {
       id: 'preparation',
       title: 'Préparation peinture',
-      vehicles: [
-        {
-          id: '5',
-          brand: 'Peugeot',
-          model: '308',
-          licensePlate: 'AB-789-XY',
-          client: 'Mme Moreau',
-          price: '680€',
-          duration: '2.5h',
-          description: 'Ponçage aile avant',
-          technician: 'Sophie Martin',
-          status: 'En cours' as const
-        }
-      ]
+      vehicles: schedules.filter(s => s.task_type === 'Préparation peinture').map(schedule => ({
+        id: schedule.id,
+        brand: schedule.vehicles?.car_brands?.name || 'Marque inconnue',
+        model: schedule.vehicles?.car_models?.name || 'Modèle inconnu',
+        licensePlate: schedule.vehicles?.license_plate || 'Plaque inconnue',
+        client: schedule.vehicles?.clients ? `${schedule.vehicles.clients.first_name} ${schedule.vehicles.clients.last_name}` : 'Client inconnu',
+        price: '0€',
+        duration: calculateDuration(schedule.start_datetime, schedule.end_datetime),
+        description: schedule.task_type,
+        technician: findEmployeeName(schedule.user_id, employees),
+        status: mapScheduleStatus(schedule.status)
+      }))
     },
     {
       id: 'peinture',
       title: 'Mise en peinture',
-      vehicles: [
-        {
-          id: '6',
-          brand: 'Renault',
-          model: 'Clio',
-          licensePlate: 'CD-123-ZW',
-          client: 'M. Petit',
-          price: '1200€',
-          duration: '4h',
-          description: 'Application base',
-          technician: 'Sophie Martin',
-          status: 'En cours' as const
-        }
-      ]
+      vehicles: schedules.filter(s => s.task_type === 'Mise en peinture').map(schedule => ({
+        id: schedule.id,
+        brand: schedule.vehicles?.car_brands?.name || 'Marque inconnue',
+        model: schedule.vehicles?.car_models?.name || 'Modèle inconnu',
+        licensePlate: schedule.vehicles?.license_plate || 'Plaque inconnue',
+        client: schedule.vehicles?.clients ? `${schedule.vehicles.clients.first_name} ${schedule.vehicles.clients.last_name}` : 'Client inconnu',
+        price: '0€',
+        duration: calculateDuration(schedule.start_datetime, schedule.end_datetime),
+        description: schedule.task_type,
+        technician: findEmployeeName(schedule.user_id, employees),
+        status: mapScheduleStatus(schedule.status)
+      }))
     },
     {
       id: 'finitions',
       title: 'Finitions & remontage',
-      vehicles: [
-        {
-          id: '7',
-          brand: 'Volkswagen',
-          model: 'Golf',
-          licensePlate: 'EF-456-UV',
-          client: 'Mme Blanc',
-          price: '350€',
-          duration: '1.5h',
-          description: 'Polissage final',
-          technician: 'Martin Dubois',
-          status: 'En cours' as const
-        }
-      ]
+      vehicles: schedules.filter(s => s.task_type === 'Finitions & remontage').map(schedule => ({
+        id: schedule.id,
+        brand: schedule.vehicles?.car_brands?.name || 'Marque inconnue',
+        model: schedule.vehicles?.car_models?.name || 'Modèle inconnu',
+        licensePlate: schedule.vehicles?.license_plate || 'Plaque inconnue',
+        client: schedule.vehicles?.clients ? `${schedule.vehicles.clients.first_name} ${schedule.vehicles.clients.last_name}` : 'Client inconnu',
+        price: '0€',
+        duration: calculateDuration(schedule.start_datetime, schedule.end_datetime),
+        description: schedule.task_type,
+        technician: findEmployeeName(schedule.user_id, employees),
+        status: mapScheduleStatus(schedule.status)
+      }))
     },
     {
       id: 'cloture',
       title: 'Clôture du dossier et livraison',
-      vehicles: [
-        {
-          id: '8',
-          brand: 'Ford',
-          model: 'Focus',
-          licensePlate: 'GH-789-ST',
-          client: 'M. Roux',
-          price: '80€',
-          duration: '0.5h',
-          description: 'Contrôle qualité',
-          technician: 'Martin Dubois',
-          status: 'En cours' as const
-        }
-      ]
+      vehicles: schedules.filter(s => s.task_type === 'Clôture du dossier et livraison').map(schedule => ({
+        id: schedule.id,
+        brand: schedule.vehicles?.car_brands?.name || 'Marque inconnue',
+        model: schedule.vehicles?.car_models?.name || 'Modèle inconnu',
+        licensePlate: schedule.vehicles?.license_plate || 'Plaque inconnue',
+        client: schedule.vehicles?.clients ? `${schedule.vehicles.clients.first_name} ${schedule.vehicles.clients.last_name}` : 'Client inconnu',
+        price: '0€',
+        duration: calculateDuration(schedule.start_datetime, schedule.end_datetime),
+        description: schedule.task_type,
+        technician: findEmployeeName(schedule.user_id, employees),
+        status: mapScheduleStatus(schedule.status)
+      }))
     }
   ];
 
-  const totalVehicles = mockWorkflowSteps.reduce((acc, step) => acc + step.vehicles.length, 0);
-  const completedVehicles = 0; // Aucun terminé dans les données mock
-  const waitingVehicles = mockWorkflowSteps.reduce((acc, step) => 
+  // Helper functions
+  const calculateDuration = (start: string, end: string): string => {
+    if (!start || !end) return '0h';
+    const startTime = new Date(start);
+    const endTime = new Date(end);
+    const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+    return `${hours.toFixed(1)}h`;
+  };
+
+  const findEmployeeName = (userId: string, employees: any[]): string => {
+    const employee = employees.find(emp => emp.user_id === userId);
+    return employee ? employee.nom : 'Technicien non assigné';
+  };
+
+  const mapScheduleStatus = (status: string): 'En cours' | 'À planifier' | 'Terminé' => {
+    switch (status) {
+      case 'En cours': return 'En cours';
+      case 'Terminé': return 'Terminé';
+      default: return 'À planifier';
+    }
+  };
+
+  const totalVehicles = workflowSteps.reduce((acc, step) => acc + step.vehicles.length, 0);
+  const completedVehicles = workflowSteps.reduce((acc, step) => 
+    acc + step.vehicles.filter(v => v.status === 'Terminé').length, 0
+  );
+  const waitingVehicles = workflowSteps.reduce((acc, step) => 
     acc + step.vehicles.filter(v => v.status === 'À planifier').length, 0
   );
-  const totalRevenue = mockWorkflowSteps.reduce((acc, step) => 
+  const totalRevenue = workflowSteps.reduce((acc, step) => 
     acc + step.vehicles.reduce((stepAcc, vehicle) => 
       stepAcc + parseFloat(vehicle.price.replace('€', '')), 0
     ), 0
@@ -335,7 +325,7 @@ export const WorkshopPlanningInterface = ({
 
             {/* Workflow Steps */}
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {mockWorkflowSteps.map((step) => (
+              {workflowSteps.map((step) => (
                 <WorkflowStep
                   key={step.id}
                   title={step.title}
