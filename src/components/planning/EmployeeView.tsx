@@ -6,6 +6,7 @@ import { Clock, Play, Pause, CheckCircle, Calendar, User } from 'lucide-react';
 import { useEmployeeSchedule } from '@/hooks/use-employee-schedule';
 import { useCompany } from '@/hooks/use-company';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface EmployeeViewProps {
   employeeId?: string;
@@ -20,7 +21,7 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   const currentUserId = employeeId || user?.id;
   
   // Récupérer les vraies données depuis Supabase
-  const { schedules, isLoading } = useEmployeeSchedule(currentUserId);
+  const { schedules, isLoading, refetch } = useEmployeeSchedule(currentUserId);
 
   // Convertir les données Supabase au format attendu par l'interface
   const tasks = schedules.map(schedule => ({
@@ -42,16 +43,54 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   const upcomingTasks = tasks.filter(task => task.status === 'En attente');
   const completedTasks = tasks.filter(task => task.status === 'Terminé');
 
-  const handleStartTask = (taskId: string) => {
-    // TODO: Mettre à jour le statut de la tâche dans Supabase
-    console.log('Démarrage de la tâche:', taskId);
-    setCurrentTimer(taskId);
+  const handleStartTask = async (taskId: string) => {
+    try {
+      // Mettre à jour le statut de la tâche dans Supabase
+      const { error } = await supabase
+        .from('employee_schedule')
+        .update({ 
+          status: 'En cours',
+          real_start_datetime: new Date().toISOString()
+        })
+        .eq('id', taskId);
+
+      if (error) {
+        console.error('Erreur lors du démarrage de la tâche:', error);
+        return;
+      }
+
+      console.log('Tâche démarrée avec succès:', taskId);
+      setCurrentTimer(taskId);
+      // Rafraîchir les données pour voir les changements
+      refetch();
+    } catch (error) {
+      console.error('Erreur:', error);
+    }
   };
 
-  const handleCompleteTask = (taskId: string) => {
-    // TODO: Mettre à jour le statut de la tâche dans Supabase
-    console.log('Fin de la tâche:', taskId);
-    setCurrentTimer(null);
+  const handleCompleteTask = async (taskId: string) => {
+    try {
+      // Mettre à jour le statut de la tâche dans Supabase
+      const { error } = await supabase
+        .from('employee_schedule')
+        .update({ 
+          status: 'Terminé',
+          real_end_datetime: new Date().toISOString()
+        })
+        .eq('id', taskId);
+
+      if (error) {
+        console.error('Erreur lors de la finalisation de la tâche:', error);
+        return;
+      }
+
+      console.log('Tâche terminée avec succès:', taskId);
+      setCurrentTimer(null);
+      // Rafraîchir les données pour voir les changements
+      refetch();
+    } catch (error) {
+      console.error('Erreur:', error);
+    }
   };
 
   const getStatusBadge = (status: 'En attente' | 'En cours' | 'Terminé') => {
