@@ -89,46 +89,43 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
           <DialogTitle>{getTitle()}</DialogTitle>
         </DialogHeader>
         
-        {mode === 'create' && vehicle ? (
-          <FleetLoanForm
-            vehicle={vehicle}
-            onSubmit={handleLoanSubmit}
-            onCancel={onClose}
-          />
-        ) : mode === 'edit' && reservation && reservation.fleet_vehicles ? (
-          <FleetLoanForm
-            vehicle={createCompleteVehicle(reservation.fleet_vehicles)}
-            onSubmit={handleLoanSubmit}
-            onCancel={onClose}
-            defaultValues={reservation}
-          />
-        ) : mode === 'view' && reservation && reservation.fleet_vehicles ? (
-          <FleetLoanForm
-            vehicle={createCompleteVehicle(reservation.fleet_vehicles)}
-            onSubmit={handleLoanSubmit}
-            onCancel={onClose}
-            defaultValues={reservation}
-            isViewMode={true}
-          />
-        ) : mode === 'return' && reservation && reservation.fleet_vehicles ? (
-          <FleetReturnForm
-            vehicle={createCompleteVehicle(reservation.fleet_vehicles)}
-            reservationId={reservation.id}
-            onSubmit={handleReturnSubmit}
-            onCancel={onClose}
-          />
-        ) : mode === 'view_return' && reservation && reservation.fleet_vehicles ? (
-          <FleetReturnForm
-            vehicle={createCompleteVehicle(reservation.fleet_vehicles)}
-            reservationId={reservation.id}
-            onSubmit={handleReturnSubmit}
-            onCancel={onClose}
-            isViewMode={true}
-          />
+        {(mode === 'return' || mode === 'view_return') ? (
+          reservation && reservation.fleet_vehicles ? (
+            <FleetReturnForm
+              vehicle={createCompleteVehicle(reservation.fleet_vehicles)}
+              reservationId={reservation.id}
+              onSubmit={handleReturnSubmit}
+              onCancel={onClose}
+              isViewMode={mode === 'view_return'}
+            />
+          ) : (
+            <div className="p-4">
+              <p className="text-gray-600">Chargement des données de retour...</p>
+            </div>
+          )
         ) : (
-          <div className="p-4">
-            <p className="text-gray-600">Chargement des données...</p>
-          </div>
+          // Always render FleetLoanForm for create/edit/view modes
+          <>
+            {mode === 'create' && vehicle ? (
+              <FleetLoanForm
+                vehicle={vehicle}
+                onSubmit={handleLoanSubmit}
+                onCancel={onClose}
+              />
+            ) : reservation && reservation.fleet_vehicles ? (
+              <FleetLoanForm
+                vehicle={createCompleteVehicle(reservation.fleet_vehicles)}
+                onSubmit={handleLoanSubmit}
+                onCancel={onClose}
+                defaultValues={reservation}
+                isViewMode={mode === 'view'}
+              />
+            ) : (
+              <div className="p-4">
+                <p className="text-gray-600">Chargement des données du prêt...</p>
+              </div>
+            )}
+          </>
         )}
       </DialogContent>
     </Dialog>
