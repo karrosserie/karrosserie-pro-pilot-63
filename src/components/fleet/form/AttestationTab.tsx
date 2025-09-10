@@ -29,7 +29,14 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
   const { companyData } = useCompany();
   const { client } = useClient(formData.clientId);
 
-  // Show loading state if client is being fetched - MUST BE BEFORE HOOKS
+  // Automatically fill client name when client is selected
+  React.useEffect(() => {
+    if (client && (!formData.clientName || formData.clientName.trim() === '')) {
+      onSignatureChange('clientName', `${client.firstName} ${client.lastName}`);
+    }
+  }, [client, formData.clientName, onSignatureChange]);
+
+  // Show loading state if client is being fetched
   if (formData.clientId && !client) {
     return (
       <div className="space-y-6">
@@ -49,13 +56,6 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
       minute: '2-digit' 
     });
   };
-
-  // Automatically fill client name when client is selected
-  React.useEffect(() => {
-    if (client && (!formData.clientName || formData.clientName.trim() === '')) {
-      onSignatureChange('clientName', `${client.firstName} ${client.lastName}`);
-    }
-  }, [client, formData.clientName, onSignatureChange]);
 
   return (
     <div className="space-y-6">
