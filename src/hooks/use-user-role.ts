@@ -1,17 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useCompany } from '@/hooks/use-company';
+import { useCompanyId } from '@/hooks/use-company-id';
 import { supabase } from '@/integrations/supabase/client';
 
 export function useUserRole() {
   const { user } = useAuth();
-  const { companyData } = useCompany();
+  const { companyId, isLoading: companyLoading } = useCompanyId();
   const [userRole, setUserRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserRole = async () => {
-      if (!user || !companyData?.id) {
+      console.log('🔍 useUserRole - Debug:', { 
+        userId: user?.id, 
+        companyId, 
+        companyLoading 
+      });
+
+      if (!user || !companyId || companyLoading) {
         setUserRole(null);
         setIsLoading(false);
         return;
@@ -22,15 +28,18 @@ export function useUserRole() {
           .from('user_companies')
           .select('role')
           .eq('user_id', user.id)
-          .eq('company_id', companyData.id)
+          .eq('company_id', companyId)
           .eq('active', true)
           .single();
+
+        console.log('🔍 useUserRole - Supabase response:', { data, error });
 
         if (error) {
           console.error('Erreur lors de la récupération du rôle:', error);
           setUserRole(null);
         } else {
           setUserRole(data?.role || null);
+          console.log('🔍 useUserRole - Role set to:', data?.role);
         }
       } catch (error) {
         console.error('Erreur lors de la récupération du rôle:', error);
@@ -41,7 +50,7 @@ export function useUserRole() {
     };
 
     fetchUserRole();
-  }, [user?.id, companyData?.id]);
+  }, [user?.id, companyId, companyLoading]);
 
   return {
     userRole,
