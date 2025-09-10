@@ -93,6 +93,7 @@ serve(async (req) => {
       },
       company: userCompany.company_info,
       role: userCompany.role,
+      supabaseToken: token, // Include original Supabase token
       iat: now,
       exp: exp,
       purpose: 'iframe-context'
