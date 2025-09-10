@@ -30,108 +30,131 @@ interface EmployeeSchedule {
   }>;
 }
 
-const mockEmployeeSchedules: EmployeeSchedule[] = [
-  {
-    id: '1',
-    name: 'Sophie Martin',
-    role: 'Technicien Peinture',
-    status: 'Occupé',
-    currentTask: {
-      vehicleBrand: 'Peugeot',
-      vehicleModel: '308',
-      licensePlate: 'AB-789-XY',
-      taskType: 'Préparation peinture',
-      endTime: '10:30'
-    },
-    todayTasks: {
-      completed: 2,
-      total: 4,
-      efficiency: 85
-    },
-    upcomingTasks: [
-      {
-        id: '1',
-        vehicleBrand: 'Renault',
-        vehicleModel: 'Clio',
-        taskType: 'Mise en peinture',
-        startTime: '11:00',
-        duration: '4h'
-      },
-      {
-        id: '2',
-        vehicleBrand: 'Audi',
-        vehicleModel: 'A4',
-        taskType: 'Débosselage portière',
-        startTime: '15:30',
-        duration: '2h'
-      }
-    ]
-  },
-  {
-    id: '2',
-    name: 'Martin Dubois',
-    role: 'Technicien Carrosserie',
-    status: 'Disponible',
-    todayTasks: {
-      completed: 3,
-      total: 3,
-      efficiency: 92
-    },
-    upcomingTasks: [
-      {
-        id: '3',
-        vehicleBrand: 'Volkswagen',
-        vehicleModel: 'Golf',
-        taskType: 'Finitions & remontage',
-        startTime: '14:00',
-        duration: '1h30'
-      },
-      {
-        id: '4',
-        vehicleBrand: 'Ford',
-        vehicleModel: 'Focus',
-        taskType: 'Contrôle qualité',
-        startTime: '16:00',
-        duration: '30min'
-      }
-    ]
-  },
-  {
-    id: '3',
-    name: 'Julie Blanc',
-    role: 'Technicien Junior',
-    status: 'Pause',
-    todayTasks: {
-      completed: 1,
-      total: 3,
-      efficiency: 78
-    },
-    upcomingTasks: [
-      {
-        id: '5',
-        vehicleBrand: 'BMW',
-        vehicleModel: 'Série 1',
-        taskType: 'Remplacement pare-chocs',
-        startTime: '13:30',
-        duration: '3h'
-      }
-    ]
-  },
-  {
-    id: '4',
-    name: 'Pierre Moreau',
-    role: 'Chef d\'équipe',
-    status: 'Absent',
-    todayTasks: {
-      completed: 0,
-      total: 0,
-      efficiency: 0
-    },
-    upcomingTasks: []
-  }
-];
+interface EmployeePlanningTabProps {
+  employees?: any[];
+  schedules?: any[];
+  vehicles?: any[];
+}
 
-export const EmployeePlanningTab = () => {
+export const EmployeePlanningTab = ({ 
+  employees = [], 
+  schedules = [], 
+  vehicles = [] 
+}: EmployeePlanningTabProps) => {
+  // Helper functions
+  const findVehicleInfo = (vehicleId: string) => {
+    const vehicle = vehicles.find(v => v.id === vehicleId);
+    return {
+      brand: vehicle?.car_brands?.name || 'Marque inconnue',
+      model: vehicle?.car_models?.name || 'Modèle inconnu',
+      licensePlate: vehicle?.license_plate || 'Plaque inconnue'
+    };
+  };
+
+  const getEmployeeStatus = (employee: any): EmployeeSchedule['status'] => {
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    
+    // Vérifier si l'employé a une tâche en cours aujourd'hui
+    const currentTask = schedules.find(schedule => 
+      schedule.user_id === employee.user_id &&
+      schedule.status === 'En cours' &&
+      new Date(schedule.start_datetime).toISOString().split('T')[0] === today
+    );
+    
+    if (currentTask) {
+      return 'Occupé';
+    }
+    
+    // Vérifier s'il a des tâches planifiées aujourd'hui
+    const hasTodayTasks = schedules.some(schedule => 
+      schedule.user_id === employee.user_id &&
+      new Date(schedule.start_datetime).toISOString().split('T')[0] === today
+    );
+    
+    return hasTodayTasks ? 'Disponible' : 'Disponible';
+  };
+
+  const getCurrentTask = (employee: any) => {
+    const now = new Date();
+    const currentTask = schedules.find(schedule => 
+      schedule.user_id === employee.user_id &&
+      schedule.status === 'En cours' &&
+      new Date(schedule.start_datetime) <= now &&
+      new Date(schedule.end_datetime) >= now
+    );
+
+    if (currentTask) {
+      const vehicleInfo = findVehicleInfo(currentTask.vehicle_id);
+      return {
+        vehicleBrand: vehicleInfo.brand,
+        vehicleModel: vehicleInfo.model,
+        licensePlate: vehicleInfo.licensePlate,
+        taskType: currentTask.task_type,
+        endTime: new Date(currentTask.end_datetime).toLocaleTimeString('fr-FR', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        })
+      };
+    }
+    return undefined;
+  };
+
+  const getTodayTasks = (employee: any) => {
+    const today = new Date().toISOString().split('T')[0];
+    const todaySchedules = schedules.filter(schedule => 
+      schedule.user_id === employee.user_id &&
+      new Date(schedule.start_datetime).toISOString().split('T')[0] === today
+    );
+
+    const completed = todaySchedules.filter(s => s.status === 'Terminé').length;
+    const total = todaySchedules.length;
+    const efficiency = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+    return { completed, total, efficiency };
+  };
+
+  const getUpcomingTasks = (employee: any) => {
+    const now = new Date();
+    return schedules
+      .filter(schedule => 
+        schedule.user_id === employee.user_id &&
+        schedule.status === 'En attente' &&
+        new Date(schedule.start_datetime) > now
+      )
+      .sort((a, b) => new Date(a.start_datetime).getTime() - new Date(b.start_datetime).getTime())
+      .slice(0, 3) // Limite à 3 tâches à venir
+      .map(schedule => {
+        const vehicleInfo = findVehicleInfo(schedule.vehicle_id);
+        const startTime = new Date(schedule.start_datetime);
+        const endTime = new Date(schedule.end_datetime);
+        const duration = Math.round((endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60 * 100)) / 100;
+        
+        return {
+          id: schedule.id,
+          vehicleBrand: vehicleInfo.brand,
+          vehicleModel: vehicleInfo.model,
+          taskType: schedule.task_type,
+          startTime: startTime.toLocaleTimeString('fr-FR', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          }),
+          duration: `${duration}h`
+        };
+      });
+  };
+
+  // Convertir les employés de la base de données en format EmployeeSchedule
+  const employeeSchedules: EmployeeSchedule[] = employees.map(employee => ({
+    id: employee.user_id,
+    name: employee.nom || 'Employé',
+    role: employee.role || 'Technicien',
+    status: getEmployeeStatus(employee),
+    currentTask: getCurrentTask(employee),
+    todayTasks: getTodayTasks(employee),
+    upcomingTasks: getUpcomingTasks(employee)
+  }));
+
   const getStatusBadge = (status: EmployeeSchedule['status']) => {
     switch (status) {
       case 'Disponible':
@@ -153,13 +176,13 @@ export const EmployeePlanningTab = () => {
   };
 
   const stats = {
-    totalEmployees: mockEmployeeSchedules.length,
-    available: mockEmployeeSchedules.filter(e => e.status === 'Disponible').length,
-    busy: mockEmployeeSchedules.filter(e => e.status === 'Occupé').length,
-    averageEfficiency: Math.round(
-      mockEmployeeSchedules.reduce((acc, emp) => acc + emp.todayTasks.efficiency, 0) / 
-      mockEmployeeSchedules.length
-    )
+    totalEmployees: employeeSchedules.length,
+    available: employeeSchedules.filter(e => e.status === 'Disponible').length,
+    busy: employeeSchedules.filter(e => e.status === 'Occupé').length,
+    averageEfficiency: employeeSchedules.length > 0 ? Math.round(
+      employeeSchedules.reduce((acc, emp) => acc + emp.todayTasks.efficiency, 0) / 
+      employeeSchedules.length
+    ) : 0
   };
 
   return (
@@ -202,7 +225,16 @@ export const EmployeePlanningTab = () => {
 
       {/* Employee Cards */}
       <div className="grid gap-6">
-        {mockEmployeeSchedules.map((employee) => (
+        {employeeSchedules.length === 0 ? (
+          <Card>
+            <CardContent className="text-center py-12">
+              <User className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Aucun employé trouvé</h3>
+              <p className="text-muted-foreground">Ajoutez des employés pour voir leur planning</p>
+            </CardContent>
+          </Card>
+        ) : (
+          employeeSchedules.map((employee) => (
           <Card key={employee.id} className="overflow-hidden">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
@@ -299,7 +331,7 @@ export const EmployeePlanningTab = () => {
               )}
             </CardContent>
           </Card>
-        ))}
+        )))}
       </div>
     </div>
   );

@@ -358,7 +358,11 @@ export const WorkshopPlanningInterface = ({
             </TabsContent>
 
             <TabsContent value="employee-planning" className="space-y-6">
-              <EmployeePlanningTab />
+              <EmployeePlanningTab 
+                employees={employees}
+                schedules={schedules}
+                vehicles={vehicles}
+              />
             </TabsContent>
 
             <TabsContent value="employees" className="space-y-6">
