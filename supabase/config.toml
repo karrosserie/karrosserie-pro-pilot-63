@@ -1,5 +1,8 @@
 project_id = "jukdsypvuehnniskgpfd"
 
+[functions.send-payment-reminder-webhook]
+verify_jwt = false
+
 [functions.analyze-driving-license]
 verify_jwt = true
 
