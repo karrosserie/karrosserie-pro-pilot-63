@@ -29,48 +29,156 @@ export class UrgencyVehicleService {
     try {
       const { plaque, nom, prenom, heure, employeId, companyId } = data;
       
-      console.log('🚨 UrgencyVehicleService: Adding emergency vehicle via edge function:', data);
+      console.log('🚨 UrgencyVehicleService: Adding emergency vehicle via Supabase JS:', data);
       
-      // Utiliser supabase.functions.invoke au lieu de fetch direct pour éviter le rate limiting
-      const { data: result, error } = await supabase.functions.invoke('create-emergency-vehicle', {
-        body: {
-          plaque,
-          nom,
-          prenom,
-          heure,
-          employeId,
-          companyId
-        }
-      });
-
-      if (error) {
-        console.error('❌ Edge function error:', error);
+      // 1. Créer ou récupérer le client
+      let clientId: string;
+      
+      // Chercher si le client existe déjà
+      const { data: existingClient, error: clientSearchError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('first_name', prenom)
+        .eq('last_name', nom)
+        .eq('company_id', companyId)
+        .maybeSingle();
+      
+      if (clientSearchError) {
+        console.error('❌ Error searching for client:', clientSearchError);
         return {
           success: false,
-          message: `Erreur du serveur: ${error.message || 'Erreur inconnue'}`
+          message: `Erreur lors de la recherche du client: ${clientSearchError.message}`
         };
       }
       
-      if (result.success) {
-        console.log('✅ Emergency vehicle created successfully:', result.data);
-        
-        // Attendre un peu pour que les données soient bien persistées
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        return {
-          success: true,
-          message: result.message,
-          clientId: result.data.clientId,
-          vehicleId: result.data.vehicleId,
-          scheduleId: result.data.scheduleId
-        };
+      if (existingClient) {
+        clientId = existingClient.id;
+        console.log('✅ Client existant trouvé:', clientId);
       } else {
-        console.error('❌ Edge function returned error:', result.message);
+        // Créer un nouveau client
+        const { data: newClient, error: clientError } = await supabase
+          .from('clients')
+          .insert({
+            first_name: prenom,
+            last_name: nom,
+            company_id: companyId
+          })
+          .select('id')
+          .single();
+        
+        if (clientError) {
+          console.error('❌ Error creating client:', clientError);
+          return {
+            success: false,
+            message: `Erreur lors de la création du client: ${clientError.message}`
+          };
+        }
+        
+        clientId = newClient.id;
+        console.log('✅ Nouveau client créé:', clientId);
+      }
+      
+      // 2. Créer ou récupérer le véhicule
+      let vehicleId: string;
+      
+      // Chercher si le véhicule existe déjà
+      const { data: existingVehicle, error: vehicleSearchError } = await supabase
+        .from('vehicles')
+        .select('id')
+        .eq('license_plate', plaque)
+        .eq('company_id', companyId)
+        .maybeSingle();
+      
+      if (vehicleSearchError) {
+        console.error('❌ Error searching for vehicle:', vehicleSearchError);
         return {
           success: false,
-          message: result.message
+          message: `Erreur lors de la recherche du véhicule: ${vehicleSearchError.message}`
         };
       }
+      
+      if (existingVehicle) {
+        vehicleId = existingVehicle.id;
+        console.log('✅ Véhicule existant trouvé:', vehicleId);
+        
+        // Mettre à jour le client du véhicule
+        const { error: updateError } = await supabase
+          .from('vehicles')
+          .update({ client_id: clientId })
+          .eq('id', vehicleId);
+        
+        if (updateError) {
+          console.warn('⚠️ Warning updating vehicle client:', updateError);
+        }
+      } else {
+        // Créer un nouveau véhicule
+        const { data: newVehicle, error: vehicleError } = await supabase
+          .from('vehicles')
+          .insert({
+            license_plate: plaque,
+            client_id: clientId,
+            company_id: companyId,
+            status: 'En attente'
+          })
+          .select('id')
+          .single();
+        
+        if (vehicleError) {
+          console.error('❌ Error creating vehicle:', vehicleError);
+          return {
+            success: false,
+            message: `Erreur lors de la création du véhicule: ${vehicleError.message}`
+          };
+        }
+        
+        vehicleId = newVehicle.id;
+        console.log('✅ Nouveau véhicule créé:', vehicleId);
+      }
+      
+      // 3. Créer la tâche dans le planning
+      const today = new Date();
+      const [heureStr, minuteStr] = heure.split(':');
+      const startDateTime = new Date(today);
+      startDateTime.setHours(parseInt(heureStr), parseInt(minuteStr), 0, 0);
+      
+      const endDateTime = new Date(startDateTime);
+      endDateTime.setHours(startDateTime.getHours() + 1); // 1 heure par défaut
+      
+      const { data: newSchedule, error: scheduleError } = await supabase
+        .from('employee_schedule')
+        .insert({
+          company_id: companyId,
+          user_id: employeId,
+          vehicle_id: vehicleId,
+          task_type: 'Accueil & Préparation du dossier',
+          start_datetime: startDateTime.toISOString(),
+          end_datetime: endDateTime.toISOString(),
+          status: 'En attente'
+        })
+        .select('id')
+        .single();
+      
+      if (scheduleError) {
+        console.error('❌ Error creating schedule:', scheduleError);
+        return {
+          success: false,
+          message: `Erreur lors de la création de la tâche: ${scheduleError.message}`
+        };
+      }
+      
+      console.log('✅ Emergency vehicle created successfully:', {
+        clientId,
+        vehicleId,
+        scheduleId: newSchedule.id
+      });
+      
+      return {
+        success: true,
+        message: 'Véhicule d\'urgence ajouté avec succès',
+        clientId,
+        vehicleId,
+        scheduleId: newSchedule.id
+      };
       
     } catch (error) {
       console.error('❌ UrgencyVehicleService: Unexpected error:', error);
