@@ -1,17 +1,21 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Car, Calendar, User } from 'lucide-react';
+import { Car, Calendar, User, FileText, Download } from 'lucide-react';
 
 interface FleetLoansMobileCardProps {
   reservation: any;
   onViewLoan?: (loanId: string) => void;
   onViewReturn?: (loanId: string) => void;
+  onDownloadLoanAttestation?: (loanId: string) => void;
+  onDownloadReturnAttestation?: (loanId: string) => void;
 }
 
 export const FleetLoansMobileCard = ({ 
   reservation,
   onViewLoan,
-  onViewReturn
+  onViewReturn,
+  onDownloadLoanAttestation,
+  onDownloadReturnAttestation
 }: FleetLoansMobileCardProps) => {
   const getVehicleDisplayName = (fleetVehicle: any) => {
     if (fleetVehicle?.car_brands?.name && fleetVehicle?.car_models?.name) {
@@ -51,11 +55,10 @@ export const FleetLoansMobileCard = ({
         </div>
       </div>
 
-      <div className="flex space-x-2 pt-2">
+      <div className="grid grid-cols-2 gap-2 pt-2">
         <Button 
           variant="outline" 
           size="sm"
-          className="flex-1"
           onClick={() => onViewLoan?.(reservation.id)}
         >
           Sortie
@@ -63,9 +66,26 @@ export const FleetLoansMobileCard = ({
         <Button 
           variant="outline" 
           size="sm"
-          className="flex-1"
           onClick={() => onViewReturn?.(reservation.id)}
         >
+          Retour
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => onDownloadLoanAttestation?.(reservation.id)}
+          title="Attestation de prêt"
+        >
+          <FileText className="h-4 w-4 mr-1" />
+          Prêt
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => onDownloadReturnAttestation?.(reservation.id)}
+          title="Attestation de retour"
+        >
+          <Download className="h-4 w-4 mr-1" />
           Retour
         </Button>
       </div>

@@ -4,7 +4,7 @@ import { useFleetReservations } from '@/hooks/use-fleet-reservations';
 import { useFleetPage } from '@/hooks/use-fleet-page';
 import { useCompany } from '@/hooks/use-company';
 import { getCurrentPosition } from '@/utils/geolocation';
-import { generateAttestationPDF } from '@/utils/pdf-generator';
+import { generateAttestationPDF, generateReturnAttestationPDF } from '@/utils/pdf-generator';
 import FleetVehicleDialog from './FleetVehicleDialog';
 import FleetLoanDialog from './FleetLoanDialog';
 import VehicleSelectionDialog from './VehicleSelectionDialog';
@@ -100,6 +100,67 @@ const FleetPageContent = () => {
     }
   };
 
+  // Fonction pour télécharger l'attestation de prêt depuis l'historique
+  const handleDownloadLoanAttestation = async (loanId: string) => {
+    try {
+      const loanData = reservations?.find(r => r.id === loanId);
+      if (!loanData) {
+        console.error('Données du prêt non trouvées');
+        return;
+      }
+
+      // Obtenir la position utilisateur
+      let userPosition = '[position non disponible]';
+      try {
+        const position = await getCurrentPosition();
+        userPosition = `${position.latitude.toFixed(6)},${position.longitude.toFixed(6)}`;
+      } catch (error) {
+        console.error('Erreur de géolocalisation:', error);
+      }
+
+      // Générer le PDF d'attestation de prêt
+      await generateAttestationPDF(loanData, companyData, userPosition);
+    } catch (error) {
+      console.error('Erreur lors de la génération du PDF d\'attestation de prêt:', error);
+    }
+  };
+
+  // Fonction pour télécharger l'attestation de retour depuis l'historique
+  const handleDownloadReturnAttestation = async (loanId: string) => {
+    try {
+      const loanData = reservations?.find(r => r.id === loanId);
+      if (!loanData) {
+        console.error('Données du prêt non trouvées');
+        return;
+      }
+
+      // Pour l'attestation de retour, nous avons besoin des données de retour
+      // Ces données pourraient être dans loanData ou extraites des champs existants
+      const returnData = {
+        return_date: loanData.actual_return_date || loanData.expected_return_date,
+        return_mileage: loanData.end_mileage,
+        fuel_level_end: loanData.fuel_level_end,
+        damages: loanData.damages || [],
+        vehicle_images: loanData.vehicle_images || [],
+        client_signature: loanData.client_signature
+      };
+
+      // Obtenir la position utilisateur
+      let userPosition = '[position non disponible]';
+      try {
+        const position = await getCurrentPosition();
+        userPosition = `${position.latitude.toFixed(6)},${position.longitude.toFixed(6)}`;
+      } catch (error) {
+        console.error('Erreur de géolocalisation:', error);
+      }
+
+      // Générer le PDF d'attestation de retour
+      await generateReturnAttestationPDF(returnData, loanData, companyData, userPosition);
+    } catch (error) {
+      console.error('Erreur lors de la génération du PDF d\'attestation de retour:', error);
+    }
+  };
+
   if (isLoading) {
     return <Loading text="Chargement de la flotte..." size="lg" />;
   }
@@ -145,6 +206,8 @@ const FleetPageContent = () => {
           <FleetLoansHistory 
             onViewLoan={handleViewLoan}
             onViewReturn={handleViewReturn}
+            onDownloadLoanAttestation={handleDownloadLoanAttestation}
+            onDownloadReturnAttestation={handleDownloadReturnAttestation}
           />
 
           <FleetViolations />
@@ -167,6 +230,8 @@ const FleetPageContent = () => {
             <FleetLoansHistory 
               onViewLoan={handleViewLoan}
               onViewReturn={handleViewReturn}
+              onDownloadLoanAttestation={handleDownloadLoanAttestation}
+              onDownloadReturnAttestation={handleDownloadReturnAttestation}
             />
           </div>
 

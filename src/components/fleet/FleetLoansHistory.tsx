@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Download, FileText } from 'lucide-react';
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { FleetLoansMobileCard } from './FleetLoansMobileCard';
@@ -8,9 +9,16 @@ import { FleetLoansMobileCard } from './FleetLoansMobileCard';
 interface FleetLoansHistoryProps {
   onViewLoan?: (loanId: string) => void;
   onViewReturn?: (loanId: string) => void;
+  onDownloadLoanAttestation?: (loanId: string) => void;
+  onDownloadReturnAttestation?: (loanId: string) => void;
 }
 
-const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ onViewLoan, onViewReturn }) => {
+const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ 
+  onViewLoan, 
+  onViewReturn, 
+  onDownloadLoanAttestation,
+  onDownloadReturnAttestation 
+}) => {
   const { reservations, isLoading } = useFleetReservations();
   const isMobile = useIsMobile(); // MUST be called before any conditional returns
 
@@ -46,12 +54,14 @@ const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ onViewLoan, onVie
         <div className="space-y-4">
           {completedReservations.length > 0 ? (
             completedReservations.map((reservation) => (
-              <FleetLoansMobileCard
-                key={reservation.id}
-                reservation={reservation}
-                onViewLoan={onViewLoan}
-                onViewReturn={onViewReturn}
-              />
+                <FleetLoansMobileCard
+                  key={reservation.id}
+                  reservation={reservation}
+                  onViewLoan={onViewLoan}
+                  onViewReturn={onViewReturn}
+                  onDownloadLoanAttestation={onDownloadLoanAttestation}
+                  onDownloadReturnAttestation={onDownloadReturnAttestation}
+                />
             ))
           ) : (
             <div className="text-center text-muted-foreground py-8">
@@ -91,7 +101,7 @@ const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ onViewLoan, onVie
                       }
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex space-x-2">
+                      <div className="flex flex-wrap gap-1">
                         <Button 
                           variant="outline" 
                           size="sm"
@@ -105,6 +115,22 @@ const FleetLoansHistory: React.FC<FleetLoansHistoryProps> = ({ onViewLoan, onVie
                           onClick={() => onViewReturn?.(reservation.id)}
                         >
                           Retour
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => onDownloadLoanAttestation?.(reservation.id)}
+                          title="Télécharger attestation de prêt"
+                        >
+                          <FileText className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => onDownloadReturnAttestation?.(reservation.id)}
+                          title="Télécharger attestation de retour"
+                        >
+                          <Download className="h-4 w-4" />
                         </Button>
                       </div>
                     </td>
