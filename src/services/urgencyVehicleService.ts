@@ -135,7 +135,43 @@ export class UrgencyVehicleService {
         console.log('✅ Nouveau véhicule créé:', vehicleId);
       }
       
-      // 3. Créer la tâche dans le planning
+      // 3. Vérifier et créer le profil de l'employé si nécessaire
+      const { data: existingProfile, error: profileSearchError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', employeId)
+        .maybeSingle();
+      
+      if (profileSearchError) {
+        console.error('❌ Error searching for employee profile:', profileSearchError);
+        return {
+          success: false,
+          message: `Erreur lors de la recherche du profil employé: ${profileSearchError.message}`
+        };
+      }
+      
+      if (!existingProfile) {
+        // Créer un profil pour l'employé s'il n'existe pas
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: employeId,
+            first_name: 'Employé',
+            last_name: 'Urgence'
+          });
+        
+        if (profileError) {
+          console.error('❌ Error creating employee profile:', profileError);
+          return {
+            success: false,
+            message: `Erreur lors de la création du profil employé: ${profileError.message}`
+          };
+        }
+        
+        console.log('✅ Profil employé créé:', employeId);
+      }
+      
+      // 4. Créer la tâche dans le planning
       const today = new Date();
       const [heureStr, minuteStr] = heure.split(':');
       const startDateTime = new Date(today);
