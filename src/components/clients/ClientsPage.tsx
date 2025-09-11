@@ -77,7 +77,6 @@ const ClientsPage = () => {
         onViewClient={handleViewClient}
         onEditClient={handleEditClient}
         onDeleteClient={handleDeleteClient}
-        onCreateQuote={handleCreateQuote}
         onCreateInvoice={handleCreateInvoice}
         onCreateCredit={handleCreateCredit}
         onRequestDocuments={handleRequestDocuments}

@@ -9,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Eye, Pencil, Trash, UserPlus, MoreVertical, FileText, Receipt, CreditCard, Send } from 'lucide-react';
+import { Eye, Pencil, Trash, UserPlus, MoreVertical, Receipt, CreditCard, Send } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
@@ -25,7 +25,6 @@ interface ClientsTableProps {
   onViewClient: (client: Client) => void;
   onEditClient: (client: Client) => void;
   onDeleteClient: (client: Client) => void;
-  onCreateQuote?: (client: Client) => void;
   onCreateInvoice?: (client: Client) => void;
   onCreateCredit?: (client: Client) => void;
   onRequestDocuments?: (client: Client) => void;
@@ -36,7 +35,6 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
   onViewClient,
   onEditClient,
   onDeleteClient,
-  onCreateQuote,
   onCreateInvoice,
   onCreateCredit,
   onRequestDocuments
@@ -55,7 +53,6 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
               onViewClient={onViewClient}
               onEditClient={onEditClient}
               onDeleteClient={onDeleteClient}
-              onCreateQuote={onCreateQuote}
               onCreateInvoice={onCreateInvoice}
               onCreateCredit={onCreateCredit}
               onRequestDocuments={onRequestDocuments}
@@ -101,13 +98,6 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
               const hasFrontLicense = clientData.driver_license_front_url;
               const hasBackLicense = clientData.driver_license_back_url;
               const hasCompleteLicense = hasFrontLicense && hasBackLicense;
-
-              const handleCreateQuote = (e: React.MouseEvent) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Creating quote for client:', client);
-                onCreateQuote?.(client);
-              };
 
               const handleCreateInvoice = (e: React.MouseEvent) => {
                 e.preventDefault();
@@ -159,10 +149,6 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                         <Button variant="edit" size="sm" onClick={() => onEditClient(client)}>
                           <Pencil className="h-4 w-4 mr-1" />
                           Modifier
-                        </Button>
-                        <Button variant="create" size="sm" onClick={handleCreateQuote}>
-                          <FileText className="h-4 w-4 mr-1" />
-                          Créer un devis
                         </Button>
                         <Button variant="create" size="sm" onClick={handleCreateInvoice}>
                           <Receipt className="h-4 w-4 mr-1" />
