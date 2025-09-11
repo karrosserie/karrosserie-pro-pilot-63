@@ -65,7 +65,11 @@ export const PlanningCalendar = ({
     const events: Record<string, PlanningEvent[]> = {};
     
     schedules.forEach(schedule => {
+      if (!schedule.start_datetime) return;
+      
       const startDate = new Date(schedule.start_datetime);
+      if (isNaN(startDate.getTime())) return; // Skip invalid dates
+      
       const dateKey = startDate.toISOString().split('T')[0];
       const vehicleInfo = findVehicleInfo(schedule.vehicle_id);
       
