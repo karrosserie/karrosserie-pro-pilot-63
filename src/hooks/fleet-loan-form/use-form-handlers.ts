@@ -2,6 +2,7 @@
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompanyId } from '@/hooks/use-company-id';
+import { useClients } from '@/hooks/use-clients';
 import { DamageItem, LoanFormData } from '@/components/fleet/FleetLoanForm';
 import { prepareReservationData } from './utils';
 import { FleetLoanFormState } from './types';
@@ -14,6 +15,7 @@ export const useFleetLoanFormHandlers = (
   const { createReservation, updateReservation } = useFleetReservations();
   const { user } = useAuth();
   const { companyId } = useCompanyId();
+  const { clients } = useClients();
   const { formData, setFormData } = state;
   
   // Determine if we're editing an existing reservation
@@ -26,6 +28,30 @@ export const useFleetLoanFormHandlers = (
 
   const handleClientSelect = (clientId: string) => {
     setFormData(prev => ({ ...prev, clientId }));
+    
+    // Find the selected client and populate license information if available
+    const selectedClient = clients?.find(client => client.id === clientId);
+    if (selectedClient) {
+      setFormData(prev => ({ 
+        ...prev, 
+        clientId,
+        // Pre-fill license information from client data
+        licenseNumber: selectedClient.license_number || prev.licenseNumber,
+        licenseIssueDate: selectedClient.license_issue_date || prev.licenseIssueDate,
+        prefecture: selectedClient.prefecture || prev.prefecture,
+        dateOfBirth: selectedClient.date_of_birth || prev.dateOfBirth,
+        placeOfBirth: selectedClient.place_of_birth || prev.placeOfBirth,
+        // Pre-fill driver license URLs if available
+        driverLicenseFrontUrl: selectedClient.driver_license_front_url || prev.driverLicenseFrontUrl,
+        driverLicenseBackUrl: selectedClient.driver_license_back_url || prev.driverLicenseBackUrl,
+        // Pre-fill basic client information
+        clientName: `${selectedClient.first_name} ${selectedClient.last_name}`,
+        clientPhone: selectedClient.phone || prev.clientPhone,
+        clientEmail: selectedClient.email || prev.clientEmail,
+        // Set holder info based on client name
+        holderInfo: `${selectedClient.first_name} ${selectedClient.last_name}`
+      }));
+    }
     
     // Also update the client data in the parent component
     state.setFormData(prev => ({ ...prev, clientId }));
