@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Camera as CapCamera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
+import { ViolationValidationModal } from './ViolationValidationModal';
 
 interface ViolationDocumentUploadProps {
   documentUrl?: string;
@@ -27,6 +28,9 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
   companyId
 }) => {
   const [isUploading, setIsUploading] = useState(false);
+  const [showValidationModal, setShowValidationModal] = useState(false);
+  const [validationError, setValidationError] = useState<any>(null);
+  const [pendingAnalysisData, setPendingAnalysisData] = useState<any>(null);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -97,6 +101,15 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
       if (error) {
         console.error('Analysis error:', error);
         throw error;
+      }
+
+      // Check for validation errors
+      if (data?.validationError) {
+        console.log('Validation error found:', data.validationError);
+        setValidationError(data.validationError);
+        setPendingAnalysisData(data.extractedData);
+        setShowValidationModal(true);
+        return;
       }
 
       if (data?.success && onDocumentAnalyzed) {
@@ -311,94 +324,115 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
     return <Eye className="h-4 w-4" />;
   };
 
+  const handleContinueAnyway = () => {
+    if (pendingAnalysisData && onDocumentAnalyzed) {
+      console.log('User chose to continue anyway, using analysis data:', pendingAnalysisData);
+      onDocumentAnalyzed(pendingAnalysisData);
+      toast({
+        title: "Analyse terminée",
+        description: "Les informations ont été extraites automatiquement de l'image."
+      });
+    }
+    setPendingAnalysisData(null);
+    setValidationError(null);
+  };
+
   return (
-    <div className="space-y-4">
-      <Label>Document de la contravention</Label>
-      
-      {!documentUrl ? (
-        <div className="space-y-2">
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleTakePhoto}
-              disabled={isUploading}
-              className="flex-1"
-            >
-              <Camera className="h-4 w-4 mr-2" />
-              {Capacitor.isNativePlatform() ? 'Prendre une photo' : 'Sélectionner une image'}
-            </Button>
-            
-            <div className="flex-1">
-              <Input
-                id="document-upload"
-                type="file"
-                accept="image/*,application/pdf"
-                onChange={handleInputFileChange}
-                disabled={isUploading}
-                className="hidden"
-              />
+    <>
+      <ViolationValidationModal
+        open={showValidationModal}
+        onOpenChange={setShowValidationModal}
+        validationError={validationError}
+        onContinueAnyway={handleContinueAnyway}
+      />
+      <div className="space-y-4">
+        <Label>Document de la contravention</Label>
+        
+        {!documentUrl ? (
+          <div className="space-y-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => document.getElementById('document-upload')?.click()}
+                onClick={handleTakePhoto}
                 disabled={isUploading}
-                className="w-full"
+                className="flex-1"
               >
-                <Upload className="h-4 w-4 mr-2" />
-                Uploader un fichier
+                <Camera className="h-4 w-4 mr-2" />
+                {Capacitor.isNativePlatform() ? 'Prendre une photo' : 'Sélectionner une image'}
+              </Button>
+              
+              <div className="flex-1">
+                <Input
+                  id="document-upload"
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={handleInputFileChange}
+                  disabled={isUploading}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('document-upload')?.click()}
+                  disabled={isUploading}
+                  className="w-full"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Uploader un fichier
+                </Button>
+              </div>
+            </div>
+            
+            {/* Hidden input for camera fallback on web */}
+            <input
+              id="camera-input"
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleInputFileChange}
+              className="hidden"
+            />
+            
+            <p className="text-sm text-muted-foreground">
+              Formats acceptés: JPEG, PNG, WebP, PDF (max 10MB)
+            </p>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between p-3 border rounded-lg bg-accent/10">
+            <div className="flex items-center space-x-2">
+              {getFileIcon(documentUrl)}
+              <span className="text-sm font-medium">Document ajouté</span>
+            </div>
+            
+            <div className="flex items-center space-x-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleViewDocument}
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleRemoveDocument}
+                className="text-destructive hover:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
               </Button>
             </div>
           </div>
-          
-          {/* Hidden input for camera fallback on web */}
-          <input
-            id="camera-input"
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handleInputFileChange}
-            className="hidden"
-          />
-          
-          <p className="text-sm text-muted-foreground">
-            Formats acceptés: JPEG, PNG, WebP, PDF (max 10MB)
-          </p>
-        </div>
-      ) : (
-        <div className="flex items-center justify-between p-3 border rounded-lg bg-accent/10">
-          <div className="flex items-center space-x-2">
-            {getFileIcon(documentUrl)}
-            <span className="text-sm font-medium">Document ajouté</span>
+        )}
+        
+        {isUploading && (
+          <div className="text-sm text-muted-foreground">
+            Upload en cours...
           </div>
-          
-          <div className="flex items-center space-x-1">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleViewDocument}
-            >
-              <Eye className="h-4 w-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleRemoveDocument}
-              className="text-destructive hover:text-destructive"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
-      
-      {isUploading && (
-        <div className="text-sm text-muted-foreground">
-          Upload en cours...
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };

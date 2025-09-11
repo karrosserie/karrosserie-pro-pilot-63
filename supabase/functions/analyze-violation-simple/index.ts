@@ -68,10 +68,69 @@ serve(async (req) => {
     const webhookData = await webhookResponse.json();
     console.log('Webhook response:', webhookData);
 
-    // If we have a violationId, update the violation in the database
-    if (violationId) {
+    // Extract license plate from webhook response
+    const outputData = webhookData.output || {};
+    const licensePlate = outputData.immatriculation;
+    const violationDateStr = outputData['infraction-date'];
+    
+    let warningMessage = null;
+    let validationError = null;
+
+    // Check if license plate exists and validate against fleet
+    if (licensePlate) {
+      console.log('Validating license plate:', licensePlate);
+      
+      // Check if the vehicle exists in the fleet
+      const { data: fleetVehicle, error: vehicleError } = await supabase
+        .from('fleet_vehicles')
+        .select('id, license_plate, status')
+        .eq('company_id', companyId)
+        .eq('license_plate', licensePlate)
+        .single();
+
+      if (vehicleError || !fleetVehicle) {
+        console.log('Vehicle not found in fleet:', licensePlate);
+        validationError = {
+          type: 'vehicle_not_found',
+          message: `Le véhicule avec la plaque "${licensePlate}" ne fait pas partie de votre flotte.`,
+          licensePlate
+        };
+      } else if (violationDateStr) {
+        // Parse the violation date
+        const [day, month, year] = violationDateStr.split('/');
+        const violationDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        
+        console.log('Checking reservations for vehicle:', fleetVehicle.id, 'on date:', violationDate);
+        
+        // Check if there was an active reservation at the time of violation
+        const { data: activeReservations, error: reservationError } = await supabase
+          .from('fleet_reservations')
+          .select('id, client_id, start_date, expected_return_date, actual_return_date')
+          .eq('fleet_vehicle_id', fleetVehicle.id)
+          .eq('company_id', companyId)
+          .lte('start_date', violationDate.toISOString())
+          .or(`expected_return_date.gte.${violationDate.toISOString()},actual_return_date.gte.${violationDate.toISOString()},actual_return_date.is.null`);
+
+        if (reservationError) {
+          console.error('Error checking reservations:', reservationError);
+          warningMessage = 'Impossible de vérifier les prêts en cours pour cette date.';
+        } else if (!activeReservations || activeReservations.length === 0) {
+          console.log('No active reservation found for violation date');
+          validationError = {
+            type: 'no_active_loan',
+            message: `Aucun prêt en cours trouvé pour le véhicule "${licensePlate}" à la date du ${violationDateStr}.`,
+            licensePlate,
+            violationDate: violationDateStr
+          };
+        } else {
+          console.log('Active reservation found:', activeReservations[0]);
+        }
+      }
+    }
+
+    // If we have a violationId and no validation errors, update the violation in the database
+    if (violationId && !validationError) {
       const updateData: any = {};
-      const outputData = webhookData.output || {};
       
       if (outputData.numero) {
         updateData.reference_number = outputData.numero;
@@ -115,9 +174,11 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ 
-        success: true, 
-        message: 'Violation analyzed successfully',
+        success: !validationError, 
+        message: validationError ? validationError.message : 'Violation analyzed successfully',
         extractedData: webhookData,
+        validationError,
+        warningMessage
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
