@@ -30,7 +30,7 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
   const [drawerData, setDrawerData] = useState<any>(null);
   const [viewingContent, setViewingContent] = useState<any>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [currentView, setCurrentView] = useState<'relances' | 'campagnes'>('relances');
+  const [currentView, setCurrentView] = useState<'relances' | 'campagnes'>('campagnes');
   const [isAutoMode, setIsAutoMode] = useState(true); // true = auto, false = semi auto
   
   // États pour les campagnes
@@ -596,7 +596,7 @@ Garage Martin`
             className="flex items-center gap-2"
           >
             <AlertTriangle className="h-4 w-4" />
-            Tableau de bord
+            Récapitulatif
           </Button>
           <Button
             variant={currentView === 'campagnes' ? 'default' : 'outline'}
@@ -604,7 +604,7 @@ Garage Martin`
             className="flex items-center gap-2"
           >
             <Mail className="h-4 w-4" />
-            Phase de relance
+            Relance de paiement
           </Button>
         </div>
       </div>

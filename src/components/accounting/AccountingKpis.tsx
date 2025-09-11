@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Euro, TrendingUp, CreditCard, Receipt, TrendingDown } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { format } from 'date-fns';
+import { format, startOfQuarter, endOfQuarter, startOfYear, endOfYear } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 interface KpiData {
@@ -29,6 +30,8 @@ export const AccountingKpis = ({
   balance, 
   transactionCount 
 }: AccountingKpisProps) => {
+  const [selectedPeriod, setSelectedPeriod] = useState<'monthly' | 'quarterly' | 'yearly'>('monthly');
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
@@ -36,37 +39,57 @@ export const AccountingKpis = ({
     }).format(amount);
   };
 
-  // Calculer le mois et l'année actuels
+  // Calculer les périodes selon la sélection
   const currentDate = new Date();
-  const currentMonth = format(currentDate, 'MMMM yyyy', { locale: fr });
-  const capitalizedMonth = currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1);
-
-  // Pour les tendances, on peut calculer un pourcentage basé sur les données réelles
-  // ou simplement indiquer qu'on ne peut pas calculer sans données historiques
-  const calculateTrend = (value: number) => {
-    // Comme on n'a pas de données historiques, on peut soit :
-    // 1. Retourner "N/A" ou "Nouveau"
-    // 2. Faire un calcul basé sur une heuristique simple
-    // Je vais opter pour indiquer qu'on ne peut pas calculer
-    return "N/A";
+  
+  const getPeriodInfo = () => {
+    switch (selectedPeriod) {
+      case 'monthly':
+        const currentMonth = format(currentDate, 'MMMM yyyy', { locale: fr });
+        return {
+          title: 'du mois',
+          period: currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1)
+        };
+      case 'quarterly':
+        const quarterStart = startOfQuarter(currentDate);
+        const quarterEnd = endOfQuarter(currentDate);
+        const quarter = `T${Math.ceil((currentDate.getMonth() + 1) / 3)} ${currentDate.getFullYear()}`;
+        return {
+          title: 'du trimestre',
+          period: quarter
+        };
+      case 'yearly':
+        const year = currentDate.getFullYear().toString();
+        return {
+          title: "de l'année",
+          period: year
+        };
+      default:
+        return {
+          title: 'du mois',
+          period: format(currentDate, 'MMMM yyyy', { locale: fr })
+        };
+    }
   };
+
+  const periodInfo = getPeriodInfo();
 
   const kpis: KpiData[] = [
     {
-      title: 'Encaissements du mois',
+      title: `Encaissements ${periodInfo.title}`,
       value: formatCurrency(totalReceipts),
       trend: 'Données actuelles',
       trendUp: totalReceipts > 0,
-      period: capitalizedMonth,
+      period: periodInfo.period,
       variant: 'success',
       icon: <TrendingUp className="h-6 w-6" />
     },
     {
-      title: 'Dépenses du mois',
+      title: `Dépenses ${periodInfo.title}`,
       value: formatCurrency(totalExpenses),
       trend: 'Données actuelles',
       trendUp: false,
-      period: capitalizedMonth,
+      period: periodInfo.period,
       variant: 'default',
       icon: <CreditCard className="h-6 w-6" />
     },
@@ -75,7 +98,7 @@ export const AccountingKpis = ({
       value: formatCurrency(balance),
       trend: balance >= 0 ? 'Positif' : 'Négatif',
       trendUp: balance >= 0,
-      period: capitalizedMonth,
+      period: periodInfo.period,
       variant: balance >= 0 ? 'success' : 'danger',
       icon: <Euro className="h-6 w-6" />
     }
@@ -92,43 +115,77 @@ export const AccountingKpis = ({
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-      {kpis.map((kpi, index) => (
-        <Card 
-          key={index}
-          className={cn(
-            "transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer",
-            getVariantStyles(kpi.variant || 'default')
-          )}
-        >
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600 mb-1">{kpi.title}</p>
-                <p className="text-2xl font-bold text-gray-900 mb-2">{kpi.value}</p>
-                <p className="text-xs text-gray-500">{kpi.period}</p>
-              </div>
-              {kpi.icon && (
-                <div className="text-gray-400 opacity-60">
-                  {kpi.icon}
+    <div className="space-y-6">
+      {/* Sélecteur de période */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h2 className="text-lg font-semibold text-gray-900">Indicateurs financiers</h2>
+        <div className="flex gap-2">
+          <Button
+            variant={selectedPeriod === 'monthly' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setSelectedPeriod('monthly')}
+            className="text-xs"
+          >
+            Mensuel
+          </Button>
+          <Button
+            variant={selectedPeriod === 'quarterly' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setSelectedPeriod('quarterly')}
+            className="text-xs"
+          >
+            Trimestriel
+          </Button>
+          <Button
+            variant={selectedPeriod === 'yearly' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setSelectedPeriod('yearly')}
+            className="text-xs"
+          >
+            Annuel
+          </Button>
+        </div>
+      </div>
+
+      {/* Cartes KPI */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {kpis.map((kpi, index) => (
+          <Card 
+            key={index}
+            className={cn(
+              "transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer",
+              getVariantStyles(kpi.variant || 'default')
+            )}
+          >
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-600 mb-1">{kpi.title}</p>
+                  <p className="text-2xl font-bold text-gray-900 mb-2">{kpi.value}</p>
+                  <p className="text-xs text-gray-500">{kpi.period}</p>
                 </div>
-              )}
-            </div>
-            
-            <div className={cn(
-              "flex items-center mt-3 text-sm font-medium",
-              kpi.trendUp ? "text-green-600" : "text-red-600"
-            )}>
-              {kpi.trendUp ? (
-                <TrendingUp className="h-4 w-4 mr-1" />
-              ) : (
-                <TrendingDown className="h-4 w-4 mr-1" />
-              )}
-              <span>{kpi.trend}</span>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+                {kpi.icon && (
+                  <div className="text-gray-400 opacity-60">
+                    {kpi.icon}
+                  </div>
+                )}
+              </div>
+              
+              <div className={cn(
+                "flex items-center mt-3 text-sm font-medium",
+                kpi.trendUp ? "text-green-600" : "text-red-600"
+              )}>
+                {kpi.trendUp ? (
+                  <TrendingUp className="h-4 w-4 mr-1" />
+                ) : (
+                  <TrendingDown className="h-4 w-4 mr-1" />
+                )}
+                <span>{kpi.trend}</span>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 };
