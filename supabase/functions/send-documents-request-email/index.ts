@@ -137,16 +137,40 @@ const handler = async (req: Request): Promise<Response> => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Récupérer les informations du token
-    const { data: tokenData, error: tokenError } = await supabase
-      .from('tokens')
-      .select('*')
-      .eq('id', tokenId)
-      .single();
+    // Récupérer les informations du token avec système de retry
+    let tokenData: any = null;
+    let tokenError: any = null;
+    let retryCount = 0;
+    const maxRetries = 3;
+
+    while (retryCount < maxRetries) {
+      console.log(`Tentative ${retryCount + 1} de récupération du token:`, tokenId);
+      
+      const { data, error } = await supabase
+        .from('tokens')
+        .select('*')
+        .eq('id', tokenId)
+        .single();
+
+      if (!error && data) {
+        tokenData = data;
+        tokenError = null;
+        console.log('Token récupéré avec succès à la tentative', retryCount + 1);
+        break;
+      }
+
+      tokenError = error;
+      retryCount++;
+      
+      if (retryCount < maxRetries) {
+        console.log(`Token non trouvé, retry dans 2 secondes (tentative ${retryCount}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
 
     if (tokenError || !tokenData) {
-      console.error('Erreur lors de la récupération du token:', tokenError);
-      throw new Error('Token non trouvé');
+      console.error('Erreur lors de la récupération du token après', maxRetries, 'tentatives:', tokenError);
+      throw new Error(`Token non trouvé après ${maxRetries} tentatives: ${tokenError?.message || 'Token inexistant'}`);
     }
 
     console.log('Données du token récupérées:', tokenData);
