@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Settings, Clock, Users, Plus, Edit, Trash2, Move, ArrowRight, Loader2 } from 'lucide-react';
-import { useProcessTemplates, useCreateWorkflowStep, useUpdateWorkflowStep, useDeleteWorkflowStep } from '@/hooks/useProcessTemplates';
+import { useProcessTemplates, useCreateWorkflowStep, useUpdateWorkflowStep, useDeleteWorkflowStep, useDeleteProcessTemplate } from '@/hooks/useProcessTemplates';
 import { ProcessTemplateWithSteps, WorkflowStep as DBWorkflowStep } from '@/services/supabase/processTemplates';
 
 interface WorkflowStep {
@@ -99,6 +99,7 @@ export const ProcessConfig = () => {
   const createStepMutation = useCreateWorkflowStep();
   const updateStepMutation = useUpdateWorkflowStep();
   const deleteStepMutation = useDeleteWorkflowStep();
+  const deleteProcessMutation = useDeleteProcessTemplate();
 
   const [processes, setProcesses] = useState<ProcessTemplate[]>([]);
   const [selectedProcess, setSelectedProcess] = useState<ProcessTemplate | null>(null);
@@ -179,6 +180,18 @@ export const ProcessConfig = () => {
     deleteStepMutation.mutate({
       id: stepId,
       processTemplateId: selectedProcess.id
+    });
+  };
+
+  const handleDeleteProcess = async () => {
+    if (!selectedProcess) return;
+    
+    deleteProcessMutation.mutate(selectedProcess.id, {
+      onSuccess: () => {
+        // Sélectionner un autre processus si possible
+        const remainingProcesses = processes.filter(p => p.id !== selectedProcess.id);
+        setSelectedProcess(remainingProcesses.length > 0 ? remainingProcesses[0] : null);
+      }
     });
   };
 
@@ -361,15 +374,31 @@ export const ProcessConfig = () => {
       {/* Process Overview */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="w-5 h-5" />
-                {selectedProcess.name}
-                {selectedProcess.isDefault && <Badge>Défaut</Badge>}
-              </CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">{selectedProcess.description}</p>
-            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="w-5 h-5" />
+                  {selectedProcess.name}
+                  {selectedProcess.isDefault && <Badge>Défaut</Badge>}
+                </CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">{selectedProcess.description}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleDeleteProcess}
+                  disabled={deleteProcessMutation.isPending || selectedProcess.isDefault}
+                  className="flex items-center gap-1 text-red-600 hover:text-red-700"
+                >
+                  {deleteProcessMutation.isPending ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-3 h-3" />
+                  )}
+                  Supprimer le processus
+                </Button>
+              </div>
             <div className="text-right">
               <div className="text-2xl font-bold text-primary">{selectedProcess.estimatedTotalDuration}h</div>
               <div className="text-sm text-muted-foreground">Durée totale</div>
