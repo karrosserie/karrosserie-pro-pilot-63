@@ -200,24 +200,31 @@ export const CessionsTable = ({
       // Si on a un document signé, l'utiliser
       if (cession.signed_document_url) {
         try {
-          const response = await fetch(cession.signed_document_url);
-          if (!response.ok) {
-            throw new Error('Erreur lors du téléchargement du fichier signé');
-          }
+          // Méthode plus robuste pour éviter ERR_BLOCKED_BY_CLIENT
+          const downloadWithFallback = () => {
+            try {
+              // Tentative de téléchargement direct
+              const link = document.createElement('a');
+              link.href = cession.signed_document_url;
+              link.download = `cession-${cession.reference || cession.id}-signee.pdf`;
+              link.target = '_blank';
+              link.rel = 'noopener noreferrer';
+              
+              // Déclencher dans le contexte d'une action utilisateur
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            } catch (linkError) {
+              console.warn('Téléchargement direct bloqué, utilisation de window.open:', linkError);
+              // Fallback: ouvrir dans un nouvel onglet
+              const newWindow = window.open(cession.signed_document_url, '_blank');
+              if (!newWindow) {
+                throw new Error('Téléchargement bloqué par le navigateur. Veuillez désactiver votre bloqueur de publicités ou autoriser les téléchargements pour ce site.');
+              }
+            }
+          };
           
-          const blob = await response.blob();
-          const url = URL.createObjectURL(blob);
-          
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `cession-${cession.reference || cession.id}-signee.pdf`;
-          link.style.display = 'none';
-          
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          
-          URL.revokeObjectURL(url);
+          downloadWithFallback();
           return;
         } catch (error) {
           console.error('Erreur lors du téléchargement du document signé:', error);
@@ -242,27 +249,31 @@ export const CessionsTable = ({
     }
 
     try {
-      // Utiliser fetch pour télécharger le fichier et créer un lien de téléchargement
-      const response = await fetch(cession.document_url);
-      if (!response.ok) {
-        throw new Error('Erreur lors du téléchargement du fichier');
-      }
+      // Méthode plus robuste pour éviter ERR_BLOCKED_BY_CLIENT  
+      const downloadWithFallback = (url: string, filename: string) => {
+        try {
+          // Tentative de téléchargement direct
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = filename;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          
+          // Déclencher dans le contexte d'une action utilisateur
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } catch (linkError) {
+          console.warn('Téléchargement direct bloqué, utilisation de window.open:', linkError);
+          // Fallback: ouvrir dans un nouvel onglet
+          const newWindow = window.open(url, '_blank');
+          if (!newWindow) {
+            throw new Error('Téléchargement bloqué par le navigateur. Veuillez désactiver votre bloqueur de publicités ou autoriser les téléchargements pour ce site.');
+          }
+        }
+      };
       
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      
-      // Créer un lien de téléchargement
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `cession-${cession.reference || cession.id}.pdf`;
-      link.style.display = 'none';
-      
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      // Nettoyer l'URL blob
-      URL.revokeObjectURL(url);
+      downloadWithFallback(cession.document_url, `cession-${cession.reference || cession.id}.pdf`);
     } catch (error) {
       console.error('Erreur lors du téléchargement:', error);
       toast({
