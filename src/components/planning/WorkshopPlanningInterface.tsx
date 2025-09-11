@@ -207,7 +207,7 @@ export const WorkshopPlanningInterface = ({
   };
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-6 m-2.5">
       {/* Header with view switcher */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
