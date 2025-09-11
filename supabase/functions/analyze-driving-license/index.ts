@@ -68,6 +68,17 @@ serve(async (req) => {
     const webhookData = await webhookResponse.json();
     console.log('Webhook response:', webhookData);
 
+    // Helper function to convert DD/MM/YYYY to YYYY-MM-DD
+    const convertDateFormat = (frenchDate: string): string | null => {
+      if (!frenchDate) return null;
+      const parts = frenchDate.split('/');
+      if (parts.length === 3) {
+        const [day, month, year] = parts;
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      }
+      return null;
+    };
+
     // Update the client with the extracted information
     const updateData: any = {};
     const outputData = webhookData.output || {};
@@ -77,7 +88,10 @@ serve(async (req) => {
     }
     
     if (outputData.date_delivrance) {
-      updateData.license_issue_date = outputData.date_delivrance;
+      const convertedDate = convertDateFormat(outputData.date_delivrance);
+      if (convertedDate) {
+        updateData.license_issue_date = convertedDate;
+      }
     }
     
     if (outputData.prefecture) {
@@ -85,7 +99,10 @@ serve(async (req) => {
     }
     
     if (outputData.date_naissance) {
-      updateData.date_of_birth = outputData.date_naissance;
+      const convertedDate = convertDateFormat(outputData.date_naissance);
+      if (convertedDate) {
+        updateData.date_of_birth = convertedDate;
+      }
     }
     
     if (outputData.lieu_naissance) {
