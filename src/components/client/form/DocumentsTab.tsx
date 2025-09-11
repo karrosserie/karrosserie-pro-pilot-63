@@ -48,6 +48,7 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({
           onUploadComplete={handleDriverLicenseFrontUpload}
           onDelete={handleFrontDelete}
           isViewMode={isViewMode}
+          allowDeleteInViewMode={true}
         />
       </div>
       
@@ -60,6 +61,7 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({
           onUploadComplete={handleDriverLicenseBackUpload}
           onDelete={handleBackDelete}
           isViewMode={isViewMode}
+          allowDeleteInViewMode={true}
         />
       </div>
     </div>

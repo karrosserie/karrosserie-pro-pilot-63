@@ -11,6 +11,7 @@ interface DocumentDisplayProps {
   isAnalyzing?: boolean;
   onDelete: () => void;
   customContent?: React.ReactNode;
+  allowDeleteInViewMode?: boolean;
 }
 
 export const DocumentDisplay: React.FC<DocumentDisplayProps> = ({
@@ -19,7 +20,8 @@ export const DocumentDisplay: React.FC<DocumentDisplayProps> = ({
   isDeleting,
   isAnalyzing = false,
   onDelete,
-  customContent
+  customContent,
+  allowDeleteInViewMode = false
 }) => {
   const isImage = isImageFile(documentUrl);
 
@@ -44,7 +46,7 @@ export const DocumentDisplay: React.FC<DocumentDisplayProps> = ({
               customContent
             )}
           </div>
-          {!isViewMode && (
+          {(!isViewMode || allowDeleteInViewMode) && (
             <div className="flex space-x-2">
               <Button 
                 variant="outline" 
@@ -81,7 +83,7 @@ export const DocumentDisplay: React.FC<DocumentDisplayProps> = ({
           <p className="font-medium truncate">{getFilename(documentUrl)}</p>
           <p className="text-xs text-gray-500">Document téléchargé</p>
         </div>
-        {!isViewMode && (
+        {(!isViewMode || allowDeleteInViewMode) && (
           <div className="flex space-x-2">
             <Button 
               variant="outline" 

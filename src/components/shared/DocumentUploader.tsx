@@ -18,6 +18,7 @@ interface DocumentUploaderProps {
   onDelete?: () => void;
   isViewMode?: boolean;
   customContent?: React.ReactNode;
+  allowDeleteInViewMode?: boolean;
 }
 
 export function DocumentUploader({
@@ -28,7 +29,8 @@ export function DocumentUploader({
   onAnalysisComplete,
   onDelete: customOnDelete,
   isViewMode = false,
-  customContent
+  customContent,
+  allowDeleteInViewMode = false
 }: DocumentUploaderProps) {
   const { isUploading, isDeleting, isAnalyzing, uploadFile, handleDelete } = useDocumentUpload({
     documentType,
@@ -70,6 +72,7 @@ export function DocumentUploader({
         isAnalyzing={isAnalyzing}
         onDelete={customOnDelete || (() => handleDelete(currentDocumentUrl))}
         customContent={customContent}
+        allowDeleteInViewMode={allowDeleteInViewMode}
       />
     );
   }
