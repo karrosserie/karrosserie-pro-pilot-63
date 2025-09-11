@@ -604,7 +604,7 @@ Garage Martin`
             className="flex items-center gap-2"
           >
             <Mail className="h-4 w-4" />
-            Phase de relance
+            Relance de paiement
           </Button>
         </div>
       </div>
