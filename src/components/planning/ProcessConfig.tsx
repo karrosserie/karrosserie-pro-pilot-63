@@ -121,11 +121,17 @@ export const ProcessConfig = () => {
       const convertedProcesses = dbProcesses.map(convertDBProcessToUI);
       setProcesses(convertedProcesses);
       
-      if (!selectedProcess && convertedProcesses.length > 0) {
+      // Mettre à jour selectedProcess avec les nouvelles données
+      if (selectedProcess) {
+        const updatedSelectedProcess = convertedProcesses.find(p => p.id === selectedProcess.id);
+        if (updatedSelectedProcess) {
+          setSelectedProcess(updatedSelectedProcess);
+        }
+      } else if (convertedProcesses.length > 0) {
         setSelectedProcess(convertedProcesses[0]);
       }
     }
-  }, [dbProcesses, selectedProcess]);
+  }, [dbProcesses]);
 
   const handleAddStep = async () => {
     if (!selectedProcess) return;
