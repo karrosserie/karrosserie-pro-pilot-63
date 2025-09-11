@@ -91,7 +91,8 @@ export const FleetViolationForm: React.FC<FleetViolationFormProps> = ({
       const violationData = {
         ...formData,
         company_id: companyId.companyId,
-        fine_amount: Number(formData.fine_amount)
+        fine_amount: Number(formData.fine_amount),
+        due_date: formData.due_date || null
       };
 
       if (violation) {
