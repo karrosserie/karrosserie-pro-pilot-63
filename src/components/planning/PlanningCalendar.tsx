@@ -184,6 +184,28 @@ export const PlanningCalendar = ({
     return `${hour.toString().padStart(2, '0')}:00`;
   });
 
+  // Helper function to calculate position based on time
+  const getEventPosition = (startTime: string): number => {
+    const [hours, minutes] = startTime.replace('h', ':').split(':').map(Number);
+    const totalMinutes = hours * 60 + minutes;
+    const startOfDay = 8 * 60; // 8:00 AM in minutes
+    const minutesFromStart = totalMinutes - startOfDay;
+    const hourHeight = 48; // Height per hour in pixels
+    return Math.max(0, (minutesFromStart / 60) * hourHeight);
+  };
+
+  const getEventHeight = (startTime: string, endTime: string): number => {
+    const [startHours, startMinutes] = startTime.replace('h', ':').split(':').map(Number);
+    const [endHours, endMinutes] = endTime.replace('h', ':').split(':').map(Number);
+    
+    const startTotalMinutes = startHours * 60 + startMinutes;
+    const endTotalMinutes = endHours * 60 + endMinutes;
+    const durationMinutes = endTotalMinutes - startTotalMinutes;
+    
+    const hourHeight = 48; // Height per hour in pixels
+    return Math.max(24, (durationMinutes / 60) * hourHeight); // Minimum height of 24px
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -213,10 +235,10 @@ export const PlanningCalendar = ({
         <CardContent>
           <div className="grid grid-cols-8 gap-2">
             {/* Time column */}
-            <div className="space-y-12">
+            <div className="space-y-0">
               <div className="h-8"></div> {/* Header space */}
               {timeSlots.map(time => (
-                <div key={time} className="text-sm text-muted-foreground text-right pr-2">
+                <div key={time} className="h-12 text-sm text-muted-foreground text-right pr-2 flex items-start pt-1 border-t border-gray-100">
                   {time}
                 </div>
               ))}
@@ -224,7 +246,7 @@ export const PlanningCalendar = ({
 
             {/* Day columns */}
             {weekDays.map(day => (
-              <div key={day.date} className="space-y-2">
+              <div key={day.date} className="relative">
                 <div 
                   className={`text-center p-2 rounded cursor-pointer transition-colors ${
                     selectedDate === day.date 
@@ -239,21 +261,43 @@ export const PlanningCalendar = ({
                   <div className="text-sm">{day.dayNumber}</div>
                 </div>
                 
-                {/* Events for this day */}
-                <div className="space-y-1 min-h-[400px]">
-                  {(eventsByDate[day.date] || []).map(event => (
+                {/* Time grid background */}
+                <div className="relative" style={{ height: '480px' }}> {/* 10 hours * 48px */}
+                  {timeSlots.map((_, index) => (
                     <div 
-                      key={event.id}
-                      className="bg-blue-50 border border-blue-200 rounded p-2 text-xs cursor-pointer hover:bg-blue-100 transition-colors"
-                    >
-                      <div className="font-medium truncate">{event.vehicleBrand} {event.vehicleModel}</div>
-                      <div className="text-muted-foreground truncate">{event.taskType}</div>
-                      <div className="flex items-center gap-1 mt-1">
-                        <Clock className="w-3 h-3" />
-                        <span>{event.startTime}</span>
-                      </div>
-                    </div>
+                      key={index} 
+                      className="absolute w-full border-t border-gray-100" 
+                      style={{ 
+                        top: `${index * 48}px`, 
+                        height: '48px' 
+                      }} 
+                    />
                   ))}
+                  
+                  {/* Events for this day */}
+                  {(eventsByDate[day.date] || []).map(event => {
+                    const top = getEventPosition(event.startTime);
+                    const height = getEventHeight(event.startTime, event.endTime);
+                    
+                    return (
+                      <div 
+                        key={event.id}
+                        className="absolute left-1 right-1 bg-blue-50 border border-blue-200 rounded p-1 text-xs cursor-pointer hover:bg-blue-100 transition-colors z-10 overflow-hidden"
+                        style={{ 
+                          top: `${top}px`, 
+                          height: `${height}px`,
+                          minHeight: '24px'
+                        }}
+                      >
+                        <div className="font-medium truncate text-xs">{event.vehicleBrand} {event.vehicleModel}</div>
+                        <div className="text-muted-foreground truncate text-xs">{event.taskType}</div>
+                        <div className="flex items-center gap-1 mt-1">
+                          <Clock className="w-3 h-3" />
+                          <span className="text-xs">{event.startTime}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}
