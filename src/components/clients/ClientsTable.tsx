@@ -9,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Eye, Pencil, Trash, UserPlus, MoreVertical, CreditCard, Send } from 'lucide-react';
+import { Eye, Pencil, Trash, UserPlus, MoreVertical, Send } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
@@ -25,7 +25,6 @@ interface ClientsTableProps {
   onViewClient: (client: Client) => void;
   onEditClient: (client: Client) => void;
   onDeleteClient: (client: Client) => void;
-  onCreateCredit?: (client: Client) => void;
   onRequestDocuments?: (client: Client) => void;
 }
 
@@ -34,7 +33,6 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
   onViewClient,
   onEditClient,
   onDeleteClient,
-  onCreateCredit,
   onRequestDocuments
 }) => {
   const { sortedData: sortedClients, sortConfig, handleSort } = useTableSorting(clients, 'last_name');
@@ -51,7 +49,6 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
               onViewClient={onViewClient}
               onEditClient={onEditClient}
               onDeleteClient={onDeleteClient}
-              onCreateCredit={onCreateCredit}
               onRequestDocuments={onRequestDocuments}
             />
           ))
@@ -96,13 +93,6 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
               const hasBackLicense = clientData.driver_license_back_url;
               const hasCompleteLicense = hasFrontLicense && hasBackLicense;
 
-              const handleCreateCredit = (e: React.MouseEvent) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Creating credit for client:', client);
-                onCreateCredit?.(client);
-              };
-
               
               return (
                 <React.Fragment key={client.id}>
@@ -130,10 +120,6 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                         <Button variant="edit" size="sm" onClick={() => onEditClient(client)}>
                           <Pencil className="h-4 w-4 mr-1" />
                           Modifier
-                        </Button>
-                        <Button variant="create" size="sm" onClick={handleCreateCredit}>
-                          <CreditCard className="h-4 w-4 mr-1" />
-                          Créer un avoir
                         </Button>
                         {onRequestDocuments && (
                           <RequestDocumentsButton
