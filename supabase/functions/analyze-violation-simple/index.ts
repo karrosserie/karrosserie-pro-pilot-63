@@ -55,7 +55,7 @@ serve(async (req) => {
     console.log('Sending request to webhook...');
 
     // Call the external webhook
-    const webhookResponse = await fetch('https://n8n.karrosserie.pro/webhook/view-contravention', {
+    const webhookResponse = await fetch('https://n8n.karrosserie.pro/webhook/70efc3a9-eefa-422c-aa90-d7b4e8b357cf', {
       method: 'POST',
       body: formData,
     });
@@ -71,29 +71,28 @@ serve(async (req) => {
     // If we have a violationId, update the violation in the database
     if (violationId) {
       const updateData: any = {};
+      const outputData = webhookData.output || {};
       
-      if (webhookData.numero_avis) {
-        updateData.reference_number = webhookData.numero_avis;
+      if (outputData.numero) {
+        updateData.reference_number = outputData.numero;
       }
       
-      if (webhookData.date_infraction) {
-        updateData.violation_date = webhookData.date_infraction;
+      if (outputData['infraction-date']) {
+        updateData.violation_date = outputData['infraction-date'];
       }
       
-      if (webhookData.heure_infraction) {
-        updateData.violation_time = webhookData.heure_infraction;
+      if (outputData['infraction-heure']) {
+        updateData.violation_time = outputData['infraction-heure'];
       }
       
-      if (webhookData.immatriculation) {
-        updateData.license_plate = webhookData.immatriculation;
+      if (outputData.immatriculation) {
+        updateData.license_plate = outputData.immatriculation;
       }
       
-      if (webhookData.montant_amende) {
-        updateData.fine_amount = parseFloat(webhookData.montant_amende);
-      }
-      
-      if (webhookData.points_perdus) {
-        updateData.points_lost = parseInt(webhookData.points_perdus);
+      if (outputData.montant) {
+        // Remove the € symbol and parse the number
+        const amount = outputData.montant.replace('€', '').trim();
+        updateData.fine_amount = parseFloat(amount);
       }
 
       console.log('Updating violation with data:', updateData);
