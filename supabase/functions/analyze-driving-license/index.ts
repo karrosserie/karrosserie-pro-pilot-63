@@ -55,7 +55,7 @@ serve(async (req) => {
     console.log('Sending request to driving license webhook...');
 
     // Call the external webhook
-    const webhookResponse = await fetch('https://n8n.karrosserie.pro/webhook/driving-license', {
+    const webhookResponse = await fetch('https://n8n.karrosserie.pro/webhook/8aeb4881-46c6-41e3-b2a1-5077683eb417', {
       method: 'POST',
       body: formData,
     });
