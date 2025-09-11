@@ -582,7 +582,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
             <View style={styles.leftColumn}>
               <Text>Le Cédant</Text>
               <Text style={[styles.boldText, styles.section]}>{clientName.toUpperCase()}</Text>
-              <Text>[Signature1/]</Text>
+              <Text>[Signature2/]</Text>
               <Text style={styles.text}>Lu et approuvé,</Text>
               <Text style={styles.text}>Bon pour cession irrévocable de créance</Text>
               <Text style={styles.text}>d'un montant de {cession.repair_orders?.amount ? `${formatEuro(cession.repair_orders.amount)} €` : '0,00 €'} TTC</Text>
@@ -592,7 +592,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
             <View style={styles.rightColumn}>
               <Text>Le Cessionnaire</Text>
               <Text style={[styles.boldText, styles.section]}>{companyData.name?.toUpperCase()}</Text>
-              <Text>[Signature2/]</Text>
+              <Text>[Signature1/]</Text>
               <Text style={styles.text}>Bon pour acceptation de cession</Text>
             </View>
           </View>
