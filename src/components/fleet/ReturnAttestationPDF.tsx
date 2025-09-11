@@ -229,7 +229,7 @@ const ReturnAttestationPDF = ({ returnData, loanData, companyData, userPosition 
             <Text style={styles.label}>RETOUR :</Text>
             <Text style={styles.text}>Le : {returnDate}</Text>
             <Text style={styles.text}>Kilométrage : {returnData?.return_mileage || 0} Km</Text>
-            <Text style={styles.text}>Niveau de carburant : {returnData?.fuel_level_end || 0}%</Text>
+            <Text style={styles.text}>Niveau de carburant : {returnData?.fuel_level_return || 0}%</Text>
           </View>
         </View>
 
@@ -280,11 +280,11 @@ const ReturnAttestationPDF = ({ returnData, loanData, companyData, userPosition 
           l'expression de mon consentement libre et éclairé, et engage ma pleine responsabilité juridique.
         </Text>
 
-        {/* Section signature */}
+        {/* Section signature - Signature du retour (validation de l'état du véhicule) */}
         <View style={styles.signatureSection}>
           <View>
             <Text style={styles.signatureLabel}>
-              Signature du client
+              Signature du client (retour du véhicule)
             </Text>
             <View style={styles.signatureBox}>
               {returnData?.client_signature && (

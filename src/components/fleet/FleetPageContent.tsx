@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
+import { useFleetReturns } from '@/hooks/use-fleet-returns';
 import { useFleetPage } from '@/hooks/use-fleet-page';
 import { useCompany } from '@/hooks/use-company';
 import { getCurrentPosition } from '@/utils/geolocation';
@@ -55,6 +56,7 @@ const FleetPageContent = () => {
   } = useFleetPage();
 
   const { reservations } = useFleetReservations();
+  const { returns } = useFleetReturns();
   const { companyData } = useCompany();
   const isMobile = useIsMobile();
 
@@ -134,15 +136,24 @@ const FleetPageContent = () => {
         return;
       }
 
-      // Pour l'attestation de retour, nous avons besoin des données de retour
-      // Ces données pourraient être dans loanData ou extraites des champs existants
+      // Trouver les données de retour correspondantes
+      const fleetReturn = returns?.find(r => r.fleet_reservation_id === loanId);
+      if (!fleetReturn) {
+        console.error('Données de retour non trouvées pour ce prêt');
+        return;
+      }
+
+      // Utiliser les données de retour réelles avec la signature du retour
       const returnData = {
-        return_date: loanData.actual_return_date || loanData.expected_return_date,
-        return_mileage: loanData.end_mileage,
-        fuel_level_end: loanData.fuel_level_end,
-        damages: Array.isArray(loanData.damages) ? loanData.damages : (loanData.damages ? JSON.parse(loanData.damages as string) : []),
-        vehicle_images: Array.isArray(loanData.vehicle_images) ? loanData.vehicle_images : (loanData.vehicle_images ? JSON.parse(loanData.vehicle_images as string) : []),
-        client_signature: loanData.client_signature
+        return_date: fleetReturn.return_date,
+        return_mileage: fleetReturn.return_mileage,
+        fuel_level_return: fleetReturn.fuel_level_return,
+        damages: Array.isArray(fleetReturn.damages) ? fleetReturn.damages : (fleetReturn.damages ? JSON.parse(fleetReturn.damages as string) : []),
+        vehicle_images: Array.isArray(fleetReturn.vehicle_images) ? fleetReturn.vehicle_images : (fleetReturn.vehicle_images ? JSON.parse(fleetReturn.vehicle_images as string) : []),
+        client_signature: fleetReturn.client_signature, // Signature du retour, pas du prêt
+        client_name: fleetReturn.client_name,
+        attestation_accepted: fleetReturn.attestation_accepted,
+        notes: fleetReturn.notes
       };
 
       // Obtenir la position utilisateur
