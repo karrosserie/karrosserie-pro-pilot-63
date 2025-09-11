@@ -31,16 +31,12 @@ const ReturnAttestationTab: React.FC<ReturnAttestationTabProps> = ({
   const { companyData } = useCompany();
   const { client } = useClient(formData.clientId);
 
-  // Show loading state if client is being fetched - MUST BE BEFORE HOOKS
-  if (formData.clientId && !client) {
-    return (
-      <div className="space-y-6">
-        <div className="text-center py-8">
-          <p>Chargement des informations du client...</p>
-        </div>
-      </div>
-    );
-  }
+  // Automatically fill client name when client is selected - MUST BE BEFORE ANY CONDITIONAL RETURNS
+  React.useEffect(() => {
+    if (client && (!formData.clientName || formData.clientName.trim() === '')) {
+      onSignatureChange('clientName', `${client.firstName} ${client.lastName}`);
+    }
+  }, [client, formData.clientName, onSignatureChange]);
 
   // Format date and time to French format
   const formatDateTimeToFrench = (dateString: string) => {
@@ -52,12 +48,16 @@ const ReturnAttestationTab: React.FC<ReturnAttestationTabProps> = ({
     });
   };
 
-  // Automatically fill client name when client is selected
-  React.useEffect(() => {
-    if (client && (!formData.clientName || formData.clientName.trim() === '')) {
-      onSignatureChange('clientName', `${client.firstName} ${client.lastName}`);
-    }
-  }, [client, formData.clientName, onSignatureChange]);
+  // Show loading state if client is being fetched - NOW AFTER ALL HOOKS
+  if (formData.clientId && !client) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-8">
+          <p>Chargement des informations du client...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
