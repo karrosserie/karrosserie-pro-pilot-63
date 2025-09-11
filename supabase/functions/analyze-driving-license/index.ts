@@ -70,25 +70,26 @@ serve(async (req) => {
 
     // Update the client with the extracted information
     const updateData: any = {};
+    const outputData = webhookData.output || {};
     
-    if (webhookData.numero_permis) {
-      updateData.license_number = webhookData.numero_permis;
+    if (outputData.numero_permis) {
+      updateData.license_number = outputData.numero_permis;
     }
     
-    if (webhookData.date_delivrance) {
-      updateData.license_issue_date = webhookData.date_delivrance;
+    if (outputData.date_delivrance) {
+      updateData.license_issue_date = outputData.date_delivrance;
     }
     
-    if (webhookData.prefecture) {
-      updateData.prefecture = webhookData.prefecture;
+    if (outputData.prefecture) {
+      updateData.prefecture = outputData.prefecture;
     }
     
-    if (webhookData.date_naissance) {
-      updateData.date_of_birth = webhookData.date_naissance;
+    if (outputData.date_naissance) {
+      updateData.date_of_birth = outputData.date_naissance;
     }
     
-    if (webhookData.lieu_naissance) {
-      updateData.place_of_birth = webhookData.lieu_naissance;
+    if (outputData.lieu_naissance) {
+      updateData.place_of_birth = outputData.lieu_naissance;
     }
 
     console.log('Updating client with data:', updateData);
