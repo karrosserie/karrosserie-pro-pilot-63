@@ -154,7 +154,8 @@ export const CessionMobileCard = ({
           </Button>
         )}
         
-        {cession.status !== 'en_attente' && cession.status !== 'en_attente_signature' && (
+        {((cession.status !== 'en_attente' && cession.status !== 'en_attente_signature') || 
+          (cession.status === 'en_attente_signature' && cession.document_url)) && (
           <Button 
             variant="outline" 
             size="sm"

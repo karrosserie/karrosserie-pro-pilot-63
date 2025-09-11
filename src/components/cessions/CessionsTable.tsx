@@ -477,7 +477,8 @@ export const CessionsTable = ({
                           Voir
                         </Button>
                       )}
-                      {cession.status !== 'en_attente' && cession.status !== 'en_attente_signature' && (
+                      {((cession.status !== 'en_attente' && cession.status !== 'en_attente_signature') || 
+                        (cession.status === 'en_attente_signature' && cession.document_url)) && (
                         <Button 
                           variant="download" 
                           size="sm"
