@@ -9,7 +9,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { ValidationErrorDialog } from '@/components/cessions/form/components/ValidationErrorDialog';
-import { FileText, Download, Eye, Pencil, Trash, Play, Loader2, ExternalLink } from 'lucide-react';
+import { FileText, Download, Eye, Pencil, Trash, Play, Loader2 } from 'lucide-react';
 import { Cession } from '@/services/supabase/cessions';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -153,44 +153,7 @@ export const CessionsTable = ({
     return `Ordre n°${order.reference} du ${orderDate} - ${clientName} - ${vehicleInfo}`;
   };
 
-  const handleDownloadPDF = async (cession: Cession) => {
-    if (!cession.document_url) {
-      toast({
-        title: "PDF non disponible",
-        description: "Aucun PDF n'a été généré pour cette cession. Veuillez d'abord initialiser la procédure.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      // Télécharger le fichier
-      const response = await fetch(cession.document_url);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `cession-${cession.reference}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
-      toast({
-        title: "Téléchargement démarré",
-        description: "Le téléchargement du PDF a été initié.",
-      });
-    } catch (error) {
-      console.error('Error downloading PDF:', error);
-      toast({
-        title: "Erreur",
-        description: "Erreur lors du téléchargement du PDF.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleViewPDF = (cession: Cession) => {
+  const handleDownloadPDF = (cession: Cession) => {
     if (!cession.document_url) {
       toast({
         title: "PDF non disponible",
@@ -443,7 +406,6 @@ export const CessionsTable = ({
                   setPreviewOpen(true);
                 }}
                 onDownloadPDF={handleDownloadPDF}
-                onViewPDF={handleViewPDF}
                 onInitializeProcedure={handleInitializeProcedure}
                 isGeneratingPDF={isGeneratingPDF}
               />
@@ -515,25 +477,15 @@ export const CessionsTable = ({
                           Voir
                         </Button>
                       )}
-                      {cession.status !== 'en_attente' && cession.status !== 'en_attente_signature' && cession.document_url && (
-                        <>
-                          <Button 
-                            variant="view" 
-                            size="sm"
-                            onClick={() => handleViewPDF(cession)}
-                          >
-                            <Eye className="h-4 w-4 mr-1" />
-                            Voir PDF
-                          </Button>
-                          <Button 
-                            variant="download" 
-                            size="sm"
-                            onClick={() => handleDownloadPDF(cession)}
-                          >
-                            <Download className="h-4 w-4 mr-1" />
-                            Télécharger
-                          </Button>
-                        </>
+                      {cession.status !== 'en_attente' && cession.status !== 'en_attente_signature' && (
+                        <Button 
+                          variant="download" 
+                          size="sm"
+                          onClick={() => handleDownloadPDF(cession)}
+                        >
+                          <Download className="h-4 w-4 mr-1" />
+                          Télécharger
+                        </Button>
                       )}
                       {cession.status === 'en_attente' && (
                         <Button 
