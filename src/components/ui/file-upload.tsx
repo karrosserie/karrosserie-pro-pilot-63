@@ -100,7 +100,11 @@ export function FileUpload({
   const handleCameraClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    cameraInputRef.current?.click();
+    
+    // Add slight delay to ensure event handlers are properly processed
+    setTimeout(() => {
+      cameraInputRef.current?.click();
+    }, 100);
   };
 
   const handleRemove = () => {
@@ -133,6 +137,7 @@ export function FileUpload({
         accept="image/*"
         capture="environment"
         className="hidden"
+        tabIndex={-1}
       />
       
       {!selectedFile ? (
