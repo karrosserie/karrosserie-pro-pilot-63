@@ -48,7 +48,11 @@ export const ImageCropperDialog: React.FC<ImageCropperDialogProps> = ({
     containerRef
   });
 
-  const handleComplete = () => {
+  const handleComplete = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     getCroppedImage(zoom, rotation);
     onClose();
   };

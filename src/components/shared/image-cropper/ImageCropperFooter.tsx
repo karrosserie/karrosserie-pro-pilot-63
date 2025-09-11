@@ -15,13 +15,26 @@ export const ImageCropperFooter: React.FC<ImageCropperFooterProps> = ({
   onCancel,
   onApply
 }) => {
+  const handleCancel = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onCancel();
+  };
+
+  const handleApply = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onApply();
+  };
+
   return (
     <DialogFooter>
-      <Button variant="outline" onClick={onCancel}>
+      <Button type="button" variant="outline" onClick={handleCancel}>
         Annuler
       </Button>
       <Button 
-        onClick={onApply} 
+        type="button"
+        onClick={handleApply} 
         disabled={isLoading}
         className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
       >
