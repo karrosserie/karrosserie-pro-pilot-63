@@ -99,7 +99,14 @@ export function useImportNotification() {
                     // Envoyer automatiquement la demande de documents
                     try {
                       console.log('📧 Sending documents request for client:', report.clients.id);
-                      await sendDocumentsRequest(report.clients.id);
+                      // Récupérer la company_id du rapport d'expertise
+                      const { data: reportData } = await supabase
+                        .from('expertise_reports')
+                        .select('company_id')
+                        .eq('id', report.id)
+                        .single();
+                      
+                      await sendDocumentsRequest(report.clients.id, reportData?.company_id);
                       console.log('✅ Documents request sent successfully');
                     } catch (docError) {
                       console.error('❌ Error sending documents request:', docError);
