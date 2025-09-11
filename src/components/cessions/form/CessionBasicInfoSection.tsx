@@ -9,6 +9,8 @@ interface CessionBasicInfoSectionProps {
   formData: CessionFormData;
   errors: CessionFormErrors;
   validationErrorMessage?: string | null;
+  client?: any;
+  companyId?: string;
   onFieldChange: (field: keyof CessionFormData, value: any) => void;
   onClearValidationError?: () => void;
 }
@@ -17,6 +19,8 @@ export const CessionBasicInfoSection = ({
   formData,
   errors,
   validationErrorMessage,
+  client,
+  companyId,
   onFieldChange,
   onClearValidationError
 }: CessionBasicInfoSectionProps) => {
@@ -41,6 +45,8 @@ export const CessionBasicInfoSection = ({
       <ValidationErrorDialog 
         isOpen={!!validationErrorMessage}
         errorMessage={validationErrorMessage}
+        client={client}
+        companyId={companyId}
         onClose={() => onClearValidationError?.()}
       />
     </>

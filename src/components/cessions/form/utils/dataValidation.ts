@@ -1,8 +1,7 @@
 
 export const validateRepairOrderData = (order: any, client: any, repairOrderVehicle: any): string | null => {
-  // Aucune vérification lors de la sélection de l'ordre de réparation ou de la validation du formulaire
-  // Toutes les vérifications sont maintenant effectuées uniquement lors de la procédure de cession
-  return null;
+  // Appeler directement la validation des données de cession
+  return validateCessionProcedureData(order, client, repairOrderVehicle);
 };
 
 // Nouvelle fonction pour valider uniquement lors de la procédure de cession

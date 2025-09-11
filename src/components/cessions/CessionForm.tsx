@@ -26,6 +26,7 @@ export const CessionForm = ({
     errors,
     isReadOnly,
     validationErrorMessage,
+    client,
     handleChange,
     validateForm,
     prepareSubmitData,
@@ -72,6 +73,8 @@ export const CessionForm = ({
         formData={formData}
         errors={errors}
         validationErrorMessage={validationErrorMessage}
+        client={client}
+        companyId={undefined}
         onFieldChange={handleChange}
         onClearValidationError={clearValidationError}
       />

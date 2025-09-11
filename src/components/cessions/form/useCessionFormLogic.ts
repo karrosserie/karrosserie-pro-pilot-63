@@ -114,6 +114,7 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
     isReadOnly,
     validationBlocked,
     validationErrorMessage,
+    client,
     handleChange,
     validateForm,
     prepareSubmitData: () => prepareSubmitData(formData),
