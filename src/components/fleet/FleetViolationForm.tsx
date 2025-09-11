@@ -113,20 +113,37 @@ export const FleetViolationForm: React.FC<FleetViolationFormProps> = ({
   const handleDocumentAnalyzed = (analyzedData: any) => {
     console.log('FleetViolationForm: handleDocumentAnalyzed called with:', analyzedData);
     
+    // Extract data from the output structure
+    const data = analyzedData.output || analyzedData;
+    
     // Update form data with analyzed information
     const updates: any = {};
     
-    if (analyzedData.numero_avis || analyzedData.reference_number) {
-      updates.reference_number = analyzedData.numero_avis || analyzedData.reference_number;
+    if (data.numero || data.numero_avis || data.reference_number) {
+      updates.reference_number = data.numero || data.numero_avis || data.reference_number;
     }
-    if (analyzedData.date_infraction || analyzedData.violation_date) {
-      updates.violation_date = analyzedData.date_infraction || analyzedData.violation_date;
+    if (data['infraction-date'] || data.date_infraction || data.violation_date) {
+      const dateStr = data['infraction-date'] || data.date_infraction || data.violation_date;
+      // Convert DD/MM/YYYY to YYYY-MM-DD
+      if (dateStr && dateStr.includes('/')) {
+        const [day, month, year] = dateStr.split('/');
+        updates.violation_date = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      } else {
+        updates.violation_date = dateStr;
+      }
     }
-    if (analyzedData.heure_infraction || analyzedData.violation_time) {
-      updates.violation_time = analyzedData.heure_infraction || analyzedData.violation_time;
+    if (data['infraction-heure'] || data.heure_infraction || data.violation_time) {
+      const timeStr = data['infraction-heure'] || data.heure_infraction || data.violation_time;
+      // Convert 17h32 format to 17:32
+      if (timeStr && timeStr.includes('h')) {
+        const [hours, minutes] = timeStr.replace('h', ':').split(':');
+        updates.violation_time = `${hours.padStart(2, '0')}:${(minutes || '00').padStart(2, '0')}`;
+      } else {
+        updates.violation_time = timeStr;
+      }
     }
-    if (analyzedData.immatriculation || analyzedData.license_plate) {
-      const plate = analyzedData.immatriculation || analyzedData.license_plate;
+    if (data.immatriculation || data.license_plate) {
+      const plate = data.immatriculation || data.license_plate;
       updates.license_plate = plate;
       
       // Try to find matching vehicle by license plate
@@ -138,8 +155,13 @@ export const FleetViolationForm: React.FC<FleetViolationFormProps> = ({
         updates.fleet_vehicle_id = matchingVehicle.id;
       }
     }
-    if (analyzedData.montant_amende || analyzedData.fine_amount) {
-      updates.fine_amount = parseFloat(analyzedData.montant_amende || analyzedData.fine_amount) || 0;
+    if (data.montant || data.montant_amende || data.fine_amount) {
+      const amountStr = data.montant || data.montant_amende || data.fine_amount;
+      // Remove € symbol and convert to number
+      const amount = typeof amountStr === 'string' 
+        ? parseFloat(amountStr.replace('€', '').trim()) 
+        : parseFloat(amountStr);
+      updates.fine_amount = amount || 0;
     }
     if (analyzedData.lieu || analyzedData.location) {
       updates.location = analyzedData.lieu || analyzedData.location;
