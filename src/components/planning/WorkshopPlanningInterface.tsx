@@ -72,6 +72,35 @@ export const WorkshopPlanningInterface = ({
   // Déterminer si l'utilisateur peut changer de vue
   const canSwitchView = isOwner;
 
+  // Helper functions - MUST be defined before workflowSteps
+  const calculateDuration = (start: string, end: string): string => {
+    if (!start || !end) return '0h';
+    const startTime = new Date(start);
+    const endTime = new Date(end);
+    const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+    return `${hours.toFixed(1)}h`;
+  };
+
+  const findEmployeeName = (userId: string, employees: any[]): string => {
+    const employee = employees.find(emp => emp.user_id === userId);
+    return employee ? employee.nom : 'Technicien non assigné';
+  };
+
+  const mapTaskStatus = (status: string): 'En cours' | 'À planifier' | 'Terminé' => {
+    switch (status) {
+      case 'en_cours': 
+      case 'En cours': 
+        return 'En cours';
+      case 'termine': 
+      case 'Terminé': 
+        return 'Terminé';
+      case 'planifie':
+      case 'À planifier':
+      default: 
+        return 'À planifier';
+    }
+  };
+
   // Convert real data to workflow steps format
   const workflowSteps = [
     {
@@ -172,34 +201,7 @@ export const WorkshopPlanningInterface = ({
     }
   ];
 
-  // Helper functions
-  const calculateDuration = (start: string, end: string): string => {
-    if (!start || !end) return '0h';
-    const startTime = new Date(start);
-    const endTime = new Date(end);
-    const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
-    return `${hours.toFixed(1)}h`;
-  };
-
-  const findEmployeeName = (userId: string, employees: any[]): string => {
-    const employee = employees.find(emp => emp.user_id === userId);
-    return employee ? employee.nom : 'Technicien non assigné';
-  };
-
-  const mapTaskStatus = (status: string): 'En cours' | 'À planifier' | 'Terminé' => {
-    switch (status) {
-      case 'en_cours': 
-      case 'En cours': 
-        return 'En cours';
-      case 'termine': 
-      case 'Terminé': 
-        return 'Terminé';
-      case 'planifie':
-      case 'À planifier':
-      default: 
-        return 'À planifier';
-    }
-  };
+  // Helper functions moved to after useEffect hooks but kept here for reference if needed later
 
   const totalVehicles = workflowSteps.reduce((acc, step) => acc + step.vehicles.length, 0);
   const completedVehicles = workflowSteps.reduce((acc, step) => 
