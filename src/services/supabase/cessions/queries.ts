@@ -35,7 +35,7 @@ export const getAllCessions = async (): Promise<Cession[]> => {
           // First get the repair order
           const { data: repairOrder, error: repairOrderError } = await supabase
             .from('repair_orders')
-            .select('reference, created_at, client_id, vehicle_id')
+            .select('reference, created_at, client_id, vehicle_id, client_signature, client_name_signature, signature_date')
             .eq('id', cession.repair_order_id)
             .single();
             
@@ -98,7 +98,10 @@ export const getAllCessions = async (): Promise<Cession[]> => {
               clients: clientData,
               vehicles: vehicleData,
               parts_data: repairOrderItems.parts_data,
-              repairs_data: repairOrderItems.repairs_data
+              repairs_data: repairOrderItems.repairs_data,
+              client_signature: repairOrder.client_signature,
+              client_name_signature: repairOrder.client_name_signature,
+              signature_date: repairOrder.signature_date
             };
           }
         } catch (error) {
@@ -168,6 +171,9 @@ export const getCessionById = async (id: string): Promise<Cession> => {
         created_at,
         parts_data,
         repairs_data,
+        client_signature,
+        client_name_signature,
+        signature_date,
         clients(first_name, last_name, address, city, postal_code, email, phone, driver_license_front_url, driver_license_back_url),
         vehicles(
           license_plate,
