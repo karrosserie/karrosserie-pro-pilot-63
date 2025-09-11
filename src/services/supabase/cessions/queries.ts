@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Cession } from './types';
+import { calculateOrderAmount } from '@/components/repair-orders/utils/orderCalculations';
 
 export const getAllCessions = async (): Promise<Cession[]> => {
   console.log('Fetching cessions...');
@@ -74,35 +75,26 @@ export const getAllCessions = async (): Promise<Cession[]> => {
               vehicleData = vehicle;
             }
             
-            // Get invoice amount and items for this repair order
-            let invoiceAmount = 0;
-            let repairOrderItems = { parts_data: null, repairs_data: null };
-            
-            const { data: invoice } = await supabase
-              .from('invoices')
-              .select('amount')
-              .eq('repair_order_id', cession.repair_order_id)
-              .single();
-            
-            if (invoice) {
-              invoiceAmount = invoice.amount || 0;
-            }
-            
             // Get repair order items for calculations
             const { data: repairOrderWithItems } = await supabase
               .from('repair_orders')
-              .select('parts_data, repairs_data')
+              .select('parts_data, repairs_data, discounts_data')
               .eq('id', cession.repair_order_id)
               .single();
               
+            let repairOrderItems = { parts_data: null, repairs_data: null };
+            let calculatedAmount = 0;
+            
             if (repairOrderWithItems) {
               repairOrderItems = repairOrderWithItems;
+              // Calculate amount from repair order data instead of invoice
+              calculatedAmount = calculateOrderAmount(repairOrderWithItems);
             }
             
             repairOrderData = {
               reference: repairOrder.reference,
               created_at: repairOrder.created_at,
-              amount: invoiceAmount,
+              amount: calculatedAmount,
               clients: clientData,
               vehicles: vehicleData,
               parts_data: repairOrderItems.parts_data,
@@ -114,6 +106,17 @@ export const getAllCessions = async (): Promise<Cession[]> => {
         }
       }
       
+      // Get bank account data if bank_account_id exists
+      let bankAccountData = null;
+      if (cession.bank_account_id) {
+        const { data: bankAccount } = await supabase
+          .from('bank_accounts')
+          .select('name, iban, bic, bank')
+          .eq('id', cession.bank_account_id)
+          .single();
+        bankAccountData = bankAccount;
+      }
+      
       // Map database response to Cession interface with proper defaults
       const cessionData = cession as any;
       return {
@@ -121,7 +124,7 @@ export const getAllCessions = async (): Promise<Cession[]> => {
         reference: cession.reference || '',
         status: cession.status || 'en_attente',
         repair_orders: repairOrderData,
-        bank_accounts: null, // Set to null since we removed the join
+        bank_accounts: bankAccountData,
         expertise_date: cessionData.expertise_date ?? null,
         expertise_amount: cessionData.expertise_amount ?? null,
         salvage_value: cessionData.salvage_value ?? null
@@ -180,25 +183,27 @@ export const getCessionById = async (id: string): Promise<Cession> => {
       .eq('id', basicCession.repair_order_id)
       .single();
       
-    // Get invoice amount for this repair order
-    let invoiceAmount = 0;
+    // Calculate amount from repair order data
     if (repairOrder) {
-      const { data: invoice } = await supabase
-        .from('invoices')
-        .select('amount')
-        .eq('repair_order_id', basicCession.repair_order_id)
-        .single();
-        
-      if (invoice) {
-        invoiceAmount = invoice.amount || 0;
-      }
+      const calculatedAmount = calculateOrderAmount(repairOrder);
       
       // Add amount to repair order data
       repairOrderData = {
         ...repairOrder,
-        amount: invoiceAmount
+        amount: calculatedAmount
       };
     }
+  }
+  
+  // Get bank account data if bank_account_id exists
+  let bankAccountData = null;
+  if (basicCession.bank_account_id) {
+    const { data: bankAccount } = await supabase
+      .from('bank_accounts')
+      .select('name, iban, bic, bank')
+      .eq('id', basicCession.bank_account_id)
+      .single();
+    bankAccountData = bankAccount;
   }
   
   // Map database response to Cession interface with proper defaults
@@ -208,7 +213,7 @@ export const getCessionById = async (id: string): Promise<Cession> => {
     reference: basicCession.reference || '',
     status: basicCession.status || 'en_attente',
     repair_orders: repairOrderData,
-    bank_accounts: null, // Set to null since we removed the join
+    bank_accounts: bankAccountData,
     expertise_date: cessionData.expertise_date ?? null,
     expertise_amount: cessionData.expertise_amount ?? null,
     salvage_value: cessionData.salvage_value ?? null
