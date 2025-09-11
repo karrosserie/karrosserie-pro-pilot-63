@@ -153,6 +153,7 @@ const CarrosseriePlanning = () => {
         vehicles={vehicles}
         waitingVehicles={waitingVehicles}
         schedules={getTodayTasks()}
+        planningTaches={planningTaches}
         onScheduleUpdate={handleScheduleUpdate}
         onOpenUrgenceModal={() => setShowVehiculeUrgenceModal(true)}
       />

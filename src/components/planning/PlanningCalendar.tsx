@@ -29,6 +29,19 @@ export const PlanningCalendar = ({
   employees = [], 
   vehicles = [] 
 }: PlanningCalendarProps) => {
+  console.log('🔍 PlanningCalendar - Data received:', {
+    schedulesCount: schedules.length,
+    schedulesStructure: schedules.slice(0, 2).map(s => ({
+      id: s.id,
+      start_datetime: s.start_datetime,
+      end_datetime: s.end_datetime,
+      task_type: s.task_type,
+      dateAssignation: s.dateAssignation,
+      heure: s.heure,
+      tache: s.tache,
+      allKeys: Object.keys(s)
+    }))
+  });
   const [selectedDate, setSelectedDate] = useState(() => {
     const today = new Date();
     return today.toISOString().split('T')[0];
@@ -53,10 +66,18 @@ export const PlanningCalendar = ({
 
   const mapScheduleStatus = (status: string): PlanningEvent['status'] => {
     switch (status) {
-      case 'En cours': return 'En cours';
-      case 'Terminé': return 'Terminé';
-      case 'En retard': return 'En retard';
-      default: return 'Planifié';
+      case 'en_cours': 
+      case 'En cours': 
+        return 'En cours';
+      case 'termine': 
+      case 'Terminé': 
+        return 'Terminé';
+      case 'En retard': 
+        return 'En retard';
+      case 'planifie':
+      case 'À planifier':
+      default: 
+        return 'Planifié';
     }
   };
 
@@ -65,25 +86,51 @@ export const PlanningCalendar = ({
     const events: Record<string, PlanningEvent[]> = {};
     
     schedules.forEach(schedule => {
-      if (!schedule.start_datetime) return;
+      // Handle both schedule structures: new planningTaches and old schedules
+      let dateKey: string;
+      let startTime: string;
+      let endTime: string;
+      let vehicleInfo: any;
       
-      const startDate = new Date(schedule.start_datetime);
-      if (isNaN(startDate.getTime())) return; // Skip invalid dates
-      
-      const dateKey = startDate.toISOString().split('T')[0];
-      const vehicleInfo = findVehicleInfo(schedule.vehicle_id);
+      if (schedule.dateAssignation) {
+        // New structure from planningTaches
+        dateKey = schedule.dateAssignation;
+        const timeRange = schedule.heure || '00h00-00h00';
+        const [start, end] = timeRange.split('-');
+        startTime = start.replace('h', ':');
+        endTime = end.replace('h', ':');
+        
+        vehicleInfo = {
+          brand: schedule.modele?.split(' ')[0] || 'Marque inconnue',
+          model: schedule.modele?.split(' ').slice(1).join(' ') || 'Modèle inconnu',
+          licensePlate: schedule.vehicule || 'Plaque inconnue',
+          client: schedule.client || 'Client inconnu'
+        };
+      } else if (schedule.start_datetime) {
+        // Old structure from employee_schedule
+        const startDate = new Date(schedule.start_datetime);
+        if (isNaN(startDate.getTime())) return; // Skip invalid dates
+        
+        dateKey = startDate.toISOString().split('T')[0];
+        startTime = startDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        endTime = new Date(schedule.end_datetime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        
+        vehicleInfo = findVehicleInfo(schedule.vehicle_id);
+      } else {
+        return; // Skip if neither structure is found
+      }
       
       const event: PlanningEvent = {
         id: schedule.id,
-        title: schedule.task_type,
+        title: schedule.task_type || schedule.tache,
         vehicleBrand: vehicleInfo.brand,
         vehicleModel: vehicleInfo.model,
         licensePlate: vehicleInfo.licensePlate,
         client: vehicleInfo.client,
-        technician: findEmployeeName(schedule.user_id),
-        startTime: startDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-        endTime: new Date(schedule.end_datetime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-        taskType: schedule.task_type,
+        technician: schedule.technicien || findEmployeeName(schedule.user_id),
+        startTime,
+        endTime,
+        taskType: schedule.task_type || schedule.tache,
         status: mapScheduleStatus(schedule.status)
       };
 

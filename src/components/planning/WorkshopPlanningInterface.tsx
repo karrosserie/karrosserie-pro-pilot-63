@@ -18,6 +18,7 @@ interface WorkshopPlanningInterfaceProps {
   vehicles?: any[];
   waitingVehicles?: any[];
   schedules?: any[];
+  planningTaches?: any[];
   onScheduleUpdate?: (data: any) => void;
   onOpenUrgenceModal?: () => void;
 }
@@ -27,6 +28,7 @@ export const WorkshopPlanningInterface = ({
   vehicles = [], 
   waitingVehicles: waitingVehiclesProps = [],
   schedules = [], 
+  planningTaches = [],
   onScheduleUpdate,
   onOpenUrgenceModal
 }: WorkshopPlanningInterfaceProps) => {
@@ -366,7 +368,7 @@ export const WorkshopPlanningInterface = ({
 
             <TabsContent value="planning" className="space-y-6">
               <PlanningCalendar 
-                schedules={schedules}
+                schedules={planningTaches}
                 employees={employees}
                 vehicles={vehicles}
               />
