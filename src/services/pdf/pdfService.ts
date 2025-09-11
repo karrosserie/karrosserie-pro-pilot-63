@@ -8,6 +8,7 @@ import { repairOrdersService } from '@/services/supabase/repair-orders';
 import { quotesService } from '@/services/supabase/quotes';
 import { expertiseReportsService } from '@/services/supabase/expertise-reports';
 import { PDFDocument } from 'pdf-lib';
+import { getCurrentUserCompanyId } from '@/services/supabase/auth-company';
 
 // Fonction pour vérifier que le fichier est accessible
 const verifyFileAccessibility = async (url: string, maxRetries: number = 5): Promise<void> => {
@@ -259,16 +260,19 @@ export const generateAndUploadCessionPDF = async (
       console.log('Aucun rapport d\'expertise à fusionner');
     }
 
-    // Get current user
+    // Get current user and company
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
       throw new Error('Utilisateur non authentifié');
     }
 
-    // Create filename
+    // Get company ID for the current user
+    const companyId = await getCurrentUserCompanyId();
+
+    // Create filename with company-based path structure
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const filename = `cession-${cession.reference}-${timestamp}.pdf`;
-    const filePath = `${user.id}/cessions/${filename}`;
+    const filePath = `company/${companyId}/cessions/${filename}`;
 
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
