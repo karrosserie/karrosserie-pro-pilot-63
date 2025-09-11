@@ -110,13 +110,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   signatureBox: {
-    height: 75, 
-    width: 150, 
-    borderWidth: 1, 
-    borderColor: '#ccc', 
+    height: 100, 
+    width: 200, 
+    borderWidth: 2, 
+    borderColor: '#404348', 
     alignItems: 'center', 
     justifyContent: 'center',
     marginBottom: 8,
+    backgroundColor: '#f9f9f9',
   },
   boldText: {
     fontWeight: 'bold',
@@ -312,25 +313,38 @@ export const RepairOrderMainPage = ({ cession, companyData }: RepairOrderPageFor
 
       {/* Signature section */}
       <View style={styles.signatureSection}>
-        <Text style={[styles.sectionTitle, { textAlign: 'center', marginBottom: 15 }]}>Signature du client</Text>
+        <Text style={[styles.sectionTitle, { textAlign: 'center', marginBottom: 15, fontSize: 14 }]}>Signature du client</Text>
         {(cession.repair_orders as any).client_signature ? (
-          <View style={{ alignItems: 'center' }}>
+          <View style={{ alignItems: 'center', marginBottom: 20 }}>
             <Image 
               src={(cession.repair_orders as any).client_signature} 
-              style={{ width: 150, height: 75, marginBottom: 8 }} 
+              style={{ width: 200, height: 100, marginBottom: 10, borderWidth: 1, borderColor: '#ccc' }} 
             />
-            <Text style={{ fontSize: 9, marginBottom: 2 }}>
+            <Text style={{ fontSize: 10, fontWeight: 'bold', marginBottom: 4 }}>
               {(cession.repair_orders as any).client_name_signature || clientName}
             </Text>
-            <Text style={{ fontSize: 8, color: '#666' }}>
-              Signé le {(cession.repair_orders as any).signature_date ? formatDate((cession.repair_orders as any).signature_date) : ''}
+            <Text style={{ fontSize: 9, color: '#666' }}>
+              Signé le {(cession.repair_orders as any).signature_date ? formatDate((cession.repair_orders as any).signature_date) : formatDate(cession.repair_orders.created_at)}
             </Text>
           </View>
         ) : (
-          <View style={styles.signatureBox}>
-            <Text style={{ fontSize: 9, color: '#666' }}>Signature en attente</Text>
+          <View style={[styles.signatureBox, { alignSelf: 'center', marginBottom: 20 }]}>
+            <Text style={{ fontSize: 10, color: '#666', textAlign: 'center' }}>Signature du client</Text>
+            <Text style={{ fontSize: 8, color: '#999', textAlign: 'center', marginTop: 5 }}>
+              (Espace réservé à la signature)
+            </Text>
           </View>
         )}
+        
+        {/* Client acceptance text */}
+        <View style={{ marginTop: 10, paddingHorizontal: 20 }}>
+          <Text style={{ fontSize: 9, textAlign: 'center', fontStyle: 'italic' }}>
+            Le client reconnaît avoir pris connaissance des conditions générales
+          </Text>
+          <Text style={{ fontSize: 9, textAlign: 'center', fontStyle: 'italic' }}>
+            et accepte les travaux décrits dans le présent ordre de réparation.
+          </Text>
+        </View>
       </View>
 
       {/* Footer */}
