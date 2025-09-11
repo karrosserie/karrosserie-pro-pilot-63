@@ -23,22 +23,28 @@ export const tokensService = {
 
     console.log('Token créé avec succès:', data);
 
-    // Envoyer l'email de demande de justificatifs
+    // Envoyer l'email de demande de justificatifs de manière asynchrone
     try {
       console.log('Tentative d\'envoi de l\'email pour le token:', data.id);
       
-      const { data: emailResponse, error: emailError } = await supabase.functions.invoke('send-documents-request-email', {
-        body: { tokenId: data.id }
-      });
+      // Utiliser la nouvelle edge function qui traite les demandes de documents
+      // avec un délai pour permettre au token d'être committé en base
+      setTimeout(async () => {
+        try {
+          const { data: processResponse, error: processError } = await supabase.functions.invoke('process-documents-request', {
+            body: { tokenId: data.id }
+          });
 
-      console.log('Réponse de l\'edge function:', emailResponse);
+          if (processError) {
+            console.error('Erreur lors du traitement de la demande de documents:', processError);
+          } else {
+            console.log('Demande de documents traitée avec succès:', processResponse);
+          }
+        } catch (error) {
+          console.error('Exception lors du traitement de la demande de documents:', error);
+        }
+      }, 1000); // Délai de 1 seconde pour permettre au token d'être committé
       
-      if (emailError) {
-        console.error('Erreur lors de l\'envoi de l\'email:', emailError);
-        // Ne pas faire échouer la création du token si l'email échoue
-      } else {
-        console.log('Email envoyé avec succès');
-      }
     } catch (emailError) {
       console.error('Exception lors de l\'envoi de l\'email:', emailError);
     }
