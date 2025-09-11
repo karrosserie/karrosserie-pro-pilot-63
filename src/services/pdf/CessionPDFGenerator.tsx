@@ -1,7 +1,7 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import { Cession } from '@/services/supabase/cessions';
-import { RepairOrderPageForCession } from './RepairOrderPageForCession';
+import { RepairOrderMainPage, RepairOrderGeneralConditionsPage, RepairOrderLegalReferencesPage } from './RepairOrderPageForCession';
 
 const styles = StyleSheet.create({
   page: {
@@ -778,7 +778,9 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
       )}
 
       {/* Ordre de réparation intégré avec format A4 */}
-      <RepairOrderPageForCession cession={cession} companyData={companyData} />
+      <RepairOrderMainPage cession={cession} companyData={companyData} />
+      <RepairOrderGeneralConditionsPage />
+      <RepairOrderLegalReferencesPage />
 
       {/* Rapport d'expertise original - fallback */}
       {cession.document_url && (
