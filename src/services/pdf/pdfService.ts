@@ -45,43 +45,6 @@ export const generateAndUploadCessionPDF = async (
   vehicleData?: any
 ): Promise<string> => {
   try {
-    // Générer le document InvoicePDF pour l'ordre de réparation si disponible
-    let repairOrderPDFDocument = null;
-    if (cession.repair_orders) {
-      try {
-        console.log('Génération du PDF de l\'ordre de réparation avec le bon utilitaire');
-        
-        // Utiliser l'utilitaire dédié pour préparer les données de l'ordre de réparation
-        const data = await prepareRepairOrderDataForPDF(cession.repair_orders as any, companyData);
-        
-        // Adapter l'ordre de réparation au format Invoice pour le PDF
-        const invoiceData = {
-          ...data.repairOrder,
-          amount: data.totals.total,
-          date: data.repairOrder.created_at,
-          due_date: data.repairOrder.created_at,
-          repairs_data: Array.isArray(data.repairOrder.repairs_data) ? data.repairOrder.repairs_data : [],
-          parts_data: Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data : []
-        } as any;
-
-        console.log('Création du PDF de l\'ordre de réparation avec le bon template:', data.template);
-
-        repairOrderPDFDocument = InvoicePDF({ 
-          invoice: invoiceData, 
-          companyData: data.companyData, 
-          receipts: [],
-          clientData: data.clientData,
-          vehicleData: data.vehicleData,
-          signatureData: data.signatureData,
-          template: data.template,
-          documentType: 'repair_order'
-        });
-        
-        console.log('PDF de l\'ordre de réparation généré avec succès');
-      } catch (error) {
-        console.error('Erreur lors de la génération du PDF ordre de réparation:', error);
-      }
-    }
 
     // Récupérer le PDF du rapport d'expertise si disponible
     let expertiseReportPDFUrl = null;
@@ -129,8 +92,7 @@ export const generateAndUploadCessionPDF = async (
         companyData,
         selectedInsuranceCompany,
         clientData,
-        vehicleData,
-        repairOrderPDFDocument
+        vehicleData
       })
     ).toBlob();
 

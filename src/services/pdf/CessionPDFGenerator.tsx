@@ -1,6 +1,7 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import { Cession } from '@/services/supabase/cessions';
+import { RepairOrderPageForCession } from './RepairOrderPageForCession';
 
 const styles = StyleSheet.create({
   page: {
@@ -9,6 +10,7 @@ const styles = StyleSheet.create({
     padding: 40,
     lineHeight: 1.4,
     color: '#000000',
+    size: 'A4',
   },
   title: {
     fontSize: 14,
@@ -91,10 +93,9 @@ interface CessionPDFProps {
   selectedInsuranceCompany: any;
   clientData?: any;
   vehicleData?: any;
-  repairOrderPDFDocument?: React.ReactElement | null;
 }
 
-export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, clientData, vehicleData, repairOrderPDFDocument }: CessionPDFProps) => {
+export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, clientData, vehicleData }: CessionPDFProps) => {
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('fr-FR');
   };
@@ -776,8 +777,8 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
         </Page>
       )}
 
-      {/* Intégration directe de l'ordre de réparation */}
-      {repairOrderPDFDocument}
+      {/* Ordre de réparation intégré avec format A4 */}
+      <RepairOrderPageForCession cession={cession} companyData={companyData} />
 
       {/* Rapport d'expertise original - fallback */}
       {cession.document_url && (
