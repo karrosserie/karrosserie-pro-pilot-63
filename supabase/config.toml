@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.notify-company-documents-complete]
 verify_jwt = false
+
+[functions.download-signed-contract]
+verify_jwt = true

@@ -154,6 +154,78 @@ export const CessionsTable = ({
   };
 
   const handleDownloadPDF = async (cession: Cession) => {
+    // Si la cession est signée, essayer d'utiliser le document signé
+    if (cession.status === 'signee') {
+      // Si le document signé n'est pas encore téléchargé, le télécharger
+      if (!cession.signed_document_url && cession.oodrive_contract_id) {
+        try {
+          toast({
+            title: "Téléchargement du document signé",
+            description: "Récupération du document signé en cours...",
+          });
+
+          const response = await supabase.functions.invoke('download-signed-contract', {
+            body: { cessionId: cession.id }
+          });
+
+          if (response.error) {
+            throw new Error(response.error.message);
+          }
+
+          toast({
+            title: "Document signé récupéré",
+            description: "Le document signé a été téléchargé et stocké avec succès.",
+          });
+
+          // Rafraîchir la page pour afficher le nouveau lien
+          window.location.reload();
+          return;
+        } catch (error) {
+          console.error('Erreur lors du téléchargement du document signé:', error);
+          toast({
+            title: "Erreur",
+            description: `Impossible de récupérer le document signé: ${error.message}`,
+            variant: "destructive",
+          });
+          // Utiliser le document original en cas d'erreur
+        }
+      }
+      
+      // Si on a un document signé, l'utiliser
+      if (cession.signed_document_url) {
+        try {
+          const response = await fetch(cession.signed_document_url);
+          if (!response.ok) {
+            throw new Error('Erreur lors du téléchargement du fichier signé');
+          }
+          
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `cession-${cession.reference || cession.id}-signee.pdf`;
+          link.style.display = 'none';
+          
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          URL.revokeObjectURL(url);
+          return;
+        } catch (error) {
+          console.error('Erreur lors du téléchargement du document signé:', error);
+          toast({
+            title: "Erreur de téléchargement",
+            description: "Impossible de télécharger le document signé. Utilisation du document original...",
+            variant: "destructive",
+          });
+          // Continuer avec le document original
+        }
+      }
+    }
+
+    // Utiliser le document original
     if (!cession.document_url) {
       toast({
         title: "PDF non disponible",

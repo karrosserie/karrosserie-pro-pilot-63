@@ -166,6 +166,7 @@ export type Database = {
           reference: string
           repair_order_id: string | null
           report_number: string | null
+          signed_document_url: string | null
           status: string | null
           updated_at: string
         }
@@ -184,6 +185,7 @@ export type Database = {
           reference?: string
           repair_order_id?: string | null
           report_number?: string | null
+          signed_document_url?: string | null
           status?: string | null
           updated_at?: string
         }
@@ -202,6 +204,7 @@ export type Database = {
           reference?: string
           repair_order_id?: string | null
           report_number?: string | null
+          signed_document_url?: string | null
           status?: string | null
           updated_at?: string
         }
@@ -1672,12 +1675,14 @@ export type Database = {
           archived: boolean
           channel: string
           company_id: string
+          contact: string | null
           created_at: string
           date: string
           eta: string
           id: string
           message: string
           priority: number
+          reponse: string | null
           resolved: boolean
           summary: string
           tags: string[] | null
@@ -1689,12 +1694,14 @@ export type Database = {
           archived?: boolean
           channel: string
           company_id: string
+          contact?: string | null
           created_at?: string
           date?: string
           eta: string
           id?: string
           message: string
           priority: number
+          reponse?: string | null
           resolved?: boolean
           summary: string
           tags?: string[] | null
@@ -1706,12 +1713,14 @@ export type Database = {
           archived?: boolean
           channel?: string
           company_id?: string
+          contact?: string | null
           created_at?: string
           date?: string
           eta?: string
           id?: string
           message?: string
           priority?: number
+          reponse?: string | null
           resolved?: boolean
           summary?: string
           tags?: string[] | null
