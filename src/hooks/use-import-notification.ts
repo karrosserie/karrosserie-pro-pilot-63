@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { quotesService } from '@/services/supabase/quotes';
 import { useNavigate } from 'react-router-dom';
+import { sendDocumentsRequest } from '@/services/documentsRequestService';
 
 export function useImportNotification() {
   const { toast } = useToast();
@@ -95,6 +96,15 @@ export function useImportNotification() {
                   
                   // Vérifier si le rapport a un client et un véhicule (requis pour la conversion)
                   if (report.clients && report.vehicles) {
+                    // Envoyer automatiquement la demande de documents
+                    try {
+                      console.log('📧 Sending documents request for client:', report.clients.id);
+                      await sendDocumentsRequest(report.clients.id);
+                      console.log('✅ Documents request sent successfully');
+                    } catch (docError) {
+                      console.error('❌ Error sending documents request:', docError);
+                    }
+                    
                     // Vérifier si un devis existe déjà pour ce rapport
                     const existingQuote = await quotesService.getByReportId(report.id);
                     
