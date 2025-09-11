@@ -163,7 +163,15 @@ const CarrosseriePlanning = () => {
           console.log('Véhicule urgence ajouté:', vehiculeUrgence);
           if (companyId) {
             try {
-              await ajouterVehiculeUrgence(vehiculeUrgence, companyId, {});
+              await ajouterVehiculeUrgence(vehiculeUrgence, companyId, {
+                refetchEmployees,
+                refetchVehicles,
+                refetchPlanning
+              });
+              
+              // Forcer le refetch des données de planning
+              await refetchPlanning();
+              
               setFloatingNotifications(prev => [...prev, {
                 id: Date.now().toString(),
                 type: 'success' as const,

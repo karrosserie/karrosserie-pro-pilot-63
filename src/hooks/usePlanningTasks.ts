@@ -178,7 +178,18 @@ export const usePlanningTasks = (companyId: string | null) => {
   // Obtenir toutes les tâches d'aujourd'hui
   const getTodayTasks = (): PlanningTache[] => {
     const today = new Date().toISOString().split('T')[0];
-    return planningTaches.filter(task => task.dateAssignation === today);
+    console.log('🔍 getTodayTasks - Filtering for today:', today);
+    console.log('🔍 All tasks available:', planningTaches.map(t => ({ 
+      id: t.id, 
+      vehicule: t.vehicule, 
+      dateAssignation: t.dateAssignation,
+      isToday: t.dateAssignation === today
+    })));
+    
+    const todayTasks = planningTaches.filter(task => task.dateAssignation === today);
+    console.log('🔍 Tasks for today:', todayTasks.length);
+    
+    return todayTasks;
   };
 
   return {
