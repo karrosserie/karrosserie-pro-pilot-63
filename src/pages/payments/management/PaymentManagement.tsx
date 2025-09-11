@@ -141,7 +141,7 @@ const PaymentManagement = () => {
 
       {/* Metrics Cards */}
       <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-3">
-        <Card>
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setAccountsModalOpen(true)}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Comptes actifs
