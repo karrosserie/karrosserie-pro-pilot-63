@@ -30,7 +30,7 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
   const [drawerData, setDrawerData] = useState<any>(null);
   const [viewingContent, setViewingContent] = useState<any>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [currentView, setCurrentView] = useState<'relances' | 'campagnes'>('relances');
+  const [currentView, setCurrentView] = useState<'relances' | 'campagnes'>('campagnes');
   const [isAutoMode, setIsAutoMode] = useState(true); // true = auto, false = semi auto
   
   // États pour les campagnes
