@@ -8,15 +8,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ValidationErrorDialog } from '@/components/cessions/form/components/ValidationErrorDialog';
 import { FileText, Download, Eye, Pencil, Trash, Play, Loader2 } from 'lucide-react';
 import { Cession } from '@/services/supabase/cessions';
 import { format } from 'date-fns';
@@ -53,6 +45,7 @@ export const CessionsTable = ({
 }: CessionsTableProps) => {
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [selectedClient, setSelectedClient] = useState<any>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [selectedCession, setSelectedCession] = useState<Cession | null>(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
@@ -202,6 +195,7 @@ export const CessionsTable = ({
       
       if (validationError) {
         setErrorMessage(validationError);
+        setSelectedClient(repairOrderData.clients);
         setErrorDialogOpen(true);
         return;
       }
@@ -555,38 +549,13 @@ export const CessionsTable = ({
         </Table>
       )}
       
-      <AlertDialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
-        <AlertDialogContent className="max-w-md">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Données manquantes</AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-4">
-                <p>Des informations obligatoires sont manquantes :</p>
-                {parseValidationError(errorMessage).map((section, index) => (
-                  <div key={index}>
-                    <h4 className="font-medium text-sm">{section.title} :</h4>
-                    <ul className="list-disc list-inside ml-4 space-y-1">
-                      {section.items.map((item, itemIndex) => (
-                        <li key={itemIndex} className="text-sm text-muted-foreground">
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-                <p className="text-sm text-muted-foreground">
-                  Veuillez compléter ces informations avant de pouvoir créer une cession de créance.
-                </p>
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction className="bg-karrosserie-orange hover:bg-karrosserie-orange/90">
-              Compris
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ValidationErrorDialog
+        isOpen={errorDialogOpen}
+        errorMessage={errorMessage}
+        onClose={() => setErrorDialogOpen(false)}
+        client={selectedClient}
+        companyId={companyData?.id}
+      />
 
       <CessionPreview 
         cession={selectedCession}
