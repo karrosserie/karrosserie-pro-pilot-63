@@ -19,7 +19,7 @@ export const useFleetLoanFormState = (vehicle: FleetVehicle, defaultValues?: any
     notes: defaultValues?.notes || '',
     mileage: defaultValues?.start_mileage || vehicle.mileage || 0,
     fuelLevel: defaultValues?.fuel_level_start || 100,
-    vehicleImages: defaultValues?.vehicle_images || [],
+    vehicleImages: Array.isArray(defaultValues?.vehicle_images) ? defaultValues.vehicle_images : [],
     damages: defaultValues?.damages || [],
     driverLicenseFrontUrl: defaultValues?.clients?.driver_license_front_url || '',
     driverLicenseBackUrl: defaultValues?.clients?.driver_license_back_url || '',
