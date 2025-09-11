@@ -114,17 +114,43 @@ const CarrosseriePlanning = () => {
   const finalSelectedEmployeView = currentView === 'employe' ? (selectedEmployeView || user?.id) : selectedEmployeView;
 
   // Enhanced schedule update handler for WorkshopPlanningInterface
-  const handleScheduleUpdate = (data: any) => {
+  const handleScheduleUpdate = async (data: any) => {
     console.log('Schedule update:', data);
     
-    // Add notification for user feedback
-    setFloatingNotifications(prev => [...prev, {
-      id: Date.now().toString(),
-      type: 'success' as const,
-      title: 'Planning mis à jour',
-      message: 'Les modifications ont été enregistrées',
-      duration: 3000
-    }]);
+    try {
+      // Rafraîchir les données après création d'une tâche
+      if (data.action === 'plan' && data.taskId) {
+        await refetchPlanning();
+        await refetchWaitingVehicles();
+        
+        // Add notification for user feedback
+        setFloatingNotifications(prev => [...prev, {
+          id: Date.now().toString(),
+          type: 'success' as const,
+          title: 'Véhicule planifié',
+          message: data.message || 'Le véhicule a été ajouté au planning avec succès',
+          duration: 4000
+        }]);
+      } else {
+        // Add notification for user feedback
+        setFloatingNotifications(prev => [...prev, {
+          id: Date.now().toString(),
+          type: 'success' as const,
+          title: 'Planning mis à jour',
+          message: 'Les modifications ont été enregistrées',
+          duration: 3000
+        }]);
+      }
+    } catch (error) {
+      console.error('Erreur lors du rafraîchissement:', error);
+      setFloatingNotifications(prev => [...prev, {
+        id: Date.now().toString(),
+        type: 'error' as const,
+        title: 'Erreur',
+        message: 'Impossible de rafraîchir les données',
+        duration: 4000
+      }]);
+    }
   };
 
   // Vehicle details handler
@@ -154,6 +180,7 @@ const CarrosseriePlanning = () => {
         waitingVehicles={waitingVehicles}
         schedules={getTodayTasks()}
         planningTaches={planningTaches}
+        companyId={companyId}
         onScheduleUpdate={handleScheduleUpdate}
         onOpenUrgenceModal={() => setShowVehiculeUrgenceModal(true)}
       />

@@ -11,6 +11,7 @@ import { PlanningCalendar } from "./PlanningCalendar";
 import { EmployeePlanningTab } from "./EmployeePlanningTab";
 import { ProcessConfig } from "./ProcessConfig";
 import { useUserRole } from "@/hooks/use-user-role";
+import { supabase } from "@/integrations/supabase/client";
 
 
 interface WorkshopPlanningInterfaceProps {
@@ -19,6 +20,7 @@ interface WorkshopPlanningInterfaceProps {
   waitingVehicles?: any[];
   schedules?: any[];
   planningTaches?: any[];
+  companyId?: string | null;
   onScheduleUpdate?: (data: any) => void;
   onOpenUrgenceModal?: () => void;
 }
@@ -29,6 +31,7 @@ export const WorkshopPlanningInterface = ({
   waitingVehicles: waitingVehiclesProps = [],
   schedules = [], 
   planningTaches = [],
+  companyId,
   onScheduleUpdate,
   onOpenUrgenceModal
 }: WorkshopPlanningInterfaceProps) => {
@@ -220,11 +223,64 @@ export const WorkshopPlanningInterface = ({
     ), 0
   );
 
-  const handlePlanVehicle = (vehicleId: string) => {
+  const handlePlanVehicle = async (vehicleId: string) => {
     console.log('Planning vehicle:', vehicleId);
-    // TODO: Implement vehicle planning logic
-    if (onScheduleUpdate) {
-      onScheduleUpdate({ vehicleId, action: 'plan' });
+    
+    try {
+      // Créer une nouvelle tâche de planning pour le véhicule
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        console.error('Erreur d\'authentification:', authError);
+        return;
+      }
+
+      // Trouver le premier employé disponible ou utiliser l'utilisateur actuel
+      const assignedEmployee = employees.length > 0 ? employees[0] : null;
+      if (!assignedEmployee) {
+        console.error('Aucun employé disponible pour assigner la tâche');
+        return;
+      }
+
+      // Calculer les dates de début et fin (début maintenant, durée 1h par défaut)
+      const startTime = new Date();
+      const endTime = new Date(startTime.getTime() + (1 * 60 * 60 * 1000)); // +1 heure
+
+      // Créer la tâche dans employee_schedule
+      const { data: newTask, error: insertError } = await supabase
+        .from('employee_schedule')
+        .insert({
+          vehicle_id: vehicleId,
+          user_id: assignedEmployee.user_id,
+          company_id: companyId,
+          task_type: 'Accueil & Préparation du dossier',
+          start_datetime: startTime.toISOString(),
+          end_datetime: endTime.toISOString(),
+          status: 'En cours'
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('Erreur lors de la création de la tâche:', insertError);
+        return;
+      }
+
+      console.log('Tâche créée avec succès:', newTask);
+      
+      // Appeler onScheduleUpdate pour informer le parent
+      if (onScheduleUpdate) {
+        onScheduleUpdate({ 
+          vehicleId, 
+          action: 'plan', 
+          taskId: newTask.id,
+          message: 'Véhicule ajouté au planning avec succès'
+        });
+      }
+
+      // TODO: Ajouter une notification de succès
+      
+    } catch (error) {
+      console.error('Erreur inattendue lors de la planification:', error);
     }
   };
 
