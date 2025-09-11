@@ -35,3 +35,6 @@ verify_jwt = true
 
 [functions.send-cession-registered-mail]
 verify_jwt = true
+
+[functions.process-documents-request]
+verify_jwt = false
