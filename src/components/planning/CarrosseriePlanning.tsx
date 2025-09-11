@@ -6,6 +6,7 @@ import { WorkshopPlanningInterface } from '@/components/planning/WorkshopPlannin
 // Data hooks
 import { useEmployeeData } from '@/hooks/useEmployeeData';
 import { useVehicleData } from '@/hooks/useVehicleData';
+import { useWaitingVehicles } from '@/hooks/useWaitingVehicles';
 import { usePlanningTasks } from '@/hooks/usePlanningTasks';
 import { usePlanningManager } from '@/hooks/usePlanningManager';
 
@@ -77,6 +78,7 @@ const CarrosseriePlanning = () => {
   // Data hooks - only load if we have a company ID
   const { employees: employesFromData, loading: employesLoading, createEmployee, refetch: refetchEmployees } = useEmployeeData(companyId);
   const { vehicles, loading: vehiclesLoading, refetch: refetchVehicles } = useVehicleData(companyId);
+  const { waitingVehicles, loading: waitingVehiclesLoading, refetch: refetchWaitingVehicles } = useWaitingVehicles(companyId);
   const { planningTaches, getTasksForEmployee, getTasksForEmployeeById, getTodayTasks, loading: planningLoading, refetch: refetchPlanning } = usePlanningTasks(companyId);
 
   console.log('🚀 COMPOSANT CARROSSERIE PLANNING - HOOKS APPELÉS:', {
@@ -149,6 +151,7 @@ const CarrosseriePlanning = () => {
       <WorkshopPlanningInterface
         employees={employes}
         vehicles={vehicles}
+        waitingVehicles={waitingVehicles}
         schedules={getTodayTasks()}
         onScheduleUpdate={handleScheduleUpdate}
         onOpenUrgenceModal={() => setShowVehiculeUrgenceModal(true)}
@@ -169,8 +172,9 @@ const CarrosseriePlanning = () => {
                 refetchPlanning
               });
               
-              // Forcer le refetch des données de planning
+              // Forcer le refetch des données de planning et véhicules en attente
               await refetchPlanning();
+              await refetchWaitingVehicles();
               
               setFloatingNotifications(prev => [...prev, {
                 id: Date.now().toString(),

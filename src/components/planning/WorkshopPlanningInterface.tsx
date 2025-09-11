@@ -16,6 +16,7 @@ import { useUserRole } from "@/hooks/use-user-role";
 interface WorkshopPlanningInterfaceProps {
   employees?: any[];
   vehicles?: any[];
+  waitingVehicles?: any[];
   schedules?: any[];
   onScheduleUpdate?: (data: any) => void;
   onOpenUrgenceModal?: () => void;
@@ -24,6 +25,7 @@ interface WorkshopPlanningInterfaceProps {
 export const WorkshopPlanningInterface = ({ 
   employees = [], 
   vehicles = [], 
+  waitingVehicles: waitingVehiclesProps = [],
   schedules = [], 
   onScheduleUpdate,
   onOpenUrgenceModal
@@ -207,7 +209,7 @@ export const WorkshopPlanningInterface = ({
   const completedVehicles = workflowSteps.reduce((acc, step) => 
     acc + step.vehicles.filter(v => v.status === 'Terminé').length, 0
   );
-  const waitingVehicles = workflowSteps.reduce((acc, step) => 
+  const waitingVehiclesCount = workflowSteps.reduce((acc, step) => 
     acc + step.vehicles.filter(v => v.status === 'À planifier').length, 0
   );
   const totalRevenue = workflowSteps.reduce((acc, step) => 
@@ -324,14 +326,14 @@ export const WorkshopPlanningInterface = ({
             <WorkshopStats
               totalVehicles={totalVehicles}
               completedVehicles={completedVehicles}
-              waitingVehicles={waitingVehicles}
+              waitingVehicles={waitingVehiclesCount}
               totalRevenue={totalRevenue}
             />
 
             {/* Summary banner */}
             <div className="bg-muted p-4 rounded-lg mb-6">
               <div className="text-sm text-muted-foreground">
-                {waitingVehicles} véhicules en attente
+                {waitingVehiclesCount} véhicules en attente
               </div>
               <div className="text-sm text-muted-foreground">
                 Pièces: 2 • Approbations: 1 • Techniciens: 1
@@ -355,7 +357,7 @@ export const WorkshopPlanningInterface = ({
 
             <TabsContent value="waiting" className="space-y-6">
               <VehiclesWaitingTab 
-                vehicles={vehicles}
+                vehicles={waitingVehiclesProps}
                 schedules={schedules}
                 employees={employees}
                 onAddToWorkflow={handlePlanVehicle}

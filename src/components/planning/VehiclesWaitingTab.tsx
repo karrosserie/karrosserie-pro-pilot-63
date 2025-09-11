@@ -30,6 +30,26 @@ export const VehiclesWaitingTab = ({
   employees = [],
   onAddToWorkflow 
 }: VehiclesWaitingTabProps) => {
+  console.log('🔍 VehiclesWaitingTab - Data received:', {
+    vehiclesCount: vehicles.length,
+    schedulesCount: schedules.length,
+    employeesCount: employees.length,
+    vehiclesStructure: vehicles.slice(0, 2).map(v => ({
+      id: v.id,
+      license_plate: v.license_plate,
+      car_brands: v.car_brands,
+      car_models: v.car_models,
+      clients: v.clients,
+      created_at: v.created_at,
+      allKeys: Object.keys(v)
+    })),
+    schedulesStructure: schedules.slice(0, 2).map(s => ({
+      id: s.id,
+      vehicle_id: s.vehicle_id,
+      status: s.status,
+      allKeys: Object.keys(s)
+    }))
+  });
   const getPriorityBadge = (priority: WaitingVehicle['priority']) => {
     switch (priority) {
       case 'Très urgent':
