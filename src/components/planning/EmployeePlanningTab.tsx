@@ -13,6 +13,18 @@ interface EmployeePlanningTabProps {
 }
 
 export const EmployeePlanningTab = ({ employees = [], schedules = [] }: EmployeePlanningTabProps) => {
+  console.log('🔍 EmployeePlanningTab - Data received:', {
+    employeesCount: employees.length,
+    schedulesCount: schedules.length,
+    schedulesStructure: schedules.slice(0, 2).map(s => ({
+      id: s.id,
+      dateAssignation: s.dateAssignation,
+      heure: s.heure,
+      technicien: s.technicien,
+      user_id: s.user_id,
+      allKeys: Object.keys(s)
+    }))
+  });
   const [selectedEmployee, setSelectedEmployee] = useState<string>('all');
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -23,23 +35,41 @@ export const EmployeePlanningTab = ({ employees = [], schedules = [] }: Employee
   // Filtrer les tâches par employé et date
   const getEmployeeTasks = (employeeId: string) => {
     return schedules.filter(schedule => {
-      if (!schedule.start_datetime) return false;
-      const startDate = new Date(schedule.start_datetime);
-      if (isNaN(startDate.getTime())) return false;
-      const scheduleDate = startDate.toISOString().split('T')[0];
-      return schedule.user_id === employeeId && scheduleDate === selectedDate;
+      // Handle both schedule structures
+      if (schedule.dateAssignation) {
+        // New structure from planningTaches
+        return schedule.user_id === employeeId && schedule.dateAssignation === selectedDate;
+      } else if (schedule.start_datetime) {
+        // Old structure from employee_schedule
+        const startDate = new Date(schedule.start_datetime);
+        if (isNaN(startDate.getTime())) return false;
+        const scheduleDate = startDate.toISOString().split('T')[0];
+        return schedule.user_id === employeeId && scheduleDate === selectedDate;
+      }
+      return false;
     });
   };
 
   // Calculer les statistiques pour un employé
   const getEmployeeStats = (employeeId: string) => {
     const tasks = getEmployeeTasks(employeeId);
-    const completedTasks = tasks.filter(t => t.status === 'Terminé');
-    const inProgressTasks = tasks.filter(t => t.status === 'En cours');
+    const completedTasks = tasks.filter(t => t.status === 'Terminé' || t.status === 'termine');
+    const inProgressTasks = tasks.filter(t => t.status === 'En cours' || t.status === 'en_cours');
     
     // Calculer le temps total
     const totalTime = tasks.reduce((acc, task) => {
-      if (task.start_datetime && task.end_datetime) {
+      if (task.heure) {
+        // New structure: parse heure format "12h-13h"
+        const timeRange = task.heure.replace(/h/g, ':');
+        const [startTime, endTime] = timeRange.split('-');
+        if (startTime && endTime) {
+          const [startHour, startMin = '0'] = startTime.split(':').map(Number);
+          const [endHour, endMin = '0'] = endTime.split(':').map(Number);
+          const duration = (endHour + endMin/60) - (startHour + startMin/60);
+          return acc + duration;
+        }
+      } else if (task.start_datetime && task.end_datetime) {
+        // Old structure: calculate from datetime
         const start = new Date(task.start_datetime);
         const end = new Date(task.end_datetime);
         if (isNaN(start.getTime()) || isNaN(end.getTime())) return acc;
@@ -131,22 +161,22 @@ export const EmployeePlanningTab = ({ employees = [], schedules = [] }: Employee
                       {employee.nom.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="flex-1">
-                    <CardTitle className="text-base">{employee.nom}</CardTitle>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Mail className="h-3 w-3" />
-                        {employee.email || 'Non renseigné'}
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-base truncate">{employee.nom}</CardTitle>
+                    <div className="flex flex-col gap-1 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1 min-w-0">
+                        <Mail className="h-3 w-3 flex-shrink-0" />
+                        <span className="truncate">{employee.email || 'Non renseigné'}</span>
                       </div>
                       {employee.telephone && (
-                        <div className="flex items-center gap-1">
-                          <Phone className="h-3 w-3" />
-                          {employee.telephone}
+                        <div className="flex items-center gap-1 min-w-0">
+                          <Phone className="h-3 w-3 flex-shrink-0" />
+                          <span className="truncate">{employee.telephone}</span>
                         </div>
                       )}
                     </div>
                   </div>
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-xs whitespace-nowrap flex-shrink-0">
                     {employee.role}
                   </Badge>
                 </div>
@@ -173,50 +203,57 @@ export const EmployeePlanningTab = ({ employees = [], schedules = [] }: Employee
                 ) : (
                   <div className="space-y-2 max-h-48 overflow-y-auto">
                     {tasks.map((task) => (
-                      <div
-                        key={task.id}
-                        className="p-3 border rounded-lg hover:bg-muted/50 transition-colors"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1">
-                            <div className="font-medium text-sm">
-                              {task.task_type}
+                        <div
+                          key={task.id}
+                          className="p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm">
+                                {task.task_type || task.tache}
+                              </div>
+                              <div className="text-xs text-muted-foreground truncate">
+                                {task.vehicule || task.vehicles?.license_plate} • {task.client || 
+                                  (task.vehicles?.clients ? 
+                                    `${task.vehicles.clients.first_name} ${task.vehicles.clients.last_name}` : 
+                                    'Client non renseigné')}
+                              </div>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Clock className="h-3 w-3 flex-shrink-0" />
+                                <span className="text-xs">
+                                  {task.heure || (() => {
+                                    if (!task.start_datetime) return '--:--';
+                                    const startDate = new Date(task.start_datetime);
+                                    const startTime = !isNaN(startDate.getTime()) 
+                                      ? startDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                                      : '--:--';
+                                    
+                                    if (!task.end_datetime) return startTime;
+                                    
+                                    const endDate = new Date(task.end_datetime);
+                                    const endTime = !isNaN(endDate.getTime())
+                                      ? endDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                                      : '--:--';
+                                    
+                                    return `${startTime} - ${endTime}`;
+                                  })()}
+                                </span>
+                              </div>
                             </div>
-                            <div className="text-xs text-muted-foreground">
-                              {task.vehicles?.license_plate} • {task.vehicles?.clients ? 
-                                `${task.vehicles.clients.first_name} ${task.vehicles.clients.last_name}` : 
-                                'Client non renseigné'}
-                            </div>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Clock className="h-3 w-3" />
-                              <span className="text-xs">
-                                {(() => {
-                                  const startDate = new Date(task.start_datetime);
-                                  const startTime = !isNaN(startDate.getTime()) 
-                                    ? startDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-                                    : '--:--';
-                                  
-                                  if (!task.end_datetime) return startTime;
-                                  
-                                  const endDate = new Date(task.end_datetime);
-                                  const endTime = !isNaN(endDate.getTime())
-                                    ? endDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-                                    : '--:--';
-                                  
-                                  return `${startTime} - ${endTime}`;
-                                })()}
-                              </span>
-                            </div>
+                            <Badge 
+                              variant={
+                                (task.status === 'Terminé' || task.status === 'termine') ? 'default' : 
+                                (task.status === 'En cours' || task.status === 'en_cours') ? 'secondary' : 'outline'
+                              }
+                              className="text-xs whitespace-nowrap flex-shrink-0"
+                            >
+                              {task.status === 'termine' ? 'Terminé' : 
+                               task.status === 'en_cours' ? 'En cours' : 
+                               task.status === 'planifie' ? 'Planifié' : 
+                               task.status}
+                            </Badge>
                           </div>
-                          <Badge 
-                            variant={task.status === 'Terminé' ? 'default' : 
-                                   task.status === 'En cours' ? 'secondary' : 'outline'}
-                            className="text-xs"
-                          >
-                            {task.status}
-                          </Badge>
                         </div>
-                      </div>
                     ))}
                   </div>
                 )}
