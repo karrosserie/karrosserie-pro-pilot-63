@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Eye, Pencil, Trash, FileText, Receipt, CreditCard, User, Mail, Phone, MapPin, Send } from 'lucide-react';
 import { Client } from '@/services/supabase/clients';
+import { RequestDocumentsButton } from './RequestDocumentsButton';
 
 interface ClientMobileCardProps {
   client: Client;
@@ -107,10 +108,10 @@ export const ClientMobileCard = ({
         )}
         
         {onRequestDocuments && (
-          <Button variant="secondary" size="sm" onClick={() => onRequestDocuments(client)}>
-            <Send className="h-4 w-4 mr-1" />
-            Demander documents
-          </Button>
+          <RequestDocumentsButton
+            client={client}
+            onRequestDocuments={onRequestDocuments}
+          />
         )}
         
         <Button variant="delete" size="sm" onClick={() => onDeleteClient(client)}>

@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCompanyId } from '@/hooks/use-company-id';
 import { Client } from '@/services/supabase/clients';
 import { sendDocumentsRequest } from '@/services/documentsRequestService';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useClientActions = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -82,6 +83,21 @@ export const useClientActions = () => {
     }
   };
 
+  const checkClientHasVehicle = async (clientId: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase
+        .from('vehicles')
+        .select('id')
+        .eq('client_id', clientId)
+        .limit(1)
+        .single();
+      
+      return !error && !!data;
+    } catch {
+      return false;
+    }
+  };
+
   const handleClientSubmit = (data: any) => {
     if (dialogMode === 'create') {
       createClient.mutate({
@@ -145,6 +161,7 @@ export const useClientActions = () => {
     handleCreateCredit,
     handleCreateIntervention,
     handleRequestDocuments,
-    handleClientSubmit
+    handleClientSubmit,
+    checkClientHasVehicle
   };
 };

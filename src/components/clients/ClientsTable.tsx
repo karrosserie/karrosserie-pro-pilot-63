@@ -17,6 +17,8 @@ import { useTableSorting } from '@/hooks/use-table-sorting';
 import { Client } from '@/services/supabase/clients';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ClientMobileCard } from './ClientMobileCard';
+import { useClientVehicleCheck } from '@/hooks/use-client-vehicle-check';
+import { RequestDocumentsButton } from './RequestDocumentsButton';
 
 interface ClientsTableProps {
   clients: Client[];
@@ -130,12 +132,6 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                 onCreateCredit?.(client);
               };
 
-              const handleRequestDocuments = (e: React.MouseEvent) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onRequestDocuments?.(client);
-              };
-
               
               return (
                 <React.Fragment key={client.id}>
@@ -177,10 +173,10 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                           Créer un avoir
                         </Button>
                         {onRequestDocuments && (
-                          <Button variant="secondary" size="sm" onClick={handleRequestDocuments}>
-                            <Send className="h-4 w-4 mr-1" />
-                            Demander documents
-                          </Button>
+                          <RequestDocumentsButton
+                            client={client}
+                            onRequestDocuments={onRequestDocuments}
+                          />
                         )}
                         <Button variant="delete" size="sm" onClick={() => onDeleteClient(client)}>
                           <Trash className="h-4 w-4 mr-1" />

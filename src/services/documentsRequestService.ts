@@ -3,12 +3,26 @@ import { toast } from 'sonner';
 
 export const sendDocumentsRequest = async (clientId: string, companyId?: string) => {
   try {
-    // D'abord, créer un token pour la demande de documents
+    // D'abord, récupérer le premier véhicule du client
+    const { data: vehicleData, error: vehicleError } = await supabase
+      .from('vehicles')
+      .select('id')
+      .eq('client_id', clientId)
+      .limit(1)
+      .single();
+
+    if (vehicleError) {
+      console.error('Aucun véhicule trouvé pour ce client:', vehicleError);
+      throw new Error('Le client doit avoir au moins un véhicule pour demander des documents');
+    }
+
+    // Ensuite, créer un token pour la demande de documents
     const { data: tokenData, error: tokenError } = await supabase
       .from('tokens')
       .insert({
         client_id: clientId,
         company_id: companyId,
+        vehicule_id: vehicleData.id,
       })
       .select('id')
       .single();
