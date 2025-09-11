@@ -55,7 +55,7 @@ serve(async (req) => {
     console.log('Sending request to webhook...');
 
     // Call the external webhook
-    const webhookResponse = await fetch('https://n8n.karrosserie.pro/webhook/view-contravention', {
+    const webhookResponse = await fetch('https://n8n.karrosserie.pro/webhook/70efc3a9-eefa-422c-aa90-d7b4e8b357cf', {
       method: 'POST',
       body: formData,
     });
