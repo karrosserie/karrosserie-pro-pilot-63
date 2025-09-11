@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Pencil, Trash, MoreVertical, Receipt, Car, User } from 'lucide-react';
+import { Eye, Pencil, Trash, MoreVertical, Car, User } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { StatusBadge } from '@/components/ui/status-badge';
 
@@ -39,23 +39,14 @@ interface VehiclesGridProps {
   onViewVehicle: (vehicle: Vehicle) => void;
   onEditVehicle: (vehicle: Vehicle) => void;
   onDeleteVehicle: (vehicleId: string) => void;
-  onCreateInvoice?: (vehicle: Vehicle) => void;
 }
 
 const VehiclesGrid: React.FC<VehiclesGridProps> = ({
   vehicles,
   onViewVehicle,
   onEditVehicle,
-  onDeleteVehicle,
-  onCreateInvoice
+  onDeleteVehicle
 }) => {
-  const handleCreateInvoice = (e: React.MouseEvent, vehicle: Vehicle) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('Creating invoice for vehicle:', vehicle);
-    onCreateInvoice?.(vehicle);
-  };
-
 
   const getFirstImage = (vehicle: Vehicle) => {
     if (vehicle.vehicle_image_url) return vehicle.vehicle_image_url;
@@ -149,11 +140,7 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
                   <Pencil className="h-4 w-4 mr-1" />
                   Modifier
                 </Button>
-                <Button variant="outline" size="sm" onClick={(e) => handleCreateInvoice(e, vehicle)}>
-                  <Receipt className="h-4 w-4 mr-1" />
-                  Créer une facture
-                </Button>
-                <Button 
+                <Button
                   variant="outline" 
                   size="sm"
                   className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700" 

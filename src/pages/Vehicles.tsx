@@ -60,7 +60,6 @@ const Vehicles = () => {
           onViewVehicle={handleViewVehicle}
           onEditVehicle={handleEditVehicle}
           onDeleteVehicle={handleDeleteVehicle}
-          onCreateInvoice={handleCreateInvoice}
         />
       )}
 
