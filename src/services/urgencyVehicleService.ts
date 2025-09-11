@@ -206,7 +206,7 @@ export class UrgencyVehicleService {
           task_type: 'Accueil & Préparation du dossier',
           start_datetime: startDateTime.toISOString(),
           end_datetime: endDateTime.toISOString(),
-          status: 'En attente'
+          status: 'En cours'
         })
         .select('id')
         .single();

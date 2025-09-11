@@ -101,6 +101,8 @@ export const WorkshopPlanningInterface = ({
       case 'termine': 
       case 'Terminé': 
         return 'Terminé';
+      case 'En attente':
+        return 'À planifier';
       case 'planifie':
       case 'À planifier':
       default: 
