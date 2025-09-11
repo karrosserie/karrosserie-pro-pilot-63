@@ -144,7 +144,7 @@ const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
           E-mail
         </Button>
         {onRequestDocuments && (
-          <Button variant="create" size="sm" className="hidden" onClick={() => onRequestDocuments(quote)}>
+          <Button variant="create" size="sm" onClick={() => onRequestDocuments(quote)}>
             <FileCheck className="h-3 w-3 mr-1" />
             Justificatifs
           </Button>
