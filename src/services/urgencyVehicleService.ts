@@ -135,43 +135,60 @@ export class UrgencyVehicleService {
         console.log('✅ Nouveau véhicule créé:', vehicleId);
       }
       
-      // 3. Vérifier et créer le profil de l'employé si nécessaire
-      const { data: existingProfile, error: profileSearchError } = await supabase
-        .from('profiles')
-        .select('id')
+      // 3. Récupérer l'ID utilisateur réel depuis user_companies
+      const { data: userCompany, error: userCompanyError } = await supabase
+        .from('user_companies')
+        .select('user_id, role, active')
         .eq('id', employeId)
+        .eq('company_id', companyId)
+        .eq('active', true)
         .maybeSingle();
       
-      if (profileSearchError) {
-        console.error('❌ Error searching for employee profile:', profileSearchError);
+      if (userCompanyError) {
+        console.error('❌ Error fetching user_companies:', userCompanyError);
         return {
           success: false,
-          message: `Erreur lors de la recherche du profil employé: ${profileSearchError.message}`
+          message: `Employé non trouvé dans l'entreprise: ${userCompanyError.message}`
+        };
+      }
+      
+      if (!userCompany) {
+        console.log('❌ Employee ID not found in user_companies:', employeId);
+        return {
+          success: false,
+          message: `L'employé sélectionné n'existe pas ou n'est pas actif dans cette entreprise.`
+        };
+      }
+      
+      const actualUserId = userCompany.user_id;
+      console.log('✅ Found employee in user_companies:', { employeId, actualUserId, role: userCompany.role });
+      
+      // 4. Vérifier que l'employé a un profil utilisateur
+      const { data: existingProfile, error: profileCheckError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name')
+        .eq('id', actualUserId)
+        .maybeSingle();
+      
+      if (profileCheckError) {
+        console.error('❌ Error checking employee profile:', profileCheckError);
+        return {
+          success: false,
+          message: `L'employé sélectionné n'a pas de profil utilisateur valide: ${profileCheckError.message}`
         };
       }
       
       if (!existingProfile) {
-        // Créer un profil pour l'employé s'il n'existe pas
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: employeId,
-            first_name: 'Employé',
-            last_name: 'Urgence'
-          });
-        
-        if (profileError) {
-          console.error('❌ Error creating employee profile:', profileError);
-          return {
-            success: false,
-            message: `Erreur lors de la création du profil employé: ${profileError.message}`
-          };
-        }
-        
-        console.log('✅ Profil employé créé:', employeId);
+        console.log('❌ Employee has no profile in auth system:', actualUserId);
+        return {
+          success: false,
+          message: `L'employé sélectionné n'a pas de profil utilisateur dans le système d'authentification.`
+        };
       }
       
-      // 4. Créer la tâche dans le planning
+      console.log('✅ Employee profile exists:', existingProfile);
+      
+      // 5. Créer la tâche dans le planning
       const today = new Date();
       const [heureStr, minuteStr] = heure.split(':');
       const startDateTime = new Date(today);
@@ -184,7 +201,7 @@ export class UrgencyVehicleService {
         .from('employee_schedule')
         .insert({
           company_id: companyId,
-          user_id: employeId,
+          user_id: actualUserId,
           vehicle_id: vehicleId,
           task_type: 'Accueil & Préparation du dossier',
           start_datetime: startDateTime.toISOString(),
