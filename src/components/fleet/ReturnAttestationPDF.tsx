@@ -234,7 +234,7 @@ const ReturnAttestationPDF = ({ returnData, loanData, companyData, userPosition 
         </View>
 
         {/* État du véhicule au retour */}
-        {returnData?.damages && returnData.damages.length > 0 && (
+        {returnData?.damages && Array.isArray(returnData.damages) && returnData.damages.length > 0 && (
           <>
             <Text style={styles.sectionTitle}>ÉTAT DU VÉHICULE AU RETOUR</Text>
             <View style={styles.damagesGrid}>
@@ -249,7 +249,7 @@ const ReturnAttestationPDF = ({ returnData, loanData, companyData, userPosition 
         )}
 
         {/* Photos du véhicule au retour */}
-        {returnData?.vehicle_images && returnData.vehicle_images.length > 0 && (
+        {returnData?.vehicle_images && Array.isArray(returnData.vehicle_images) && returnData.vehicle_images.length > 0 && (
           <>
             <Text style={styles.sectionTitle}>PHOTOS DU VÉHICULE AU RETOUR</Text>
             <View style={styles.documentsGrid}>

@@ -140,8 +140,8 @@ const FleetPageContent = () => {
         return_date: loanData.actual_return_date || loanData.expected_return_date,
         return_mileage: loanData.end_mileage,
         fuel_level_end: loanData.fuel_level_end,
-        damages: loanData.damages || [],
-        vehicle_images: loanData.vehicle_images || [],
+        damages: Array.isArray(loanData.damages) ? loanData.damages : (loanData.damages ? JSON.parse(loanData.damages as string) : []),
+        vehicle_images: Array.isArray(loanData.vehicle_images) ? loanData.vehicle_images : (loanData.vehicle_images ? JSON.parse(loanData.vehicle_images as string) : []),
         client_signature: loanData.client_signature
       };
 
