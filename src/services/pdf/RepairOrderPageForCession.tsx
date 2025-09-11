@@ -346,7 +346,7 @@ export const RepairOrderMainPage = ({ cession, companyData }: RepairOrderPageFor
 // General conditions page component
 export const RepairOrderGeneralConditionsPage = () => {
   return (
-    <Page size="A4" style={styles.page}>
+    <Page size="A4" style={styles.page} break>
       <View style={{ marginBottom: 20 }}>
         <Text style={styles.conditionsTitle}>CONDITIONS GÉNÉRALES</Text>
       </View>
@@ -459,7 +459,7 @@ export const RepairOrderGeneralConditionsPage = () => {
 // Legal references page component
 export const RepairOrderLegalReferencesPage = () => {
   return (
-    <Page size="A4" style={styles.page}>
+    <Page size="A4" style={styles.page} break>
       <View style={{ marginBottom: 20 }}>
         <Text style={styles.conditionsTitle}>RÉFÉRENCES JURIDIQUES</Text>
       </View>
