@@ -13,6 +13,7 @@ export default function DocumentUploadFlow() {
   const [tokenData, setTokenData] = useState<{
     client_id: string | null;
     vehicule_id: string | null;
+    company_id: string | null;
   } | null>(null);
   const [missingDocuments, setMissingDocuments] = useState<string[]>([]);
 
@@ -39,7 +40,8 @@ export default function DocumentUploadFlow() {
 
         setTokenData({
           client_id: tokenResult.client_id,
-          vehicule_id: tokenResult.vehicule_id
+          vehicule_id: tokenResult.vehicule_id,
+          company_id: tokenResult.company_id
         });
 
         // Récupérer le nom de l'entreprise depuis la table company_info
@@ -220,6 +222,21 @@ export default function DocumentUploadFlow() {
       await Promise.all(updatePromises);
 
       console.log("Documents sauvegardés avec succès");
+      
+      // Notifier la carrosserie que le client a terminé l'upload de ses documents
+      try {
+        await supabase.functions.invoke('notify-company-documents-complete', {
+          body: {
+            clientId: tokenData.client_id,
+            companyId: tokenData.company_id
+          }
+        });
+        console.log("Notification envoyée à la carrosserie");
+      } catch (emailError) {
+        console.error("Erreur lors de l'envoi de la notification:", emailError);
+        // On ne fait pas échouer le processus si l'email ne peut pas être envoyé
+      }
+      
       setShowWorkflow(false);
       
       // Mettre à jour l'état pour afficher directement l'écran de confirmation

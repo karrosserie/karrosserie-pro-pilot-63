@@ -26,3 +26,6 @@ verify_jwt = true
 
 [functions.send-documents-request-email]
 verify_jwt = false
+
+[functions.notify-company-documents-complete]
+verify_jwt = false
