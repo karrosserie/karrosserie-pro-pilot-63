@@ -11,6 +11,7 @@ interface CessionMobileCardProps {
   onDeleteCession: (id: string) => void;
   onViewPreview: (cession: Cession) => void;
   onDownloadPDF: (cession: Cession) => void;
+  onViewPDF: (cession: Cession) => void;
   onInitializeProcedure: (cession: Cession) => void;
   isGeneratingPDF: boolean;
 }
@@ -21,6 +22,7 @@ export const CessionMobileCard = ({
   onDeleteCession,
   onViewPreview,
   onDownloadPDF,
+  onViewPDF,
   onInitializeProcedure,
   isGeneratingPDF
 }: CessionMobileCardProps) => {
@@ -154,15 +156,26 @@ export const CessionMobileCard = ({
           </Button>
         )}
         
-        {cession.status !== 'en_attente' && cession.status !== 'en_attente_signature' && (
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => onDownloadPDF(cession)}
-          >
-            <Download className="h-4 w-4 mr-1" />
-            PDF
-          </Button>
+        {cession.status !== 'en_attente' && cession.status !== 'en_attente_signature' && cession.document_url && (
+          <>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => onViewPDF(cession)}
+            >
+              <Eye className="h-4 w-4 mr-1" />
+              Voir PDF
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => onDownloadPDF(cession)}
+            >
+              <Download className="h-4 w-4 mr-1" />
+              Télécharger
+            </Button>
+          </>
         )}
         
         <Button 
