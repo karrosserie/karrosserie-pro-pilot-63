@@ -41,6 +41,7 @@ const ClientsPage = () => {
     handleCreateInvoice,
     handleCreateCredit,
     handleCreateIntervention,
+    handleRequestDocuments,
     handleClientSubmit
   } = useClientActions();
 
@@ -79,6 +80,7 @@ const ClientsPage = () => {
         onCreateQuote={handleCreateQuote}
         onCreateInvoice={handleCreateInvoice}
         onCreateCredit={handleCreateCredit}
+        onRequestDocuments={handleRequestDocuments}
       />
 
       <ClientDialogs

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
-import { Eye, Pencil, Trash, FileText, Receipt, CreditCard, User, Mail, Phone, MapPin } from 'lucide-react';
+import { Eye, Pencil, Trash, FileText, Receipt, CreditCard, User, Mail, Phone, MapPin, Send } from 'lucide-react';
 import { Client } from '@/services/supabase/clients';
 
 interface ClientMobileCardProps {
@@ -12,6 +12,7 @@ interface ClientMobileCardProps {
   onCreateQuote?: (client: Client) => void;
   onCreateInvoice?: (client: Client) => void;
   onCreateCredit?: (client: Client) => void;
+  onRequestDocuments?: (client: Client) => void;
 }
 
 export const ClientMobileCard = ({ 
@@ -21,7 +22,8 @@ export const ClientMobileCard = ({
   onDeleteClient,
   onCreateQuote,
   onCreateInvoice,
-  onCreateCredit
+  onCreateCredit,
+  onRequestDocuments
 }: ClientMobileCardProps) => {
   const clientData = client as any;
   const hasFrontLicense = clientData.driver_license_front_url;
@@ -101,6 +103,13 @@ export const ClientMobileCard = ({
           <Button variant="create" size="sm" onClick={() => onCreateCredit(client)}>
             <CreditCard className="h-4 w-4 mr-1" />
             Avoir
+          </Button>
+        )}
+        
+        {onRequestDocuments && (
+          <Button variant="secondary" size="sm" onClick={() => onRequestDocuments(client)}>
+            <Send className="h-4 w-4 mr-1" />
+            Demander documents
           </Button>
         )}
         

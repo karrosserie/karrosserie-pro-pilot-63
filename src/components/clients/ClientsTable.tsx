@@ -9,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Eye, Pencil, Trash, UserPlus, MoreVertical, FileText, Receipt, CreditCard } from 'lucide-react';
+import { Eye, Pencil, Trash, UserPlus, MoreVertical, FileText, Receipt, CreditCard, Send } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
@@ -26,6 +26,7 @@ interface ClientsTableProps {
   onCreateQuote?: (client: Client) => void;
   onCreateInvoice?: (client: Client) => void;
   onCreateCredit?: (client: Client) => void;
+  onRequestDocuments?: (client: Client) => void;
 }
 
 const ClientsTable: React.FC<ClientsTableProps> = ({
@@ -35,7 +36,8 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
   onDeleteClient,
   onCreateQuote,
   onCreateInvoice,
-  onCreateCredit
+  onCreateCredit,
+  onRequestDocuments
 }) => {
   const { sortedData: sortedClients, sortConfig, handleSort } = useTableSorting(clients, 'last_name');
   const isMobile = useIsMobile();
@@ -54,6 +56,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
               onCreateQuote={onCreateQuote}
               onCreateInvoice={onCreateInvoice}
               onCreateCredit={onCreateCredit}
+              onRequestDocuments={onRequestDocuments}
             />
           ))
         ) : (
@@ -127,6 +130,12 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                 onCreateCredit?.(client);
               };
 
+              const handleRequestDocuments = (e: React.MouseEvent) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onRequestDocuments?.(client);
+              };
+
               
               return (
                 <React.Fragment key={client.id}>
@@ -167,6 +176,12 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                           <CreditCard className="h-4 w-4 mr-1" />
                           Créer un avoir
                         </Button>
+                        {onRequestDocuments && (
+                          <Button variant="secondary" size="sm" onClick={handleRequestDocuments}>
+                            <Send className="h-4 w-4 mr-1" />
+                            Demander documents
+                          </Button>
+                        )}
                         <Button variant="delete" size="sm" onClick={() => onDeleteClient(client)}>
                           <Trash className="h-4 w-4 mr-1" />
                           Supprimer

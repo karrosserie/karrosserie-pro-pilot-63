@@ -4,6 +4,7 @@ import { useClients } from '@/hooks/use-clients';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompanyId } from '@/hooks/use-company-id';
 import { Client } from '@/services/supabase/clients';
+import { sendDocumentsRequest } from '@/services/documentsRequestService';
 
 export const useClientActions = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -72,6 +73,15 @@ export const useClientActions = () => {
     setInterventionDialogOpen(true);
   };
 
+  const handleRequestDocuments = async (client: Client) => {
+    try {
+      await sendDocumentsRequest(client.id, companyId);
+    } catch (error) {
+      // L'erreur est déjà gérée dans le service
+      console.error('Erreur lors de la demande de documents:', error);
+    }
+  };
+
   const handleClientSubmit = (data: any) => {
     if (dialogMode === 'create') {
       createClient.mutate({
@@ -134,6 +144,7 @@ export const useClientActions = () => {
     handleCreateInvoice,
     handleCreateCredit,
     handleCreateIntervention,
+    handleRequestDocuments,
     handleClientSubmit
   };
 };
