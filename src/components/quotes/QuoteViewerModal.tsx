@@ -327,23 +327,19 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
 
   const handleRequestDocuments = async () => {
     try {
-      const { tokensService } = await import('@/services/supabase/tokens');
+      const { sendDocumentsRequest } = await import('@/services/documentsRequestService');
       
-      await tokensService.createToken({
-        company_id: currentQuote.company_id!,
-        client_id: currentQuote.client_id,
-        vehicule_id: currentQuote.vehicle_id
-      });
+      await sendDocumentsRequest(currentQuote.client_id, currentQuote.company_id);
 
       toast({
-        title: "Demande de justificatifs",
-        description: `Demande de justificatifs envoyée pour le devis ${currentQuote.reference}. Token créé avec succès.`
+        title: "Demande de justificatifs envoyée",
+        description: `La demande de justificatifs a été envoyée avec succès pour le devis ${currentQuote.reference}.`
       });
     } catch (error) {
-      console.error('Erreur lors de la création du token:', error);
+      console.error('Erreur lors de l\'envoi de la demande de documents:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de créer le token pour la demande de justificatifs.",
+        description: "Impossible d'envoyer la demande de justificatifs.",
         variant: "destructive"
       });
     }
