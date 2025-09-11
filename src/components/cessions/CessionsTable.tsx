@@ -153,7 +153,7 @@ export const CessionsTable = ({
     return `Ordre n°${order.reference} du ${orderDate} - ${clientName} - ${vehicleInfo}`;
   };
 
-  const handleDownloadPDF = (cession: Cession) => {
+  const handleDownloadPDF = async (cession: Cession) => {
     if (!cession.document_url) {
       toast({
         title: "PDF non disponible",
@@ -163,8 +163,39 @@ export const CessionsTable = ({
       return;
     }
 
-    // Ouvrir le PDF dans un nouvel onglet
-    window.open(cession.document_url, '_blank');
+    try {
+      // Utiliser fetch pour télécharger le fichier et créer un lien de téléchargement
+      const response = await fetch(cession.document_url);
+      if (!response.ok) {
+        throw new Error('Erreur lors du téléchargement du fichier');
+      }
+      
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      
+      // Créer un lien de téléchargement
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `cession-${cession.reference || cession.id}.pdf`;
+      link.style.display = 'none';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Nettoyer l'URL blob
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Erreur lors du téléchargement:', error);
+      toast({
+        title: "Erreur de téléchargement",
+        description: "Impossible de télécharger le fichier. Tentative d'ouverture dans un nouvel onglet...",
+        variant: "destructive",
+      });
+      
+      // Fallback: ouvrir dans un nouvel onglet
+      window.open(cession.document_url, '_blank');
+    }
   };
 
   const handleInitializeProcedure = async (cession: Cession) => {
