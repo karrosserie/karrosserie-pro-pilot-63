@@ -23,7 +23,10 @@ export const EmployeePlanningTab = ({ employees = [], schedules = [] }: Employee
   // Filtrer les tâches par employé et date
   const getEmployeeTasks = (employeeId: string) => {
     return schedules.filter(schedule => {
-      const scheduleDate = new Date(schedule.start_datetime).toISOString().split('T')[0];
+      if (!schedule.start_datetime) return false;
+      const startDate = new Date(schedule.start_datetime);
+      if (isNaN(startDate.getTime())) return false;
+      const scheduleDate = startDate.toISOString().split('T')[0];
       return schedule.user_id === employeeId && scheduleDate === selectedDate;
     });
   };
@@ -39,6 +42,7 @@ export const EmployeePlanningTab = ({ employees = [], schedules = [] }: Employee
       if (task.start_datetime && task.end_datetime) {
         const start = new Date(task.start_datetime);
         const end = new Date(task.end_datetime);
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) return acc;
         return acc + (end.getTime() - start.getTime()) / (1000 * 60 * 60);
       }
       return acc;
@@ -186,16 +190,21 @@ export const EmployeePlanningTab = ({ employees = [], schedules = [] }: Employee
                             <div className="flex items-center gap-2 mt-1">
                               <Clock className="h-3 w-3" />
                               <span className="text-xs">
-                                {new Date(task.start_datetime).toLocaleTimeString('fr-FR', { 
-                                  hour: '2-digit', 
-                                  minute: '2-digit' 
-                                })}
-                                {task.end_datetime && 
-                                  ` - ${new Date(task.end_datetime).toLocaleTimeString('fr-FR', { 
-                                    hour: '2-digit', 
-                                    minute: '2-digit' 
-                                  })}`
-                                }
+                                {(() => {
+                                  const startDate = new Date(task.start_datetime);
+                                  const startTime = !isNaN(startDate.getTime()) 
+                                    ? startDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                                    : '--:--';
+                                  
+                                  if (!task.end_datetime) return startTime;
+                                  
+                                  const endDate = new Date(task.end_datetime);
+                                  const endTime = !isNaN(endDate.getTime())
+                                    ? endDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                                    : '--:--';
+                                  
+                                  return `${startTime} - ${endTime}`;
+                                })()}
                               </span>
                             </div>
                           </div>
