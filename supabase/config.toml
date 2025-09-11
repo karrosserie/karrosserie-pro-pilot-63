@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.download-signed-contract]
 verify_jwt = true
+
+[functions.send-cession-registered-mail]
+verify_jwt = true

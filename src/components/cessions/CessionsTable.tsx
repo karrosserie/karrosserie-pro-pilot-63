@@ -9,7 +9,8 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { ValidationErrorDialog } from '@/components/cessions/form/components/ValidationErrorDialog';
-import { FileText, Download, Eye, Pencil, Trash, Play, Loader2 } from 'lucide-react';
+import { CessionEmailConfirmationDialog } from './CessionEmailConfirmationDialog';
+import { FileText, Download, Eye, Pencil, Trash, Play, Loader2, Mail } from 'lucide-react';
 import { Cession } from '@/services/supabase/cessions';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -29,6 +30,7 @@ import { useTableSorting } from '@/hooks/use-table-sorting';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { CessionMobileCard } from './CessionMobileCard';
+import { useSubscription } from '@/hooks/use-subscription';
 
 interface CessionsTableProps {
   cessions: Cession[];
@@ -49,11 +51,15 @@ export const CessionsTable = ({
   const [previewOpen, setPreviewOpen] = useState(false);
   const [selectedCession, setSelectedCession] = useState<Cession | null>(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [emailConfirmationOpen, setEmailConfirmationOpen] = useState(false);
+  const [selectedCessionForEmail, setSelectedCessionForEmail] = useState<Cession | null>(null);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
   
   const { companyData } = useCompany();
   const { insuranceCompanies } = useInsuranceCompanies();
   const { sortedData, sortConfig, handleSort } = useTableSorting(cessions, 'created_at');
   const isMobile = useIsMobile();
+  const { tokensRemaining, canPerformOperation } = useSubscription();
 
   
   const parseValidationError = (validationError: string) => {
@@ -481,6 +487,46 @@ export const CessionsTable = ({
     }
   };
 
+  const handleEmailClick = (cession: Cession) => {
+    setSelectedCessionForEmail(cession);
+    setEmailConfirmationOpen(true);
+  };
+
+  const handleEmailConfirm = async () => {
+    if (!selectedCessionForEmail) return;
+
+    setIsSendingEmail(true);
+    setEmailConfirmationOpen(false);
+
+    try {
+      const response = await supabase.functions.invoke('send-cession-registered-mail', {
+        body: { cessionId: selectedCessionForEmail.id }
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      toast({
+        title: "Cession envoyée",
+        description: "La cession de créance a été envoyée par courrier électronique avec succès.",
+      });
+
+      // Rafraîchir la page pour voir le nouveau statut
+      window.location.reload();
+    } catch (error: any) {
+      console.error('Erreur lors de l\'envoi de la cession:', error);
+      toast({
+        title: "Erreur",
+        description: `Impossible d'envoyer la cession: ${error.message}`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingEmail(false);
+      setSelectedCessionForEmail(null);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="card-container">
@@ -590,18 +636,29 @@ export const CessionsTable = ({
                           <Download className="h-4 w-4 mr-1" />
                           Télécharger
                         </Button>
-                      )}
-                      {cession.status === 'en_attente' && (
-                        <Button 
-                          variant="edit" 
-                          size="sm"
-                          onClick={() => onEditCession(cession)}
-                        >
-                          <Pencil className="h-4 w-4 mr-1" />
-                          Modifier
-                        </Button>
-                      )}
-                      {cession.status === 'en_attente' && (
+                       )}
+                       {cession.status === 'signee' && canPerformOperation('CESSION_CREANCE') && (
+                         <Button 
+                           variant="outline" 
+                           size="sm"
+                           onClick={() => handleEmailClick(cession)}
+                           disabled={isSendingEmail}
+                           className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                         >
+                           {isSendingEmail ? (
+                             <>
+                               <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                               Envoi...
+                             </>
+                           ) : (
+                             <>
+                               <Mail className="h-4 w-4 mr-1" />
+                               Envoyer par courrier
+                             </>
+                           )}
+                         </Button>
+                       )}
+                       {cession.status === 'en_attente' && (
                         <Button 
                           variant="create" 
                           size="sm"
@@ -665,6 +722,18 @@ export const CessionsTable = ({
         cession={selectedCession}
         open={previewOpen}
         onOpenChange={setPreviewOpen}
+      />
+
+      <CessionEmailConfirmationDialog
+        isOpen={emailConfirmationOpen}
+        onClose={() => {
+          setEmailConfirmationOpen(false);
+          setSelectedCessionForEmail(null);
+        }}
+        onConfirm={handleEmailConfirm}
+        tokensRemaining={tokensRemaining}
+        cessionReference={selectedCessionForEmail?.reference || selectedCessionForEmail?.id || ''}
+        incidentNumber={selectedCessionForEmail?.incident_number}
       />
     </div>
   );
