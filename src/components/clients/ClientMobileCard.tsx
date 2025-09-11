@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
-import { Eye, Pencil, Trash, FileText, Receipt, CreditCard, User, Mail, Phone, MapPin, Send } from 'lucide-react';
+import { Eye, Pencil, Trash, FileText, Receipt, CreditCard, User, Mail, Phone, MapPin, Send, Car } from 'lucide-react';
 import { Client } from '@/services/supabase/clients';
 import { RequestDocumentsButton } from './RequestDocumentsButton';
 
@@ -13,6 +13,7 @@ interface ClientMobileCardProps {
   onCreateQuote?: (client: Client) => void;
   onCreateInvoice?: (client: Client) => void;
   onCreateCredit?: (client: Client) => void;
+  onCreateVehicle?: (client: Client) => void;
   onRequestDocuments?: (client: Client) => void;
 }
 
@@ -24,6 +25,7 @@ export const ClientMobileCard = ({
   onCreateQuote,
   onCreateInvoice,
   onCreateCredit,
+  onCreateVehicle,
   onRequestDocuments
 }: ClientMobileCardProps) => {
   const clientData = client as any;
@@ -83,6 +85,13 @@ export const ClientMobileCard = ({
           <Pencil className="h-4 w-4 mr-1" />
           Modifier
         </Button>
+        
+        {onCreateVehicle && (
+          <Button variant="create" size="sm" onClick={() => onCreateVehicle(client)}>
+            <Car className="h-4 w-4 mr-1" />
+            Nouveau véhicule
+          </Button>
+        )}
       </div>
 
       <div className="flex flex-wrap gap-2 pt-1 border-t">

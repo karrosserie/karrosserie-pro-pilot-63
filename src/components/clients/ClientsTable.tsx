@@ -9,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Eye, Pencil, Trash, UserPlus, MoreVertical, Send } from 'lucide-react';
+import { Eye, Pencil, Trash, UserPlus, MoreVertical, Send, Car } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
@@ -25,6 +25,7 @@ interface ClientsTableProps {
   onViewClient: (client: Client) => void;
   onEditClient: (client: Client) => void;
   onDeleteClient: (client: Client) => void;
+  onCreateVehicle?: (client: Client) => void;
   onRequestDocuments?: (client: Client) => void;
 }
 
@@ -33,6 +34,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
   onViewClient,
   onEditClient,
   onDeleteClient,
+  onCreateVehicle,
   onRequestDocuments
 }) => {
   const { sortedData: sortedClients, sortConfig, handleSort } = useTableSorting(clients, 'last_name');
@@ -49,6 +51,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
               onViewClient={onViewClient}
               onEditClient={onEditClient}
               onDeleteClient={onDeleteClient}
+              onCreateVehicle={onCreateVehicle}
               onRequestDocuments={onRequestDocuments}
             />
           ))
@@ -120,6 +123,10 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                         <Button variant="edit" size="sm" onClick={() => onEditClient(client)}>
                           <Pencil className="h-4 w-4 mr-1" />
                           Modifier
+                        </Button>
+                        <Button variant="create" size="sm" onClick={() => onCreateVehicle?.(client)}>
+                          <Car className="h-4 w-4 mr-1" />
+                          Nouveau véhicule
                         </Button>
                         {onRequestDocuments && (
                           <RequestDocumentsButton
