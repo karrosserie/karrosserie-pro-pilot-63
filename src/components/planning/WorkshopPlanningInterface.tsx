@@ -30,6 +30,15 @@ export const WorkshopPlanningInterface = ({
 }: WorkshopPlanningInterfaceProps) => {
   // Force cache refresh
   console.log('🔄 WorkshopPlanningInterface reloaded with real data');
+  console.log('🔍 WorkshopPlanningInterface - Schedules received:', schedules);
+  console.log('🔍 WorkshopPlanningInterface - Schedules structure:', schedules.map(s => ({
+    id: s.id,
+    task_type: s.task_type,
+    tache: s.tache,
+    etape: s.etape,
+    vehicule: s.vehicule,
+    technicien: s.technicien
+  })));
   const { userRole, isCarrossier, isCarrossierCourtesy, isResponsable, isOwner, isLoading } = useUserRole();
   
   // Debug logs pour comprendre le problème de rôle
@@ -68,97 +77,97 @@ export const WorkshopPlanningInterface = ({
     {
       id: 'accueil',
       title: 'Accueil & Préparation du dossier',
-      vehicles: schedules.filter(s => s.task_type === 'Accueil & Préparation du dossier').map(schedule => ({
+      vehicles: schedules.filter(s => s.etape === 'accueil' || s.tache === 'Accueil & Préparation').map(schedule => ({
         id: schedule.id,
-        brand: schedule.vehicles?.car_brands?.name || 'Marque inconnue',
-        model: schedule.vehicles?.car_models?.name || 'Modèle inconnu',
-        licensePlate: schedule.vehicles?.license_plate || 'Plaque inconnue',
-        client: schedule.vehicles?.clients ? `${schedule.vehicles.clients.first_name} ${schedule.vehicles.clients.last_name}` : 'Client inconnu',
+        brand: schedule.modele?.split(' ')[0] || 'Marque inconnue',
+        model: schedule.modele?.split(' ')[1] || 'Modèle inconnu',
+        licensePlate: schedule.vehicule || 'Plaque inconnue',
+        client: schedule.client || 'Client inconnu',
         price: '0€', // TODO: Calculate real price
-        duration: calculateDuration(schedule.start_datetime, schedule.end_datetime),
-        description: schedule.task_type,
-        technician: findEmployeeName(schedule.user_id, employees),
-        status: mapScheduleStatus(schedule.status)
+        duration: schedule.heure || '0h',
+        description: schedule.tache,
+        technician: schedule.technicien || 'Technicien non assigné',
+        status: mapTaskStatus(schedule.status)
       }))
     },
     {
       id: 'remplacement',
       title: 'Remplacement ou débosselage',
-      vehicles: schedules.filter(s => s.task_type === 'Remplacement ou débosselage').map(schedule => ({
+      vehicles: schedules.filter(s => s.tache === 'Débosselage' || s.tache === 'Remplacement ou débosselage').map(schedule => ({
         id: schedule.id,
-        brand: schedule.vehicles?.car_brands?.name || 'Marque inconnue',
-        model: schedule.vehicles?.car_models?.name || 'Modèle inconnu',
-        licensePlate: schedule.vehicles?.license_plate || 'Plaque inconnue',
-        client: schedule.vehicles?.clients ? `${schedule.vehicles.clients.first_name} ${schedule.vehicles.clients.last_name}` : 'Client inconnu',
+        brand: schedule.modele?.split(' ')[0] || 'Marque inconnue',
+        model: schedule.modele?.split(' ')[1] || 'Modèle inconnu',
+        licensePlate: schedule.vehicule || 'Plaque inconnue',
+        client: schedule.client || 'Client inconnu',
         price: '0€',
-        duration: calculateDuration(schedule.start_datetime, schedule.end_datetime),
-        description: schedule.task_type,
-        technician: findEmployeeName(schedule.user_id, employees),
-        status: mapScheduleStatus(schedule.status)
+        duration: schedule.heure || '0h',
+        description: schedule.tache,
+        technician: schedule.technicien || 'Technicien non assigné',
+        status: mapTaskStatus(schedule.status)
       }))
     },
     {
       id: 'preparation',
       title: 'Préparation peinture',
-      vehicles: schedules.filter(s => s.task_type === 'Préparation peinture').map(schedule => ({
+      vehicles: schedules.filter(s => s.tache === 'Préparation peinture').map(schedule => ({
         id: schedule.id,
-        brand: schedule.vehicles?.car_brands?.name || 'Marque inconnue',
-        model: schedule.vehicles?.car_models?.name || 'Modèle inconnu',
-        licensePlate: schedule.vehicles?.license_plate || 'Plaque inconnue',
-        client: schedule.vehicles?.clients ? `${schedule.vehicles.clients.first_name} ${schedule.vehicles.clients.last_name}` : 'Client inconnu',
+        brand: schedule.modele?.split(' ')[0] || 'Marque inconnue',
+        model: schedule.modele?.split(' ')[1] || 'Modèle inconnu',
+        licensePlate: schedule.vehicule || 'Plaque inconnue',
+        client: schedule.client || 'Client inconnu',
         price: '0€',
-        duration: calculateDuration(schedule.start_datetime, schedule.end_datetime),
-        description: schedule.task_type,
-        technician: findEmployeeName(schedule.user_id, employees),
-        status: mapScheduleStatus(schedule.status)
+        duration: schedule.heure || '0h',
+        description: schedule.tache,
+        technician: schedule.technicien || 'Technicien non assigné',
+        status: mapTaskStatus(schedule.status)
       }))
     },
     {
       id: 'peinture',
       title: 'Mise en peinture',
-      vehicles: schedules.filter(s => s.task_type === 'Mise en peinture').map(schedule => ({
+      vehicles: schedules.filter(s => s.tache === 'Mise en peinture').map(schedule => ({
         id: schedule.id,
-        brand: schedule.vehicles?.car_brands?.name || 'Marque inconnue',
-        model: schedule.vehicles?.car_models?.name || 'Modèle inconnu',
-        licensePlate: schedule.vehicles?.license_plate || 'Plaque inconnue',
-        client: schedule.vehicles?.clients ? `${schedule.vehicles.clients.first_name} ${schedule.vehicles.clients.last_name}` : 'Client inconnu',
+        brand: schedule.modele?.split(' ')[0] || 'Marque inconnue',
+        model: schedule.modele?.split(' ')[1] || 'Modèle inconnu',
+        licensePlate: schedule.vehicule || 'Plaque inconnue',
+        client: schedule.client || 'Client inconnu',
         price: '0€',
-        duration: calculateDuration(schedule.start_datetime, schedule.end_datetime),
-        description: schedule.task_type,
-        technician: findEmployeeName(schedule.user_id, employees),
-        status: mapScheduleStatus(schedule.status)
+        duration: schedule.heure || '0h',
+        description: schedule.tache,
+        technician: schedule.technicien || 'Technicien non assigné',
+        status: mapTaskStatus(schedule.status)
       }))
     },
     {
       id: 'finitions',
       title: 'Finitions & remontage',
-      vehicles: schedules.filter(s => s.task_type === 'Finitions & remontage').map(schedule => ({
+      vehicles: schedules.filter(s => s.tache === 'Finitions & remontage').map(schedule => ({
         id: schedule.id,
-        brand: schedule.vehicles?.car_brands?.name || 'Marque inconnue',
-        model: schedule.vehicles?.car_models?.name || 'Modèle inconnu',
-        licensePlate: schedule.vehicles?.license_plate || 'Plaque inconnue',
-        client: schedule.vehicles?.clients ? `${schedule.vehicles.clients.first_name} ${schedule.vehicles.clients.last_name}` : 'Client inconnu',
+        brand: schedule.modele?.split(' ')[0] || 'Marque inconnue',
+        model: schedule.modele?.split(' ')[1] || 'Modèle inconnu',
+        licensePlate: schedule.vehicule || 'Plaque inconnue',
+        client: schedule.client || 'Client inconnu',
         price: '0€',
-        duration: calculateDuration(schedule.start_datetime, schedule.end_datetime),
-        description: schedule.task_type,
-        technician: findEmployeeName(schedule.user_id, employees),
-        status: mapScheduleStatus(schedule.status)
+        duration: schedule.heure || '0h',
+        description: schedule.tache,
+        technician: schedule.technicien || 'Technicien non assigné',
+        status: mapTaskStatus(schedule.status)
       }))
     },
     {
       id: 'cloture',
       title: 'Clôture du dossier et livraison',
-      vehicles: schedules.filter(s => s.task_type === 'Clôture du dossier et livraison').map(schedule => ({
+      vehicles: schedules.filter(s => s.tache === 'Clôture & livraison' || s.tache === 'Clôture du dossier et livraison').map(schedule => ({
         id: schedule.id,
-        brand: schedule.vehicles?.car_brands?.name || 'Marque inconnue',
-        model: schedule.vehicles?.car_models?.name || 'Modèle inconnu',
-        licensePlate: schedule.vehicles?.license_plate || 'Plaque inconnue',
-        client: schedule.vehicles?.clients ? `${schedule.vehicles.clients.first_name} ${schedule.vehicles.clients.last_name}` : 'Client inconnu',
+        brand: schedule.modele?.split(' ')[0] || 'Marque inconnue',
+        model: schedule.modele?.split(' ')[1] || 'Modèle inconnu',
+        licensePlate: schedule.vehicule || 'Plaque inconnue',
+        client: schedule.client || 'Client inconnu',
         price: '0€',
-        duration: calculateDuration(schedule.start_datetime, schedule.end_datetime),
-        description: schedule.task_type,
-        technician: findEmployeeName(schedule.user_id, employees),
-        status: mapScheduleStatus(schedule.status)
+        duration: schedule.heure || '0h',
+        description: schedule.tache,
+        technician: schedule.technicien || 'Technicien non assigné',
+        status: mapTaskStatus(schedule.status)
       }))
     }
   ];
@@ -177,11 +186,18 @@ export const WorkshopPlanningInterface = ({
     return employee ? employee.nom : 'Technicien non assigné';
   };
 
-  const mapScheduleStatus = (status: string): 'En cours' | 'À planifier' | 'Terminé' => {
+  const mapTaskStatus = (status: string): 'En cours' | 'À planifier' | 'Terminé' => {
     switch (status) {
-      case 'En cours': return 'En cours';
-      case 'Terminé': return 'Terminé';
-      default: return 'À planifier';
+      case 'en_cours': 
+      case 'En cours': 
+        return 'En cours';
+      case 'termine': 
+      case 'Terminé': 
+        return 'Terminé';
+      case 'planifie':
+      case 'À planifier':
+      default: 
+        return 'À planifier';
     }
   };
 
