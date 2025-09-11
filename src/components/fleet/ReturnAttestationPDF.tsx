@@ -85,12 +85,11 @@ const styles = StyleSheet.create({
   },
   signatureSection: {
     marginTop: 30,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   signatureBox: {
-    width: '40%',
-    height: 80,
+    width: '60%',
+    height: 120,
     border: '1 solid black',
     alignItems: 'center',
     justifyContent: 'center',
@@ -282,34 +281,20 @@ const ReturnAttestationPDF = ({ returnData, loanData, companyData, userPosition 
 
         {/* Section signature - Signature du retour (validation de l'état du véhicule) */}
         <View style={styles.signatureSection}>
-          <View>
-            <Text style={styles.signatureLabel}>
-              Signature du client (retour du véhicule)
-            </Text>
-            <View style={styles.signatureBox}>
-              {returnData?.client_signature && (
-                <Image 
-                  src={returnData.client_signature} 
-                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                />
-              )}
-            </View>
-            <Text style={styles.text}>
-              {loanData?.clients?.first_name} {loanData?.clients?.last_name}
-            </Text>
+          <Text style={styles.signatureLabel}>
+            Signature du client (retour du véhicule)
+          </Text>
+          <View style={styles.signatureBox}>
+            {returnData?.client_signature && (
+              <Image 
+                src={returnData.client_signature} 
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
+            )}
           </View>
-
-          <View>
-            <Text style={styles.signatureLabel}>
-              Signature du représentant
-            </Text>
-            <View style={styles.signatureBox}>
-              {/* Espace pour signature du représentant */}
-            </View>
-            <Text style={styles.text}>
-              {companyData?.name}
-            </Text>
-          </View>
+          <Text style={styles.text}>
+            {loanData?.clients?.first_name} {loanData?.clients?.last_name}
+          </Text>
         </View>
 
         {/* Informations légales */}
