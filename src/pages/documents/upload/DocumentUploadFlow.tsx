@@ -113,11 +113,17 @@ export default function DocumentUploadFlow() {
     fetchTokenDataAndCheckDocuments();
   }, [token]);
 
-  const handleStart = () => {
+  const handleStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setShowWorkflow(true);
   };
 
-  const handleBackToStart = () => {
+  const handleBackToStart = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setShowWorkflow(false);
   };
 
@@ -267,7 +273,8 @@ export default function DocumentUploadFlow() {
         </div>
 
         {/* Start button */}
-        <Button 
+        <Button
+          type="button" 
           onClick={handleStart}
           className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white w-full max-w-sm mx-auto shadow-lg hover:shadow-xl transition-all duration-300"
           size="lg"

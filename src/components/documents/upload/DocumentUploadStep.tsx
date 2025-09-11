@@ -48,13 +48,16 @@ export default function DocumentUploadStep({
   });
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
     const file = event.target.files?.[0];
     if (file) {
       handleFileUpload(file); // Utilise le système de crop
     }
   };
 
-  const handleNext = () => {
+  const handleNext = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (selectedFile) {
       onNext(selectedFile);
     }
@@ -96,6 +99,7 @@ export default function DocumentUploadStep({
 
         {/* Next Button */}
         <Button
+          type="button"
           onClick={handleNext}
           disabled={!selectedFile}
           className="w-full mb-6 bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white disabled:bg-muted disabled:text-muted-foreground"

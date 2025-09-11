@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Button } from "@/components/ui/button";
 import DocumentUploadStep from "./DocumentUploadStep";
 
 const ALL_DOCUMENT_STEPS = [
@@ -68,12 +69,13 @@ export default function DocumentUploadWorkflow({
           <p className="text-muted-foreground">
             Nous avons déjà tous les documents nécessaires pour traiter votre dossier.
           </p>
-          <button 
+          <Button 
+            type="button"
             onClick={onBack}
             className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white px-6 py-2 rounded-md"
           >
             Retour
-          </button>
+          </Button>
         </div>
       </div>
     );
