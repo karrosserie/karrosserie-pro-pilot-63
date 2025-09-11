@@ -124,7 +124,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                           <Pencil className="h-4 w-4 mr-1" />
                           Modifier
                         </Button>
-                        <Button variant="create" size="sm" onClick={() => onCreateVehicle?.(client)}>
+                        <Button variant="create" size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white" onClick={() => onCreateVehicle?.(client)}>
                           <Car className="h-4 w-4 mr-1" />
                           Nouveau véhicule
                         </Button>
