@@ -50,6 +50,14 @@ const ClientForm: React.FC<ClientFormProps> = ({
     setFormData(prev => ({ ...prev, driverLicenseBackUrl: url }));
   };
 
+  const handleDriverLicenseFrontDelete = () => {
+    setFormData(prev => ({ ...prev, driverLicenseFrontUrl: '' }));
+  };
+
+  const handleDriverLicenseBackDelete = () => {
+    setFormData(prev => ({ ...prev, driverLicenseBackUrl: '' }));
+  };
+
   const handleAutoRelancesToggle = (checked: boolean) => {
     setFormData(prev => ({ ...prev, autoRelancesDisabled: !checked }));
   };
@@ -112,6 +120,8 @@ const ClientForm: React.FC<ClientFormProps> = ({
             formData={formData}
             handleDriverLicenseFrontUpload={handleDriverLicenseFrontUpload}
             handleDriverLicenseBackUpload={handleDriverLicenseBackUpload}
+            handleDriverLicenseFrontDelete={handleDriverLicenseFrontDelete}
+            handleDriverLicenseBackDelete={handleDriverLicenseBackDelete}
             isViewMode={isViewMode}
           />
         </TabsContent>

@@ -11,6 +11,8 @@ interface DocumentsTabProps {
   };
   handleDriverLicenseFrontUpload: (url: string) => void;
   handleDriverLicenseBackUpload: (url: string) => void;
+  handleDriverLicenseFrontDelete?: () => void;
+  handleDriverLicenseBackDelete?: () => void;
   isViewMode?: boolean;
 }
 
@@ -19,8 +21,22 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({
   formData,
   handleDriverLicenseFrontUpload,
   handleDriverLicenseBackUpload,
+  handleDriverLicenseFrontDelete,
+  handleDriverLicenseBackDelete,
   isViewMode = false
 }) => {
+  const handleFrontDelete = () => {
+    if (handleDriverLicenseFrontDelete) {
+      handleDriverLicenseFrontDelete();
+    }
+  };
+
+  const handleBackDelete = () => {
+    if (handleDriverLicenseBackDelete) {
+      handleDriverLicenseBackDelete();
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -30,6 +46,7 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({
           documentId={`${clientId}-front`}
           currentDocumentUrl={formData.driverLicenseFrontUrl}
           onUploadComplete={handleDriverLicenseFrontUpload}
+          onDelete={handleFrontDelete}
           isViewMode={isViewMode}
         />
       </div>
@@ -41,6 +58,7 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({
           documentId={`${clientId}-back`}
           currentDocumentUrl={formData.driverLicenseBackUrl}
           onUploadComplete={handleDriverLicenseBackUpload}
+          onDelete={handleBackDelete}
           isViewMode={isViewMode}
         />
       </div>
