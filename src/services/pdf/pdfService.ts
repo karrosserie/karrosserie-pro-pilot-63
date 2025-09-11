@@ -49,112 +49,35 @@ export const generateAndUploadCessionPDF = async (
     let repairOrderPDFDocument = null;
     if (cession.repair_orders) {
       try {
-        // Préparer les données client depuis la cession
-        const repairOrderClient = cession.repair_orders.clients;
-        const repairOrderVehicle = cession.repair_orders.vehicles;
+        console.log('Génération du PDF de l\'ordre de réparation avec le bon utilitaire');
         
-        // Parser les données des réparations et pièces
-        let repairs = [];
-        let parts = [];
-        try {
-          repairs = cession.repair_orders.repairs_data ? JSON.parse(cession.repair_orders.repairs_data as string) : [];
-          parts = cession.repair_orders.parts_data ? JSON.parse(cession.repair_orders.parts_data as string) : [];
-        } catch (error) {
-          console.error('Error parsing repair/parts data:', error);
-        }
-
-        // Formater les articles pour le PDF
-        const allItems = [...repairs, ...parts];
-        const formattedItems = allItems.map(item => {
-          const unitCost = parseFloat(item.unitCost) || 0;
-          const quantity = parseFloat(item.quantity) || 0;
-          const discount = parseFloat(item.discount) || 0;
-          const vat = parseFloat(item.vat) || 20;
-          
-          const subtotal = unitCost * quantity;
-          const afterDiscount = subtotal - discount;
-          const vatAmount = (afterDiscount * vat) / 100;
-          const totalTTC = afterDiscount + vatAmount;
-
-          return {
-            ref: item.ref || '',
-            description: item.description || '',
-            quantity: quantity,
-            discount: discount,
-            unitPrice: unitCost,
-            vat: vat,
-            totalHT: afterDiscount,
-            totalTTC: totalTTC
-          };
-        });
-
-        // Calculer les totaux
-        const totals = formattedItems.reduce((acc, item) => {
-          acc.subtotal += item.totalHT;
-          acc.vat += item.totalTTC - item.totalHT;
-          acc.total += item.totalTTC;
-          acc.discount += item.discount;
-          return acc;
-        }, { subtotal: 0, vat: 0, total: 0, discount: 0 });
-
-        // Formater les données client comme attendu par InvoicePDF
-        const formattedClientData = repairOrderClient ? {
-          number: cession.repair_orders.reference,
-          name: `${repairOrderClient.first_name} ${repairOrderClient.last_name}`,
-          phone: repairOrderClient.phone || '',
-          email: repairOrderClient.email || '',
-          address: repairOrderClient.address || '',
-          city: `${repairOrderClient.postal_code || ''} ${repairOrderClient.city || ''}`.trim(),
-          licensePlate: repairOrderVehicle?.license_plate || '',
-          mileage: repairOrderVehicle?.mileage ? repairOrderVehicle.mileage.toLocaleString() + ' km' : '',
-          vehicle: repairOrderVehicle ? `${repairOrderVehicle.car_brands?.name || ''} ${repairOrderVehicle.car_models?.name || ''}`.trim() : '',
-          billingDate: cession.repair_orders.created_at ? new Date(cession.repair_orders.created_at).toLocaleDateString('fr-FR') : '',
-          notes: 'Observations et remarques concernant cette réparation\n\n[Signature2/]',  // Notes avec saut de ligne avant signature
-          items: formattedItems,
-          totals: {
-            // Format pour le template par défaut
-            subtotal: `${totals.subtotal.toFixed(2).replace('.', ',')} €`,
-            vat: `${totals.vat.toFixed(2).replace('.', ',')} €`,
-            total: `${totals.total.toFixed(2).replace('.', ',')} €`,
-            // Format pour le template alternatif
-            totalHT: `${totals.subtotal.toFixed(2).replace('.', ',')} €`,
-            totalVAT: `${totals.vat.toFixed(2).replace('.', ',')} €`,
-            totalDiscount: `${totals.discount.toFixed(2).replace('.', ',')} €`,
-            totalTTC: `${totals.total.toFixed(2).replace('.', ',')} €`
-          }
-        } : null;
-
-        // Formater les données véhicule comme attendu par InvoicePDF
-        const today = new Date();
-        const futureDate = new Date();
-        futureDate.setDate(today.getDate() + 7); // Délai de 7 jours par défaut
+        // Utiliser l'utilitaire dédié pour préparer les données de l'ordre de réparation
+        const data = await prepareRepairOrderDataForPDF(cession.repair_orders as any, companyData);
         
-        const formattedVehicleData = repairOrderVehicle ? {
-          vehicle: `${repairOrderVehicle.car_brands?.name || ''} ${repairOrderVehicle.car_models?.name || ''}`.trim(),
-          licensePlate: repairOrderVehicle.license_plate || '',
-          mileage: repairOrderVehicle.mileage ? repairOrderVehicle.mileage.toLocaleString() + ' km' : '',
-          start_date: today.toISOString(),     // Date de début = aujourd'hui
-          end_date: futureDate.toISOString(),  // Date de fin = dans 7 jours
-        } : null;
-
+        // Adapter l'ordre de réparation au format Invoice pour le PDF
         const invoiceData = {
-          ...cession.repair_orders,
-          amount: totals.total,
-          date: cession.repair_orders.created_at,
-          due_date: cession.repair_orders.created_at,
-          repairs_data: repairs,
-          parts_data: parts
+          ...data.repairOrder,
+          amount: data.totals.total,
+          date: data.repairOrder.created_at,
+          due_date: data.repairOrder.created_at,
+          repairs_data: Array.isArray(data.repairOrder.repairs_data) ? data.repairOrder.repairs_data : [],
+          parts_data: Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data : []
         } as any;
+
+        console.log('Création du PDF de l\'ordre de réparation avec le bon template:', data.template);
 
         repairOrderPDFDocument = InvoicePDF({ 
           invoice: invoiceData, 
-          companyData: companyData, 
+          companyData: data.companyData, 
           receipts: [],
-          clientData: formattedClientData,
-          vehicleData: formattedVehicleData,
-          template: 'default',
+          clientData: data.clientData,
+          vehicleData: data.vehicleData,
+          signatureData: data.signatureData,
+          template: data.template,
           documentType: 'repair_order'
         });
+        
+        console.log('PDF de l\'ordre de réparation généré avec succès');
       } catch (error) {
         console.error('Erreur lors de la génération du PDF ordre de réparation:', error);
       }
