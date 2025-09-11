@@ -140,49 +140,7 @@ const PaymentManagement = () => {
       </div>
 
       {/* Metrics Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Encaissements du mois
-            </CardTitle>
-            <TrendingUp className="h-4 w-4 text-purple-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">
-              {statisticsLoading ? "..." : statistics?.receipts.formatted || "0,00 €"}
-            </div>
-            <p className={`text-xs ${
-              !statistics?.receipts.change || statistics.receipts.change >= 0 
-                ? 'text-emerald-600' 
-                : 'text-red-600'
-            }`}>
-              {statisticsLoading ? "..." : statistics?.receipts.changeFormatted || "0.0%"} vs mois dernier
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Dépenses du mois
-            </CardTitle>
-            <TrendingDown className="h-4 w-4 text-purple-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">
-              {statisticsLoading ? "..." : statistics?.expenses.formatted || "0,00 €"}
-            </div>
-            <p className={`text-xs ${
-              !statistics?.expenses.change || statistics.expenses.change <= 0 
-                ? 'text-emerald-600' 
-                : 'text-red-600'
-            }`}>
-              {statisticsLoading ? "..." : statistics?.expenses.changeFormatted || "0.0%"} vs mois dernier
-            </p>
-          </CardContent>
-        </Card>
-
+      <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -199,7 +157,6 @@ const PaymentManagement = () => {
             </p>
           </CardContent>
         </Card>
-
       </div>
 
       {/* Action Cards */}
