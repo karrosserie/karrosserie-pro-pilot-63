@@ -24,20 +24,33 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   const { schedules, isLoading, refetch } = useEmployeeSchedule(currentUserId);
 
   // Convertir les données Supabase au format attendu par l'interface
-  const tasks = schedules.map(schedule => ({
-    id: schedule.id,
-    vehicleBrand: schedule.vehicles?.car_brands?.name || 'Marque inconnue',
-    vehicleModel: schedule.vehicles?.car_models?.name || 'Modèle inconnu',
-    licensePlate: schedule.vehicles?.license_plate || 'Plaque inconnue',
-    client: schedule.vehicles?.clients 
-      ? `${schedule.vehicles.clients.first_name} ${schedule.vehicles.clients.last_name}` 
-      : 'Client inconnu',
-    taskType: schedule.task_type,
-    startTime: new Date(schedule.start_datetime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-    endTime: new Date(schedule.end_datetime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-    status: schedule.status,
-    description: `${schedule.task_type} - ${schedule.vehicles?.license_plate || ''}`
-  }));
+  const tasks = schedules.map(schedule => {
+    // Validation des dates pour éviter les erreurs "Invalid time value"
+    const startDate = schedule.start_datetime ? new Date(schedule.start_datetime) : null;
+    const endDate = schedule.end_datetime ? new Date(schedule.end_datetime) : null;
+    
+    const isValidStartDate = startDate && !isNaN(startDate.getTime());
+    const isValidEndDate = endDate && !isNaN(endDate.getTime());
+    
+    return {
+      id: schedule.id,
+      vehicleBrand: schedule.vehicles?.car_brands?.name || 'Marque inconnue',
+      vehicleModel: schedule.vehicles?.car_models?.name || 'Modèle inconnu',
+      licensePlate: schedule.vehicles?.license_plate || 'Plaque inconnue',
+      client: schedule.vehicles?.clients 
+        ? `${schedule.vehicles.clients.first_name} ${schedule.vehicles.clients.last_name}` 
+        : 'Client inconnu',
+      taskType: schedule.task_type,
+      startTime: isValidStartDate 
+        ? startDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+        : '--:--',
+      endTime: isValidEndDate 
+        ? endDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+        : '--:--',
+      status: schedule.status,
+      description: `${schedule.task_type} - ${schedule.vehicles?.license_plate || ''}`
+    };
+  });
 
   const currentTask = tasks.find(task => task.status === 'En cours');
   const upcomingTasks = tasks.filter(task => task.status === 'En attente');
