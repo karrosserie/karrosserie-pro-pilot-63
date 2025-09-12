@@ -10,6 +10,7 @@ import { VehiclesWaitingTab } from "./VehiclesWaitingTab";
 import { PlanningCalendar } from "./PlanningCalendar";
 import { EmployeePlanningTab } from "./EmployeePlanningTab";
 import { ProcessConfig } from "./ProcessConfig";
+import { EmployeesManagement } from "./EmployeesManagement";
 import { useUserRole } from "@/hooks/use-user-role";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -364,7 +365,7 @@ export const WorkshopPlanningInterface = ({
       {/* Navigation Tabs - Only show for manager view */}
       {activeView === 'manager' && (
         <Tabs defaultValue="workshop" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="workshop" className="flex items-center gap-1">
             <Wrench className="w-4 h-4" />
             <span className="hidden sm:inline">Étapes atelier</span>
@@ -384,6 +385,11 @@ export const WorkshopPlanningInterface = ({
             <Users className="w-4 h-4" />
             <span className="hidden sm:inline">Planning Employés</span>
             <span className="sm:hidden">P.Emp</span>
+          </TabsTrigger>
+          <TabsTrigger value="team-management" className="flex items-center gap-1">
+            <Users className="w-4 h-4" />
+            <span className="hidden sm:inline">Gérer l'équipe</span>
+            <span className="sm:hidden">Équipe</span>
           </TabsTrigger>
           <TabsTrigger value="process" className="flex items-center gap-1">
             <Cog className="w-4 h-4" />
@@ -451,6 +457,10 @@ export const WorkshopPlanningInterface = ({
                 employees={employees}
                 schedules={planningTaches}
               />
+            </TabsContent>
+
+            <TabsContent value="team-management" className="space-y-6">
+              <EmployeesManagement />
             </TabsContent>
 
             <TabsContent value="process" className="space-y-6">
