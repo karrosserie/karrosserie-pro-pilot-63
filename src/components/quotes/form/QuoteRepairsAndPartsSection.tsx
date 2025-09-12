@@ -287,7 +287,7 @@ export const QuoteRepairsAndPartsSection = ({
                   />
                   <Input
                     type="number"
-                    value={repair.total.toFixed(2)}
+                    defaultValue=""
                     onChange={(e) => {
                       const newTotal = parseFloat(e.target.value) || 0;
                       const newUnitCost = newTotal * 0.8;
@@ -297,7 +297,7 @@ export const QuoteRepairsAndPartsSection = ({
                     step="0.01"
                     readOnly={isReadOnly}
                     className={`text-right font-medium ${isReadOnly ? 'bg-gray-50' : ''}`}
-                    placeholder="0.00"
+                    placeholder="Saisir le montant total"
                   />
                   {!isReadOnly && (
                     <Button
@@ -393,7 +393,7 @@ export const QuoteRepairsAndPartsSection = ({
                   />
                   <Input
                     type="number"
-                    value={part.total.toFixed(2)}
+                    defaultValue=""
                     onChange={(e) => {
                       const newTotal = parseFloat(e.target.value) || 0;
                       const newUnitCost = newTotal * 0.8;
@@ -403,7 +403,7 @@ export const QuoteRepairsAndPartsSection = ({
                     step="0.01"
                     readOnly={isReadOnly}
                     className={`text-right font-medium ${isReadOnly ? 'bg-gray-50' : ''}`}
-                    placeholder="0.00"
+                    placeholder="Saisir le montant total"
                   />
                   {!isReadOnly && (
                     <Button
