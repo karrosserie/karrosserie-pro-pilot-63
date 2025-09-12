@@ -92,15 +92,10 @@ export const useTeamMembers = () => {
   // Ajouter un nouveau membre d'équipe
   const addTeamMember = useMutation({
     mutationFn: async (data: CreateTeamMemberData) => {
-      // Récupérer l'ID de l'entreprise courante
-      const { data: userCompany } = await supabase
-        .from('user_companies')
-        .select('company_id')
-        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
-        .eq('active', true)
-        .single();
+      // Récupérer l'ID de l'entreprise effective côté serveur (gère l'impersonation)
+      const { data: effectiveCompanyId, error: companyIdError } = await supabase.rpc('get_effective_company_id');
 
-      if (!userCompany?.company_id) {
+      if (companyIdError || !effectiveCompanyId) {
         throw new Error("Impossible de déterminer l'entreprise");
       }
 
@@ -108,7 +103,7 @@ export const useTeamMembers = () => {
         .from('user_companies')
         .insert({
           user_id: data.user_id,
-          company_id: userCompany.company_id,
+          company_id: effectiveCompanyId as string,
           role: data.role,
           qualifications: data.qualifications,
           active: true
