@@ -6,10 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
-import { Plus, Pencil, UserX, Crown, User, Trash, Users, UserPlus, Clock } from 'lucide-react';
+import { Plus, Pencil, UserX, Crown, User, Trash, Users, UserPlus, Clock, X } from 'lucide-react';
 import EmployeeTimesheetModal from './EmployeeTimesheetModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
@@ -20,6 +21,7 @@ import * as z from 'zod';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import { useIsMobile } from '@/hooks/use-mobile';
 import TeamMobileCard from './TeamMobileCard';
+import { STANDARD_QUALIFICATIONS } from '@/hooks/useEmployeeData';
 
 interface TeamMember {
   id: string;
@@ -46,7 +48,8 @@ const addMemberSchema = z.object({
   }, "Veuillez entrer un numéro de téléphone valide"),
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
   role: z.enum(['carrossier', 'carrossier-vehicule de courtoisie', 'responsable', 'responsable administratif']),
-  active: z.boolean().default(true)
+  active: z.boolean().default(true),
+  qualifications: z.array(z.string()).default([])
 });
 
 type AddMemberFormValues = z.infer<typeof addMemberSchema>;
@@ -89,7 +92,8 @@ const TeamTab = () => {
       phoneNumber: "",
       password: "",
       role: "carrossier",
-      active: true
+      active: true,
+      qualifications: []
     }
   });
 
@@ -110,6 +114,14 @@ const TeamTab = () => {
       fetchTeamMembers();
     }
   }, [companyInfo?.id]);
+
+  // Reset qualifications when role changes to non-carrossier role
+  React.useEffect(() => {
+    const currentRole = addForm.watch('role');
+    if (currentRole !== 'carrossier' && currentRole !== 'carrossier-vehicule de courtoisie') {
+      addForm.setValue('qualifications', []);
+    }
+  }, [addForm.watch('role')]);
 
   const fetchTeamMembers = async () => {
     if (!companyInfo?.id) return;
@@ -181,7 +193,8 @@ const TeamTab = () => {
           user_id: user.id,
           company_id: companyInfo.id,
           role: data.role,
-          active: data.active
+          active: data.active,
+          qualifications: data.qualifications || []
         });
 
       if (error) {
@@ -506,6 +519,58 @@ const TeamTab = () => {
                     </FormItem>
                   )}
                 />
+                
+                {/* Qualifications - shown only for carrossier roles */}
+                {(addForm.watch('role') === 'carrossier' || addForm.watch('role') === 'carrossier-vehicule de courtoisie') && (
+                  <FormField
+                    control={addForm.control}
+                    name="qualifications"
+                    render={({ field }) => {
+                      const handleQualificationToggle = (qualificationId: string) => {
+                        const currentQualifications = field.value || [];
+                        const newQualifications = currentQualifications.includes(qualificationId)
+                          ? currentQualifications.filter(q => q !== qualificationId)
+                          : [...currentQualifications, qualificationId];
+                        field.onChange(newQualifications);
+                      };
+                      
+                      return (
+                        <FormItem>
+                          <div className="flex items-center justify-between">
+                            <FormLabel>Qualifications * (sélectionnez une ou plusieurs)</FormLabel>
+                            {field.value && field.value.length > 0 && (
+                              <span className="text-sm text-muted-foreground">
+                                {field.value.length} qualification(s) sélectionnée(s)
+                              </span>
+                            )}
+                          </div>
+                          <FormControl>
+                            <div className="space-y-2 max-h-60 overflow-y-auto border rounded-lg p-3">
+                              {STANDARD_QUALIFICATIONS.map((qualification) => (
+                                <div key={qualification.id} className="flex items-center space-x-3">
+                                  <Checkbox
+                                    id={qualification.id}
+                                    checked={field.value?.includes(qualification.id) || false}
+                                    onCheckedChange={() => handleQualificationToggle(qualification.id)}
+                                  />
+                                  <label 
+                                    htmlFor={qualification.id} 
+                                    className="text-sm font-normal flex-1 cursor-pointer"
+                                  >
+                                    <span className={`inline-block px-2 py-1 rounded-sm text-xs mr-2 ${qualification.color}`}>
+                                      {qualification.name}
+                                    </span>
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
+                  />
+                )}
                 
                 <FormField
                   control={addForm.control}
