@@ -405,10 +405,14 @@ export const WorkshopPlanningInterface = ({
             {/* Summary banner */}
             <div className="bg-yellow-100 border border-yellow-300 p-4 rounded-lg mb-6">
               <div className="text-sm text-yellow-800 font-medium">
-                {waitingVehiclesCount} véhicules en attente
+                {waitingVehiclesProps.length} véhicules en attente
               </div>
-              <div className="text-sm text-yellow-700">
+              <div className="text-sm text-yellow-700 mb-2">
                 Pièces: 2 • Approbations: 1 • Techniciens: 1
+              </div>
+              {/* Debug temporaire */}
+              <div className="text-xs text-yellow-600 border-t pt-2">
+                Debug - Props: {waitingVehiclesProps.length} | Workflow: {waitingVehiclesCount}
               </div>
             </div>
 
