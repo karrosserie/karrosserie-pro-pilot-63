@@ -149,6 +149,23 @@ const CarrosseriePlanning = () => {
           message: data.message || 'Le véhicule a été ajouté au planning avec succès',
           duration: 4000
         }]);
+      } else if (data.action === 'refresh') {
+        // Rafraîchir toutes les données quand demandé depuis VehiclesWaitingTab
+        console.log('Rafraîchissement des données suite à une planification...');
+        await Promise.all([
+          refetchPlanning(),
+          refetchWaitingVehicles(),
+          refetchVehicles(),
+          refetchEmployees()
+        ]);
+        
+        setFloatingNotifications(prev => [...prev, {
+          id: Date.now().toString(),
+          type: 'success' as const,
+          title: 'Véhicule planifié',
+          message: 'Le véhicule a été planifié avec succès',
+          duration: 4000
+        }]);
       } else {
         // Add notification for user feedback
         setFloatingNotifications(prev => [...prev, {
