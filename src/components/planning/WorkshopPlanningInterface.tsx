@@ -407,12 +407,8 @@ export const WorkshopPlanningInterface = ({
               <div className="text-sm text-yellow-800 font-medium">
                 {waitingVehiclesProps.length} véhicules en attente
               </div>
-              <div className="text-sm text-yellow-700 mb-2">
+              <div className="text-sm text-yellow-700">
                 Pièces: 2 • Approbations: 1 • Techniciens: 1
-              </div>
-              {/* Debug temporaire */}
-              <div className="text-xs text-yellow-600 border-t pt-2">
-                Debug - Props: {waitingVehiclesProps.length} | Workflow: {waitingVehiclesCount}
               </div>
             </div>
 
