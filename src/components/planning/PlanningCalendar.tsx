@@ -28,186 +28,61 @@ export const PlanningCalendar = ({
 }: PlanningCalendarProps) => {
   const [currentWeek, setCurrentWeek] = useState(0);
 
-  // Données de test correspondant à l'image
-  const mockTasks: Record<string, PlanningTask[]> = {
-    'lundi': [
-      {
-        id: '1',
-        time: '10h-12h',
-        vehicleCode: 'VS-901-AB',
-        brand: 'Audi',
-        model: 'A4',
-        taskType: 'Débosselage portière',
-        technician: 'Sophie Martin',
-        client: 'M. Bernard',
-        stage: 'Remplacement ou débosselage',
-        color: 'border-l-green-500 bg-green-50'
-      },
-      {
-        id: '2',
-        time: '14h-16h30',
-        vehicleCode: 'AB-789-XY',
-        brand: 'Peugeot',
-        model: '308',
-        taskType: 'Ponçage aile avant',
-        technician: 'Sophie Martin',
-        client: 'Mme Moreau',
-        stage: 'Préparation peinture',
-        color: 'border-l-yellow-500 bg-yellow-50'
-      },
-      {
-        id: '3',
-        time: '9h-10h',
-        vehicleCode: 'EZ-787-KL',
-        brand: 'Citroën',
-        model: 'C4',
-        taskType: 'Accueil & Préparation',
-        technician: 'Martin Dubois',
-        client: 'M. Durand',
-        stage: 'Accueil & Préparation du dossier',
-        color: 'border-l-blue-500 bg-blue-50'
-      }
-    ],
-    'mardi': [
-      {
-        id: '4',
-        time: '14h-15h30',
-        vehicleCode: 'EF-456-UV',
-        brand: 'Volkswagen',
-        model: 'Golf',
-        taskType: 'Polissage final',
-        technician: 'Martin Dubois',
-        client: 'Mme Blanc',
-        stage: 'Finitions & remontage',
-        color: 'border-l-orange-500 bg-orange-50'
-      },
-      {
-        id: '5',
-        time: '8h-9h',
-        vehicleCode: 'QR-345-ST',
-        brand: 'Mercedes',
-        model: 'Classe C',
-        taskType: 'Accueil & Préparation du dossier',
-        technician: 'Martin Dubois',
-        client: 'Mme Leclerc',
-        stage: 'Accueil & Préparation du dossier',
-        color: 'border-l-blue-500 bg-blue-50'
-      },
-      {
-        id: '6',
-        time: '9h-13h',
-        vehicleCode: 'CD-123-ZW',
-        brand: 'Renault',
-        model: 'Clio',
-        taskType: 'Application base peinture',
-        technician: 'Sophie Martin',
-        client: 'M. Petit',
-        stage: 'Mise en peinture',
-        color: 'border-l-red-500 bg-red-50'
-      }
-    ],
-    'mercredi': [
-      {
-        id: '7',
-        time: '11h-11h30',
-        vehicleCode: 'GH-789-ST',
-        brand: 'Ford',
-        model: 'Focus',
-        taskType: 'Contrôle qualité',
-        technician: 'Martin Dubois',
-        client: 'M. Roux',
-        stage: 'Clôture du dossier et livraison',
-        color: 'border-l-purple-500 bg-purple-50'
-      },
-      {
-        id: '8',
-        time: '14h-15h',
-        vehicleCode: 'CD-123-ZW',
-        brand: 'Renault',
-        model: 'Clio',
-        taskType: 'Finitions peinture',
-        technician: 'Sophie Martin',
-        client: 'M. Petit',
-        stage: 'Finitions & remontage',
-        color: 'border-l-orange-500 bg-orange-50'
-      },
-      {
-        id: '9',
-        time: '8h-11h',
-        vehicleCode: 'HT-556-GH',
-        brand: 'BMW',
-        model: 'Série 1',
-        taskType: 'Remplacement pare-chocs',
-        technician: 'Sophie Martin',
-        client: 'M. Rousseau',
-        stage: 'Remplacement ou débosselage',
-        color: 'border-l-green-500 bg-green-50'
-      }
-    ],
-    'jeudi': [
-      {
-        id: '10',
-        time: '14h-16h',
-        vehicleCode: 'EZ-787-KL',
-        brand: 'Citroën',
-        model: 'C4',
-        taskType: 'Débosselage léger',
-        technician: 'Martin Dubois',
-        client: 'M. Durand',
-        stage: 'Remplacement ou débosselage',
-        color: 'border-l-green-500 bg-green-50'
-      },
-      {
-        id: '11',
-        time: '9h-12h',
-        vehicleCode: 'AB-789-XY',
-        brand: 'Peugeot',
-        model: '308',
-        taskType: 'Application peinture',
-        technician: 'Sophie Martin',
-        client: 'Mme Moreau',
-        stage: 'Mise en peinture',
-        color: 'border-l-red-500 bg-red-50'
-      },
-      {
-        id: '12',
-        time: '14h-14h30',
-        vehicleCode: 'EZ-787-KL',
-        brand: 'Citroën',
-        model: 'C4',
-        taskType: 'Livraison client',
-        technician: 'Martin Dubois',
-        client: 'M. Durand',
-        stage: 'Clôture du dossier et livraison',
-        color: 'border-l-purple-500 bg-purple-50'
-      }
-    ],
-    'vendredi': [
-      {
-        id: '13',
-        time: '10h-12h',
-        vehicleCode: 'AB-789-XY',
-        brand: 'Peugeot',
-        model: '308',
-        taskType: 'Finitions & remontage',
-        technician: 'Martin Dubois',
-        client: 'Mme Moreau',
-        stage: 'Finitions & remontage',
-        color: 'border-l-orange-500 bg-orange-50'
-      },
-      {
-        id: '14',
-        time: '8h-10h',
-        vehicleCode: 'HT-556-GH',
-        brand: 'BMW',
-        model: 'Série 1',
-        taskType: 'Préparation peinture',
-        technician: 'Sophie Martin',
-        client: 'M. Rousseau',
-        stage: 'Préparation peinture',
-        color: 'border-l-yellow-500 bg-yellow-50'
-      }
-    ]
+  // Organiser les vraies données par jour de la semaine
+  const tasksByDay = useMemo(() => {
+    const days: Record<string, PlanningTask[]> = {
+      'lundi': [],
+      'mardi': [],
+      'mercredi': [],
+      'jeudi': [],
+      'vendredi': []
+    };
+
+    schedules.forEach(schedule => {
+      if (!schedule.jour || !days[schedule.jour]) return;
+      
+      const task: PlanningTask = {
+        id: schedule.id,
+        time: schedule.heure || '0h-0h',
+        vehicleCode: schedule.vehicule || 'N/A',
+        brand: schedule.modele?.split(' ')[0] || 'Marque',
+        model: schedule.modele?.split(' ').slice(1).join(' ') || 'Modèle',
+        taskType: schedule.tache || 'Tâche',
+        technician: schedule.technicien || 'Non assigné',
+        client: schedule.client || 'Client',
+        stage: schedule.etape || 'Étape',
+        color: getStageColor(schedule.etape || '')
+      };
+
+      days[schedule.jour].push(task);
+    });
+
+    return days;
+  }, [schedules]);
+
+  const getStageColor = (stage: string): string => {
+    switch (stage) {
+      case 'Accueil & Préparation du dossier':
+      case 'accueil':
+        return 'border-l-blue-500 bg-blue-50';
+      case 'Remplacement ou débosselage':
+      case 'remplacement_debosselage':
+        return 'border-l-green-500 bg-green-50';
+      case 'Préparation peinture':
+      case 'preparation_peinture':
+        return 'border-l-yellow-500 bg-yellow-50';
+      case 'Mise en peinture':
+      case 'mise_en_peinture':
+        return 'border-l-red-500 bg-red-50';
+      case 'Finitions & remontage':
+      case 'finitions_remontage':
+        return 'border-l-orange-500 bg-orange-50';
+      case 'Clôture du dossier et livraison':
+      case 'cloture_livraison':
+        return 'border-l-purple-500 bg-purple-50';
+      default:
+        return 'border-l-gray-500 bg-gray-50';
+    }
   };
 
   const weekDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'];
@@ -238,7 +113,7 @@ export const PlanningCalendar = ({
       {/* Planning Grid */}
       <div className="grid grid-cols-5 gap-4">
         {weekDays.map((day, dayIndex) => {
-          const dayTasks = mockTasks[day] || [];
+          const dayTasks = tasksByDay[day] || [];
           return (
             <div key={day} className="bg-white border border-slate-200 rounded-lg">
               {/* Day Header */}

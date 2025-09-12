@@ -112,119 +112,109 @@ export const WorkshopPlanningInterface = ({
     }
   };
 
-  // Convert real data to workflow steps format  
+  // Convert real data to workflow steps format from database
   const workflowSteps = [
     {
       id: 'accueil',
       title: 'Accueil & Préparation du dossier',
       color: 'bg-blue-600',
-      vehicles: [
-        {
-          id: '1',
-          brand: 'Citroën',
-          model: 'C4',
-          licensePlate: '12 XY 75',
-          client: 'Client Martin',
-          price: '600€',
-          duration: '2h',
-          description: 'Devis en cours',
-          status: 'En cours' as 'En cours' | 'À planifier' | 'Terminé'
-        },
-        {
-          id: '2', 
-          brand: 'Mercedes',
-          model: 'Classe C',
-          licensePlate: 'AB 123 CD',
-          client: 'Client Dupont',
-          price: '850€', 
-          duration: '3h',
-          description: 'Expertise assurance',
-          status: 'À planifier' as 'En cours' | 'À planifier' | 'Terminé'
-        }
-      ]
+      vehicles: schedules.filter(s => s.task_type === 'Accueil & Préparation du dossier').map(s => ({
+        id: s.id,
+        brand: s.modele?.split(' ')[0] || 'Marque',
+        model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
+        licensePlate: s.vehicule || 'N/A',
+        client: s.client || 'Client',
+        price: '0€',
+        duration: s.heure || '0h',
+        description: s.tache || 'Tâche',
+        technician: s.technicien || 'Non assigné',
+        status: mapTaskStatus(s.status)
+      }))
     },
     {
       id: 'remplacement',
       title: 'Remplacement ou débosselage',
       color: 'bg-orange-500',
-      vehicles: [
-        {
-          id: '3',
-          brand: 'Audi',
-          model: 'A4',
-          licensePlate: 'VH 567 RT',
-          client: 'Client Moreau',
-          price: '1250€',
-          duration: '4h',
-          description: 'Débosselage portière',
-          status: 'En cours' as 'En cours' | 'À planifier' | 'Terminé'
-        },
-        {
-          id: '4',
-          brand: 'BMW',
-          model: 'Série 3',
-          licensePlate: 'RT 890 HU',
-          client: 'Client Bernard',
-          price: '950€',
-          duration: '3h', 
-          description: 'Remplacement pare-chocs',
-          status: 'À planifier' as 'En cours' | 'À planifier' | 'Terminé'
-        }
-      ]
+      vehicles: schedules.filter(s => s.task_type === 'Remplacement ou débosselage').map(s => ({
+        id: s.id,
+        brand: s.modele?.split(' ')[0] || 'Marque',
+        model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
+        licensePlate: s.vehicule || 'N/A',
+        client: s.client || 'Client',
+        price: '0€',
+        duration: s.heure || '0h',
+        description: s.tache || 'Tâche',
+        technician: s.technicien || 'Non assigné',
+        status: mapTaskStatus(s.status)
+      }))
     },
     {
       id: 'preparation',
       title: 'Préparation peinture',
       color: 'bg-purple-600',
-      vehicles: [
-        {
-          id: '5',
-          brand: 'Peugeot',
-          model: '308',
-          licensePlate: 'AB 789 XY',
-          client: 'Client Rousseau',
-          price: '680€',
-          duration: '2h',
-          description: 'Ponçage aile avant',
-          status: 'En cours' as 'En cours' | 'À planifier' | 'Terminé'
-        }
-      ]
+      vehicles: schedules.filter(s => s.task_type === 'Préparation peinture').map(s => ({
+        id: s.id,
+        brand: s.modele?.split(' ')[0] || 'Marque',
+        model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
+        licensePlate: s.vehicule || 'N/A',
+        client: s.client || 'Client',
+        price: '0€',
+        duration: s.heure || '0h',
+        description: s.tache || 'Tâche',
+        technician: s.technicien || 'Non assigné',
+        status: mapTaskStatus(s.status)
+      }))
     },
     {
       id: 'peinture',
       title: 'Mise en peinture',
       color: 'bg-green-600',
-      vehicles: [
-        {
-          id: '6',
-          brand: 'Renault',
-          model: 'Clio',
-          licensePlate: 'CD 456 RT',
-          client: 'Client Petit',
-          price: '1200€',
-          duration: '5h',
-          description: 'Application base',
-          status: 'En cours' as 'En cours' | 'À planifier' | 'Terminé'
-        }
-      ]
+      vehicles: schedules.filter(s => s.task_type === 'Mise en peinture').map(s => ({
+        id: s.id,
+        brand: s.modele?.split(' ')[0] || 'Marque',
+        model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
+        licensePlate: s.vehicule || 'N/A',
+        client: s.client || 'Client',
+        price: '0€',
+        duration: s.heure || '0h',
+        description: s.tache || 'Tâche',
+        technician: s.technicien || 'Non assigné',
+        status: mapTaskStatus(s.status)
+      }))
     },
     {
       id: 'finitions',
-      title: 'Finitions & remontage', 
+      title: 'Finitions & remontage',
       color: 'bg-indigo-600',
-      vehicles: [
-        {
-          id: '7',
-          brand: 'Volkswagen',
-          model: 'Golf',
-          licensePlate: 'EF 321 GH',
-          client: 'Client Lambert',
-          price: '550€',
-          duration: '1h30',
-          description: 'Polissage final',
-          status: 'En cours' as 'En cours' | 'À planifier' | 'Terminé'
-        }
-      ]
+      vehicles: schedules.filter(s => s.task_type === 'Finitions & remontage').map(s => ({
+        id: s.id,
+        brand: s.modele?.split(' ')[0] || 'Marque',
+        model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
+        licensePlate: s.vehicule || 'N/A',
+        client: s.client || 'Client',
+        price: '0€',
+        duration: s.heure || '0h',
+        description: s.tache || 'Tâche',
+        technician: s.technicien || 'Non assigné',
+        status: mapTaskStatus(s.status)
+      }))
+    },
+    {
+      id: 'cloture',
+      title: 'Clôture du dossier et livraison',
+      color: 'bg-slate-600',
+      vehicles: schedules.filter(s => s.task_type === 'Clôture du dossier et livraison').map(s => ({
+        id: s.id,
+        brand: s.modele?.split(' ')[0] || 'Marque',
+        model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
+        licensePlate: s.vehicule || 'N/A',
+        client: s.client || 'Client',
+        price: '0€',
+        duration: s.heure || '0h',
+        description: s.tache || 'Tâche',
+        technician: s.technicien || 'Non assigné',
+        status: mapTaskStatus(s.status)
+      }))
     }
   ];
 

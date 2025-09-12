@@ -16,61 +16,22 @@ export const VehiclesWaitingTab = ({
   onAddToWorkflow 
 }: VehiclesWaitingTabProps) => {
   
-  // Données de test qui correspondent à l'image
-  const waitingVehicles = [
-    {
-      id: '1',
-      brand: 'Peugeot',
-      model: '308',
-      licensePlate: 'AB-123-CD',
-      client: 'M. Dupont',
-      price: '2500€',
-      blockedStage: 'Réparation carrosserie',
-      waitingSince: '254 jour(s)',
-      blockingReason: 'Attente pièces',
-      blockingDescription: 'Pare-chocs avant en commande - Délai 5-7 jours',
-      urgent: false
-    },
-    {
-      id: '2',
-      brand: 'Renault',
-      model: 'Clio',
-      licensePlate: 'FG-456-GH',
-      client: 'Mme Martin',
-      price: '1200€',
-      blockedStage: 'Expertise',
-      waitingSince: '255 jour(s)',
-      blockingReason: 'Accord expert assurance',
-      blockingDescription: 'En attente validation devis par expert AXA',
-      urgent: true
-    },
-    {
-      id: '3',
-      brand: 'BMW',
-      model: 'Série 3',
-      licensePlate: 'PQ-012-UV',
-      client: 'M. Leroy',
-      price: '3200€',
-      blockedStage: 'Préparation',
-      waitingSince: '253 jour(s)',
-      blockingReason: 'Attente technicien',
-      blockingDescription: 'Spécialiste BMW requis - Disponible jeudi',
-      urgent: false
-    },
-    {
-      id: '4',
-      brand: 'Volkswagen',
-      model: 'Golf',
-      licensePlate: 'XY-789-ZA',
-      client: 'M. Durand',
-      price: '1800€',
-      blockedStage: 'Peinture',
-      waitingSince: '254 jour(s)',
-      blockingReason: 'Problème découvert',
-      blockingDescription: 'Corrosion cachée détectée - Devis supplémentaire requis',
-      urgent: false
-    }
-  ];
+  // Utiliser les vraies données de la base
+  const waitingVehicles = vehicles.filter(vehicle => 
+    !schedules.some(schedule => schedule.vehicle_id === vehicle.id)
+  ).map(vehicle => ({
+    id: vehicle.id,
+    brand: vehicle.car_brands?.name || 'Marque inconnue',
+    model: vehicle.car_models?.name || 'Modèle inconnu',
+    licensePlate: vehicle.license_plate || 'N/A',
+    client: vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Client inconnu',
+    price: '0€',
+    blockedStage: 'En attente de planification',
+    waitingSince: '0 jour(s)',
+    blockingReason: 'En attente',
+    blockingDescription: 'Véhicule en attente de planification dans l\'atelier',
+    urgent: false
+  }));
 
   const blockedCount = waitingVehicles.length;
 
