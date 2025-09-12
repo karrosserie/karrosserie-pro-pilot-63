@@ -65,8 +65,8 @@ const CarrosseriePlanning = () => {
 
   // Pointage status hook for automatic clock-in detection
   const {
-    showPointageModal,
-    showRetourPauseModal,
+    showPointageModal: isPointageOpen,
+    showRetourPauseModal: isRetourPauseOpen,
     closePointageModal,
     closeRetourPauseModal,
     refreshStatus
@@ -242,7 +242,7 @@ const CarrosseriePlanning = () => {
       />
 
       <PointageModal
-        isOpen={showPointageModal}
+        isOpen={isPointageOpen}
         onPointer={async () => {
           if (user?.id) {
             try {
@@ -278,7 +278,7 @@ const CarrosseriePlanning = () => {
       />
 
       <RetourPauseModal
-        isOpen={showRetourPauseModal}
+        isOpen={isRetourPauseOpen}
         onRevenir={async () => {
           if (user?.id) {
             refreshStatus();
