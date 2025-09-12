@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,12 +24,48 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   const { companyInfo } = useCompany();
   const [currentTimer, setCurrentTimer] = useState<string | null>(null);
   const [showPointageModal, setShowPointageModal] = useState(false);
+  const [isOnBreak, setIsOnBreak] = useState(false);
 
   // Utiliser l'ID de l'utilisateur connecté ou celui passé en prop
   const currentUserId = employeeId || user?.id;
   
   // Récupérer les vraies données depuis Supabase
   const { schedules, isLoading, refetch } = useEmployeeSchedule(currentUserId);
+
+  // Vérifier si l'employé est en pause
+  const checkBreakStatus = async () => {
+    if (!currentUserId) return;
+    
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const { data: timesheet } = await supabase
+        .from('employee_timesheets')
+        .select('id')
+        .eq('user_id', currentUserId)
+        .eq('date', today)
+        .single();
+
+      if (timesheet) {
+        const { data: activeBreak } = await supabase
+          .from('employee_breaks')
+          .select('id')
+          .eq('timesheet_id', timesheet.id)
+          .is('break_end_time', null)
+          .single();
+
+        setIsOnBreak(!!activeBreak);
+      }
+    } catch (error) {
+      console.error('Erreur vérification pause:', error);
+    }
+  };
+
+  // Vérifier le statut de pause au chargement
+  useEffect(() => {
+    if (currentUserId) {
+      checkBreakStatus();
+    }
+  }, [currentUserId]);
 
   // Convertir les données Supabase au format attendu par l'interface
   const tasks = schedules.map(schedule => {
@@ -121,7 +157,43 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
       }
 
       console.log('Pause démarrée avec succès');
-      // Vous pourriez vouloir rafraîchir les données ou afficher une notification
+      setIsOnBreak(true);
+      
+    } catch (error) {
+      console.error('Erreur:', error);
+    }
+  };
+
+  const handleEndBreak = async () => {
+    if (!currentUserId) return;
+    
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const { data: timesheet } = await supabase
+        .from('employee_timesheets')
+        .select('id')
+        .eq('user_id', currentUserId)
+        .eq('date', today)
+        .single();
+
+      if (!timesheet) return;
+
+      // Terminer la pause active
+      const { error } = await supabase
+        .from('employee_breaks')
+        .update({
+          break_end_time: new Date().toISOString()
+        })
+        .eq('timesheet_id', timesheet.id)
+        .is('break_end_time', null);
+
+      if (error) {
+        console.error('Erreur lors de la fin de pause:', error);
+        return;
+      }
+
+      console.log('Pause terminée avec succès');
+      setIsOnBreak(false);
       
     } catch (error) {
       console.error('Erreur:', error);
@@ -226,10 +298,17 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={handleStartBreak}>
-              <Coffee className="w-4 h-4 mr-2" />
-              Partir en pause
-            </DropdownMenuItem>
+            {isOnBreak ? (
+              <DropdownMenuItem onClick={handleEndBreak}>
+                <Coffee className="w-4 h-4 mr-2" />
+                Revenir de pause
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem onClick={handleStartBreak}>
+                <Coffee className="w-4 h-4 mr-2" />
+                Partir en pause
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onClick={handleClockOut}>
               <LogOut className="w-4 h-4 mr-2" />
               Dépointer (fin de journée)
@@ -325,9 +404,10 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
                     variant="outline"
                     onClick={() => handleStartTask(task.id)}
                     className="flex items-center gap-1"
+                    disabled={isOnBreak}
                   >
                     <Play className="w-4 h-4" />
-                    Commencer
+                    {isOnBreak ? 'En pause' : 'Commencer'}
                   </Button>
                 </div>
               </div>
