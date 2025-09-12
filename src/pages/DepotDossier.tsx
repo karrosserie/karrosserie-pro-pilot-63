@@ -49,25 +49,25 @@ const DepotDossier = () => {
     label: "Vérification",
     icon: "2",
     current: currentStep === 2,
-    completed: currentStep > 2
+    completed: currentStep >= 2
   }, {
     id: 3,
     label: "Envoyé",
     icon: "3",
     current: currentStep === 3,
-    completed: currentStep > 3
+    completed: currentStep >= 3
   }, {
     id: 4,
     label: "Reçu",
     icon: "4",
     current: currentStep === 4,
-    completed: currentStep > 4
+    completed: currentStep >= 4
   }, {
     id: 5,
     label: "Suivi",
     icon: "5",
     current: currentStep === 5,
-    completed: currentStep > 5
+    completed: currentStep >= 5
   }];
   const documents = [{
     name: "Facture FAC-2024-002",
@@ -105,6 +105,7 @@ const DepotDossier = () => {
     setShowConfirmModal(false);
     setIsDepositing(true);
     setProgress(0);
+    setCurrentStep(3); // Avancer immédiatement jusqu'à "Envoyé"
     const loadingSteps = ['Vérification des documents...', 'Connexion au portail du tribunal...', 'Téléchargement des pièces jointes...', 'Validation de la requête...', 'Paiement des frais de greffe...', 'Confirmation du dépôt...'];
     
     for (let i = 0; i < loadingSteps.length; i++) {
