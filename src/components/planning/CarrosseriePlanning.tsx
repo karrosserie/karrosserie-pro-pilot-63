@@ -131,13 +131,13 @@ const CarrosseriePlanning = () => {
   // Final selected employee view based on role
   const finalSelectedEmployeView = currentView === 'employe' ? (selectedEmployeView || user?.id) : selectedEmployeView;
 
-  // Enhanced schedule update handler for WorkshopPlanningInterface
   const handleScheduleUpdate = async (data: any) => {
-    console.log('Schedule update:', data);
+    console.log('🔄 Schedule update received:', data);
     
     try {
       // Rafraîchir les données après création d'une tâche
       if (data.action === 'plan' && data.taskId) {
+        console.log('🔄 Refreshing data after task creation...');
         await refetchPlanning();
         await refetchWaitingVehicles();
         
@@ -151,13 +151,19 @@ const CarrosseriePlanning = () => {
         }]);
       } else if (data.action === 'refresh') {
         // Rafraîchir toutes les données quand demandé depuis VehiclesWaitingTab
-        console.log('Rafraîchissement des données suite à une planification...');
+        console.log('🔄 Refreshing all data after vehicle planning from modal...');
+        
+        // Attendre un peu pour que la transaction DB soit complètement terminée
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         await Promise.all([
           refetchPlanning(),
           refetchWaitingVehicles(),
           refetchVehicles(),
           refetchEmployees()
         ]);
+        
+        console.log('✅ All data refreshed successfully');
         
         setFloatingNotifications(prev => [...prev, {
           id: Date.now().toString(),

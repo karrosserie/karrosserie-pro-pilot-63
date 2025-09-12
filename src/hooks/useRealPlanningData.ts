@@ -68,10 +68,15 @@ export const useRealPlanningData = (companyId: string | null) => {
           vehicles!employee_schedule_vehicle_id_fkey (
             id,
             license_plate,
-            color,
-            car_brands!brand_id (name),
-            car_models!model_id (name),
-            clients!client_id (
+            car_brands!vehicles_brand_id_fkey (
+              id,
+              name
+            ),
+            car_models!vehicles_model_id_fkey (
+              id,
+              name
+            ),
+            clients (
               id,
               first_name,
               last_name
