@@ -235,11 +235,9 @@ const DepotDossier = () => {
 
       <div className="container mx-auto p-8 max-w-5xl">
         {/* Calendrier précis - Procédure Tribunal */}
-        {depositResult && (
-          <div className="bg-white border border-slate-200 rounded-xl p-8 mb-8 shadow-sm">
+        {depositResult && <div className="bg-white border border-slate-200 rounded-xl p-8 mb-8 shadow-sm">
             <CalendrierProcedure />
-          </div>
-        )}
+          </div>}
 
         {/* Process Steps */}
         <div className="flex justify-center mb-12 relative">
@@ -403,7 +401,7 @@ const DepotDossier = () => {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <p>Voulez-vous procéder au dépôt de la requête en injonction de payer ?</p>
+            <p>Voulez-vous procéder au dépôt de la requête au tribunal ?</p>
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <p className="text-yellow-800 text-sm font-medium">
                 ⚠️ Cette action engagera les frais de procédure (38€)
