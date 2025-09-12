@@ -266,10 +266,24 @@ Deno.serve(async (req) => {
 
     console.log(`🎯 New task created with ID: ${newTask.id}`);
 
+    // 7. Supprimer la tâche terminée du planning
+    const { error: deleteError } = await supabase
+      .from('employee_schedule')
+      .delete()
+      .eq('id', taskId);
+
+    if (deleteError) {
+      console.error('⚠️ Error deleting completed task:', deleteError);
+      // On continue même si la suppression échoue car la nouvelle tâche est créée
+    } else {
+      console.log(`🗑️ Completed task ${taskId} removed from schedule`);
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true,
         completedTask: completedTask.task_type,
+        removedTaskId: taskId,
         nextTask: {
           id: newTask.id,
           type: nextTaskType,
