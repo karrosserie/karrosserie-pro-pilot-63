@@ -28,6 +28,32 @@ export const PlanningCalendar = ({
 }: PlanningCalendarProps) => {
   const [currentWeek, setCurrentWeek] = useState(0);
 
+  // Helper function pour les couleurs des étapes - définie AVANT useMemo
+  const getStageColor = (stage: string): string => {
+    switch (stage) {
+      case 'Accueil & Préparation du dossier':
+      case 'accueil':
+        return 'border-l-blue-500 bg-blue-50';
+      case 'Remplacement ou débosselage':
+      case 'remplacement_debosselage':
+        return 'border-l-green-500 bg-green-50';
+      case 'Préparation peinture':
+      case 'preparation_peinture':
+        return 'border-l-yellow-500 bg-yellow-50';
+      case 'Mise en peinture':
+      case 'mise_en_peinture':
+        return 'border-l-red-500 bg-red-50';
+      case 'Finitions & remontage':
+      case 'finitions_remontage':
+        return 'border-l-orange-500 bg-orange-50';
+      case 'Clôture du dossier et livraison':
+      case 'cloture_livraison':
+        return 'border-l-purple-500 bg-purple-50';
+      default:
+        return 'border-l-gray-500 bg-gray-50';
+    }
+  };
+
   // Organiser les vraies données par jour de la semaine
   const tasksByDay = useMemo(() => {
     const days: Record<string, PlanningTask[]> = {
@@ -59,31 +85,6 @@ export const PlanningCalendar = ({
 
     return days;
   }, [schedules]);
-
-  const getStageColor = (stage: string): string => {
-    switch (stage) {
-      case 'Accueil & Préparation du dossier':
-      case 'accueil':
-        return 'border-l-blue-500 bg-blue-50';
-      case 'Remplacement ou débosselage':
-      case 'remplacement_debosselage':
-        return 'border-l-green-500 bg-green-50';
-      case 'Préparation peinture':
-      case 'preparation_peinture':
-        return 'border-l-yellow-500 bg-yellow-50';
-      case 'Mise en peinture':
-      case 'mise_en_peinture':
-        return 'border-l-red-500 bg-red-50';
-      case 'Finitions & remontage':
-      case 'finitions_remontage':
-        return 'border-l-orange-500 bg-orange-50';
-      case 'Clôture du dossier et livraison':
-      case 'cloture_livraison':
-        return 'border-l-purple-500 bg-purple-50';
-      default:
-        return 'border-l-gray-500 bg-gray-50';
-    }
-  };
 
   const weekDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'];
   const weekDaysDisplay = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
