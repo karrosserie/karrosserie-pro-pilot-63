@@ -397,32 +397,47 @@ export const WorkshopPlanningInterface = ({
       {/* Navigation Tabs - Only show for manager view */}
       {activeView === 'manager' && (
         <Tabs defaultValue="workshop" className="w-full">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 lg:w-auto">
-            <TabsTrigger value="workshop" className="flex items-center gap-1 text-xs sm:text-sm">
-              <Wrench className="w-4 h-4" />
-              <span className="hidden sm:inline">Étapes</span>
-              <span className="sm:hidden">É.</span>
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 lg:w-auto h-12 sm:h-11 bg-muted/60 p-1.5 rounded-xl">
+            <TabsTrigger 
+              value="workshop" 
+              className="flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
+              <Wrench className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Étapes atelier</span>
+              <span className="sm:hidden">Étapes</span>
             </TabsTrigger>
-            <TabsTrigger value="waiting" className="flex items-center gap-1 text-xs sm:text-sm">
-              <Clock className="w-4 h-4" />
-              <span className="hidden sm:inline">Attente</span>
-              <span className="sm:hidden">A.</span>
+            <TabsTrigger 
+              value="waiting" 
+              className="flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
+              <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">En attente</span>
+              <span className="sm:hidden">Attente</span>
             </TabsTrigger>
-            <TabsTrigger value="planning" className="flex items-center gap-1 text-xs sm:text-sm">
-              <BarChart className="w-4 h-4" />
-              <span className="hidden sm:inline">Planning</span>
-              <span className="sm:hidden">P.</span>
+            <TabsTrigger 
+              value="planning" 
+              className="flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
+              <BarChart className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Calendrier</span>
+              <span className="sm:hidden">Planning</span>
             </TabsTrigger>
-            <TabsTrigger value="employee-planning" className="flex items-center gap-1 text-xs sm:text-sm">
-              <Users className="w-4 h-4" />
+            <TabsTrigger 
+              value="employee-planning" 
+              className="flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
+              <Users className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="hidden sm:inline">Employés</span>
-              <span className="sm:hidden">E.</span>
+              <span className="sm:hidden">Equipe</span>
             </TabsTrigger>
-            <TabsTrigger value="process" className="flex items-center gap-1 text-xs sm:text-sm">
-              <Cog className="w-4 h-4" />
-              <span className="hidden sm:inline">Process</span>
-              <span className="sm:hidden">Pr.</span>
+            <TabsTrigger 
+              value="process" 
+              className="flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
+              <Cog className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Configuration</span>
+              <span className="sm:hidden">Config</span>
             </TabsTrigger>
           </TabsList>
           
@@ -430,7 +445,7 @@ export const WorkshopPlanningInterface = ({
             variant="outline"
             size="sm"
             onClick={() => navigate('/settings?tab=team')}
-            className="flex items-center gap-2 w-full lg:w-auto"
+            className="flex items-center gap-2 w-full lg:w-auto h-10 px-4 hover:bg-accent/50 border-border/50"
           >
             <Users className="w-4 h-4" />
             <span className="hidden sm:inline">Gérer l'équipe</span>
