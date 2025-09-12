@@ -37,9 +37,6 @@ export const VehicleCard = ({ vehicle, onPlan }: VehicleCardProps) => {
         <div className="text-xs text-slate-500">
           {vehicle.technician || 'À planifier'}
         </div>
-        <Badge variant={vehicle.status === 'En cours' ? 'default' : 'secondary'} className="text-xs">
-          {vehicle.status}
-        </Badge>
       </div>
     </div>
   );
