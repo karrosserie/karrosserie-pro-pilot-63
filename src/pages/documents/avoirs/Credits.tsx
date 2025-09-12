@@ -561,7 +561,7 @@ const Credits = () => {
                           </Button>
                         ) : (
                           <Button 
-                            variant="secondary" 
+                            variant="delete" 
                             size="sm" 
                             onClick={() => handleArchive(credit)} 
                             disabled={archiveCredit.isPending}
