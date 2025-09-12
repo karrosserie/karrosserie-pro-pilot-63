@@ -13,6 +13,7 @@ import StatsCard from '@/components/dashboard/StatsCard';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompany } from '@/hooks/use-company';
+import { useViewManagement } from '@/hooks/use-view-management';
 import { useTeamMembers, TeamMember } from '@/hooks/use-team-members';
 import { EmployeesList } from '@/components/planning/EmployeesList';
 import TaskDetailsModal from '@/components/planning/TaskDetailsModal';
@@ -52,7 +53,16 @@ interface ExtendedPlanningData {
 const Planning = () => {
   const { companyInfo } = useCompany();
   const { user } = useAuth();
-  const [activeView, setActiveView] = useState("manager");
+  const {
+    currentView,
+    selectedEmployeView,
+    setCurrentView,
+    setSelectedEmployeView,
+    canSwitchViews,
+    isEmployeeRole,
+    canManageUsers
+  } = useViewManagement();
+  
   const [activeTab, setActiveTab] = useState("workshop");
   const [showWaitingVehiclesModal, setShowWaitingVehiclesModal] = useState(false);
   const [showVehicleDetailModal, setShowVehicleDetailModal] = useState(false);
@@ -844,19 +854,19 @@ const Planning = () => {
           
           <div className="flex items-center gap-2">
             <Button
-              variant={activeView === "manager" ? "default" : "outline"}
-              onClick={() => setActiveView("manager")}
+              variant={currentView === "manager" ? "default" : "outline"}
+              onClick={() => setCurrentView("manager")}
               size="sm"
-              className={activeView === "manager" ? "bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white" : ""}
+              className={currentView === "manager" ? "bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white" : ""}
             >
               <Crown className="w-4 h-4 mr-2" />
               Vue Manager
             </Button>
             <Button
-              variant={activeView === "employee" ? "default" : "outline"}
-              onClick={() => setActiveView("employee")}
+              variant={currentView === "employe" ? "default" : "outline"}
+              onClick={() => setCurrentView("employe")}
               size="sm"
-              className={activeView === "employee" ? "bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white" : ""}
+              className={currentView === "employe" ? "bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white" : ""}
             >
               <UserCheck className="w-4 h-4 mr-2" />
               Vue Employé
@@ -868,7 +878,7 @@ const Planning = () => {
         </div>
 
         {/* Vue Employé - Liste déroulante simplifiée */}
-        {activeView === "employee" && (
+        {currentView === "employe" && (
           <div className="space-y-6">
             {/* Sélecteur d'employé */}
             <div className="flex items-center gap-4">
@@ -997,7 +1007,7 @@ const Planning = () => {
         )}
 
         {/* Vue Manager - Onglets complets */}
-         {activeView === "manager" && (
+         {currentView === "manager" && (
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="workshop" className="flex items-center gap-2">
