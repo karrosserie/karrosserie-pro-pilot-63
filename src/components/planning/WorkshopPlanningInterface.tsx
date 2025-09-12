@@ -13,6 +13,7 @@ import { ProcessConfig } from "./ProcessConfig";
 import { useUserRole } from "@/hooks/use-user-role";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { isWithinInterval, isSameWeek, startOfWeek, addDays, parseISO, isValid } from 'date-fns';
 
 
 interface WorkshopPlanningInterfaceProps {

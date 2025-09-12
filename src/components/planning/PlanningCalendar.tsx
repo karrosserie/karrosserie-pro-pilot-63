@@ -97,6 +97,7 @@ export const PlanningCalendar = ({
         schedule.start_datetime ||
         schedule.startDate ||
         schedule.date ||
+        schedule.dateAssignation ||
         schedule.date_debut ||
         schedule.dateTime;
 
