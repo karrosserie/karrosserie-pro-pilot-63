@@ -104,10 +104,6 @@ export const VehiclesWaitingTab = ({
                   <Calendar className="w-4 h-4 mr-1" />
                   Planifier
                 </Button>
-                <Button size="sm" variant="outline">
-                  <Edit className="w-4 h-4 mr-1" />
-                  Modifier
-                </Button>
               </div>
             </div>
 
