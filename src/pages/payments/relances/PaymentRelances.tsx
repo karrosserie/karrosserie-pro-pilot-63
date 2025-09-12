@@ -951,7 +951,7 @@ Garage Martin`
               <div className="flex-1 min-w-0 ml-0.5">
                 <div className="bg-white text-black border-3 border-green-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
                   <div className="text-xs opacity-70 truncate">Récupérés</div>
-                  <div className="text-xl lg:text-2xl font-bold">78% • 156 240€</div>
+                  <div className="text-xl lg:text-2xl font-bold">78% • 156k€</div>
                 </div>
               </div>
             </div>
