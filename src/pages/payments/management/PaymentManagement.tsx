@@ -99,36 +99,6 @@ const PaymentManagement = () => {
     setAccountDialogOpen(true);
   };
 
-  const transactions = [
-    {
-      id: 1,
-      name: "Société ABC",
-      type: "Encaissement",
-      date: "Aujourd'hui",
-      amount: "+€2,450",
-      status: "Confirmé",
-      statusColor: "bg-emerald-500"
-    },
-    {
-      id: 2,
-      name: "Fournisseur XYZ",
-      type: "Dépenses",
-      date: "Hier",
-      amount: "-€890",
-      status: "Payé",
-      statusColor: "bg-purple-500"
-    },
-    {
-      id: 3,
-      name: "Client DEF",
-      type: "Encaissement",
-      date: "2 jours",
-      amount: "+€1,200",
-      status: "En attente",
-      statusColor: "bg-blue-500"
-    }
-  ];
-
   return (
     <div className={`${isMobile ? 'p-4' : 'p-6'} space-y-4 md:space-y-6`}>
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
@@ -174,48 +144,6 @@ const PaymentManagement = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* Recent Transactions */}
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
-            <CardTitle>Transactions récentes</CardTitle>
-            <div className="relative w-full sm:w-64">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Rechercher..." className="pl-8 w-full" />
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {transactions.map((transaction) => (
-              <div key={transaction.id} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-3 border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                    transaction.type === 'Encaissement' ? 'bg-emerald-500' : 'bg-red-500'
-                  }`} />
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium truncate">{transaction.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {transaction.type} • {transaction.date}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between sm:justify-end gap-3 ml-5 sm:ml-0">
-                  <span className={`font-semibold ${
-                    transaction.amount.startsWith('+') ? 'text-emerald-600' : 'text-red-600'
-                  }`}>
-                    {transaction.amount}
-                  </span>
-                  <Badge variant="secondary" className={`${transaction.statusColor} text-white flex-shrink-0`}>
-                    {transaction.status}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Receipts Modal */}
       <Dialog open={receiptsModalOpen} onOpenChange={setReceiptsModalOpen}>
