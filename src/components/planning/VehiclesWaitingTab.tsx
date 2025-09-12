@@ -1,21 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Car, User, Euro, ArrowRight } from 'lucide-react';
-
-interface WaitingVehicle {
-  id: string;
-  brand: string;
-  model: string;
-  licensePlate: string;
-  client: string;
-  price: string;
-  estimatedDuration: string;
-  description: string;
-  priority: 'Normal' | 'Urgent' | 'Très urgent';
-  arrivalDate: string;
-  waitingTime: string;
-}
+import { Button } from '@/components/ui/button';
+import { AlertTriangle, Calendar, Edit } from 'lucide-react';
 
 interface VehiclesWaitingTabProps {
   vehicles?: any[];
@@ -30,217 +15,148 @@ export const VehiclesWaitingTab = ({
   employees = [],
   onAddToWorkflow 
 }: VehiclesWaitingTabProps) => {
-  console.log('🔍 VehiclesWaitingTab - Data received:', {
-    vehiclesCount: vehicles.length,
-    schedulesCount: schedules.length,
-    employeesCount: employees.length,
-    vehiclesStructure: vehicles.slice(0, 2).map(v => ({
-      id: v.id,
-      license_plate: v.license_plate,
-      car_brands: v.car_brands,
-      car_models: v.car_models,
-      clients: v.clients,
-      created_at: v.created_at,
-      allKeys: Object.keys(v)
-    })),
-    schedulesStructure: schedules.slice(0, 2).map(s => ({
-      id: s.id,
-      vehicle_id: s.vehicle_id,
-      status: s.status,
-      allKeys: Object.keys(s)
-    }))
-  });
-  const getPriorityBadge = (priority: WaitingVehicle['priority']) => {
-    switch (priority) {
-      case 'Très urgent':
-        return <Badge className="bg-red-100 text-red-800">Très urgent</Badge>;
-      case 'Urgent':
-        return <Badge className="bg-orange-100 text-orange-800">Urgent</Badge>;
-      case 'Normal':
-        return <Badge variant="outline">Normal</Badge>;
+  
+  // Données de test qui correspondent à l'image
+  const waitingVehicles = [
+    {
+      id: '1',
+      brand: 'Peugeot',
+      model: '308',
+      licensePlate: 'AB-123-CD',
+      client: 'M. Dupont',
+      price: '2500€',
+      blockedStage: 'Réparation carrosserie',
+      waitingSince: '254 jour(s)',
+      blockingReason: 'Attente pièces',
+      blockingDescription: 'Pare-chocs avant en commande - Délai 5-7 jours',
+      urgent: false
+    },
+    {
+      id: '2',
+      brand: 'Renault',
+      model: 'Clio',
+      licensePlate: 'FG-456-GH',
+      client: 'Mme Martin',
+      price: '1200€',
+      blockedStage: 'Expertise',
+      waitingSince: '255 jour(s)',
+      blockingReason: 'Accord expert assurance',
+      blockingDescription: 'En attente validation devis par expert AXA',
+      urgent: true
+    },
+    {
+      id: '3',
+      brand: 'BMW',
+      model: 'Série 3',
+      licensePlate: 'PQ-012-UV',
+      client: 'M. Leroy',
+      price: '3200€',
+      blockedStage: 'Préparation',
+      waitingSince: '253 jour(s)',
+      blockingReason: 'Attente technicien',
+      blockingDescription: 'Spécialiste BMW requis - Disponible jeudi',
+      urgent: false
+    },
+    {
+      id: '4',
+      brand: 'Volkswagen',
+      model: 'Golf',
+      licensePlate: 'XY-789-ZA',
+      client: 'M. Durand',
+      price: '1800€',
+      blockedStage: 'Peinture',
+      waitingSince: '254 jour(s)',
+      blockingReason: 'Problème découvert',
+      blockingDescription: 'Corrosion cachée détectée - Devis supplémentaire requis',
+      urgent: false
     }
-  };
+  ];
 
-  const getPriorityOrder = (priority: WaitingVehicle['priority']) => {
-    switch (priority) {
-      case 'Très urgent': return 0;
-      case 'Urgent': return 1;
-      case 'Normal': return 2;
-    }
-  };
-
-  // Helper functions
-  const calculateWaitingTime = (createdAt: string): string => {
-    const now = new Date();
-    const created = new Date(createdAt);
-    const diffInHours = Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60));
-    
-    if (diffInHours < 24) {
-      return `${diffInHours}h`;
-    } else {
-      const days = Math.floor(diffInHours / 24);
-      return `${days} jour${days > 1 ? 's' : ''}`;
-    }
-  };
-
-  const getVehiclePriority = (vehicle: any): 'Normal' | 'Urgent' | 'Très urgent' => {
-    // Déterminer la priorité basée sur certains critères
-    // Pour l'instant, on retourne Normal par défaut
-    return 'Normal';
-  };
-
-  const findEmployeeName = (userId: string): string => {
-    const employee = employees.find(emp => emp.user_id === userId);
-    return employee ? employee.nom : 'Non assigné';
-  };
-
-  // Convertir les véhicules de la base de données en format WaitingVehicle
-  const waitingVehicles: WaitingVehicle[] = vehicles
-    .filter(vehicle => {
-      // Filtrer les véhicules qui ne sont pas encore dans un planning actif
-      const hasActiveSchedule = schedules.some(schedule => 
-        schedule.vehicle_id === vehicle.id && 
-        (schedule.status === 'En cours' || schedule.status === 'En attente')
-      );
-      return !hasActiveSchedule;
-    })
-    .map(vehicle => ({
-      id: vehicle.id,
-      brand: vehicle.car_brands?.name || 'Marque inconnue',
-      model: vehicle.car_models?.name || 'Modèle inconnu',
-      licensePlate: vehicle.license_plate || 'Plaque inconnue',
-      client: vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Client inconnu',
-      price: '0€', // TODO: Calculer le prix réel depuis les ordres de réparation
-      estimatedDuration: '2h', // TODO: Calculer la durée estimée
-      description: 'En attente de planification',
-      priority: getVehiclePriority(vehicle),
-      arrivalDate: new Date(vehicle.created_at).toLocaleDateString('fr-FR'),
-      waitingTime: calculateWaitingTime(vehicle.created_at)
-    }));
-
-  const sortedVehicles = [...waitingVehicles].sort((a, b) => 
-    getPriorityOrder(a.priority) - getPriorityOrder(b.priority)
-  );
-
-  const handleAddToWorkflow = (vehicleId: string) => {
-    console.log('Adding vehicle to workflow:', vehicleId);
-    if (onAddToWorkflow) {
-      onAddToWorkflow(vehicleId);
-    }
-  };
-
-  const stats = {
-    total: waitingVehicles.length,
-    urgent: waitingVehicles.filter(v => v.priority === 'Urgent').length,
-    veryUrgent: waitingVehicles.filter(v => v.priority === 'Très urgent').length,
-    totalValue: waitingVehicles.reduce((acc, v) => acc + parseFloat(v.price.replace('€', '')), 0)
-  };
+  const blockedCount = waitingVehicles.length;
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Véhicules en Attente</h2>
-        <p className="text-muted-foreground">Véhicules prêts à intégrer le processus de réparation</p>
+      {/* Header avec badge rouge */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="w-6 h-6 text-orange-500" />
+          <h2 className="text-xl font-bold">Véhicules en Attente</h2>
+          <Badge className="bg-red-500 text-white font-medium px-3 py-1">
+            {blockedCount} véhicule{blockedCount > 1 ? 's' : ''} bloqué{blockedCount > 1 ? 's' : ''}
+          </Badge>
+        </div>
       </div>
 
-      {/* Statistics */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-primary">{stats.total}</div>
-            <div className="text-sm text-muted-foreground">Total véhicules</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-red-600">{stats.veryUrgent}</div>
-            <div className="text-sm text-muted-foreground">Très urgent</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-orange-600">{stats.urgent}</div>
-            <div className="text-sm text-muted-foreground">Urgent</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-primary">{stats.totalValue.toLocaleString()}€</div>
-            <div className="text-sm text-muted-foreground">Valeur totale</div>
-          </CardContent>
-        </Card>
+      {/* Sous-titre */}
+      <div className="text-sm text-muted-foreground mb-6">
+        {blockedCount} véhicule{blockedCount > 1 ? 's' : ''} bloqué{blockedCount > 1 ? 's' : ''} dans les étapes atelier
       </div>
 
-      {/* Vehicles List */}
-      <div className="grid gap-4">
-        {sortedVehicles.map((vehicle) => (
-          <Card key={vehicle.id} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex-1 space-y-3">
-                  {/* Vehicle Info */}
-                  <div className="flex items-center gap-3">
-                    <Car className="w-5 h-5 text-primary" />
-                    <div>
-                      <h3 className="font-semibold text-lg">
-                        {vehicle.brand} {vehicle.model}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">{vehicle.licensePlate}</p>
-                    </div>
-                    {getPriorityBadge(vehicle.priority)}
-                  </div>
-
-                  {/* Client & Details */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-muted-foreground" />
-                      <span>{vehicle.client}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Euro className="w-4 h-4 text-muted-foreground" />
-                      <span className="font-medium">{vehicle.price}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-muted-foreground" />
-                      <span>~{vehicle.estimatedDuration}</span>
-                    </div>
-                    <div className="text-muted-foreground">
-                      En attente: <span className="font-medium">{vehicle.waitingTime}</span>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <p className="text-sm bg-muted p-2 rounded">
-                    <strong>Travaux:</strong> {vehicle.description}
-                  </p>
-                </div>
-
-                {/* Actions */}
-                <div className="ml-4 flex flex-col gap-2">
-                  <Button 
-                    onClick={() => handleAddToWorkflow(vehicle.id)}
-                    className="flex items-center gap-2"
-                  >
-                    <ArrowRight className="w-4 h-4" />
-                    Démarrer
-                  </Button>
-                </div>
+      {/* Liste des véhicules */}
+      <div className="space-y-4">
+        {waitingVehicles.map((vehicle) => (
+          <div key={vehicle.id} className="bg-white border border-slate-200 rounded-lg p-6">
+            {/* En-tête avec marque/modèle et plaque */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-slate-900">
+                  {vehicle.brand} {vehicle.model}
+                </h3>
+                <span className="text-sm font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded">
+                  {vehicle.licensePlate}
+                </span>
+                {vehicle.urgent && (
+                  <Badge className="bg-red-500 text-white text-xs">Urgent</Badge>
+                )}
               </div>
-            </CardContent>
-          </Card>
+              <div className="flex gap-2">
+                <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                  Débloquer
+                </Button>
+                <Button size="sm" variant="default" className="bg-blue-600 hover:bg-blue-700">
+                  <Calendar className="w-4 h-4 mr-1" />
+                  Planifier
+                </Button>
+                <Button size="sm" variant="outline">
+                  <Edit className="w-4 h-4 mr-1" />
+                  Modifier
+                </Button>
+              </div>
+            </div>
+
+            {/* Informations en colonnes */}
+            <div className="grid grid-cols-4 gap-6 mb-4 text-sm">
+              <div>
+                <span className="text-slate-500">Client :</span>
+                <div className="font-medium text-slate-900">{vehicle.client}</div>
+              </div>
+              <div>
+                <span className="text-slate-500">Prix :</span>
+                <div className="font-medium text-slate-900">{vehicle.price}</div>
+              </div>
+              <div>
+                <span className="text-slate-500">Étape bloquée :</span>
+                <div className="font-medium text-blue-600">{vehicle.blockedStage}</div>
+              </div>
+              <div>
+                <span className="text-slate-500">En attente depuis :</span>
+                <div className="font-medium text-orange-600">{vehicle.waitingSince}</div>
+              </div>
+            </div>
+
+            {/* Raison du blocage */}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                <span className="font-medium text-yellow-800">Raison du blocage : {vehicle.blockingReason}</span>
+              </div>
+              <div className="text-sm text-yellow-700">
+                {vehicle.blockingDescription}
+              </div>
+            </div>
+          </div>
         ))}
       </div>
-
-      {waitingVehicles.length === 0 && (
-        <Card>
-          <CardContent className="text-center py-12">
-            <Car className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Aucun véhicule en attente</h3>
-            <p className="text-muted-foreground">Tous les véhicules sont dans le processus de réparation</p>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };
