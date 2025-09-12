@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Clock, User, MapPin } from 'lucide-react';
+import { startOfWeek, addWeeks, format, addDays } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface PlanningTask {
   id: string;
@@ -54,6 +56,20 @@ export const PlanningCalendar = ({
     }
   };
 
+  // Calculer les dates de la semaine actuelle
+  const currentWeekStart = useMemo(() => {
+    const today = new Date();
+    const mondayOfThisWeek = startOfWeek(today, { weekStartsOn: 1 }); // 1 = Lundi
+    return addWeeks(mondayOfThisWeek, currentWeek);
+  }, [currentWeek]);
+
+  // Générer les dates pour chaque jour de la semaine
+  const weekDates = useMemo(() => {
+    return Array.from({ length: 5 }, (_, index) => 
+      addDays(currentWeekStart, index)
+    );
+  }, [currentWeekStart]);
+
   // Organiser les vraies données par jour de la semaine
   const tasksByDay = useMemo(() => {
     const days: Record<string, PlanningTask[]> = {
@@ -84,7 +100,7 @@ export const PlanningCalendar = ({
     });
 
     return days;
-  }, [schedules]);
+  }, [schedules, currentWeek]);
 
   const weekDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'];
   const weekDaysDisplay = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
@@ -98,7 +114,12 @@ export const PlanningCalendar = ({
       {/* Header */}
       <div className="space-y-2">
         <h2 className="text-2xl font-bold">Planning Détaillé</h2>
-        <p className="text-muted-foreground">Toutes les tâches par véhicule et jour par jour</p>
+        <div className="flex items-center justify-between">
+          <p className="text-muted-foreground">Toutes les tâches par véhicule et jour par jour</p>
+          <div className="text-sm font-medium text-slate-700">
+            Semaine du {format(currentWeekStart, 'dd MMMM', { locale: fr })} au {format(addDays(currentWeekStart, 4), 'dd MMMM yyyy', { locale: fr })}
+          </div>
+        </div>
       </div>
 
       {/* Week Navigation */}
@@ -120,6 +141,7 @@ export const PlanningCalendar = ({
               {/* Day Header */}
               <div className="bg-slate-50 p-4 rounded-t-lg border-b border-slate-200">
                 <h3 className="font-semibold text-lg text-blue-600">{weekDaysDisplay[dayIndex]}</h3>
+                <p className="text-xs text-slate-500 mb-1">{format(weekDates[dayIndex], 'dd/MM', { locale: fr })}</p>
                 <p className="text-sm text-slate-600">{dayTasks.length} tâche{dayTasks.length !== 1 ? 's' : ''}</p>
               </div>
 
