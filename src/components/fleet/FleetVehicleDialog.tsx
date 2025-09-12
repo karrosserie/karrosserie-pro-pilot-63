@@ -36,7 +36,7 @@ const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto sm:w-full">
         <DialogHeader>
           <DialogTitle>{getTitle()}</DialogTitle>

@@ -83,7 +83,7 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
   };
 
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{getTitle()}</DialogTitle>
