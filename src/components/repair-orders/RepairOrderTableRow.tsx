@@ -2,7 +2,7 @@ import React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Pencil, Trash, Download, Printer, Mail, Signature, FileCheck, ArrowRight } from 'lucide-react';
+import { Eye, Pencil, Trash, Download, Printer, Mail, Signature, FileCheck, ArrowRight, RotateCcw } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { RepairOrderActionsDropdown } from './RepairOrderActionsDropdown';
 import { calculateOrderAmount, formatAmount } from './utils/orderCalculations';
@@ -11,6 +11,7 @@ interface RepairOrderTableRowProps {
   order: RepairOrder;
   onEditOrder: (order: RepairOrder) => void;
   onDeleteOrder: (order: RepairOrder) => void;
+  onRestoreOrder?: (order: RepairOrder) => void;
   onViewOrder?: (order: RepairOrder) => void;
   contextMenuProps?: {
     onDownload: (order: RepairOrder) => void;
@@ -22,7 +23,7 @@ interface RepairOrderTableRowProps {
   };
 }
 
-export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onViewOrder, contextMenuProps }: RepairOrderTableRowProps) => {
+export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onRestoreOrder, onViewOrder, contextMenuProps }: RepairOrderTableRowProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'En cours':
@@ -124,14 +125,25 @@ export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onViewO
                 Convertir
               </Button>
             ) : null}
-            <Button 
-              variant="delete"
-              size="sm" 
-              onClick={() => onDeleteOrder(order)}
-            >
-              <Trash className="h-4 w-4 mr-1" />
-              Archivé
-            </Button>
+            {order.archived ? (
+              <Button 
+                variant="validation"
+                size="sm" 
+                onClick={() => onRestoreOrder?.(order)}
+              >
+                <RotateCcw className="h-4 w-4 mr-1" />
+                Restaurer
+              </Button>
+            ) : (
+              <Button 
+                variant="delete"
+                size="sm" 
+                onClick={() => onDeleteOrder(order)}
+              >
+                <Trash className="h-4 w-4 mr-1" />
+                Archiver
+              </Button>
+            )}
           </div>
         </TableCell>
       </TableRow>

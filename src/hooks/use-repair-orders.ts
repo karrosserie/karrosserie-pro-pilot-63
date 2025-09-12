@@ -99,6 +99,18 @@ export function useRepairOrders() {
     }
   });
 
+  const restoreOrder = useMutation({
+    mutationFn: async (id: string) => {
+      return await repairOrdersService.restore(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['repair-orders'] });
+    },
+    onError: (error) => {
+      console.error('Restore repair order error:', error);
+    }
+  });
+
   return {
     orders,
     isLoading,
@@ -106,6 +118,7 @@ export function useRepairOrders() {
     createOrder,
     updateOrder,
     deleteOrder,
-    archiveOrder
+    archiveOrder,
+    restoreOrder
   };
 }

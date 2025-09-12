@@ -48,7 +48,7 @@ const RepairOrders = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   
-  const { orders, isLoading, error, deleteOrder, archiveOrder } = useRepairOrders();
+  const { orders, isLoading, error, deleteOrder, archiveOrder, restoreOrder } = useRepairOrders();
   
   const filteredOrders = orders?.filter(order => {
     const searchLower = searchTerm.toLowerCase();
@@ -251,6 +251,23 @@ const RepairOrders = () => {
     }
   };
 
+  const handleRestoreOrder = async (order: RepairOrder) => {
+    try {
+      await restoreOrder.mutateAsync(order.id);
+      toast({
+        title: "Ordre de réparation restauré",
+        description: "L'ordre de réparation a été restauré avec succès."
+      });
+    } catch (error: any) {
+      console.error('Error restoring repair order:', error);
+      toast({
+        title: "Erreur",
+        description: `Impossible de restaurer l'ordre de réparation: ${error?.message || 'Erreur inconnue'}`,
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleDeleteOrder = (order: RepairOrder) => {
     setSelectedOrderForDeletion(order);
     setDeleteDialogOpen(true);
@@ -389,6 +406,7 @@ const RepairOrders = () => {
           orders={filteredOrders}
           onEditOrder={handleEditOrder}
           onDeleteOrder={handleDeleteOrder}
+          onRestoreOrder={handleRestoreOrder}
           onViewOrder={handleViewOrder}
           contextMenuProps={{
             onDownload: handleDownload,

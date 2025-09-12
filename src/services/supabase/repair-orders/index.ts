@@ -1,6 +1,6 @@
 
 import { getRepairOrders, getRepairOrderById, getLastOrderByUser } from './queries';
-import { createRepairOrder, updateRepairOrder, deleteRepairOrder, archiveRepairOrder } from './mutations';
+import { createRepairOrder, updateRepairOrder, deleteRepairOrder, archiveRepairOrder, restoreRepairOrder } from './mutations';
 
 export * from './types';
 
@@ -11,5 +11,6 @@ export const repairOrdersService = {
   create: createRepairOrder,
   update: updateRepairOrder,
   delete: deleteRepairOrder,
-  archive: archiveRepairOrder
+  archive: archiveRepairOrder,
+  restore: restoreRepairOrder
 };

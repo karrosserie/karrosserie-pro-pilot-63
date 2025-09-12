@@ -11,6 +11,7 @@ interface RepairOrdersTableProps {
   orders: RepairOrder[];
   onEditOrder: (order: RepairOrder) => void;
   onDeleteOrder: (order: RepairOrder) => void;
+  onRestoreOrder?: (order: RepairOrder) => void;
   onViewOrder?: (order: RepairOrder) => void;
   contextMenuProps?: {
     onDownload: (order: RepairOrder) => void;
@@ -22,7 +23,7 @@ interface RepairOrdersTableProps {
   };
 }
 
-export const RepairOrdersTable = ({ orders, onEditOrder, onDeleteOrder, onViewOrder, contextMenuProps }: RepairOrdersTableProps) => {
+export const RepairOrdersTable = ({ orders, onEditOrder, onDeleteOrder, onRestoreOrder, onViewOrder, contextMenuProps }: RepairOrdersTableProps) => {
   const { sortedData: sortedOrders, sortConfig, handleSort } = useTableSorting(orders || [], 'reference');
   return (
     <div className="card-container">
@@ -57,6 +58,7 @@ export const RepairOrdersTable = ({ orders, onEditOrder, onDeleteOrder, onViewOr
                 order={order}
                 onEditOrder={onEditOrder}
                 onDeleteOrder={onDeleteOrder}
+                onRestoreOrder={onRestoreOrder}
                 onViewOrder={onViewOrder}
                 contextMenuProps={contextMenuProps}
               />
