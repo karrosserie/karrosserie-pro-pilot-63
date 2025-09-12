@@ -402,11 +402,6 @@ const DepotDossier = () => {
           </DialogHeader>
           <div className="space-y-4">
             <p>Voulez-vous procéder au dépôt de la requête au tribunal ?</p>
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <p className="text-yellow-800 text-sm font-medium">
-                ⚠️ Cette action engagera les frais de procédure (38€)
-              </p>
-            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowConfirmModal(false)}>
