@@ -59,10 +59,12 @@ export const QuoteRepairsAndPartsSection = ({
       if (repair.id === id) {
         const updated = { ...repair, [field]: value } as QuoteRepairItem;
 
-        // If user edits the total, respect it and do not auto-recalculate
+        // If user edits the total, respect it and calculate unit cost
         if (field === 'total') {
           const manualTotal = isNaN(Number(value)) ? 0 : Number(value);
           updated.total = manualTotal;
+          // Calculate unit cost as total * 0.8
+          updated.unitCost = manualTotal * 0.8;
           return updated;
         }
 
@@ -113,10 +115,12 @@ export const QuoteRepairsAndPartsSection = ({
       if (part.id === id) {
         const updated = { ...part, [field]: value } as QuotePartItem;
 
-        // If user edits the total, respect it and do not auto-recalculate
+        // If user edits the total, respect it and calculate unit cost
         if (field === 'total') {
           const manualTotal = isNaN(Number(value)) ? 0 : Number(value);
           updated.total = manualTotal;
+          // Calculate unit cost as total * 0.8
+          updated.unitCost = manualTotal * 0.8;
           return updated;
         }
         
