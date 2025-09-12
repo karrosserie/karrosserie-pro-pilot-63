@@ -5,6 +5,7 @@ import { startOfWeek, addWeeks, format, addDays, isSameWeek, parseISO, isValid, 
 import { fr } from 'date-fns/locale';
 import { DeplacerTacheModal } from './DeplacerTacheModal';
 import { useToast } from '@/hooks/use-toast';
+import { deplacerTacheSupabase } from '@/utils/deplacerTacheUtils';
 
 interface PlanningTask {
   id: string;
@@ -24,13 +25,15 @@ interface PlanningCalendarProps {
   employees?: any[];
   vehicles?: any[];
   onWeekChange?: (weekStart: Date, weekEnd: Date) => void;
+  onTaskUpdated?: () => void; // Callback pour rafraîchir les données après modification
 }
 
 export const PlanningCalendar = ({ 
   schedules = [], 
   employees = [], 
   vehicles = [],
-  onWeekChange
+  onWeekChange,
+  onTaskUpdated
 }: PlanningCalendarProps) => {
   const [currentWeek, setCurrentWeek] = useState(0);
   const [showDeplacerModal, setShowDeplacerModal] = useState(false);
@@ -203,8 +206,8 @@ export const PlanningCalendar = ({
     if (!selectedTaskForMove) return;
 
     try {
-      // Ici vous pouvez ajouter la logique pour déplacer la tâche dans Supabase
-      console.log('Déplacement de la tâche:', {
+      // Déplacer la tâche dans Supabase
+      await deplacerTacheSupabase({
         taskId: selectedTaskForMove.id,
         nouvelEmployeId,
         nouvelleDate,
@@ -220,8 +223,8 @@ export const PlanningCalendar = ({
       setShowDeplacerModal(false);
       setSelectedTaskForMove(null);
 
-      // Optionnel: déclencher un rafraîchissement des données
-      // onWeekChange pourrait être utilisé pour refetch les données
+      // Déclencher un rafraîchissement des données
+      onTaskUpdated?.();
       
     } catch (error) {
       console.error('Erreur lors du déplacement:', error);

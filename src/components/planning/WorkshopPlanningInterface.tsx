@@ -489,6 +489,7 @@ export const WorkshopPlanningInterface = ({
                 employees={employees}
                 vehicles={vehicles}
                 onWeekChange={handleWeekChange}
+                onTaskUpdated={() => onScheduleUpdate?.({ action: 'refresh' })}
               />
             </TabsContent>
 
