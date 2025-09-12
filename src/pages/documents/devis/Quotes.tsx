@@ -13,7 +13,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, Download, Printer, Mail, FileCheck, ArrowRight } from 'lucide-react';
+import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, Download, Printer, Mail, FileCheck, ArrowRight, RotateCcw } from 'lucide-react';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import { useQuotes } from '@/hooks/use-quotes';
@@ -33,7 +33,7 @@ const Quotes = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { confirm } = useConfirmation();
-  const { quotes, isLoading, error, deleteQuote, archiveQuote } = useQuotes();
+  const { quotes, isLoading, error, deleteQuote, archiveQuote, restoreQuote } = useQuotes();
   const { sortedData: sortedQuotes, sortConfig, handleSort } = useTableSorting(quotes || [], 'reference');
   const [searchTerm, setSearchTerm] = useState('');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -65,6 +65,33 @@ const Quotes = () => {
   const handleEditQuote = (quote: Quote) => {
     setSelectedQuote(quote);
     setEditDialogOpen(true);
+  };
+
+  const handleRestoreQuote = async (id: string) => {
+    const confirmed = await confirm({
+      title: 'Restaurer le devis',
+      description: 'Êtes-vous sûr de vouloir restaurer ce devis dans les documents actifs ?',
+      confirmText: 'Restaurer',
+      cancelText: 'Annuler',
+      variant: 'default'
+    });
+
+    if (confirmed) {
+      try {
+        await restoreQuote.mutateAsync(id);
+        toast({
+          title: "Devis restauré",
+          description: "Le devis a été restauré avec succès."
+        });
+      } catch (error) {
+        console.error('Error restoring quote:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de restaurer le devis.",
+          variant: "destructive"
+        });
+      }
+    }
   };
 
   const handleArchiveQuote = async (id: string) => {
@@ -496,14 +523,25 @@ const Quotes = () => {
                           </Button>
                         ) : null}
 
-                        <Button 
-                          variant="delete" 
-                          size="sm" 
-                          onClick={() => showArchived ? handleDeleteQuote(quote.id) : handleArchiveQuote(quote.id)}
-                        >
-                          <Trash className="h-4 w-4 mr-1" />
-                          {showArchived ? 'Supprimer' : 'Archiver'}
-                        </Button>
+                        {showArchived ? (
+                          <Button 
+                            variant="validation"
+                            size="sm" 
+                            onClick={() => handleRestoreQuote(quote.id)}
+                          >
+                            <RotateCcw className="h-4 w-4 mr-1" />
+                            Restaurer
+                          </Button>
+                        ) : (
+                          <Button 
+                            variant="delete" 
+                            size="sm" 
+                            onClick={() => handleArchiveQuote(quote.id)}
+                          >
+                            <Trash className="h-4 w-4 mr-1" />
+                            Archiver
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>

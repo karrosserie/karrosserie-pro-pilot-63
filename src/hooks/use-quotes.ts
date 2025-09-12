@@ -208,6 +208,28 @@ export function useQuotes() {
     }
   });
 
+  const restoreQuote = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('quotes')
+        .update({ archived: false })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error restoring quote:', error);
+        throw new Error(error.message);
+      }
+
+      return true;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['quotes'] });
+    },
+    onError: (error) => {
+      console.error('Restore quote error:', error);
+    }
+  });
+
   return {
     quotes,
     isLoading,
@@ -215,6 +237,7 @@ export function useQuotes() {
     createQuote,
     updateQuote,
     deleteQuote,
-    archiveQuote
+    archiveQuote,
+    restoreQuote
   };
 }

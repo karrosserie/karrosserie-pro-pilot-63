@@ -251,7 +251,33 @@ export const quotesService = {
     return data && data.length > 0 ? data[0] : null;
   },
 
-  // Créer un devis à partir d'un rapport d'expertise
+  archive: async (id: string) => {
+    const { error } = await supabase
+      .from('quotes')
+      .update({ archived: true })
+      .eq('id', id);
+      
+    if (error) {
+      console.error(`Error archiving quote with id ${id}:`, error);
+      throw new Error(error.message);
+    }
+    
+    return true;
+  },
+
+  restore: async (id: string) => {
+    const { error } = await supabase
+      .from('quotes')
+      .update({ archived: false })
+      .eq('id', id);
+      
+    if (error) {
+      console.error(`Error restoring quote with id ${id}:`, error);
+      throw new Error(error.message);
+    }
+    
+    return true;
+  },
   createFromReport: async (expertiseReport: any) => {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     
