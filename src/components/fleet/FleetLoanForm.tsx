@@ -11,6 +11,7 @@ import ClientInfoTab from './form/ClientInfoTab';
 import InsuranceTab from './form/InsuranceTab';
 import AttestationTab from './form/AttestationTab';
 import ClientDialog from '@/components/client/ClientDialog';
+import { useClients } from '@/hooks/use-clients';
 
 interface FleetLoanFormProps {
   vehicle: FleetVehicle;
@@ -71,6 +72,9 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
 }) => {
   // État pour le dialog de création de client
   const [isClientDialogOpen, setIsClientDialogOpen] = useState(false);
+  
+  // Hook pour gérer les clients
+  const { createClient } = useClients();
 
   const {
     activeTab,
@@ -131,7 +135,23 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
   // Handler pour la soumission du nouveau client
   const handleNewClientSubmit = (clientData: any) => {
     console.log('Nouveau client créé:', clientData);
-    // Le client sera automatiquement disponible dans la liste grâce à React Query
+    
+    // Transformer les données du formulaire vers le format de la base de données
+    const clientForDB = {
+      first_name: clientData.firstName,
+      last_name: clientData.lastName,
+      email: clientData.email,
+      phone: clientData.phone,
+      address: clientData.address,
+      city: clientData.city,
+      postal_code: clientData.zipCode,
+      driver_license_front_url: clientData.driverLicenseFrontUrl,
+      driver_license_back_url: clientData.driverLicenseBackUrl,
+      auto_relances_disabled: clientData.autoRelancesDisabled
+    };
+    
+    // Créer le client en base de données
+    createClient.mutate(clientForDB);
     setIsClientDialogOpen(false);
   };
 
