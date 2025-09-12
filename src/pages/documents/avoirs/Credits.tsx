@@ -10,7 +10,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Archive, MoreVertical } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import CreditViewerModal from '@/components/credits/CreditViewerModal';
 import { useConfirmation } from '@/hooks/use-confirmation';
@@ -257,20 +257,20 @@ const Credits = () => {
     setEditDialogOpen(true);
   };
 
-  const handleDelete = async (credit: any) => {
+  const handleArchive = async (credit: any) => {
     const confirmed = await confirm({
-      title: 'Supprimer l\'avoir',
-      description: `Êtes-vous sûr de vouloir supprimer l'avoir ${credit.reference} ? Cette action est irréversible.`,
-      confirmText: 'Supprimer',
+      title: 'Archiver l\'avoir',
+      description: `Êtes-vous sûr de vouloir archiver l'avoir ${credit.reference} ? Vous pourrez le restaurer plus tard.`,
+      confirmText: 'Archiver',
       cancelText: 'Annuler',
-      variant: 'destructive'
+      variant: 'default'
     });
 
     if (confirmed) {
       try {
-        await deleteCredit.mutateAsync(credit.id);
+        await archiveCredit.mutateAsync(credit.id);
       } catch (error) {
-        console.error('Error deleting credit:', error);
+        console.error('Error archiving credit:', error);
       }
     }
   };
@@ -421,7 +421,7 @@ const Credits = () => {
                 credit={credit}
                 onViewCredit={handleViewCredit}
                 onEditCredit={handleEditCredit}
-                onDelete={handleDelete}
+                onArchive={handleArchive}
                 onDownload={handleDownload}
                 onPrint={handlePrint}
                 onSendEmail={handleSendEmail}
@@ -509,9 +509,9 @@ const Credits = () => {
                           <Mail className="h-4 w-4 mr-1" />
                           Envoyer
                         </Button>
-                        <Button variant="delete" size="sm" onClick={() => handleDelete(credit)} disabled={deleteCredit.isPending}>
-                          <Trash className="h-4 w-4 mr-1" />
-                          Supprimer
+                        <Button variant="secondary" size="sm" onClick={() => handleArchive(credit)} disabled={archiveCredit.isPending}>
+                          <Archive className="h-4 w-4 mr-1" />
+                          Archiver
                         </Button>
                       </div>
                     </TableCell>

@@ -1,12 +1,12 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Eye, Pencil, Trash, Download, Printer, Mail, Calendar, User, Car, Euro, FileText } from 'lucide-react';
+import { Eye, Pencil, Archive, Download, Printer, Mail, Calendar, User, Car, Euro, FileText } from 'lucide-react';
 
 interface CreditMobileCardProps {
   credit: any;
   onViewCredit: (credit: any) => void;
   onEditCredit: (credit: any) => void;
-  onDelete: (credit: any) => void;
+  onArchive: (credit: any) => void;
   onDownload: (credit: any) => void;
   onPrint: (credit: any) => void;
   onSendEmail: (credit: any) => void;
@@ -18,7 +18,7 @@ const CreditMobileCard: React.FC<CreditMobileCardProps> = ({
   credit,
   onViewCredit,
   onEditCredit,
-  onDelete,
+  onArchive,
   onDownload,
   onPrint,
   onSendEmail,
@@ -113,9 +113,9 @@ const CreditMobileCard: React.FC<CreditMobileCardProps> = ({
           <Mail className="h-3 w-3 mr-1" />
           Envoyer
         </Button>
-        <Button variant="delete" size="sm" onClick={() => onDelete(credit)}>
-          <Trash className="h-3 w-3 mr-1" />
-          Supprimer
+        <Button variant="secondary" size="sm" onClick={() => onArchive(credit)}>
+          <Archive className="h-3 w-3 mr-1" />
+          Archiver
         </Button>
       </div>
     </div>
