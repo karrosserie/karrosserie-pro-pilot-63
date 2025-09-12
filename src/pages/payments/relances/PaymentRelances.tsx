@@ -42,6 +42,7 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
   const [viewingLog, setViewingLog] = useState<any>(null);
   const [viewingCampaignDetails, setViewingCampaignDetails] = useState<any>(null);
   const [viewingStatDetails, setViewingStatDetails] = useState<{type: string, data: any} | null>(null);
+  const [isBlinking, setIsBlinking] = useState(false);
 
   // Force rebuild - données fictives pour la démonstration
   const mockInvoices = [
@@ -432,6 +433,9 @@ Garage Martin`
 
   const viewLogDetails = (log: any) => {
     setViewingLog(log);
+    // Déclencher l'animation de clignotement
+    setIsBlinking(true);
+    setTimeout(() => setIsBlinking(false), 1000);
   };
 
   const closeLogViewer = () => {
@@ -1447,18 +1451,23 @@ Garage Martin`
                 </Button>
               </div>
 
-              {/* Status Badge */}
+              {/* Status Badge avec date */}
               <div className="mb-6">
-                <Badge 
-                  variant={
-                    viewingLog.type === 'success' ? 'default' : 
-                    viewingLog.type === 'error' ? 'destructive' : 
-                    viewingLog.type === 'warning' ? 'secondary' : 'outline'
-                  }
-                  className="text-sm px-3 py-1"
-                >
-                  {viewingLog.status}
-                </Badge>
+                <div className={`flex items-center gap-3 ${isBlinking ? 'animate-pulse' : ''}`}>
+                  <Badge 
+                    variant={
+                      viewingLog.type === 'success' ? 'default' : 
+                      viewingLog.type === 'error' ? 'destructive' : 
+                      viewingLog.type === 'warning' ? 'secondary' : 'outline'
+                    }
+                    className="text-sm px-3 py-1"
+                  >
+                    {viewingLog.status}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+                    {viewingLog.time}
+                  </span>
+                </div>
               </div>
 
               {/* Informations principales */}
