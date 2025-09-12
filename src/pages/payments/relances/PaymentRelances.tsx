@@ -1464,7 +1464,7 @@ Garage Martin`
                   >
                     {viewingLog.status}
                   </Badge>
-                  <span className="text-sm text-muted-foreground bg-muted px-3 py-1.5 rounded">
+                  <span className="text-sm text-white bg-black px-3 py-1.5 rounded">
                     {viewingLog.time}
                   </span>
                 </div>
