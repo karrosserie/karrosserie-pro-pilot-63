@@ -102,7 +102,7 @@ export const PointageModal: React.FC<PointageModalProps> = ({
           
           <p className="text-xs text-muted-foreground text-center mt-2 flex items-center justify-center gap-1">
             <MapPin className="w-3 h-3" />
-            Position vérifiée dans un rayon de 40m
+            Vérification de position dans un rayon de 100m
           </p>
         </div>
       </DialogContent>

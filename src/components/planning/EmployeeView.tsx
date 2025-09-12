@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { clockIn } from '@/utils/pointageSupabaseUtils';
+import { clockIn, startBreak, endBreak } from '@/utils/pointageSupabaseUtils';
 import { takeTaskPhoto } from '@/utils/cameraUtils';
 import { useToast } from '@/hooks/use-toast';
 
@@ -188,41 +188,28 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
     if (!currentUserId) return;
     
     try {
-      // Récupérer le timesheet actif d'aujourd'hui
-      const today = new Date().toISOString().split('T')[0];
-      const { data: activeTimesheets } = await supabase
-        .from('employee_timesheets')
-        .select('id')
-        .eq('user_id', currentUserId)
-        .eq('date', today)
-        .is('clock_out_time', null)
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-      const activeTimesheet = activeTimesheets && activeTimesheets.length > 0 ? activeTimesheets[0] : null;
-      if (!activeTimesheet) {
-        console.error('Aucun timesheet actif trouvé');
-        return;
-      }
-
-      // Créer une nouvelle pause
-      const { error } = await supabase
-        .from('employee_breaks')
-        .insert({
-          timesheet_id: activeTimesheet.id,
-          break_start_time: new Date().toISOString()
-        });
-
-      if (error) {
-        console.error('Erreur lors du démarrage de la pause:', error);
-        return;
-      }
-
-      console.log('Pause démarrée avec succès');
-      setIsOnBreak(true);
+      const result = await startBreak(currentUserId);
       
+      if (result.success) {
+        setIsOnBreak(true);
+        toast({
+          title: "☕ Pause démarrée",
+          description: result.message,
+        });
+      } else {
+        toast({
+          title: "❌ Pause refusée",
+          description: result.message,
+          variant: "destructive"
+        });
+      }
     } catch (error) {
-      console.error('Erreur:', error);
+      console.error('Error starting break:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors du démarrage de la pause",
+        variant: "destructive",
+      });
     }
   };
 
@@ -230,38 +217,28 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
     if (!currentUserId) return;
     
     try {
-      const today = new Date().toISOString().split('T')[0];
-      const { data: activeTimesheets } = await supabase
-        .from('employee_timesheets')
-        .select('id')
-        .eq('user_id', currentUserId)
-        .eq('date', today)
-        .is('clock_out_time', null)
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-      const activeTimesheet = activeTimesheets && activeTimesheets.length > 0 ? activeTimesheets[0] : null;
-      if (!activeTimesheet) return;
-
-      // Terminer la pause active
-      const { error } = await supabase
-        .from('employee_breaks')
-        .update({
-          break_end_time: new Date().toISOString()
-        })
-        .eq('timesheet_id', activeTimesheet.id)
-        .is('break_end_time', null);
-
-      if (error) {
-        console.error('Erreur lors de la fin de pause:', error);
-        return;
-      }
-
-      console.log('Pause terminée avec succès');
-      setIsOnBreak(false);
+      const result = await endBreak(currentUserId);
       
+      if (result.success) {
+        setIsOnBreak(false);
+        toast({
+          title: "✅ Reprise du travail",
+          description: result.message,
+        });
+      } else {
+        toast({
+          title: "❌ Reprise refusée",
+          description: result.message,
+          variant: "destructive"
+        });
+      }
     } catch (error) {
-      console.error('Erreur:', error);
+      console.error('Error ending break:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la reprise du travail",
+        variant: "destructive",
+      });
     }
   };
 
