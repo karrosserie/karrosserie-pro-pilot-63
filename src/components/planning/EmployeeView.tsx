@@ -2,12 +2,18 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Play, Pause, CheckCircle, Calendar, User, BarChart } from 'lucide-react';
+import { Clock, Play, Pause, CheckCircle, Calendar, User, BarChart, Coffee, LogOut } from 'lucide-react';
 import { useEmployeeSchedule } from '@/hooks/use-employee-schedule';
 import { useCompany } from '@/hooks/use-company';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { EmployePointageModal } from '@/components/EmployePointageModal';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface EmployeeViewProps {
   employeeId?: string;
@@ -83,6 +89,72 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
     }
   };
 
+  const handleStartBreak = async () => {
+    if (!currentUserId) return;
+    
+    try {
+      // Récupérer la feuille de temps d'aujourd'hui
+      const today = new Date().toISOString().split('T')[0];
+      const { data: timesheet, error: timesheetError } = await supabase
+        .from('employee_timesheets')
+        .select('id')
+        .eq('user_id', currentUserId)
+        .eq('date', today)
+        .single();
+
+      if (timesheetError || !timesheet) {
+        console.error('Erreur récupération timesheet:', timesheetError);
+        return;
+      }
+
+      // Créer une nouvelle pause
+      const { error } = await supabase
+        .from('employee_breaks')
+        .insert({
+          timesheet_id: timesheet.id,
+          break_start_time: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error('Erreur lors du démarrage de la pause:', error);
+        return;
+      }
+
+      console.log('Pause démarrée avec succès');
+      // Vous pourriez vouloir rafraîchir les données ou afficher une notification
+      
+    } catch (error) {
+      console.error('Erreur:', error);
+    }
+  };
+
+  const handleClockOut = async () => {
+    if (!currentUserId) return;
+    
+    try {
+      // Récupérer la feuille de temps d'aujourd'hui
+      const today = new Date().toISOString().split('T')[0];
+      const { error } = await supabase
+        .from('employee_timesheets')
+        .update({
+          clock_out_time: new Date().toISOString()
+        })
+        .eq('user_id', currentUserId)
+        .eq('date', today);
+
+      if (error) {
+        console.error('Erreur lors du dépointage:', error);
+        return;
+      }
+
+      console.log('Dépointage effectué avec succès');
+      // Vous pourriez vouloir rafraîchir les données ou rediriger l'utilisateur
+      
+    } catch (error) {
+      console.error('Erreur:', error);
+    }
+  };
+
   const handleCompleteTask = async (taskId: string) => {
     try {
       // Mettre à jour le statut de la tâche dans Supabase
@@ -142,15 +214,32 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
             <p className="text-muted-foreground">Vue employé - {new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
           </div>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowPointageModal(true)}
-          className="flex items-center gap-2"
-        >
-          <BarChart className="w-4 h-4" />
-          Gestion des pointages
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <BarChart className="w-4 h-4" />
+              Gestion des pointages
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleStartBreak}>
+              <Coffee className="w-4 h-4 mr-2" />
+              Partir en pause
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleClockOut}>
+              <LogOut className="w-4 h-4 mr-2" />
+              Dépointer (fin de journée)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowPointageModal(true)}>
+              <BarChart className="w-4 h-4 mr-2" />
+              Voir mes statistiques
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Tâche en cours */}
