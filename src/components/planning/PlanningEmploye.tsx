@@ -10,6 +10,8 @@ import { GestionPointageDropdown } from './GestionPointageDropdown';
 import { RetourPauseModal } from './RetourPauseModal';
 import { clockIn } from '@/utils/pointageSupabaseUtils';
 import { usePointageStatus } from '@/hooks/usePointageStatus';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/use-user-role';
 
 interface PlanningEmployeProps {
   employe: any;
@@ -29,18 +31,23 @@ export const PlanningEmploye: React.FC<PlanningEmployeProps> = ({
   companyId
 }) => {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { userRole: actualUserRole } = useUserRole();
   
   console.log('🚀🚀🚀 PlanningEmploye rendu avec:', {
     employeId: employe?.id?.toString(),
     employeNom: employe?.nom,
     userRole,
+    actualUserRole,
+    userId: user?.id,
     tachesLength: taches?.length
   });
   console.log('🔍 DÉTAIL EMPLOYE:', employe);
 
   // Hook de pointage qui se déclenche à la connexion ET après dépointage
   // MAIS PAS lors des actions de tâches grâce au flag isTaskAction
-  const employeeId = employe?.id?.toString() || '';
+  // Utiliser l'ID utilisateur Supabase pour le pointage au lieu de l'ID employé
+  const employeeId = user?.id || '';
   const {
     showPointageModal,
     showRetourPauseModal,
@@ -50,15 +57,15 @@ export const PlanningEmploye: React.FC<PlanningEmployeProps> = ({
     refreshStatus
   } = usePointageStatus({
     employeeId: employeeId,
-    userRole: userRole || 'employe',
-    isEnabled: !!employeeId && !!userRole,
+    userRole: actualUserRole,
+    isEnabled: !!employeeId && !!actualUserRole,
     isTaskAction: false // Important : pas d'action de tâche en cours
   });
 
   const handlePointer = async () => {
     console.log('DEBUG - handlePointer called');
-    if (employe?.id) {
-      const result = await clockIn(employe.id.toString());
+    if (user?.id) {
+      const result = await clockIn(user.id);
       if (result.success) {
         toast({
           title: "✅ Pointage réussi",
@@ -289,7 +296,7 @@ export const PlanningEmploye: React.FC<PlanningEmployeProps> = ({
           })()}
           onPointer={handlePointer}
           employeNom={employe?.nom || ''}
-          employeId={employe?.id?.toString() || ''}
+          employeId={user?.id || ''}
         />
 
         {/* Modal de retour de pause - Géré par le hook usePointageStatus */}
@@ -297,7 +304,7 @@ export const PlanningEmploye: React.FC<PlanningEmployeProps> = ({
           isOpen={showRetourPauseModal}
           onRevenir={handleRetourPause}
           employeNom={employe?.nom || ''}
-          employeId={employe?.id || 0}
+          employeId={user?.id || ''}
         />
       </div>
   );

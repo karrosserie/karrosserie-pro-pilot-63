@@ -9,7 +9,7 @@ interface RetourPauseModalProps {
   isOpen: boolean;
   onRevenir: () => void;
   employeNom: string;
-  employeId: number;
+  employeId: string;  // Changé de number à string pour supporter les UUID
 }
 
 export const RetourPauseModal: React.FC<RetourPauseModalProps> = ({
@@ -21,7 +21,7 @@ export const RetourPauseModal: React.FC<RetourPauseModalProps> = ({
   const { toast } = useToast();
 
   const handleRevenirDePause = async () => {
-    const success = await terminerPause(employeId.toString());
+    const success = await terminerPause(employeId);  // employeId est maintenant déjà une string
     
     if (success) {
       onRevenir();

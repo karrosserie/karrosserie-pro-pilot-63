@@ -33,12 +33,20 @@ export function usePointageStatus({ employeeId, userRole, isEnabled = true, isTa
   const isCheckingStatus = useRef(false);
   const hasCompletedCheck = useRef(false); // ✅ Flag pour éviter les re-checks
 
+  // Fonction pour vérifier si l'utilisateur est un employé
+  const isEmployeeRole = (role: string | null): boolean => {
+    if (!role) return false;
+    const employeeRoles = ['employe', 'carrossier', 'carrossier-vehicule de courtoisie'];
+    return employeeRoles.includes(role);
+  };
+
   const checkPointageStatus = async (currentEmployeeId: string) => {
-    if (!currentEmployeeId || userRole !== 'employe' || !isEnabled || 
+    if (!currentEmployeeId || !isEmployeeRole(userRole) || !isEnabled || 
         isCheckingStatus.current || isTaskAction) {
       console.log('🚫 Vérification pointage BLOQUÉE:', {
         employeeId: !!currentEmployeeId,
         userRole,
+        isEmployeeRole: isEmployeeRole(userRole),
         isEnabled,
         isChecking: isCheckingStatus.current,
         isTaskAction
@@ -110,13 +118,13 @@ export function usePointageStatus({ employeeId, userRole, isEnabled = true, isTa
       isTaskAction
     });
     
-    if (employeeId && userRole === 'employe' && isEnabled && !isTaskAction) {
+    if (employeeId && isEmployeeRole(userRole) && isEnabled && !isTaskAction) {
       console.log('✅ Conditions remplies - Démarrage vérification statut pointage');
       checkPointageStatus(employeeId);
     } else {
       console.log('🚫 Vérification ignorée - Détail des conditions:', {
         hasEmployeeId: !!employeeId,
-        isEmployeeRole: userRole === 'employe',
+        isEmployeeRole: isEmployeeRole(userRole),
         isEnabled,
         isNotTaskAction: !isTaskAction,
         actualUserRole: userRole
