@@ -186,12 +186,35 @@ export function useQuotes() {
     }
   });
 
+  const archiveQuote = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('quotes')
+        .update({ archived: true })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error archiving quote:', error);
+        throw new Error(error.message);
+      }
+
+      return true;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['quotes'] });
+    },
+    onError: (error) => {
+      console.error('Archive quote error:', error);
+    }
+  });
+
   return {
     quotes,
     isLoading,
     error,
     createQuote,
     updateQuote,
-    deleteQuote
+    deleteQuote,
+    archiveQuote
   };
 }

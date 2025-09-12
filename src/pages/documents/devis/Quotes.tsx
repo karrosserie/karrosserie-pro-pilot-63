@@ -33,7 +33,7 @@ const Quotes = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { confirm } = useConfirmation();
-  const { quotes, isLoading, error, deleteQuote } = useQuotes();
+  const { quotes, isLoading, error, deleteQuote, archiveQuote } = useQuotes();
   const { sortedData: sortedQuotes, sortConfig, handleSort } = useTableSorting(quotes || [], 'reference');
   const [searchTerm, setSearchTerm] = useState('');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -43,14 +43,19 @@ const Quotes = () => {
   const [selectedQuoteForEmail, setSelectedQuoteForEmail] = useState<Quote | null>(null);
   const [prefilledRepairOrder, setPrefilledRepairOrder] = useState<Partial<RepairOrder> | null>(null);
   const [viewerModalOpen, setViewerModalOpen] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
   
-  const filteredQuotes = sortedQuotes?.filter(quote => 
-    quote.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (quote.clients && `${quote.clients.first_name} ${quote.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (quote.vehicles && `${quote.vehicles.car_brands?.name || 'Marque inconnue'} ${quote.vehicles.car_models?.name || 'Modèle inconnu'} - ${quote.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
-  ) || [];
+  const filteredQuotes = sortedQuotes?.filter(quote => {
+    const matchesSearch = quote.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (quote.clients && `${quote.clients.first_name} ${quote.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (quote.vehicles && `${quote.vehicles.car_brands?.name || 'Marque inconnue'} ${quote.vehicles.car_models?.name || 'Modèle inconnu'} - ${quote.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesArchiveStatus = showArchived ? quote.archived : !quote.archived;
+    
+    return matchesSearch && matchesArchiveStatus;
+  }) || [];
 
   const handleCreateQuote = () => {
     setSelectedQuote(null);
@@ -62,10 +67,37 @@ const Quotes = () => {
     setEditDialogOpen(true);
   };
 
+  const handleArchiveQuote = async (id: string) => {
+    const confirmed = await confirm({
+      title: 'Archiver le devis',
+      description: 'Êtes-vous sûr de vouloir archiver ce devis ? Vous pourrez le restaurer depuis l\'onglet "Documents archivés".',
+      confirmText: 'Archiver',
+      cancelText: 'Annuler',
+      variant: 'default'
+    });
+
+    if (confirmed) {
+      try {
+        await archiveQuote.mutateAsync(id);
+        toast({
+          title: "Devis archivé",
+          description: "Le devis a été archivé avec succès."
+        });
+      } catch (error: any) {
+        console.error('Error archiving quote:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible d'archiver le devis.",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
   const handleDeleteQuote = async (id: string) => {
     const confirmed = await confirm({
-      title: 'Supprimer le devis',
-      description: 'Êtes-vous sûr de vouloir supprimer ce devis ? Cette action est irréversible.',
+      title: 'Supprimer définitivement le devis',
+      description: 'Êtes-vous sûr de vouloir supprimer définitivement ce devis ? Cette action est irréversible.',
       confirmText: 'Supprimer',
       cancelText: 'Annuler',
       variant: 'destructive'
@@ -285,6 +317,30 @@ const Quotes = () => {
         <p className="text-gray-600 mt-1">
             Consultez et gérez les devis de réparation
         </p>
+        
+        {/* Onglets pour basculer entre actifs et archivés */}
+        <div className="flex space-x-1 mt-4 bg-gray-100 p-1 rounded-lg w-fit">
+          <button
+            onClick={() => setShowArchived(false)}
+            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              !showArchived 
+                ? 'bg-white text-gray-900 shadow-sm' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Devis actifs
+          </button>
+          <button
+            onClick={() => setShowArchived(true)}
+            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              showArchived 
+                ? 'bg-white text-gray-900 shadow-sm' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Documents archivés
+          </button>
+        </div>
       </div>
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">      
@@ -324,7 +380,7 @@ const Quotes = () => {
                 quote={quote}
                 onViewQuote={handleViewQuote}
                 onEditQuote={handleEditQuote}
-                onDeleteQuote={handleDeleteQuote}
+                onDeleteQuote={showArchived ? handleDeleteQuote : handleArchiveQuote}
                 onDownload={handleDownload}
                 onPrint={handlePrint}
                 onSendEmail={handleSendEmail}
@@ -440,9 +496,13 @@ const Quotes = () => {
                           </Button>
                         ) : null}
 
-                        <Button variant="delete" size="sm" onClick={() => handleDeleteQuote(quote.id)}>
+                        <Button 
+                          variant="delete" 
+                          size="sm" 
+                          onClick={() => showArchived ? handleDeleteQuote(quote.id) : handleArchiveQuote(quote.id)}
+                        >
                           <Trash className="h-4 w-4 mr-1" />
-                          Supprimer
+                          {showArchived ? 'Supprimer' : 'Archiver'}
                         </Button>
                       </div>
                     </TableCell>

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { RepairOrdersHeader } from '@/components/repair-orders/RepairOrdersHeader';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Search, Filter, Plus } from 'lucide-react';
 import { RepairOrdersTable } from '@/components/repair-orders/RepairOrdersTable';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
 import RepairOrderEmailDialog from '@/components/repair-orders/RepairOrderEmailDialog';
@@ -42,22 +44,24 @@ const RepairOrders = () => {
   const [selectedOrderForConversion, setSelectedOrderForConversion] = useState<RepairOrder | null>(null);
   const [selectedOrderForDeletion, setSelectedOrderForDeletion] = useState<RepairOrder | null>(null);
   const [prefilledInvoice, setPrefilledInvoice] = useState<Partial<Invoice> | null>(null);
+  const [showArchived, setShowArchived] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
   
-  const { orders, isLoading, error, deleteOrder } = useRepairOrders();
+  const { orders, isLoading, error, deleteOrder, archiveOrder } = useRepairOrders();
   
   const filteredOrders = orders?.filter(order => {
     const searchLower = searchTerm.toLowerCase();
     
     // Search by reference
+    let matchesSearch = false;
     if (order.reference?.toLowerCase().includes(searchLower)) {
-      return true;
+      matchesSearch = true;
     }
     
     // Search by client name
     if (order.clients && `${order.clients.first_name} ${order.clients.last_name}`.toLowerCase().includes(searchLower)) {
-      return true;
+      matchesSearch = true;
     }
     
     // Search by vehicle info
@@ -68,11 +72,19 @@ const RepairOrders = () => {
       const vehicleInfo = `${brand} ${model} - ${licensePlate}`.toLowerCase();
       
       if (vehicleInfo.includes(searchLower)) {
-        return true;
+        matchesSearch = true;
       }
     }
     
-    return false;
+    // Apply search filter
+    if (searchTerm && !matchesSearch) {
+      return false;
+    }
+    
+    // Apply archive filter
+    const matchesArchiveStatus = showArchived ? order.archived : !order.archived;
+    
+    return matchesArchiveStatus;
   }) || [];
 
   // Effet pour ouvrir automatiquement un ordre de réparation depuis l'URL
@@ -222,6 +234,23 @@ const RepairOrders = () => {
     setInvoiceDialogOpen(true);
   };
 
+  const handleArchiveOrder = async (order: RepairOrder) => {
+    try {
+      await archiveOrder.mutateAsync(order.id);
+      toast({
+        title: "Ordre de réparation archivé",
+        description: "L'ordre de réparation a été archivé avec succès."
+      });
+    } catch (error) {
+      console.error('Error archiving repair order:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'archiver l'ordre de réparation.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleDeleteOrder = (order: RepairOrder) => {
     setSelectedOrderForDeletion(order);
     setDeleteDialogOpen(true);
@@ -234,7 +263,11 @@ const RepairOrders = () => {
 
   const confirmDeleteOrder = () => {
     if (selectedOrderForDeletion) {
-      deleteOrder.mutate(selectedOrderForDeletion.id);
+      if (showArchived) {
+        deleteOrder.mutate(selectedOrderForDeletion.id);
+      } else {
+        handleArchiveOrder(selectedOrderForDeletion);
+      }
       setDeleteDialogOpen(false);
       setSelectedOrderForDeletion(null);
     }
@@ -258,11 +291,66 @@ const RepairOrders = () => {
   
   return (
     <div className="p-6 space-y-6">
-      <RepairOrdersHeader
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        onCreateOrder={handleCreateOrder}
-      />
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Ordres de réparation</h1>
+        <p className="text-gray-600 mt-1">
+          Consultez et gérez les ordres de réparation
+        </p>
+        
+        {/* Onglets pour basculer entre actifs et archivés */}
+        <div className="flex space-x-1 mt-4 bg-gray-100 p-1 rounded-lg w-fit">
+          <button
+            onClick={() => setShowArchived(false)}
+            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              !showArchived 
+                ? 'bg-white text-gray-900 shadow-sm' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Ordres actifs
+          </button>
+          <button
+            onClick={() => setShowArchived(true)}
+            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              showArchived 
+                ? 'bg-white text-gray-900 shadow-sm' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Documents archivés
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">      
+        <div className="flex-1" />
+        
+        <div className="flex items-center w-full md:w-auto space-x-2">
+          <div className="relative flex-1 md:w-60">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input 
+              placeholder="Rechercher un ordre..." 
+              className="pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          
+          <Button variant="outline" size="icon">
+            <Filter className="h-4 w-4" />
+          </Button>
+          
+          {!showArchived && (
+            <Button 
+              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+              onClick={handleCreateOrder}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Nouvel ordre
+            </Button>
+          )}
+        </div>
+      </div>
       
       {isMobile ? (
         <div className="space-y-3">
@@ -273,7 +361,7 @@ const RepairOrders = () => {
                 order={order}
                 onViewOrder={handleViewOrder}
                 onEditOrder={handleEditOrder}
-                onDeleteOrder={handleDeleteOrder}
+                onDeleteOrder={showArchived ? handleDeleteOrder : handleArchiveOrder}
                 contextMenuProps={{
                   onDownload: handleDownload,
                   onPrint: handlePrint,
@@ -300,7 +388,7 @@ const RepairOrders = () => {
         <RepairOrdersTable
           orders={filteredOrders}
           onEditOrder={handleEditOrder}
-          onDeleteOrder={handleDeleteOrder}
+          onDeleteOrder={showArchived ? handleDeleteOrder : handleArchiveOrder}
           onViewOrder={handleViewOrder}
           contextMenuProps={{
             onDownload: handleDownload,
@@ -349,15 +437,23 @@ const RepairOrders = () => {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer l'ordre de réparation</AlertDialogTitle>
+            <AlertDialogTitle>
+              {showArchived ? 'Supprimer définitivement l\'ordre de réparation' : 'Archiver l\'ordre de réparation'}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Êtes-vous sûr de vouloir supprimer cet ordre de réparation ? Cette action est irréversible et supprimera définitivement toutes les données associées.
+              {showArchived 
+                ? 'Êtes-vous sûr de vouloir supprimer définitivement cet ordre de réparation ? Cette action est irréversible et supprimera définitivement toutes les données associées.'
+                : 'Êtes-vous sûr de vouloir archiver cet ordre de réparation ? Vous pourrez le restaurer depuis l\'onglet "Documents archivés".'
+              }
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteOrder} className="bg-red-600 hover:bg-red-700">
-              Supprimer
+            <AlertDialogAction 
+              onClick={confirmDeleteOrder} 
+              className={showArchived ? "bg-red-600 hover:bg-red-700" : "bg-gray-600 hover:bg-gray-700"}
+            >
+              {showArchived ? 'Supprimer' : 'Archiver'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -54,3 +54,19 @@ export const deleteRepairOrder = async (id: string) => {
   
   return true;
 };
+
+export const archiveRepairOrder = async (id: string) => {
+  const { data, error } = await supabase
+    .from('repair_orders')
+    .update({ archived: true })
+    .eq('id', id)
+    .select()
+    .single();
+    
+  if (error) {
+    console.error(`Error archiving repair order with id ${id}:`, error);
+    throw new Error(error.message);
+  }
+  
+  return data;
+};

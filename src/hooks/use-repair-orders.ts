@@ -87,12 +87,25 @@ export function useRepairOrders() {
     }
   });
 
+  const archiveOrder = useMutation({
+    mutationFn: async (id: string) => {
+      return await repairOrdersService.archive(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['repair-orders'] });
+    },
+    onError: (error) => {
+      console.error('Archive repair order error:', error);
+    }
+  });
+
   return {
     orders,
     isLoading,
     error,
     createOrder,
     updateOrder,
-    deleteOrder
+    deleteOrder,
+    archiveOrder
   };
 }

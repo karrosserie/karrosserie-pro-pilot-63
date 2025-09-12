@@ -90,10 +90,11 @@ const Credits = () => {
   const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [selectedCredit, setSelectedCredit] = useState<any>(null);
+  const [showArchived, setShowArchived] = useState(false);
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   
-  const { credits = [], isLoading, deleteCredit, error } = useCredits();
+  const { credits = [], isLoading, deleteCredit, archiveCredit, error } = useCredits();
   const { invoices } = useInvoices();
   const { sortedData, sortConfig, handleSort } = useTableSorting(credits, 'created_at');
   const isMobile = useIsMobile();
@@ -160,11 +161,15 @@ const Credits = () => {
     return '-';
   };
   
-  const filteredCredits = sortedData?.filter(credit => 
-    credit.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (credit.clients && `${credit.clients.first_name} ${credit.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    formatVehicleDisplay(credit).toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredCredits = sortedData?.filter(credit => {
+    const matchesSearch = credit.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (credit.clients && `${credit.clients.first_name} ${credit.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      formatVehicleDisplay(credit).toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesArchiveStatus = showArchived ? credit.archived : !credit.archived;
+    
+    return matchesSearch && matchesArchiveStatus;
+  }) || [];
 
   const getStatusColor = (status: string) => {
     switch (status) {

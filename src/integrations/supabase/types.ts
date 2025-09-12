@@ -655,6 +655,7 @@ export type Database = {
       credits: {
         Row: {
           amount: number
+          archived: boolean
           company_id: string | null
           created_at: string
           id: string
@@ -667,6 +668,7 @@ export type Database = {
         }
         Insert: {
           amount?: number
+          archived?: boolean
           company_id?: string | null
           created_at?: string
           id?: string
@@ -679,6 +681,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          archived?: boolean
           company_id?: string | null
           created_at?: string
           id?: string
@@ -1853,6 +1856,7 @@ export type Database = {
       quotes: {
         Row: {
           amount: number
+          archived: boolean
           claim_number: string | null
           client_id: string | null
           company_id: string | null
@@ -1878,6 +1882,7 @@ export type Database = {
         }
         Insert: {
           amount: number
+          archived?: boolean
           claim_number?: string | null
           client_id?: string | null
           company_id?: string | null
@@ -1903,6 +1908,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          archived?: boolean
           claim_number?: string | null
           client_id?: string | null
           company_id?: string | null
@@ -2008,6 +2014,7 @@ export type Database = {
       }
       repair_orders: {
         Row: {
+          archived: boolean
           arrival_date: string | null
           claim_number: string | null
           cleanliness_condition: string | null
@@ -2040,6 +2047,7 @@ export type Database = {
           vehicle_id: string | null
         }
         Insert: {
+          archived?: boolean
           arrival_date?: string | null
           claim_number?: string | null
           cleanliness_condition?: string | null
@@ -2072,6 +2080,7 @@ export type Database = {
           vehicle_id?: string | null
         }
         Update: {
+          archived?: boolean
           arrival_date?: string | null
           claim_number?: string | null
           cleanliness_condition?: string | null
