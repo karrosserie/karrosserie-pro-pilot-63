@@ -103,20 +103,19 @@ const DepotDossier = () => {
   };
   const confirmDeposit = async () => {
     setShowConfirmModal(false);
-    setCurrentStep(3); // Avancer à l'étape "Envoyé"
     setIsDepositing(true);
     setProgress(0);
     const loadingSteps = ['Vérification des documents...', 'Connexion au portail du tribunal...', 'Téléchargement des pièces jointes...', 'Validation de la requête...', 'Paiement des frais de greffe...', 'Confirmation du dépôt...'];
+    
     for (let i = 0; i < loadingSteps.length; i++) {
       setLoadingText(loadingSteps[i]);
       setProgress((i + 1) / loadingSteps.length * 100);
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // Progresser les étapes pendant le processus
+      // Progresser uniquement jusqu'à l'étape "Envoyé" (étape 3)
       if (i === 1) setCurrentStep(3); // Étape Envoyé
-      if (i === 3) setCurrentStep(4); // Étape Reçu
-      if (i === 4) setCurrentStep(5); // Étape Suivi
     }
+    
     setIsDepositing(false);
 
     // Préparer les données de résultat
