@@ -235,25 +235,24 @@ const DepotDossier = () => {
       <div className="container mx-auto p-8 max-w-5xl">
         {/* Accusé de réception - Affiché après succès du dépôt */}
         {depositResult && (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8 shadow-sm">
-            <div className="flex items-start space-x-4">
+          <div className="bg-white border border-slate-200 rounded-xl p-8 mb-8 shadow-sm">
+            <div className="flex items-start space-x-4 mb-6">
               <div className="flex-shrink-0">
                 <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                   <CheckCircle className="w-6 h-6 text-green-600" />
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-green-900 mb-2">
+                <h3 className="text-xl font-bold text-slate-900 mb-2">
                   🏛️ Dossier reçu par le tribunal
                 </h3>
-                <p className="text-green-800 mb-4 text-sm leading-relaxed">
+                <p className="text-slate-700 mb-6 text-sm">
                   Vous recevrez sous 8 à 15 jours votre numéro RG (Répertoire Général), et le nom du juge qui s'occupera du dossier.
                 </p>
-                <div className="flex space-x-3">
+                <div className="flex space-x-3 mb-6">
                   <button 
                     className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
                     onClick={() => {
-                      // Simuler l'ouverture de l'accusé de réception
                       window.open('about:blank', '_blank');
                     }}
                   >
@@ -263,7 +262,6 @@ const DepotDossier = () => {
                   <button 
                     className="px-4 py-2 bg-green-100 text-green-700 border border-green-300 text-sm font-medium rounded-md hover:bg-green-200 transition-colors flex items-center gap-2"
                     onClick={() => {
-                      // Simuler le téléchargement de l'accusé de réception
                       const link = document.createElement('a');
                       link.href = 'data:text/plain;charset=utf-8,Accusé de réception - Dossier ' + selectedCase.reference;
                       link.download = `Accuse_reception_${selectedCase.reference}.pdf`;
@@ -273,6 +271,104 @@ const DepotDossier = () => {
                     <Download className="w-4 h-4" />
                     Télécharger
                   </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Contenu détaillé des phases */}
+            <div className="border-t border-slate-200 pt-6 space-y-8">
+              {/* PHASE 1 */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  📋 PHASE 1 : INSTRUCTION DU DOSSIER
+                </h4>
+                
+                <div className="space-y-4 pl-4">
+                  <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
+                    <h5 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                      🏛️ Attribution et enregistrement
+                    </h5>
+                    <div className="space-y-1 text-sm text-blue-800">
+                      <p><strong>Formalité :</strong> Enregistrement au greffe avec numéro RG (Répertoire Général)</p>
+                      <p><strong>Attribution :</strong> Désignation automatique du juge compétent</p>
+                      <p><strong>Récépissé :</strong> Accusé de réception du greffe (obligatoire)</p>
+                      <p><strong>Délai :</strong> 8-15 jours après réception</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-orange-50 border-l-4 border-orange-500 p-4">
+                    <h5 className="font-semibold text-orange-900 mb-2 flex items-center gap-2">
+                      📊 Contrôle de recevabilité
+                    </h5>
+                    <div className="space-y-1 text-sm text-orange-800">
+                      <p><strong>Vérification :</strong> Compétence territoriale et matérielle</p>
+                      <p><strong>Pièces :</strong> Contrôle exhaustivité du dossier</p>
+                      <p><strong>Taxes :</strong> Vérification paiement droit de greffe (38€)</p>
+                      <p><strong>Décision :</strong> Acceptation ou demande de régularisation</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* PHASE 2 */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  ⚖️ PHASE 2 : EXAMEN AU FOND
+                </h4>
+                
+                <div className="space-y-4 pl-4">
+                  <div className="bg-purple-50 border-l-4 border-purple-500 p-4">
+                    <h5 className="font-semibold text-purple-900 mb-2 flex items-center gap-2">
+                      🔍 Instruction sur pièces (Article 1405 CPC)
+                    </h5>
+                    <p className="text-sm text-purple-800 mb-2">
+                      <strong>Formalité :</strong> "Ordonnance sur requête en injonction de payer"
+                    </p>
+                    <div className="space-y-1 text-sm text-purple-800">
+                      <p><strong>Délai d'instruction :</strong> 15 jours à 6 semaines</p>
+                      <p><strong>Examen :</strong> Créance certaine, liquide et exigible</p>
+                      <p><strong>Décision :</strong> Rendu d'ordonnance portant injonction</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-indigo-50 border-l-4 border-indigo-500 p-4">
+                    <h5 className="font-semibold text-indigo-900 mb-2 flex items-center gap-2">
+                      📋 Contrôles effectués par le juge
+                    </h5>
+                    <div className="space-y-1 text-sm text-indigo-800">
+                      <p><strong>Créance certaine :</strong> Existence incontestable</p>
+                      <p><strong>Créance liquide :</strong> Montant déterminable</p>
+                      <p><strong>Créance exigible :</strong> Échéance dépassée</p>
+                      <p><strong>Justificatifs :</strong> Conformité des pièces</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* PHASE 3 */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  📄 PHASE 3 : DÉCISION DU TRIBUNAL
+                </h4>
+                
+                <div className="pl-4">
+                  <div className="bg-green-50 border-l-4 border-green-500 p-4">
+                    <h5 className="font-semibold text-green-900 mb-2 flex items-center gap-2">
+                      ✅ Ordonnance portant injonction de payer
+                    </h5>
+                    <p className="text-sm text-green-800 mb-3">
+                      <strong>Formalité :</strong> "Minute d'ordonnance"
+                    </p>
+                    <div className="space-y-1 text-sm text-green-800">
+                      <p className="font-medium mb-2">Contenu obligatoire :</p>
+                      <ul className="list-disc list-inside space-y-1 ml-2">
+                        <li>Nom du créancier et débiteur</li>
+                        <li>Montant accordé (principal + intérêts + frais)</li>
+                        <li>Formule exécutoire</li>
+                        <li>Délai et modalités de signification</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
