@@ -13,7 +13,7 @@ import { ProcessConfig } from "./ProcessConfig";
 import { useUserRole } from "@/hooks/use-user-role";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { isWithinInterval, isSameWeek, startOfWeek, addDays, parseISO, isValid } from 'date-fns';
+import { isSameWeek, startOfWeek, addDays, parseISO, isValid, parse } from 'date-fns';
 
 
 interface WorkshopPlanningInterfaceProps {
@@ -75,14 +75,73 @@ export const WorkshopPlanningInterface = ({
   // Gérer le changement de semaine dans le calendrier
   const handleWeekChange = (weekStart: Date, weekEnd: Date) => {
     console.log('📅 Changement de semaine:', { weekStart, weekEnd });
-    // Filtrer les données selon la semaine si nécessaire
-    // Pour l'instant, on utilise toutes les données planningTaches
-    setCurrentWeekData(planningTaches);
+
+    const tryParse = (raw: any): Date | null => {
+      if (!raw) return null;
+      try {
+        if (typeof raw === 'string') {
+          const iso = parseISO(raw);
+          if (isValid(iso)) return iso;
+          const frParsed = parse(raw, 'dd/MM/yyyy', new Date());
+          if (isValid(frParsed)) return frParsed;
+        } else {
+          const d = new Date(raw);
+          if (isValid(d)) return d;
+        }
+      } catch {}
+      return null;
+    };
+
+    const filtered = (planningTaches || []).filter((t) => {
+      const rawDate =
+        (t as any).start_datetime ||
+        (t as any).dateAssignation ||
+        (t as any).date ||
+        (t as any).startDate ||
+        (t as any).date_debut ||
+        (t as any).dateTime;
+      const d = tryParse(rawDate);
+      if (!d) return false; // exclure si pas de date pour la navigation par semaine
+      return isSameWeek(d, weekStart, { weekStartsOn: 1 });
+    });
+
+    setCurrentWeekData(filtered);
   };
 
   // Initialiser les données de la semaine courante
   useEffect(() => {
-    setCurrentWeekData(planningTaches);
+    const currentMonday = startOfWeek(new Date(), { weekStartsOn: 1 });
+
+    const tryParse = (raw: any): Date | null => {
+      if (!raw) return null;
+      try {
+        if (typeof raw === 'string') {
+          const iso = parseISO(raw);
+          if (isValid(iso)) return iso;
+          const frParsed = parse(raw, 'dd/MM/yyyy', new Date());
+          if (isValid(frParsed)) return frParsed;
+        } else {
+          const d = new Date(raw);
+          if (isValid(d)) return d;
+        }
+      } catch {}
+      return null;
+    };
+
+    const initial = (planningTaches || []).filter((t) => {
+      const rawDate =
+        (t as any).start_datetime ||
+        (t as any).dateAssignation ||
+        (t as any).date ||
+        (t as any).startDate ||
+        (t as any).date_debut ||
+        (t as any).dateTime;
+      const d = tryParse(rawDate);
+      if (!d) return true; // par défaut, inclure ceux sans date sur la semaine courante
+      return isSameWeek(d, currentMonday, { weekStartsOn: 1 });
+    });
+
+    setCurrentWeekData(initial);
   }, [planningTaches]);
 
   // Déterminer si l'utilisateur peut changer de vue

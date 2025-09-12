@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Clock, User, MapPin } from 'lucide-react';
-import { startOfWeek, addWeeks, format, addDays, isSameWeek, parseISO, isValid } from 'date-fns';
+import { startOfWeek, addWeeks, format, addDays, isSameWeek, parseISO, isValid, parse } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 interface PlanningTask {
@@ -103,9 +103,21 @@ export const PlanningCalendar = ({
 
       if (rawDate) {
         try {
-          scheduleDate = typeof rawDate === 'string' ? parseISO(rawDate) : new Date(rawDate);
-          if (!isValid(scheduleDate)) {
-            scheduleDate = null;
+          if (typeof rawDate === 'string') {
+            const iso = parseISO(rawDate);
+            if (isValid(iso)) {
+              scheduleDate = iso;
+            } else {
+              const frParsed = parse(rawDate, 'dd/MM/yyyy', new Date());
+              if (isValid(frParsed)) {
+                scheduleDate = frParsed;
+              } else {
+                scheduleDate = null;
+              }
+            }
+          } else {
+            const d = new Date(rawDate);
+            scheduleDate = isValid(d) ? d : null;
           }
         } catch {
           scheduleDate = null;
@@ -124,8 +136,11 @@ export const PlanningCalendar = ({
 
       // Déterminer le jour cible
       let dayKey: string | null = null;
-      if (schedule.jour && days[schedule.jour]) {
-        dayKey = schedule.jour;
+      if (schedule.jour) {
+        const key = String(schedule.jour).toLowerCase();
+        if (days[key]) {
+          dayKey = key;
+        }
       } else if (scheduleDate) {
         const frenchDay = format(scheduleDate, 'EEEE', { locale: fr }).toLowerCase();
         if (days[frenchDay]) {
