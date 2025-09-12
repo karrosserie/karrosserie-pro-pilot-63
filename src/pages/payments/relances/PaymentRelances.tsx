@@ -595,20 +595,20 @@ Garage Martin`
         {/* View Toggle Buttons */}
         <div className="flex gap-2 mt-4">
           <Button
-            variant={currentView === 'relances' ? 'default' : 'outline'}
-            onClick={() => setCurrentView('relances')}
-            className="flex items-center gap-2"
-          >
-            <AlertTriangle className="h-4 w-4" />
-            Récapitulatif
-          </Button>
-          <Button
             variant={currentView === 'campagnes' ? 'default' : 'outline'}
             onClick={() => setCurrentView('campagnes')}
             className="flex items-center gap-2"
           >
             <Mail className="h-4 w-4" />
             Relance de paiement
+          </Button>
+          <Button
+            variant={currentView === 'relances' ? 'default' : 'outline'}
+            onClick={() => setCurrentView('relances')}
+            className="flex items-center gap-2"
+          >
+            <AlertTriangle className="h-4 w-4" />
+            Récapitulatif
           </Button>
         </div>
       </div>
