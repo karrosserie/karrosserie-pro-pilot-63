@@ -14,6 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { clockIn } from '@/utils/pointageSupabaseUtils';
 
 interface EmployeeViewProps {
   employeeId?: string;
@@ -39,28 +40,37 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
     
     try {
       const today = new Date().toISOString().split('T')[0];
-      const { data: timesheet } = await supabase
+      const { data: timesheets } = await supabase
         .from('employee_timesheets')
         .select('id, clock_out_time')
         .eq('user_id', currentUserId)
         .eq('date', today)
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(1);
 
-      if (timesheet) {
-        // Vérifier si l'employé a déjà dépointé
-        if (timesheet.clock_out_time) {
+      const lastTimesheet = timesheets && timesheets.length > 0 ? timesheets[0] : null;
+      
+      if (lastTimesheet) {
+        // Vérifier si l'employé a déjà dépointé (dernier timesheet fermé)
+        if (lastTimesheet.clock_out_time) {
           setIsClockedOut(true);
           return;
         }
 
-        const { data: activeBreak } = await supabase
+        // Timesheet actif, vérifier si en pause
+        setIsClockedOut(false);
+        const { data: activeBreaks } = await supabase
           .from('employee_breaks')
           .select('id')
-          .eq('timesheet_id', timesheet.id)
+          .eq('timesheet_id', lastTimesheet.id)
           .is('break_end_time', null)
-          .single();
+          .limit(1);
 
-        setIsOnBreak(!!activeBreak);
+        setIsOnBreak(activeBreaks && activeBreaks.length > 0);
+      } else {
+        // Aucun timesheet aujourd'hui
+        setIsClockedOut(false);
+        setIsOnBreak(false);
       }
     } catch (error) {
       console.error('Erreur vérification pause:', error);
@@ -136,17 +146,20 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
     if (!currentUserId) return;
     
     try {
-      // Récupérer la feuille de temps d'aujourd'hui
+      // Récupérer le timesheet actif d'aujourd'hui
       const today = new Date().toISOString().split('T')[0];
-      const { data: timesheet, error: timesheetError } = await supabase
+      const { data: activeTimesheets } = await supabase
         .from('employee_timesheets')
         .select('id')
         .eq('user_id', currentUserId)
         .eq('date', today)
-        .single();
+        .is('clock_out_time', null)
+        .order('created_at', { ascending: false })
+        .limit(1);
 
-      if (timesheetError || !timesheet) {
-        console.error('Erreur récupération timesheet:', timesheetError);
+      const activeTimesheet = activeTimesheets && activeTimesheets.length > 0 ? activeTimesheets[0] : null;
+      if (!activeTimesheet) {
+        console.error('Aucun timesheet actif trouvé');
         return;
       }
 
@@ -154,7 +167,7 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
       const { error } = await supabase
         .from('employee_breaks')
         .insert({
-          timesheet_id: timesheet.id,
+          timesheet_id: activeTimesheet.id,
           break_start_time: new Date().toISOString()
         });
 
@@ -176,14 +189,17 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
     
     try {
       const today = new Date().toISOString().split('T')[0];
-      const { data: timesheet } = await supabase
+      const { data: activeTimesheets } = await supabase
         .from('employee_timesheets')
         .select('id')
         .eq('user_id', currentUserId)
         .eq('date', today)
-        .single();
+        .is('clock_out_time', null)
+        .order('created_at', { ascending: false })
+        .limit(1);
 
-      if (!timesheet) return;
+      const activeTimesheet = activeTimesheets && activeTimesheets.length > 0 ? activeTimesheets[0] : null;
+      if (!activeTimesheet) return;
 
       // Terminer la pause active
       const { error } = await supabase
@@ -191,7 +207,7 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
         .update({
           break_end_time: new Date().toISOString()
         })
-        .eq('timesheet_id', timesheet.id)
+        .eq('timesheet_id', activeTimesheet.id)
         .is('break_end_time', null);
 
       if (error) {
@@ -211,7 +227,7 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
     if (!currentUserId) return;
     
     try {
-      // Récupérer la feuille de temps d'aujourd'hui
+      // Dépointer le timesheet actif uniquement
       const today = new Date().toISOString().split('T')[0];
       const { error } = await supabase
         .from('employee_timesheets')
@@ -219,7 +235,8 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
           clock_out_time: new Date().toISOString()
         })
         .eq('user_id', currentUserId)
-        .eq('date', today);
+        .eq('date', today)
+        .is('clock_out_time', null);
 
       if (error) {
         console.error('Erreur lors du dépointage:', error);
@@ -235,31 +252,21 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   };
 
   const handleClockIn = async () => {
-    if (!currentUserId || !companyInfo?.id) return;
+    if (!currentUserId) return;
     
     try {
-      const today = new Date().toISOString().split('T')[0];
+      // Utiliser la fonction clockIn de pointageSupabaseUtils
+      const result = await clockIn(currentUserId);
       
-      // Créer une nouvelle feuille de temps pour aujourd'hui
-      const { error } = await supabase
-        .from('employee_timesheets')
-        .insert({
-          user_id: currentUserId,
-          company_id: companyInfo.id,
-          date: today,
-          clock_in_time: new Date().toISOString()
-        });
-
-      if (error) {
-        console.error('Erreur lors du pointage:', error);
-        return;
+      if (result.success) {
+        console.log('Pointage effectué avec succès');
+        setIsClockedOut(false);
+        setShowPointageModal(false);
+        // Rafraîchir les données
+        checkBreakStatus();
+      } else {
+        console.error('Erreur lors du pointage:', result.message);
       }
-
-      console.log('Pointage effectué avec succès');
-      setIsClockedOut(false);
-      setShowPointageModal(false);
-      // Rafraîchir les données
-      checkBreakStatus();
       
     } catch (error) {
       console.error('Erreur:', error);
