@@ -233,34 +233,41 @@ const TeamTab = () => {
         newData: data
       });
 
-      // 1. Mettre à jour le profil utilisateur via l'edge function
-      const { data: session } = await supabase.auth.getSession();
-      
-      const response = await fetch(`https://jukdsypvuehnniskgpfd.supabase.co/functions/v1/update-user`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.session?.access_token}`,
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1a2RzeXB2dWVobm5pc2tncGZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc5OTA5MTIsImV4cCI6MjA2MzU2NjkxMn0.fJcqL0Sg_x7AXacC6lhqic-VWhvI46D3tFgRcpgchxo',
-        },
-        body: JSON.stringify({
-          userId: editingMember.user_id,
-          profileData: {
-            first_name: data.firstName,
-            last_name: data.lastName,
-            phone_number: data.phoneNumber
-          }
-        }),
-      });
+      // Déterminer si une mise à jour du profil est nécessaire (prénom/nom/téléphone)
+      const needsProfileUpdate = (
+        (data.firstName || '') !== (editingMember.profiles?.first_name || '') ||
+        (data.lastName || '') !== (editingMember.profiles?.last_name || '') ||
+        (data.phoneNumber || '') !== (editingMember.profiles?.phone_number || '')
+      );
 
-      const result = await response.json();
-      console.log('Résultat edge function:', result);
+      // 1) Mettre à jour le profil uniquement si nécessaire
+      if (needsProfileUpdate) {
+        const { data: session } = await supabase.auth.getSession();
+        const response = await fetch(`https://jukdsypvuehnniskgpfd.supabase.co/functions/v1/update-user`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.session?.access_token}`,
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1a2RzeXB2dWVobm5pc2tncGZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc5OTA5MTIsImV4cCI6MjA2MzU2NjkxMn0.fJcqL0Sg_x7AXacC6lhqic-VWhvI46D3tFgRcpgchxo',
+          },
+          body: JSON.stringify({
+            userId: editingMember.user_id,
+            profileData: {
+              first_name: data.firstName,
+              last_name: data.lastName,
+              phone_number: data.phoneNumber
+            }
+          }),
+        });
 
-      if (!response.ok) {
-        throw new Error(result.error || 'Erreur lors de la mise à jour du profil');
+        const result = await response.json();
+        console.log('Résultat edge function:', result);
+        if (!response.ok) {
+          throw new Error(result.error || 'Erreur lors de la mise à jour du profil');
+        }
       }
 
-      // 2. Mettre à jour le rôle et le statut actif dans user_companies
+      // 2) Mettre à jour le rôle et le statut actif dans user_companies
       const { error: userCompanyError } = await supabase
         .from('user_companies')
         .update({
