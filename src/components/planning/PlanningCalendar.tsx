@@ -90,25 +90,50 @@ export const PlanningCalendar = ({
       'vendredi': []
     };
 
-    schedules.forEach(schedule => {
-      if (!schedule.jour || !days[schedule.jour]) return;
-      
-      // Filtrer par semaine si une date est disponible
-      if (schedule.date) {
-        let scheduleDate: Date;
+    schedules.forEach((schedule) => {
+      // Tenter de trouver une date exploitable
+      let scheduleDate: Date | null = null;
+      const rawDate =
+        schedule.start_datetime ||
+        schedule.startDate ||
+        schedule.date ||
+        schedule.date_debut ||
+        schedule.dateTime;
+
+      if (rawDate) {
         try {
-          scheduleDate = typeof schedule.date === 'string' ? parseISO(schedule.date) : new Date(schedule.date);
-          if (!isValid(scheduleDate)) return;
-          
-          // Vérifier si la tâche appartient à la semaine actuelle
-          if (!isSameWeek(scheduleDate, currentWeekStart, { weekStartsOn: 1 })) {
-            return;
+          scheduleDate = typeof rawDate === 'string' ? parseISO(rawDate) : new Date(rawDate);
+          if (!isValid(scheduleDate)) {
+            scheduleDate = null;
           }
         } catch {
-          // Si la date n'est pas valide, continuer sans filtrage par date
+          scheduleDate = null;
         }
       }
-      
+
+      // Si on a une date valide, filtrer par semaine sélectionnée
+      if (scheduleDate) {
+        if (!isSameWeek(scheduleDate, currentWeekStart, { weekStartsOn: 1 })) {
+          return; // Pas la bonne semaine
+        }
+      } else {
+        // Aucune date: n'afficher que sur la semaine courante (offset 0)
+        if (currentWeek !== 0) return;
+      }
+
+      // Déterminer le jour cible
+      let dayKey: string | null = null;
+      if (schedule.jour && days[schedule.jour]) {
+        dayKey = schedule.jour;
+      } else if (scheduleDate) {
+        const frenchDay = format(scheduleDate, 'EEEE', { locale: fr }).toLowerCase();
+        if (days[frenchDay]) {
+          dayKey = frenchDay;
+        }
+      }
+
+      if (!dayKey) return; // Impossible de placer ce task dans la grille
+
       const task: PlanningTask = {
         id: schedule.id,
         time: schedule.heure || '0h-0h',
@@ -122,11 +147,11 @@ export const PlanningCalendar = ({
         color: getStageColor(schedule.etape || '')
       };
 
-      days[schedule.jour].push(task);
+      days[dayKey].push(task);
     });
 
     return days;
-  }, [schedules, currentWeekStart]);
+  }, [schedules, currentWeekStart, currentWeek]);
 
   const weekDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'];
   const weekDaysDisplay = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
