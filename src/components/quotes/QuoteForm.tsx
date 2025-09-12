@@ -6,8 +6,7 @@ import { Quote } from '@/services/supabase/quotes';
 import { QuoteBasicInfoSection } from './form/QuoteBasicInfoSection';
 import { QuoteAssignmentSection } from './form/QuoteAssignmentSection';
 import { QuoteDetailsSection } from './form/QuoteDetailsSection';
-import { QuoteRepairsSection } from './form/QuoteRepairsSection';
-import { QuotePartsSection } from './form/QuotePartsSection';
+import { QuoteRepairsAndPartsSection } from './form/QuoteRepairsAndPartsSection';
 import { QuoteDiscountsSection } from './form/QuoteDiscountsSection';
 import { QuoteFormActions } from './form/QuoteFormActions';
 import { useQuoteFormLogic } from './form/useQuoteFormLogic';
@@ -114,14 +113,10 @@ export const QuoteForm = ({
         errors={errors}
       />
 
-      <QuoteRepairsSection 
+      <QuoteRepairsAndPartsSection 
         repairs={repairs}
-        onRepairsChange={setRepairs}
-        isReadOnly={isReadOnly}
-      />
-
-      <QuotePartsSection 
         parts={parts}
+        onRepairsChange={setRepairs}
         onPartsChange={setParts}
         isReadOnly={isReadOnly}
       />
