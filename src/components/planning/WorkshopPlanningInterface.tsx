@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,29 +37,8 @@ export const WorkshopPlanningInterface = ({
   onScheduleUpdate,
   onOpenUrgenceModal
 }: WorkshopPlanningInterfaceProps) => {
-  // Force cache refresh
-  console.log('🔄 WorkshopPlanningInterface reloaded with real data');
-  console.log('🔍 WorkshopPlanningInterface - Schedules received:', schedules);
-  console.log('🔍 WorkshopPlanningInterface - Schedules structure:', schedules.map(s => ({
-    id: s.id,
-    task_type: s.task_type,
-    tache: s.tache,
-    etape: s.etape,
-    vehicule: s.vehicule,
-    technicien: s.technicien
-  })));
   const { userRole, isCarrossier, isCarrossierCourtesy, isResponsable, isOwner, isLoading } = useUserRole();
   const navigate = useNavigate();
-  
-  // Debug logs pour comprendre le problème de rôle
-  console.log('🔍 WorkshopPlanningInterface - User Role Debug:', {
-    userRole,
-    isOwner,
-    isCarrossier,
-    isCarrossierCourtesy,
-    isResponsable,
-    isLoading
-  });
   
   // Déterminer la vue par défaut selon le rôle
   const getDefaultView = () => {
@@ -72,10 +51,12 @@ export const WorkshopPlanningInterface = ({
   const [activeView, setActiveView] = useState<'manager' | 'employee'>(getDefaultView());
   const [currentWeekData, setCurrentWeekData] = useState<any[]>([]);
 
-  // Gérer le changement de semaine dans le calendrier
-  const handleWeekChange = useCallback((weekStart: Date, weekEnd: Date) => {
-    console.log('📅 Changement de semaine:', { weekStart, weekEnd });
+  // Ref pour conserver la dernière valeur de planningTaches
+  const planningRef = useRef(planningTaches);
+  planningRef.current = planningTaches;
 
+  // Gérer le changement de semaine dans le calendrier (stabilisé)
+  const handleWeekChange = useCallback((weekStart: Date, weekEnd: Date) => {
     const tryParse = (raw: any): Date | null => {
       if (!raw) return null;
       try {
@@ -92,7 +73,7 @@ export const WorkshopPlanningInterface = ({
       return null;
     };
 
-    const filtered = (planningTaches || []).filter((t) => {
+    const filtered = (planningRef.current || []).filter((t) => {
       const rawDate =
         (t as any).start_datetime ||
         (t as any).dateAssignation ||
@@ -101,12 +82,35 @@ export const WorkshopPlanningInterface = ({
         (t as any).date_debut ||
         (t as any).dateTime;
       const d = tryParse(rawDate);
-      if (!d) return false; // exclure si pas de date pour la navigation par semaine
+      if (!d) return false;
       return isSameWeek(d, weekStart, { weekStartsOn: 1 });
     });
 
-    setCurrentWeekData(filtered);
-  }, [planningTaches]);
+    // Comparaison légère pour éviter des setState inutiles
+    setCurrentWeekData(prev => {
+      if (prev.length === filtered.length && 
+          prev.every((p, i) => p.id === filtered[i]?.id)) {
+        return prev; // Aucun changement
+      }
+      return filtered;
+    });
+  }, []); // Dépendances vides pour stabiliser la référence
+
+  // Logs de debug déplacés dans un useEffect conditionnel
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.log('🔄 WorkshopPlanningInterface reloaded with real data');
+      console.log('🔍 WorkshopPlanningInterface - Schedules received:', schedules.length, 'items');
+      console.log('🔍 WorkshopPlanningInterface - User Role Debug:', {
+        userRole,
+        isOwner,
+        isCarrossier,
+        isCarrossierCourtesy,
+        isResponsable,
+        isLoading
+      });
+    }
+  }, [schedules.length, userRole, isOwner, isCarrossier, isCarrossierCourtesy, isResponsable, isLoading]);
 
   // Initialiser les données de la semaine courante
   useEffect(() => {
@@ -137,11 +141,17 @@ export const WorkshopPlanningInterface = ({
         (t as any).date_debut ||
         (t as any).dateTime;
       const d = tryParse(rawDate);
-      if (!d) return true; // par défaut, inclure ceux sans date sur la semaine courante
+      if (!d) return true;
       return isSameWeek(d, currentMonday, { weekStartsOn: 1 });
     });
 
-    setCurrentWeekData(initial);
+    setCurrentWeekData(prev => {
+      if (prev.length === initial.length && 
+          prev.every((p, i) => p.id === initial[i]?.id)) {
+        return prev;
+      }
+      return initial;
+    });
   }, [planningTaches]);
 
   // Déterminer si l'utilisateur peut changer de vue

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Clock, User, MapPin } from 'lucide-react';
 import { startOfWeek, addWeeks, format, addDays, isSameWeek, parseISO, isValid, parse } from 'date-fns';
@@ -72,13 +72,17 @@ export const PlanningCalendar = ({
     );
   }, [currentWeekStart]);
 
+  // Stabiliser la référence de onWeekChange
+  const onWeekChangeRef = useRef(onWeekChange);
+  onWeekChangeRef.current = onWeekChange;
+
   // Notifier le parent du changement de semaine
   useEffect(() => {
-    if (onWeekChange) {
+    if (onWeekChangeRef.current) {
       const weekEnd = addDays(currentWeekStart, 4);
-      onWeekChange(currentWeekStart, weekEnd);
+      onWeekChangeRef.current(currentWeekStart, weekEnd);
     }
-  }, [currentWeekStart, onWeekChange]);
+  }, [currentWeekStart]);
 
   // Organiser les vraies données par jour de la semaine
   const tasksByDay = useMemo(() => {
