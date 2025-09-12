@@ -20,6 +20,7 @@ interface Employee {
   id: string;
   user_id: string;
   nom: string;
+  role: string;
 }
 
 interface PlanVehicleModalProps {
@@ -149,18 +150,23 @@ export const PlanVehicleModal = ({
                 <User className="w-4 h-4" />
                 Employé *
               </Label>
-              <Select value={selectedEmployeeId} onValueChange={setSelectedEmployeeId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner un employé" />
-                </SelectTrigger>
-                <SelectContent>
-                  {employees.map((employee) => (
-                    <SelectItem key={employee.user_id} value={employee.user_id}>
-                      {employee.nom}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <Select value={selectedEmployeeId} onValueChange={setSelectedEmployeeId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Sélectionner un employé" />
+            </SelectTrigger>
+            <SelectContent>
+              {employees
+                .filter(employee => 
+                  employee.role === 'carrossier' || 
+                  employee.role === 'carrossier-vehicule de courtoisie'
+                )
+                .map((employee) => (
+                <SelectItem key={employee.user_id} value={employee.user_id}>
+                  {employee.nom}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
             </div>
 
             {/* Sélection du type de tâche */}

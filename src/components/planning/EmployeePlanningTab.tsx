@@ -29,8 +29,11 @@ export const EmployeePlanningTab = ({ employees = [], schedules = [] }: Employee
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Filtrer les employés actifs
-  const activeEmployees = employees.filter(emp => emp.actif);
+  // Filtrer les employés actifs ayant les rôles autorisés pour la planification
+  const activeEmployees = employees.filter(emp => 
+    emp.actif && 
+    (emp.role === 'carrossier' || emp.role === 'carrossier-vehicule de courtoisie')
+  );
 
   // Filtrer les tâches par employé et date
   const getEmployeeTasks = (employeeId: string) => {

@@ -884,7 +884,10 @@ const Planning = () => {
                   <SelectValue placeholder="Sélectionner un employé" />
                 </SelectTrigger>
                 <SelectContent className="bg-background border border-border shadow-md z-50">
-                  {employees?.sort((a, b) => {
+                  {employees?.filter(employee => 
+                    employee.role === 'carrossier' || 
+                    employee.role === 'carrossier-vehicule de courtoisie'
+                  ).sort((a, b) => {
                     const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
                     const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                     return nameA.localeCompare(nameB);
@@ -1160,7 +1163,10 @@ const Planning = () => {
                   <SelectValue placeholder="Sélectionner un employé" />
                 </SelectTrigger>
                 <SelectContent className="bg-background border border-border shadow-md z-50">
-                  {employees?.sort((a, b) => {
+                  {employees?.filter(employee => 
+                    employee.role === 'carrossier' || 
+                    employee.role === 'carrossier-vehicule de courtoisie'
+                  ).sort((a, b) => {
                     const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
                     const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
                     return nameA.localeCompare(nameB);
@@ -2640,7 +2646,8 @@ const Planning = () => {
                         </SelectTrigger>
                         <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                           {employees?.filter(emp => 
-                            emp.qualifications.includes('Accueil & Préparation du dossier')
+                            emp.qualifications.includes('Accueil & Préparation du dossier') &&
+                            (emp.role === 'carrossier' || emp.role === 'carrossier-vehicule de courtoisie')
                           ).sort((a, b) => {
                             const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
                             const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
@@ -2711,7 +2718,8 @@ const Planning = () => {
                         </SelectTrigger>
                         <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                           {employees?.filter(emp => 
-                            emp.qualifications.includes('Remplacement ou débosselage')
+                            emp.qualifications.includes('Remplacement ou débosselage') &&
+                            (emp.role === 'carrossier' || emp.role === 'carrossier-vehicule de courtoisie')
                           ).sort((a, b) => {
                             const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
                             const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
@@ -2782,7 +2790,8 @@ const Planning = () => {
                         </SelectTrigger>
                         <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                           {employees?.filter(emp => 
-                            emp.qualifications.includes('Préparation peinture')
+                            emp.qualifications.includes('Préparation peinture') &&
+                            (emp.role === 'carrossier' || emp.role === 'carrossier-vehicule de courtoisie')
                           ).sort((a, b) => {
                             const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
                             const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
@@ -2853,7 +2862,8 @@ const Planning = () => {
                         </SelectTrigger>
                         <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                           {employees?.filter(emp => 
-                            emp.qualifications.includes('Mise en peinture')
+                            emp.qualifications.includes('Mise en peinture') &&
+                            (emp.role === 'carrossier' || emp.role === 'carrossier-vehicule de courtoisie')
                           ).sort((a, b) => {
                             const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
                             const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
@@ -2924,7 +2934,8 @@ const Planning = () => {
                         </SelectTrigger>
                         <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                           {employees?.filter(emp => 
-                            emp.qualifications.includes('Finitions & remontage')
+                            emp.qualifications.includes('Finitions & remontage') &&
+                            (emp.role === 'carrossier' || emp.role === 'carrossier-vehicule de courtoisie')
                           ).sort((a, b) => {
                             const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
                             const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
@@ -3003,7 +3014,8 @@ const Planning = () => {
                         </SelectTrigger>
                         <SelectContent className="bg-popover border border-border shadow-lg z-[200] max-h-48 overflow-y-auto">
                           {employees?.filter(emp => 
-                            emp.qualifications.includes('Clôture du dossier et livraison')
+                            emp.qualifications.includes('Clôture du dossier et livraison') &&
+                            (emp.role === 'carrossier' || emp.role === 'carrossier-vehicule de courtoisie')
                           ).sort((a, b) => {
                             const nameA = `${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}`.trim();
                             const nameB = `${b.profiles?.first_name || ''} ${b.profiles?.last_name || ''}`.trim();
