@@ -5,18 +5,31 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, MoveRight } from 'lucide-react';
+import { CalendarIcon, MoveRight, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 interface DeplacerTacheModalProps {
   isOpen: boolean;
   onClose: () => void;
   tache?: any;
   employes?: any[];
-  onConfirm?: (nouvelEmployeId: string, nouvelleDate: Date) => void;
+  onConfirm?: (nouvelEmployeId: string, nouvelleDate: Date, nouvelleHeure: string) => void;
 }
+
+// Générer les heures de 8h à 18h par tranches de 30 minutes
+const generateTimeSlots = () => {
+  const slots = [];
+  for (let hour = 8; hour <= 18; hour++) {
+    for (let minute = 0; minute < 60; minute += 30) {
+      const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      slots.push(timeString);
+    }
+  }
+  return slots;
+};
 
 export const DeplacerTacheModal: React.FC<DeplacerTacheModalProps> = ({
   isOpen,
@@ -27,20 +40,42 @@ export const DeplacerTacheModal: React.FC<DeplacerTacheModalProps> = ({
 }) => {
   const [nouvelEmployeId, setNouvelEmployeId] = useState('');
   const [nouvelleDate, setNouvelleDate] = useState<Date>();
+  const [nouvelleHeure, setNouvelleHeure] = useState<string>('');
+  const { toast } = useToast();
+
+  const timeSlots = generateTimeSlots();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
 
   const handleConfirm = () => {
-    if (nouvelEmployeId && nouvelleDate) {
-      onConfirm?.(nouvelEmployeId, nouvelleDate);
-      onClose();
-      setNouvelEmployeId('');
-      setNouvelleDate(undefined);
+    if (!nouvelEmployeId || !nouvelleDate || !nouvelleHeure) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez sélectionner un technicien, une date et une heure",
+        variant: "destructive"
+      });
+      return;
     }
+
+    // Vérifier que la date n'est pas antérieure à aujourd'hui
+    if (nouvelleDate < today) {
+      toast({
+        title: "Date invalide", 
+        description: "Impossible de déplacer une tâche à une date antérieure à aujourd'hui",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    onConfirm?.(nouvelEmployeId, nouvelleDate, nouvelleHeure);
+    handleClose();
   };
 
   const handleClose = () => {
     onClose();
     setNouvelEmployeId('');
     setNouvelleDate(undefined);
+    setNouvelleHeure('');
   };
 
   return (
@@ -106,11 +141,30 @@ export const DeplacerTacheModal: React.FC<DeplacerTacheModalProps> = ({
                   mode="single"
                   selected={nouvelleDate}
                   onSelect={setNouvelleDate}
-                  disabled={(date) => date < new Date()}
+                  disabled={(date) => date < today}
                   initialFocus
+                  className={cn("p-3 pointer-events-auto")}
                 />
               </PopoverContent>
             </Popover>
+          </div>
+
+          {/* Sélection de l'heure */}
+          <div className="space-y-2">
+            <Label>Nouvelle heure</Label>
+            <Select value={nouvelleHeure} onValueChange={setNouvelleHeure}>
+              <SelectTrigger>
+                <Clock className="mr-2 h-4 w-4" />
+                <SelectValue placeholder="Sélectionner une heure" />
+              </SelectTrigger>
+              <SelectContent>
+                {timeSlots.map((time) => (
+                  <SelectItem key={time} value={time}>
+                    {time}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
         
@@ -120,7 +174,7 @@ export const DeplacerTacheModal: React.FC<DeplacerTacheModalProps> = ({
           </Button>
           <Button 
             onClick={handleConfirm}
-            disabled={!nouvelEmployeId || !nouvelleDate}
+            disabled={!nouvelEmployeId || !nouvelleDate || !nouvelleHeure}
           >
             Déplacer la tâche
           </Button>

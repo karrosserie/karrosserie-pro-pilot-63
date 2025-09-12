@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Clock, User, MapPin } from 'lucide-react';
 import { startOfWeek, addWeeks, format, addDays, isSameWeek, parseISO, isValid, parse } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { DeplacerTacheModal } from './DeplacerTacheModal';
+import { useToast } from '@/hooks/use-toast';
 
 interface PlanningTask {
   id: string;
@@ -31,6 +33,9 @@ export const PlanningCalendar = ({
   onWeekChange
 }: PlanningCalendarProps) => {
   const [currentWeek, setCurrentWeek] = useState(0);
+  const [showDeplacerModal, setShowDeplacerModal] = useState(false);
+  const [selectedTaskForMove, setSelectedTaskForMove] = useState<PlanningTask | null>(null);
+  const { toast } = useToast();
 
   // Helper function pour les couleurs des étapes - définie AVANT useMemo
   const getStageColor = (stage: string): string => {
@@ -182,7 +187,50 @@ export const PlanningCalendar = ({
   const weekDaysDisplay = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
 
   const handleMoveTask = (taskId: string) => {
-    console.log('Déplacer tâche:', taskId);
+    // Trouver la tâche dans les données actuelles
+    const allTasks = Object.values(tasksByDay).flat();
+    const task = allTasks.find(t => t.id === taskId);
+    
+    if (task) {
+      setSelectedTaskForMove(task);
+      setShowDeplacerModal(true);
+    } else {
+      console.error('Tâche non trouvée:', taskId);
+    }
+  };
+
+  const handleConfirmDeplacerTache = async (nouvelEmployeId: string, nouvelleDate: Date, nouvelleHeure: string) => {
+    if (!selectedTaskForMove) return;
+
+    try {
+      // Ici vous pouvez ajouter la logique pour déplacer la tâche dans Supabase
+      console.log('Déplacement de la tâche:', {
+        taskId: selectedTaskForMove.id,
+        nouvelEmployeId,
+        nouvelleDate,
+        nouvelleHeure
+      });
+
+      toast({
+        title: "Tâche déplacée",
+        description: `La tâche a été déplacée au ${format(nouvelleDate, "dd/MM/yyyy", { locale: fr })} à ${nouvelleHeure}`,
+      });
+
+      // Fermer le modal
+      setShowDeplacerModal(false);
+      setSelectedTaskForMove(null);
+
+      // Optionnel: déclencher un rafraîchissement des données
+      // onWeekChange pourrait être utilisé pour refetch les données
+      
+    } catch (error) {
+      console.error('Erreur lors du déplacement:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de déplacer la tâche",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -278,6 +326,24 @@ export const PlanningCalendar = ({
           );
         })}
       </div>
+
+      {/* Modal de déplacement de tâche */}
+      <DeplacerTacheModal
+        isOpen={showDeplacerModal}
+        onClose={() => {
+          setShowDeplacerModal(false);
+          setSelectedTaskForMove(null);
+        }}
+        tache={selectedTaskForMove ? {
+          id: selectedTaskForMove.id,
+          vehicule: selectedTaskForMove.vehicleCode,
+          etape: selectedTaskForMove.stage,
+          client: selectedTaskForMove.client,
+          technicien: selectedTaskForMove.technician
+        } : undefined}
+        employes={employees}
+        onConfirm={handleConfirmDeplacerTache}
+      />
     </div>
   );
 };
