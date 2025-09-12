@@ -1,4 +1,6 @@
 
+"use client"
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -30,12 +32,6 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   // Find the selected option
   const selectedOption = options.find(option => option.value === value);
 
-  const handleSelect = (selectedValue: string) => {
-    console.log('SearchableSelect handleSelect called with:', selectedValue);
-    setOpen(false);
-    onValueChange(selectedValue);
-  };
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -50,33 +46,28 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 z-[120] bg-background border rounded-md shadow-md min-w-[var(--radix-popover-trigger-width)] pointer-events-auto" align="start" sideOffset={4}>
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
         <Command>
-          <CommandInput 
-            placeholder={searchPlaceholder} 
-            autoFocus
-            className="border-0 focus:ring-0 focus:outline-none"
-          />
-          <CommandList className="max-h-[200px] overflow-y-auto">
+          <CommandInput placeholder={searchPlaceholder} className="h-9" />
+          <CommandList>
             <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => (
                 <CommandItem
                   key={option.value}
-                  value={option.label}
-                  onSelect={() => {
-                    console.log('CommandItem clicked, option:', option);
-                    handleSelect(option.value);
+                  value={option.value}
+                  onSelect={(currentValue) => {
+                    onValueChange(currentValue === value ? "" : currentValue);
+                    setOpen(false);
                   }}
-                  className="cursor-pointer hover:bg-accent hover:text-accent-foreground px-2 py-1.5 select-none pointer-events-auto"
                 >
+                  {option.label}
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      "ml-auto h-4 w-4",
                       value === option.value ? "opacity-100" : "opacity-0"
                     )}
                   />
-                  {option.label}
                 </CommandItem>
               ))}
             </CommandGroup>
