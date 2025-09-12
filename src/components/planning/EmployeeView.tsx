@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Play, Pause, CheckCircle, Calendar, User } from 'lucide-react';
+import { Clock, Play, Pause, CheckCircle, Calendar, User, BarChart } from 'lucide-react';
 import { useEmployeeSchedule } from '@/hooks/use-employee-schedule';
 import { useCompany } from '@/hooks/use-company';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { EmployePointageModal } from '@/components/EmployePointageModal';
 
 interface EmployeeViewProps {
   employeeId?: string;
@@ -16,6 +17,7 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   const { user } = useAuth();
   const { companyInfo } = useCompany();
   const [currentTimer, setCurrentTimer] = useState<string | null>(null);
+  const [showPointageModal, setShowPointageModal] = useState(false);
 
   // Utiliser l'ID de l'utilisateur connecté ou celui passé en prop
   const currentUserId = employeeId || user?.id;
@@ -132,12 +134,23 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <User className="w-6 h-6 text-primary" />
-        <div>
-          <h1 className="text-2xl font-bold">Mon Planning</h1>
-          <p className="text-muted-foreground">Vue employé - {new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <User className="w-6 h-6 text-primary" />
+          <div>
+            <h1 className="text-2xl font-bold">Mon Planning</h1>
+            <p className="text-muted-foreground">Vue employé - {new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          </div>
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowPointageModal(true)}
+          className="flex items-center gap-2"
+        >
+          <BarChart className="w-4 h-4" />
+          Gestion des pointages
+        </Button>
       </div>
 
       {/* Tâche en cours */}
@@ -257,6 +270,16 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
           </CardContent>
         </Card>
       )}
+
+      {/* Modal de gestion des pointages */}
+      <EmployePointageModal
+        isOpen={showPointageModal}
+        onClose={() => setShowPointageModal(false)}
+        employe={{
+          id: currentUserId || '',
+          nom: user?.email?.split('@')[0] || 'Employé'
+        }}
+      />
     </div>
   );
 };
