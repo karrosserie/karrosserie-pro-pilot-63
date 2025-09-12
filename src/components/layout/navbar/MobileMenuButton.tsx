@@ -13,9 +13,9 @@ const MobileMenuButton = ({ onClick }: MobileMenuButtonProps) => {
       variant="ghost" 
       size="icon" 
       onClick={onClick}
-      className="lg:hidden mr-2 h-9 w-9 sm:h-10 sm:w-10"
+      className="lg:hidden h-10 w-10 sm:h-11 sm:w-11 hover:bg-gray-100/80 transition-colors"
     >
-      <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
+      <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
     </Button>
   );
 };

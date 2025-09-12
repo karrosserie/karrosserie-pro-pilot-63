@@ -30,16 +30,16 @@ const Navbar = ({ onToggleSidebar, isSidebarOpen = false }: NavbarProps) => {
 
   return (
     <div className="sticky top-0 z-30 w-full bg-white border-b border-gray-200 shadow-sm">
-      <div className="px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between">
-        <div className="flex items-center">
+      <div className="px-4 sm:px-6 h-16 sm:h-16 flex items-center justify-between gap-3">
+        <div className="flex items-center min-w-0">
           <MobileMenuButton onClick={onToggleSidebar} />
         </div>
 
-        <div className="hidden sm:block flex-1 max-w-md mx-4">
+        <div className="hidden sm:block flex-1 max-w-md mx-6">
           <SearchBar onImportClick={() => setImportDialogOpen(true)} />
         </div>
 
-        <div className="flex items-center space-x-1 sm:space-x-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           {isImpersonating && (
             <Button 
               variant="outline" 
@@ -52,14 +52,6 @@ const Navbar = ({ onToggleSidebar, isSidebarOpen = false }: NavbarProps) => {
               <span className="md:hidden">Admin</span>
             </Button>
           )}
-          
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="text-gray-600 sm:hidden h-9 w-9 hidden"
-          >
-            <Search className="h-4 w-4" />
-          </Button>
           
           <div className="hidden">
             <NotificationsPanel 
