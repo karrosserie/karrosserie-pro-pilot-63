@@ -379,9 +379,6 @@ export const WorkshopPlanningInterface = ({
         {/* Workshop Steps Tab */}
         <TabsContent value="workshop" className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Étapes atelier</h2>
-            <p className="text-muted-foreground mb-4">Parcours complet avec synchronisation planning automatique</p>
-            
             {/* Statistics */}
             <WorkshopStats
               totalVehicles={totalVehicles}
@@ -391,17 +388,17 @@ export const WorkshopPlanningInterface = ({
             />
 
             {/* Summary banner */}
-            <div className="bg-muted p-4 rounded-lg mb-6">
-              <div className="text-sm text-muted-foreground">
+            <div className="bg-slate-100 p-4 rounded-lg mb-6 border">
+              <div className="text-sm text-slate-600">
                 {waitingVehiclesCount} véhicules en attente
               </div>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-slate-600">
                 Pièces: 2 • Approbations: 1 • Techniciens: 1
               </div>
             </div>
 
             {/* Workflow Steps */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="space-y-6">
               {workflowSteps.map((step) => (
                 <WorkflowStep
                   key={step.id}

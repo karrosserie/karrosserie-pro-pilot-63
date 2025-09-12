@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VehicleCard } from "./VehicleCard";
 
 interface Vehicle {
@@ -23,18 +22,17 @@ interface WorkflowStepProps {
 
 export const WorkflowStep = ({ title, vehicles, count, onPlanVehicle }: WorkflowStepProps) => {
   return (
-    <Card className="h-fit">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold flex items-center justify-between">
-          <span>{title}</span>
-          <span className="text-sm font-normal bg-muted px-2 py-1 rounded">
-            {count} véhicule{count !== 1 ? 's' : ''}
-          </span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
+    <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+        <span className="text-sm text-slate-600 bg-white px-2 py-1 rounded border">
+          {count} véhicule{count !== 1 ? 's' : ''}
+        </span>
+      </div>
+      
+      <div className="space-y-3">
         {vehicles.length === 0 ? (
-          <div className="text-center text-muted-foreground py-8">
+          <div className="text-center text-slate-500 py-8 bg-white rounded border-2 border-dashed">
             Aucun véhicule à cette étape
           </div>
         ) : (
@@ -46,7 +44,7 @@ export const WorkflowStep = ({ title, vehicles, count, onPlanVehicle }: Workflow
             />
           ))
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

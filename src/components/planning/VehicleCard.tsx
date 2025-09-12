@@ -20,71 +20,30 @@ interface VehicleCardProps {
 }
 
 export const VehicleCard = ({ vehicle, onPlan }: VehicleCardProps) => {
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'En cours':
-        return <Badge className="bg-green-100 text-green-800">En cours</Badge>;
-      case 'À planifier':
-        return <Badge className="bg-amber-100 text-amber-800">À planifier</Badge>;
-      case 'Terminé':
-        return <Badge className="bg-gray-100 text-gray-800">Terminé</Badge>;
-      default:
-        return null;
-    }
-  };
-
   return (
-    <Card className="mb-4 hover:shadow-md transition-shadow">
-      <CardContent className="p-4">
-        <div className="space-y-3">
-          {/* En-tête avec marque et modèle */}
-          <div className="flex items-start justify-between">
-            <h4 className="font-semibold text-base">{vehicle.brand} {vehicle.model}</h4>
-            {getStatusBadge(vehicle.status)}
+    <div className="bg-white p-4 rounded-md border border-slate-200 mb-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-blue-600 text-white rounded flex items-center justify-center text-sm font-medium">
+            {vehicle.brand.charAt(0)}
           </div>
-
-          {/* Plaque et client */}
-          <div className="space-y-1">
-            <div className="text-sm font-medium text-muted-foreground">{vehicle.licensePlate}</div>
-            <div className="text-sm text-muted-foreground">{vehicle.client}</div>
+          <div>
+            <h4 className="font-semibold text-sm text-slate-900">{vehicle.brand} {vehicle.model}</h4>
+            <p className="text-xs text-slate-600">{vehicle.licensePlate} • {vehicle.description}</p>
           </div>
-
-          {/* Prix et durée */}
-          <div className="flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-1">
-              <Euro className="w-4 h-4 text-muted-foreground" />
-              <span className="font-medium">{vehicle.price}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Clock className="w-4 h-4 text-muted-foreground" />
-              <span>{vehicle.duration}</span>
-            </div>
-          </div>
-
-          {/* Description */}
-          <div className="text-sm text-muted-foreground">{vehicle.description}</div>
-
-          {/* Technicien si assigné */}
-          {vehicle.technician && (
-            <div className="flex items-center gap-1 text-sm">
-              <User className="w-4 h-4 text-muted-foreground" />
-              <span>{vehicle.technician}</span>
-            </div>
-          )}
-
-          {/* Bouton planifier si statut À planifier */}
-          {vehicle.status === 'À planifier' && onPlan && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPlan(vehicle.id)}
-              className="w-full mt-2"
-            >
-              Planifier
-            </Button>
-          )}
         </div>
-      </CardContent>
-    </Card>
+        <div className="flex items-center gap-2">
+          <div className="text-right">
+            <div className="text-sm font-semibold text-slate-900">{vehicle.price}</div>
+            {vehicle.duration && (
+              <div className="text-xs text-slate-500">{vehicle.duration}</div>
+            )}
+          </div>
+          <button className="px-3 py-1.5 bg-slate-600 text-white text-xs font-medium rounded hover:bg-slate-700 transition-colors">
+            Planifier
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
