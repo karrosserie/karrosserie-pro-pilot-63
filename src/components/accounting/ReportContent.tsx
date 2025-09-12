@@ -7,7 +7,7 @@ import { GeneratedReportsTable } from './GeneratedReportsTable';
 import { EmailReportDialog } from './EmailReportDialog';
 import { useToast } from '@/hooks/use-toast';
 import { useGeneratedReports, GeneratedReport } from '@/hooks/use-generated-reports';
-type DialogType = 'monthly' | 'quarterly' | 'yearly' | 'fec' | 'csv' | 'excel' | 'social' | null;
+type DialogType = 'monthly' | 'quarterly' | 'yearly' | 'fec' | 'csv' | 'excel' | 'social' | 'pdf' | null;
 const ReportContent = () => {
   const [openDialog, setOpenDialog] = useState<DialogType>(null);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
@@ -62,6 +62,8 @@ const ReportContent = () => {
         return 'Export au format Excel';
       case 'social':
         return 'Générer le bilan sociale';
+      case 'pdf':
+        return 'Export au format PDF';
       default:
         return '';
     }
@@ -82,6 +84,8 @@ const ReportContent = () => {
         return 'Export Excel';
       case 'social':
         return 'Bilan sociale';
+      case 'pdf':
+        return 'Export PDF';
       default:
         return '';
     }
@@ -144,6 +148,23 @@ const ReportContent = () => {
                 <Download className="h-4 w-4 text-orange-600" />
               </div>
               <span className="font-medium text-gray-900">Format CSV</span>
+            </div>
+            <div className="text-gray-400">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+          
+          <div 
+            onClick={() => setOpenDialog('pdf')} 
+            className="flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                <FileText className="h-4 w-4 text-orange-600" />
+              </div>
+              <span className="font-medium text-gray-900">Format PDF</span>
             </div>
             <div className="text-gray-400">
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
