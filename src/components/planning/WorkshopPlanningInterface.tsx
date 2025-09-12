@@ -56,101 +56,19 @@ export const WorkshopPlanningInterface = ({
   planningRef.current = planningTaches;
 
   // Gérer le changement de semaine dans le calendrier (stabilisé)
-  const handleWeekChange = useCallback((weekStart: Date, weekEnd: Date) => {
-    const tryParse = (raw: any): Date | null => {
-      if (!raw) return null;
-      try {
-        if (typeof raw === 'string') {
-          const iso = parseISO(raw);
-          if (isValid(iso)) return iso;
-          const frParsed = parse(raw, 'dd/MM/yyyy', new Date());
-          if (isValid(frParsed)) return frParsed;
-        } else {
-          const d = new Date(raw);
-          if (isValid(d)) return d;
-        }
-      } catch {}
-      return null;
-    };
+  const handleWeekChange = useCallback((_weekStart: Date, _weekEnd: Date) => {
+    // Intentionnellement vide: le filtrage par semaine est géré dans PlanningCalendar
+    // Cela évite d'exclure les tâches sans date (qui utilisent seulement `jour`).
+  }, []);
 
-    const filtered = (planningRef.current || []).filter((t) => {
-      const rawDate =
-        (t as any).start_datetime ||
-        (t as any).dateAssignation ||
-        (t as any).date ||
-        (t as any).startDate ||
-        (t as any).date_debut ||
-        (t as any).dateTime;
-      const d = tryParse(rawDate);
-      if (!d) return false;
-      return isSameWeek(d, weekStart, { weekStartsOn: 1 });
-    });
-
-    // Comparaison légère pour éviter des setState inutiles
-    setCurrentWeekData(prev => {
-      if (prev.length === filtered.length && 
-          prev.every((p, i) => p.id === filtered[i]?.id)) {
-        return prev; // Aucun changement
-      }
-      return filtered;
-    });
-  }, []); // Dépendances vides pour stabiliser la référence
-
-  // Logs de debug déplacés dans un useEffect conditionnel
+  // Synchroniser les données avec toutes les tâches disponibles
   useEffect(() => {
-    if (import.meta.env.DEV) {
-      console.log('🔄 WorkshopPlanningInterface reloaded with real data');
-      console.log('🔍 WorkshopPlanningInterface - Schedules received:', schedules.length, 'items');
-      console.log('🔍 WorkshopPlanningInterface - User Role Debug:', {
-        userRole,
-        isOwner,
-        isCarrossier,
-        isCarrossierCourtesy,
-        isResponsable,
-        isLoading
-      });
-    }
-  }, [schedules.length, userRole, isOwner, isCarrossier, isCarrossierCourtesy, isResponsable, isLoading]);
-
-  // Initialiser les données de la semaine courante
-  useEffect(() => {
-    const currentMonday = startOfWeek(new Date(), { weekStartsOn: 1 });
-
-    const tryParse = (raw: any): Date | null => {
-      if (!raw) return null;
-      try {
-        if (typeof raw === 'string') {
-          const iso = parseISO(raw);
-          if (isValid(iso)) return iso;
-          const frParsed = parse(raw, 'dd/MM/yyyy', new Date());
-          if (isValid(frParsed)) return frParsed;
-        } else {
-          const d = new Date(raw);
-          if (isValid(d)) return d;
-        }
-      } catch {}
-      return null;
-    };
-
-    const initial = (planningTaches || []).filter((t) => {
-      const rawDate =
-        (t as any).start_datetime ||
-        (t as any).dateAssignation ||
-        (t as any).date ||
-        (t as any).startDate ||
-        (t as any).date_debut ||
-        (t as any).dateTime;
-      const d = tryParse(rawDate);
-      if (!d) return true;
-      return isSameWeek(d, currentMonday, { weekStartsOn: 1 });
-    });
-
     setCurrentWeekData(prev => {
-      if (prev.length === initial.length && 
-          prev.every((p, i) => p.id === initial[i]?.id)) {
+      const next = Array.isArray(planningTaches) ? planningTaches : [];
+      if (prev.length === next.length && prev.every((p, i) => p.id === next[i]?.id)) {
         return prev;
       }
-      return initial;
+      return next;
     });
   }, [planningTaches]);
 
