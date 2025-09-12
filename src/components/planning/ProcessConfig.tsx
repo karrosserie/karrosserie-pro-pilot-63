@@ -1,517 +1,332 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Settings, Clock, Users, Plus, Edit, Trash2, Move, ArrowRight, Loader2 } from 'lucide-react';
-import { useProcessTemplates, useCreateWorkflowStep, useUpdateWorkflowStep, useDeleteWorkflowStep, useDeleteProcessTemplate } from '@/hooks/useProcessTemplates';
-import { ProcessTemplateWithSteps, WorkflowStep as DBWorkflowStep } from '@/services/supabase/processTemplates';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Clock, Settings, AlertTriangle, Calendar } from 'lucide-react';
 
-interface WorkflowStep {
+interface ProcessStep {
   id: string;
   name: string;
-  description: string;
-  estimatedDuration: number; // en heures
-  requiredQualifications: string[];
-  isRequired: boolean;
-  canRunInParallel: boolean;
-  dependencies: string[];
-  color: string;
-  order: number;
+  types: {
+    name: string;
+    description: string;
+    duration: string;
+    color: string;
+  }[];
 }
-
-interface ProcessTemplate {
-  id: string;
-  name: string;
-  description: string;
-  steps: WorkflowStep[];
-  estimatedTotalDuration: number;
-  isDefault: boolean;
-}
-
-// Fonction pour convertir les données DB vers le format UI
-const convertDBStepToUI = (dbStep: DBWorkflowStep): WorkflowStep => ({
-  id: dbStep.id,
-  name: dbStep.name,
-  description: dbStep.description || '',
-  estimatedDuration: Number(dbStep.estimated_duration),
-  requiredQualifications: dbStep.required_qualifications,
-  isRequired: dbStep.is_required,
-  canRunInParallel: dbStep.can_run_in_parallel,
-  dependencies: dbStep.dependencies,
-  color: dbStep.color,
-  order: dbStep.step_order
-});
-
-// Fonction pour convertir les données UI vers le format DB
-const convertUIStepToDB = (uiStep: Partial<WorkflowStep>, processTemplateId: string): Omit<DBWorkflowStep, 'id' | 'created_at' | 'updated_at'> => ({
-  process_template_id: processTemplateId,
-  step_key: uiStep.name?.toLowerCase().replace(/\s+/g, '_') || '',
-  name: uiStep.name || '',
-  description: uiStep.description || null,
-  estimated_duration: uiStep.estimatedDuration || 0,
-  required_qualifications: uiStep.requiredQualifications || [],
-  is_required: uiStep.isRequired || false,
-  can_run_in_parallel: uiStep.canRunInParallel || false,
-  dependencies: uiStep.dependencies || [],
-  color: uiStep.color || 'bg-blue-100 text-blue-800',
-  step_order: uiStep.order || 1
-});
-
-// Fonction pour convertir les données DB vers le format UI pour les processus
-const convertDBProcessToUI = (dbProcess: ProcessTemplateWithSteps): ProcessTemplate => ({
-  id: dbProcess.id,
-  name: dbProcess.name,
-  description: dbProcess.description || '',
-  estimatedTotalDuration: Number(dbProcess.estimated_total_duration),
-  isDefault: dbProcess.is_default,
-  steps: dbProcess.workflow_steps.map(convertDBStepToUI)
-});
-
-const availableQualifications = [
-  'Carrosserie',
-  'Peinture',
-  'Mécanique', 
-  'Électricité',
-  'Diagnostic',
-  'Soudure',
-  'Débosselage',
-  'Polissage'
-];
-
-const stepColors = [
-  'bg-blue-100 text-blue-800',
-  'bg-green-100 text-green-800',
-  'bg-yellow-100 text-yellow-800',
-  'bg-purple-100 text-purple-800',
-  'bg-red-100 text-red-800',
-  'bg-orange-100 text-orange-800'
-];
-
 
 export const ProcessConfig = () => {
-  const { data: dbProcesses, isLoading } = useProcessTemplates();
-  const createStepMutation = useCreateWorkflowStep();
-  const updateStepMutation = useUpdateWorkflowStep();
-  const deleteStepMutation = useDeleteWorkflowStep();
-  const deleteProcessMutation = useDeleteProcessTemplate();
+  const [activeTab, setActiveTab] = useState('accueil');
 
-  const [processes, setProcesses] = useState<ProcessTemplate[]>([]);
-  const [selectedProcess, setSelectedProcess] = useState<ProcessTemplate | null>(null);
-  const [isStepDialogOpen, setIsStepDialogOpen] = useState(false);
-  const [editingStep, setEditingStep] = useState<WorkflowStep | null>(null);
-  const [newStep, setNewStep] = useState<Partial<WorkflowStep>>({
-    name: '',
-    description: '',
-    estimatedDuration: 1,
-    requiredQualifications: [],
-    isRequired: true,
-    canRunInParallel: false,
-    dependencies: [],
-    color: stepColors[0]
-  });
-
-  // Synchroniser les données de la base avec l'état local
-  useEffect(() => {
-    if (dbProcesses) {
-      const convertedProcesses = dbProcesses.map(convertDBProcessToUI);
-      setProcesses(convertedProcesses);
-      
-      // Mettre à jour selectedProcess avec les nouvelles données
-      if (selectedProcess) {
-        const updatedSelectedProcess = convertedProcesses.find(p => p.id === selectedProcess.id);
-        if (updatedSelectedProcess) {
-          setSelectedProcess(updatedSelectedProcess);
+  const processSteps: ProcessStep[] = [
+    {
+      id: 'accueil',
+      name: 'ACCUEIL & PRÉPARATION DU DOSSIER',
+      types: [
+        {
+          name: 'Sinistre simple (rayure, petite bosse)',
+          description: 'Devis rapide, photos basiques',
+          duration: '30-45 min',
+          color: 'text-blue-600'
+        },
+        {
+          name: 'Sinistre moyen (plusieurs éléments)',
+          description: 'Devis détaillé, multiples photos, recherche pièces',
+          duration: '45-75 min',
+          color: 'text-blue-600'
+        },
+        {
+          name: 'Gros sinistre (structure touchée)',
+          description: 'Expertise approfondie, mesures, déjantement complet',
+          duration: '1-2 heures',
+          color: 'text-blue-600'
+        },
+        {
+          name: 'Véhicule de luxe/collection',
+          description: 'Déshabillage spécialisé, photos détaillées, recherche pièces spécifiques',
+          duration: '1-3 heures',
+          color: 'text-blue-600'
         }
-      } else if (convertedProcesses.length > 0) {
-        setSelectedProcess(convertedProcesses[0]);
-      }
+      ]
+    },
+    {
+      id: 'remplacement',
+      name: 'REMPLACEMENT OU DÉBOSSELAGE',
+      types: [
+        {
+          name: 'Débosselage simple',
+          description: 'Petites bosses, rayures superficielles',
+          duration: '1-2 heures',
+          color: 'text-orange-600'
+        },
+        {
+          name: 'Remplacement éléments',
+          description: 'Pare-chocs, ailes, portières',
+          duration: '2-4 heures',
+          color: 'text-orange-600'
+        },
+        {
+          name: 'Travaux structure',
+          description: 'Réparation châssis, marbre',
+          duration: '4-8 heures',
+          color: 'text-orange-600'
+        }
+      ]
+    },
+    {
+      id: 'preparation',
+      name: 'PRÉPARATION PEINTURE',
+      types: [
+        {
+          name: 'Préparation standard',
+          description: 'Ponçage, apprêt, masquage',
+          duration: '2-4 heures',
+          color: 'text-purple-600'
+        },
+        {
+          name: 'Préparation complexe',
+          description: 'Mastic, apprêts multiples',
+          duration: '4-6 heures',
+          color: 'text-purple-600'
+        }
+      ]
+    },
+    {
+      id: 'peinture',
+      name: 'MISE EN PEINTURE',
+      types: [
+        {
+          name: 'Peinture éléments',
+          description: 'Application base, vernis',
+          duration: '3-5 heures',
+          color: 'text-green-600'
+        },
+        {
+          name: 'Peinture complète',
+          description: 'Véhicule entier, raccords',
+          duration: '8-12 heures',
+          color: 'text-green-600'
+        }
+      ]
+    },
+    {
+      id: 'finitions',
+      name: 'FINITIONS & REMONTAGE',
+      types: [
+        {
+          name: 'Remontage standard',
+          description: 'Pose éléments, réglages',
+          duration: '2-4 heures',
+          color: 'text-indigo-600'
+        },
+        {
+          name: 'Finitions luxe',
+          description: 'Polissage, contrôles qualité',
+          duration: '3-6 heures',
+          color: 'text-indigo-600'
+        }
+      ]
+    },
+    {
+      id: 'cloture',
+      name: 'CLÔTURE & LIVRAISON',
+      types: [
+        {
+          name: 'Contrôle final',
+          description: 'Vérifications, nettoyage',
+          duration: '1-2 heures',
+          color: 'text-slate-600'
+        },
+        {
+          name: 'Livraison client',
+          description: 'Présentation, signature',
+          duration: '30 min',
+          color: 'text-slate-600'
+        }
+      ]
     }
-  }, [dbProcesses]);
+  ];
 
-  const handleAddStep = async () => {
-    if (!selectedProcess) return;
-    
-    const stepData = convertUIStepToDB({
-      ...newStep,
-      order: selectedProcess.steps.length + 1
-    }, selectedProcess.id);
+  const summaryData = [
+    {
+      category: 'Micro rayure/retouche',
+      totalTime: '2-4 heures',
+      calendarDuration: '1 jour'
+    },
+    {
+      category: 'Sinistre léger (pare-chocs, rayures)',
+      totalTime: '6-12 heures',
+      calendarDuration: '2-3 jours'
+    },
+    {
+      category: 'Sinistre moyen (1-2 éléments)',
+      totalTime: '12-20 heures',
+      calendarDuration: '2-3 jours'
+    },
+    {
+      category: 'Sinistre important (3+ éléments)',
+      totalTime: '20-40 heures',
+      calendarDuration: '3-7 jours'
+    },
+    {
+      category: 'Gros sinistre (structure touchée)',
+      totalTime: '40-80 heures',
+      calendarDuration: '1-3 semaines'
+    },
+    {
+      category: 'Sinistre majeur (reconstruction)',
+      totalTime: '80-200 heures',
+      calendarDuration: '3-8 semaines'
+    }
+  ];
 
-    createStepMutation.mutate(stepData, {
-      onSuccess: () => {
-        setIsStepDialogOpen(false);
-        resetNewStep();
-      }
-    });
-  };
-
-  const handleEditStep = (step: WorkflowStep) => {
-    setEditingStep(step);
-    setNewStep(step);
-    setIsStepDialogOpen(true);
-  };
-
-  const handleUpdateStep = async () => {
-    if (!editingStep || !selectedProcess) return;
-
-    const updates = convertUIStepToDB(newStep, selectedProcess.id);
-
-    updateStepMutation.mutate({
-      id: editingStep.id,
-      updates,
-      processTemplateId: selectedProcess.id
-    }, {
-      onSuccess: () => {
-        setIsStepDialogOpen(false);
-        setEditingStep(null);
-        resetNewStep();
-      }
-    });
-  };
-
-  const handleDeleteStep = async (stepId: string) => {
-    if (!selectedProcess) return;
-
-    deleteStepMutation.mutate({
-      id: stepId,
-      processTemplateId: selectedProcess.id
-    });
-  };
-
-  const handleDeleteProcess = async () => {
-    if (!selectedProcess) return;
-    
-    deleteProcessMutation.mutate(selectedProcess.id, {
-      onSuccess: () => {
-        // Sélectionner un autre processus si possible
-        const remainingProcesses = processes.filter(p => p.id !== selectedProcess.id);
-        setSelectedProcess(remainingProcesses.length > 0 ? remainingProcesses[0] : null);
-      }
-    });
-  };
-
-  const resetNewStep = () => {
-    setNewStep({
-      name: '',
-      description: '',
-      estimatedDuration: 1,
-      requiredQualifications: [],
-      isRequired: true,
-      canRunInParallel: false,
-      dependencies: [],
-      color: stepColors[0]
-    });
-  };
-
-  const handleQualificationChange = (qualification: string, checked: boolean) => {
-    setNewStep(prev => ({
-      ...prev,
-      requiredQualifications: checked 
-        ? [...(prev.requiredQualifications || []), qualification]
-        : (prev.requiredQualifications || []).filter(q => q !== qualification)
-    }));
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Chargement des processus...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!selectedProcess) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <p className="text-muted-foreground">Aucun processus disponible</p>
-        </div>
-      </div>
-    );
-  }
+  const delayFactors = [
+    {
+      category: 'Attente pièces',
+      delay: '+2-15 jours',
+      description: 'Véhicules neufs, constructeur/grossiste',
+      color: 'text-orange-600'
+    },
+    {
+      category: 'Pièces sur commande',
+      delay: '+3-30 jours',
+      description: 'Pièces sur mesure/commande',
+      color: 'text-orange-600'
+    },
+    {
+      category: 'Expertise assurance',
+      delay: '+1-5 jours',
+      description: 'Attente visite expert',
+      color: 'text-blue-600'
+    },
+    {
+      category: 'Problèmes découverts',
+      delay: '+20-100%',
+      description: 'Dégâts cachés révélés',
+      color: 'text-red-600'
+    }
+  ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">Configuration des Processus</h2>
-          <p className="text-muted-foreground">Définir les étapes et durées du workflow</p>
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+            <Settings className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Process de Réparation</h1>
+            <p className="text-slate-600 mt-1">Temps estimés par type d'intervention</p>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Dialog open={isStepDialogOpen} onOpenChange={setIsStepDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="flex items-center gap-2" onClick={() => setEditingStep(null)}>
-                <Plus className="w-4 h-4" />
-                Ajouter une étape
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
-              <DialogHeader>
-                <DialogTitle>
-                  {editingStep ? 'Modifier l\'étape' : 'Ajouter une nouvelle étape'}
-                </DialogTitle>
-                <DialogDescription>
-                  Configurez les détails de l'étape du workflow.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div>
-                  <Label htmlFor="stepName">Nom de l'étape</Label>
-                  <Input
-                    id="stepName"
-                    value={newStep.name}
-                    onChange={(e) => setNewStep(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="Ex: Préparation peinture"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="stepDescription">Description</Label>
-                  <Textarea
-                    id="stepDescription"
-                    value={newStep.description}
-                    onChange={(e) => setNewStep(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Description détaillée de l'étape"
-                    rows={3}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="duration">Durée estimée (heures)</Label>
-                    <Input
-                      id="duration"
-                      type="number"
-                      step="0.5"
-                      value={newStep.estimatedDuration}
-                      onChange={(e) => setNewStep(prev => ({ ...prev, estimatedDuration: Number(e.target.value) }))}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="color">Couleur</Label>
-                    <Select 
-                      value={newStep.color} 
-                      onValueChange={(value) => setNewStep(prev => ({ ...prev, color: value }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choisir une couleur" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {stepColors.map((color, index) => (
-                          <SelectItem key={color} value={color}>
-                            <div className="flex items-center gap-2">
-                              <div className={`w-4 h-4 rounded ${color}`}></div>
-                              Couleur {index + 1}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <Label>Qualifications requises</Label>
-                  <div className="grid grid-cols-2 gap-2 mt-2">
-                    {availableQualifications.map(qualification => (
-                      <div key={qualification} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`qual-${qualification}`}
-                          checked={newStep.requiredQualifications?.includes(qualification)}
-                          onCheckedChange={(checked) => handleQualificationChange(qualification, checked as boolean)}
-                        />
-                        <Label htmlFor={`qual-${qualification}`} className="text-sm">{qualification}</Label>
+        
+        <div className="flex gap-2 flex-wrap">
+          <Badge className="bg-green-100 text-green-800">Temps optimisés</Badge>
+          <Badge className="bg-blue-100 text-blue-800">Par atelier compétent</Badge>
+        </div>
+      </div>
+
+      {/* Process Steps Tabs */}
+      <Card className="shadow-lg">
+        <CardHeader className="pb-4">
+          <Tabs defaultValue="accueil" className="w-full">
+            <TabsList className="grid w-full grid-cols-6 h-auto p-2 bg-slate-50">
+              {processSteps.map((step) => (
+                <TabsTrigger 
+                  key={step.id}
+                  value={step.id}
+                  className="flex flex-col items-center gap-1 p-3 text-xs font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                >
+                  <span className="text-center leading-tight">{step.name}</span>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
+            {processSteps.map((step) => (
+              <TabsContent key={step.id} value={step.id} className="mt-6">
+                <div className="bg-blue-50 rounded-xl p-6 border-l-4 border-blue-500">
+                  <h2 className="text-xl font-bold text-blue-900 mb-4">{step.name}</h2>
+                  
+                  <div className="space-y-4">
+                    {step.types.map((type, index) => (
+                      <div key={index} className="bg-white rounded-lg p-4 shadow-sm border border-blue-100">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-slate-900 mb-1">{type.name}</h3>
+                            <p className="text-sm text-slate-600">{type.description}</p>
+                          </div>
+                          <div className={`font-bold text-lg ${type.color} ml-4`}>
+                            {type.duration}
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="isRequired"
-                    checked={newStep.isRequired}
-                    onCheckedChange={(checked) => setNewStep(prev => ({ ...prev, isRequired: checked as boolean }))}
-                  />
-                  <Label htmlFor="isRequired">Étape obligatoire</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="canRunInParallel"
-                    checked={newStep.canRunInParallel}
-                    onCheckedChange={(checked) => setNewStep(prev => ({ ...prev, canRunInParallel: checked as boolean }))}
-                  />
-                  <Label htmlFor="canRunInParallel">Peut être exécutée en parallèle</Label>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsStepDialogOpen(false)}>
-                  Annuler
-                </Button>
-                <Button 
-                  onClick={editingStep ? handleUpdateStep : handleAddStep}
-                  disabled={createStepMutation.isPending || updateStepMutation.isPending}
-                >
-                  {createStepMutation.isPending || updateStepMutation.isPending ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      {editingStep ? 'Mise à jour...' : 'Ajout...'}
-                    </>
-                  ) : (
-                    editingStep ? 'Mettre à jour' : 'Ajouter'
-                  )}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
+              </TabsContent>
+            ))}
+          </Tabs>
+        </CardHeader>
+      </Card>
 
-      {/* Process Overview */}
-      <Card>
+      {/* Summary Table */}
+      <Card className="shadow-lg">
         <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="w-5 h-5" />
-                  {selectedProcess.name}
-                  {selectedProcess.isDefault && <Badge>Défaut</Badge>}
-                </CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">{selectedProcess.description}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={handleDeleteProcess}
-                  disabled={deleteProcessMutation.isPending || selectedProcess.isDefault}
-                  className="flex items-center gap-1 text-red-600 hover:text-red-700"
-                >
-                  {deleteProcessMutation.isPending ? (
-                    <Loader2 className="w-3 h-3 animate-spin" />
-                  ) : (
-                    <Trash2 className="w-3 h-3" />
-                  )}
-                  Supprimer le processus
-                </Button>
-              </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-primary">{selectedProcess.estimatedTotalDuration}h</div>
-              <div className="text-sm text-muted-foreground">Durée totale</div>
-            </div>
-          </div>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="w-5 h-5 text-blue-600" />
+            Récapitulatif par Type de Sinistre
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center mb-6">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>{selectedProcess.steps.length} étapes</span>
-              <span>•</span>
-              <span>{selectedProcess.steps.filter(s => s.isRequired).length} obligatoires</span>
-              <span>•</span>
-              <span>{selectedProcess.steps.filter(s => s.canRunInParallel).length} parallélisables</span>
-            </div>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b border-slate-200">
+                  <th className="text-left p-4 font-semibold text-slate-700">Catégorie de Sinistre</th>
+                  <th className="text-left p-4 font-semibold text-slate-700">Temps Total</th>
+                  <th className="text-left p-4 font-semibold text-slate-700">Durée Calendaire</th>
+                </tr>
+              </thead>
+              <tbody>
+                {summaryData.map((row, index) => (
+                  <tr key={index} className="border-b border-slate-100 hover:bg-slate-50">
+                    <td className="p-4 text-slate-900">{row.category}</td>
+                    <td className="p-4 font-semibold text-blue-600">{row.totalTime}</td>
+                    <td className="p-4 text-slate-600">{row.calendarDuration}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </CardContent>
       </Card>
 
-      {/* Workflow Steps */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Étapes du workflow</h3>
-        
-        {/* Visual Flow */}
-        <Card className="p-6">
-          <div className="flex items-center justify-center overflow-x-auto">
-            <div className="flex items-center gap-4 min-w-fit">
-              {selectedProcess.steps
-                .sort((a, b) => a.order - b.order)
-                .map((step, index) => (
-                  <div key={step.id} className="flex items-center">
-                    <div className={`px-3 py-2 rounded-lg text-sm font-medium ${step.color} whitespace-nowrap`}>
-                      {step.name}
-                      <div className="text-xs opacity-75 mt-1">
-                        {step.estimatedDuration}h
-                      </div>
-                    </div>
-                    {index < selectedProcess.steps.length - 1 && (
-                      <ArrowRight className="w-4 h-4 text-muted-foreground mx-2" />
-                    )}
+      {/* Delay Factors */}
+      <Card className="shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-orange-600" />
+            Facteurs d'Allongement des Délais
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {delayFactors.map((factor, index) => (
+              <div key={index} className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg p-6 border border-orange-200">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold text-slate-900">{factor.category}</h3>
+                  <div className={`font-bold text-lg ${factor.color}`}>
+                    {factor.delay}
                   </div>
-                ))}
-            </div>
-          </div>
-        </Card>
-
-        {/* Step Details */}
-        <div className="grid gap-4">
-          {selectedProcess.steps
-            .sort((a, b) => a.order - b.order)
-            .map((step) => (
-              <Card key={step.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 space-y-3">
-                      <div className="flex items-center gap-3">
-                        <div className={`px-3 py-1 rounded text-sm font-medium ${step.color}`}>
-                          Étape {step.order}
-                        </div>
-                        <h4 className="font-semibold">{step.name}</h4>
-                        {step.isRequired && <Badge variant="secondary">Obligatoire</Badge>}
-                        {step.canRunInParallel && <Badge variant="outline">Parallélisable</Badge>}
-                      </div>
-                      
-                      <p className="text-sm text-muted-foreground">{step.description}</p>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-muted-foreground" />
-                          <span>Durée: {step.estimatedDuration}h</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4 text-muted-foreground" />
-                          <span>Qualifications: {step.requiredQualifications.join(', ')}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Move className="w-4 h-4 text-muted-foreground" />
-                          <span>Dépendances: {step.dependencies.length > 0 ? step.dependencies.join(', ') : 'Aucune'}</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 ml-4">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => handleEditStep(step)}
-                        className="flex items-center gap-1"
-                      >
-                        <Edit className="w-3 h-3" />
-                        Modifier
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => handleDeleteStep(step.id)}
-                        disabled={deleteStepMutation.isPending}
-                        className="flex items-center gap-1 text-red-600 hover:text-red-700"
-                      >
-                        {deleteStepMutation.isPending ? (
-                          <Loader2 className="w-3 h-3 animate-spin" />
-                        ) : (
-                          <Trash2 className="w-3 h-3" />
-                        )}
-                        Supprimer
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                </div>
+                <p className="text-sm text-slate-600">{factor.description}</p>
+              </div>
             ))}
-        </div>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
