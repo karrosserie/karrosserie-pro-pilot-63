@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
-import { Plus, Pencil, UserX, Crown, User, Trash, Users, UserPlus } from 'lucide-react';
+import { Plus, Pencil, UserX, Crown, User, Trash, Users, UserPlus, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
 import { useConfirmation } from '@/hooks/use-confirmation';
@@ -577,6 +577,16 @@ const TeamTab = () => {
                     )}
                   </div>
                   <div className="flex gap-2">
+                    {(member.role === 'carrossier' || member.role === 'carrossier-vehicule de courtoisie') && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="hover:bg-muted"
+                        title="Gérer les horaires"
+                      >
+                        <Clock className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="sm"

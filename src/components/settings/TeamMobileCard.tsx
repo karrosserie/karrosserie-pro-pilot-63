@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Crown, User, Users, Pencil, Trash, Phone, Mail } from 'lucide-react';
+import { Crown, User, Users, Pencil, Trash, Phone, Mail, Clock } from 'lucide-react';
 
 interface TeamMember {
   id: string;
@@ -91,6 +91,17 @@ const TeamMobileCard: React.FC<TeamMobileCardProps> = ({
 
         {/* Actions */}
         <div className="flex gap-2 pt-2 border-t">
+          {(member.role === 'carrossier' || member.role === 'carrossier-vehicule de courtoisie') && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex-1 text-xs"
+              title="Gérer les horaires"
+            >
+              <Clock className="h-3 w-3 mr-1" />
+              Horaires
+            </Button>
+          )}
           <Button 
             variant="outline" 
             size="sm" 
