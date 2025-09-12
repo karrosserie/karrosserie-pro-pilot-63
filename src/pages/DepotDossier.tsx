@@ -229,6 +229,52 @@ const DepotDossier = () => {
       </div>
 
       <div className="container mx-auto p-8 max-w-5xl">
+        {/* Accusé de réception - Affiché après succès du dépôt */}
+        {depositResult === 'success' && (
+          <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8 shadow-sm">
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-green-900 mb-2">
+                  🏛️ Dossier reçu par le tribunal
+                </h3>
+                <p className="text-green-800 mb-4 text-sm leading-relaxed">
+                  Vous recevrez sous 8 à 15 jours votre numéro RG (Répertoire Général), et le nom du juge qui s'occupera du dossier.
+                </p>
+                <div className="flex space-x-3">
+                  <button 
+                    className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
+                    onClick={() => {
+                      // Simuler l'ouverture de l'accusé de réception
+                      window.open('about:blank', '_blank');
+                    }}
+                  >
+                    <Eye className="w-4 h-4" />
+                    Voir
+                  </button>
+                  <button 
+                    className="px-4 py-2 bg-green-100 text-green-700 border border-green-300 text-sm font-medium rounded-md hover:bg-green-200 transition-colors flex items-center gap-2"
+                    onClick={() => {
+                      // Simuler le téléchargement de l'accusé de réception
+                      const link = document.createElement('a');
+                      link.href = 'data:text/plain;charset=utf-8,Accusé de réception - Dossier ' + selectedCase.reference;
+                      link.download = `Accuse_reception_${selectedCase.reference}.pdf`;
+                      link.click();
+                    }}
+                  >
+                    <Download className="w-4 h-4" />
+                    Télécharger
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Process Steps */}
         <div className="flex justify-center mb-12 relative">
           <div className="absolute top-5 left-1/4 right-1/4 h-0.5 bg-slate-300 z-0"></div>
