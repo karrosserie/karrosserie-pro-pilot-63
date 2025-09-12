@@ -28,6 +28,7 @@ interface TeamMember {
   user_id: string;
   role: string;
   active: boolean;
+  qualifications: string[];
   created_at: string;
   profiles?: {
     first_name?: string;
@@ -64,7 +65,8 @@ const editMemberSchema = z.object({
     return isValidPhoneNumber(phone);
   }, "Veuillez entrer un numéro de téléphone valide"),
   role: z.enum(['carrossier', 'carrossier-vehicule de courtoisie', 'responsable', 'responsable administratif']),
-  active: z.boolean()
+  active: z.boolean(),
+  qualifications: z.array(z.string()).default([])
 });
 
 type EditMemberFormValues = z.infer<typeof editMemberSchema>;
@@ -105,7 +107,8 @@ const TeamTab = () => {
       email: "",
       phoneNumber: "",
       role: "carrossier",
-      active: true
+      active: true,
+      qualifications: []
     }
   });
 
@@ -135,6 +138,7 @@ const TeamTab = () => {
         user_id,
         role,
         active,
+        qualifications,
         created_at
       `)
       .eq('company_id', companyInfo.id);
@@ -163,7 +167,8 @@ const TeamTab = () => {
           
           return {
             ...member,
-            profiles: profile || null
+            profiles: profile || null,
+            qualifications: (member.qualifications as string[]) || []
           };
         })
       );
@@ -186,7 +191,7 @@ const TeamTab = () => {
       console.log('SignUp completed, user:', user);
       
       console.log('Adding user to team...');
-      // Ajouter l'utilisateur à l'équipe
+      // Ajouter l'utilisateur à l'équipe avec les qualifications
       const { error } = await supabase
         .from('user_companies')
         .insert({
@@ -280,12 +285,13 @@ const TeamTab = () => {
         }
       }
 
-      // 2) Mettre à jour le rôle et le statut actif dans user_companies
+      // 2) Mettre à jour le rôle, le statut actif et les qualifications dans user_companies
       const { error: userCompanyError } = await supabase
         .from('user_companies')
         .update({
           role: data.role,
           active: data.active,
+          qualifications: data.qualifications || [],
           updated_at: new Date().toISOString()
         })
         .eq('id', editingMember.id);
@@ -356,7 +362,8 @@ const TeamTab = () => {
       email: member.profiles?.email || '',
       phoneNumber: member.profiles?.phone_number || '',
       role: member.role as 'carrossier' | 'carrossier-vehicule de courtoisie' | 'responsable' | 'responsable administratif',
-      active: member.active
+      active: member.active,
+      qualifications: member.qualifications || []
     });
     setIsEditDialogOpen(true);
   };
@@ -804,9 +811,61 @@ const TeamTab = () => {
                     </FormItem>
                   )}
                 />
-              )}
-              
-              {editingMember?.role !== 'Propriétaire' && (
+               )}
+               
+               {/* Qualifications - shown only for carrossier roles */}
+               {editingMember?.role !== 'Propriétaire' && (editForm.watch('role') === 'carrossier' || editForm.watch('role') === 'carrossier-vehicule de courtoisie') && (
+                 <FormField
+                   control={editForm.control}
+                   name="qualifications"
+                   render={({ field }) => {
+                     const handleQualificationToggle = (qualificationId: string) => {
+                       const currentQualifications = field.value || [];
+                       const newQualifications = currentQualifications.includes(qualificationId)
+                         ? currentQualifications.filter(q => q !== qualificationId)
+                         : [...currentQualifications, qualificationId];
+                       field.onChange(newQualifications);
+                     };
+                     
+                     return (
+                       <FormItem>
+                         <div className="flex items-center justify-between">
+                           <FormLabel>Qualifications * (sélectionnez une ou plusieurs)</FormLabel>
+                           {field.value && field.value.length > 0 && (
+                             <span className="text-sm text-muted-foreground">
+                               {field.value.length} qualification(s) sélectionnée(s)
+                             </span>
+                           )}
+                         </div>
+                         <FormControl>
+                           <div className="space-y-2 max-h-60 overflow-y-auto border rounded-lg p-3">
+                             {STANDARD_QUALIFICATIONS.map((qualification) => (
+                               <div key={qualification.id} className="flex items-center space-x-3">
+                                 <Checkbox
+                                   id={qualification.id}
+                                   checked={field.value?.includes(qualification.id) || false}
+                                   onCheckedChange={() => handleQualificationToggle(qualification.id)}
+                                 />
+                                 <label 
+                                   htmlFor={qualification.id} 
+                                   className="text-sm font-normal flex-1 cursor-pointer"
+                                 >
+                                   <span className={`inline-block px-2 py-1 rounded-sm text-xs mr-2 ${qualification.color}`}>
+                                     {qualification.name}
+                                   </span>
+                                 </label>
+                               </div>
+                             ))}
+                           </div>
+                         </FormControl>
+                         <FormMessage />
+                       </FormItem>
+                     );
+                   }}
+                 />
+               )}
+               
+               {editingMember?.role !== 'Propriétaire' && (
                 <FormField
                   control={editForm.control}
                   name="active"
