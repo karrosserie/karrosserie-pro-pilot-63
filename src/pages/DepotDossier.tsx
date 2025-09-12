@@ -216,7 +216,7 @@ const DepotDossier = () => {
       {/* Header */}
       <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-6 shadow-lg">
         <h1 className="text-2xl font-bold mb-2">🏛️ Dépôt de Requête Tribunal</h1>
-        <p className="opacity-90 text-base">Procédure d'injonction de payer simplifiée</p>
+        
       </div>
 
       {/* Breadcrumb */}
