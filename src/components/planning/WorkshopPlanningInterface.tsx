@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -51,9 +51,15 @@ export const WorkshopPlanningInterface = ({
   const [activeView, setActiveView] = useState<'manager' | 'employee'>(getDefaultView());
   const [currentWeekData, setCurrentWeekData] = useState<any[]>([]);
 
-  // Ref pour conserver la dernière valeur de planningTaches
-  const planningRef = useRef(planningTaches);
-  planningRef.current = planningTaches;
+  // Source unifiée des tâches: préférer planningTaches si fourni, sinon schedules
+  const allTasks = useMemo(() => {
+    const pt = Array.isArray(planningTaches) ? planningTaches : [];
+    return pt.length ? pt : (Array.isArray(schedules) ? schedules : []);
+  }, [planningTaches, schedules]);
+
+  // Ref pour conserver la dernière valeur de la source
+  const planningRef = useRef(allTasks);
+  planningRef.current = allTasks;
 
   // Gérer le changement de semaine dans le calendrier (filtrage local + demande de rafraîchissement Supabase)
   const handleWeekChange = useCallback((weekStart: Date, weekEnd: Date) => {
@@ -96,13 +102,13 @@ export const WorkshopPlanningInterface = ({
   // Synchroniser les données avec toutes les tâches disponibles
   useEffect(() => {
     setCurrentWeekData(prev => {
-      const next = Array.isArray(planningTaches) ? planningTaches : [];
-      if (prev.length === next.length && prev.every((p, i) => p.id === next[i]?.id)) {
+      const next = allTasks;
+      if (prev.length === next.length && prev.every((p, i) => p?.id === next[i]?.id)) {
         return prev;
       }
       return next;
     });
-  }, [planningTaches]);
+  }, [allTasks]);
 
   // Déterminer si l'utilisateur peut changer de vue
   const canSwitchView = isOwner;

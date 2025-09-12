@@ -220,7 +220,7 @@ const CarrosseriePlanning = () => {
         vehicles={vehicles}
         waitingVehicles={waitingVehicles}
         schedules={getAllWorkflowTasks()} // Utiliser toutes les tâches pour les étapes atelier
-        planningTaches={getTodayTasks()} // Garder les tâches du jour pour le planning
+        planningTaches={getAllWorkflowTasks()} // Utiliser toutes les tâches pour le planning hebdomadaire
         companyId={companyId}
         onScheduleUpdate={handleScheduleUpdate}
         onOpenUrgenceModal={() => setShowVehiculeUrgenceModal(true)}
