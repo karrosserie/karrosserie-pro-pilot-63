@@ -53,16 +53,22 @@ const DepotDossier = () => {
     completed: currentStep > 3
   }, {
     id: 4,
-    label: "Dépôt",
+    label: "Envoyé",
     icon: "4",
     current: currentStep === 4,
     completed: currentStep > 4
   }, {
     id: 5,
-    label: "Suivi",
+    label: "Reçu",
     icon: "5",
     current: currentStep === 5,
     completed: currentStep > 5
+  }, {
+    id: 6,
+    label: "Suivi",
+    icon: "6",
+    current: currentStep === 6,
+    completed: currentStep > 6
   }];
   const documents = [{
     name: "Facture FAC-2024-002",
@@ -108,8 +114,9 @@ const DepotDossier = () => {
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       // Progresser les étapes pendant le processus
-      if (i === 1) setCurrentStep(4); // Étape Dépôt
-      if (i === 4) setCurrentStep(5); // Étape Suivi
+      if (i === 1) setCurrentStep(4); // Étape Envoyé
+      if (i === 3) setCurrentStep(5); // Étape Reçu
+      if (i === 4) setCurrentStep(6); // Étape Suivi
     }
     setIsDepositing(false);
 
@@ -367,7 +374,7 @@ const DepotDossier = () => {
           {/* Actions Footer */}
           <div className="bg-slate-50 p-8 border-t border-slate-200 flex items-center justify-between">
             <div className="text-sm text-slate-600">
-              Étape 2/5 - Vérification du dossier
+              Étape 2/6 - Vérification du dossier
             </div>
             <div className="flex gap-4">
               <button onClick={() => navigate('/contentieux/depot-dossier')} className="px-4 py-2 bg-slate-600 text-white text-sm font-medium rounded-md hover:bg-slate-700 transition-colors">
