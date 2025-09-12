@@ -1,14 +1,13 @@
 import { User, Clock, Euro, Camera, Image } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { uploadVehiclePhoto } from "@/utils/vehiclePhotoService";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCompany } from "@/hooks/use-company";
 import { VehiclePhotosViewer } from "@/components/vehicle/VehiclePhotosViewer";
-import { Camera as CapacitorCamera, CameraResultType, CameraSource } from "@capacitor/camera";
+import { takeTaskPhoto } from "@/utils/cameraUtils";
 
 interface VehicleCardProps {
   vehicle: {
@@ -28,116 +27,68 @@ interface VehicleCardProps {
 
 export const VehicleCard = ({ vehicle, onPlan }: VehicleCardProps) => {
   const [showPhotosViewer, setShowPhotosViewer] = useState(false);
-  const [showCameraDialog, setShowCameraDialog] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isStreaming, setIsStreaming] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
   const { companyInfo } = useCompany();
 
-  const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { 
-          facingMode: 'environment',
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        },
-        audio: false
+  const handleCameraClick = async () => {
+    if (!user?.id || !companyInfo?.id) {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'accéder aux informations utilisateur",
+        variant: "destructive",
       });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play();
-        };
-        streamRef.current = stream;
-        setIsStreaming(true);
-      }
-    } catch (err) {
-      console.error('Erreur accès caméra (getUserMedia):', err);
-      // Fallback Capacitor Camera en dernier recours
-      try {
-        const image = await CapacitorCamera.getPhoto({
-          quality: 80,
-          allowEditing: false,
-          source: CameraSource.Camera,
-          resultType: CameraResultType.DataUrl,
-          presentationStyle: 'fullscreen'
-        });
-        if (image.dataUrl) {
-          const response = await fetch(image.dataUrl);
-          const blob = await response.blob();
-          await saveBlob(blob);
+      return;
+    }
+
+    setIsProcessing(true);
+    
+    try {
+      const result = await takeTaskPhoto(user.id, vehicle.id, 'start');
+      
+      if (result.success && result.photoUrl) {
+        // Convertir l'URL en blob pour utiliser notre service existant
+        const response = await fetch(result.photoUrl);
+        const blob = await response.blob();
+        
+        const uploadResult = await uploadVehiclePhoto(
+          vehicle.id,
+          user.id,
+          companyInfo.id,
+          blob,
+          `Photo atelier - ${vehicle.brand} ${vehicle.model} ${vehicle.licensePlate}`
+        );
+        
+        if (uploadResult.success) {
+          toast({
+            title: "Photo sauvegardée",
+            description: "La photo a été ajoutée au véhicule avec succès",
+          });
+        } else {
+          toast({
+            title: "Erreur",
+            description: uploadResult.error || "Erreur lors de la sauvegarde",
+            variant: "destructive",
+          });
         }
-      } catch (e) {
+      } else {
         toast({
-          title: "Caméra indisponible",
-          description: "Impossible d'accéder à la caméra",
+          title: "Erreur",
+          description: result.error || "Erreur lors de la prise de photo",
           variant: "destructive",
         });
-        setShowCameraDialog(false);
-      }
-    }
-  };
-
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(t => t.stop());
-      streamRef.current = null;
-    }
-    setIsStreaming(false);
-  };
-
-  const saveBlob = async (blob: Blob) => {
-    if (!user?.id || !companyInfo?.id) return;
-    setIsProcessing(true);
-    try {
-      const result = await uploadVehiclePhoto(
-        vehicle.id,
-        user.id,
-        companyInfo.id,
-        blob,
-        `Photo atelier - ${vehicle.brand} ${vehicle.model} ${vehicle.licensePlate}`
-      );
-      if (result.success) {
-        toast({ title: 'Photo sauvegardée', description: 'Ajoutée avec succès' });
-        setShowCameraDialog(false);
-        stopCamera();
-      } else {
-        toast({ title: 'Erreur', description: result.error || 'Sauvegarde impossible', variant: 'destructive' });
       }
     } catch (error) {
-      console.error('Erreur sauvegarde photo:', error);
-      toast({ title: 'Erreur', description: 'Erreur lors de la sauvegarde', variant: 'destructive' });
+      console.error('Erreur prise photo:', error);
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la prise de photo",
+        variant: "destructive",
+      });
     } finally {
       setIsProcessing(false);
     }
-  };
-
-  const takePhoto = async () => {
-    if (!videoRef.current) return;
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    ctx.drawImage(videoRef.current, 0, 0);
-    canvas.toBlob((blob) => {
-      if (blob) saveBlob(blob);
-    }, 'image/jpeg', 0.85);
-  };
-
-  const handleCameraClick = () => {
-    if (!user?.id || !companyInfo?.id) return;
-    setShowCameraDialog(true);
-    setTimeout(startCamera, 200);
-  };
-
-  const handleCloseCamera = () => {
-    stopCamera();
-    setShowCameraDialog(false);
   };
 
   return (
@@ -175,54 +126,13 @@ export const VehicleCard = ({ vehicle, onPlan }: VehicleCardProps) => {
               variant="outline"
               className="p-2"
               title="Prendre une photo"
+              disabled={isProcessing}
             >
               <Camera className="h-4 w-4" />
             </Button>
           </div>
         </div>
       </div>
-
-      {/* Dialog Caméra */}
-      <Dialog open={showCameraDialog} onOpenChange={handleCloseCamera}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Prendre une photo du véhicule</DialogTitle>
-            <DialogDescription>
-              Cadrez le véhicule et appuyez sur « Prendre la photo » pour l’enregistrer.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <div className="text-sm text-muted-foreground">
-              {vehicle.brand} {vehicle.model} - {vehicle.licensePlate}
-            </div>
-
-            {isStreaming ? (
-              <div className="flex flex-col items-center space-y-4">
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  className="w-full max-w-sm rounded-lg border"
-                />
-                <div className="flex gap-2">
-                  <Button onClick={takePhoto} disabled={isProcessing}>
-                    <Camera className="w-4 h-4 mr-1" />
-                    {isProcessing ? 'Sauvegarde…' : 'Prendre la photo'}
-                  </Button>
-                  <Button onClick={handleCloseCamera} variant="outline" disabled={isProcessing}>
-                    Annuler
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-4">Initialisation de la caméra…</p>
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Viewer des photos */}
       <VehiclePhotosViewer
