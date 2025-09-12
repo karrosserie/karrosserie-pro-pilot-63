@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Card,
@@ -22,6 +22,7 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { formatDate } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useIsMobile } from '@/hooks/use-mobile';
+import PricingPage from '@/components/pricing/PricingPage';
 
 const SubscriptionTab: React.FC = () => {
   const {
@@ -216,14 +217,23 @@ const SubscriptionTab: React.FC = () => {
 
       {/* Pricing Page Button */}
       <div className="flex justify-center">
-        <Button 
-          variant="outline" 
-          onClick={() => window.open('/pricing', '_blank')}
-          className="flex items-center gap-2"
-        >
-          <PackageIcon className="w-4 h-4" />
-          Voir la page tarifaire
-        </Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2"
+            >
+              <PackageIcon className="w-4 h-4" />
+              Voir la page tarifaire
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Grille tarifaire complète</DialogTitle>
+            </DialogHeader>
+            <PricingPage />
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Available Plans */}
