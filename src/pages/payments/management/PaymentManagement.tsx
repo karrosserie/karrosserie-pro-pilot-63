@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Search, Filter, TrendingUp, TrendingDown, CreditCard, ArrowUpCircle, ArrowDownCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ReceiptsHeader } from '@/components/receipts/ReceiptsHeader';
 import { ReceiptsTable } from '@/components/receipts/ReceiptsTable';
 import ReceiptDialog from '@/components/receipts/ReceiptDialog';
@@ -25,20 +25,20 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const PaymentManagement = () => {
-  // Receipts modal state
-  const [receiptsModalOpen, setReceiptsModalOpen] = useState(false);
+  // Tab state
+  const [activeTab, setActiveTab] = useState("overview");
+  
+  // Receipts state
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState<ReceiptWithClient | null>(null);
   
-  // Expenses modal state
-  const [expensesModalOpen, setExpensesModalOpen] = useState(false);
+  // Expenses state
   const [expenseSearchTerm, setExpenseSearchTerm] = useState('');
   const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<ExpenseWithRelations | null>(null);
   
-  // Accounts modal state
-  const [accountsModalOpen, setAccountsModalOpen] = useState(false);
+  // Accounts state
   const [accountSearchTerm, setAccountSearchTerm] = useState('');
   const [accountDialogOpen, setAccountDialogOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<any>(null);
@@ -109,49 +109,53 @@ const PaymentManagement = () => {
         </div>
       </div>
 
-      {/* Action Cards */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setReceiptsModalOpen(true)}>
-          <CardContent className="flex flex-col items-center justify-center p-6">
-            <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
-              <ArrowUpCircle className="h-6 w-6 text-emerald-600" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Encaissements</h3>
-            <p className="text-sm text-muted-foreground text-center">Gérer les recettes</p>
-          </CardContent>
-        </Card>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+          <TabsTrigger value="receipts">Encaissements</TabsTrigger>
+          <TabsTrigger value="expenses">Dépenses</TabsTrigger>
+          <TabsTrigger value="accounts">Comptes actifs</TabsTrigger>
+        </TabsList>
 
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setExpensesModalOpen(true)}>
-          <CardContent className="flex flex-col items-center justify-center p-6">
-            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
-              <ArrowDownCircle className="h-6 w-6 text-red-600" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Dépenses</h3>
-            <p className="text-sm text-muted-foreground text-center">Suivre les coûts</p>
-          </CardContent>
-        </Card>
+        <TabsContent value="overview" className="space-y-4">
+          {/* Action Cards */}
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+            <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab("receipts")}>
+              <CardContent className="flex flex-col items-center justify-center p-6">
+                <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
+                  <ArrowUpCircle className="h-6 w-6 text-emerald-600" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Encaissements</h3>
+                <p className="text-sm text-muted-foreground text-center">Gérer les recettes</p>
+              </CardContent>
+            </Card>
 
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setAccountsModalOpen(true)}>
-          <CardContent className="flex flex-col items-center justify-center p-6">
-            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-              <CreditCard className="h-6 w-6 text-purple-600" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Comptes actifs</h3>
-            <div className="text-xl sm:text-2xl font-bold mb-1">
-              {statisticsLoading ? "..." : statistics?.accounts.count || 0}
-            </div>
-            <p className="text-sm text-muted-foreground text-center">comptes bancaires</p>
-          </CardContent>
-        </Card>
-      </div>
+            <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab("expenses")}>
+              <CardContent className="flex flex-col items-center justify-center p-6">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                  <ArrowDownCircle className="h-6 w-6 text-red-600" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Dépenses</h3>
+                <p className="text-sm text-muted-foreground text-center">Suivre les coûts</p>
+              </CardContent>
+            </Card>
 
-      {/* Receipts Modal */}
-      <Dialog open={receiptsModalOpen} onOpenChange={setReceiptsModalOpen}>
-        <DialogContent className={`${isMobile ? 'w-[95vw] h-[95vh]' : 'w-[95vw] max-w-7xl max-h-[90vh]'} overflow-y-auto`}>
-          <DialogHeader>
-            <DialogTitle>Gestion des encaissements</DialogTitle>
-          </DialogHeader>
-          
+            <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab("accounts")}>
+              <CardContent className="flex flex-col items-center justify-center p-6">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-4">
+                  <CreditCard className="h-6 w-6 text-purple-600" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Comptes actifs</h3>
+                <div className="text-xl sm:text-2xl font-bold mb-1">
+                  {statisticsLoading ? "..." : statistics?.accounts.count || 0}
+                </div>
+                <p className="text-sm text-muted-foreground text-center">comptes bancaires</p>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="receipts" className="space-y-4">
           {isLoading ? (
             <div className="flex items-center justify-center h-64">
               <LoadingSpinner />
@@ -173,23 +177,9 @@ const PaymentManagement = () => {
               </div>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </TabsContent>
 
-      {/* Receipt Dialog */}
-      <ReceiptDialog
-        receipt={selectedReceipt}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-      />
-
-      {/* Expenses Modal */}
-      <Dialog open={expensesModalOpen} onOpenChange={setExpensesModalOpen}>
-        <DialogContent className={`${isMobile ? 'w-[95vw] h-[95vh]' : 'w-[95vw] max-w-7xl max-h-[90vh]'} overflow-y-auto`}>
-          <DialogHeader>
-            <DialogTitle>Gestion des dépenses</DialogTitle>
-          </DialogHeader>
-          
+        <TabsContent value="expenses" className="space-y-4">
           {expensesLoading ? (
             <div className="flex items-center justify-center h-64">
               <LoadingSpinner />
@@ -210,23 +200,9 @@ const PaymentManagement = () => {
               />
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </TabsContent>
 
-      {/* Expense Dialog */}
-      <ExpenseDialog
-        expense={selectedExpense}
-        open={expenseDialogOpen}
-        onOpenChange={setExpenseDialogOpen}
-      />
-
-      {/* Accounts Modal */}
-      <Dialog open={accountsModalOpen} onOpenChange={setAccountsModalOpen}>
-        <DialogContent className={`${isMobile ? 'w-[95vw] h-[95vh]' : 'w-[95vw] max-w-7xl max-h-[90vh]'} overflow-y-auto`}>
-          <DialogHeader>
-            <DialogTitle>Gestion des comptes</DialogTitle>
-          </DialogHeader>
-          
+        <TabsContent value="accounts" className="space-y-4">
           {accountsLoading ? (
             <div className="flex items-center justify-center h-64">
               <LoadingSpinner />
@@ -247,8 +223,22 @@ const PaymentManagement = () => {
               />
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </TabsContent>
+      </Tabs>
+
+      {/* Receipt Dialog */}
+      <ReceiptDialog
+        receipt={selectedReceipt}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
+
+      {/* Expense Dialog */}
+      <ExpenseDialog
+        expense={selectedExpense}
+        open={expenseDialogOpen}
+        onOpenChange={setExpenseDialogOpen}
+      />
 
       {/* Account Dialog */}
       <AccountDialog
