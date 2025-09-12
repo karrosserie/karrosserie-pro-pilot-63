@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -73,7 +73,7 @@ export const WorkshopPlanningInterface = ({
   const [currentWeekData, setCurrentWeekData] = useState<any[]>([]);
 
   // Gérer le changement de semaine dans le calendrier
-  const handleWeekChange = (weekStart: Date, weekEnd: Date) => {
+  const handleWeekChange = useCallback((weekStart: Date, weekEnd: Date) => {
     console.log('📅 Changement de semaine:', { weekStart, weekEnd });
 
     const tryParse = (raw: any): Date | null => {
@@ -106,7 +106,7 @@ export const WorkshopPlanningInterface = ({
     });
 
     setCurrentWeekData(filtered);
-  };
+  }, [planningTaches]);
 
   // Initialiser les données de la semaine courante
   useEffect(() => {
