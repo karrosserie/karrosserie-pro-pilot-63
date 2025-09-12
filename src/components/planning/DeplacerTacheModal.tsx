@@ -80,30 +80,30 @@ export const DeplacerTacheModal: React.FC<DeplacerTacheModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-sm sm:max-w-lg mx-4 sm:mx-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <MoveRight className="h-5 w-5" />
+          <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
+            <MoveRight className="h-4 w-4 sm:h-5 sm:w-5" />
             Déplacer la tâche
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Informations de la tâche */}
           {tache && (
-            <div className="p-4 bg-muted rounded-lg">
-              <div className="font-medium">{tache.vehicule}</div>
-              <div className="text-sm text-muted-foreground">{tache.etape}</div>
-              <div className="text-sm">{tache.client}</div>
-              <div className="text-sm">Actuellement assigné à: <span className="font-medium">{tache.technicien}</span></div>
+            <div className="p-3 sm:p-4 bg-muted rounded-lg">
+              <div className="font-medium text-sm sm:text-base">{tache.vehicule}</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">{tache.etape}</div>
+              <div className="text-xs sm:text-sm">{tache.client}</div>
+              <div className="text-xs sm:text-sm">Actuellement assigné à: <span className="font-medium">{tache.technicien}</span></div>
             </div>
           )}
           
           {/* Sélection du nouvel employé */}
           <div className="space-y-2">
-            <Label>Nouveau technicien</Label>
+            <Label className="text-sm sm:text-base">Nouveau technicien</Label>
             <Select value={nouvelEmployeId} onValueChange={setNouvelEmployeId}>
-              <SelectTrigger>
+              <SelectTrigger className="h-10 sm:h-11">
                 <SelectValue placeholder="Sélectionner un technicien" />
               </SelectTrigger>
               <SelectContent>
@@ -118,13 +118,13 @@ export const DeplacerTacheModal: React.FC<DeplacerTacheModalProps> = ({
 
           {/* Sélection de la nouvelle date */}
           <div className="space-y-2">
-            <Label>Nouvelle date</Label>
+            <Label className="text-sm sm:text-base">Nouvelle date</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal",
+                    "w-full justify-start text-left font-normal h-10 sm:h-11",
                     !nouvelleDate && "text-muted-foreground"
                   )}
                 >
@@ -151,9 +151,9 @@ export const DeplacerTacheModal: React.FC<DeplacerTacheModalProps> = ({
 
           {/* Sélection de l'heure */}
           <div className="space-y-2">
-            <Label>Nouvelle heure</Label>
+            <Label className="text-sm sm:text-base">Nouvelle heure</Label>
             <Select value={nouvelleHeure} onValueChange={setNouvelleHeure}>
-              <SelectTrigger>
+              <SelectTrigger className="h-10 sm:h-11">
                 <Clock className="mr-2 h-4 w-4" />
                 <SelectValue placeholder="Sélectionner une heure" />
               </SelectTrigger>
@@ -168,13 +168,14 @@ export const DeplacerTacheModal: React.FC<DeplacerTacheModalProps> = ({
           </div>
         </div>
         
-        <div className="flex justify-end gap-2 pt-4">
-          <Button variant="outline" onClick={handleClose}>
+        <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4">
+          <Button variant="outline" onClick={handleClose} className="w-full sm:w-auto">
             Annuler
           </Button>
           <Button 
             onClick={handleConfirm}
             disabled={!nouvelEmployeId || !nouvelleDate || !nouvelleHeure}
+            className="w-full sm:w-auto"
           >
             Déplacer la tâche
           </Button>

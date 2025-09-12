@@ -333,13 +333,13 @@ export const WorkshopPlanningInterface = ({
   };
 
   return (
-    <div className="w-full space-y-6 p-2.5">
+    <div className="w-full space-y-4 sm:space-y-6 p-2 sm:p-4">
       {/* Header with view switcher */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 sm:items-center">
           {/* Afficher les boutons de changement de vue uniquement pour les propriétaires */}
           {canSwitchView ? (
-            <>
+            <div className="flex gap-2">
               <Button
                 variant={activeView === 'manager' ? 'default' : 'outline'}
                 size="sm"
@@ -347,7 +347,8 @@ export const WorkshopPlanningInterface = ({
                 className="flex items-center gap-2"
               >
                 <Crown className="w-4 h-4" />
-                Vue Manager
+                <span className="hidden sm:inline">Vue Manager</span>
+                <span className="sm:hidden">Manager</span>
               </Button>
               <Button
                 variant={activeView === 'employee' ? 'default' : 'outline'}
@@ -356,9 +357,10 @@ export const WorkshopPlanningInterface = ({
                 className="flex items-center gap-2"
               >
                 <User className="w-4 h-4" />
-                Vue Employé
+                <span className="hidden sm:inline">Vue Employé</span>
+                <span className="sm:hidden">Employé</span>
               </Button>
-            </>
+            </div>
           ) : (
             /* Afficher la vue actuelle sans possibilité de changement */
             <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-md">
@@ -387,39 +389,40 @@ export const WorkshopPlanningInterface = ({
           className="flex items-center gap-2 bg-destructive hover:bg-destructive/90"
         >
           <AlertTriangle className="w-4 h-4" />
-          Véhicule Urgence
+          <span className="hidden sm:inline">Véhicule Urgence</span>
+          <span className="sm:hidden">Urgence</span>
         </Button>
       </div>
 
       {/* Navigation Tabs - Only show for manager view */}
       {activeView === 'manager' && (
         <Tabs defaultValue="workshop" className="w-full">
-        <div className="flex items-center justify-between">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="workshop" className="flex items-center gap-1">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 lg:w-auto">
+            <TabsTrigger value="workshop" className="flex items-center gap-1 text-xs sm:text-sm">
               <Wrench className="w-4 h-4" />
-              <span className="hidden sm:inline">Étapes atelier</span>
-              <span className="sm:hidden">Étapes</span>
+              <span className="hidden sm:inline">Étapes</span>
+              <span className="sm:hidden">É.</span>
             </TabsTrigger>
-            <TabsTrigger value="waiting" className="flex items-center gap-1">
+            <TabsTrigger value="waiting" className="flex items-center gap-1 text-xs sm:text-sm">
               <Clock className="w-4 h-4" />
-              <span className="hidden sm:inline">Véhicules en Attente</span>
-              <span className="sm:hidden">Attente</span>
+              <span className="hidden sm:inline">Attente</span>
+              <span className="sm:hidden">A.</span>
             </TabsTrigger>
-            <TabsTrigger value="planning" className="flex items-center gap-1">
+            <TabsTrigger value="planning" className="flex items-center gap-1 text-xs sm:text-sm">
               <BarChart className="w-4 h-4" />
               <span className="hidden sm:inline">Planning</span>
-              <span className="sm:hidden">Plan</span>
+              <span className="sm:hidden">P.</span>
             </TabsTrigger>
-            <TabsTrigger value="employee-planning" className="flex items-center gap-1">
+            <TabsTrigger value="employee-planning" className="flex items-center gap-1 text-xs sm:text-sm">
               <Users className="w-4 h-4" />
-              <span className="hidden sm:inline">Planning Employés</span>
-              <span className="sm:hidden">P.Emp</span>
+              <span className="hidden sm:inline">Employés</span>
+              <span className="sm:hidden">E.</span>
             </TabsTrigger>
-            <TabsTrigger value="process" className="flex items-center gap-1">
+            <TabsTrigger value="process" className="flex items-center gap-1 text-xs sm:text-sm">
               <Cog className="w-4 h-4" />
               <span className="hidden sm:inline">Process</span>
-              <span className="sm:hidden">Proc</span>
+              <span className="sm:hidden">Pr.</span>
             </TabsTrigger>
           </TabsList>
           
@@ -427,7 +430,7 @@ export const WorkshopPlanningInterface = ({
             variant="outline"
             size="sm"
             onClick={() => navigate('/settings?tab=team')}
-            className="flex items-center gap-2 ml-4"
+            className="flex items-center gap-2 w-full lg:w-auto"
           >
             <Users className="w-4 h-4" />
             <span className="hidden sm:inline">Gérer l'équipe</span>

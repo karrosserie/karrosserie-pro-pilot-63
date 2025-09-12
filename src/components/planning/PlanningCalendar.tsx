@@ -237,90 +237,93 @@ export const PlanningCalendar = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 p-2 sm:p-4">
       {/* Header */}
       <div className="space-y-2">
-        <h2 className="text-2xl font-bold">Planning Détaillé</h2>
-        <div className="flex items-center justify-between">
-          <p className="text-muted-foreground">Toutes les tâches par véhicule et jour par jour</p>
-          <div className="text-sm font-medium text-slate-700">
+        <h2 className="text-xl sm:text-2xl font-bold">Planning Détaillé</h2>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <p className="text-muted-foreground text-sm sm:text-base">Toutes les tâches par véhicule et jour par jour</p>
+          <div className="text-xs sm:text-sm font-medium text-slate-700">
             Semaine du {format(currentWeekStart, 'dd MMMM', { locale: fr })} au {format(addDays(currentWeekStart, 4), 'dd MMMM yyyy', { locale: fr })}
           </div>
         </div>
       </div>
 
       {/* Week Navigation */}
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-center sm:justify-end gap-2">
         <Button variant="outline" size="sm" onClick={() => setCurrentWeek(prev => prev - 1)}>
           <ChevronLeft className="w-4 h-4" />
+          <span className="hidden sm:inline ml-1">Précédent</span>
         </Button>
         <Button variant="outline" size="sm" onClick={() => setCurrentWeek(prev => prev + 1)}>
+          <span className="hidden sm:inline mr-1">Suivant</span>
           <ChevronRight className="w-4 h-4" />
         </Button>
       </div>
 
-      {/* Planning Grid */}
-      <div className="grid grid-cols-5 gap-4">
+      {/* Planning Grid - Responsive */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
         {weekDays.map((day, dayIndex) => {
           const dayTasks = tasksByDay[day] || [];
           return (
-            <div key={day} className="bg-white border border-slate-200 rounded-lg">
+            <div key={day} className="bg-white border border-slate-200 rounded-lg min-h-[200px]">
               {/* Day Header */}
-              <div className="bg-slate-50 p-4 rounded-t-lg border-b border-slate-200">
-                <h3 className="font-semibold text-lg text-blue-600">{weekDaysDisplay[dayIndex]}</h3>
+              <div className="bg-slate-50 p-3 sm:p-4 rounded-t-lg border-b border-slate-200">
+                <h3 className="font-semibold text-base sm:text-lg text-blue-600">{weekDaysDisplay[dayIndex]}</h3>
                 <p className="text-xs text-slate-500 mb-1">{format(weekDates[dayIndex], 'dd/MM', { locale: fr })}</p>
-                <p className="text-sm text-slate-600">{dayTasks.length} tâche{dayTasks.length !== 1 ? 's' : ''}</p>
+                <p className="text-xs sm:text-sm text-slate-600">{dayTasks.length} tâche{dayTasks.length !== 1 ? 's' : ''}</p>
               </div>
 
               {/* Tasks */}
-              <div className="p-4 space-y-3">
+              <div className="p-2 sm:p-4 space-y-2 sm:space-y-3">
                 {dayTasks.map((task) => (
-                  <div key={task.id} className={`border-l-4 ${task.color} rounded-r-lg p-3 bg-white shadow-sm`}>
+                  <div key={task.id} className={`border-l-4 ${task.color} rounded-r-lg p-2 sm:p-3 bg-white shadow-sm`}>
                     {/* Time and Vehicle Code */}
                     <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-slate-500" />
-                        <span className="text-sm font-medium">{task.time}</span>
+                      <div className="flex items-center gap-1 sm:gap-2">
+                        <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-slate-500 flex-shrink-0" />
+                        <span className="text-xs sm:text-sm font-medium">{task.time}</span>
                       </div>
-                      <span className="text-sm font-mono bg-slate-100 px-2 py-1 rounded">
+                      <span className="text-xs sm:text-sm font-mono bg-slate-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
                         {task.vehicleCode}
                       </span>
                     </div>
 
                     {/* Vehicle Info */}
                     <div className="mb-2">
-                      <h4 className="font-semibold text-slate-900">{task.brand} {task.model}</h4>
-                      <p className="text-sm text-slate-600">{task.taskType}</p>
+                      <h4 className="font-semibold text-xs sm:text-sm text-slate-900 line-clamp-1">{task.brand} {task.model}</h4>
+                      <p className="text-xs sm:text-sm text-slate-600 line-clamp-1">{task.taskType}</p>
                     </div>
 
                     {/* Technician */}
-                    <div className="flex items-center gap-2 mb-2">
-                      <User className="w-4 h-4 text-slate-500" />
-                      <span className="text-sm text-slate-600">{task.technician}</span>
+                    <div className="flex items-center gap-1 sm:gap-2 mb-2">
+                      <User className="w-3 h-3 sm:w-4 sm:h-4 text-slate-500 flex-shrink-0" />
+                      <span className="text-xs sm:text-sm text-slate-600 line-clamp-1">{task.technician}</span>
                     </div>
 
                     {/* Client */}
-                    <div className="text-sm text-slate-600 mb-2">
+                    <div className="text-xs sm:text-sm text-slate-600 mb-2 line-clamp-1">
                       Client: {task.client}
                     </div>
 
                     {/* Stage and Action */}
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-slate-500">{task.stage}</span>
+                      <span className="text-xs text-slate-500 line-clamp-1 flex-1 mr-2">{task.stage}</span>
                       <Button 
                         size="sm" 
                         variant="outline" 
-                        className="text-xs h-7"
+                        className="text-xs h-6 sm:h-7 px-2 sm:px-3 flex-shrink-0"
                         onClick={() => handleMoveTask(task.id)}
                       >
-                        Déplacer
+                        <span className="hidden sm:inline">Déplacer</span>
+                        <span className="sm:hidden">Dép.</span>
                       </Button>
                     </div>
                   </div>
                 ))}
 
                 {dayTasks.length === 0 && (
-                  <div className="text-center text-slate-400 py-8">
+                  <div className="text-center text-slate-400 py-6 sm:py-8 text-xs sm:text-sm">
                     Aucune tâche
                   </div>
                 )}
