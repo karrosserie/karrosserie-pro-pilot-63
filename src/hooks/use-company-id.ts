@@ -21,7 +21,7 @@ export function useCompanyId() {
           .select('company_id')
           .eq('user_id', user.id)
           .eq('active', true)
-          .single();
+          .maybeSingle();
 
         if (error || !data) {
           console.error('Erreur lors de la récupération du company_id:', error);

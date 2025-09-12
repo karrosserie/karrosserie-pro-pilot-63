@@ -186,17 +186,36 @@ const TeamTab = () => {
 
     try {
       console.log('Calling signUp...');
+      // Sauvegarder la session actuelle pour éviter le switch de session lors du signUp
+      const { data: currentSessionData } = await supabase.auth.getSession();
+      const originalSession = currentSessionData.session;
+
       // Créer l'utilisateur avec Supabase Auth en tant que membre d'équipe
       const { user } = await signUp(data.email, data.password, data.firstName, data.lastName, data.phoneNumber, true);
       console.log('SignUp completed, user:', user);
+
+      // Rétablir la session d'origine (sinon l'app bascule sur le nouvel employé)
+      if (originalSession) {
+        console.log('Restoring original session after signUp...');
+        await supabase.auth.setSession({
+          access_token: originalSession.access_token,
+          refresh_token: originalSession.refresh_token,
+        });
+      }
       
       console.log('Adding user to team...');
+      // Récupérer l'ID d'entreprise effectif depuis le serveur (gère l'impersonation)
+      const { data: effectiveCompanyId, error: companyIdError } = await supabase.rpc('get_effective_company_id');
+      if (companyIdError || !effectiveCompanyId) {
+        throw new Error("Impossible de déterminer l'entreprise");
+      }
+
       // Ajouter l'utilisateur à l'équipe avec les qualifications
       const { error } = await supabase
         .from('user_companies')
         .insert({
           user_id: user.id,
-          company_id: companyInfo.id,
+          company_id: effectiveCompanyId as string,
           role: data.role,
           active: data.active,
           qualifications: data.qualifications || []
