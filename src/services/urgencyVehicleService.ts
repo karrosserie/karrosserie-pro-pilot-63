@@ -193,16 +193,28 @@ export class UrgencyVehicleService {
       const currentTime = new Date();
       const [heureStr, minuteStr] = heure.split(':');
       
+      // Fonction pour obtenir le prochain jour ouvrable
+      const getNextWorkingDay = (date: Date): Date => {
+        const nextDay = new Date(date);
+        nextDay.setDate(date.getDate() + 1);
+        
+        // Si c'est samedi (6) ou dimanche (0), passer au lundi suivant
+        while (nextDay.getDay() === 0 || nextDay.getDay() === 6) {
+          nextDay.setDate(nextDay.getDate() + 1);
+        }
+        
+        return nextDay;
+      };
+      
       // Calculer la date de la tâche
       let taskDate = new Date(today);
       const selectedTime = new Date(today);
       selectedTime.setHours(parseInt(heureStr), parseInt(minuteStr), 0, 0);
       
-      // Si l'heure sélectionnée est antérieure à l'heure actuelle, programmer pour le lendemain
+      // Si l'heure sélectionnée est antérieure à l'heure actuelle, programmer pour le prochain jour ouvrable
       if (selectedTime <= currentTime) {
-        taskDate = new Date(today);
-        taskDate.setDate(today.getDate() + 1); // Ajouter un jour
-        console.log('⏰ Heure sélectionnée antérieure à maintenant, programmé pour demain');
+        taskDate = getNextWorkingDay(today);
+        console.log('⏰ Heure sélectionnée antérieure à maintenant, programmé pour le prochain jour ouvrable');
       }
       
       const startDateTime = new Date(taskDate);
@@ -246,10 +258,19 @@ export class UrgencyVehicleService {
         scheduleId: newSchedule.id
       });
       
-      // Déterminer le message selon si c'est programmé aujourd'hui ou demain
+      // Déterminer le message selon le jour de programmation
       let successMessage = 'Véhicule d\'urgence ajouté avec succès';
       if (selectedTime <= currentTime) {
-        successMessage += ` et programmé pour demain à ${heure}`;
+        const dayOfWeek = taskDate.getDay();
+        const dayNames = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+        
+        if (taskDate.toDateString() === new Date(today.getTime() + 24 * 60 * 60 * 1000).toDateString()) {
+          // C'est demain
+          successMessage += ` et programmé pour demain (${dayNames[dayOfWeek]}) à ${heure}`;
+        } else {
+          // C'est plus tard (lundi après un weekend)
+          successMessage += ` et programmé pour ${dayNames[dayOfWeek]} à ${heure}`;
+        }
       } else {
         successMessage += ` et programmé pour aujourd'hui à ${heure}`;
       }
