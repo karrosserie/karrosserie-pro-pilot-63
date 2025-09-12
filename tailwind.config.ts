@@ -117,13 +117,32 @@ export default {
 						opacity: '1',
 						transform: 'translateY(0)'
 					}
+				},
+				'blink-bright': {
+					'0%, 100%': {
+						opacity: '1',
+						backgroundColor: 'transparent'
+					},
+					'25%': {
+						opacity: '0.7',
+						backgroundColor: 'hsl(var(--primary) / 0.1)'
+					},
+					'50%': {
+						opacity: '1',
+						backgroundColor: 'hsl(var(--primary) / 0.2)'
+					},
+					'75%': {
+						opacity: '0.7',
+						backgroundColor: 'hsl(var(--primary) / 0.1)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.3s ease-out',
-				'fade-in-down': 'fade-in-down 0.3s ease-out'
+				'fade-in-down': 'fade-in-down 0.3s ease-out',
+				'blink-bright': 'blink-bright 0.4s ease-in-out infinite'
 			}
 		}
 	},

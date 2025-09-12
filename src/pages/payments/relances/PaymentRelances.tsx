@@ -433,9 +433,9 @@ Garage Martin`
 
   const viewLogDetails = (log: any) => {
     setViewingLog(log);
-    // Déclencher l'animation de clignotement
+    // Déclencher l'animation de clignotement pendant 2 secondes
     setIsBlinking(true);
-    setTimeout(() => setIsBlinking(false), 1000);
+    setTimeout(() => setIsBlinking(false), 2000);
   };
 
   const closeLogViewer = () => {
@@ -1453,7 +1453,7 @@ Garage Martin`
 
               {/* Status Badge avec date */}
               <div className="mb-6">
-                <div className={`flex items-center gap-3 ${isBlinking ? 'animate-pulse' : ''}`}>
+                <div className={`flex items-center gap-3 p-2 rounded-lg transition-all duration-200 ${isBlinking ? 'animate-blink-bright' : ''}`}>
                   <Badge 
                     variant={
                       viewingLog.type === 'success' ? 'default' : 
