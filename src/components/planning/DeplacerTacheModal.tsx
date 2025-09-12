@@ -107,11 +107,17 @@ export const DeplacerTacheModal: React.FC<DeplacerTacheModalProps> = ({
                 <SelectValue placeholder="Sélectionner un technicien" />
               </SelectTrigger>
               <SelectContent>
-                {employes.map(employe => (
-                  <SelectItem key={employe.user_id} value={employe.user_id}>
-                    {employe.nom}
-                  </SelectItem>
-                ))}
+                {employes
+                  .filter(employe => 
+                    employe.role === 'carrossier' || 
+                    employe.role === 'carrossier-vehicule de courtoisie'
+                  )
+                  .map(employe => (
+                    <SelectItem key={employe.user_id} value={employe.user_id}>
+                      {employe.nom}
+                    </SelectItem>
+                  ))
+                }
               </SelectContent>
             </Select>
           </div>

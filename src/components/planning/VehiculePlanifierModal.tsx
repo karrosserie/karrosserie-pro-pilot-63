@@ -171,7 +171,12 @@ export const VehiculePlanifierModal: React.FC<VehiculePlanifierModalProps> = ({
                   <SelectValue placeholder="Sélectionner un employé" />
                 </SelectTrigger>
                 <SelectContent>
-                  {employes.filter(emp => emp.actif).map((employe) => (
+                  {employes
+                    .filter(emp => 
+                      emp.actif && 
+                      (emp.role === 'carrossier' || emp.role === 'carrossier-vehicule de courtoisie')
+                    )
+                    .map((employe) => (
                     <SelectItem key={employe.id} value={employe.id.toString()}>
                       <div className="flex items-center gap-2">
                         <span>{employe.nom}</span>

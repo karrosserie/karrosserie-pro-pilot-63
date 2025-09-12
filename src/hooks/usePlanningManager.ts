@@ -84,9 +84,11 @@ export const usePlanningManager = () => {
     const tempsRequis = parseFloat(vehicule.temps.replace('h', ''));
     const qualification = vehicule.qualificationRequise || vehicule.etape;
     
-    // Trouver les employés qualifiés
+    // Trouver les employés qualifiés et ayant le bon rôle
     const employesQualifies = employes.filter(emp => 
-      emp.actif && emp.qualifications.includes(qualification)
+      emp.actif && 
+      emp.qualifications.includes(qualification) &&
+      (emp.role === 'carrossier' || emp.role === 'carrossier-vehicule de courtoisie')
     );
 
     if (employesQualifies.length === 0) {

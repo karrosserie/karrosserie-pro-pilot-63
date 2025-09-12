@@ -29,6 +29,7 @@ interface Employe {
   email: string;
   qualifications: string[];
   actif: boolean;
+  role: string;
 }
 
 // Modal pour débloquer un véhicule
@@ -252,7 +253,12 @@ export const PlanifierModal: React.FC<PlanifierModalProps> = ({
                   <SelectValue placeholder="Sélectionnez un technicien..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {employes.filter(emp => emp.actif).map(employe => (
+                  {employes
+                    .filter(emp => 
+                      emp.actif && 
+                      (emp.role === 'carrossier' || emp.role === 'carrossier-vehicule de courtoisie')
+                    )
+                    .map(employe => (
                     <SelectItem key={employe.id} value={employe.id.toString()}>
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4" />
