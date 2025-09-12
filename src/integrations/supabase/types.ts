@@ -2524,6 +2524,45 @@ export type Database = {
           },
         ]
       }
+      vehicle_photos: {
+        Row: {
+          company_id: string
+          created_at: string
+          description: string | null
+          employee_id: string
+          file_name: string
+          file_url: string
+          id: string
+          photo_type: string
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          description?: string | null
+          employee_id: string
+          file_name: string
+          file_url: string
+          id?: string
+          photo_type?: string
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          employee_id?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          photo_type?: string
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: []
+      }
       vehicle_specifications: {
         Row: {
           brand_id: string | null
