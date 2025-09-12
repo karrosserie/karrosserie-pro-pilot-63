@@ -214,6 +214,18 @@ const SubscriptionTab: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Pricing Page Button */}
+      <div className="flex justify-center">
+        <Button 
+          variant="outline" 
+          onClick={() => window.open('/pricing', '_blank')}
+          className="flex items-center gap-2"
+        >
+          <PackageIcon className="w-4 h-4" />
+          Voir la page tarifaire
+        </Button>
+      </div>
+
       {/* Available Plans */}
       {(!hasActiveSubscription || (hasActiveSubscription && (companySubscription as any).subscription_plans?.price === 0)) && (
         <Card>
