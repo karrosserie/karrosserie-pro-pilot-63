@@ -59,6 +59,33 @@ export type Database = {
         }
         Relationships: []
       }
+      body_parts: {
+        Row: {
+          base_surface_m2: number
+          created_at: string
+          id: string
+          name: string
+          surface_coefficient: number
+          updated_at: string
+        }
+        Insert: {
+          base_surface_m2: number
+          created_at?: string
+          id?: string
+          name: string
+          surface_coefficient?: number
+          updated_at?: string
+        }
+        Update: {
+          base_surface_m2?: number
+          created_at?: string
+          id?: string
+          name?: string
+          surface_coefficient?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bridge: {
         Row: {
           access_token: string
@@ -769,10 +796,12 @@ export type Database = {
           company_id: string
           created_at: string
           end_datetime: string
+          end_photo_url: string | null
           id: string
           real_end_datetime: string | null
           real_start_datetime: string | null
           start_datetime: string
+          start_photo_url: string | null
           status: Database["public"]["Enums"]["task_status"]
           task_type: Database["public"]["Enums"]["schedule_task_type"]
           updated_at: string
@@ -783,10 +812,12 @@ export type Database = {
           company_id: string
           created_at?: string
           end_datetime: string
+          end_photo_url?: string | null
           id?: string
           real_end_datetime?: string | null
           real_start_datetime?: string | null
           start_datetime: string
+          start_photo_url?: string | null
           status?: Database["public"]["Enums"]["task_status"]
           task_type: Database["public"]["Enums"]["schedule_task_type"]
           updated_at?: string
@@ -797,10 +828,12 @@ export type Database = {
           company_id?: string
           created_at?: string
           end_datetime?: string
+          end_photo_url?: string | null
           id?: string
           real_end_datetime?: string | null
           real_start_datetime?: string | null
           start_datetime?: string
+          start_photo_url?: string | null
           status?: Database["public"]["Enums"]["task_status"]
           task_type?: Database["public"]["Enums"]["schedule_task_type"]
           updated_at?: string
@@ -1781,6 +1814,45 @@ export type Database = {
         }
         Relationships: []
       }
+      performance_metrics: {
+        Row: {
+          calculated_at: string
+          company_id: string
+          created_at: string
+          id: string
+          metric_type: string
+          metric_unit: string | null
+          metric_value: number
+          period_end: string | null
+          period_start: string | null
+          updated_at: string
+        }
+        Insert: {
+          calculated_at?: string
+          company_id: string
+          created_at?: string
+          id?: string
+          metric_type: string
+          metric_unit?: string | null
+          metric_value: number
+          period_end?: string | null
+          period_start?: string | null
+          updated_at?: string
+        }
+        Update: {
+          calculated_at?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          metric_type?: string
+          metric_unit?: string | null
+          metric_value?: number
+          period_end?: string | null
+          period_start?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       process_templates: {
         Row: {
           company_id: string
@@ -2026,14 +2098,17 @@ export type Database = {
           discounts_data: Json | null
           document_url: string | null
           end_date: string | null
+          estimated_hours: number | null
           expert_name: string | null
           general_condition: string | null
           id: string
           incident_date: string | null
           notes: string | null
+          operator_name: string | null
           order_date: string | null
           parts_data: Json | null
           personal_items: string | null
+          pieces_array: string[] | null
           policy_number: string | null
           quote_id: string | null
           reference: string
@@ -2043,6 +2118,7 @@ export type Database = {
           signature_date: string | null
           start_date: string | null
           status: string | null
+          total_surface_m2: number | null
           updated_at: string
           vehicle_id: string | null
         }
@@ -2059,14 +2135,17 @@ export type Database = {
           discounts_data?: Json | null
           document_url?: string | null
           end_date?: string | null
+          estimated_hours?: number | null
           expert_name?: string | null
           general_condition?: string | null
           id?: string
           incident_date?: string | null
           notes?: string | null
+          operator_name?: string | null
           order_date?: string | null
           parts_data?: Json | null
           personal_items?: string | null
+          pieces_array?: string[] | null
           policy_number?: string | null
           quote_id?: string | null
           reference: string
@@ -2076,6 +2155,7 @@ export type Database = {
           signature_date?: string | null
           start_date?: string | null
           status?: string | null
+          total_surface_m2?: number | null
           updated_at?: string
           vehicle_id?: string | null
         }
@@ -2092,14 +2172,17 @@ export type Database = {
           discounts_data?: Json | null
           document_url?: string | null
           end_date?: string | null
+          estimated_hours?: number | null
           expert_name?: string | null
           general_condition?: string | null
           id?: string
           incident_date?: string | null
           notes?: string | null
+          operator_name?: string | null
           order_date?: string | null
           parts_data?: Json | null
           personal_items?: string | null
+          pieces_array?: string[] | null
           policy_number?: string | null
           quote_id?: string | null
           reference?: string
@@ -2109,6 +2192,7 @@ export type Database = {
           signature_date?: string | null
           start_date?: string | null
           status?: string | null
+          total_surface_m2?: number | null
           updated_at?: string
           vehicle_id?: string | null
         }
@@ -2395,6 +2479,111 @@ export type Database = {
           },
         ]
       }
+      vehicle_part_surfaces: {
+        Row: {
+          body_part_id: string
+          created_at: string
+          id: string
+          is_calculated: boolean
+          surface_m2: number
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          body_part_id: string
+          created_at?: string
+          id?: string
+          is_calculated?: boolean
+          surface_m2: number
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          body_part_id?: string
+          created_at?: string
+          id?: string
+          is_calculated?: boolean
+          surface_m2?: number
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_part_surfaces_body_part_id_fkey"
+            columns: ["body_part_id"]
+            isOneToOne: false
+            referencedRelation: "body_parts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_part_surfaces_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_specifications: {
+        Row: {
+          brand_id: string | null
+          category: string
+          created_at: string
+          height_mm: number | null
+          id: string
+          length_mm: number | null
+          model_id: string | null
+          updated_at: string
+          variant: string | null
+          width_mm: number | null
+          year_end: number | null
+          year_start: number | null
+        }
+        Insert: {
+          brand_id?: string | null
+          category?: string
+          created_at?: string
+          height_mm?: number | null
+          id?: string
+          length_mm?: number | null
+          model_id?: string | null
+          updated_at?: string
+          variant?: string | null
+          width_mm?: number | null
+          year_end?: number | null
+          year_start?: number | null
+        }
+        Update: {
+          brand_id?: string | null
+          category?: string
+          created_at?: string
+          height_mm?: number | null
+          id?: string
+          length_mm?: number | null
+          model_id?: string | null
+          updated_at?: string
+          variant?: string | null
+          width_mm?: number | null
+          year_end?: number | null
+          year_start?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_specifications_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "car_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_specifications_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "car_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_workflow_steps: {
         Row: {
           company_id: string
@@ -2458,6 +2647,7 @@ export type Database = {
           updated_at: string
           vehicle_image_url: string | null
           vehicle_images: Json | null
+          vehicle_specification_id: string | null
           vin: string | null
           work_items: Json | null
           year: number | null
@@ -2485,6 +2675,7 @@ export type Database = {
           updated_at?: string
           vehicle_image_url?: string | null
           vehicle_images?: Json | null
+          vehicle_specification_id?: string | null
           vin?: string | null
           work_items?: Json | null
           year?: number | null
@@ -2512,6 +2703,7 @@ export type Database = {
           updated_at?: string
           vehicle_image_url?: string | null
           vehicle_images?: Json | null
+          vehicle_specification_id?: string | null
           vin?: string | null
           work_items?: Json | null
           year?: number | null
@@ -2543,6 +2735,13 @@ export type Database = {
             columns: ["model_id"]
             isOneToOne: false
             referencedRelation: "car_models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_vehicle_specification_id_fkey"
+            columns: ["vehicle_specification_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_specifications"
             referencedColumns: ["id"]
           },
         ]
@@ -2728,6 +2927,10 @@ export type Database = {
       bytea_to_text: {
         Args: { data: string }
         Returns: string
+      }
+      calculate_repair_order_surface: {
+        Args: { repair_order_id: string }
+        Returns: number
       }
       current_setting: {
         Args: { setting_name: string }

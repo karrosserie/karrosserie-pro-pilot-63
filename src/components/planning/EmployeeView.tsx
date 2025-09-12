@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Play, Pause, CheckCircle, Calendar, User, BarChart, Coffee, LogOut } from 'lucide-react';
+import { Clock, Play, Pause, CheckCircle, Calendar, User, BarChart, Coffee, LogOut, Camera } from 'lucide-react';
 import { useEmployeeSchedule } from '@/hooks/use-employee-schedule';
 import { useCompany } from '@/hooks/use-company';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,6 +15,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { clockIn } from '@/utils/pointageSupabaseUtils';
+import { takeTaskPhoto } from '@/utils/cameraUtils';
+import { useToast } from '@/hooks/use-toast';
 
 interface EmployeeViewProps {
   employeeId?: string;
@@ -23,10 +25,12 @@ interface EmployeeViewProps {
 export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   const { user } = useAuth();
   const { companyInfo } = useCompany();
+  const { toast } = useToast();
   const [currentTimer, setCurrentTimer] = useState<string | null>(null);
   const [showPointageModal, setShowPointageModal] = useState(false);
   const [isOnBreak, setIsOnBreak] = useState(false);
   const [isClockedOut, setIsClockedOut] = useState(false);
+  const [isProcessingPhoto, setIsProcessingPhoto] = useState(false);
 
   // Utiliser l'ID de l'utilisateur connecté ou celui passé en prop
   const currentUserId = employeeId || user?.id;
@@ -118,27 +122,65 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   const completedTasks = tasks.filter(task => task.status === 'Terminé');
 
   const handleStartTask = async (taskId: string) => {
+    if (!currentUserId) return;
+    
+    setIsProcessingPhoto(true);
+    
     try {
-      // Mettre à jour le statut de la tâche dans Supabase
+      // Prendre une photo avant de commencer la tâche
+      toast({
+        title: "Photo requise",
+        description: "Veuillez prendre une photo pour commencer la tâche",
+      });
+      
+      const photoResult = await takeTaskPhoto(currentUserId, taskId, 'start');
+      
+      if (!photoResult.success) {
+        toast({
+          title: "Erreur",
+          description: photoResult.error || "Impossible de prendre la photo",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Mettre à jour le statut de la tâche dans Supabase avec la photo
       const { error } = await supabase
         .from('employee_schedule')
         .update({ 
           status: 'En cours',
-          real_start_datetime: new Date().toISOString()
+          real_start_datetime: new Date().toISOString(),
+          start_photo_url: photoResult.photoUrl
         })
         .eq('id', taskId);
 
       if (error) {
         console.error('Erreur lors du démarrage de la tâche:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de démarrer la tâche",
+          variant: "destructive",
+        });
         return;
       }
 
       console.log('Tâche démarrée avec succès:', taskId);
       setCurrentTimer(taskId);
+      toast({
+        title: "Tâche démarrée",
+        description: "La tâche a été démarrée avec succès",
+      });
       // Rafraîchir les données pour voir les changements
       refetch();
     } catch (error) {
       console.error('Erreur:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessingPhoto(false);
     }
   };
 
@@ -274,27 +316,65 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   };
 
   const handleCompleteTask = async (taskId: string) => {
+    if (!currentUserId) return;
+    
+    setIsProcessingPhoto(true);
+    
     try {
-      // Mettre à jour le statut de la tâche dans Supabase
+      // Prendre une photo avant de terminer la tâche
+      toast({
+        title: "Photo requise",
+        description: "Veuillez prendre une photo pour terminer la tâche",
+      });
+      
+      const photoResult = await takeTaskPhoto(currentUserId, taskId, 'end');
+      
+      if (!photoResult.success) {
+        toast({
+          title: "Erreur",
+          description: photoResult.error || "Impossible de prendre la photo",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Mettre à jour le statut de la tâche dans Supabase avec la photo
       const { error } = await supabase
         .from('employee_schedule')
         .update({ 
           status: 'Terminé',
-          real_end_datetime: new Date().toISOString()
+          real_end_datetime: new Date().toISOString(),
+          end_photo_url: photoResult.photoUrl
         })
         .eq('id', taskId);
 
       if (error) {
         console.error('Erreur lors de la finalisation de la tâche:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de terminer la tâche",
+          variant: "destructive",
+        });
         return;
       }
 
       console.log('Tâche terminée avec succès:', taskId);
       setCurrentTimer(null);
+      toast({
+        title: "Tâche terminée",
+        description: "La tâche a été terminée avec succès",
+      });
       // Rafraîchir les données pour voir les changements
       refetch();
     } catch (error) {
       console.error('Erreur:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessingPhoto(false);
     }
   };
 
@@ -428,9 +508,19 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
                     size="sm" 
                     onClick={() => handleCompleteTask(currentTask.id)}
                     className="flex items-center gap-1"
+                    disabled={isProcessingPhoto}
                   >
-                    <CheckCircle className="w-4 h-4" />
-                    Terminer
+                    {isProcessingPhoto ? (
+                      <>
+                        <Camera className="w-4 h-4 animate-pulse" />
+                        Photo...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="w-4 h-4" />
+                        Terminer
+                      </>
+                    )}
                   </Button>
                 </div>
               </div>
@@ -484,10 +574,19 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
                     variant="outline"
                     onClick={() => handleStartTask(task.id)}
                     className="flex items-center gap-1"
-                    disabled={isOnBreak}
+                    disabled={isOnBreak || isProcessingPhoto}
                   >
-                    <Play className="w-4 h-4" />
-                    {isOnBreak ? 'En pause' : 'Commencer'}
+                    {isProcessingPhoto ? (
+                      <>
+                        <Camera className="w-4 h-4 animate-pulse" />
+                        Photo...
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4" />
+                        {isOnBreak ? 'En pause' : 'Commencer'}
+                      </>
+                    )}
                   </Button>
                 </div>
               </div>
