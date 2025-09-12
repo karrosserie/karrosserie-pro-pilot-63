@@ -10,7 +10,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Archive, MoreVertical } from 'lucide-react';
+import { Search, FileText, Plus, Filter, Download, Eye, Pencil, Archive, MoreVertical, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import CreditViewerModal from '@/components/credits/CreditViewerModal';
 import { useConfirmation } from '@/hooks/use-confirmation';
@@ -94,7 +94,7 @@ const Credits = () => {
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   
-  const { credits = [], isLoading, deleteCredit, archiveCredit, error } = useCredits();
+  const { credits = [], isLoading, deleteCredit, archiveCredit, restoreCredit, error } = useCredits();
   const { invoices } = useInvoices();
   const { sortedData, sortConfig, handleSort } = useTableSorting(credits, 'created_at');
   const isMobile = useIsMobile();
@@ -255,6 +255,24 @@ const Credits = () => {
       items
     });
     setEditDialogOpen(true);
+  };
+
+  const handleRestore = async (credit: any) => {
+    const confirmed = await confirm({
+      title: 'Restaurer l\'avoir',
+      description: `Êtes-vous sûr de vouloir restaurer l'avoir ${credit.reference} dans les documents actifs ?`,
+      confirmText: 'Restaurer',
+      cancelText: 'Annuler',
+      variant: 'default'
+    });
+
+    if (confirmed) {
+      try {
+        await restoreCredit.mutateAsync(credit.id);
+      } catch (error) {
+        console.error('Error restoring credit:', error);
+      }
+    }
   };
 
   const handleArchive = async (credit: any) => {
@@ -531,10 +549,27 @@ const Credits = () => {
                           <Mail className="h-4 w-4 mr-1" />
                           Envoyer
                         </Button>
-                        <Button variant="secondary" size="sm" onClick={() => handleArchive(credit)} disabled={archiveCredit.isPending}>
-                          <Archive className="h-4 w-4 mr-1" />
-                          Archiver
-                        </Button>
+                        {showArchived ? (
+                          <Button 
+                            variant="validation" 
+                            size="sm" 
+                            onClick={() => handleRestore(credit)} 
+                            disabled={restoreCredit.isPending}
+                          >
+                            <RotateCcw className="h-4 w-4 mr-1" />
+                            Restaurer
+                          </Button>
+                        ) : (
+                          <Button 
+                            variant="secondary" 
+                            size="sm" 
+                            onClick={() => handleArchive(credit)} 
+                            disabled={archiveCredit.isPending}
+                          >
+                            <Archive className="h-4 w-4 mr-1" />
+                            Archiver
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>

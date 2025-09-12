@@ -89,6 +89,24 @@ export function useCredits() {
     }
   });
 
+  const restoreCredit = useMutation({
+    mutationFn: creditsService.restoreCredit,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['credits'] });
+      toast({
+        title: "Avoir restauré",
+        description: "L'avoir a été restauré avec succès."
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erreur",
+        description: `Impossible de restaurer l'avoir: ${error.message}`,
+        variant: "destructive"
+      });
+    }
+  });
+
   return {
     credits,
     isLoading,
@@ -96,6 +114,7 @@ export function useCredits() {
     createCredit,
     updateCredit,
     deleteCredit,
-    archiveCredit
+    archiveCredit,
+    restoreCredit
   };
 }

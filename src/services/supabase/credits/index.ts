@@ -1,6 +1,6 @@
 
 import { getCredits, getCredit } from './queries';
-import { createCredit, updateCredit, deleteCredit, archiveCredit } from './mutations';
+import { createCredit, updateCredit, deleteCredit, archiveCredit, restoreCredit } from './mutations';
 import { generateReference } from './table-utils';
 
 export const creditsService = {
@@ -10,6 +10,7 @@ export const creditsService = {
   updateCredit,
   deleteCredit,
   archiveCredit,
+  restoreCredit,
   generateReference
 };
 

@@ -175,3 +175,38 @@ export const archiveCredit = async (id: string): Promise<Credit> => {
     throw error;
   }
 };
+
+export const restoreCredit = async (id: string): Promise<Credit> => {
+  try {
+    // Test if table exists first
+    const { error: testError } = await (supabase as any)
+      .from('credits')
+      .select('id')
+      .limit(1);
+
+    if (testError && testError.code === '42P01') {
+      throw new Error('TABLE_MISSING');
+    }
+
+    const { data, error } = await (supabase as any)
+      .from('credits')
+      .update({ archived: false })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Restore credit error:', error);
+      if (error.code === '42P01') {
+        throw new Error('TABLE_MISSING');
+      }
+      throw new Error(`Failed to restore credit: ${error.message || 'Unknown error'}`);
+    }
+    return data;
+  } catch (error: any) {
+    if (error.message === 'TABLE_MISSING') {
+      throw new Error('La table des avoirs n\'existe pas. Veuillez exécuter la migration SQL dans votre dashboard Supabase.');
+    }
+    throw error;
+  }
+};
