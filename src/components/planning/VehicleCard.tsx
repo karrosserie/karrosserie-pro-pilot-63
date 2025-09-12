@@ -37,18 +37,9 @@ export const VehicleCard = ({ vehicle, onPlan }: VehicleCardProps) => {
         <div className="text-xs text-slate-500">
           {vehicle.technician || 'À planifier'}
         </div>
-        {vehicle.status === 'En cours' ? (
-          <span className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
-            En cours
-          </span>
-        ) : (
-          <button 
-            onClick={() => onPlan?.(vehicle.id)}
-            className="px-3 py-1 bg-slate-600 text-white text-xs font-medium rounded hover:bg-slate-700 transition-colors"
-          >
-            Planifier
-          </button>
-        )}
+        <Badge variant={vehicle.status === 'En cours' ? 'default' : 'secondary'} className="text-xs">
+          {vehicle.status}
+        </Badge>
       </div>
     </div>
   );
