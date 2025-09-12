@@ -112,13 +112,19 @@ export const WorkshopPlanningInterface = ({
     }
   };
 
+  // Normaliser le type d'étape à partir des différentes sources (task_type, etape, tache)
+  const getScheduleType = (s: any): string => {
+    const raw = typeof s.task_type === 'string' ? s.task_type : (s.etape || s.tache || '');
+    return String(raw).trim();
+  };
+
   // Convert real data to workflow steps format from database
   const workflowSteps = [
     {
       id: 'accueil',
       title: 'Accueil & Préparation du dossier',
       color: 'bg-blue-600',
-      vehicles: schedules.filter(s => s.task_type === 'Accueil & Préparation du dossier').map(s => ({
+      vehicles: schedules.filter(s => getScheduleType(s) === 'Accueil & Préparation du dossier').map(s => ({
         id: s.id,
         brand: s.modele?.split(' ')[0] || 'Marque',
         model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
@@ -135,7 +141,7 @@ export const WorkshopPlanningInterface = ({
       id: 'remplacement',
       title: 'Remplacement ou débosselage',
       color: 'bg-orange-500',
-      vehicles: schedules.filter(s => s.task_type === 'Remplacement ou débosselage').map(s => ({
+      vehicles: schedules.filter(s => getScheduleType(s) === 'Remplacement ou débosselage').map(s => ({
         id: s.id,
         brand: s.modele?.split(' ')[0] || 'Marque',
         model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
@@ -152,7 +158,7 @@ export const WorkshopPlanningInterface = ({
       id: 'preparation',
       title: 'Préparation peinture',
       color: 'bg-purple-600',
-      vehicles: schedules.filter(s => s.task_type === 'Préparation peinture').map(s => ({
+      vehicles: schedules.filter(s => getScheduleType(s) === 'Préparation peinture').map(s => ({
         id: s.id,
         brand: s.modele?.split(' ')[0] || 'Marque',
         model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
@@ -169,7 +175,7 @@ export const WorkshopPlanningInterface = ({
       id: 'peinture',
       title: 'Mise en peinture',
       color: 'bg-green-600',
-      vehicles: schedules.filter(s => s.task_type === 'Mise en peinture').map(s => ({
+      vehicles: schedules.filter(s => getScheduleType(s) === 'Mise en peinture').map(s => ({
         id: s.id,
         brand: s.modele?.split(' ')[0] || 'Marque',
         model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
@@ -186,7 +192,7 @@ export const WorkshopPlanningInterface = ({
       id: 'finitions',
       title: 'Finitions & remontage',
       color: 'bg-indigo-600',
-      vehicles: schedules.filter(s => s.task_type === 'Finitions & remontage').map(s => ({
+      vehicles: schedules.filter(s => getScheduleType(s) === 'Finitions & remontage').map(s => ({
         id: s.id,
         brand: s.modele?.split(' ')[0] || 'Marque',
         model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
@@ -203,7 +209,7 @@ export const WorkshopPlanningInterface = ({
       id: 'cloture',
       title: 'Clôture du dossier et livraison',
       color: 'bg-slate-600',
-      vehicles: schedules.filter(s => s.task_type === 'Clôture du dossier et livraison').map(s => ({
+      vehicles: schedules.filter(s => getScheduleType(s) === 'Clôture & livraison').map(s => ({
         id: s.id,
         brand: s.modele?.split(' ')[0] || 'Marque',
         model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
