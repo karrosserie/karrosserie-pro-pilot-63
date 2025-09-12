@@ -241,11 +241,11 @@ const RepairOrders = () => {
         title: "Ordre de réparation archivé",
         description: "L'ordre de réparation a été archivé avec succès."
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error archiving repair order:', error);
       toast({
         title: "Erreur",
-        description: "Impossible d'archiver l'ordre de réparation.",
+        description: `Impossible d'archiver l'ordre de réparation: ${error?.message || 'Erreur inconnue'}`,
         variant: "destructive"
       });
     }

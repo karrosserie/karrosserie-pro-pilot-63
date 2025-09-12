@@ -56,13 +56,27 @@ export const deleteRepairOrder = async (id: string) => {
 };
 
 export const archiveRepairOrder = async (id: string) => {
-  const { data, error } = await supabase
+  // S'assurer que l'utilisateur agit bien sur sa société (meilleure compatibilité avec les politiques RLS)
+  const { getCurrentUserCompanyId } = await import('../auth-company');
+  let companyId: string | null = null;
+  try {
+    companyId = await getCurrentUserCompanyId();
+  } catch (e) {
+    // Si non authentifié ou pas de company, on tente quand même l'update via RLS (cas impersonation)
+    console.warn('No company context found, attempting archive with RLS checks only');
+  }
+
+  const query = supabase
     .from('repair_orders')
     .update({ archived: true, updated_at: new Date().toISOString() })
-    .eq('id', id)
-    .select()
-    .single();
-    
+    .eq('id', id);
+
+  if (companyId) {
+    query.eq('company_id', companyId);
+  }
+
+  const { data, error } = await query.select().single();
+  
   if (error) {
     console.error(`Error archiving repair order with id ${id}:`, error);
     throw new Error(error.message);
