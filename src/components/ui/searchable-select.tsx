@@ -52,7 +52,11 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
       </PopoverTrigger>
       <PopoverContent className="w-full p-0 z-[120] bg-background border rounded-md shadow-md min-w-[var(--radix-popover-trigger-width)] pointer-events-auto" align="start" sideOffset={4}>
         <Command>
-          <CommandInput placeholder={searchPlaceholder} />
+          <CommandInput 
+            placeholder={searchPlaceholder} 
+            autoFocus
+            className="border-0 focus:ring-0 focus:outline-none"
+          />
           <CommandList className="max-h-[200px] overflow-y-auto">
             <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
             <CommandGroup>
