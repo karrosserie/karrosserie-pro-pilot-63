@@ -205,7 +205,7 @@ export const PlanVehicleModal = ({
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionner une heure" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-[200px] overflow-y-auto bg-white border shadow-lg z-50">
                   {Array.from({ length: 20 }, (_, index) => {
                     const hour = Math.floor(8 + index / 2); // Commence à 8h
                     const minute = index % 2 === 0 ? '00' : '30';
@@ -213,7 +213,11 @@ export const PlanVehicleModal = ({
                     const displayTime = `${hour}h${minute === '00' ? '' : minute}`;
                     
                     return (
-                      <SelectItem key={timeValue} value={timeValue}>
+                      <SelectItem 
+                        key={timeValue} 
+                        value={timeValue}
+                        className="cursor-pointer hover:bg-slate-100 px-3 py-2"
+                      >
                         {displayTime}
                       </SelectItem>
                     );
