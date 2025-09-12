@@ -1,20 +1,28 @@
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, Calendar, Edit } from 'lucide-react';
+import { PlanVehicleModal } from './PlanVehicleModal';
 
 interface VehiclesWaitingTabProps {
   vehicles?: any[];
   schedules?: any[];
   employees?: any[];
   onAddToWorkflow?: (vehicleId: string) => void;
+  companyId?: string | null;
+  onRefresh?: () => void;
 }
 
 export const VehiclesWaitingTab = ({ 
   vehicles = [], 
   schedules = [], 
   employees = [],
-  onAddToWorkflow 
+  onAddToWorkflow,
+  companyId,
+  onRefresh
 }: VehiclesWaitingTabProps) => {
+  const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
+  const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   
   // Utiliser les vraies données de la base
   const waitingVehicles = vehicles.filter(vehicle => 
@@ -34,6 +42,22 @@ export const VehiclesWaitingTab = ({
   }));
 
   const blockedCount = waitingVehicles.length;
+
+  const handlePlanVehicle = (vehicle: any) => {
+    setSelectedVehicle(vehicle);
+    setIsPlanModalOpen(true);
+  };
+
+  const handlePlanSuccess = () => {
+    if (onRefresh) {
+      onRefresh();
+    }
+  };
+
+  const handleUnblockVehicle = (vehicleId: string) => {
+    console.log('Débloquer véhicule:', vehicleId);
+    // TODO: Implémenter la logique de déblocage
+  };
 
   return (
     <div className="space-y-6">
@@ -71,10 +95,19 @@ export const VehiclesWaitingTab = ({
                 )}
               </div>
               <div className="flex gap-2">
-                <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                <Button 
+                  size="sm" 
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => handleUnblockVehicle(vehicle.id)}
+                >
                   Débloquer
                 </Button>
-                <Button size="sm" variant="default" className="bg-blue-600 hover:bg-blue-700">
+                <Button 
+                  size="sm" 
+                  variant="default" 
+                  className="bg-blue-600 hover:bg-blue-700"
+                  onClick={() => handlePlanVehicle(vehicle)}
+                >
                   <Calendar className="w-4 h-4 mr-1" />
                   Planifier
                 </Button>
@@ -118,6 +151,19 @@ export const VehiclesWaitingTab = ({
           </div>
         ))}
       </div>
+
+      {/* Modal de planification */}
+      <PlanVehicleModal
+        isOpen={isPlanModalOpen}
+        onClose={() => {
+          setIsPlanModalOpen(false);
+          setSelectedVehicle(null);
+        }}
+        vehicle={selectedVehicle}
+        employees={employees}
+        companyId={companyId}
+        onSuccess={handlePlanSuccess}
+      />
     </div>
   );
 };

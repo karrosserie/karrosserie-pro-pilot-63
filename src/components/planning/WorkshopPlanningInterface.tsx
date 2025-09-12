@@ -440,6 +440,8 @@ export const WorkshopPlanningInterface = ({
                 schedules={schedules}
                 employees={employees}
                 onAddToWorkflow={handlePlanVehicle}
+                companyId={companyId}
+                onRefresh={() => onScheduleUpdate && onScheduleUpdate({ action: 'refresh' })}
               />
             </TabsContent>
 
